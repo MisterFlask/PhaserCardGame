@@ -3,7 +3,29 @@ import Phaser from 'phaser';
 interface CardData {
     name: string;
     description: string;
+    cardType: CardType;
 }
+
+enum CardType{
+    CHARACTER = "CHARACTER",
+    PLAYABLE = "PLAYABLE"
+}
+
+
+class BaseCardBehavior implements CardData {
+    name: string
+    description: string
+    portraitName: string
+    cardType: CardType
+
+    constructor({ name, description, portraitName, cardType }: { name: string; description: string; portraitName?: string, cardType?: CardType }) {
+        this.name = name
+        this.description = description
+        this.portraitName = portraitName || "NONE"
+        this.cardType = cardType || CardType.PLAYABLE
+    }
+}
+
 
 interface GameConfig {
     cardWidth: number;
@@ -42,15 +64,15 @@ class CardGame extends Phaser.Scene {
 
     createPlayerUnits(): void {
         const unitData: CardData[] = [
-            { name: 'Knight', description: 'A brave warrior' },
-            { name: 'Archer', description: 'Skilled with a bow' },
-            { name: 'Mage', description: 'Wields powerful magic' }
+            new BaseCardBehavior({ name: 'Knight', description: 'A brave warrior', portraitName: 'knight.png', cardType: CardType.CHARACTER }),
+            new BaseCardBehavior({ name: 'Archer', description: 'Skilled with a bow', portraitName: 'archer.png' , cardType: CardType.CHARACTER }),
+            new BaseCardBehavior({name: 'Mage', description: 'Wields powerful magic', portraitName: 'mage.png' , cardType: CardType.CHARACTER }),
         ];
 
         unitData.forEach((data, index) => {
             const x = this.config.gameWidth - 100;
             const y = 100 + index * 180;
-            const unit = this.createCard(x, y, data, true);
+            const unit = this.createCard(x, y, data);
             (unit as any).isPlayerUnit = true;
             this.playerUnits.push(unit);
         });
@@ -89,14 +111,14 @@ class CardGame extends Phaser.Scene {
 
     createPlayerHand(): void {
         const cardData: CardData[] = [
-            { name: 'Fireball', description: 'Deals 3 damage to target' },
-            { name: 'Healing Touch', description: 'Restores 2 health' },
-            { name: 'Stone Wall', description: 'Summons a defensive barrier' },
-            { name: 'Lightning Bolt', description: 'Strikes for 2 damage' },
-            { name: 'Nature\'s Blessing', description: 'Grants 1 extra mana' },
-            { name: 'Nature\'s Blessing', description: 'Grants 1 extra mana' },
-            { name: 'Nature\'s Blessing', description: 'Grants 1 extra mana' },
-            { name: 'Nature\'s Blessing', description: 'Grants 1 extra mana' }
+            new BaseCardBehavior({ name: 'Fireball', description: 'Deals 3 damage to target' }),
+            new BaseCardBehavior({ name: 'Healing Touch', description: 'Restores 2 health' }),
+            new BaseCardBehavior({ name: 'Stone Wall', description: 'Summons a defensive barrier' }),
+            new BaseCardBehavior({ name: 'Lightning Bolt', description: 'Strikes for 2 damage' }),
+            new BaseCardBehavior({ name: 'Nature\'s Blessing', description: 'Grants 1 extra mana' }),
+            new BaseCardBehavior({ name: 'Nature\'s Blessing', description: 'Grants 1 extra mana' }),
+            new BaseCardBehavior({ name: 'Nature\'s Blessing', description: 'Grants 1 extra mana' }),
+            new BaseCardBehavior({ name: 'Nature\'s Blessing', description: 'Grants 1 extra mana' })
         ];
 
         cardData.forEach((data, index) => {
@@ -108,12 +130,12 @@ class CardGame extends Phaser.Scene {
         this.arrangeCards(this.playerHand, this.config.handY);
     }
 
-    createCard(x: number, y: number, data: CardData, isMonster: boolean = false): Phaser.GameObjects.Container {
+    createCard(x: number, y: number, data: CardData): Phaser.GameObjects.Container {
         const { cardWidth, cardHeight } = this.config;
         const cardContainer = this.add.container(x, y);
         const cardBackground = this.add.image(0, 0, 'card_bg').setDisplaySize(cardWidth, cardHeight);
         let cardTexture: string;
-        if (isMonster) {
+        if (data.cardType === CardType.CHARACTER) {
             cardTexture = 'monster';
         } else {
             cardTexture = 'card';
@@ -134,18 +156,17 @@ class CardGame extends Phaser.Scene {
         cardContainer.add([cardBackground, cardImage, nameBackground, nameText, descBackground, descText]);
         cardContainer.setSize(cardWidth, cardHeight);
         cardContainer.setInteractive();
-        if (!isMonster) this.input.setDraggable(cardContainer);
+        if (data.cardType == CardType.PLAYABLE) this.input.setDraggable(cardContainer);
 
         (cardContainer as any).data = data;
-        (cardContainer as any).isMonster = isMonster;
 
         this.setupCardEvents(cardContainer, descText, descBackground);
 
         return cardContainer;
     }
     createMonsterCard(): void {
-        const monsterData: CardData = { name: 'Goblin', description: 'A small, mischievous creature' };
-        const monsterCard = this.createCard(400, this.config.battlefieldY, monsterData, true);
+        const monsterData: CardData = new BaseCardBehavior({ name: 'Goblin', description: 'A small, mischievous creature' , cardType: CardType.CHARACTER});
+        const monsterCard = this.createCard(400, this.config.battlefieldY, monsterData);
         monsterCard.setDepth(1);
         this.battlefield.push(monsterCard);
     }
@@ -179,7 +200,7 @@ class CardGame extends Phaser.Scene {
     }
 
     handleDragEnd(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container): void {
-        if ((gameObject as any).isMonster) return;
+        if ((gameObject as any)?.data?.cardType === CardType.CHARACTER) return;
 
         const inHand = gameObject.y > this.config.dividerY;
         if (inHand) {

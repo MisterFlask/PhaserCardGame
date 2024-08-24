@@ -1,6 +1,7 @@
 const path = require('path');
 
 module.exports = {
+  mode: 'development',  // Set development mode to avoid minification
   entry: './game.ts',
   module: {
     rules: [
@@ -13,6 +14,14 @@ module.exports = {
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
+  },
+  devtool: 'source-map',  // Enable source maps for development builds
+  devServer: {
+    static: {
+      directory: path.join(__dirname, 'dist'),  // Serve static files from 'dist'
+    },
+    compress: true,
+    port: 9000,  // Port to serve the game in the browser
   },
   output: {
     filename: 'bundle.js',
