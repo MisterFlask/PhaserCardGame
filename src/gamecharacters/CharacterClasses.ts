@@ -1,4 +1,4 @@
-class BaseCharacterClass {
+export class BaseCharacterClass {
     constructor({ name, iconName }: { name: string; iconName: string }) {
         this.name = name
         this.iconName = iconName
@@ -14,7 +14,7 @@ class BaseCharacterClass {
     }
 }
 
-class BlackhandClass extends BaseCharacterClass {
+export class BlackhandClass extends BaseCharacterClass {
     constructor() {
         super({ name: "Blackhand", iconName: "blackhand_icon" })
         // Add Blackhand-specific cards here
@@ -23,7 +23,7 @@ class BlackhandClass extends BaseCharacterClass {
     }
 }
 
-class DiabolistClass extends BaseCharacterClass {
+export class DiabolistClass extends BaseCharacterClass {
     constructor() {
         super({ name: "Diabolist", iconName: "diabolist_icon" })
         // Add Diabolist-specific cards here
@@ -32,19 +32,19 @@ class DiabolistClass extends BaseCharacterClass {
     }
 }
 
-interface CardData {
+export interface CardData {
     name: string;
     description: string;
     cardType: CardType;
     portraitName: string;
 }
 
-enum CardType{
+export enum CardType{
     CHARACTER = "CHARACTER",
     PLAYABLE = "PLAYABLE"
 }
 
-class BaseCardBehavior implements CardData {
+export class BaseCardBehavior implements CardData {
     name: string
     description: string
     portraitName: string
@@ -59,7 +59,7 @@ class BaseCardBehavior implements CardData {
 }
 
 
-class ArcaneRitualCard extends BaseCardBehavior {
+export class ArcaneRitualCard extends BaseCardBehavior {
     constructor() {
         super({
             name: "Arcane Ritual",
@@ -68,7 +68,7 @@ class ArcaneRitualCard extends BaseCardBehavior {
         });
     }
 }
-class FireballCard extends BaseCardBehavior {
+export class FireballCard extends BaseCardBehavior {
     constructor() {
         super({
             name: "Fireball",
@@ -78,7 +78,7 @@ class FireballCard extends BaseCardBehavior {
     }
 }
 
-class ToxicCloudCard extends BaseCardBehavior {
+export class ToxicCloudCard extends BaseCardBehavior {
     constructor() {
         super({
             name: "Toxic Cloud",
@@ -88,7 +88,7 @@ class ToxicCloudCard extends BaseCardBehavior {
     }
 }
 
-class SummonDemonCard extends BaseCardBehavior {
+export class SummonDemonCard extends BaseCardBehavior {
     constructor() {
         super({
             name: "Summon Demon",

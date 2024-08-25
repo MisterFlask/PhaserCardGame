@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
   mode: 'development',  // Set development mode to avoid minification
-  entry: './game.ts',
+  entry: './src/game.ts',
   module: {
     rules: [
       {

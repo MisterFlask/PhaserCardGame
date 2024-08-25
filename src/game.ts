@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
-import RandomImageLoader from './ImageUtils';
-
+import RandomImageLoader from './utils/ImageUtils';
+import { BaseCardBehavior, ArcaneRitualCard, CardData, CardType, FireballCard, SummonDemonCard, ToxicCloudCard } from './gamecharacters/CharacterClasses';
 
 
 interface GameConfig {
