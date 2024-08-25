@@ -92,7 +92,6 @@ class CardGame extends Phaser.Scene {
     preload(): void {
         this.load.setBaseURL('https://raw.githubusercontent.com/');
         this.load.image('card', 'photonstorm/phaser3-examples/master/public/assets/sprites/blue_ball.png');
-        this.load.image('card_bg', 'photonstorm/phaser3-examples/master/public/assets/sprites/white_square.png');
         this.load.image('monster', 'photonstorm/phaser3-examples/master/public/assets/sprites/red_ball.png');
         new RandomImageLoader().loadAllImages(this.load);
     }
@@ -133,7 +132,7 @@ class CardGame extends Phaser.Scene {
     createCard(x: number, y: number, data: CardData): Phaser.GameObjects.Container {
         const { cardWidth, cardHeight } = this.config;
         const cardContainer = this.add.container(x, y);
-        const cardBackground = this.add.image(0, 0, 'card_bg').setDisplaySize(cardWidth, cardHeight);
+        const cardBackground = this.add.image(0, 0, 'greyscale').setDisplaySize(cardWidth, cardHeight);
         let cardTexture = data.portraitName
 
         const cardImage = this.add.image(0, -cardHeight / 4, cardTexture)

@@ -3,7 +3,7 @@ export default class RandomImageLoader {
     private readonly images = {
         backgrounds: {
             prefix: 'Backgrounds/',
-            files: ['battleback1.png']
+            files: ['battleback1.png', 'greyscale.png']
         },
         characters: {
             prefix: 'Portraits/BlackhandPortraits/',
