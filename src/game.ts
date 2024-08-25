@@ -165,7 +165,9 @@ class CardGame extends Phaser.Scene {
             descBackground: infoBackground,
             tooltipBackground: tooltipBackground,
             data: data,
-            cardLocation: location
+            cardLocation: location,
+            visualTags: [],
+            scene: this
         });
 
         (cardContainer as any).physicalCard = physicalCard;
@@ -382,3 +384,4 @@ const config: Phaser.Types.Core.GameConfig = {
 };
 
 const game = new Phaser.Game(config);
+
