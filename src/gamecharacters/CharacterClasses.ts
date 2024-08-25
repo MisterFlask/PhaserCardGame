@@ -71,7 +71,7 @@ export class AbstractCard implements CardData {
         this.description = description
         this.portraitName = portraitName || "flamer1"
         this.cardType = cardType || CardType.PLAYABLE
-        this.tooltip = tooltip || ""
+        this.tooltip = tooltip || "Lorem ipsum dolor sit amet"
     }
 }
 

@@ -165,21 +165,26 @@ class CardGame extends Phaser.Scene {
         const cardImage = this.add.image(0, -cardHeight / 4, cardTexture)
             .setDisplaySize(cardWidth / 2, cardHeight / 2);
 
-        const nameBackground = this.add.rectangle(0, cardHeight / 4, cardWidth - 10, 30, 0xffffff);
+        const nameBackground = this.add.rectangle(0, cardHeight / 4, cardWidth - 10, 30, 0xffffff).setStrokeStyle(2, 0x000000);
         const nameText = this.add.text(0, cardHeight / 4, data.name, { fontSize: '16px', color: '#000', wordWrap: { width: cardWidth - 10 } });
-        
-        // Modified to include both description and tooltip
-        const descText = this.add.text(-cardWidth / 4, cardHeight / 2, data.description, { fontSize: '12px', color: '#000', wordWrap: { width: (cardWidth - 10) / 2 } });
-        const tooltipText = this.add.text(cardWidth / 4, cardHeight / 2, data.tooltip || '', { fontSize: '12px', color: '#000', wordWrap: { width: (cardWidth - 10) / 2 } });
+        const descText = this.add.text(0, cardHeight / 2, data.description, { fontSize: '12px', color: '#000', wordWrap: { width: cardWidth - 10 } });
+        const tooltipText = this.add.text(cardWidth + 5, 0, data.tooltip || '', { 
+            fontSize: '12px', 
+            color: '#000', 
+            wordWrap: { width: cardWidth - 20 },
+            align: 'left'
+        });
         const infoBackground = this.add.rectangle(0, cardHeight / 2, cardWidth - 10, 60, 0xffffff).setVisible(false).setStrokeStyle(2, 0x000000);
+        const tooltipBackground = this.add.rectangle(cardWidth + cardWidth / 2, 0, cardWidth - 10, cardHeight, 0xffffff).setVisible(false).setStrokeStyle(2, 0x000000);
 
         nameText.setOrigin(0.5);
         descText.setOrigin(0.5);
-        tooltipText.setOrigin(0.5);
+        tooltipText.setOrigin(0, 0);
+        tooltipText.setPosition(cardWidth + 10, 10);
         descText.setVisible(false);
         tooltipText.setVisible(false);
 
-        cardContainer.add([cardBackground, cardImage, nameBackground, nameText, infoBackground, descText, tooltipText]);
+        cardContainer.add([cardBackground, cardImage, nameBackground, nameText, tooltipBackground, tooltipText, infoBackground, descText]);
         cardContainer.setSize(cardWidth, cardHeight);
         cardContainer.setInteractive();
         if (data.cardType == CardType.PLAYABLE) this.input.setDraggable(cardContainer);
@@ -193,12 +198,11 @@ class CardGame extends Phaser.Scene {
             descText: descText,
             tooltipText: tooltipText,
             descBackground: infoBackground,
-            tooltipBackground: infoBackground,//todo: fix this to be a different background thing
+            tooltipBackground: tooltipBackground,
             data: data
         });
 
-        this.setupCardEvents(physicalCard.container, physicalCard.descText, physicalCard.descBackground);
-
+        this.setupCardEvents(physicalCard);
         return physicalCard;
     }
 
@@ -210,16 +214,20 @@ class CardGame extends Phaser.Scene {
         this.battlefield.push(monsterCard.container);
     }
 
-    setupCardEvents(card: Phaser.GameObjects.Container, descText: Phaser.GameObjects.Text, descBackground: Phaser.GameObjects.Rectangle): void {
-        card.on('pointerover', () => {
-            descText.setVisible(true);
-            descBackground.setVisible(true);
-            card.setDepth(1000);
+    setupCardEvents(card: PhysicalCard): void {
+        card.container.on('pointerover', () => {
+            card.descText.setVisible(true);
+            card.descBackground.setVisible(true);
+            card.tooltipText.setVisible(true);
+            card.tooltipBackground.setVisible(true);
+            card.container.setDepth(1000);
         });
-        card.on('pointerout', () => {
-            descText.setVisible(false);
-            descBackground.setVisible(false);
-            card.setDepth((card as any).originalDepth);
+        card.container.on('pointerout', () => {
+            card.descText.setVisible(false);
+            card.descBackground.setVisible(false);
+            card.tooltipText.setVisible(false);
+            card.tooltipBackground.setVisible(false);
+            card.container.setDepth((card.container as any).originalDepth);
         });
     }
 
