@@ -5,6 +5,7 @@ export interface CardData {
     cardType: CardType;
     portraitName: string;
     tooltip: string;
+    Action: (targetCard: PhysicalCard) => void;
 }
 
 
@@ -20,13 +21,17 @@ export class AbstractCard implements CardData {
     portraitName: string
     cardType: CardType
     tooltip: string
-
+    
     constructor({ name, description, portraitName, cardType, tooltip}: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string }) {
         this.name = name
         this.description = description
         this.portraitName = portraitName || "flamer1"
         this.cardType = cardType || CardType.PLAYABLE
         this.tooltip = tooltip || "Lorem ipsum dolor sit amet"
+    }
+
+    Action(targetCard: PhysicalCard) {
+        console.log("Action performed on " + targetCard.data.name + " by  "+ this.name)
     }
 }
 

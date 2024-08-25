@@ -168,6 +168,8 @@ class CardGame extends Phaser.Scene {
             data: data
         });
 
+        (cardContainer as any).physicalCard = physicalCard;
+
         this.setupCardEvents(physicalCard);
         return physicalCard;
     }
@@ -271,11 +273,24 @@ class CardGame extends Phaser.Scene {
         this.handArea.setVisible(false);
 
         if (this.highlightedCard) {
+            this.handleCardInteraction(gameObject, this.highlightedCard);
             this.unhighlightCard(this.highlightedCard);
             this.highlightedCard = null;
         }
 
         this.draggedCard = null;
+    }
+
+    handleCardInteraction(usedCard: Phaser.GameObjects.Container, targetCard: Phaser.GameObjects.Container): void {
+        const usedCardData = (usedCard as any).physicalCard as PhysicalCard;
+        const targetCardData = (targetCard as any).physicalCard as PhysicalCard;
+
+        if (usedCardData && usedCardData.data) {
+            usedCardData.data.Action(targetCardData);
+
+            // You might want to update the visual representation of the cards here
+            // For example, updating health, removing cards, etc.
+        }
     }
 
     handleGameObjectOver(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject): void {
