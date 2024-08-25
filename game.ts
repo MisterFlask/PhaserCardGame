@@ -1,31 +1,7 @@
 import Phaser from 'phaser';
 import RandomImageLoader from './ImageUtils';
 
-interface CardData {
-    name: string;
-    description: string;
-    cardType: CardType;
-    portraitName: string;
-}
 
-enum CardType{
-    CHARACTER = "CHARACTER",
-    PLAYABLE = "PLAYABLE"
-}
-
-class BaseCardBehavior implements CardData {
-    name: string
-    description: string
-    portraitName: string
-    cardType: CardType
-
-    constructor({ name, description, portraitName, cardType }: { name: string; description: string; portraitName?: string, cardType?: CardType }) {
-        this.name = name
-        this.description = description
-        this.portraitName = portraitName || "flamer1"
-        this.cardType = cardType || CardType.PLAYABLE
-    }
-}
 
 interface GameConfig {
     cardWidth: number;
@@ -51,7 +27,11 @@ const cardData: CardData[] = [
     new BaseCardBehavior({ name: 'Nature\'s Blessing', description: 'Grants 1 extra mana' }),
     new BaseCardBehavior({ name: 'Nature\'s Blessing', description: 'Grants 1 extra mana' }),
     new BaseCardBehavior({ name: 'Nature\'s Blessing', description: 'Grants 1 extra mana' }),
-    new BaseCardBehavior({ name: 'Nature\'s Blessing', description: 'Grants 1 extra mana' })
+    new BaseCardBehavior({ name: 'Nature\'s Blessing', description: 'Grants 1 extra mana' }),
+    new FireballCard(),
+    new ToxicCloudCard(),
+    new SummonDemonCard(),
+    new ArcaneRitualCard(),
 ];
 
 class CardGame extends Phaser.Scene {

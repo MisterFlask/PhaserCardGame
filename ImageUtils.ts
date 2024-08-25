@@ -8,6 +8,14 @@ export default class RandomImageLoader {
         characters: {
             prefix: 'Portraits/BlackhandPortraits/',
             files: ['flamer1.png']
+        },
+        cards_blackhand: {
+            prefix: 'Sprites/Blackhand/',
+            files: ['fire.png', 'smog-grenade.png']
+        },
+        cards_diabolist: {
+            prefix: 'Sprites/Diabolist/',
+            files: ['gem-pendant.png', 'skull-bolt.png']
         }
     };
 
