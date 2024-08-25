@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import RandomImageLoader from './utils/ImageUtils';
-import { AbstractCard, ArcaneRitualCard, CardData, CardType, FireballCard, SummonDemonCard, ToxicCloudCard } from './gamecharacters/CharacterClasses';
+import { ArcaneRitualCard, FireballCard, SummonDemonCard, ToxicCloudCard } from './gamecharacters/CharacterClasses';
+import { AbstractCard, CardType, PhysicalCard, CardData } from './gamecharacters/PhysicalCard';
 
 
 interface GameConfig {
@@ -19,53 +20,6 @@ const unitData: CardData[] = [
     new AbstractCard({ name: 'Mage', description: 'Wields powerful magic', portraitName: 'flamer1', cardType: CardType.CHARACTER }),
 ];
 
-class PhysicalCard {
-    container: Phaser.GameObjects.Container;
-    cardBackground: Phaser.GameObjects.Image;
-    cardImage: Phaser.GameObjects.Image;
-    nameBackground: Phaser.GameObjects.Rectangle;
-    nameText: Phaser.GameObjects.Text;
-    descText: Phaser.GameObjects.Text;
-    descBackground: Phaser.GameObjects.Rectangle;
-    tooltipBackground: Phaser.GameObjects.Rectangle;
-    tooltipText: Phaser.GameObjects.Text;
-    data: CardData;
-
-    constructor({
-        container,
-        cardBackground,
-        cardImage,
-        nameBackground,
-        nameText,
-        descText,
-        tooltipBackground,
-        tooltipText,
-        descBackground,
-        data
-    }: {
-        container: Phaser.GameObjects.Container;
-        cardBackground: Phaser.GameObjects.Image;
-        cardImage: Phaser.GameObjects.Image;
-        nameBackground: Phaser.GameObjects.Rectangle;
-        nameText: Phaser.GameObjects.Text;
-        descText: Phaser.GameObjects.Text;
-        tooltipBackground: Phaser.GameObjects.Rectangle;
-        tooltipText: Phaser.GameObjects.Text;
-        descBackground: Phaser.GameObjects.Rectangle;
-        data: CardData;
-    }) {
-        this.container = container;
-        this.cardBackground = cardBackground;
-        this.cardImage = cardImage;
-        this.nameBackground = nameBackground;
-        this.nameText = nameText;
-        this.descText = descText;
-        this.descBackground = descBackground;
-        this.tooltipBackground = tooltipBackground;
-        this.tooltipText = tooltipText;
-        this.data = data;
-    }
-}
 
 const cardData: CardData[] = [
     new AbstractCard({ name: 'Fireball', description: 'Deals 3 damage to target' }),

@@ -1,3 +1,5 @@
+import { AbstractCard } from "./PhysicalCard";
+
 export class BaseCharacter{
     name: string;
     portraitName: string;
@@ -43,35 +45,6 @@ export class DiabolistClass extends BaseCharacterClass {
         // Add Diabolist-specific cards here
         this.addCard(new ArcaneRitualCard())
         this.addCard(new SummonDemonCard())
-    }
-}
-
-export interface CardData {
-    name: string;
-    description: string;
-    cardType: CardType;
-    portraitName: string;
-    tooltip: string;
-}
-
-export enum CardType{
-    CHARACTER = "CHARACTER",
-    PLAYABLE = "PLAYABLE"
-}
-
-export class AbstractCard implements CardData {
-    name: string
-    description: string
-    portraitName: string
-    cardType: CardType
-    tooltip: string
-
-    constructor({ name, description, portraitName, cardType, tooltip}: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string }) {
-        this.name = name
-        this.description = description
-        this.portraitName = portraitName || "flamer1"
-        this.cardType = cardType || CardType.PLAYABLE
-        this.tooltip = tooltip || "Lorem ipsum dolor sit amet"
     }
 }
 
