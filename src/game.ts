@@ -44,6 +44,8 @@ class CardGame extends Phaser.Scene {
     private backgroundImage!: Phaser.GameObjects.Image;
     private battlefieldArea!: Phaser.GameObjects.Rectangle;
     private handArea!: Phaser.GameObjects.Rectangle;
+    private highlightedCard: Phaser.GameObjects.Container | null;
+    private draggedCard: Phaser.GameObjects.Container | null;
 
     constructor() {
         super('CardGame');
@@ -59,6 +61,8 @@ class CardGame extends Phaser.Scene {
         this.playerHand = [];
         this.battlefield = [];
         this.playerUnits = [];
+        this.highlightedCard = null;
+        this.draggedCard = null;
     }
 
     createPlayerUnits(): void {
@@ -131,6 +135,13 @@ class CardGame extends Phaser.Scene {
         const infoBackground = this.add.rectangle(0, cardHeight / 2, cardWidth - 10, 60, 0xffffff).setVisible(false).setStrokeStyle(2, 0x000000);
         const tooltipBackground = this.add.rectangle(cardWidth + cardWidth / 2, 0, cardWidth - 10, cardHeight, 0xffffff).setVisible(false).setStrokeStyle(2, 0x000000);
 
+        // Create hidden highlight border
+        const highlightBorder = this.add.rectangle(0, 0, cardWidth + 10, cardHeight + 10, 0xffff00)
+            .setStrokeStyle(4, 0xffff00)
+            .setFillStyle(0x000000, 0)
+            .setVisible(false)
+            .setName('highlightBorder');
+
         nameText.setOrigin(0.5);
         descText.setOrigin(0.5);
         tooltipText.setOrigin(0, 0);
@@ -138,9 +149,10 @@ class CardGame extends Phaser.Scene {
         descText.setVisible(false);
         tooltipText.setVisible(false);
 
-        cardContainer.add([cardBackground, cardImage, nameBackground, nameText, tooltipBackground, tooltipText, infoBackground, descText]);
+        cardContainer.add([cardBackground, cardImage, nameBackground, nameText, tooltipBackground, tooltipText, infoBackground, descText, highlightBorder]);
         cardContainer.setSize(cardWidth, cardHeight);
-        cardContainer.setInteractive();
+        cardContainer.setInteractive(new Phaser.Geom.Rectangle(0, 0, cardWidth, cardHeight), Phaser.Geom.Rectangle.Contains);
+
         if (data.cardType == CardType.PLAYABLE) this.input.setDraggable(cardContainer);
 
         const physicalCard = new PhysicalCard({
@@ -170,6 +182,8 @@ class CardGame extends Phaser.Scene {
 
     setupCardEvents(card: PhysicalCard): void {
         card.container.on('pointerover', () => {
+            //this.highlightCard(card.container);
+
             card.descText.setVisible(true);
             card.descBackground.setVisible(true);
             card.tooltipText.setVisible(true);
@@ -177,6 +191,8 @@ class CardGame extends Phaser.Scene {
             card.container.setDepth(1000);
         });
         card.container.on('pointerout', () => {
+            //this.unhighlightCard(card.container);
+
             card.descText.setVisible(false);
             card.descBackground.setVisible(false);
             card.tooltipText.setVisible(false);
@@ -186,9 +202,18 @@ class CardGame extends Phaser.Scene {
     }
 
     setupEventListeners(): void {
+        this.input.on('dragstart', this.handleDragStart, this);
         this.input.on('drag', this.handleDrag, this);
         this.input.on('dragend', this.handleDragEnd, this);
         this.input.on('gameobjectover', this.handleGameObjectOver, this);
+    }
+
+    /**
+     * Handles the start of a card drag.
+     * Sets the draggedCard to the current gameObject being dragged.
+     */
+    handleDragStart(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container): void {
+        this.draggedCard = gameObject;
     }
 
     handleDrag(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container, dragX: number, dragY: number): void {
@@ -198,6 +223,38 @@ class CardGame extends Phaser.Scene {
         const inBattlefield = dragY < this.config.dividerY;
         this.battlefieldArea.setVisible(inBattlefield);
         this.handArea.setVisible(!inBattlefield);
+
+        this.checkCardUnderPointer(pointer);
+
+    }
+
+    // highlight the card under the pointer.
+    checkCardUnderPointer(pointer: Phaser.Input.Pointer): void {
+        const cardUnderPointer = this.getCardUnderPointer(pointer);
+
+        if (cardUnderPointer && cardUnderPointer !== this.draggedCard) {
+            if (this.highlightedCard !== cardUnderPointer) {
+                if (this.highlightedCard) {
+                    this.unhighlightCard(this.highlightedCard);
+                }
+                this.highlightedCard = cardUnderPointer;
+                this.highlightCard(cardUnderPointer);
+            }
+        } else if (this.highlightedCard) {
+            this.unhighlightCard(this.highlightedCard);
+            this.highlightedCard = null;
+        }
+    }
+
+    getCardUnderPointer(pointer: Phaser.Input.Pointer): Phaser.GameObjects.Container | null {
+        const allCards = [...this.playerHand, ...this.battlefield, ...this.playerUnits];
+        for (let i = allCards.length - 1; i >= 0; i--) {
+            const card = allCards[i];
+            if (card !== this.draggedCard && Phaser.Geom.Rectangle.Contains(card.getBounds(), pointer.x, pointer.y)) {
+                return card;
+            }
+        }
+        return null;
     }
 
     handleDragEnd(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container): void {
@@ -212,11 +269,38 @@ class CardGame extends Phaser.Scene {
 
         this.battlefieldArea.setVisible(false);
         this.handArea.setVisible(false);
+
+        if (this.highlightedCard) {
+            this.unhighlightCard(this.highlightedCard);
+            this.highlightedCard = null;
+        }
+
+        this.draggedCard = null;
     }
 
     handleGameObjectOver(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject): void {
         if (gameObject.type === 'Container') {
             this.children.bringToTop(gameObject);
+        }
+    }
+
+    /**
+     * Highlights a card by showing its hidden highlight border.
+     */
+    highlightCard(card: Phaser.GameObjects.Container): void {
+        const highlightBorder = card.getByName('highlightBorder') as Phaser.GameObjects.Rectangle;
+        if (highlightBorder) {
+            highlightBorder.setVisible(true);
+        }
+    }
+
+    /**
+     * Removes the highlight from a card by hiding its highlight border.
+     */
+    unhighlightCard(card: Phaser.GameObjects.Container): void {
+        const highlightBorder = card.getByName('highlightBorder') as Phaser.GameObjects.Rectangle;
+        if (highlightBorder) {
+            highlightBorder.setVisible(false);
         }
     }
 
