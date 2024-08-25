@@ -1,8 +1,7 @@
 import Phaser from 'phaser';
 import RandomImageLoader from './utils/ImageUtils';
 import { ArcaneRitualCard, FireballCard, SummonDemonCard, ToxicCloudCard } from './gamecharacters/CharacterClasses';
-import { AbstractCard, CardType, PhysicalCard, CardData } from './gamecharacters/PhysicalCard';
-
+import { AbstractCard, CardType, PhysicalCard, CardData, CardLocation } from './gamecharacters/PhysicalCard';
 
 interface GameConfig {
     cardWidth: number;
@@ -19,7 +18,6 @@ const unitData: CardData[] = [
     new AbstractCard({ name: 'Archer', description: 'Skilled with a bow', portraitName: 'flamer1', cardType: CardType.CHARACTER }),
     new AbstractCard({ name: 'Mage', description: 'Wields powerful magic', portraitName: 'flamer1', cardType: CardType.CHARACTER }),
 ];
-
 
 const cardData: CardData[] = [
     new AbstractCard({ name: 'Fireball', description: 'Deals 3 damage to target' }),
@@ -69,7 +67,7 @@ class CardGame extends Phaser.Scene {
         unitData.forEach((data, index) => {
             const x = this.config.gameWidth - 100;
             const y = 100 + index * 180;
-            const unit = this.createCard(x, y, data);
+            const unit = this.createCard(x, y, data, CardLocation.CHARACTER_ROSTER);
             (unit as any).isPlayerUnit = true;
             this.playerUnits.push(unit.container);
         });
@@ -109,12 +107,13 @@ class CardGame extends Phaser.Scene {
         cardData.forEach((data, index) => {
             const x = 100 + index * 150;
             const y = this.config.handY;
-            const card = this.createCard(x, y, data);
+            const card = this.createCard(x, y, data, CardLocation.HAND);
             this.playerHand.push(card.container);
         });
         this.arrangeCards(this.playerHand, this.config.handY);
     }
-    createCard(x: number, y: number, data: CardData): PhysicalCard {
+
+    createCard(x: number, y: number, data: CardData, location: CardLocation): PhysicalCard {
         const { cardWidth, cardHeight } = this.config;
         const cardContainer = this.add.container(x, y);
         const cardBackground = this.add.image(0, 0, 'greyscale').setDisplaySize(cardWidth, cardHeight);
@@ -165,7 +164,8 @@ class CardGame extends Phaser.Scene {
             tooltipText: tooltipText,
             descBackground: infoBackground,
             tooltipBackground: tooltipBackground,
-            data: data
+            data: data,
+            cardLocation: location
         });
 
         (cardContainer as any).physicalCard = physicalCard;
@@ -174,18 +174,15 @@ class CardGame extends Phaser.Scene {
         return physicalCard;
     }
 
-
     createMonsterCard(): void {
         const monsterData: CardData = new AbstractCard({ name: 'Goblin', description: 'A small, mischievous creature', cardType: CardType.CHARACTER });
-        const monsterCard = this.createCard(400, this.config.battlefieldY, monsterData);
+        const monsterCard = this.createCard(400, this.config.battlefieldY, monsterData, CardLocation.BATTLEFIELD);
         monsterCard.container.setDepth(1);
         this.battlefield.push(monsterCard.container);
     }
 
     setupCardEvents(card: PhysicalCard): void {
         card.container.on('pointerover', () => {
-            //this.highlightCard(card.container);
-
             card.descText.setVisible(true);
             card.descBackground.setVisible(true);
             card.tooltipText.setVisible(true);
@@ -193,8 +190,6 @@ class CardGame extends Phaser.Scene {
             card.container.setDepth(1000);
         });
         card.container.on('pointerout', () => {
-            //this.unhighlightCard(card.container);
-
             card.descText.setVisible(false);
             card.descBackground.setVisible(false);
             card.tooltipText.setVisible(false);
@@ -210,10 +205,6 @@ class CardGame extends Phaser.Scene {
         this.input.on('gameobjectover', this.handleGameObjectOver, this);
     }
 
-    /**
-     * Handles the start of a card drag.
-     * Sets the draggedCard to the current gameObject being dragged.
-     */
     handleDragStart(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container): void {
         this.draggedCard = gameObject;
     }
@@ -227,10 +218,8 @@ class CardGame extends Phaser.Scene {
         this.handArea.setVisible(!inBattlefield);
 
         this.checkCardUnderPointer(pointer);
-
     }
 
-    // highlight the card under the pointer.
     checkCardUnderPointer(pointer: Phaser.Input.Pointer): void {
         const cardUnderPointer = this.getCardUnderPointer(pointer);
 
@@ -260,7 +249,7 @@ class CardGame extends Phaser.Scene {
     }
 
     handleDragEnd(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container): void {
-        if ((gameObject as any)?.data?.cardType === CardType.CHARACTER) return;
+        if ((gameObject as any)?.physicalCard?.data?.cardType === CardType.CHARACTER) return;
 
         const inHand = gameObject.y > this.config.dividerY;
         if (inHand) {
@@ -286,7 +275,11 @@ class CardGame extends Phaser.Scene {
         const targetCardData = (targetCard as any).physicalCard as PhysicalCard;
 
         if (usedCardData && usedCardData.data) {
-            usedCardData.data.Action(targetCardData);
+            if (usedCardData.data.IsPerformableOn(targetCardData)){
+                usedCardData.data.Action(targetCardData);
+            }else{
+                console.log("Action not performable on " + targetCardData.data.name + " by  "+ usedCardData.data.name)
+            }
 
             // You might want to update the visual representation of the cards here
             // For example, updating health, removing cards, etc.
@@ -299,9 +292,6 @@ class CardGame extends Phaser.Scene {
         }
     }
 
-    /**
-     * Highlights a card by showing its hidden highlight border.
-     */
     highlightCard(card: Phaser.GameObjects.Container): void {
         const highlightBorder = card.getByName('highlightBorder') as Phaser.GameObjects.Rectangle;
         if (highlightBorder) {
@@ -309,9 +299,6 @@ class CardGame extends Phaser.Scene {
         }
     }
 
-    /**
-     * Removes the highlight from a card by hiding its highlight border.
-     */
     unhighlightCard(card: Phaser.GameObjects.Container): void {
         const highlightBorder = card.getByName('highlightBorder') as Phaser.GameObjects.Rectangle;
         if (highlightBorder) {
@@ -323,6 +310,7 @@ class CardGame extends Phaser.Scene {
         if (!this.playerHand.includes(card)) {
             this.playerHand.push(card);
             this.battlefield = this.battlefield.filter(c => c !== card);
+            (card as any).physicalCard.cardLocation = CardLocation.HAND;
         }
         this.arrangeCards(this.playerHand, this.config.handY);
     }

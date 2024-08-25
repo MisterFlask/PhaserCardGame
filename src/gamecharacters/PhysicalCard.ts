@@ -6,9 +6,14 @@ export interface CardData {
     portraitName: string;
     tooltip: string;
     Action: (targetCard: PhysicalCard) => void;
+    IsPerformableOn: (targetCard: PhysicalCard) => boolean;
 }
 
-
+export enum CardLocation {
+    BATTLEFIELD,
+    HAND,
+    CHARACTER_ROSTER
+}
 
 export enum CardType{
     CHARACTER = "CHARACTER",
@@ -21,6 +26,7 @@ export class AbstractCard implements CardData {
     portraitName: string
     cardType: CardType
     tooltip: string
+
     
     constructor({ name, description, portraitName, cardType, tooltip}: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string }) {
         this.name = name
@@ -28,6 +34,13 @@ export class AbstractCard implements CardData {
         this.portraitName = portraitName || "flamer1"
         this.cardType = cardType || CardType.PLAYABLE
         this.tooltip = tooltip || "Lorem ipsum dolor sit amet"
+    }
+
+    IsPerformableOn(targetCard: PhysicalCard) {
+        if (this.cardType == CardType.PLAYABLE){
+            return false
+        }
+        return true
     }
 
     Action(targetCard: PhysicalCard) {
@@ -46,6 +59,7 @@ export class PhysicalCard {
     tooltipBackground: Phaser.GameObjects.Rectangle;
     tooltipText: Phaser.GameObjects.Text;
     data: CardData;
+    cardLocation: CardLocation;
 
     constructor({
         container,
@@ -57,7 +71,8 @@ export class PhysicalCard {
         tooltipBackground,
         tooltipText,
         descBackground,
-        data
+        data,
+        cardLocation
     }: {
         container: Phaser.GameObjects.Container;
         cardBackground: Phaser.GameObjects.Image;
@@ -69,6 +84,7 @@ export class PhysicalCard {
         tooltipText: Phaser.GameObjects.Text;
         descBackground: Phaser.GameObjects.Rectangle;
         data: CardData;
+        cardLocation: CardLocation;
     }) {
         this.container = container;
         this.cardBackground = cardBackground;
@@ -80,5 +96,6 @@ export class PhysicalCard {
         this.tooltipBackground = tooltipBackground;
         this.tooltipText = tooltipText;
         this.data = data;
+        this.cardLocation = cardLocation;
     }
 }
