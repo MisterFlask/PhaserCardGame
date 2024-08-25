@@ -1,13 +1,4 @@
-
-export interface CardData {
-    name: string;
-    description: string;
-    cardType: CardType;
-    portraitName: string;
-    tooltip: string;
-    Action: (targetCard: PhysicalCard) => void;
-    IsPerformableOn: (targetCard: PhysicalCard) => boolean;
-}
+import { BaseCharacter } from "./CharacterClasses";
 
 export enum CardLocation {
     BATTLEFIELD,
@@ -20,20 +11,23 @@ export enum CardType {
     PLAYABLE = "PLAYABLE"
 }
 
-export class AbstractCard implements CardData {
+export class AbstractCard {
     name: string
     description: string
     portraitName: string
     cardType: CardType
     tooltip: string
+    characterData: BaseCharacter | null
 
 
-    constructor({ name, description, portraitName, cardType, tooltip }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string }) {
+
+    constructor({ name, description, portraitName, cardType, tooltip, characterData }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: BaseCharacter }) {
         this.name = name
         this.description = description
         this.portraitName = portraitName || "flamer1"
         this.cardType = cardType || CardType.PLAYABLE
         this.tooltip = tooltip || "Lorem ipsum dolor sit amet"
+        this.characterData = characterData || null
     }
 
     IsPerformableOn(targetCard: PhysicalCard) {

@@ -1,4 +1,4 @@
-export default class RandomImageLoader {
+export default class GameImageLoader {
     // Nested object containing categories with file prefix and an array of image filenames
     private readonly images = {
         backgrounds: {

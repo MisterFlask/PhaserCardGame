@@ -1,25 +1,17 @@
 import Phaser from 'phaser';
-import RandomImageLoader from './utils/ImageUtils';
+import GameImageLoader from './utils/ImageUtils';
 import { ArcaneRitualCard, FireballCard, SummonDemonCard, ToxicCloudCard } from './gamecharacters/CharacterClasses';
-import { AbstractCard, CardType, PhysicalCard, CardData, CardLocation } from './gamecharacters/PhysicalCard';
+import { AbstractCard, CardType, PhysicalCard, CardLocation } from './gamecharacters/PhysicalCard';
+import { CardGuiUtils, GameConfig } from './utils/CardGuiUtils';
 
-interface GameConfig {
-    cardWidth: number;
-    cardHeight: number;
-    battlefieldY: number;
-    handY: number;
-    dividerY: number;
-    gameWidth: number;
-    gameHeight: number;
-}
 
-const unitData: CardData[] = [
+const unitData: AbstractCard[] = [
     new AbstractCard({ name: 'Knight', description: 'A brave warrior', portraitName: 'flamer1', cardType: CardType.CHARACTER }),
     new AbstractCard({ name: 'Archer', description: 'Skilled with a bow', portraitName: 'flamer1', cardType: CardType.CHARACTER }),
     new AbstractCard({ name: 'Mage', description: 'Wields powerful magic', portraitName: 'flamer1', cardType: CardType.CHARACTER }),
 ];
 
-const cardData: CardData[] = [
+const cardData: AbstractCard[] = [
     new AbstractCard({ name: 'Fireball', description: 'Deals 3 damage to target' }),
     new AbstractCard({ name: 'Healing Touch', description: 'Restores 2 health' }),
     new AbstractCard({ name: 'Stone Wall', description: 'Summons a defensive barrier' }),
@@ -35,7 +27,6 @@ const cardData: CardData[] = [
 ];
 
 class CardGame extends Phaser.Scene {
-    private config: GameConfig;
     private playerHand: Phaser.GameObjects.Container[];
     private battlefield: Phaser.GameObjects.Container[];
     private playerUnits: Phaser.GameObjects.Container[];
@@ -44,18 +35,13 @@ class CardGame extends Phaser.Scene {
     private handArea!: Phaser.GameObjects.Rectangle;
     private highlightedCard: Phaser.GameObjects.Container | null;
     private draggedCard: Phaser.GameObjects.Container | null;
-
+    private menuButton!: Phaser.GameObjects.Text;
+    private menuPanel!: Phaser.GameObjects.Container;
+    private config: GameConfig;
+    
     constructor() {
         super('CardGame');
-        this.config = {
-            cardWidth: 120,
-            cardHeight: 160,
-            battlefieldY: 200,
-            handY: 500,
-            dividerY: 350,
-            gameWidth: 800,
-            gameHeight: 600
-        };
+        this.config = new CardGuiUtils().config;
         this.playerHand = [];
         this.battlefield = [];
         this.playerUnits = [];
@@ -67,7 +53,7 @@ class CardGame extends Phaser.Scene {
         unitData.forEach((data, index) => {
             const x = this.config.gameWidth - 100;
             const y = 100 + index * 180;
-            const unit = this.createCard(x, y, data, CardLocation.CHARACTER_ROSTER);
+            const unit = new CardGuiUtils().createCard(this, x, y, data, CardLocation.CHARACTER_ROSTER, this.setupCardEvents);
             (unit as any).isPlayerUnit = true;
             this.playerUnits.push(unit.container);
         });
@@ -77,7 +63,7 @@ class CardGame extends Phaser.Scene {
         this.load.setBaseURL('https://raw.githubusercontent.com/');
         this.load.image('card', 'photonstorm/phaser3-examples/master/public/assets/sprites/blue_ball.png');
         this.load.image('monster', 'photonstorm/phaser3-examples/master/public/assets/sprites/red_ball.png');
-        new RandomImageLoader().loadAllImages(this.load);
+        new GameImageLoader().loadAllImages(this.load);
     }
 
     create(): void {
@@ -86,6 +72,7 @@ class CardGame extends Phaser.Scene {
         this.createMonsterCard();
         this.setupEventListeners();
         this.createPlayerUnits();
+        this.createMenu();
 
         this.scale.on('resize', this.resize, this);
         this.resize();
@@ -107,78 +94,16 @@ class CardGame extends Phaser.Scene {
         cardData.forEach((data, index) => {
             const x = 100 + index * 150;
             const y = this.config.handY;
-            const card = this.createCard(x, y, data, CardLocation.HAND);
+            const card = new CardGuiUtils().createCard(this, x, y, data, CardLocation.HAND, this.setupCardEvents);
             this.playerHand.push(card.container);
         });
         this.arrangeCards(this.playerHand, this.config.handY);
     }
 
-    createCard(x: number, y: number, data: CardData, location: CardLocation): PhysicalCard {
-        const { cardWidth, cardHeight } = this.config;
-        const cardContainer = this.add.container(x, y);
-        const cardBackground = this.add.image(0, 0, 'greyscale').setDisplaySize(cardWidth, cardHeight);
-        let cardTexture = data.portraitName;
-
-        const cardImage = this.add.image(0, -cardHeight / 4, cardTexture)
-            .setDisplaySize(cardWidth / 2, cardHeight / 2);
-
-        const nameBackground = this.add.rectangle(0, cardHeight / 4, cardWidth - 10, 30, 0xffffff).setStrokeStyle(2, 0x000000);
-        const nameText = this.add.text(0, cardHeight / 4, data.name, { fontSize: '16px', color: '#000', wordWrap: { width: cardWidth - 10 } });
-        const descText = this.add.text(0, cardHeight / 2, data.description, { fontSize: '12px', color: '#000', wordWrap: { width: cardWidth - 10 } });
-        const tooltipText = this.add.text(cardWidth + 5, 0, data.tooltip || '', { 
-            fontSize: '12px', 
-            color: '#000', 
-            wordWrap: { width: cardWidth - 20 },
-            align: 'left'
-        });
-        const infoBackground = this.add.rectangle(0, cardHeight / 2, cardWidth - 10, 60, 0xffffff).setVisible(false).setStrokeStyle(2, 0x000000);
-        const tooltipBackground = this.add.rectangle(cardWidth + cardWidth / 2, 0, cardWidth - 10, cardHeight, 0xffffff).setVisible(false).setStrokeStyle(2, 0x000000);
-
-        // Create hidden highlight border
-        const highlightBorder = this.add.rectangle(0, 0, cardWidth + 10, cardHeight + 10, 0xffff00)
-            .setStrokeStyle(4, 0xffff00)
-            .setFillStyle(0x000000, 0)
-            .setVisible(false)
-            .setName('highlightBorder');
-
-        nameText.setOrigin(0.5);
-        descText.setOrigin(0.5);
-        tooltipText.setOrigin(0, 0);
-        tooltipText.setPosition(cardWidth + 10, 10);
-        descText.setVisible(false);
-        tooltipText.setVisible(false);
-
-        cardContainer.add([cardBackground, cardImage, nameBackground, nameText, tooltipBackground, tooltipText, infoBackground, descText, highlightBorder]);
-        cardContainer.setSize(cardWidth, cardHeight);
-        cardContainer.setInteractive(new Phaser.Geom.Rectangle(0, 0, cardWidth, cardHeight), Phaser.Geom.Rectangle.Contains);
-
-        if (data.cardType == CardType.PLAYABLE) this.input.setDraggable(cardContainer);
-
-        const physicalCard = new PhysicalCard({
-            container: cardContainer,
-            cardBackground: cardBackground,
-            cardImage: cardImage,
-            nameBackground: nameBackground,
-            nameText: nameText,
-            descText: descText,
-            tooltipText: tooltipText,
-            descBackground: infoBackground,
-            tooltipBackground: tooltipBackground,
-            data: data,
-            cardLocation: location,
-            visualTags: [],
-            scene: this
-        });
-
-        (cardContainer as any).physicalCard = physicalCard;
-
-        this.setupCardEvents(physicalCard);
-        return physicalCard;
-    }
 
     createMonsterCard(): void {
-        const monsterData: CardData = new AbstractCard({ name: 'Goblin', description: 'A small, mischievous creature', cardType: CardType.CHARACTER });
-        const monsterCard = this.createCard(400, this.config.battlefieldY, monsterData, CardLocation.BATTLEFIELD);
+        const monsterData: AbstractCard = new AbstractCard({ name: 'Goblin', description: 'A small, mischievous creature', cardType: CardType.CHARACTER });
+        const monsterCard = new CardGuiUtils().createCard(this, 400, this.config.battlefieldY, monsterData, CardLocation.BATTLEFIELD, this.setupCardEvents);
         monsterCard.container.setDepth(1);
         this.battlefield.push(monsterCard.container);
     }
@@ -205,6 +130,47 @@ class CardGame extends Phaser.Scene {
         this.input.on('drag', this.handleDrag, this);
         this.input.on('dragend', this.handleDragEnd, this);
         this.input.on('gameobjectover', this.handleGameObjectOver, this);
+    }
+
+    createMenu(): void {
+        this.menuButton = this.add.text(10, 10, 'Menu', { fontSize: '24px', color: '#fff' })
+            .setInteractive()
+            .on('pointerdown', this.toggleMenu, this);
+
+        this.menuPanel = this.add.container(0, -200);
+        const panelBg = this.add.rectangle(0, 0, 200, 200, 0x000000, 0.8);
+        const newGameButton = this.add.text(0, -60, 'Start New Game', { fontSize: '20px', color: '#fff' })
+            .setInteractive()
+            .on('pointerdown', this.startNewGame, this);
+        const newCampaignButton = this.add.text(0, 0, 'New Campaign', { fontSize: '20px', color: '#fff' })
+            .setInteractive()
+            .on('pointerdown', this.startNewCampaign, this);
+        const quitButton = this.add.text(0, 60, 'Quit', { fontSize: '20px', color: '#fff' })
+            .setInteractive()
+            .on('pointerdown', this.quitGame, this);
+
+        this.menuPanel.add([panelBg, newGameButton, newCampaignButton, quitButton]);
+        this.menuPanel.setPosition(100, 100);
+        this.menuPanel.setVisible(false);
+    }
+
+    toggleMenu(): void {
+        this.menuPanel.setVisible(!this.menuPanel.visible);
+    }
+
+    startNewGame(): void {
+        console.log('Starting new game');
+        this.scene.restart();
+    }
+
+    startNewCampaign(): void {
+        console.log('Starting new campaign');
+        this.scene.start('Campaign');
+    }
+
+    quitGame(): void {
+        console.log('Quitting game');
+        this.game.destroy(true);
     }
 
     handleDragStart(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container): void {
@@ -384,4 +350,5 @@ const config: Phaser.Types.Core.GameConfig = {
 };
 
 const game = new Phaser.Game(config);
+
 
