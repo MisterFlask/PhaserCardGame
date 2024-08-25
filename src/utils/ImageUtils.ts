@@ -10,11 +10,11 @@ export default class RandomImageLoader {
             files: ['flamer1.png']
         },
         cards_blackhand: {
-            prefix: 'Sprites/Blackhand/',
+            prefix: 'Sprites/Cards/Blackhand/',
             files: ['fire.png', 'smog-grenade.png']
         },
         cards_diabolist: {
-            prefix: 'Sprites/Diabolist/',
+            prefix: 'Sprites/Cards/Diabolist/',
             files: ['gem-pendant.png', 'skull-bolt.png']
         }
     };

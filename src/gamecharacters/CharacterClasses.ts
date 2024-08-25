@@ -1,3 +1,17 @@
+export class BaseCharacter{
+    name: string;
+    portraitName: string;
+    characterClass: BaseCharacterClass;
+    
+
+    constructor({ name, portraitName, characterClass }: { name: string; portraitName: string; characterClass: BaseCharacterClass }) {
+        this.name = name;
+        this.portraitName = portraitName;
+        this.characterClass = characterClass;
+    }
+}
+
+
 export class BaseCharacterClass {
     constructor({ name, iconName }: { name: string; iconName: string }) {
         this.name = name
@@ -7,9 +21,9 @@ export class BaseCharacterClass {
 
     name: string
     iconName: string
-    availableCards: BaseCardBehavior[]
+    availableCards: AbstractCard[]
 
-    addCard(card: BaseCardBehavior) {
+    addCard(card: AbstractCard) {
         this.availableCards.push(card)
     }
 }
@@ -37,6 +51,7 @@ export interface CardData {
     description: string;
     cardType: CardType;
     portraitName: string;
+    tooltip: string;
 }
 
 export enum CardType{
@@ -44,22 +59,24 @@ export enum CardType{
     PLAYABLE = "PLAYABLE"
 }
 
-export class BaseCardBehavior implements CardData {
+export class AbstractCard implements CardData {
     name: string
     description: string
     portraitName: string
     cardType: CardType
+    tooltip: string
 
-    constructor({ name, description, portraitName, cardType }: { name: string; description: string; portraitName?: string, cardType?: CardType }) {
+    constructor({ name, description, portraitName, cardType, tooltip}: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string }) {
         this.name = name
         this.description = description
         this.portraitName = portraitName || "flamer1"
         this.cardType = cardType || CardType.PLAYABLE
+        this.tooltip = tooltip || ""
     }
 }
 
 
-export class ArcaneRitualCard extends BaseCardBehavior {
+export class ArcaneRitualCard extends AbstractCard {
     constructor() {
         super({
             name: "Arcane Ritual",
@@ -68,7 +85,7 @@ export class ArcaneRitualCard extends BaseCardBehavior {
         });
     }
 }
-export class FireballCard extends BaseCardBehavior {
+export class FireballCard extends AbstractCard {
     constructor() {
         super({
             name: "Fireball",
@@ -78,7 +95,7 @@ export class FireballCard extends BaseCardBehavior {
     }
 }
 
-export class ToxicCloudCard extends BaseCardBehavior {
+export class ToxicCloudCard extends AbstractCard {
     constructor() {
         super({
             name: "Toxic Cloud",
@@ -88,7 +105,7 @@ export class ToxicCloudCard extends BaseCardBehavior {
     }
 }
 
-export class SummonDemonCard extends BaseCardBehavior {
+export class SummonDemonCard extends AbstractCard {
     constructor() {
         super({
             name: "Summon Demon",

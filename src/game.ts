@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import RandomImageLoader from './utils/ImageUtils';
-import { BaseCardBehavior, ArcaneRitualCard, CardData, CardType, FireballCard, SummonDemonCard, ToxicCloudCard } from './gamecharacters/CharacterClasses';
+import { AbstractCard, ArcaneRitualCard, CardData, CardType, FireballCard, SummonDemonCard, ToxicCloudCard } from './gamecharacters/CharacterClasses';
 
 
 interface GameConfig {
@@ -14,20 +14,68 @@ interface GameConfig {
 }
 
 const unitData: CardData[] = [
-    new BaseCardBehavior({ name: 'Knight', description: 'A brave warrior', portraitName: 'flamer1', cardType: CardType.CHARACTER }),
-    new BaseCardBehavior({ name: 'Archer', description: 'Skilled with a bow', portraitName: 'flamer1', cardType: CardType.CHARACTER }),
-    new BaseCardBehavior({ name: 'Mage', description: 'Wields powerful magic', portraitName: 'flamer1', cardType: CardType.CHARACTER }),
+    new AbstractCard({ name: 'Knight', description: 'A brave warrior', portraitName: 'flamer1', cardType: CardType.CHARACTER }),
+    new AbstractCard({ name: 'Archer', description: 'Skilled with a bow', portraitName: 'flamer1', cardType: CardType.CHARACTER }),
+    new AbstractCard({ name: 'Mage', description: 'Wields powerful magic', portraitName: 'flamer1', cardType: CardType.CHARACTER }),
 ];
 
+class PhysicalCard {
+    container: Phaser.GameObjects.Container;
+    cardBackground: Phaser.GameObjects.Image;
+    cardImage: Phaser.GameObjects.Image;
+    nameBackground: Phaser.GameObjects.Rectangle;
+    nameText: Phaser.GameObjects.Text;
+    descText: Phaser.GameObjects.Text;
+    descBackground: Phaser.GameObjects.Rectangle;
+    tooltipBackground: Phaser.GameObjects.Rectangle;
+    tooltipText: Phaser.GameObjects.Text;
+    data: CardData;
+
+    constructor({
+        container,
+        cardBackground,
+        cardImage,
+        nameBackground,
+        nameText,
+        descText,
+        tooltipBackground,
+        tooltipText,
+        descBackground,
+        data
+    }: {
+        container: Phaser.GameObjects.Container;
+        cardBackground: Phaser.GameObjects.Image;
+        cardImage: Phaser.GameObjects.Image;
+        nameBackground: Phaser.GameObjects.Rectangle;
+        nameText: Phaser.GameObjects.Text;
+        descText: Phaser.GameObjects.Text;
+        tooltipBackground: Phaser.GameObjects.Rectangle;
+        tooltipText: Phaser.GameObjects.Text;
+        descBackground: Phaser.GameObjects.Rectangle;
+        data: CardData;
+    }) {
+        this.container = container;
+        this.cardBackground = cardBackground;
+        this.cardImage = cardImage;
+        this.nameBackground = nameBackground;
+        this.nameText = nameText;
+        this.descText = descText;
+        this.descBackground = descBackground;
+        this.tooltipBackground = tooltipBackground;
+        this.tooltipText = tooltipText;
+        this.data = data;
+    }
+}
+
 const cardData: CardData[] = [
-    new BaseCardBehavior({ name: 'Fireball', description: 'Deals 3 damage to target' }),
-    new BaseCardBehavior({ name: 'Healing Touch', description: 'Restores 2 health' }),
-    new BaseCardBehavior({ name: 'Stone Wall', description: 'Summons a defensive barrier' }),
-    new BaseCardBehavior({ name: 'Lightning Bolt', description: 'Strikes for 2 damage' }),
-    new BaseCardBehavior({ name: 'Nature\'s Blessing', description: 'Grants 1 extra mana' }),
-    new BaseCardBehavior({ name: 'Nature\'s Blessing', description: 'Grants 1 extra mana' }),
-    new BaseCardBehavior({ name: 'Nature\'s Blessing', description: 'Grants 1 extra mana' }),
-    new BaseCardBehavior({ name: 'Nature\'s Blessing', description: 'Grants 1 extra mana' }),
+    new AbstractCard({ name: 'Fireball', description: 'Deals 3 damage to target' }),
+    new AbstractCard({ name: 'Healing Touch', description: 'Restores 2 health' }),
+    new AbstractCard({ name: 'Stone Wall', description: 'Summons a defensive barrier' }),
+    new AbstractCard({ name: 'Lightning Bolt', description: 'Strikes for 2 damage' }),
+    new AbstractCard({ name: 'Nature\'s Blessing', description: 'Grants 1 extra mana' }),
+    new AbstractCard({ name: 'Nature\'s Blessing', description: 'Grants 1 extra mana' }),
+    new AbstractCard({ name: 'Nature\'s Blessing', description: 'Grants 1 extra mana' }),
+    new AbstractCard({ name: 'Nature\'s Blessing', description: 'Grants 1 extra mana' }),
     new FireballCard(),
     new ToxicCloudCard(),
     new SummonDemonCard(),
@@ -65,7 +113,7 @@ class CardGame extends Phaser.Scene {
             const y = 100 + index * 180;
             const unit = this.createCard(x, y, data);
             (unit as any).isPlayerUnit = true;
-            this.playerUnits.push(unit);
+            this.playerUnits.push(unit.container);
         });
     }
 
@@ -104,47 +152,62 @@ class CardGame extends Phaser.Scene {
             const x = 100 + index * 150;
             const y = this.config.handY;
             const card = this.createCard(x, y, data);
-            this.playerHand.push(card);
+            this.playerHand.push(card.container);
         });
         this.arrangeCards(this.playerHand, this.config.handY);
     }
-
-    createCard(x: number, y: number, data: CardData): Phaser.GameObjects.Container {
+    createCard(x: number, y: number, data: CardData): PhysicalCard {
         const { cardWidth, cardHeight } = this.config;
         const cardContainer = this.add.container(x, y);
         const cardBackground = this.add.image(0, 0, 'greyscale').setDisplaySize(cardWidth, cardHeight);
-        let cardTexture = data.portraitName
+        let cardTexture = data.portraitName;
 
         const cardImage = this.add.image(0, -cardHeight / 4, cardTexture)
             .setDisplaySize(cardWidth / 2, cardHeight / 2);
 
         const nameBackground = this.add.rectangle(0, cardHeight / 4, cardWidth - 10, 30, 0xffffff);
         const nameText = this.add.text(0, cardHeight / 4, data.name, { fontSize: '16px', color: '#000', wordWrap: { width: cardWidth - 10 } });
-        const descText = this.add.text(0, cardHeight / 2, data.description, { fontSize: '12px', color: '#000', wordWrap: { width: cardWidth - 10 } });
-        const descBackground = this.add.rectangle(0, cardHeight / 2, cardWidth - 10, 60, 0xffffff).setVisible(false).setStrokeStyle(2, 0x000000);
+        
+        // Modified to include both description and tooltip
+        const descText = this.add.text(-cardWidth / 4, cardHeight / 2, data.description, { fontSize: '12px', color: '#000', wordWrap: { width: (cardWidth - 10) / 2 } });
+        const tooltipText = this.add.text(cardWidth / 4, cardHeight / 2, data.tooltip || '', { fontSize: '12px', color: '#000', wordWrap: { width: (cardWidth - 10) / 2 } });
+        const infoBackground = this.add.rectangle(0, cardHeight / 2, cardWidth - 10, 60, 0xffffff).setVisible(false).setStrokeStyle(2, 0x000000);
 
         nameText.setOrigin(0.5);
         descText.setOrigin(0.5);
+        tooltipText.setOrigin(0.5);
         descText.setVisible(false);
+        tooltipText.setVisible(false);
 
-        cardContainer.add([cardBackground, cardImage, nameBackground, nameText, descBackground, descText]);
+        cardContainer.add([cardBackground, cardImage, nameBackground, nameText, infoBackground, descText, tooltipText]);
         cardContainer.setSize(cardWidth, cardHeight);
         cardContainer.setInteractive();
         if (data.cardType == CardType.PLAYABLE) this.input.setDraggable(cardContainer);
 
-        (cardContainer as any).data = data;
+        const physicalCard = new PhysicalCard({
+            container: cardContainer,
+            cardBackground: cardBackground,
+            cardImage: cardImage,
+            nameBackground: nameBackground,
+            nameText: nameText,
+            descText: descText,
+            tooltipText: tooltipText,
+            descBackground: infoBackground,
+            tooltipBackground: infoBackground,//todo: fix this to be a different background thing
+            data: data
+        });
 
-        this.setupCardEvents(cardContainer, descText, descBackground);
+        this.setupCardEvents(physicalCard.container, physicalCard.descText, physicalCard.descBackground);
 
-        return cardContainer;
+        return physicalCard;
     }
 
 
     createMonsterCard(): void {
-        const monsterData: CardData = new BaseCardBehavior({ name: 'Goblin', description: 'A small, mischievous creature', cardType: CardType.CHARACTER });
+        const monsterData: CardData = new AbstractCard({ name: 'Goblin', description: 'A small, mischievous creature', cardType: CardType.CHARACTER });
         const monsterCard = this.createCard(400, this.config.battlefieldY, monsterData);
-        monsterCard.setDepth(1);
-        this.battlefield.push(monsterCard);
+        monsterCard.container.setDepth(1);
+        this.battlefield.push(monsterCard.container);
     }
 
     setupCardEvents(card: Phaser.GameObjects.Container, descText: Phaser.GameObjects.Text, descBackground: Phaser.GameObjects.Rectangle): void {
