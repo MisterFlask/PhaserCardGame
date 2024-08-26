@@ -16,17 +16,28 @@ export default class CampaignScene extends Phaser.Scene {
     private draggedCard: PhysicalCard | null = null;
     private deckDisplayCards: Phaser.GameObjects.Container[] = [];
     private deckDisplayY: number = 0;
+    private rosterY: number = 0;
+    private selectedY: number = 0;
+    private embarkButton!: Phaser.GameObjects.Text;
+    private debugGraphics!: Phaser.GameObjects.Graphics;
 
     constructor() {
         super('Campaign');
     }
 
     create() {
+        this.createLayout();
         this.createCardSlots();
         this.createCharacterRoster();
         this.setupDragAndDrop();
         this.createEmbarkButton();
         this.createDeckDisplay();
+
+        // Listen for resize events
+        this.scale.on('resize', this.resize, this);
+        this.createDebugGraphics();
+        this.updateDebugGraphics();
+        this.resize();
     }
     
     preload(): void {
@@ -34,19 +45,54 @@ export default class CampaignScene extends Phaser.Scene {
         new GameImageLoader().loadAllImages(this.load);
     }
 
+    createLayout() {
+        const { width, height } = this.scale;
+        this.rosterY = height * 0.1;
+        this.deckDisplayY = height * 0.3;
+        this.selectedY = height * 0.55;
+    }
+
+    resize() {
+        const { width, height } = this.scale;
+
+        // Update layout
+        this.rosterY = height * 0.1;
+        this.deckDisplayY = height * 0.3;
+        this.selectedY = height * 0.55;
+
+        // Reposition card slots
+        this.cardSlots.forEach((slot, index) => {
+            if (slot.type === 'roster') {
+                slot.container.setPosition(width * (0.1 + index * 0.18), this.rosterY);
+            } else if (slot.type === 'selected') {
+                slot.container.setPosition(width * (0.1 + index * 0.1) + 40, this.selectedY);
+            }
+
+            console.log(`Slot ${index} (${slot.type}): x=${slot.container.x}, y=${slot.container.y}`);
+        });
+
+        // Reposition embark button
+        this.embarkButton.setPosition(width * 0.95, height * 0.5);
+
+        // Update deck display
+        if (this.draggedCard && this.draggedCard.data instanceof BaseCharacter) {
+            this.updateDeckDisplay(this.draggedCard.data.cardsInDeck);
+        }
+        this.updateDebugGraphics();
+
+    }
+
     createCardSlots() {
-        const rosterY = 120;
-        this.deckDisplayY = this.scale.height / 2;
-        const selectedY = this.scale.height - 80;
+        const { width } = this.scale;
 
         // Create roster slots
         for (let i = 0; i < 5; i++) {
-            this.createSlot(100 + i * 150, rosterY, 'roster');
+            this.createSlot(width * (0.1 + i * 0.18), this.rosterY, 'roster');
         }
 
         // Create selected character slots
         for (let i = 0; i < 3; i++) {
-            this.createSlot(100 + i * 250, selectedY, 'selected');
+            this.createSlot(width * (0.25 + i * 0.25), this.selectedY, 'selected');
         }
     }
 
@@ -114,6 +160,7 @@ export default class CampaignScene extends Phaser.Scene {
             card.container.setDepth((card.container as any).originalDepth);
         });
     }
+
     onDragEnd(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container) {
         const sourceSlot = this.findSlotWithCard(this.draggedCard!);
         const targetSlot = this.findNearestEmptySlot(gameObject);
@@ -166,14 +213,14 @@ export default class CampaignScene extends Phaser.Scene {
     }
 
     createEmbarkButton() {
-        const embarkButton = this.add.text(this.scale.width - 100, this.scale.height / 2, 'Embark!', {
+        this.embarkButton = this.add.text(this.scale.width * 0.95, this.scale.height * 0.5, 'Embark!', {
             fontSize: '24px',
             color: '#ffffff',
             backgroundColor: '#4a4a4a',
             padding: { x: 10, y: 5 }
         })
         .setOrigin(0.5)
-        .setAngle(90)
+        .setAngle(-90)
         .setInteractive()
         .on('pointerdown', this.onEmbarkClicked, this);
     }
@@ -199,9 +246,10 @@ export default class CampaignScene extends Phaser.Scene {
         this.deckDisplayCards = [];
 
         // Create new deck display
-        const cardWidth = 100;
-        const cardSpacing = 10;
-        const startX = (this.scale.width - (cards.length * (cardWidth + cardSpacing))) / 2;
+        const { width } = this.scale;
+        const cardWidth = width * 0.1;
+        const cardSpacing = width * 0.01;
+        const startX = (width - (cards.length * (cardWidth + cardSpacing))) / 2;
 
         cards.forEach((card, index) => {
             const x = startX + index * (cardWidth + cardSpacing);
@@ -218,5 +266,23 @@ export default class CampaignScene extends Phaser.Scene {
                     this.updateDeckDisplay(card.data.cardsInDeck);
                 }
             });
+    }
+
+    createDebugGraphics() {
+        this.debugGraphics = this.add.graphics();
+    }
+
+    updateDebugGraphics() {
+        this.debugGraphics.clear();
+        this.debugGraphics.lineStyle(2, 0xff0000);
+        
+        this.cardSlots.forEach(slot => {
+            this.debugGraphics.strokeRect(
+                slot.container.x - 50, 
+                slot.container.y - 70, 
+                100, 
+                140
+            );
+        });
     }
 }
