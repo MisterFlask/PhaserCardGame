@@ -1,21 +1,37 @@
 import Phaser from 'phaser';
-import { PhysicalCard, CardLocation } from '../gamecharacters/PhysicalCard';
+import { PhysicalCard, CardLocation, CardType } from '../gamecharacters/PhysicalCard';
 import { BaseCharacter, BaseCharacterClass, BlackhandClass, DiabolistClass } from '../gamecharacters/CharacterClasses';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 import { AbstractCard } from '../gamecharacters/PhysicalCard';
 import GameImageLoader from '../utils/ImageUtils';
 
+export class StoreCard extends AbstractCard {
+    constructor({ name, description, portraitName, tooltip }: { name: string; description: string; portraitName?: string, tooltip?: string}) {
+        super(
+            {
+                name: name,
+                description: description,
+                portraitName: portraitName,
+                cardType: CardType.STORE,
+                tooltip: tooltip
+            }
+        );
+    }
+}
+
 interface CardSlot {
     container: Phaser.GameObjects.Container;
     card: PhysicalCard | null;
-    type: 'roster' | 'selected';
+    type: 'roster' | 'selected' | 'deck' | 'shop';
 }
 
 export default class CampaignScene extends Phaser.Scene {
     private cardSlots: CardSlot[] = [];
     private draggedCard: PhysicalCard | null = null;
-    private deckDisplayCards: Phaser.GameObjects.Container[] = [];
+    private deckDisplayCards: PhysicalCard[] = [];
+    private shopCards: PhysicalCard[] = [];
     private deckDisplayY: number = 0;
+    private shopY: number = 0;
     private rosterY: number = 0;
     private selectedY: number = 0;
     private embarkButton!: Phaser.GameObjects.Text;
@@ -32,6 +48,7 @@ export default class CampaignScene extends Phaser.Scene {
         this.setupDragAndDrop();
         this.createEmbarkButton();
         this.createDeckDisplay();
+        this.createShop();
 
         // Listen for resize events
         this.scale.on('resize', this.resize, this);
@@ -49,7 +66,8 @@ export default class CampaignScene extends Phaser.Scene {
         const { width, height } = this.scale;
         this.rosterY = height * 0.1;
         this.deckDisplayY = height * 0.3;
-        this.selectedY = height * 0.55;
+        this.shopY = height * 0.5;
+        this.selectedY = height * 0.85;
     }
 
     resize() {
@@ -58,14 +76,25 @@ export default class CampaignScene extends Phaser.Scene {
         // Update layout
         this.rosterY = height * 0.1;
         this.deckDisplayY = height * 0.3;
-        this.selectedY = height * 0.55;
+        this.shopY = height * 0.5;
+        this.selectedY = height * 0.85;
 
         // Reposition card slots
         this.cardSlots.forEach((slot, index) => {
             if (slot.type === 'roster') {
                 slot.container.setPosition(width * (0.1 + index * 0.18), this.rosterY);
             } else if (slot.type === 'selected') {
-                slot.container.setPosition(width * (0.1 + index * 0.1) + 40, this.selectedY);
+                slot.container.setPosition(width * (0.1 + index * 0.1), this.selectedY);
+            } else if (slot.type === 'deck') {
+                const cardWidth = width * 0.1;
+                const cardSpacing = width * 0.01;
+                const startX = (width - (this.deckDisplayCards.length * (cardWidth + cardSpacing))) / 2;
+                slot.container.setPosition(startX + index * (cardWidth + cardSpacing), this.deckDisplayY);
+            } else if (slot.type === 'shop') {
+                const cardWidth = width * 0.1;
+                const cardSpacing = width * 0.01;
+                const startX = (width - (this.shopCards.length * (cardWidth + cardSpacing))) / 2;
+                slot.container.setPosition(startX + index * (cardWidth + cardSpacing), this.shopY);
             }
 
             console.log(`Slot ${index} (${slot.type}): x=${slot.container.x}, y=${slot.container.y}`);
@@ -78,8 +107,11 @@ export default class CampaignScene extends Phaser.Scene {
         if (this.draggedCard && this.draggedCard.data instanceof BaseCharacter) {
             this.updateDeckDisplay(this.draggedCard.data.cardsInDeck);
         }
-        this.updateDebugGraphics();
 
+        // Update shop cards
+        this.positionShopCards(this.shopCards.map(card => card.data as StoreCard));
+
+        this.updateDebugGraphics();
     }
 
     createCardSlots() {
@@ -96,7 +128,7 @@ export default class CampaignScene extends Phaser.Scene {
         }
     }
 
-    createSlot(x: number, y: number, type: 'roster' | 'selected') {
+    createSlot(x: number, y: number, type: 'roster' | 'selected' | 'deck' | 'shop') {
         const container = this.add.container(x, y);
         const background = this.add.image(0, 0, 'card_background').setOrigin(0.5);
         container.add(background);
@@ -126,6 +158,7 @@ export default class CampaignScene extends Phaser.Scene {
         card.container.setPosition(0, 0);
         this.input.setDraggable(card.container);
         (card.container as any).physicalCard = card;  // For easy reference during drag
+        this.setupCardEvents(card);
     }
 
     setupDragAndDrop() {
@@ -144,21 +177,24 @@ export default class CampaignScene extends Phaser.Scene {
         gameObject.y = dragY;
     }
 
-    setupPlayingCardEvents(card: PhysicalCard): void {
-        card.container.on('pointerover', () => {
-            card.descText.setVisible(true);
-            card.descBackground.setVisible(true);
-            card.tooltipText.setVisible(true);
-            card.tooltipBackground.setVisible(true);
-            card.container.setDepth(1000);
-        });
-        card.container.on('pointerout', () => {
-            card.descText.setVisible(false);
-            card.descBackground.setVisible(false);
-            card.tooltipText.setVisible(false);
-            card.tooltipBackground.setVisible(false);
-            card.container.setDepth((card.container as any).originalDepth);
-        });
+    setupCardEvents(card: PhysicalCard): void {
+        card.container.setInteractive()
+            .on('pointerover', () => {
+                card.container.setScale(1.1);
+                card.descText.setVisible(true);
+                card.descBackground.setVisible(true);
+                card.tooltipText.setVisible(true);
+                card.tooltipBackground.setVisible(true);
+                card.container.setDepth(1000);
+            })
+            .on('pointerout', () => {
+                card.container.setScale(1);
+                card.descText.setVisible(false);
+                card.descBackground.setVisible(false);
+                card.tooltipText.setVisible(false);
+                card.tooltipBackground.setVisible(false);
+                card.container.setDepth((card.container as any).originalDepth);
+            });
     }
 
     onDragEnd(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container) {
@@ -227,8 +263,10 @@ export default class CampaignScene extends Phaser.Scene {
 
     onEmbarkClicked() {
         const selectedCards = this.getSelectedCards();
+        const selectedShopCards = this.shopCards.filter(card => card.isSelected);
         if (selectedCards.length === 3) {
             console.log('Embarking on adventure with:', selectedCards.map(card => card.data.name));
+            console.log('Purchased items:', selectedShopCards.map(card => card.data.name));
             // Transition to the next scene or start the game
         } else {
             console.log('Please select 3 characters before embarking:', selectedCards.map(card => card.data.name));
@@ -245,6 +283,9 @@ export default class CampaignScene extends Phaser.Scene {
         this.deckDisplayCards.forEach(card => card.destroy());
         this.deckDisplayCards = [];
 
+        // Remove existing deck slots
+        this.cardSlots = this.cardSlots.filter(slot => slot.type !== 'deck');
+
         // Create new deck display
         const { width } = this.scale;
         const cardWidth = width * 0.1;
@@ -254,8 +295,13 @@ export default class CampaignScene extends Phaser.Scene {
         cards.forEach((card, index) => {
             const x = startX + index * (cardWidth + cardSpacing);
             const physicalCard = new CardGuiUtils().createCard(
-                this, x, this.deckDisplayY, card, CardLocation.BATTLEFIELD, this.setupPlayingCardEvents);
-            this.deckDisplayCards.push(physicalCard.container);
+                this, x, this.deckDisplayY, card, CardLocation.BATTLEFIELD, this.setupCardEvents);
+            this.deckDisplayCards.push(physicalCard);
+            
+            // Create a new slot for this deck card
+            this.createSlot(x, this.deckDisplayY, 'deck');
+            const slot = this.cardSlots[this.cardSlots.length - 1];
+            this.addCardToSlot(physicalCard, slot);
         });
     }
 
@@ -284,5 +330,75 @@ export default class CampaignScene extends Phaser.Scene {
                 140
             );
         });
+    }
+
+    createShop() {
+        const shopItems = [
+            new StoreCard({ name: 'Cargo', description: 'Increases carrying capacity', portraitName: '', tooltip: 'Carry more items' }),
+            new StoreCard({ name: 'Stimpack', description: 'Restores health', portraitName: '', tooltip: 'Heal your character' })
+        ];
+
+        this.positionShopCards(shopItems);
+    }
+
+    positionShopCards(shopItems: StoreCard[]) {
+        // Clear existing shop cards and slots
+        this.shopCards.forEach(card => card.destroy());
+        this.shopCards = [];
+        this.cardSlots = this.cardSlots.filter(slot => slot.type !== 'shop');
+
+        const { width } = this.scale;
+        const cardWidth = width * 0.1;
+        const cardSpacing = width * 0.01;
+        const startX = (width - (shopItems.length * (cardWidth + cardSpacing))) / 2;
+
+        shopItems.forEach((item, index) => {
+            const x = startX + index * (cardWidth + cardSpacing);
+            const physicalCard = new CardGuiUtils().createCard(
+                this, x, this.shopY, item, CardLocation.SHOP, this.setupShopCardEvents);
+            this.shopCards.push(physicalCard);
+            
+            // Create a new slot for this shop card
+            this.createSlot(x, this.shopY, 'shop');
+            const slot = this.cardSlots[this.cardSlots.length - 1];
+            this.addCardToSlot(physicalCard, slot);
+        });
+    }
+    setupShopCardEvents(card: PhysicalCard): void {
+        card.container.setInteractive()
+            .on('pointerover', () => {
+                card.container.setScale(1.1);
+            })
+            .on('pointerout', () => {
+                card.container.setScale(1);
+            })
+            .on('pointerdown', () => {
+                this.toggleCardSelection(card);
+            });
+    }
+
+    private toggleCardSelection(card: PhysicalCard): void {
+        const isSelected = card.container.getData('isSelected');
+        card.container.setData('isSelected', !isSelected);
+        
+        if (!isSelected) {
+            // Create a selection border if it doesn't exist
+            if (!card.container.getData('selectionBorder')) {
+                const border = this.add.graphics();
+                border.lineStyle(2, 0xffff00);
+                border.strokeRect(-card.container.width / 2, -card.container.height / 2, card.container.width, card.container.height);
+                card.container.add(border);
+                card.container.setData('selectionBorder', border);
+            } else {
+                // Show existing border
+                card.container.getData('selectionBorder').setVisible(true);
+            }
+        } else {
+            // Hide the selection border
+            const border = card.container.getData('selectionBorder');
+            if (border) {
+                border.setVisible(false);
+            }
+        }
     }
 }

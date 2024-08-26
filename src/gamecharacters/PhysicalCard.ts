@@ -3,12 +3,14 @@ import { BaseCharacter } from "./CharacterClasses";
 export enum CardLocation {
     BATTLEFIELD,
     HAND,
-    CHARACTER_ROSTER
+    CHARACTER_ROSTER,
+    SHOP
 }
 
 export enum CardType {
     CHARACTER = "CHARACTER",
-    PLAYABLE = "PLAYABLE"
+    PLAYABLE = "PLAYABLE",
+    STORE = "STORE"
 }
 
 export class AbstractCard {
@@ -56,6 +58,7 @@ export class PhysicalCard {
     cardLocation: CardLocation;
     visualTags: PhysicalCardVisualTag[];
     scene: Phaser.Scene;
+    isSelected: boolean = false;
 
     constructor({
         scene,
