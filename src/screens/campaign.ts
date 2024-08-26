@@ -4,6 +4,7 @@ import { BaseCharacter, BaseCharacterClass, BlackhandClass, DiabolistClass } fro
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 import { AbstractCard } from '../gamecharacters/PhysicalCard';
 import GameImageLoader from '../utils/ImageUtils';
+import { GameAction } from '../utils/ActionQueue';
 
 export class StoreCard extends AbstractCard {
     constructor({ name, description, portraitName, tooltip }: { name: string; description: string; portraitName?: string, tooltip?: string}) {
@@ -16,6 +17,14 @@ export class StoreCard extends AbstractCard {
                 tooltip: tooltip
             }
         );
+    }
+    OnPurchase(): void {
+        console.log('Item purchased');
+    }
+
+    OnCombatStart(): GameAction[] {
+        console.log('Combat started');
+        return [];
     }
 }
 

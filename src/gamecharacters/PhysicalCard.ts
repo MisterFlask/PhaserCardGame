@@ -4,7 +4,9 @@ export enum CardLocation {
     BATTLEFIELD,
     HAND,
     CHARACTER_ROSTER,
-    SHOP
+    SHOP,
+    DRAW_PILE,
+    DISCARD_PILE
 }
 
 export enum CardType {

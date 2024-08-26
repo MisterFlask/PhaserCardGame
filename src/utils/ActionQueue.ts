@@ -1,10 +1,10 @@
 import Phaser from 'phaser';
 
-abstract class GameAction {
+export abstract class GameAction {
   abstract playAction(): GameAction[];
 }
 
-class ActionQueue {
+export class ActionQueue {
   private queue: GameAction[] = [];
 
   addAction(action: GameAction): void {
