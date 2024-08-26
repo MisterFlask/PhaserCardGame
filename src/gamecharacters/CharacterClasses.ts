@@ -1,12 +1,17 @@
 import { AbstractCard } from "./PhysicalCard";
 
-export class BaseCharacter{
+export class BaseCharacter extends AbstractCard{
     name: string;
     portraitName: string;
     characterClass: BaseCharacterClass;
     
-
-    constructor({ name, portraitName, characterClass }: { name: string; portraitName: string; characterClass: BaseCharacterClass }) {
+    constructor({ name, portraitName, characterClass }
+        : { name: string; portraitName: string; characterClass: BaseCharacterClass }) {
+        super({
+            name: name,
+            description: "",
+            portraitName: portraitName
+        });
         this.name = name;
         this.portraitName = portraitName;
         this.characterClass = characterClass;

@@ -1,79 +1,80 @@
 import Phaser from 'phaser';
-import { AbstractCard, CardType, PhysicalCard, CardLocation } from '../gamecharacters/PhysicalCard';
-import { BaseCharacterClass, DiabolistClass, BlackhandClass, BaseCharacter } from '../gamecharacters/CharacterClasses';
+import { PhysicalCard, CardLocation } from '../gamecharacters/PhysicalCard';
+import { BaseCharacter, BaseCharacterClass, BlackhandClass, DiabolistClass } from '../gamecharacters/CharacterClasses';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
-import GameImageLoader from '../utils/ImageUtils';
+
+interface CardSlot {
+    container: Phaser.GameObjects.Container;
+    card: PhysicalCard | null;
+    type: 'roster' | 'selected';
+}
 
 export default class CampaignScene extends Phaser.Scene {
-    private characterRoster: PhysicalCard[] = [];
-    private characterSlots: Phaser.GameObjects.Rectangle[] = [];
-    private selectedCharacters: PhysicalCard[] = [];
-    private embarkButton!: Phaser.GameObjects.Text;
+    private cardSlots: CardSlot[] = [];
+    private draggedCard: PhysicalCard | null = null;
 
     constructor() {
-        super('campaign');
-    }
-
-    preload() {
-        new GameImageLoader().loadAllImages(this.load);
+        super('Campaign');
     }
 
     create() {
-        this.add.text(400, 50, 'Campaign Management', { fontSize: '32px', color: '#ffffff' }).setOrigin(0.5);
-
-        // Create character roster
-        this.add.text(100, 100, 'Character Roster', { fontSize: '24px', color: '#ffffff' });
+        this.createCardSlots();
         this.createCharacterRoster();
+        this.setupDragAndDrop();
+        this.createEmbarkButton();
+    }
 
-        // Create character slots
-        this.add.text(600, 100, 'Selected Characters', { fontSize: '24px', color: '#ffffff' });
-        this.createCharacterSlots();
+    createCardSlots() {
+        const rosterY = 120;
+        const selectedY = this.scale.height - 80;
 
-        // Create Embark button
-        this.embarkButton = this.add.text(400, 550, 'Embark!', { fontSize: '24px', color: '#ffffff', backgroundColor: '#4a4a4a', padding: { x: 10, y: 5 } })
-            .setOrigin(0.5)
-            .setInteractive()
-            .on('pointerdown', this.onEmbarkClicked, this);
+        // Create roster slots
+        for (let i = 0; i < 5; i++) {
+            this.createSlot(100 + i * 150, rosterY, 'roster');
+        }
 
-        // Set up drag and drop
-        this.input.on('drag', this.onDrag, this);
-        this.input.on('dragstart', this.onDragStart, this);
-        this.input.on('dragend', this.onDragEnd, this);
+        // Create selected character slots
+        for (let i = 0; i < 3; i++) {
+            this.createSlot(100 + i * 250, selectedY, 'selected');
+        }
+    }
+
+    createSlot(x: number, y: number, type: 'roster' | 'selected') {
+        const container = this.add.container(x, y);
+        const background = this.add.image(0, 0, 'card_background').setOrigin(0.5);
+        container.add(background);
+
+        const slot: CardSlot = { container, card: null, type };
+        this.cardSlots.push(slot);
     }
 
     createCharacterRoster() {
         const classes: BaseCharacterClass[] = [new DiabolistClass(), new BlackhandClass()];
-        for (let i = 0; i < 5; i++) {
+        const rosterSlots = this.cardSlots.filter(slot => slot.type === 'roster');
+
+        rosterSlots.forEach((slot, index) => {
             const randomClass = classes[Math.floor(Math.random() * classes.length)];
-            const character = new BaseCharacter({ name: `Character ${i + 1}`, portraitName: `flamer1`, characterClass: randomClass });
-            const randomCard = character.characterClass.availableCards[Math.floor(Math.random() * character.characterClass.availableCards.length)];
-            const card = new CardGuiUtils().createCard(this, 100, 150 + i * 80, randomCard, CardLocation.BATTLEFIELD, this.setupCardEvents);
-            this.characterRoster.push(card);
-        }
-    }
-
-    public setupCardEvents(card: PhysicalCard): void {
-        card.container.on('pointerover', () => {
-            card.descText.setVisible(true);
-            card.descBackground.setVisible(true);
-            card.tooltipText.setVisible(true);
-            card.tooltipBackground.setVisible(true);
-            card.container.setDepth(1000);
-        });
-        card.container.on('pointerout', () => {
-            card.descText.setVisible(false);
-            card.descBackground.setVisible(false);
-            card.tooltipText.setVisible(false);
-            card.tooltipBackground.setVisible(false);
-            card.container.setDepth((card.container as any).originalDepth);
+            const character = new BaseCharacter({ name: `Character ${index + 1} (${randomClass.name})`, portraitName: 'flamer1', characterClass: randomClass });
+            const card = new CardGuiUtils().createCard(this, 0, 0, character, CardLocation.BATTLEFIELD, () => {});
+            this.addCardToSlot(card, slot);
         });
     }
+    addCardToSlot(card: PhysicalCard, slot: CardSlot) {
+        slot.card = card;
+        slot.container.add(card.container);
+        card.container.setPosition(0, 0);
+        this.input.setDraggable(card.container);
+        (card.container as any).physicalCard = card;  // For easy reference during drag
+    }
+    setupDragAndDrop() {
+        this.input.on('dragstart', this.onDragStart, this);
+        this.input.on('drag', this.onDrag, this);
+        this.input.on('dragend', this.onDragEnd, this);
+    }
 
-    createCharacterSlots() {
-        for (let i = 0; i < 3; i++) {
-            const slot = this.add.rectangle(600, 150 + i * 100, 220, 80, 0x666666).setOrigin(0);
-            this.characterSlots.push(slot);
-        }
+    onDragStart(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container) {
+        this.draggedCard = (gameObject as any).physicalCard;
+        this.children.bringToTop(gameObject);
     }
 
     onDrag(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container, dragX: number, dragY: number) {
@@ -81,41 +82,77 @@ export default class CampaignScene extends Phaser.Scene {
         gameObject.y = dragY;
     }
 
-    onDragStart(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container) {
-        this.children.bringToTop(gameObject);
+    onDragEnd(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container) {
+        const sourceSlot = this.findSlotWithCard(this.draggedCard!);
+        const targetSlot = this.findNearestEmptySlot(gameObject);
+
+        if (targetSlot && this.canMoveCardToSlot(sourceSlot, targetSlot)) {
+            this.moveCardToSlot(this.draggedCard!, sourceSlot, targetSlot);
+        } else {
+            this.returnCardToSlot(this.draggedCard!, sourceSlot);
+        }
+
+        this.draggedCard = null;
     }
 
-    onDragEnd(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container) {
-        const droppedSlot = this.characterSlots.find(slot => Phaser.Geom.Intersects.RectangleToRectangle(gameObject.getBounds(), slot.getBounds()));
-        
-        if (droppedSlot && this.selectedCharacters.length < 3) {
-            const cardIndex = this.characterRoster.findIndex(card => card.container === gameObject);
-            if (cardIndex !== -1) {
-                const [selectedCard] = this.characterRoster.splice(cardIndex, 1);
-                this.selectedCharacters.push(selectedCard);
-                gameObject.setPosition(droppedSlot.x + 10, droppedSlot.y + 10);
-                this.updateCharacterRoster();
-            }
-        } else {
-            const originalCard = this.characterRoster.find(card => card.container === gameObject) || this.selectedCharacters.find(card => card.container === gameObject);
-            if (originalCard) {
-                gameObject.setPosition(originalCard.container.x, originalCard.container.y);
-            }
+    findSlotWithCard(card: PhysicalCard): CardSlot | undefined {
+        return this.cardSlots.find(slot => slot.card === card);
+    }
+
+    findNearestEmptySlot(gameObject: Phaser.GameObjects.Container): CardSlot | undefined {
+        return this.cardSlots
+            .filter(slot => !slot.card || slot.card === this.draggedCard)
+            .sort((a, b) => {
+                const distA = Phaser.Math.Distance.Between(gameObject.x, gameObject.y, a.container.x, a.container.y);
+                const distB = Phaser.Math.Distance.Between(gameObject.x, gameObject.y, b.container.x, b.container.y);
+                return distA - distB;
+            })[0];
+    }
+
+    canMoveCardToSlot(sourceSlot: CardSlot | undefined, targetSlot: CardSlot): boolean {
+        if (!sourceSlot || !targetSlot) return false;
+        if (sourceSlot === targetSlot) return false;
+        if (targetSlot.type === 'selected' && this.getSelectedCards().length >= 3) return false;
+        return true;
+    }
+
+    moveCardToSlot(card: PhysicalCard, sourceSlot: CardSlot | undefined, targetSlot: CardSlot) {
+        if (sourceSlot) sourceSlot.card = null;
+        this.addCardToSlot(card, targetSlot);
+    }
+    
+    returnCardToSlot(card: PhysicalCard, slot: CardSlot | undefined) {
+        if (slot) {
+            this.addCardToSlot(card, slot);
         }
     }
 
-    updateCharacterRoster() {
-        this.characterRoster.forEach((card, index) => {
-            card.container.setPosition(100, 150 + index * 80);
-        });
+    getSelectedCards(): PhysicalCard[] {
+        return this.cardSlots
+            .filter(slot => slot.type === 'selected' && slot.card)
+            .map(slot => slot.card!);
+    }
+
+    createEmbarkButton() {
+        const embarkButton = this.add.text(this.scale.width - 100, this.scale.height / 2, 'Embark!', {
+            fontSize: '24px',
+            color: '#ffffff',
+            backgroundColor: '#4a4a4a',
+            padding: { x: 10, y: 5 }
+        })
+        .setOrigin(0.5)
+        .setAngle(90)
+        .setInteractive()
+        .on('pointerdown', this.onEmbarkClicked, this);
     }
 
     onEmbarkClicked() {
-        if (this.selectedCharacters.length === 3) {
-            console.log('Embarking on adventure with:', this.selectedCharacters.map(card => card.data.name));
-            // Here you would transition to the next scene or start the game
+        const selectedCards = this.getSelectedCards();
+        if (selectedCards.length === 3) {
+            console.log('Embarking on adventure with:', selectedCards.map(card => card.data.name));
+            // Transition to the next scene or start the game
         } else {
-            console.log('Please select 3 characters before embarking');
+            console.log('Please select 3 characters before embarking:', selectedCards.map(card => card.data.name));
         }
     }
 }

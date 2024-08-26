@@ -3,6 +3,7 @@ import GameImageLoader from './utils/ImageUtils';
 import { ArcaneRitualCard, FireballCard, SummonDemonCard, ToxicCloudCard } from './gamecharacters/CharacterClasses';
 import { AbstractCard, CardType, PhysicalCard, CardLocation } from './gamecharacters/PhysicalCard';
 import { CardGuiUtils, GameConfig } from './utils/CardGuiUtils';
+import CampaignScene from './screens/campaign';
 
 
 const unitData: AbstractCard[] = [
@@ -61,8 +62,6 @@ class CardGame extends Phaser.Scene {
 
     preload(): void {
         this.load.setBaseURL('https://raw.githubusercontent.com/');
-        this.load.image('card', 'photonstorm/phaser3-examples/master/public/assets/sprites/blue_ball.png');
-        this.load.image('monster', 'photonstorm/phaser3-examples/master/public/assets/sprites/red_ball.png');
         new GameImageLoader().loadAllImages(this.load);
     }
 
@@ -305,6 +304,10 @@ class CardGame extends Phaser.Scene {
     }
 
     resize(): void {
+        if (!this.scene.isActive('CardGame')) {
+            return;
+        }
+
         const { width, height } = this.scale;
         this.cameras.main.setViewport(0, 0, width, height);
 
@@ -346,7 +349,7 @@ const config: Phaser.Types.Core.GameConfig = {
         width: '100%',
         height: '100%'
     },
-    scene: CardGame
+    scene: [CardGame, CampaignScene]
 };
 
 const game = new Phaser.Game(config);
