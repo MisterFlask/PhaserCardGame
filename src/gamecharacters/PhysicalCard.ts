@@ -105,10 +105,25 @@ export class PhysicalCard {
     }
 
     updateVisuals(): void {
+        if (!this.scene || !this.scene.sys) {
+            console.warn('Scene is undefined in updateVisuals');
+            return;
+        }
+        if (!this.cardImage.scene || !this.cardImage.scene.sys) {
+            console.warn('Scene is undefined in updateVisuals (BUT FOR THE CARDIMAGE SPECIFICALLY)');
+            return;
+        }
         this.nameText.setText(this.data.name);
         this.descText.setText(this.data.description);
         this.tooltipText.setText(this.data.tooltip);
-        this.cardImage.setTexture(this.data.portraitName);
+        // Check if the texture exists before setting it
+        if (this.scene.textures.exists(this.data.portraitName)) {
+            this.cardImage.setTexture(this.data.portraitName);
+        } else {
+            console.warn(`Texture '${this.data.portraitName}' not found. Using fallback texture.`);
+            //this.cardImage.setTexture('fallback_texture'); // Ensure you have a fallback texture
+        }
+
         this.updateVisualTags();
     }
 

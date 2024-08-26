@@ -2,6 +2,8 @@ import Phaser from 'phaser';
 import { PhysicalCard, CardLocation } from '../gamecharacters/PhysicalCard';
 import { BaseCharacter, BaseCharacterClass, BlackhandClass, DiabolistClass } from '../gamecharacters/CharacterClasses';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
+import { AbstractCard } from '../gamecharacters/PhysicalCard';
+import GameImageLoader from '../utils/ImageUtils';
 
 interface CardSlot {
     container: Phaser.GameObjects.Container;
@@ -12,6 +14,8 @@ interface CardSlot {
 export default class CampaignScene extends Phaser.Scene {
     private cardSlots: CardSlot[] = [];
     private draggedCard: PhysicalCard | null = null;
+    private deckDisplayCards: Phaser.GameObjects.Container[] = [];
+    private deckDisplayY: number = 0;
 
     constructor() {
         super('Campaign');
@@ -22,10 +26,17 @@ export default class CampaignScene extends Phaser.Scene {
         this.createCharacterRoster();
         this.setupDragAndDrop();
         this.createEmbarkButton();
+        this.createDeckDisplay();
+    }
+    
+    preload(): void {
+        this.load.setBaseURL('https://raw.githubusercontent.com/');
+        new GameImageLoader().loadAllImages(this.load);
     }
 
     createCardSlots() {
         const rosterY = 120;
+        this.deckDisplayY = this.scale.height / 2;
         const selectedY = this.scale.height - 80;
 
         // Create roster slots
@@ -55,10 +66,14 @@ export default class CampaignScene extends Phaser.Scene {
         rosterSlots.forEach((slot, index) => {
             const randomClass = classes[Math.floor(Math.random() * classes.length)];
             const character = new BaseCharacter({ name: `Character ${index + 1} (${randomClass.name})`, portraitName: 'flamer1', characterClass: randomClass });
+            character.cardsInDeck.push(...randomClass.availableCards);
+            
             const card = new CardGuiUtils().createCard(this, 0, 0, character, CardLocation.BATTLEFIELD, () => {});
             this.addCardToSlot(card, slot);
+            this.setupCardHover(card);
         });
     }
+
     addCardToSlot(card: PhysicalCard, slot: CardSlot) {
         slot.card = card;
         slot.container.add(card.container);
@@ -66,6 +81,7 @@ export default class CampaignScene extends Phaser.Scene {
         this.input.setDraggable(card.container);
         (card.container as any).physicalCard = card;  // For easy reference during drag
     }
+
     setupDragAndDrop() {
         this.input.on('dragstart', this.onDragStart, this);
         this.input.on('drag', this.onDrag, this);
@@ -82,6 +98,22 @@ export default class CampaignScene extends Phaser.Scene {
         gameObject.y = dragY;
     }
 
+    setupPlayingCardEvents(card: PhysicalCard): void {
+        card.container.on('pointerover', () => {
+            card.descText.setVisible(true);
+            card.descBackground.setVisible(true);
+            card.tooltipText.setVisible(true);
+            card.tooltipBackground.setVisible(true);
+            card.container.setDepth(1000);
+        });
+        card.container.on('pointerout', () => {
+            card.descText.setVisible(false);
+            card.descBackground.setVisible(false);
+            card.tooltipText.setVisible(false);
+            card.tooltipBackground.setVisible(false);
+            card.container.setDepth((card.container as any).originalDepth);
+        });
+    }
     onDragEnd(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container) {
         const sourceSlot = this.findSlotWithCard(this.draggedCard!);
         const targetSlot = this.findNearestEmptySlot(gameObject);
@@ -154,5 +186,37 @@ export default class CampaignScene extends Phaser.Scene {
         } else {
             console.log('Please select 3 characters before embarking:', selectedCards.map(card => card.data.name));
         }
+    }
+
+    createDeckDisplay() {
+        // Initially create an empty deck display
+        this.updateDeckDisplay([]);
+    }
+
+    updateDeckDisplay(cards: AbstractCard[]) {
+        // Clear existing deck display
+        this.deckDisplayCards.forEach(card => card.destroy());
+        this.deckDisplayCards = [];
+
+        // Create new deck display
+        const cardWidth = 100;
+        const cardSpacing = 10;
+        const startX = (this.scale.width - (cards.length * (cardWidth + cardSpacing))) / 2;
+
+        cards.forEach((card, index) => {
+            const x = startX + index * (cardWidth + cardSpacing);
+            const physicalCard = new CardGuiUtils().createCard(
+                this, x, this.deckDisplayY, card, CardLocation.BATTLEFIELD, this.setupPlayingCardEvents);
+            this.deckDisplayCards.push(physicalCard.container);
+        });
+    }
+
+    setupCardHover(card: PhysicalCard) {
+        card.container.setInteractive()
+            .on('pointerover', () => {
+                if (card.data instanceof BaseCharacter) {
+                    this.updateDeckDisplay(card.data.cardsInDeck);
+                }
+            });
     }
 }

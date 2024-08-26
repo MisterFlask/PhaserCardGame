@@ -4,6 +4,7 @@ export class BaseCharacter extends AbstractCard{
     name: string;
     portraitName: string;
     characterClass: BaseCharacterClass;
+    cardsInDeck: AbstractCard[];
     
     constructor({ name, portraitName, characterClass }
         : { name: string; portraitName: string; characterClass: BaseCharacterClass }) {
@@ -15,6 +16,7 @@ export class BaseCharacter extends AbstractCard{
         this.name = name;
         this.portraitName = portraitName;
         this.characterClass = characterClass;
+        this.cardsInDeck = [];
     }
 }
 
