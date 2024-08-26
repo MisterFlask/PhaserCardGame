@@ -267,7 +267,7 @@ export default class CampaignScene extends Phaser.Scene {
 
     onEmbarkClicked() {
         const selectedCards = this.getSelectedCards();
-        const selectedShopCards = this.shopCards.filter(card => card.isSelected);
+        const selectedShopCards = this.shopCards.filter(card => card.container.getData('isSelected'));
         if (selectedCards.length === 3) {
             console.log('Embarking on adventure with:', selectedCards.map(card => card.data.name));
             console.log('Purchased items:', selectedShopCards.map(card => card.data.name));
@@ -359,7 +359,7 @@ export default class CampaignScene extends Phaser.Scene {
         shopItems.forEach((item, index) => {
             const x = startX + index * (cardWidth + cardSpacing);
             const physicalCard = new CardGuiUtils().createCard(
-                this, x, this.shopY, item, CardLocation.SHOP, this.setupShopCardEvents);
+                this, x, this.shopY, item, CardLocation.SHOP, (card) => this.setupShopCardEvents(card));
             this.shopCards.push(physicalCard);
             
             // Create a new slot for this shop card
@@ -368,6 +368,7 @@ export default class CampaignScene extends Phaser.Scene {
             this.addCardToSlot(physicalCard, slot);
         });
     }
+    
     setupShopCardEvents(card: PhysicalCard): void {
         card.container.setInteractive()
             .on('pointerover', () => {
@@ -381,11 +382,11 @@ export default class CampaignScene extends Phaser.Scene {
             });
     }
 
-    private toggleCardSelection(card: PhysicalCard): void {
-        const isSelected = card.container.getData('isSelected');
-        card.container.setData('isSelected', !isSelected);
+ toggleCardSelection(card: PhysicalCard): void {
+        const isAlreadySelected = card.container.getData('isSelected');
+        card.container.setData('isSelected', !isAlreadySelected);
         
-        if (!isSelected) {
+        if (!isAlreadySelected) {
             // Create a selection border if it doesn't exist
             if (!card.container.getData('selectionBorder')) {
                 const border = this.add.graphics();
