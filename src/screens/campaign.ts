@@ -156,7 +156,11 @@ export default class CampaignScene extends Phaser.Scene {
         slot.card = card;
         slot.container.add(card.container);
         card.container.setPosition(0, 0);
-        this.input.setDraggable(card.container);
+        var draggableCard = (slot.type === 'roster' || slot.type === 'selected')
+
+        
+        this.input.setDraggable(card.container, draggableCard);
+    
         (card.container as any).physicalCard = card;  // For easy reference during drag
         this.setupCardEvents(card);
     }
@@ -216,7 +220,7 @@ export default class CampaignScene extends Phaser.Scene {
 
     findNearestEmptySlot(gameObject: Phaser.GameObjects.Container): CardSlot | undefined {
         return this.cardSlots
-            .filter(slot => !slot.card || slot.card === this.draggedCard)
+            .filter(slot => (!slot.card || slot.card === this.draggedCard) && (slot.type === 'roster' || slot.type === 'selected'))
             .sort((a, b) => {
                 const distA = Phaser.Math.Distance.Between(gameObject.x, gameObject.y, a.container.x, a.container.y);
                 const distB = Phaser.Math.Distance.Between(gameObject.x, gameObject.y, b.container.x, b.container.y);
@@ -228,7 +232,7 @@ export default class CampaignScene extends Phaser.Scene {
         if (!sourceSlot || !targetSlot) return false;
         if (sourceSlot === targetSlot) return false;
         if (targetSlot.type === 'selected' && this.getSelectedCards().length >= 3) return false;
-        return true;
+        return (targetSlot.type === 'roster' || targetSlot.type === 'selected');
     }
 
     moveCardToSlot(card: PhysicalCard, sourceSlot: CardSlot | undefined, targetSlot: CardSlot) {
