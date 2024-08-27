@@ -24,8 +24,6 @@ export class AbstractCard {
     tooltip: string
     characterData: BaseCharacter | null
 
-
-
     constructor({ name, description, portraitName, cardType, tooltip, characterData }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: BaseCharacter }) {
         this.name = name
         this.description = description
@@ -108,6 +106,31 @@ export class PhysicalCard {
 
         this.updateVisuals();
         this.scene.events.on('update', this.updateVisuals, this);
+        this.setupInteractivity();
+    }
+
+    setupInteractivity(): void {
+        this.container.setInteractive()
+            .on('pointerover', this.onPointerOver, this)
+            .on('pointerout', this.onPointerOut, this);
+    }
+
+    onPointerOver(): void {
+        this.container.setScale(1.1);
+        this.descText.setVisible(true);
+        this.descBackground.setVisible(true);
+        this.tooltipText.setVisible(true);
+        this.tooltipBackground.setVisible(true);
+        this.container.setDepth(1000);
+    }
+
+    onPointerOut(): void {
+        this.container.setScale(1);
+        this.descText.setVisible(false);
+        this.descBackground.setVisible(false);
+        this.tooltipText.setVisible(false);
+        this.tooltipBackground.setVisible(false);
+        this.container.setDepth(0);
     }
 
     updateVisuals(): void {
