@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { AbstractCard, PhysicalCard, CardType, CardScreenLocation } from '../gamecharacters/PhysicalCard';
+import { AbstractCard, PhysicalCard, CardType, CardScreenLocation, CardSize } from '../gamecharacters/PhysicalCard';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 import { GameState } from './gamestate';
 
@@ -10,7 +10,8 @@ export class LocationCard extends AbstractCard {
             description,
             portraitName,
             cardType: CardType.CHARACTER,
-            tooltip
+            tooltip,
+            size: CardSize.MEDIUM
         });
     }
 
@@ -23,17 +24,29 @@ export class LocationCard extends AbstractCard {
 export default class MapScene extends Phaser.Scene {
     private locationCards: PhysicalCard[] = [];
     private characterCards: PhysicalCard[] = [];
+    private background: Phaser.GameObjects.Image | null = null;
 
     constructor() {
         super('MapScene');
     }
 
+    preload() {
+        this.load.image('mapbackground1', 'https://raw.githubusercontent.com/MisterFlask/PhaserCardGame/master/resources/Sprites/Backgrounds/mapbackground1.png');
+    }
+
     create() {
+        this.createBackground();
         this.createLocationCards();
         this.createCharacterCards();
 
         this.scale.on('resize', this.resize, this);
         this.resize();
+    }
+
+    createBackground() {
+        this.background = this.add.image(0, 0, 'mapbackground1');
+        this.background.setOrigin(0, 0);
+        this.resizeBackground();
     }
 
     createLocationCards() {
@@ -88,13 +101,21 @@ export default class MapScene extends Phaser.Scene {
 
     resize() {
         const { width, height } = this.scale;
+        this.resizeBackground();
         this.positionLocationCards(width, height);
         this.positionCharacterCards(width, height);
     }
 
+    resizeBackground() {
+        const { width, height } = this.scale;
+        if (this.background) {
+            this.background.setDisplaySize(width, height);
+        }
+    }
+
     positionLocationCards(width: number, height: number) {
         const centerY = height / 2;
-        const cardSpacing = width * 0.2;
+        const cardSpacing = width * 0.25; // Increased spacing for larger cards
         const startX = width / 2 - cardSpacing;
 
         this.locationCards.forEach((card, index) => {

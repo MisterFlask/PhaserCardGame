@@ -16,6 +16,12 @@ export enum CardType {
     LOCATION = "LOCATION"
 }
 
+export enum CardSize {
+    SMALL = 1,
+    MEDIUM = 1.5,
+    LARGE = 2
+}
+
 export class AbstractCard {
     name: string
     description: string
@@ -23,14 +29,16 @@ export class AbstractCard {
     cardType: CardType
     tooltip: string
     characterData: BaseCharacter | null
+    size: CardSize
 
-    constructor({ name, description, portraitName, cardType, tooltip, characterData }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: BaseCharacter }) {
+    constructor({ name, description, portraitName, cardType, tooltip, characterData, size }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: BaseCharacter, size?: CardSize }) {
         this.name = name
         this.description = description
         this.portraitName = portraitName || "flamer1"
         this.cardType = cardType || CardType.PLAYABLE
         this.tooltip = tooltip || "Lorem ipsum dolor sit amet"
         this.characterData = characterData || null
+        this.size = size || CardSize.SMALL
     }
 
     IsPerformableOn(targetCard: PhysicalCard) {
@@ -62,6 +70,7 @@ export class PhysicalCard {
     isSelected: boolean = false;
     private wiggleTween: Phaser.Tweens.Tween | null = null;
     private hoverSound: Phaser.Sound.BaseSound | null = null;
+    private cardContent: Phaser.GameObjects.Container;
 
     constructor({
         scene,
@@ -106,20 +115,39 @@ export class PhysicalCard {
         this.cardLocation = cardLocation;
         this.visualTags = [];
 
-        // Load the click sound if it's not already loaded
-        if (!this.scene.cache.audio.exists('click1')) {
-            this.scene.load.audio('click1', 'resources/Sounds/Effects/click1.ogg');
+        // Create a new container for card content (excluding tooltip)
+        this.cardContent = this.scene.add.container();
+        this.cardContent.add([this.cardBackground, this.cardImage, this.nameBackground, this.nameText, this.descBackground, this.descText]);
+        this.container.add(this.cardContent);
+
+        // Add tooltip elements directly to the main container
+        this.container.add([this.tooltipBackground, this.tooltipText]);
+
+        // Load the rollover sound if it's not already loaded
+        if (!this.scene.cache.audio.exists('rollover6')) {
+            const baseUrl = 'https://raw.githubusercontent.com/MisterFlask/PhaserCardGame/master/resources/';
+            this.scene.load.audio('rollover6', baseUrl + 'Sounds/Effects/rollover6.ogg');
             this.scene.load.once('complete', () => {
-                this.hoverSound = this.scene.sound.add('click1');
+                if (this.scene.cache.audio.exists('rollover6')) {
+                    this.hoverSound = this.scene.sound.add('rollover6');
+                } else {
+                    console.error('Failed to load rollover6 sound from the server');
+                }
             });
             this.scene.load.start();
         } else {
-            this.hoverSound = this.scene.sound.add('click1');
+            this.hoverSound = this.scene.sound.add('rollover6');
         }
 
         this.updateVisuals();
         this.scene.events.on('update', this.updateVisuals, this);
         this.setupInteractivity();
+        this.applyCardSize();
+    }
+
+    applyCardSize(): void {
+        const scale = this.data.size;
+        this.cardContent.setScale(scale);
     }
 
     setupInteractivity(): void {
@@ -129,36 +157,61 @@ export class PhysicalCard {
     }
 
     onPointerOver(): void {
-        this.container.setScale(1.1);
+        this.cardContent.setScale(this.data.size * 1.1);
         this.descText.setVisible(true);
         this.descBackground.setVisible(true);
         this.tooltipText.setVisible(true);
         this.tooltipBackground.setVisible(true);
         this.container.setDepth(1000);
 
+        // Determine tooltip position based on card's position
+        const cardWidth = this.cardBackground.displayWidth * this.data.size;
+        const gameWidth = this.scene.scale.width;
+        const cardCenterX = this.container.x;
+
+        // Set tooltip text
+        this.tooltipText.setText(this.data.tooltip);
+
+        // Calculate tooltip dimensions
+        const padding = 10;
+        const tooltipWidth = this.tooltipText.width + padding * 2;
+        const tooltipHeight = this.tooltipText.height + padding * 2;
+
+        // Update tooltip background
+        this.tooltipBackground.setSize(tooltipWidth, tooltipHeight);
+
+        if (cardCenterX > gameWidth / 2) {
+            // Card is on the right side, show tooltip on the left
+            this.tooltipBackground.setPosition(-cardWidth - tooltipWidth / 2, 0);
+            this.tooltipText.setPosition(-cardWidth - tooltipWidth + padding, -tooltipHeight / 2 + padding);
+        } else {
+            // Card is on the left side, show tooltip on the right
+            this.tooltipBackground.setPosition(cardWidth + tooltipWidth / 2, 0);
+            this.tooltipText.setPosition(cardWidth + padding, -tooltipHeight / 2 + padding);
+        }
+
         // Play hover sound
         if (this.hoverSound) {
-            this.hoverSound.play();
+            // this.hoverSound.play(); //tbd i now find this annoying
         }
         // Add wiggle animation
         if (!this.wiggleTween) {
             this.wiggleTween = this.scene.tweens.add({
-                targets: this.container,
+                targets: this.cardContent,
                 angle: { from: -1, to: 1 },
                 duration: 80,
                 repeat: 1,
                 yoyo: true,
                 onComplete: () => {
-                    this.container.setAngle(0);
+                    this.cardContent.setAngle(0);
                     this.wiggleTween = null;
-                    
                 }
             });
         }
     }
 
     onPointerOut(): void {
-        this.container.setScale(1);
+        this.cardContent.setScale(this.data.size);
         this.descText.setVisible(false);
         this.descBackground.setVisible(false);
         this.tooltipText.setVisible(false);
@@ -169,7 +222,7 @@ export class PhysicalCard {
         if (this.wiggleTween) {
             this.wiggleTween.stop();
             this.wiggleTween = null;
-            this.container.setAngle(0);
+            this.cardContent.setAngle(0);
         }
     }
 
@@ -201,7 +254,7 @@ export class PhysicalCard {
 
     addVisualTag(tag: PhysicalCardVisualTag): void {
         this.visualTags.push(tag);
-        this.container.add([tag.image, tag.text]);
+        this.cardContent.add([tag.image, tag.text]);
         tag.tag.updateVisuals(tag.image, tag.text);
     }
 
@@ -209,8 +262,8 @@ export class PhysicalCard {
         const index = this.visualTags.indexOf(tag);
         if (index > -1) {
             this.visualTags.splice(index, 1);
-            this.container.remove(tag.image);
-            this.container.remove(tag.text);
+            this.cardContent.remove(tag.image);
+            this.cardContent.remove(tag.text);
             tag.image.destroy();
             tag.text.destroy();
         }
