@@ -1,6 +1,6 @@
 import { BaseCharacter } from "./CharacterClasses";
 
-export enum CardLocation {
+export enum CardScreenLocation {
     BATTLEFIELD,
     HAND,
     CHARACTER_ROSTER,
@@ -12,7 +12,8 @@ export enum CardLocation {
 export enum CardType {
     CHARACTER = "CHARACTER",
     PLAYABLE = "PLAYABLE",
-    STORE = "STORE"
+    STORE = "STORE",
+    LOCATION = "LOCATION"
 }
 
 export class AbstractCard {
@@ -57,7 +58,7 @@ export class PhysicalCard {
     tooltipBackground: Phaser.GameObjects.Rectangle;
     tooltipText: Phaser.GameObjects.Text;
     data: AbstractCard;
-    cardLocation: CardLocation;
+    cardLocation: CardScreenLocation;
     visualTags: PhysicalCardVisualTag[];
     scene: Phaser.Scene;
     isSelected: boolean = false;
@@ -88,7 +89,7 @@ export class PhysicalCard {
         tooltipText: Phaser.GameObjects.Text;
         descBackground: Phaser.GameObjects.Rectangle;
         data: AbstractCard;
-        cardLocation: CardLocation;
+        cardLocation: CardScreenLocation;
         visualTags: PhysicalCardVisualTag[];
     }) {
         this.scene = scene;

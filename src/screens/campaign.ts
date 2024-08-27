@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { PhysicalCard, CardLocation, CardType } from '../gamecharacters/PhysicalCard';
+import { PhysicalCard, CardScreenLocation, CardType } from '../gamecharacters/PhysicalCard';
 import { BaseCharacter, BaseCharacterClass, BlackhandClass, DiabolistClass } from '../gamecharacters/CharacterClasses';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 import { AbstractCard } from '../gamecharacters/PhysicalCard';
@@ -159,7 +159,14 @@ export default class CampaignScene extends Phaser.Scene {
             const character = new BaseCharacter({ name: `Character ${index + 1} (${randomClass.name})`, portraitName: 'flamer1', characterClass: randomClass });
             character.cardsInDeck.push(...randomClass.availableCards);
             
-            const card = new CardGuiUtils().createCard(this, 0, 0, character, CardLocation.BATTLEFIELD, () => {});
+            const card = new CardGuiUtils().createCard({
+                scene: this,
+                x: 0,
+                y: 0,
+                data: character,
+                location: CardScreenLocation.BATTLEFIELD,
+                eventCallback: () => {}
+            });
             this.addCardToSlot(card, slot);
             this.setupCardHover(card);
         });
@@ -311,8 +318,14 @@ export default class CampaignScene extends Phaser.Scene {
 
         cards.forEach((card, index) => {
             const x = startX + index * (cardWidth + cardSpacing);
-            const physicalCard = new CardGuiUtils().createCard(
-                this, x, this.deckDisplayY, card, CardLocation.BATTLEFIELD, this.setupCardEvents);
+            const physicalCard = new CardGuiUtils().createCard({
+                scene: this,
+                x: x,
+                y: this.deckDisplayY,
+                data: card,
+                location: CardScreenLocation.BATTLEFIELD,
+                eventCallback: this.setupCardEvents
+            });
             this.deckDisplayCards.push(physicalCard);
             
             // Create a new slot for this deck card
@@ -351,8 +364,9 @@ export default class CampaignScene extends Phaser.Scene {
 
     createShop() {
         const shopItems = [
-            new StoreCard({ name: 'Cargo', description: 'Increases carrying capacity', portraitName: '', tooltip: 'Carry more items' }),
-            new StoreCard({ name: 'Stimpack', description: 'Restores health', portraitName: '', tooltip: 'Heal your character' })
+            new StoreCard({ name: 'Cargo', description: 'Increases carrying capacity', portraitName: '', tooltip: 'Carry more items', price: 100 }),
+            new StoreCard({ name: 'Medkit', description: 'Restores health', portraitName: '', tooltip: 'Heal your character', price: 50 }),
+            new StoreCard({ name: 'Ammo Pack', description: 'Replenishes ammunition', portraitName: '', tooltip: 'Refill your ammo', price: 75 })
         ];
 
         this.positionShopCards(shopItems);
@@ -368,13 +382,17 @@ export default class CampaignScene extends Phaser.Scene {
         const cardWidth = width * 0.1;
         const cardSpacing = width * 0.01;
         const startX = (width - (shopItems.length * (cardWidth + cardSpacing))) / 2;
-
         shopItems.forEach((item, index) => {
             const x = startX + index * (cardWidth + cardSpacing);
-            const physicalCard = new CardGuiUtils().createCard(
-                this, x, this.shopY, item, CardLocation.SHOP, (card) => this.setupShopCardEvents(card));
+            const physicalCard = new CardGuiUtils().createCard({
+                scene: this,
+                x: x,
+                y: this.shopY,
+                data: item,
+                location: CardScreenLocation.SHOP,
+                eventCallback: (card) => this.setupShopCardEvents(card)
+            });
             this.shopCards.push(physicalCard);
-            
             // Create a new slot for this shop card
             this.createSlot(x, this.shopY, 'shop');
             const slot = this.cardSlots[this.cardSlots.length - 1];

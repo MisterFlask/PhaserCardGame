@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import GameImageLoader from './utils/ImageUtils';
 import { ArcaneRitualCard, FireballCard, SummonDemonCard, ToxicCloudCard } from './gamecharacters/CharacterClasses';
-import { AbstractCard, CardType, PhysicalCard, CardLocation } from './gamecharacters/PhysicalCard';
+import { AbstractCard, CardType, PhysicalCard, CardScreenLocation } from './gamecharacters/PhysicalCard';
 import { CardGuiUtils, GameConfig } from './utils/CardGuiUtils';
 import CampaignScene from './screens/campaign';
 
@@ -39,6 +39,10 @@ class CardGame extends Phaser.Scene {
     private menuButton!: Phaser.GameObjects.Text;
     private menuPanel!: Phaser.GameObjects.Container;
     private config: GameConfig;
+    private drawPile!: Phaser.GameObjects.Container;
+    private discardPile!: Phaser.GameObjects.Container;
+    private drawPileCount: number = 30;
+    private discardPileCount: number = 0;
     
     constructor() {
         super('CardGame');
@@ -54,7 +58,14 @@ class CardGame extends Phaser.Scene {
         unitData.forEach((data, index) => {
             const x = this.config.gameWidth - 100;
             const y = 100 + index * 180;
-            const unit = new CardGuiUtils().createCard(this, x, y, data, CardLocation.CHARACTER_ROSTER, this.setupCardEvents);
+            const unit = new CardGuiUtils().createCard({
+                scene: this,
+                x: x,
+                y: y,
+                data: data,
+                location: CardScreenLocation.CHARACTER_ROSTER,
+                eventCallback: this.setupCardEvents
+            });
             (unit as any).isPlayerUnit = true;
             this.playerUnits.push(unit.container);
         });
@@ -72,6 +83,7 @@ class CardGame extends Phaser.Scene {
         this.setupEventListeners();
         this.createPlayerUnits();
         this.createMenu();
+        this.createDrawAndDiscardPiles();
 
         this.scale.on('resize', this.resize, this);
         this.resize();
@@ -93,16 +105,59 @@ class CardGame extends Phaser.Scene {
         cardData.forEach((data, index) => {
             const x = 100 + index * 150;
             const y = this.config.handY;
-            const card = new CardGuiUtils().createCard(this, x, y, data, CardLocation.HAND, this.setupCardEvents);
+            const card = new CardGuiUtils().createCard({
+                scene: this,
+                x: x,
+                y: y,
+                data: data,
+                location: CardScreenLocation.HAND,
+                eventCallback: this.setupCardEvents
+            });
             this.playerHand.push(card.container);
         });
         this.arrangeCards(this.playerHand, this.config.handY);
     }
 
+    createDrawAndDiscardPiles(): void {
+        const pileY = this.config.gameHeight - 100;
+        
+        // Create Draw Pile
+        this.drawPile = this.add.container(100, pileY);
+        const drawCard = new CardGuiUtils().createCard({
+            scene: this,
+            x: 0,
+            y: 0,
+            data: new AbstractCard({ name: 'Draw Pile', description: 'Cards to draw' }),
+            location: CardScreenLocation.DRAW_PILE,
+            eventCallback: this.setupCardEvents
+        });
+        const drawCountText = this.add.text(50, 0, this.drawPileCount.toString(), { fontSize: '24px', color: '#fff' });
+        this.drawPile.add([drawCard.container, drawCountText]);
+
+        // Create Discard Pile
+        this.discardPile = this.add.container(250, pileY);
+        const discardCard = new CardGuiUtils().createCard({
+            scene: this,
+            x: 0,
+            y: 0,
+            data: new AbstractCard({ name: 'Discard Pile', description: 'Discarded cards' }),
+            location: CardScreenLocation.DISCARD_PILE,
+            eventCallback: this.setupCardEvents
+        });
+        const discardCountText = this.add.text(50, 0, this.discardPileCount.toString(), { fontSize: '24px', color: '#fff' });
+        this.discardPile.add([discardCard.container, discardCountText]);
+    }
 
     createMonsterCard(): void {
         const monsterData: AbstractCard = new AbstractCard({ name: 'Goblin', description: 'A small, mischievous creature', cardType: CardType.CHARACTER });
-        const monsterCard = new CardGuiUtils().createCard(this, 400, this.config.battlefieldY, monsterData, CardLocation.BATTLEFIELD, this.setupCardEvents);
+        const monsterCard = new CardGuiUtils().createCard({
+            scene: this,
+            x: 400,
+            y: this.config.battlefieldY,
+            data: monsterData,
+            location: CardScreenLocation.BATTLEFIELD,
+            eventCallback: this.setupCardEvents
+        });
         monsterCard.container.setDepth(1);
         this.battlefield.push(monsterCard.container);
     }
@@ -277,7 +332,7 @@ class CardGame extends Phaser.Scene {
         if (!this.playerHand.includes(card)) {
             this.playerHand.push(card);
             this.battlefield = this.battlefield.filter(c => c !== card);
-            (card as any).physicalCard.cardLocation = CardLocation.HAND;
+            (card as any).physicalCard.cardLocation = CardScreenLocation.HAND;
         }
         this.arrangeCards(this.playerHand, this.config.handY);
     }
@@ -353,5 +408,6 @@ const config: Phaser.Types.Core.GameConfig = {
 };
 
 const game = new Phaser.Game(config);
+
 
 

@@ -1,4 +1,4 @@
-import { AbstractCard, CardLocation, CardType, PhysicalCard } from "../gamecharacters/PhysicalCard";
+import { AbstractCard, CardScreenLocation, CardType, PhysicalCard } from "../gamecharacters/PhysicalCard";
 
 export interface GameConfig {
     cardWidth: number;
@@ -20,8 +20,17 @@ export class CardGuiUtils {
         gameWidth: 800,
         gameHeight: 600
     };
-    createCard(scene: Phaser.Scene,
-        x: number, y: number, data: AbstractCard, location: CardLocation, eventCallback: (card: PhysicalCard) => void): PhysicalCard {
+
+    
+    createCard(params: {
+        scene: Phaser.Scene,
+        x: number,
+        y: number,
+        data: AbstractCard,
+        location: CardScreenLocation,
+        eventCallback: (card: PhysicalCard) => void
+    }): PhysicalCard {
+        const { scene, x, y, data, location, eventCallback } = params;
         const cardContainer = scene.add.container(x, y);
         const { cardWidth, cardHeight } = this.config;
         const cardBackground = scene.add.image(0, 0, 'greyscale').setDisplaySize(cardWidth, cardHeight);

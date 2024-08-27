@@ -4,11 +4,11 @@ import { StoreCard } from './campaign';
 export class GameState {
     private static instance: GameState;
 
-    private roster: BaseCharacter[] = [];
-    private currentRunCharacters: BaseCharacter[] = [];
-    private shopItems: StoreCard[] = [];
-    private inventory: StoreCard[] = [];
-    private currency: number = 0
+    public roster: BaseCharacter[] = [];
+    public currentRunCharacters: BaseCharacter[] = [];
+    public shopItems: StoreCard[] = [];
+    public inventory: StoreCard[] = [];
+    public currency: number = 0
 
     private constructor() {}
 
