@@ -7,7 +7,9 @@ import GameImageLoader from '../utils/ImageUtils';
 import { GameAction } from '../utils/ActionQueue';
 
 export class StoreCard extends AbstractCard {
-    constructor({ name, description, portraitName, tooltip }: { name: string; description: string; portraitName?: string, tooltip?: string}) {
+    price: number;
+
+    constructor({ name, description, portraitName, tooltip, price }: { name: string; description: string; portraitName?: string, tooltip?: string, price: number}) {
         super(
             {
                 name: name,
@@ -17,7 +19,9 @@ export class StoreCard extends AbstractCard {
                 tooltip: tooltip
             }
         );
+        this.price = price;
     }
+    
     OnPurchase(): void {
         console.log('Item purchased');
     }
