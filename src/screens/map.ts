@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { AbstractCard, PhysicalCard, CardType, CardScreenLocation } from '../gamecharacters/PhysicalCard';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
+import { GameState } from './gamestate';
 
 export class LocationCard extends AbstractCard {
     constructor({ name, description, portraitName, tooltip }: { name: string; description: string; portraitName?: string; tooltip?: string }) {
@@ -56,12 +57,8 @@ export default class MapScene extends Phaser.Scene {
     }
 
     createCharacterCards() {
-        // Assuming we have 3 selected characters for this run
-        const characters = [
-            new AbstractCard({ name: 'Warrior', description: 'A strong fighter', cardType: CardType.CHARACTER }),
-            new AbstractCard({ name: 'Mage', description: 'A powerful spellcaster', cardType: CardType.CHARACTER }),
-            new AbstractCard({ name: 'Rogue', description: 'A stealthy assassin', cardType: CardType.CHARACTER })
-        ];
+        const gameState = GameState.getInstance();
+        const characters = gameState.getCurrentRunCharacters();
 
         characters.forEach((character, index) => {
             const card = new CardGuiUtils().createCard({

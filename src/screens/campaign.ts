@@ -5,6 +5,7 @@ import { CardGuiUtils } from '../utils/CardGuiUtils';
 import { AbstractCard } from '../gamecharacters/PhysicalCard';
 import GameImageLoader from '../utils/ImageUtils';
 import { GameAction } from '../utils/ActionQueue';
+import { GameState } from './gamestate';
 
 export class StoreCard extends AbstractCard {
     price: number;
@@ -291,7 +292,32 @@ export default class CampaignScene extends Phaser.Scene {
         if (selectedCards.length === 3) {
             console.log('Embarking on adventure with:', selectedCards.map(card => card.data.name));
             console.log('Purchased items:', selectedShopCards.map(card => card.data.name));
+            // Update the GameState with selected characters and purchased items
+            const gameState = GameState.getInstance();
+            
+            // Clear current run characters and add selected characters
+            gameState.currentRunCharacters = [];
+            selectedCards.forEach(card => {
+                if (card.data instanceof BaseCharacter) {
+                    gameState.addToCurrentRun(card.data);
+                }
+            });
+
+            // Add purchased items to inventory
+            selectedShopCards.forEach(card => {
+                if (card.data instanceof StoreCard) {
+                    gameState.addToInventory(card.data);
+                }
+            });
+
+            // Remove purchased items from shop
+            gameState.setShopItems(gameState.getShopItems().filter(item => !selectedShopCards.some(card => card.data === item)));
+
+            console.log('Updated GameState:', gameState);
             // Transition to the next scene or start the game
+
+            // Switch to the "map" scene
+            this.scene.start('MapScene');
         } else {
             console.log('Please select 3 characters before embarking:', selectedCards.map(card => card.data.name));
         }

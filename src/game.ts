@@ -4,6 +4,7 @@ import { ArcaneRitualCard, FireballCard, SummonDemonCard, ToxicCloudCard } from 
 import { AbstractCard, CardType, PhysicalCard, CardScreenLocation } from './gamecharacters/PhysicalCard';
 import { CardGuiUtils, GameConfig } from './utils/CardGuiUtils';
 import CampaignScene from './screens/campaign';
+import MapScene from './screens/map';
 
 
 const unitData: AbstractCard[] = [
@@ -404,7 +405,7 @@ const config: Phaser.Types.Core.GameConfig = {
         width: '100%',
         height: '100%'
     },
-    scene: [CardGame, CampaignScene]
+    scene: [CampaignScene, CardGame, MapScene]
 };
 
 const game = new Phaser.Game(config);
