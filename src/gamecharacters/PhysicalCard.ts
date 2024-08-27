@@ -60,6 +60,8 @@ export class PhysicalCard {
     visualTags: PhysicalCardVisualTag[];
     scene: Phaser.Scene;
     isSelected: boolean = false;
+    private wiggleTween: Phaser.Tweens.Tween | null = null;
+    private hoverSound: Phaser.Sound.BaseSound | null = null;
 
     constructor({
         scene,
@@ -104,6 +106,17 @@ export class PhysicalCard {
         this.cardLocation = cardLocation;
         this.visualTags = [];
 
+        // Load the click sound if it's not already loaded
+        if (!this.scene.cache.audio.exists('click1')) {
+            this.scene.load.audio('click1', 'resources/Sounds/Effects/click1.ogg');
+            this.scene.load.once('complete', () => {
+                this.hoverSound = this.scene.sound.add('click1');
+            });
+            this.scene.load.start();
+        } else {
+            this.hoverSound = this.scene.sound.add('click1');
+        }
+
         this.updateVisuals();
         this.scene.events.on('update', this.updateVisuals, this);
         this.setupInteractivity();
@@ -122,6 +135,26 @@ export class PhysicalCard {
         this.tooltipText.setVisible(true);
         this.tooltipBackground.setVisible(true);
         this.container.setDepth(1000);
+
+        // Play hover sound
+        if (this.hoverSound) {
+            this.hoverSound.play();
+        }
+        // Add wiggle animation
+        if (!this.wiggleTween) {
+            this.wiggleTween = this.scene.tweens.add({
+                targets: this.container,
+                angle: { from: -1, to: 1 },
+                duration: 80,
+                repeat: 1,
+                yoyo: true,
+                onComplete: () => {
+                    this.container.setAngle(0);
+                    this.wiggleTween = null;
+                    
+                }
+            });
+        }
     }
 
     onPointerOut(): void {
@@ -131,6 +164,13 @@ export class PhysicalCard {
         this.tooltipText.setVisible(false);
         this.tooltipBackground.setVisible(false);
         this.container.setDepth(0);
+
+        // Stop wiggle animation if it's still running
+        if (this.wiggleTween) {
+            this.wiggleTween.stop();
+            this.wiggleTween = null;
+            this.container.setAngle(0);
+        }
     }
 
     updateVisuals(): void {
@@ -184,6 +224,10 @@ export class PhysicalCard {
 
     destroy(): void {
         this.scene.events.off('update', this.updateVisuals, this);
+        if (this.wiggleTween) {
+            this.wiggleTween.stop();
+            this.wiggleTween = null;
+        }
         this.container.destroy();
     }
 }
