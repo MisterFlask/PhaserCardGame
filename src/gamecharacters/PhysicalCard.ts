@@ -26,7 +26,7 @@ export class TextBox {
     background: Phaser.GameObjects.Rectangle;
     text: Phaser.GameObjects.Text;
 
-    constructor(scene: Phaser.Scene, x: number, y: number, width: number, height: number, text: string, style: Phaser.Types.GameObjects.Text.TextStyle) {
+    constructor(scene: Phaser.Scene, x: number = 0, y: number = 0, width: number = 100, height: number = 50, text: string = '', style: Phaser.Types.GameObjects.Text.TextStyle = { fontSize: '16px', color: '#000' }) {
         this.background = scene.add.rectangle(x, y, width, height, 0xffffff);
         this.text = scene.add.text(x, y, text, style);
         this.text.setOrigin(0.5);
@@ -94,6 +94,7 @@ export class PhysicalCard {
     nameBox: TextBox;
     descBox: TextBox;
     tooltipBox: TextBox;
+    hpBox: TextBox | null;
     data: AbstractCard;
     cardLocation: CardScreenLocation;
     visualTags: PhysicalCardVisualTag[];
@@ -144,6 +145,24 @@ export class PhysicalCard {
 
         // Add tooltip elements directly to the main container
         this.container.add([this.tooltipBox.background, this.tooltipBox.text]);
+
+        // Add HP box if the card is a BaseCharacter
+        if (this.data instanceof BaseCharacter) {
+            const cardWidth = this.cardBackground.displayWidth;
+            const cardHeight = this.cardBackground.displayHeight;
+            this.hpBox = new TextBox(
+                this.scene,
+                cardWidth / 2 - 20,
+                -cardHeight / 2 + 20,
+                40,
+                20,
+                `${this.data.hitpoints}/${this.data.maxHitpoints}`,
+                { fontSize: '12px', color: '#000' }
+            );
+            this.cardContent.add([this.hpBox.background, this.hpBox.text]);
+        } else {
+            this.hpBox = null;
+        }
 
         // Load the rollover sound if it's not already loaded
         if (!this.scene.cache.audio.exists('rollover6')) {
@@ -263,6 +282,11 @@ export class PhysicalCard {
         } else {
             console.warn(`Texture '${this.data.portraitName}' not found. Using fallback texture.`);
             //this.cardImage.setTexture('fallback_texture'); // Ensure you have a fallback texture
+        }
+
+        // Update HP box if it exists
+        if (this.hpBox && this.data instanceof BaseCharacter) {
+            this.hpBox.setText(`${this.data.hitpoints}/${this.data.maxHitpoints}`);
         }
 
         this.updateVisualTags();
