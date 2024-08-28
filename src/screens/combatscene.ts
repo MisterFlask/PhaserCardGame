@@ -79,7 +79,7 @@ class CombatScene extends Phaser.Scene {
                 y: y,
                 data: data,
                 location: CardScreenLocation.CHARACTER_ROSTER,
-                eventCallback: this.setupCardEvents
+                eventCallback: ()=>{}
             });
             (unit as any).isPlayerUnit = true;
             this.playerUnits.push(unit.container);
@@ -102,8 +102,12 @@ class CombatScene extends Phaser.Scene {
         this.createCombatStatusText();
 
         this.scale.on('resize', this.resize, this);
-        this.resize();
+        // Force an initial resize after a short delay
+        this.time.delayedCall(100, () => {
+            this.resize();
+        });    
     }
+
     arrangeCards(cardArray: Phaser.GameObjects.Container[], yPosition: number): void {
         const totalWidth = config.gameWidth - 200;
         const cardSpacing = Math.min(CardGuiUtils.getInstance().cardConfig.cardWidth, totalWidth / (cardArray.length + 1));
@@ -191,7 +195,7 @@ class CombatScene extends Phaser.Scene {
                 y: y,
                 data: data,
                 location: CardScreenLocation.HAND,
-                eventCallback: this.setupCardEvents
+                eventCallback: ()=>{}
             });
             this.playerHand.push(card.container);
         });
@@ -209,7 +213,7 @@ class CombatScene extends Phaser.Scene {
             y: 0,
             data: new AbstractCard({ name: 'Draw Pile (' + this.drawPileCount + ')', description: 'Cards to draw', portraitName: "drawpile" }),
             location: CardScreenLocation.DRAW_PILE,
-            eventCallback: this.setupCardEvents
+            eventCallback: ()=>{}
         });
         this.drawPile.add([drawCard.container]);
 
@@ -221,7 +225,7 @@ class CombatScene extends Phaser.Scene {
             y: 0,
             data: new AbstractCard({ name: 'Discard Pile (' + this.discardPileCount + ')', description: 'Discarded cards', portraitName: "discardpile" }),
             location: CardScreenLocation.DISCARD_PILE,
-            eventCallback: this.setupCardEvents
+            eventCallback: ()=>{}
         });
         this.discardPile.add([discardCard.container]);
     }
@@ -248,7 +252,7 @@ class CombatScene extends Phaser.Scene {
                     y: config.battlefieldY,
                     data: enemy,
                     location: CardScreenLocation.BATTLEFIELD,
-                    eventCallback: this.setupCardEvents
+                    eventCallback: ()=>{}
                 });
                 enemyCard.container.setDepth(1);
                 this.battlefield.push(enemyCard.container);
@@ -256,18 +260,6 @@ class CombatScene extends Phaser.Scene {
         }
     }
 
-    setupCardEvents(card: PhysicalCard): void {
-        card.container.on('pointerover', () => {
-            card.descBox.setVisible(true);
-            card.tooltipBox.setVisible(true);
-            card.container.setDepth(1000);
-        });
-        card.container.on('pointerout', () => {
-            card.descBox.setVisible(false);
-            card.tooltipBox.setVisible(false);
-            card.container.setDepth((card.container as any).originalDepth);
-        });
-    }
 
     setupEventListeners(): void {
         this.input.on('dragstart', this.handleDragStart, this);
@@ -439,11 +431,13 @@ class CombatScene extends Phaser.Scene {
 const gameconfig: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
     scale: {
-        mode: Phaser.Scale.FIT,
+        mode: Phaser.Scale.CENTER_BOTH,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
         parent: 'phaser-example',
-        width: '100%',
-        height: '100%',
+        width: '1200',
+        height: '1000',
         resizeInterval: 1000,
+
     },
     render: {
         antialias: true,

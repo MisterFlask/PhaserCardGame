@@ -34,7 +34,7 @@ export class CardGuiUtils {
         const { cardWidth, cardHeight } = this.cardConfig;
         const cardBackground = scene.add.image(0, 0, 'greyscale').setDisplaySize(cardWidth, cardHeight);
         let cardTexture = data.portraitName;
-
+        
         const cardImage = scene.add.image(0, -cardHeight / 4, cardTexture)
             .setDisplaySize(cardWidth / 2, cardHeight / 2);
 

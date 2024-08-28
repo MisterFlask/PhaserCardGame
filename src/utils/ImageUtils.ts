@@ -46,7 +46,14 @@ export default class GameImageLoader {
             const categoryData = this.images[category as keyof typeof this.images];
             categoryData.files.forEach((file: string) => {
                 const key = file.replace('.png', '');
-                loader.image(key, `${this.baseURL}${categoryData.prefix}${file}`);
+                loader.image({
+                    key: key,
+                    url: `${this.baseURL}${categoryData.prefix}${file}`
+                });                
+                const texture = loader.scene.textures.get(key);
+                if (texture) {
+                    texture.setFilter(Phaser.Textures.LINEAR);
+                }
             });
         }
     }

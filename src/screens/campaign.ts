@@ -351,6 +351,10 @@ export default class CampaignScene extends Phaser.Scene {
 
     updateDeckDisplay = (cards: AbstractCard[]) => {
         // Clear existing deck display
+        // Remove all event handlers from deckDisplayCards
+        this.deckDisplayCards.forEach(card => {
+            card.container.removeAllListeners();
+        });
         this.deckDisplayCards.forEach(card => card.destroy());
         this.deckDisplayCards = [];
 
@@ -432,6 +436,10 @@ export default class CampaignScene extends Phaser.Scene {
 
     positionShopCards = (shopItems: StoreCard[]) => {
         // Clear existing shop cards and slots
+        // Remove all existing shop card event handlers
+        this.shopCards.forEach(card => {
+            card.container.removeAllListeners();
+        });
         this.shopCards.forEach(card => card.destroy());
         this.shopCards = [];
         this.cardSlots = this.cardSlots.filter(slot => slot.type !== 'shop');
