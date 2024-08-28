@@ -206,19 +206,9 @@ export default class CampaignScene extends Phaser.Scene {
         card.container.setInteractive()
             .on('pointerover', () => {
                 card.container.setScale(1.1);
-                card.descText.setVisible(true);
-                card.descBackground.setVisible(true);
-                card.tooltipText.setVisible(true);
-                card.tooltipBackground.setVisible(true);
-                card.container.setDepth(1000);
             })
             .on('pointerout', () => {
                 card.container.setScale(1);
-                card.descText.setVisible(false);
-                card.descBackground.setVisible(false);
-                card.tooltipText.setVisible(false);
-                card.tooltipBackground.setVisible(false);
-                card.container.setDepth((card.container as any).originalDepth);
             });
     }
 

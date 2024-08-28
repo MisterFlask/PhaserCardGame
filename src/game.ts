@@ -165,17 +165,13 @@ class CardGame extends Phaser.Scene {
 
     setupCardEvents(card: PhysicalCard): void {
         card.container.on('pointerover', () => {
-            card.descText.setVisible(true);
-            card.descBackground.setVisible(true);
-            card.tooltipText.setVisible(true);
-            card.tooltipBackground.setVisible(true);
+            card.descBox.setVisible(true);
+            card.tooltipBox.setVisible(true);
             card.container.setDepth(1000);
         });
         card.container.on('pointerout', () => {
-            card.descText.setVisible(false);
-            card.descBackground.setVisible(false);
-            card.tooltipText.setVisible(false);
-            card.tooltipBackground.setVisible(false);
+            card.descBox.setVisible(false);
+            card.tooltipBox.setVisible(false);
             card.container.setDepth((card.container as any).originalDepth);
         });
     }

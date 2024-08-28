@@ -1,4 +1,4 @@
-import { AbstractCard, CardScreenLocation, CardType, PhysicalCard } from "../gamecharacters/PhysicalCard";
+import { AbstractCard, CardScreenLocation, CardType, PhysicalCard, TextBox } from "../gamecharacters/PhysicalCard";
 
 export interface GameConfig {
     cardWidth: number;
@@ -21,7 +21,6 @@ export class CardGuiUtils {
         gameHeight: 600
     };
 
-    
     createCard(params: {
         scene: Phaser.Scene,
         x: number,
@@ -39,45 +38,34 @@ export class CardGuiUtils {
         const cardImage = scene.add.image(0, -cardHeight / 4, cardTexture)
             .setDisplaySize(cardWidth / 2, cardHeight / 2);
 
-        const nameBackground = scene.add.rectangle(0, cardHeight / 4, cardWidth - 10, 60, 0xffffff).setStrokeStyle(2, 0x000000);
-        const nameText = scene.add.text(0, cardHeight / 4, data.name, { fontSize: '16px', color: '#000', wordWrap: { width: cardWidth - 10 } });
-
-        const descText = scene.add.text(0, cardHeight / 2, data.description, {
+        const nameBox = new TextBox(scene, 0, cardHeight / 4, cardWidth - 10, 60, data.name, { fontSize: '16px', color: '#000', wordWrap: { width: cardWidth - 10 } });
+        const descBox = new TextBox(scene, 0, cardHeight / 2, cardWidth - 10, 60, data.description, {
             fontSize: '12px',
             color: '#000',
             wordWrap: { width: cardWidth - 20 },
             align: 'center'
-        }).setVisible(false);
-
-        const tooltipText = scene.add.text(cardWidth + 5, 0, data.tooltip || '', {
+        });
+        const tooltipBox = new TextBox(scene, cardWidth + cardWidth / 2, 0, cardWidth - 10, cardHeight, data.tooltip || '', {
             fontSize: '12px',
             color: '#000',
             wordWrap: { width: cardWidth - 20 },
             align: 'left'
-        }).setVisible(false);
-
-        // Create backgrounds that will resize with the text
-        const infoBackground = scene.add.rectangle(0, cardHeight / 2, cardWidth - 10, 60, 0xffffff).setStrokeStyle(2, 0x000000);
-        const tooltipBackground = scene.add.rectangle(cardWidth + cardWidth / 2, 0, cardWidth - 10, cardHeight, 0xffffff).setStrokeStyle(2, 0x000000);
+        });
 
         // Function to update background sizes
         const updateBackgrounds = () => {
-            infoBackground.setSize(cardWidth - 10, descText.height + 20);
-            infoBackground.setPosition(0, cardHeight / 2 + descText.height / 4);
-            descText.setPosition(0, cardHeight / 2 + descText.height / 4);
-            // Update name background and text
-            nameBackground.setSize(cardWidth - 10, nameText.height + 10);
-            nameBackground.setPosition(0, cardHeight / 4);
-            nameText.setPosition(0, cardHeight / 4);
-
-            tooltipBackground.setSize(cardWidth - 10, tooltipText.height + 20);
-            tooltipBackground.setPosition(cardWidth + cardWidth / 2, tooltipText.height / 2);
+            descBox.setSize(cardWidth - 10, descBox.text.height + 20);
+            descBox.setPosition(0, cardHeight / 2 + descBox.text.height / 4);
+            nameBox.setSize(cardWidth - 10, nameBox.text.height + 10);
+            nameBox.setPosition(0, cardHeight / 4);
+            tooltipBox.setSize(cardWidth - 10, tooltipBox.text.height + 20);
+            tooltipBox.setPosition(cardWidth + cardWidth / 2, tooltipBox.text.height / 2);
         };
 
         // Call updateBackgrounds initially
         updateBackgrounds();
-        descText.on('changedata', updateBackgrounds);
-        tooltipText.on('changedata', updateBackgrounds);
+        descBox.text.on('changedata', updateBackgrounds);
+        tooltipBox.text.on('changedata', updateBackgrounds);
 
         // Create hidden highlight border
         const highlightBorder = scene.add.rectangle(0, 0, cardWidth + 10, cardHeight + 10, 0xffff00)
@@ -86,36 +74,26 @@ export class CardGuiUtils {
             .setVisible(false)
             .setName('highlightBorder');
 
-        nameText.setOrigin(0.5);
-        descText.setOrigin(0.5);
-        tooltipText.setOrigin(0, 0);
-        tooltipText.setPosition(cardWidth + 10, 10);
-        descText.setVisible(false);
-        tooltipText.setVisible(false);
-
-        infoBackground.setVisible(false);
-        tooltipBackground.setVisible(false);
+        descBox.setVisible(false);
+        tooltipBox.setVisible(false);
         
-        cardContainer.add([cardBackground, cardImage, nameBackground, nameText, tooltipBackground, tooltipText, infoBackground, descText, highlightBorder]);
+        cardContainer.add([cardBackground, cardImage, nameBox.background, nameBox.text, tooltipBox.background, tooltipBox.text, descBox.background, descBox.text, highlightBorder]);
         cardContainer.setSize(cardWidth, cardHeight);
         cardContainer.setInteractive(new Phaser.Geom.Rectangle(0, 0, cardWidth, cardHeight), Phaser.Geom.Rectangle.Contains);
 
         if (data.cardType == CardType.PLAYABLE) scene.input.setDraggable(cardContainer);
 
         const physicalCard = new PhysicalCard({
+            scene: scene,
             container: cardContainer,
             cardBackground: cardBackground,
             cardImage: cardImage,
-            nameBackground: nameBackground,
-            nameText: nameText,
-            descText: descText,
-            tooltipText: tooltipText,
-            descBackground: infoBackground,
-            tooltipBackground: tooltipBackground,
+            nameBox: nameBox,
+            descBox: descBox,
+            tooltipBox: tooltipBox,
             data: data,
             cardLocation: location,
-            visualTags: [],
-            scene: scene,
+            visualTags: []
         });
 
         (cardContainer as any).physicalCard = physicalCard;
@@ -123,5 +101,4 @@ export class CardGuiUtils {
         eventCallback(physicalCard);
         return physicalCard;
     }
-
 }

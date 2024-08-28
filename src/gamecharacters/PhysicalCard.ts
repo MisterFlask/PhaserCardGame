@@ -22,6 +22,40 @@ export enum CardSize {
     LARGE = 2
 }
 
+export class TextBox {
+    background: Phaser.GameObjects.Rectangle;
+    text: Phaser.GameObjects.Text;
+
+    constructor(scene: Phaser.Scene, x: number, y: number, width: number, height: number, text: string, style: Phaser.Types.GameObjects.Text.TextStyle) {
+        this.background = scene.add.rectangle(x, y, width, height, 0xffffff);
+        this.text = scene.add.text(x, y, text, style);
+        this.text.setOrigin(0.5);
+    }
+
+    setPosition(x: number, y: number): void {
+        this.background.setPosition(x, y);
+        this.text.setPosition(x, y);
+    }
+
+    setSize(width: number, height: number): void {
+        this.background.setSize(width, height);
+    }
+
+    setText(text: string): void {
+        this.text.setText(text);
+    }
+
+    setVisible(visible: boolean): void {
+        this.background.setVisible(visible);
+        this.text.setVisible(visible);
+    }
+
+    destroy(): void {
+        this.background.destroy();
+        this.text.destroy();
+    }
+}
+
 export class AbstractCard {
     name: string
     description: string
@@ -57,12 +91,9 @@ export class PhysicalCard {
     container: Phaser.GameObjects.Container;
     cardBackground: Phaser.GameObjects.Image;
     cardImage: Phaser.GameObjects.Image;
-    nameBackground: Phaser.GameObjects.Rectangle;
-    nameText: Phaser.GameObjects.Text;
-    descText: Phaser.GameObjects.Text;
-    descBackground: Phaser.GameObjects.Rectangle;
-    tooltipBackground: Phaser.GameObjects.Rectangle;
-    tooltipText: Phaser.GameObjects.Text;
+    nameBox: TextBox;
+    descBox: TextBox;
+    tooltipBox: TextBox;
     data: AbstractCard;
     cardLocation: CardScreenLocation;
     visualTags: PhysicalCardVisualTag[];
@@ -77,12 +108,9 @@ export class PhysicalCard {
         container,
         cardBackground,
         cardImage,
-        nameBackground,
-        nameText,
-        descText,
-        tooltipBackground,
-        tooltipText,
-        descBackground,
+        nameBox,
+        descBox,
+        tooltipBox,
         data,
         cardLocation,
         visualTags
@@ -91,12 +119,9 @@ export class PhysicalCard {
         container: Phaser.GameObjects.Container;
         cardBackground: Phaser.GameObjects.Image;
         cardImage: Phaser.GameObjects.Image;
-        nameBackground: Phaser.GameObjects.Rectangle;
-        nameText: Phaser.GameObjects.Text;
-        descText: Phaser.GameObjects.Text;
-        tooltipBackground: Phaser.GameObjects.Rectangle;
-        tooltipText: Phaser.GameObjects.Text;
-        descBackground: Phaser.GameObjects.Rectangle;
+        nameBox: TextBox;
+        descBox: TextBox;
+        tooltipBox: TextBox;
         data: AbstractCard;
         cardLocation: CardScreenLocation;
         visualTags: PhysicalCardVisualTag[];
@@ -105,23 +130,20 @@ export class PhysicalCard {
         this.container = container;
         this.cardBackground = cardBackground;
         this.cardImage = cardImage;
-        this.nameBackground = nameBackground;
-        this.nameText = nameText;
-        this.descText = descText;
-        this.descBackground = descBackground;
-        this.tooltipBackground = tooltipBackground;
-        this.tooltipText = tooltipText;
+        this.nameBox = nameBox;
+        this.descBox = descBox;
+        this.tooltipBox = tooltipBox;
         this.data = data;
         this.cardLocation = cardLocation;
         this.visualTags = [];
 
         // Create a new container for card content (excluding tooltip)
         this.cardContent = this.scene.add.container();
-        this.cardContent.add([this.cardBackground, this.cardImage, this.nameBackground, this.nameText, this.descBackground, this.descText]);
+        this.cardContent.add([this.cardBackground, this.cardImage, this.nameBox.background, this.nameBox.text, this.descBox.background, this.descBox.text]);
         this.container.add(this.cardContent);
 
         // Add tooltip elements directly to the main container
-        this.container.add([this.tooltipBackground, this.tooltipText]);
+        this.container.add([this.tooltipBox.background, this.tooltipBox.text]);
 
         // Load the rollover sound if it's not already loaded
         if (!this.scene.cache.audio.exists('rollover6')) {
@@ -158,10 +180,8 @@ export class PhysicalCard {
 
     onPointerOver(): void {
         this.cardContent.setScale(this.data.size * 1.1);
-        this.descText.setVisible(true);
-        this.descBackground.setVisible(true);
-        this.tooltipText.setVisible(true);
-        this.tooltipBackground.setVisible(true);
+        this.descBox.setVisible(true);
+        this.tooltipBox.setVisible(true);
         this.container.setDepth(1000);
 
         // Determine tooltip position based on card's position
@@ -170,24 +190,22 @@ export class PhysicalCard {
         const cardCenterX = this.container.x;
 
         // Set tooltip text
-        this.tooltipText.setText(this.data.tooltip);
+        this.tooltipBox.setText(this.data.tooltip);
 
         // Calculate tooltip dimensions
         const padding = 10;
-        const tooltipWidth = this.tooltipText.width + padding * 2;
-        const tooltipHeight = this.tooltipText.height + padding * 2;
+        const tooltipWidth = this.tooltipBox.text.width + padding * 2;
+        const tooltipHeight = this.tooltipBox.text.height + padding * 2;
 
         // Update tooltip background
-        this.tooltipBackground.setSize(tooltipWidth, tooltipHeight);
+        this.tooltipBox.setSize(tooltipWidth, tooltipHeight);
 
         if (cardCenterX > gameWidth / 2) {
             // Card is on the right side, show tooltip on the left
-            this.tooltipBackground.setPosition(-cardWidth - tooltipWidth / 2, 0);
-            this.tooltipText.setPosition(-cardWidth - tooltipWidth + padding, -tooltipHeight / 2 + padding);
+            this.tooltipBox.setPosition(-cardWidth - tooltipWidth / 2, 0);
         } else {
             // Card is on the left side, show tooltip on the right
-            this.tooltipBackground.setPosition(cardWidth + tooltipWidth / 2, 0);
-            this.tooltipText.setPosition(cardWidth + padding, -tooltipHeight / 2 + padding);
+            this.tooltipBox.setPosition(cardWidth + tooltipWidth / 2, 0);
         }
 
         // Play hover sound
@@ -212,10 +230,8 @@ export class PhysicalCard {
 
     onPointerOut(): void {
         this.cardContent.setScale(this.data.size);
-        this.descText.setVisible(false);
-        this.descBackground.setVisible(false);
-        this.tooltipText.setVisible(false);
-        this.tooltipBackground.setVisible(false);
+        this.descBox.setVisible(false);
+        this.tooltipBox.setVisible(false);
         this.container.setDepth(0);
 
         // Stop wiggle animation if it's still running
@@ -237,9 +253,9 @@ export class PhysicalCard {
             return;
         }
 
-        this.nameText.setText(this.data.name);
-        this.descText.setText(this.data.description);
-        this.tooltipText.setText(this.data.tooltip);
+        this.nameBox.setText(this.data.name);
+        this.descBox.setText(this.data.description);
+        this.tooltipBox.setText(this.data.tooltip);
 
         // Check if the texture exists before setting it
         if (this.scene.textures.exists(this.data.portraitName)) {
