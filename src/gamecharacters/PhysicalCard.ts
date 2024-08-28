@@ -25,20 +25,24 @@ export enum CardSize {
 export class TextBox {
     background: Phaser.GameObjects.Rectangle;
     text: Phaser.GameObjects.Text;
+    outline: Phaser.GameObjects.Rectangle;
 
     constructor(scene: Phaser.Scene, x: number = 0, y: number = 0, width: number = 100, height: number = 50, text: string = '', style: Phaser.Types.GameObjects.Text.TextStyle = { fontSize: '16px', color: '#000' }) {
         this.background = scene.add.rectangle(x, y, width, height, 0xffffff);
+        this.outline = scene.add.rectangle(x, y, width, height).setStrokeStyle(2, 0x000000);
         this.text = scene.add.text(x, y, text, style);
         this.text.setOrigin(0.5);
     }
 
     setPosition(x: number, y: number): void {
         this.background.setPosition(x, y);
+        this.outline.setPosition(x, y);
         this.text.setPosition(x, y);
     }
 
     setSize(width: number, height: number): void {
         this.background.setSize(width, height);
+        this.outline.setSize(width, height);
     }
 
     setText(text: string): void {
@@ -47,11 +51,13 @@ export class TextBox {
 
     setVisible(visible: boolean): void {
         this.background.setVisible(visible);
+        this.outline.setVisible(visible);
         this.text.setVisible(visible);
     }
 
     destroy(): void {
         this.background.destroy();
+        this.outline.destroy();
         this.text.destroy();
     }
 }
@@ -140,11 +146,11 @@ export class PhysicalCard {
 
         // Create a new container for card content (excluding tooltip)
         this.cardContent = this.scene.add.container();
-        this.cardContent.add([this.cardBackground, this.cardImage, this.nameBox.background, this.nameBox.text, this.descBox.background, this.descBox.text]);
+        this.cardContent.add([this.cardBackground, this.cardImage, this.nameBox.background, this.nameBox.outline, this.nameBox.text, this.descBox.background, this.descBox.outline, this.descBox.text]);
         this.container.add(this.cardContent);
 
         // Add tooltip elements directly to the main container
-        this.container.add([this.tooltipBox.background, this.tooltipBox.text]);
+        this.container.add([this.tooltipBox.background, this.tooltipBox.outline, this.tooltipBox.text]);
 
         // Add HP box if the card is a BaseCharacter
         if (this.data instanceof BaseCharacter) {
@@ -159,7 +165,7 @@ export class PhysicalCard {
                 `${this.data.hitpoints}/${this.data.maxHitpoints}`,
                 { fontSize: '12px', color: '#000' }
             );
-            this.cardContent.add([this.hpBox.background, this.hpBox.text]);
+            this.cardContent.add([this.hpBox.background, this.hpBox.outline, this.hpBox.text]);
         } else {
             this.hpBox = null;
         }

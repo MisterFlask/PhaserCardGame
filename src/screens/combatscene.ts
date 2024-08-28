@@ -1,10 +1,10 @@
 import Phaser from 'phaser';
-import GameImageLoader from './utils/ImageUtils';
-import { ArcaneRitualCard, BaseCharacter, FireballCard, GoblinCharacter, SummonDemonCard, ToxicCloudCard } from './gamecharacters/CharacterClasses';
-import { AbstractCard, CardType, PhysicalCard, CardScreenLocation } from './gamecharacters/PhysicalCard';
-import { CardGuiUtils, GameConfig } from './utils/CardGuiUtils';
-import CampaignScene from './screens/campaign';
-import MapScene from './screens/map';
+import GameImageLoader from '../utils/ImageUtils';
+import { ArcaneRitualCard, BaseCharacter, FireballCard, GoblinCharacter, SummonDemonCard, ToxicCloudCard } from '../gamecharacters/CharacterClasses';
+import { AbstractCard, CardType, PhysicalCard, CardScreenLocation } from '../gamecharacters/PhysicalCard';
+import { CardGuiUtils, GameConfig } from '../utils/CardGuiUtils';
+import CampaignScene from './campaign';
+import MapScene from './map';
 
 
 const unitData: AbstractCard[] = [
@@ -28,7 +28,7 @@ const cardData: AbstractCard[] = [
     new ArcaneRitualCard(),
 ];
 
-class CardGame extends Phaser.Scene {
+class CombatScene extends Phaser.Scene {
     private playerHand: Phaser.GameObjects.Container[];
     private battlefield: Phaser.GameObjects.Container[];
     private playerUnits: Phaser.GameObjects.Container[];
@@ -401,7 +401,7 @@ const config: Phaser.Types.Core.GameConfig = {
         width: '100%',
         height: '100%'
     },
-    scene: [CampaignScene, CardGame, MapScene]
+    scene: [CampaignScene, CombatScene, MapScene]
 };
 
 const game = new Phaser.Game(config);

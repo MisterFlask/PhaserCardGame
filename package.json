@@ -13,11 +13,11 @@
   "scripts": {
     "build": "webpack --mode development",
     "watch": "webpack --mode development --watch",
-    "dev": "nodemon --watch './**/*.ts' --exec 'ts-node' src/game.ts"
+    "dev": "nodemon --watch './**/*.ts' --exec 'ts-node' src/screens/combatscene.ts"
   },
   "name": "phaser-game",
   "version": "1.0.0",
-  "main": "src/game.js",
+  "main": "src/screens/combatscene.js",
   "keywords": [],
   "author": "",
   "license": "ISC",

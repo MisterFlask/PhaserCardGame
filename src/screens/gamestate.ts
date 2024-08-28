@@ -8,7 +8,7 @@ export class GameState {
     public currentRunCharacters: BaseCharacter[] = [];
     public shopItems: StoreCard[] = [];
     public inventory: StoreCard[] = [];
-    public currency: number = 0
+    public currencyOnHand: number = 0
 
     private constructor() {}
 

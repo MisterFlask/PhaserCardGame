@@ -25,6 +25,8 @@ export default class MapScene extends Phaser.Scene {
     private locationCards: PhysicalCard[] = [];
     private characterCards: PhysicalCard[] = [];
     private background: Phaser.GameObjects.Image | null = null;
+    private abortButton: Phaser.GameObjects.Container | null = null;
+    private campaignStatusText: Phaser.GameObjects.Text | null = null;
 
     constructor() {
         super('MapScene');
@@ -38,6 +40,8 @@ export default class MapScene extends Phaser.Scene {
         this.createBackground();
         this.createLocationCards();
         this.createCharacterCards();
+        this.createAbortButton();
+        this.createCampaignStatusText();
 
         this.scale.on('resize', this.resize, this);
         this.resize();
@@ -86,6 +90,64 @@ export default class MapScene extends Phaser.Scene {
         });
     }
 
+    createAbortButton() {
+        const buttonWidth = 300;
+        const buttonHeight = 80;
+        const buttonX = this.scale.width / 2;
+        const buttonY = this.scale.height - 60;
+
+        const button = this.add.rectangle(0, 0, buttonWidth, buttonHeight, 0xff0000);
+        const abortText = this.add.text(0, -15, 'ABORT MISSION', { fontSize: '32px', color: '#ffffff' }).setOrigin(0.5);
+        const feeText = this.add.text(0, 20, '(fee: 50% of current revenues)', { fontSize: '16px', color: '#ffffff' }).setOrigin(0.5);
+
+        this.abortButton = this.add.container(buttonX, buttonY, [button, abortText, feeText]);
+        this.abortButton.setSize(buttonWidth, buttonHeight);
+        this.abortButton.setInteractive({ useHandCursor: true })
+            .on('pointerover', () => button.setFillStyle(0xff3333))
+            .on('pointerout', () => button.setFillStyle(0xff0000))
+            .on('pointerdown', () => this.onAbortMission());
+    }
+
+    createCampaignStatusText() {
+        const padding = 20;
+        const x = this.scale.width - padding;
+        const y = padding;
+        this.campaignStatusText = this.add.text(x, y, this.getCampaignStatusText(), {
+            fontSize: '18px',
+            color: '#ffffff',
+            align: 'right'
+        }).setOrigin(1, 0);
+    }
+
+    getCampaignStatusText(): string {
+        return [
+            this.getMissionStatusText(),
+            this.getTeamStatusText(),
+            this.getResourceStatusText()
+        ].join('\n\n');
+    }
+
+    getMissionStatusText(): string {
+        // TODO: Implement actual mission status logic
+        return 'Mission Status:\nIn Progress - Day 3 of 7';
+    }
+
+    getTeamStatusText(): string {
+        const gameState = GameState.getInstance();
+        const characters = gameState.getCurrentRunCharacters();
+        return `Team Status:\n${characters.length} Characters Active`;
+    }
+
+    getResourceStatusText(): string {
+        // TODO: Implement actual resource status logic
+        return 'Resources:\nGold: 1000\nSupplies: 75%';
+    }
+
+    onAbortMission() {
+        console.log('Mission aborted');
+        // Implement abort mission logic here
+    }
+
     setupLocationCardEvents = (card: PhysicalCard) => {
         card.container.setInteractive();
         card.container.on('pointerdown', () => {
@@ -104,6 +166,8 @@ export default class MapScene extends Phaser.Scene {
         this.resizeBackground();
         this.positionLocationCards(width, height);
         this.positionCharacterCards(width, height);
+        this.positionAbortButton(width, height);
+        this.positionCampaignStatusText(width, height);
     }
 
     resizeBackground() {
@@ -131,5 +195,18 @@ export default class MapScene extends Phaser.Scene {
         this.characterCards.forEach((card, index) => {
             card.container.setPosition(rightEdge, startY + index * cardSpacing);
         });
+    }
+
+    positionAbortButton(width: number, height: number) {
+        if (this.abortButton) {
+            this.abortButton.setPosition(width / 2, height - 60);
+        }
+    }
+
+    positionCampaignStatusText(width: number, height: number) {
+        if (this.campaignStatusText) {
+            const padding = 20;
+            this.campaignStatusText.setPosition(width - padding, padding);
+        }
     }
 }
