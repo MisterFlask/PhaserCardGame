@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { PhysicalCard, CardScreenLocation, CardType } from '../gamecharacters/PhysicalCard';
-import { BaseCharacter, BaseCharacterClass, BlackhandClass, DiabolistClass } from '../gamecharacters/CharacterClasses';
+import { BaseCharacter, BaseCharacterClass, BlackhandClass, DiabolistClass, PlayerCharacter } from '../gamecharacters/CharacterClasses';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 import { AbstractCard } from '../gamecharacters/PhysicalCard';
 import GameImageLoader from '../utils/ImageUtils';
@@ -118,7 +118,7 @@ export default class CampaignScene extends Phaser.Scene {
         this.embarkButton.setPosition(width * 0.95, height * 0.5);
 
         // Update deck display
-        if (this.draggedCard && this.draggedCard.data instanceof BaseCharacter) {
+        if (this.draggedCard && this.draggedCard.data instanceof PlayerCharacter) {
             this.updateDeckDisplay(this.draggedCard.data.cardsInDeck);
         }
 
@@ -157,7 +157,7 @@ export default class CampaignScene extends Phaser.Scene {
 
         rosterSlots.forEach((slot, index) => {
             const randomClass = classes[Math.floor(Math.random() * classes.length)];
-            const character = new BaseCharacter({ name: `Character ${index + 1} (${randomClass.name})`, portraitName: 'flamer1', characterClass: randomClass });
+            const character = new PlayerCharacter({ name: `Character ${index + 1} (${randomClass.name})`, portraitName: 'flamer1', characterClass: randomClass });
             character.cardsInDeck.push(...randomClass.availableCards);
             
             const card = new CardGuiUtils().createCard({
@@ -364,7 +364,7 @@ export default class CampaignScene extends Phaser.Scene {
     setupCardHover(card: PhysicalCard) {
         card.container.setInteractive()
             .on('pointerover', () => {
-                if (card.data instanceof BaseCharacter) {
+                if (card.data instanceof PlayerCharacter) {
                     this.updateDeckDisplay(card.data.cardsInDeck);
                 }
             });

@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import GameImageLoader from './utils/ImageUtils';
-import { ArcaneRitualCard, FireballCard, SummonDemonCard, ToxicCloudCard } from './gamecharacters/CharacterClasses';
+import { ArcaneRitualCard, BaseCharacter, FireballCard, GoblinCharacter, SummonDemonCard, ToxicCloudCard } from './gamecharacters/CharacterClasses';
 import { AbstractCard, CardType, PhysicalCard, CardScreenLocation } from './gamecharacters/PhysicalCard';
 import { CardGuiUtils, GameConfig } from './utils/CardGuiUtils';
 import CampaignScene from './screens/campaign';
@@ -150,7 +150,7 @@ class CardGame extends Phaser.Scene {
     }
 
     createMonsterCard(): void {
-        const monsterData: AbstractCard = new AbstractCard({ name: 'Goblin', description: 'A small, mischievous creature', cardType: CardType.CHARACTER });
+        const monsterData: AbstractCard = new GoblinCharacter();
         const monsterCard = new CardGuiUtils().createCard({
             scene: this,
             x: 400,
