@@ -173,12 +173,24 @@ export default class CampaignScene extends Phaser.Scene {
 
     setupCardEvents = (card: PhysicalCard): void => {
         // Remove existing listeners set up by this function
-        card.container.off('pointerdown', this.onPointerDown, this);
+        const pointerDownCallback = (pointer: Phaser.Input.Pointer) => {
+            this.onPointerDown(pointer, card);
+        };
+        const pointerOverCallback = () => {
+            this.bringToFront(card);
+        };
+        const pointerOutCallback = () => {
+            this.sendToBack(card);
+        };
+
+        card.container.off('pointerdown', pointerDownCallback, this)
+            .off('pointerover', pointerOverCallback, this)
+            .off('pointerout', pointerOutCallback, this);
     
         card.container.setInteractive()
-            .on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-                this.onPointerDown(pointer, card);
-            }, this);
+            .on('pointerdown', pointerDownCallback, this)
+            .on('pointerover', pointerOverCallback, this)
+            .on('pointerout', pointerOutCallback, this);
     }
     
     private onPointerDown = (pointer: Phaser.Input.Pointer, card: PhysicalCard) => {
@@ -191,7 +203,21 @@ export default class CampaignScene extends Phaser.Scene {
         
         card.container.setData('lastClickTime', currentTime);
     }
+    bringToFront = (card: PhysicalCard) => {
+        console.log('Bringing to front:', card.data.name);
+        const slot = this.findSlotWithCard(card);
+        if (slot) {
+            slot.container.setDepth(100);
+        }
+    }
     
+    sendToBack = (card: PhysicalCard) => {
+        console.log('Sending to back:', card.data.name);
+        const slot = this.findSlotWithCard(card);
+        if (slot) {
+            slot.container.setDepth(1);
+        }
+    }
 
     onDoubleClick = (card: PhysicalCard) => {
         const sourceSlot = this.findSlotWithCard(card);
@@ -324,12 +350,23 @@ export default class CampaignScene extends Phaser.Scene {
     }
 
     setupCardHover = (card: PhysicalCard) => {
+        // Remove existing listeners set up by this function
+        const pointerOverCallback = () => {
+            if (card.data instanceof PlayerCharacter) {
+                this.updateDeckDisplay(card.data.cardsInDeck);
+            }
+            this.bringToFront(card);
+        };
+        const pointerOutCallback = () => {
+            this.sendToBack(card);
+        };
+
+        card.container.off('pointerover', pointerOverCallback, this)
+            .off('pointerout', pointerOutCallback, this);
+
         card.container.setInteractive()
-            .on('pointerover', () => {
-                if (card.data instanceof PlayerCharacter) {
-                    this.updateDeckDisplay(card.data.cardsInDeck);
-                }
-            });
+            .on('pointerover', pointerOverCallback, this)
+            .on('pointerout', pointerOutCallback, this);
     }
 
     createDebugGraphics = () => {
