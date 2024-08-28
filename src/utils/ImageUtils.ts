@@ -3,7 +3,7 @@ export default class GameImageLoader {
     private readonly images = {
         backgrounds: {
             prefix: 'Backgrounds/',
-            files: ['battleback1.png', 'greyscale.png', "mapbackground1.png"]
+            files: ['battleback1.png', 'greyscale.png', "mapbackground1.png", "vintage_brown.png"]
         },
         characters: {
             prefix: 'Portraits/BlackhandPortraits/',

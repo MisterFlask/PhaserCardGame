@@ -70,7 +70,7 @@ export default class MapScene extends Phaser.Scene {
         ];
 
         locations.forEach((location, index) => {
-            const card = new CardGuiUtils().createCard({
+            const card = CardGuiUtils.getInstance().createCard({
                 scene: this,
                 x: 0,
                 y: 0,
@@ -87,7 +87,7 @@ export default class MapScene extends Phaser.Scene {
         const characters = gameState.getCurrentRunCharacters();
 
         characters.forEach((character, index) => {
-            const card = new CardGuiUtils().createCard({
+            const card = CardGuiUtils.getInstance().createCard({
                 scene: this,
                 x: 0,
                 y: 0,

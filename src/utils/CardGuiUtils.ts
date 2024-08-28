@@ -1,27 +1,27 @@
 import { AbstractCard, CardScreenLocation, CardType, PhysicalCard, TextBox } from "../gamecharacters/PhysicalCard";
 
-export interface GameConfig {
+export interface CardConfig {
     cardWidth: number;
     cardHeight: number;
-    battlefieldY: number;
-    handY: number;
-    dividerY: number;
-    gameWidth: number;
-    gameHeight: number;
 }
 
 export class CardGuiUtils {
-    config: GameConfig = {
+    private static instance: CardGuiUtils;
+    public cardConfig: CardConfig = {
         cardWidth: 120,
         cardHeight: 160,
-        battlefieldY: 200,
-        handY: 500,
-        dividerY: 350,
-        gameWidth: 800,
-        gameHeight: 600
     };
 
-    createCard(params: {
+    private constructor() {}
+
+    public static getInstance(): CardGuiUtils {
+        if (!CardGuiUtils.instance) {
+            CardGuiUtils.instance = new CardGuiUtils();
+        }
+        return CardGuiUtils.instance;
+    }
+
+    public createCard(params: {
         scene: Phaser.Scene,
         x: number,
         y: number,
@@ -31,7 +31,7 @@ export class CardGuiUtils {
     }): PhysicalCard {
         const { scene, x, y, data, location, eventCallback } = params;
         const cardContainer = scene.add.container(x, y);
-        const { cardWidth, cardHeight } = this.config;
+        const { cardWidth, cardHeight } = this.cardConfig;
         const cardBackground = scene.add.image(0, 0, 'greyscale').setDisplaySize(cardWidth, cardHeight);
         let cardTexture = data.portraitName;
 

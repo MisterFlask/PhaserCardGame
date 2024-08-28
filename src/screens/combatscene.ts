@@ -1,8 +1,8 @@
 import Phaser from 'phaser';
 import GameImageLoader from '../utils/ImageUtils';
 import { ArcaneRitualCard, BaseCharacter, FireballCard, GoblinCharacter, SummonDemonCard, ToxicCloudCard } from '../gamecharacters/CharacterClasses';
-import { AbstractCard, CardType, PhysicalCard, CardScreenLocation } from '../gamecharacters/PhysicalCard';
-import { CardGuiUtils, GameConfig } from '../utils/CardGuiUtils';
+import { AbstractCard, CardType, PhysicalCard, CardScreenLocation, TextBox } from '../gamecharacters/PhysicalCard';
+import { CardGuiUtils } from '../utils/CardGuiUtils';
 import CampaignScene from './campaign';
 import MapScene from './map';
 import { EncounterData } from '../encounters/encounters';
@@ -29,6 +29,15 @@ const cardData: AbstractCard[] = [
     new ArcaneRitualCard(),
 ];
 
+const config = {
+    battlefieldY: 200,
+    handY: 500,
+    dividerY: 350,
+    gameWidth: 800,
+    gameHeight: 600,
+    pileY: 550  // Increased to be below the hand
+};
+
 class CombatScene extends Phaser.Scene {
     private playerHand: Phaser.GameObjects.Container[];
     private battlefield: Phaser.GameObjects.Container[];
@@ -40,16 +49,15 @@ class CombatScene extends Phaser.Scene {
     private draggedCard: Phaser.GameObjects.Container | null;
     private menuButton!: Phaser.GameObjects.Text;
     private menuPanel!: Phaser.GameObjects.Container;
-    private config: GameConfig;
     private drawPile!: Phaser.GameObjects.Container;
     private discardPile!: Phaser.GameObjects.Container;
     private drawPileCount: number = 30;
     private discardPileCount: number = 0;
     private encounter!: EncounterData;
+    private combatStatusText!: TextBox;
     
     constructor() {
         super('CombatScene');
-        this.config = new CardGuiUtils().config;
         this.playerHand = [];
         this.battlefield = [];
         this.playerUnits = [];
@@ -63,9 +71,9 @@ class CombatScene extends Phaser.Scene {
     
     createPlayerUnits(): void {
         unitData.forEach((data, index) => {
-            const x = this.config.gameWidth - 100;
+            const x = config.gameWidth - 100;
             const y = 100 + index * 180;
-            const unit = new CardGuiUtils().createCard({
+            const unit = CardGuiUtils.getInstance().createCard({
                 scene: this,
                 x: x,
                 y: y,
@@ -91,13 +99,78 @@ class CombatScene extends Phaser.Scene {
         this.createPlayerUnits();
         this.createMenu();
         this.createDrawAndDiscardPiles();
+        this.createCombatStatusText();
 
         this.scale.on('resize', this.resize, this);
         this.resize();
     }
+    arrangeCards(cardArray: Phaser.GameObjects.Container[], yPosition: number): void {
+        const totalWidth = config.gameWidth - 200;
+        const cardSpacing = Math.min(CardGuiUtils.getInstance().cardConfig.cardWidth, totalWidth / (cardArray.length + 1));
+
+        cardArray.forEach((card, index) => {
+            card.x = 100 + index * cardSpacing;
+            card.y = yPosition;
+            (card as any).originalDepth = index;
+            card.depth = index;
+        });
+    }
+
+    resize(): void {
+        if (!this.scene.isActive('CombatScene')) {
+            return;
+        }
+
+        const { width, height } = this.scale;
+        this.cameras.main.setViewport(0, 0, width, height);
+
+        this.updateLayout(width, height);
+
+        this.updateBackgroundSize(width, height);
+    }
+
+    updateLayout(width: number, height: number): void {
+        config.gameWidth = width;
+        config.gameHeight = height;
+        config.battlefieldY = height * 0.33;
+        config.handY = height * 0.75;  // Moved up slightly to make room for piles
+        config.dividerY = height * 0.58;
+        config.pileY = height * 0.9;  // Moved down to be below the hand
+
+        this.createGameAreas();
+
+        this.arrangeCards(this.playerHand, config.handY);
+        this.arrangeCards(this.battlefield, config.battlefieldY);
+        this.playerUnits.forEach((unit, index) => {
+            unit.x = config.gameWidth - 100;
+            unit.y = 100 + index * 180;
+        });
+
+        // Position draw and discard piles
+        if (this.drawPile) {
+            this.drawPile.setPosition(width * 0.1, config.pileY);
+            this.drawPile.removeInteractive(); // Make it not draggable
+        }
+        if (this.discardPile) {
+            this.discardPile.setPosition(width * 0.2, config.pileY);
+            this.discardPile.removeInteractive(); // Make it not draggable
+        }
+
+        // Position combat status text
+        if (this.combatStatusText) {
+            this.combatStatusText.setPosition(width * 0.5, config.pileY);
+        }
+    }
+
+    updateBackgroundSize(width: number, height: number): void {
+        if (this.backgroundImage) {
+            this.backgroundImage.setDisplaySize(width, height);
+            this.backgroundImage.setPosition(width / 2, height / 2);
+        }
+    }
 
     createGameAreas(): void {
-        const { gameWidth, gameHeight, battlefieldY, handY } = this.config;
+        const { gameWidth, gameHeight, battlefieldY, handY } = config;
         this.backgroundImage = this.add.image(gameWidth / 2, gameHeight / 2, 'battleback1').setOrigin(0.5);
         this.backgroundImage.setDisplaySize(gameWidth, gameHeight);
         this.backgroundImage.setDepth(-1);
@@ -111,8 +184,8 @@ class CombatScene extends Phaser.Scene {
     createPlayerHand(): void {
         cardData.forEach((data, index) => {
             const x = 100 + index * 150;
-            const y = this.config.handY;
-            const card = new CardGuiUtils().createCard({
+            const y = config.handY;
+            const card = CardGuiUtils.getInstance().createCard({
                 scene: this,
                 x: x,
                 y: y,
@@ -122,46 +195,57 @@ class CombatScene extends Phaser.Scene {
             });
             this.playerHand.push(card.container);
         });
-        this.arrangeCards(this.playerHand, this.config.handY);
+        this.arrangeCards(this.playerHand, config.handY);
     }
 
     createDrawAndDiscardPiles(): void {
-        const pileY = this.config.gameHeight - 100;
+        const pileY = config.gameHeight - 100;
         
         // Create Draw Pile
         this.drawPile = this.add.container(100, pileY);
-        const drawCard = new CardGuiUtils().createCard({
+        const drawCard = CardGuiUtils.getInstance().createCard({
             scene: this,
             x: 0,
             y: 0,
-            data: new AbstractCard({ name: 'Draw Pile', description: 'Cards to draw', portraitName: "drawpile" }),
+            data: new AbstractCard({ name: 'Draw Pile (' + this.drawPileCount + ')', description: 'Cards to draw', portraitName: "drawpile" }),
             location: CardScreenLocation.DRAW_PILE,
             eventCallback: this.setupCardEvents
         });
-        const drawCountText = this.add.text(50, 0, this.drawPileCount.toString(), { fontSize: '24px', color: '#fff' });
-        this.drawPile.add([drawCard.container, drawCountText]);
+        this.drawPile.add([drawCard.container]);
 
         // Create Discard Pile
         this.discardPile = this.add.container(250, pileY);
-        const discardCard = new CardGuiUtils().createCard({
+        const discardCard = CardGuiUtils.getInstance().createCard({
             scene: this,
             x: 0,
             y: 0,
-            data: new AbstractCard({ name: 'Discard Pile', description: 'Discarded cards', portraitName: "discardpile" }),
+            data: new AbstractCard({ name: 'Discard Pile (' + this.discardPileCount + ')', description: 'Discarded cards', portraitName: "discardpile" }),
             location: CardScreenLocation.DISCARD_PILE,
             eventCallback: this.setupCardEvents
         });
-        const discardCountText = this.add.text(50, 0, this.discardPileCount.toString(), { fontSize: '24px', color: '#fff' });
-        this.discardPile.add([discardCard.container, discardCountText]);
+        this.discardPile.add([discardCard.container]);
+    }
+    createCombatStatusText(): void {
+        const x = 400;
+        const y = config.gameHeight - 100;
+        this.combatStatusText = new TextBox(
+            this,
+            x,
+            y,
+            300, // Adjust width as needed
+            50,  // Adjust height as needed
+            'CURRENT COMBAT STATUS',
+            { fontSize: '24px', color: '#000', align: 'center' }
+        );
     }
 
     createEnemyCards(): void {
         if (this.encounter && this.encounter.enemies) {
             this.encounter.enemies.forEach((enemy, index) => {
-                const enemyCard = new CardGuiUtils().createCard({
+                const enemyCard = CardGuiUtils.getInstance().createCard({
                     scene: this,
                     x: 400 + index * 150,
-                    y: this.config.battlefieldY,
+                    y: config.battlefieldY,
                     data: enemy,
                     location: CardScreenLocation.BATTLEFIELD,
                     eventCallback: this.setupCardEvents
@@ -241,7 +325,7 @@ class CombatScene extends Phaser.Scene {
         gameObject.x = dragX;
         gameObject.y = dragY;
 
-        const inBattlefield = dragY < this.config.dividerY;
+        const inBattlefield = dragY < config.dividerY;
         this.battlefieldArea.setVisible(inBattlefield);
         this.handArea.setVisible(!inBattlefield);
 
@@ -279,7 +363,7 @@ class CombatScene extends Phaser.Scene {
     handleDragEnd(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container): void {
         if ((gameObject as any)?.physicalCard?.data?.cardType === CardType.CHARACTER) return;
 
-        const inHand = gameObject.y > this.config.dividerY;
+        const inHand = gameObject.y > config.dividerY;
         if (inHand) {
             this.moveCardToHand(gameObject);
         } else {
@@ -313,7 +397,6 @@ class CombatScene extends Phaser.Scene {
             // For example, updating health, removing cards, etc.
         }
     }
-
     handleGameObjectOver(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject): void {
         if (gameObject.type === 'Container') {
             this.children.bringToTop(gameObject);
@@ -340,7 +423,7 @@ class CombatScene extends Phaser.Scene {
             this.battlefield = this.battlefield.filter(c => c !== card);
             (card as any).physicalCard.cardLocation = CardScreenLocation.HAND;
         }
-        this.arrangeCards(this.playerHand, this.config.handY);
+        this.arrangeCards(this.playerHand, config.handY);
     }
 
     moveCardToBattlefield(card: Phaser.GameObjects.Container): void {
@@ -348,72 +431,26 @@ class CombatScene extends Phaser.Scene {
             this.battlefield.push(card);
             this.playerHand = this.playerHand.filter(c => c !== card);
         }
-        this.arrangeCards(this.battlefield, this.config.battlefieldY);
+        this.arrangeCards(this.battlefield, config.battlefieldY);
     }
 
-    arrangeCards(cardArray: Phaser.GameObjects.Container[], yPosition: number): void {
-        const { gameWidth, cardWidth } = this.config;
-        const totalWidth = gameWidth - 200;
-        const cardSpacing = Math.min(cardWidth, totalWidth / (cardArray.length + 1));
-
-        cardArray.forEach((card, index) => {
-            card.x = 100 + index * cardSpacing;
-            card.y = yPosition;
-            (card as any).originalDepth = index;
-            card.depth = index;
-        });
-    }
-
-    resize(): void {
-        if (!this.scene.isActive('CardGame')) {
-            return;
-        }
-
-        const { width, height } = this.scale;
-        this.cameras.main.setViewport(0, 0, width, height);
-
-        this.updateLayout(width, height);
-
-        this.updateBackgroundSize(width, height);
-    }
-
-    updateLayout(width: number, height: number): void {
-        this.config.gameWidth = width;
-        this.config.gameHeight = height;
-        this.config.battlefieldY = height * 0.33;
-        this.config.handY = height * 0.83;
-        this.config.dividerY = height * 0.58;
-
-        this.createGameAreas();
-
-        this.arrangeCards(this.playerHand, this.config.handY);
-        this.arrangeCards(this.battlefield, this.config.battlefieldY);
-        this.playerUnits.forEach((unit, index) => {
-            unit.x = this.config.gameWidth - 100;
-            unit.y = 100 + index * 180;
-        });
-    }
-
-    updateBackgroundSize(width: number, height: number): void {
-        if (this.backgroundImage) {
-            this.backgroundImage.setDisplaySize(width, height);
-            this.backgroundImage.setPosition(width / 2, height / 2);
-        }
-    }
 }
 
-const config: Phaser.Types.Core.GameConfig = {
+const gameconfig: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
     scale: {
-        mode: Phaser.Scale.RESIZE,
+        mode: Phaser.Scale.FIT,
         parent: 'phaser-example',
         width: '100%',
-        height: '100%'
+        height: '100%',
+        resizeInterval: 1000,
+    },
+    render: {
+        antialias: true,
+        roundPixels:false,
+        pixelArt: false
     },
     scene: [CampaignScene, CombatScene, MapScene]
 };
 
-const game = new Phaser.Game(config);
-
-
-
+const game = new Phaser.Game(gameconfig);

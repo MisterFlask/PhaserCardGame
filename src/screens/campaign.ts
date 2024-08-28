@@ -184,7 +184,7 @@ export default class CampaignScene extends Phaser.Scene {
         const rosterSlots = this.cardSlots.filter(slot => slot.type === 'roster');
 
         characters.forEach((character, index) => {
-            const card = new CardGuiUtils().createCard({
+            const card = CardGuiUtils.getInstance().createCard({
                 scene: this,
                 x: 0,
                 y: 0,
@@ -365,7 +365,7 @@ export default class CampaignScene extends Phaser.Scene {
 
         cards.forEach((card, index) => {
             const x = startX + index * (cardWidth + cardSpacing);
-            const physicalCard = new CardGuiUtils().createCard({
+            const physicalCard = CardGuiUtils.getInstance().createCard({
                 scene: this,
                 x: x,
                 y: this.deckDisplayY,
@@ -442,7 +442,7 @@ export default class CampaignScene extends Phaser.Scene {
         const startX = (width - (shopItems.length * (cardWidth + cardSpacing))) / 2;
         shopItems.forEach((item, index) => {
             const x = startX + index * (cardWidth + cardSpacing);
-            const physicalCard = new CardGuiUtils().createCard({
+            const physicalCard = CardGuiUtils.getInstance().createCard({
                 scene: this,
                 x: x,
                 y: this.shopY,

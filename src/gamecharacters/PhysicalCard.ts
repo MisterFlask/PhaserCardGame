@@ -300,10 +300,12 @@ export class PhysicalCard {
 
         // Check if the texture exists before setting it
         if (this.scene.textures.exists(this.data.portraitName)) {
-            this.cardImage.setTexture(this.data.portraitName);
             
             // Maintain aspect ratio
             const texture = this.scene.textures.get(this.data.portraitName);
+            texture.setFilter(Phaser.Textures.LINEAR);
+            this.cardImage.setTexture(this.data.portraitName);
+            this.cardImage.texture.setFilter(Phaser.Textures.LINEAR);
             const frame = texture.get();
             const aspectRatio = frame.width / frame.height;
             
