@@ -301,10 +301,40 @@ export class PhysicalCard {
         // Check if the texture exists before setting it
         if (this.scene.textures.exists(this.data.portraitName)) {
             this.cardImage.setTexture(this.data.portraitName);
+            
+            // Maintain aspect ratio
+            const texture = this.scene.textures.get(this.data.portraitName);
+            const frame = texture.get();
+            const aspectRatio = frame.width / frame.height;
+            
+            // Assuming the card background defines the available space
+            const availableWidth = this.cardBackground.displayWidth * 0.9; // 90% of card width
+            const availableHeight = this.cardBackground.displayHeight * 0.6; // 60% of card height
+            
+            let newWidth = availableWidth;
+            let newHeight = availableWidth / aspectRatio;
+            
+            if (newHeight > availableHeight) {
+                newHeight = availableHeight;
+                newWidth = availableHeight * aspectRatio;
+            }
+            
+            this.cardImage.setDisplaySize(newWidth, newHeight);
+            
+            // Center the image on the card
+            this.cardImage.setPosition(0, -this.cardBackground.displayHeight * 0.25); // Move image to top quarter of card
         } else {
             console.warn(`Texture '${this.data.portraitName}' not found. Using fallback texture.`);
-            //this.cardImage.setTexture('fallback_texture'); // Ensure you have a fallback texture
+            // this.cardImage.setTexture('fallback_texture'); // Ensure you have a fallback texture
         }
+
+        // Position nameBox just below the portraitBox
+        const nameBoxY = this.cardImage.y + this.cardImage.displayHeight / 2 + this.nameBox.background.displayHeight / 2;
+        this.nameBox.setPosition(0, nameBoxY);
+
+        // Position descBox just below the nameBox
+        const descBoxY = nameBoxY + this.nameBox.background.displayHeight / 2 + this.descBox.background.displayHeight / 2;
+        this.descBox.setPosition(0, descBoxY);
 
         // Update HP box if it exists
         if (this.hpBox && this.data instanceof BaseCharacter) {
