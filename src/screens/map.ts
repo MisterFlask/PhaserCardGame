@@ -8,8 +8,7 @@ export class LocationCard extends AbstractCard {
     encounter: EncounterData;
 
     constructor({ name, description, portraitName, tooltip }: { name: string; description: string; portraitName?: string; tooltip?: string }) {
-        const encounterManager = new EncounterManager();
-        const encounter = encounterManager.getRandomEncounter();
+        const encounter = EncounterManager.getInstance().getRandomEncounter();
         const encounterDescription = `Encounter: ${encounter.enemies.map(e => e.name).join(', ')}`;
         const fullDescription = `${description}\n\n${encounterDescription}`;
 

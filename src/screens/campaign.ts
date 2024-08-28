@@ -6,6 +6,8 @@ import { AbstractCard } from '../gamecharacters/PhysicalCard';
 import GameImageLoader from '../utils/ImageUtils';
 import { GameAction } from '../utils/ActionQueue';
 import { GameState } from './gamestate';
+import { BaconBeast, BloodManipulationSlime, ClockworkAbomination } from '../encounters/encounters';
+import { CampaignRules } from '../rules/campaignrules';
 
 export class StoreCard extends AbstractCard {
     price: number;
@@ -44,6 +46,8 @@ export default class CampaignScene extends Phaser.Scene {
     private selectedY: number = 0;
     private embarkButton!: Phaser.GameObjects.Text;
     private debugGraphics!: Phaser.GameObjects.Graphics;
+    private menuButton!: Phaser.GameObjects.Text;
+    private menuPanel!: Phaser.GameObjects.Container;
 
     constructor() {
         super('Campaign');
@@ -56,12 +60,42 @@ export default class CampaignScene extends Phaser.Scene {
         this.createEmbarkButton();
         this.createDeckDisplay();
         this.createShop();
+        this.createMenu();
 
         // Listen for resize events
         this.scale.on('resize', this.resize, this);
         this.createDebugGraphics();
         this.updateDebugGraphics();
         this.resize();
+    }
+
+    createMenu() {
+        this.menuButton = this.add.text(10, 10, 'MENU', { fontSize: '24px', color: '#fff' })
+          .setInteractive()
+          .on('pointerdown', this.toggleMenu, this);
+   
+        this.menuPanel = this.add.container(400, 300).setVisible(false);
+        const panelBg = this.add.rectangle(0, 0, 200, 100, 0x000000, 0.8);
+        const closeButton = this.add.text(-80, -30, 'CLOSE MENU', { fontSize: '16px', color: '#fff' })
+          .setInteractive()
+          .on('pointerdown', this.toggleMenu, this);
+        const debugButton = this.add.text(-80, 10, 'COMBAT SCENE DEBUG', { fontSize: '16px', color: '#fff' })
+          .setInteractive()
+          .on('pointerdown', this.startCombatDebug, this);
+   
+        this.menuPanel.add([panelBg, closeButton, debugButton]);
+      }
+   
+      toggleMenu() {
+        this.menuPanel.setVisible(!this.menuPanel.visible);
+      }
+   
+      startCombatDebug() {
+        this.scene.start('CombatScene', { 
+          encounter: { 
+            enemies: [new ClockworkAbomination(), new BaconBeast(), new BloodManipulationSlime()] 
+          } 
+        });
     }
     
     preload = (): void => {
@@ -116,6 +150,9 @@ export default class CampaignScene extends Phaser.Scene {
         // Update shop cards
         this.positionShopCards(this.shopCards.map(card => card.data as StoreCard));
 
+        // Reposition menu button
+        this.menuButton.setPosition(10, 10);
+
         this.updateDebugGraphics();
     }
 
@@ -143,14 +180,10 @@ export default class CampaignScene extends Phaser.Scene {
     }
 
     createCharacterRoster = () => {
-        const classes: BaseCharacterClass[] = [new DiabolistClass(), new BlackhandClass()];
+        const characters = CampaignRules.getInstance().generateLogicalCharacterRoster();
         const rosterSlots = this.cardSlots.filter(slot => slot.type === 'roster');
 
-        rosterSlots.forEach((slot, index) => {
-            const randomClass = classes[Math.floor(Math.random() * classes.length)];
-            const character = new PlayerCharacter({ name: `Character ${index + 1} (${randomClass.name})`, portraitName: 'flamer1', characterClass: randomClass });
-            character.cardsInDeck.push(...randomClass.availableCards);
-            
+        characters.forEach((character, index) => {
             const card = new CardGuiUtils().createCard({
                 scene: this,
                 x: 0,
@@ -159,7 +192,7 @@ export default class CampaignScene extends Phaser.Scene {
                 location: CardScreenLocation.BATTLEFIELD,
                 eventCallback: () => {}
             });
-            this.addCardToSlot(card, slot);
+            this.addCardToSlot(card, rosterSlots[index]);
             this.setupCardHover(card);
         });
     }

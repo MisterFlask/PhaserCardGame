@@ -1,19 +1,19 @@
 import { BaseCharacter, EnemyCharacter, GoblinCharacter } from '../gamecharacters/CharacterClasses';
 
 // Define new character classes
-class OrcWarrior extends EnemyCharacter {
+export class ClockworkAbomination extends EnemyCharacter {
     constructor() {
         super({ name: 'Clockwork Abomination', portraitName: 'Clockwork Abomination', maxHitpoints: 30, description: 'A fierce orc warrior' });
     }
 }
 
-class DarkElf extends EnemyCharacter {
+export class BaconBeast extends EnemyCharacter {
     constructor() {
         super({ name: 'Breakfast Nightmares Bacon Beast', portraitName: 'Breakfast Nightmares Bacon Beast', maxHitpoints: 25, description: 'A cunning dark elf assassin' });
     }
 }
 
-class UndeadSkeleton extends EnemyCharacter {
+export class BloodManipulationSlime extends EnemyCharacter {
     constructor() {
         super({ name: 'Blood Manipulation Slime', portraitName: 'Blood Manipulation Slime', maxHitpoints: 20, description: 'A reanimated skeleton warrior' });
     }
@@ -35,9 +35,10 @@ export class Encounter {
 }
 
 export class EncounterManager {
+    private static instance: EncounterManager;
     private encounters: Encounter[];
 
-    constructor() {
+    private constructor() {
         this.encounters = [
             new Encounter({
                 enemies: [new GoblinCharacter(), new GoblinCharacter()],
@@ -45,18 +46,18 @@ export class EncounterManager {
                 rewardXP: 100
             }),
             new Encounter({
-                enemies: [new OrcWarrior(), new GoblinCharacter()],
+                enemies: [new ClockworkAbomination(), new GoblinCharacter()],
                 difficulty: 'Medium',
                 rewardXP: 150
             }),
             new Encounter({
-                enemies: [new DarkElf(), new UndeadSkeleton()],
+                enemies: [new BaconBeast(), new BloodManipulationSlime()],
                 difficulty: 'Hard',
                 rewardXP: 200,
                 specialConditions: ['Darkness']
             }),
             new Encounter({
-                enemies: [new OrcWarrior(), new OrcWarrior()],
+                enemies: [new ClockworkAbomination(), new ClockworkAbomination()],
                 difficulty: 'Hard',
                 rewardXP: 250
             }),
@@ -66,12 +67,19 @@ export class EncounterManager {
                 rewardXP: 180
             }),
             new Encounter({
-                enemies: [new DarkElf(), new OrcWarrior(), new GoblinCharacter()],
+                enemies: [new BaconBeast(), new ClockworkAbomination(), new GoblinCharacter()],
                 difficulty: 'Very Hard',
                 rewardXP: 300,
                 specialConditions: ['Ambush']
             }),
         ];
+    }
+
+    public static getInstance(): EncounterManager {
+        if (!EncounterManager.instance) {
+            EncounterManager.instance = new EncounterManager();
+        }
+        return EncounterManager.instance;
     }
 
     public getRandomEncounter(): EncounterData {
