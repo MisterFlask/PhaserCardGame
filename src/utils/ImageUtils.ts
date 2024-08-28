@@ -7,11 +7,11 @@ export default class GameImageLoader {
         },
         characters: {
             prefix: 'Portraits/BlackhandPortraits/',
-            files: ['flamer1.png']
+            files: ['flamer1.svg']
         },
         ui: {
             prefix: 'UI/',
-            files: ['drawpile.png', "discardpile.png"]
+            files: ['drawpile.svg', "discardpile.svg"]
         },
         cards_blackhand: {
             prefix: 'Sprites/Cards/Blackhand/',
@@ -45,13 +45,20 @@ export default class GameImageLoader {
         for (const category in this.images) {
             const categoryData = this.images[category as keyof typeof this.images];
             categoryData.files.forEach((file: string) => {
-                const key = file.replace('.png', '');
-                loader.image({
-                    key: key,
-                    url: `${this.baseURL}${categoryData.prefix}${file}`
-                });                
+                const key = file.replace(/\.(png|svg)$/, '');
+                if (file.endsWith('.svg')) {
+                    loader.svg({
+                        key: key,
+                        url: `${this.baseURL}${categoryData.prefix}${file}`
+                    });
+                } else {
+                    loader.image({
+                        key: key,
+                        url: `${this.baseURL}${categoryData.prefix}${file}`
+                    });
+                }
                 const texture = loader.scene.textures.get(key);
-                if (texture) {
+                if (texture && !file.endsWith('.svg')) {
                     texture.setFilter(Phaser.Textures.LINEAR);
                 }
             });

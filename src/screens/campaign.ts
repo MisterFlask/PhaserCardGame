@@ -112,6 +112,11 @@ export default class CampaignScene extends Phaser.Scene {
     }
 
     resize = () => {
+
+        // Bail if we're not in this scene right now
+        if (!this.scene.isActive('Campaign')) {
+            return;
+        }
         const { width, height } = this.scale;
 
         // Update layout

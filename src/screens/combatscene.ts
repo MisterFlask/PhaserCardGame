@@ -55,6 +55,8 @@ class CombatScene extends Phaser.Scene {
     private discardPileCount: number = 0;
     private encounter!: EncounterData;
     private combatStatusText!: TextBox;
+    private lastPerformanceLog: number = 0;
+    private frameCount: number = 0;
     
     constructor() {
         super('CombatScene');
@@ -67,6 +69,8 @@ class CombatScene extends Phaser.Scene {
 
     init(data: { encounter: EncounterData }) {
         this.encounter = data.encounter;
+        game.events.on('debug', console.log);
+
     }
     
     createPlayerUnits(): void {
@@ -92,7 +96,7 @@ class CombatScene extends Phaser.Scene {
     }
 
     create(): void {
-        this.createGameAreas();
+        this.createOrUpdateGameAreas();
         this.createPlayerHand();
         this.createEnemyCards();
         this.setupEventListeners();
@@ -106,8 +110,28 @@ class CombatScene extends Phaser.Scene {
         this.time.delayedCall(100, () => {
             this.resize();
         });    
-    }
 
+    // Set up performance monitoring
+    this.lastPerformanceLog = 0;
+    this.frameCount = 0;
+
+    this.events.on('update', (time: number, delta: number) => {
+        this.frameCount++;
+        
+        if (time - this.lastPerformanceLog >= 1000) {
+            const fps = Math.round(this.frameCount / ((time - this.lastPerformanceLog) / 1000));
+            const memory = (performance as any).memory ? 
+                Math.round((performance as any).memory.usedJSHeapSize / (1024 * 1024)) : 
+                'N/A';
+            
+            console.debug(`Performance: FPS: ${fps}, Memory: ${memory} MB`);
+            
+            this.lastPerformanceLog = time;
+            this.frameCount = 0;
+        }
+    });
+    }
+    
     arrangeCards(cardArray: Phaser.GameObjects.Container[], yPosition: number): void {
         const totalWidth = config.gameWidth - 200;
         const cardSpacing = Math.min(CardGuiUtils.getInstance().cardConfig.cardWidth, totalWidth / (cardArray.length + 1));
@@ -141,7 +165,7 @@ class CombatScene extends Phaser.Scene {
         config.dividerY = height * 0.58;
         config.pileY = height * 0.9;  // Moved down to be below the hand
 
-        this.createGameAreas();
+        this.createOrUpdateGameAreas();
 
         this.arrangeCards(this.playerHand, config.handY);
         this.arrangeCards(this.battlefield, config.battlefieldY);
@@ -172,17 +196,31 @@ class CombatScene extends Phaser.Scene {
             this.backgroundImage.setPosition(width / 2, height / 2);
         }
     }
-
-    createGameAreas(): void {
+    createOrUpdateGameAreas(): void {
         const { gameWidth, gameHeight, battlefieldY, handY } = config;
-        this.backgroundImage = this.add.image(gameWidth / 2, gameHeight / 2, 'battleback1').setOrigin(0.5);
-        this.backgroundImage.setDisplaySize(gameWidth, gameHeight);
-        this.backgroundImage.setDepth(-1);
 
-        this.battlefieldArea = this.add.rectangle(gameWidth / 2, battlefieldY, gameWidth - 100, 300).setStrokeStyle(4, 0xffff00);
-        this.handArea = this.add.rectangle(gameWidth / 2, handY, gameWidth - 100, 300).setStrokeStyle(4, 0x00ff00);
-        this.battlefieldArea.setVisible(false);
-        this.handArea.setVisible(false);
+        if (!this.backgroundImage) {
+            this.backgroundImage = this.add.image(gameWidth / 2, gameHeight / 2, 'battleback1').setOrigin(0.5);
+            this.backgroundImage.setDepth(-1);
+        }
+        this.backgroundImage.setDisplaySize(gameWidth, gameHeight);
+        this.backgroundImage.setPosition(gameWidth / 2, gameHeight / 2);
+
+        if (!this.battlefieldArea) {
+            this.battlefieldArea = this.add.rectangle(gameWidth / 2, battlefieldY, gameWidth - 100, 300).setStrokeStyle(4, 0xffff00);
+            this.battlefieldArea.setVisible(false);
+        } else {
+            this.battlefieldArea.setPosition(gameWidth / 2, battlefieldY);
+            this.battlefieldArea.setSize(gameWidth - 100, 300);
+        }
+
+        if (!this.handArea) {
+            this.handArea = this.add.rectangle(gameWidth / 2, handY, gameWidth - 100, 300).setStrokeStyle(4, 0x00ff00);
+            this.handArea.setVisible(false);
+        } else {
+            this.handArea.setPosition(gameWidth / 2, handY);
+            this.handArea.setSize(gameWidth - 100, 300);
+        }
     }
 
     createPlayerHand(): void {
@@ -431,13 +469,11 @@ class CombatScene extends Phaser.Scene {
 const gameconfig: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
     scale: {
-        mode: Phaser.Scale.CENTER_BOTH,
-        autoCenter: Phaser.Scale.CENTER_BOTH,
+        mode: Phaser.Scale.RESIZE,
         parent: 'phaser-example',
-        width: '1200',
-        height: '1000',
+        width: '100%',
+        height: '100%',
         resizeInterval: 1000,
-
     },
     render: {
         antialias: true,
