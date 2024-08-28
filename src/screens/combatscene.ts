@@ -5,6 +5,7 @@ import { AbstractCard, CardType, PhysicalCard, CardScreenLocation } from '../gam
 import { CardGuiUtils, GameConfig } from '../utils/CardGuiUtils';
 import CampaignScene from './campaign';
 import MapScene from './map';
+import { EncounterData } from '../encounters/encounters';
 
 
 const unitData: AbstractCard[] = [
@@ -44,9 +45,10 @@ class CombatScene extends Phaser.Scene {
     private discardPile!: Phaser.GameObjects.Container;
     private drawPileCount: number = 30;
     private discardPileCount: number = 0;
+    private encounter!: EncounterData;
     
     constructor() {
-        super('CardGame');
+        super('CombatScene');
         this.config = new CardGuiUtils().config;
         this.playerHand = [];
         this.battlefield = [];
@@ -55,6 +57,10 @@ class CombatScene extends Phaser.Scene {
         this.draggedCard = null;
     }
 
+    init(data: { encounter: EncounterData }) {
+        this.encounter = data.encounter;
+    }
+    
     createPlayerUnits(): void {
         unitData.forEach((data, index) => {
             const x = this.config.gameWidth - 100;
@@ -80,7 +86,7 @@ class CombatScene extends Phaser.Scene {
     create(): void {
         this.createGameAreas();
         this.createPlayerHand();
-        this.createMonsterCard();
+        this.createEnemyCards();
         this.setupEventListeners();
         this.createPlayerUnits();
         this.createMenu();
@@ -149,18 +155,21 @@ class CombatScene extends Phaser.Scene {
         this.discardPile.add([discardCard.container, discardCountText]);
     }
 
-    createMonsterCard(): void {
-        const monsterData: AbstractCard = new GoblinCharacter();
-        const monsterCard = new CardGuiUtils().createCard({
-            scene: this,
-            x: 400,
-            y: this.config.battlefieldY,
-            data: monsterData,
-            location: CardScreenLocation.BATTLEFIELD,
-            eventCallback: this.setupCardEvents
-        });
-        monsterCard.container.setDepth(1);
-        this.battlefield.push(monsterCard.container);
+    createEnemyCards(): void {
+        if (this.encounter && this.encounter.enemies) {
+            this.encounter.enemies.forEach((enemy, index) => {
+                const enemyCard = new CardGuiUtils().createCard({
+                    scene: this,
+                    x: 400 + index * 150,
+                    y: this.config.battlefieldY,
+                    data: enemy,
+                    location: CardScreenLocation.BATTLEFIELD,
+                    eventCallback: this.setupCardEvents
+                });
+                enemyCard.container.setDepth(1);
+                this.battlefield.push(enemyCard.container);
+            });
+        }
     }
 
     setupCardEvents(card: PhysicalCard): void {

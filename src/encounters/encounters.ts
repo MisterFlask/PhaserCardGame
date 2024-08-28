@@ -3,27 +3,34 @@ import { BaseCharacter, EnemyCharacter, GoblinCharacter } from '../gamecharacter
 // Define new character classes
 class OrcWarrior extends EnemyCharacter {
     constructor() {
-        super({ name: 'Orc Warrior', portraitName: 'orc_warrior', maxHitpoints: 30, description: 'A fierce orc warrior' });
+        super({ name: 'Clockwork Abomination', portraitName: 'Clockwork Abomination', maxHitpoints: 30, description: 'A fierce orc warrior' });
     }
 }
 
 class DarkElf extends EnemyCharacter {
     constructor() {
-        super({ name: 'Dark Elf', portraitName: 'dark_elf', maxHitpoints: 25, description: 'A cunning dark elf assassin' });
+        super({ name: 'Breakfast Nightmares Bacon Beast', portraitName: 'Breakfast Nightmares Bacon Beast', maxHitpoints: 25, description: 'A cunning dark elf assassin' });
     }
 }
 
 class UndeadSkeleton extends EnemyCharacter {
     constructor() {
-        super({ name: 'Undead Skeleton', portraitName: 'undead_skeleton', maxHitpoints: 20, description: 'A reanimated skeleton warrior' });
+        super({ name: 'Blood Manipulation Slime', portraitName: 'Blood Manipulation Slime', maxHitpoints: 20, description: 'A reanimated skeleton warrior' });
     }
 }
 
-export class Encounter {
+export interface EncounterData {
     enemies: EnemyCharacter[];
+    difficulty: string;
+    rewardXP: number;
+    specialConditions?: string[];
+}
 
-    constructor(enemies: EnemyCharacter[]) {
-        this.enemies = enemies;
+export class Encounter {
+    data: EncounterData;
+
+    constructor(data: EncounterData) {
+        this.data = data;
     }
 }
 
@@ -32,17 +39,43 @@ export class EncounterManager {
 
     constructor() {
         this.encounters = [
-            new Encounter([new GoblinCharacter(), new GoblinCharacter()]),
-            new Encounter([new OrcWarrior(), new GoblinCharacter()]),
-            new Encounter([new DarkElf(), new UndeadSkeleton()]),
-            new Encounter([new OrcWarrior(), new OrcWarrior()]),
-            new Encounter([new GoblinCharacter(), new GoblinCharacter(), new GoblinCharacter()]),
-            new Encounter([new DarkElf(), new OrcWarrior(), new GoblinCharacter()]),
+            new Encounter({
+                enemies: [new GoblinCharacter(), new GoblinCharacter()],
+                difficulty: 'Easy',
+                rewardXP: 100
+            }),
+            new Encounter({
+                enemies: [new OrcWarrior(), new GoblinCharacter()],
+                difficulty: 'Medium',
+                rewardXP: 150
+            }),
+            new Encounter({
+                enemies: [new DarkElf(), new UndeadSkeleton()],
+                difficulty: 'Hard',
+                rewardXP: 200,
+                specialConditions: ['Darkness']
+            }),
+            new Encounter({
+                enemies: [new OrcWarrior(), new OrcWarrior()],
+                difficulty: 'Hard',
+                rewardXP: 250
+            }),
+            new Encounter({
+                enemies: [new GoblinCharacter(), new GoblinCharacter(), new GoblinCharacter()],
+                difficulty: 'Medium',
+                rewardXP: 180
+            }),
+            new Encounter({
+                enemies: [new DarkElf(), new OrcWarrior(), new GoblinCharacter()],
+                difficulty: 'Very Hard',
+                rewardXP: 300,
+                specialConditions: ['Ambush']
+            }),
         ];
     }
 
-    public getRandomEncounter(): EnemyCharacter[] {
+    public getRandomEncounter(): EncounterData {
         const randomIndex = Math.floor(Math.random() * this.encounters.length);
-        return this.encounters[randomIndex].enemies;
+        return this.encounters[randomIndex].data;
     }
 }

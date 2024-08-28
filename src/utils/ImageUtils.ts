@@ -16,6 +16,17 @@ export default class GameImageLoader {
         cards_diabolist: {
             prefix: 'Sprites/Cards/Diabolist/',
             files: ['gem-pendant.png', 'skull-bolt.png']
+        },
+        enemies: {
+            prefix: 'Sprites/Enemies/v2/',
+            files: [
+                'Blood Manipulation Mage.png',
+                'Blood Manipulation Slime.png',
+                'Boss Flying Devourer.png',
+                'Breakfast Nightmares Bacon Beast.png',
+                'Breakfast Nightmares Bread Loaf.png',
+                'Clockwork Abomination.png',
+            ]
         }
     };
 

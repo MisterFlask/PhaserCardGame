@@ -2,22 +2,32 @@ import Phaser from 'phaser';
 import { AbstractCard, PhysicalCard, CardType, CardScreenLocation, CardSize } from '../gamecharacters/PhysicalCard';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 import { GameState } from './gamestate';
+import { EncounterData, EncounterManager } from '../encounters/encounters';
 
 export class LocationCard extends AbstractCard {
+    encounter: EncounterData;
+
     constructor({ name, description, portraitName, tooltip }: { name: string; description: string; portraitName?: string; tooltip?: string }) {
+        const encounterManager = new EncounterManager();
+        const encounter = encounterManager.getRandomEncounter();
+        const encounterDescription = `Encounter: ${encounter.enemies.map(e => e.name).join(', ')}`;
+        const fullDescription = `${description}\n\n${encounterDescription}`;
+
         super({
             name,
-            description,
+            description: fullDescription,
             portraitName,
             cardType: CardType.CHARACTER,
             tooltip,
             size: CardSize.MEDIUM
         });
+
+        this.encounter = encounter;
     }
 
-    OnLocationSelected(): void {
-        console.log(`Location ${this.name} selected`);
-        // Implementation to be added later
+    OnLocationSelected(scene: Phaser.Scene): void {
+        console.log(`Location ${this.name} selected with encounter: ${this.encounter.enemies.map(e => e.name).join(', ')}`);
+        scene.scene.start('CombatScene', { encounter: this.encounter });
     }
 }
 
@@ -152,7 +162,7 @@ export default class MapScene extends Phaser.Scene {
         card.container.setInteractive();
         card.container.on('pointerdown', () => {
             if (card.data instanceof LocationCard) {
-                card.data.OnLocationSelected();
+                card.data.OnLocationSelected(this);
             }
         });
     }
