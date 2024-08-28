@@ -5,12 +5,18 @@ import { BaseCharacter } from '../gamecharacters/CharacterClasses';
 import { AbstractCard } from '../gamecharacters/PhysicalCard';
 
 export class ActionManager {
+    private static instance: ActionManager;
     private actionQueue: ActionQueue;
-    private gameState: GameState;
 
-    constructor() {
+    private constructor() {
         this.actionQueue = new ActionQueue();
-        this.gameState = GameState.getInstance();
+    }
+
+    public static getInstance(): ActionManager {
+        if (!ActionManager.instance) {
+            ActionManager.instance = new ActionManager();
+        }
+        return ActionManager.instance;
     }
 
     public dealDamage(amount: number,
@@ -30,10 +36,8 @@ export class ActionManager {
     public async resolveActions(): Promise<void> {
         await this.actionQueue.resolveActions();
     }
-    
-    
-
 }
+
 export class DealDamageAction extends GameAction {
     constructor(private amount: number, 
         private target: BaseCharacter,

@@ -134,7 +134,7 @@ class CombatScene extends Phaser.Scene {
             scene: this,
             x: 0,
             y: 0,
-            data: new AbstractCard({ name: 'Draw Pile', description: 'Cards to draw' }),
+            data: new AbstractCard({ name: 'Draw Pile', description: 'Cards to draw', portraitName: "drawpile.png" }),
             location: CardScreenLocation.DRAW_PILE,
             eventCallback: this.setupCardEvents
         });
@@ -147,7 +147,8 @@ class CombatScene extends Phaser.Scene {
             scene: this,
             x: 0,
             y: 0,
-            data: new AbstractCard({ name: 'Discard Pile', description: 'Discarded cards' }),
+            data: new AbstractCard({ name: 'Discard Pile', description: 'Discarded cards', portraitName: "discardpile.png" })
+
             location: CardScreenLocation.DISCARD_PILE,
             eventCallback: this.setupCardEvents
         });

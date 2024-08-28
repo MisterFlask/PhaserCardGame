@@ -9,6 +9,10 @@ export default class GameImageLoader {
             prefix: 'Portraits/BlackhandPortraits/',
             files: ['flamer1.png']
         },
+        ui: {
+            prefix: 'UI/',
+            files: ['drawpile.png', "discardpile.png"]
+        },
         cards_blackhand: {
             prefix: 'Sprites/Cards/Blackhand/',
             files: ['fire.png', 'smog-grenade.png']
