@@ -23,13 +23,8 @@ export class StoreCard extends AbstractCard {
         this.price = price;
     }
     
-    OnPurchase(): void {
+    OnPurchase = (): void => {
         console.log('Item purchased');
-    }
-
-    OnCombatStart(): GameAction[] {
-        console.log('Combat started');
-        return [];
     }
 }
 
@@ -41,7 +36,6 @@ interface CardSlot {
 
 export default class CampaignScene extends Phaser.Scene {
     private cardSlots: CardSlot[] = [];
-    private draggedCard: PhysicalCard | null = null;
     private deckDisplayCards: PhysicalCard[] = [];
     private shopCards: PhysicalCard[] = [];
     private deckDisplayY: number = 0;
@@ -55,11 +49,10 @@ export default class CampaignScene extends Phaser.Scene {
         super('Campaign');
     }
 
-    create() {
+    create = () => {
         this.createLayout();
         this.createCardSlots();
         this.createCharacterRoster();
-        this.setupDragAndDrop();
         this.createEmbarkButton();
         this.createDeckDisplay();
         this.createShop();
@@ -71,12 +64,12 @@ export default class CampaignScene extends Phaser.Scene {
         this.resize();
     }
     
-    preload(): void {
+    preload = (): void => {
         this.load.setBaseURL('https://raw.githubusercontent.com/');
         new GameImageLoader().loadAllImages(this.load);
     }
 
-    createLayout() {
+    createLayout = () => {
         const { width, height } = this.scale;
         this.rosterY = height * 0.1;
         this.deckDisplayY = height * 0.3;
@@ -84,7 +77,7 @@ export default class CampaignScene extends Phaser.Scene {
         this.selectedY = height * 0.85;
     }
 
-    resize() {
+    resize = () => {
         const { width, height } = this.scale;
 
         // Update layout
@@ -118,9 +111,7 @@ export default class CampaignScene extends Phaser.Scene {
         this.embarkButton.setPosition(width * 0.95, height * 0.5);
 
         // Update deck display
-        if (this.draggedCard && this.draggedCard.data instanceof PlayerCharacter) {
-            this.updateDeckDisplay(this.draggedCard.data.cardsInDeck);
-        }
+        this.updateDeckDisplay(this.deckDisplayCards.map(card => card.data as AbstractCard));
 
         // Update shop cards
         this.positionShopCards(this.shopCards.map(card => card.data as StoreCard));
@@ -128,7 +119,7 @@ export default class CampaignScene extends Phaser.Scene {
         this.updateDebugGraphics();
     }
 
-    createCardSlots() {
+    createCardSlots = () => {
         const { width } = this.scale;
 
         // Create roster slots
@@ -142,7 +133,7 @@ export default class CampaignScene extends Phaser.Scene {
         }
     }
 
-    createSlot(x: number, y: number, type: 'roster' | 'selected' | 'deck' | 'shop') {
+    createSlot = (x: number, y: number, type: 'roster' | 'selected' | 'deck' | 'shop') => {
         const container = this.add.container(x, y);
         const background = this.add.image(0, 0, 'card_background').setOrigin(0.5);
         container.add(background);
@@ -151,7 +142,7 @@ export default class CampaignScene extends Phaser.Scene {
         this.cardSlots.push(slot);
     }
 
-    createCharacterRoster() {
+    createCharacterRoster = () => {
         const classes: BaseCharacterClass[] = [new DiabolistClass(), new BlackhandClass()];
         const rosterSlots = this.cardSlots.filter(slot => slot.type === 'roster');
 
@@ -173,97 +164,78 @@ export default class CampaignScene extends Phaser.Scene {
         });
     }
 
-    addCardToSlot(card: PhysicalCard, slot: CardSlot) {
+    addCardToSlot = (card: PhysicalCard, slot: CardSlot) => {
         slot.card = card;
         slot.container.add(card.container);
         card.container.setPosition(0, 0);
-        var draggableCard = (slot.type === 'roster' || slot.type === 'selected')
-
-        
-        this.input.setDraggable(card.container, draggableCard);
-    
-        (card.container as any).physicalCard = card;  // For easy reference during drag
         this.setupCardEvents(card);
     }
 
-    setupDragAndDrop() {
-        this.input.on('dragstart', this.onDragStart, this);
-        this.input.on('drag', this.onDrag, this);
-        this.input.on('dragend', this.onDragEnd, this);
-    }
-
-    onDragStart(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container) {
-        this.draggedCard = (gameObject as any).physicalCard;
-        this.children.bringToTop(gameObject);
-    }
-
-    onDrag(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container, dragX: number, dragY: number) {
-        gameObject.x = dragX;
-        gameObject.y = dragY;
-    }
-
-    setupCardEvents(card: PhysicalCard): void {
+    setupCardEvents = (card: PhysicalCard): void => {
+        // Remove existing listeners set up by this function
+        card.container.off('pointerdown', this.onPointerDown, this);
+    
         card.container.setInteractive()
-            .on('pointerover', () => {
-                card.container.setScale(1.1);
-            })
-            .on('pointerout', () => {
-                card.container.setScale(1);
-            });
+            .on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+                this.onPointerDown(pointer, card);
+            }, this);
     }
-
-    onDragEnd(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container) {
-        const sourceSlot = this.findSlotWithCard(this.draggedCard!);
-        const targetSlot = this.findNearestEmptySlot(gameObject);
-
-        if (targetSlot && this.canMoveCardToSlot(sourceSlot, targetSlot)) {
-            this.moveCardToSlot(this.draggedCard!, sourceSlot, targetSlot);
-        } else {
-            this.returnCardToSlot(this.draggedCard!, sourceSlot);
+    
+    private onPointerDown = (pointer: Phaser.Input.Pointer, card: PhysicalCard) => {
+        const lastClickTime = card.container.getData('lastClickTime') || 0;
+        const currentTime = pointer.downTime;
+        
+        if (currentTime - lastClickTime < 300) {
+            this.onDoubleClick(card);
         }
-
-        this.draggedCard = null;
+        
+        card.container.setData('lastClickTime', currentTime);
     }
+    
 
-    findSlotWithCard(card: PhysicalCard): CardSlot | undefined {
+    onDoubleClick = (card: PhysicalCard) => {
+        const sourceSlot = this.findSlotWithCard(card);
+        if (!sourceSlot) return;
+    
+        let targetSlot: CardSlot | undefined;
+    
+        if (sourceSlot.type === 'roster') {
+            targetSlot = this.cardSlots.find(slot => slot.type === 'selected' && !slot.card);
+        } else if (sourceSlot.type === 'selected') {
+            targetSlot = this.cardSlots.find(slot => slot.type === 'roster' && !slot.card);
+        }
+    
+        if (targetSlot && this.canMoveCardToSlot(sourceSlot, targetSlot)) {
+            this.moveCardToSlot(card, sourceSlot, targetSlot);
+            // Prevent further processing of this double-click
+            card.container.setData('lastClickTime', 0);
+        }
+    }
+    
+    findSlotWithCard = (card: PhysicalCard): CardSlot | undefined => {
+        if (!card) return undefined;
         return this.cardSlots.find(slot => slot.card === card);
     }
 
-    findNearestEmptySlot(gameObject: Phaser.GameObjects.Container): CardSlot | undefined {
-        return this.cardSlots
-            .filter(slot => (!slot.card || slot.card === this.draggedCard) && (slot.type === 'roster' || slot.type === 'selected'))
-            .sort((a, b) => {
-                const distA = Phaser.Math.Distance.Between(gameObject.x, gameObject.y, a.container.x, a.container.y);
-                const distB = Phaser.Math.Distance.Between(gameObject.x, gameObject.y, b.container.x, b.container.y);
-                return distA - distB;
-            })[0];
-    }
-
-    canMoveCardToSlot(sourceSlot: CardSlot | undefined, targetSlot: CardSlot): boolean {
+    canMoveCardToSlot = (sourceSlot: CardSlot | undefined, targetSlot: CardSlot): boolean => {
         if (!sourceSlot || !targetSlot) return false;
         if (sourceSlot === targetSlot) return false;
         if (targetSlot.type === 'selected' && this.getSelectedCards().length >= 3) return false;
         return (targetSlot.type === 'roster' || targetSlot.type === 'selected');
     }
 
-    moveCardToSlot(card: PhysicalCard, sourceSlot: CardSlot | undefined, targetSlot: CardSlot) {
+    moveCardToSlot = (card: PhysicalCard, sourceSlot: CardSlot | undefined, targetSlot: CardSlot) => {
         if (sourceSlot) sourceSlot.card = null;
         this.addCardToSlot(card, targetSlot);
     }
-    
-    returnCardToSlot(card: PhysicalCard, slot: CardSlot | undefined) {
-        if (slot) {
-            this.addCardToSlot(card, slot);
-        }
-    }
 
-    getSelectedCards(): PhysicalCard[] {
+    getSelectedCards = (): PhysicalCard[] => {
         return this.cardSlots
             .filter(slot => slot.type === 'selected' && slot.card)
             .map(slot => slot.card!);
     }
 
-    createEmbarkButton() {
+    createEmbarkButton = () => {
         this.embarkButton = this.add.text(this.scale.width * 0.95, this.scale.height * 0.5, 'Embark!', {
             fontSize: '24px',
             color: '#ffffff',
@@ -276,7 +248,7 @@ export default class CampaignScene extends Phaser.Scene {
         .on('pointerdown', this.onEmbarkClicked, this);
     }
 
-    onEmbarkClicked() {
+    onEmbarkClicked = () => {
         const selectedCards = this.getSelectedCards();
         const selectedShopCards = this.shopCards.filter(card => card.container.getData('isSelected'));
         if (selectedCards.length === 3) {
@@ -313,12 +285,12 @@ export default class CampaignScene extends Phaser.Scene {
         }
     }
 
-    createDeckDisplay() {
+    createDeckDisplay = () => {
         // Initially create an empty deck display
         this.updateDeckDisplay([]);
     }
 
-    updateDeckDisplay(cards: AbstractCard[]) {
+    updateDeckDisplay = (cards: AbstractCard[]) => {
         // Clear existing deck display
         this.deckDisplayCards.forEach(card => card.destroy());
         this.deckDisplayCards = [];
@@ -351,7 +323,7 @@ export default class CampaignScene extends Phaser.Scene {
         });
     }
 
-    setupCardHover(card: PhysicalCard) {
+    setupCardHover = (card: PhysicalCard) => {
         card.container.setInteractive()
             .on('pointerover', () => {
                 if (card.data instanceof PlayerCharacter) {
@@ -360,11 +332,11 @@ export default class CampaignScene extends Phaser.Scene {
             });
     }
 
-    createDebugGraphics() {
+    createDebugGraphics = () => {
         this.debugGraphics = this.add.graphics();
     }
 
-    updateDebugGraphics() {
+    updateDebugGraphics = () => {
         this.debugGraphics.clear();
         this.debugGraphics.lineStyle(2, 0xff0000);
         
@@ -378,7 +350,7 @@ export default class CampaignScene extends Phaser.Scene {
         });
     }
 
-    createShop() {
+    createShop = () => {
         const shopItems = [
             new StoreCard({ name: 'Cargo', description: 'Increases carrying capacity', portraitName: '', tooltip: 'Carry more items', price: 100 }),
             new StoreCard({ name: 'Medkit', description: 'Restores health', portraitName: '', tooltip: 'Heal your character', price: 50 }),
@@ -388,7 +360,7 @@ export default class CampaignScene extends Phaser.Scene {
         this.positionShopCards(shopItems);
     }
 
-    positionShopCards(shopItems: StoreCard[]) {
+    positionShopCards = (shopItems: StoreCard[]) => {
         // Clear existing shop cards and slots
         this.shopCards.forEach(card => card.destroy());
         this.shopCards = [];
@@ -416,7 +388,8 @@ export default class CampaignScene extends Phaser.Scene {
         });
     }
     
-    setupShopCardEvents(card: PhysicalCard): void {
+    setupShopCardEvents = (card: PhysicalCard): void => {
+        console.log('Setting up shop card events'); // Add this line for debugging
         card.container.setInteractive()
             .on('pointerover', () => {
                 card.container.setScale(1.1);
@@ -425,20 +398,24 @@ export default class CampaignScene extends Phaser.Scene {
                 card.container.setScale(1);
             })
             .on('pointerdown', () => {
+                console.log('Shop card clicked'); // Add this line for debugging
+
                 this.toggleCardSelection(card);
             });
     }
 
- toggleCardSelection(card: PhysicalCard): void {
+    toggleCardSelection = (card: PhysicalCard): void => {
         const isAlreadySelected = card.container.getData('isSelected');
         card.container.setData('isSelected', !isAlreadySelected);
+        
+        console.log('Toggling selection:', !isAlreadySelected); // Add this line for debugging
         
         if (!isAlreadySelected) {
             // Create a selection border if it doesn't exist
             if (!card.container.getData('selectionBorder')) {
                 const border = this.add.graphics();
-                border.lineStyle(2, 0xffff00);
-                border.strokeRect(-card.container.width / 2, -card.container.height / 2, card.container.width, card.container.height);
+                border.lineStyle(4, 0xffff00); // Increase line width for visibility
+                border.strokeRect(-50, -70, 100, 140); // Use fixed dimensions
                 card.container.add(border);
                 card.container.setData('selectionBorder', border);
             } else {

@@ -1,3 +1,4 @@
+import { GameAction } from "../utils/ActionQueue";
 import { BaseCharacter } from "./CharacterClasses";
 
 export enum CardScreenLocation {
@@ -21,14 +22,17 @@ export enum CardSize {
     MEDIUM = 1.5,
     LARGE = 2
 }
-
 export class TextBox {
-    background: Phaser.GameObjects.Rectangle;
+    background: Phaser.GameObjects.Rectangle | Phaser.GameObjects.Image;
     text: Phaser.GameObjects.Text;
     outline: Phaser.GameObjects.Rectangle;
 
-    constructor(scene: Phaser.Scene, x: number = 0, y: number = 0, width: number = 100, height: number = 50, text: string = '', style: Phaser.Types.GameObjects.Text.TextStyle = { fontSize: '16px', color: '#000' }) {
-        this.background = scene.add.rectangle(x, y, width, height, 0xffffff);
+    constructor(scene: Phaser.Scene, x: number = 0, y: number = 0, width: number = 100, height: number = 50, text: string = '', style: Phaser.Types.GameObjects.Text.TextStyle = { fontSize: '16px', color: '#000' }, backgroundImage?: string) {
+        if (backgroundImage) {
+            this.background = scene.add.image(x, y, backgroundImage).setDisplaySize(width, height);
+        } else {
+            this.background = scene.add.rectangle(x, y, width, height, 0xffffff);
+        }
         this.outline = scene.add.rectangle(x, y, width, height).setStrokeStyle(2, 0x000000);
         this.text = scene.add.text(x, y, text, style);
         this.text.setOrigin(0.5);
@@ -41,7 +45,11 @@ export class TextBox {
     }
 
     setSize(width: number, height: number): void {
-        this.background.setSize(width, height);
+        if (this.background instanceof Phaser.GameObjects.Rectangle) {
+            this.background.setSize(width, height);
+        } else {
+            this.background.setDisplaySize(width, height);
+        }
         this.outline.setSize(width, height);
     }
 
@@ -86,6 +94,12 @@ export class AbstractCard {
             return false
         }
         return true
+    }
+
+
+    OnCombatStart(): GameAction[] {
+        console.log('Combat started');
+        return [];
     }
 
     Action(targetCard: PhysicalCard) {
@@ -199,11 +213,12 @@ export class PhysicalCard {
 
     setupInteractivity(): void {
         this.container.setInteractive()
-            .on('pointerover', this.onPointerOver, this)
-            .on('pointerout', this.onPointerOut, this);
+            .on('pointerover', this.onPointerOver_PhysicalCard, this)
+            .on('pointerout', this.onPointerOut_PhysicalCard, this);
     }
 
-    onPointerOver(): void {
+    onPointerOver_PhysicalCard = (): void => {
+        console.log(`Pointer over card: ${this.data.name}`);
         this.cardContent.setScale(this.data.size * 1.1);
         this.descBox.setVisible(true);
         this.tooltipBox.setVisible(true);
@@ -253,7 +268,8 @@ export class PhysicalCard {
         }
     }
 
-    onPointerOut(): void {
+    onPointerOut_PhysicalCard = (): void => {
+        console.log(`Pointer out card: ${this.data.name}`);
         this.cardContent.setScale(this.data.size);
         this.descBox.setVisible(false);
         this.tooltipBox.setVisible(false);
