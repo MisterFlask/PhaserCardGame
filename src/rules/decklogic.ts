@@ -35,6 +35,7 @@ export class DeckLogic {
   }
 
   public endTurn(): void {
+    console.log('Ending turn');
     const gameState = GameState.getInstance();
     const combatState = gameState.combatState;
     combatState.currentDiscardPile.push(...combatState.currentHand);
@@ -42,11 +43,24 @@ export class DeckLogic {
 
     this.drawHandForNewTurn();
   }
-
   public drawHandForNewTurn(): AbstractCard[] {
+    console.log('Drawing hand for new turn');
     const gameState = GameState.getInstance();
     const combatState = gameState.combatState;
     const handSize = 3; // Assuming a hand size of 3 cards
+
+    combatState.currentHand = this.drawCards(handSize);
+
+    console.log('State of all piles:');
+    console.log('Draw Pile:', combatState.currentDrawPile.map(card => card.name));
+    console.log('Discard Pile:', combatState.currentDiscardPile.map(card => card.name));
+    console.log('Hand:', combatState.currentHand.map(card => card.name));
+    return combatState.currentHand;
+  }
+
+  private drawCards(count: number): AbstractCard[] {
+    const gameState = GameState.getInstance();
+    const combatState = gameState.combatState;
     const drawnCards: AbstractCard[] = [];
 
     // Shuffle the draw pile if it's empty
@@ -56,7 +70,7 @@ export class DeckLogic {
     }
 
     // Draw cards
-    for (let i = 0; i < handSize; i++) {
+    for (let i = 0; i < count; i++) {
       if (combatState.currentDrawPile.length > 0) {
         const drawnCard = combatState.currentDrawPile.pop()!;
         drawnCards.push(drawnCard);

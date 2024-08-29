@@ -7,6 +7,7 @@ import CampaignScene from './campaign';
 import MapScene from './map';
 import { EncounterData } from '../encounters/encounters';
 import { BattleCardLocation, GameState } from './gamestate';
+import { DeckLogic } from '../rules/decklogic';
 
 
 const config = {
@@ -51,6 +52,12 @@ class CombatScene extends Phaser.Scene {
     init(data: { encounter: EncounterData }) {
         this.encounter = data.encounter;
         game.events.on('debug', console.log);
+
+        GameState.getInstance().combatState.currentHand = []
+        GameState.getInstance().combatState.currentDrawPile = DeckLogic.getInstance().generateInitialCombatDeck();
+        GameState.getInstance().combatState.currentDiscardPile = []
+
+        DeckLogic.getInstance().drawHandForNewTurn();
     }
     
     createPlayerUnits(): void {
@@ -101,6 +108,7 @@ class CombatScene extends Phaser.Scene {
 
 
     private handleEndTurn(): void {
+        DeckLogic.getInstance().endTurn();
         console.log('End turn button clicked');
     }
 
@@ -143,11 +151,13 @@ class CombatScene extends Phaser.Scene {
     }
     
     arrangeCards(cardArray: PhysicalCard[], yPosition: number): void {
-        const totalWidth = config.gameWidth - 200;
+        const totalWidth = config.gameWidth;
         const cardSpacing = Math.min(CardGuiUtils.getInstance().cardConfig.cardWidth, totalWidth / (cardArray.length + 1));
+        const totalCardsWidth = cardArray.length * cardSpacing;
+        const startX = (totalWidth - totalCardsWidth) / 2;
 
         cardArray.forEach((card, index) => {
-            card.container.x = 100 + index * cardSpacing;
+            card.container.x = startX + index * cardSpacing;
             card.container.y = yPosition;
             (card.container as any).originalDepth = index;
             card.container.depth = index;
@@ -216,9 +226,9 @@ class CombatScene extends Phaser.Scene {
                 },
                 backgroundImage: 'button_background'
             });
-            this.endTurnButton.background.setInteractive({ useHandCursor: true })
+            this.endTurnButton.background!!.setInteractive({ useHandCursor: true })
                 .on('pointerdown', this.handleEndTurn, this);
-            this.add.existing(this.endTurnButton.background);
+            this.add.existing(this.endTurnButton.background!!);
             this.add.existing(this.endTurnButton.text);
         }
     }
@@ -258,12 +268,10 @@ class CombatScene extends Phaser.Scene {
 
     createPlayerHand(): void {
         GameState.getInstance().combatState.currentHand.forEach((data, index) => {
-            const x = 100 + index * 150;
-            const y = config.handY;
             const card = CardGuiUtils.getInstance().createCard({
                 scene: this,
-                x: x,
-                y: y,
+                x: 0,
+                y: config.handY,
                 data: data,
                 location: CardScreenLocation.HAND,
                 eventCallback: ()=>{}
@@ -546,7 +554,8 @@ class CombatScene extends Phaser.Scene {
 
     discardCard(card: PhysicalCard): void {
         this.playerHand = this.playerHand.filter(c => c !== card);
-        card.container.destroy(); // Obliterate the physical card
+        card.obliterate(); // Obliterate the physical card
+
     }
 
     discardCardById(cardId: string): void {

@@ -99,7 +99,7 @@ export default class CampaignScene extends Phaser.Scene {
         
         gameState.currentRunCharacters = characterRoster.slice(0, 3);
         gameState.roster = characterRoster;
-        
+
         this.scene.start('CombatScene', { 
           encounter: { 
             enemies: [new ClockworkAbomination(), new BaconBeast(), new BloodManipulationSlime()] 

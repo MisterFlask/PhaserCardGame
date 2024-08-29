@@ -24,7 +24,9 @@ export enum CardSize {
     LARGE = 2
 }
 export class TextBox {
-    background: Phaser.GameObjects.Rectangle | Phaser.GameObjects.Image;
+
+
+    background: Phaser.GameObjects.Rectangle | Phaser.GameObjects.Image | null;
     text: Phaser.GameObjects.Text;
     outline: Phaser.GameObjects.Rectangle;
     constructor(params: {
@@ -56,15 +58,34 @@ export class TextBox {
         this.outline = scene.add.rectangle(x, y, width, height).setStrokeStyle(2, 0x000000);
         this.text = scene.add.text(x, y, text, style);
         this.text.setOrigin(0.5);
+        // Enforce text wrapping within bounds
+        this.text.setWordWrapWidth(width - 10); // Subtract padding
+        this.text.setAlign('center');
+
+        // Adjust text size if it overflows
+        const originalFontSize = parseInt(style.fontSize as string);
+        let currentFontSize = originalFontSize;
+        while ((this.text.height > height - 10 || this.text.width > width - 10) && currentFontSize > 8) { // Minimum font size of 8
+            currentFontSize--;
+            this.text.setFontSize(currentFontSize);
+            this.text.setWordWrapWidth(width - 10);
+        }
+
     }
 
     setPosition(x: number, y: number): void {
+        if (this.background === null) {
+            return;
+        }
         this.background.setPosition(x, y);
         this.outline.setPosition(x, y);
         this.text.setPosition(x, y);
     }
 
     setSize(width: number, height: number): void {
+        if (this.background === null) {
+            return;
+        }
         if (this.background instanceof Phaser.GameObjects.Rectangle) {
             this.background.setSize(width, height);
         } else {
@@ -74,19 +95,25 @@ export class TextBox {
     }
 
     setText(text: string): void {
+        if (this.text.scene === null) {
+            return;
+        }
         this.text.setText(text);
     }
 
     setVisible(visible: boolean): void {
+        if (this.background === null) {
+            return;
+        }
         this.background.setVisible(visible);
         this.outline.setVisible(visible);
         this.text.setVisible(visible);
     }
-
     destroy(): void {
-        this.background.destroy();
-        this.outline.destroy();
-        this.text.destroy();
+        if (this.background) {
+            this.background.destroy();
+        }
+        this.background = null;
     }
 }
 import Phaser from 'phaser';
@@ -144,7 +171,7 @@ export function generateWordGuid(): string {
     const word2 = wordList[randomIndex2];
     const word3 = wordList[randomIndex3];
     
-    return `${word1}-${word2}-${word3}-${seedNumber}`;
+    return `${word1} ${word2} ${word3} ${seedNumber}`;
 }
 
 
@@ -164,7 +191,7 @@ export class PhysicalCard {
     private wiggleTween: Phaser.Tweens.Tween | null = null;
     private hoverSound: Phaser.Sound.BaseSound | null = null;
     private cardContent: Phaser.GameObjects.Container;
-
+    private obliterated: boolean = false;
     constructor({
         scene,
         container,
@@ -201,11 +228,11 @@ export class PhysicalCard {
 
         // Create a new container for card content (excluding tooltip)
         this.cardContent = this.scene.add.container();
-        this.cardContent.add([this.cardBackground, this.cardImage, this.nameBox.background, this.nameBox.outline, this.nameBox.text, this.descBox.background, this.descBox.outline, this.descBox.text]);
+        this.cardContent.add([this.cardBackground, this.cardImage, this.nameBox.background!!, this.nameBox.outline, this.nameBox.text, this.descBox.background!!, this.descBox.outline, this.descBox.text]);
         this.container.add(this.cardContent);
 
         // Add tooltip elements directly to the main container
-        this.container.add([this.tooltipBox.background, this.tooltipBox.outline, this.tooltipBox.text]);
+        this.container.add([this.tooltipBox.background!!, this.tooltipBox.outline, this.tooltipBox.text]);
 
         // Add HP box if the card is a BaseCharacter
         if (this.data instanceof BaseCharacter) {
@@ -221,7 +248,7 @@ export class PhysicalCard {
                 text: `${baseCharacter.hitpoints}/${baseCharacter.maxHitpoints}`,
                 style: { fontSize: '12px', color: '#000' }
             });
-            this.cardContent.add([this.hpBox.background, this.hpBox.outline, this.hpBox.text]);
+            this.cardContent.add([this.hpBox.background!!, this.hpBox.outline, this.hpBox.text]);
         } else {
             this.hpBox = null;
         }
@@ -248,6 +275,50 @@ export class PhysicalCard {
         this.applyCardSize();
     }
 
+    obliterate(): void {
+        // Remove event listener
+        this.scene.events.off('update', this.updateVisuals, this);
+
+        // Stop and remove the wiggle tween if it exists
+        if (this.wiggleTween) {
+            this.wiggleTween.stop();
+            this.wiggleTween.remove();
+            this.wiggleTween = null;
+        }
+
+        // Destroy the hover sound if it exists
+        if (this.hoverSound) {
+            this.hoverSound.destroy();
+        }
+
+        // Destroy all TextBox components
+        this.nameBox.destroy();
+        this.descBox.destroy();
+        this.tooltipBox.destroy();
+        if (this.hpBox) {
+            this.hpBox.destroy();
+        }
+
+        // Destroy the card image
+        if (this.cardImage) {
+            this.cardImage.destroy();
+        }
+
+        // Destroy the card background
+        if (this.cardBackground) {
+            this.cardBackground.destroy();
+        }
+
+        // Destroy containers
+        if (this.cardContent) {
+            this.cardContent.destroy();
+        }
+        if (this.container) {
+            this.container.destroy();
+        }
+        this.obliterated = true;
+    }
+
     applyCardSize(): void {
         const scale = this.data.size;
         this.cardContent.setScale(scale);
@@ -260,6 +331,9 @@ export class PhysicalCard {
     }
 
     onPointerOver_PhysicalCard = (): void => {
+        if (this.obliterated) {
+            return;
+        }
         console.log(`Pointer over card: ${this.data.name}`);
         this.cardContent.setScale(this.data.size * 1.1);
         this.descBox.setVisible(true);
@@ -311,6 +385,9 @@ export class PhysicalCard {
     }
 
     onPointerOut_PhysicalCard = (): void => {
+        if (this.obliterated) {
+            return;
+        }
         console.log(`Pointer out card: ${this.data.name}`);
         this.cardContent.setScale(this.data.size);
         this.descBox.setVisible(false);
@@ -326,6 +403,9 @@ export class PhysicalCard {
     }
 
     updateVisuals(): void {
+        if (this.obliterated) {
+            return;
+        }
         if (!this.scene || !this.scene.sys) {
             console.warn('Scene is undefined in updateVisuals');
             return;
@@ -373,11 +453,11 @@ export class PhysicalCard {
         }
 
         // Position nameBox just below the portraitBox
-        const nameBoxY = this.cardImage.y + this.cardImage.displayHeight / 2 + this.nameBox.background.displayHeight / 2;
+        const nameBoxY = this.cardImage.y + this.cardImage.displayHeight / 2 + this.nameBox.background!!.displayHeight / 2;
         this.nameBox.setPosition(0, nameBoxY);
 
         // Position descBox just below the nameBox
-        const descBoxY = nameBoxY + this.nameBox.background.displayHeight / 2 + this.descBox.background.displayHeight / 2;
+        const descBoxY = nameBoxY + this.nameBox.background!!.displayHeight / 2 + this.descBox.background!!.displayHeight / 2;
         this.descBox.setPosition(0, descBoxY);
 
         // Update HP box if it exists
@@ -385,6 +465,8 @@ export class PhysicalCard {
             const baseCharacter = this.data as BaseCharacter;
             this.hpBox.setText(`${baseCharacter.hitpoints}/${baseCharacter.maxHitpoints}`);
         }
+
+        this.tooltipBox.text.setText(this.data.id);
 
         this.updateVisualTags();
     }
