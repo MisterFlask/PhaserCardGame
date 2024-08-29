@@ -1,4 +1,4 @@
-import { GameAction } from "../utils/ActionQueue"
+import { GameAction } from "../utils/ActionManager"
 import { CardType, CardSize, generateWordGuid, PhysicalCard } from "./PhysicalCard"
 
 export class AbstractCard {
@@ -10,6 +10,7 @@ export class AbstractCard {
     characterData: BaseCharacter | null
     size: CardSize
     id: string = generateWordGuid()
+    physicalCard: PhysicalCard | null = null
 
     constructor({ name, description, portraitName, cardType, tooltip, characterData, size }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: BaseCharacter, size?: CardSize }) {
         this.name = name
@@ -34,9 +35,11 @@ export class AbstractCard {
         return [];
     }
 
-    Action(targetCard: PhysicalCard) {
-        console.log("Action performed on " + targetCard.data.name + " by  " + this.name)
+    PlayCard(targetCard?: PhysicalCard) : GameAction[] {
+        console.log("Action performed on " + targetCard?.data?.name + " by  " + this.name)
+        return [];
     }
+
     Copy(): AbstractCard {
         return new AbstractCard({
             name: this.name,

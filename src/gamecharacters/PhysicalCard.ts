@@ -1,4 +1,3 @@
-import { GameAction } from "../utils/ActionQueue";
 import { AbstractCard } from "./AbstractCard";
 import { BaseCharacter } from "./AbstractCard";
 
@@ -237,6 +236,7 @@ export class PhysicalCard {
         this.descBox = descBox;
         this.tooltipBox = tooltipBox;
         this.data = data;
+        this.data.physicalCard = this;
         this.cardLocation = cardLocation;
         this.visualTags = [];
 

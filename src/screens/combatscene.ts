@@ -466,9 +466,9 @@ class CombatScene extends Phaser.Scene {
     }
     handleCardInteraction(usedCard: PhysicalCard, targetCard: PhysicalCard): void {
         if (usedCard && usedCard.data && targetCard && targetCard.data) {
-            if (usedCard.data.IsPerformableOn && usedCard.data.Action) {
+            if (usedCard.data.IsPerformableOn && usedCard.data.PlayCard) {
                 if (usedCard.data.IsPerformableOn(targetCard)) {
-                    usedCard.data.Action(targetCard);
+                    usedCard.data.PlayCard(targetCard);
                     
                     // Update visual representation of the cards
                     this.updateCardVisuals(usedCard);
@@ -557,28 +557,21 @@ class CombatScene extends Phaser.Scene {
         // Create a map of existing PhysicalCards by their AbstractCard's id
         const existingCards = new Map(this.playerHand.map(card => [card.data.id, card]));
     
+
+        // Remove any PhysicalCards that are no longer in the hand
+        existingCards.forEach((physicalCard, id) => {
+            if (!combatState.currentHand.some(c => c.id === id)) {
+                this.discardCard(physicalCard);
+            }
+        });
+
         // Update the hand based on the current game state
         this.playerHand = combatState.currentHand.map(abstractCard => {
             if (existingCards.has(abstractCard.id)) {
                 // If a PhysicalCard already exists for this AbstractCard, use it
                 return existingCards.get(abstractCard.id)!;
             } else {
-                // If not, create a new PhysicalCard
-                return CardGuiUtils.getInstance().createCard({
-                    scene: this,
-                    x: 0,
-                    y: 0,
-                    data: abstractCard,
-                    location: CardScreenLocation.HAND,
-                    eventCallback: ()=>{}
-                });
-            }
-        });
-    
-        // Remove any PhysicalCards that are no longer in the hand
-        existingCards.forEach((physicalCard, id) => {
-            if (!combatState.currentHand.some(c => c.id === id)) {
-                physicalCard.obliterate();
+                return this.animateCardDraw(abstractCard);
             }
         });
     
@@ -586,18 +579,56 @@ class CombatScene extends Phaser.Scene {
         this.arrangeCards(this.playerHand, config.handY);
     }
 
-    discardCard(card: PhysicalCard): void {
-        this.playerHand = this.playerHand.filter(c => c !== card);
-        card.obliterate(); // Obliterate the physical card
+    animateCardDraw(data: AbstractCard): PhysicalCard {
+    // If not, create a new PhysicalCard and animate it
+        const card = CardGuiUtils.getInstance().createCard({
+            scene: this,
+            x: this.drawPile!.container.x,
+            y: this.drawPile!.container.y,
+            data: data,
+            location: CardScreenLocation.HAND,
+            eventCallback: ()=>{}
+        });
+        // Start the card at the draw pile position
+        card.container.setPosition(this.drawPile!.container.x, this.drawPile!.container.y);
+        card.container.setScale(0.5);
+        card.container.setAlpha(0);
 
+        // Animate the card to its position in the hand
+        this.tweens.add({
+            targets: card.container,
+            x: card.container.x,
+            y: config.handY,
+            scaleX: 1,
+            scaleY: 1,
+            alpha: 1,
+            duration: 500,
+            ease: 'Power2'
+        });
+
+        return card;
     }
 
-    discardCardById(cardId: string): void {
-        const card = this.playerHand.find(c => c.data.id === cardId);
-        if (card) {
-            this.playerHand = this.playerHand.filter(c => c !== card);
-            card.obliterate(); // Obliterate the physical card
-        }
+    discardCard(card: PhysicalCard): void {
+        this.playerHand = this.playerHand.filter(c => c !== card);
+        // Log initial positions for debugging
+        console.log('Card initial position:', card.container.x, card.container.y);
+        console.log('Discard pile position:', this.discardPile!.container.x, this.discardPile!.container.y);
+
+        // Create a discard animation
+        this.tweens.add({
+            targets: card.container,
+            x: this.discardPile!.container.x,
+            y: this.discardPile!.container.y,
+            scaleX: 0.5,
+            scaleY: 0.5,
+            alpha: 0,
+            duration: 500,
+            ease: 'Power2',
+            onComplete: () => {
+                card.obliterate(); // Obliterate the physical card after animation
+            }
+        });
     }
 
     // Add these methods to resolve compilation errors

@@ -4,7 +4,6 @@ import { BaseCharacterClass, BlackhandClass, DiabolistClass, PlayerCharacter } f
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 import { AbstractCard } from '../gamecharacters/PhysicalCard';
 import GameImageLoader from '../utils/ImageUtils';
-import { GameAction } from '../utils/ActionQueue';
 import { GameState } from './gamestate';
 import { BaconBeast, BloodManipulationSlime, ClockworkAbomination } from '../encounters/encounters';
 import { CampaignRules } from '../rules/campaignrules';

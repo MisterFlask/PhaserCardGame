@@ -1,8 +1,10 @@
 {
   "dependencies": {
+    "lodash": "^4.17.21",
     "phaser": "^3.80.1"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.7",
     "nodemon": "^3.1.4",
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
