@@ -37,6 +37,17 @@ export class AbstractCard {
     Action(targetCard: PhysicalCard) {
         console.log("Action performed on " + targetCard.data.name + " by  " + this.name)
     }
+    Copy(): AbstractCard {
+        return new AbstractCard({
+            name: this.name,
+            description: this.description,
+            portraitName: this.portraitName,
+            cardType: this.cardType,
+            tooltip: this.tooltip,
+            size: this.size,
+            characterData: this.characterData || undefined
+        });
+    }
 }
 
 export class BaseCharacter extends AbstractCard{

@@ -23,7 +23,9 @@ export class CampaignRules {
                 portraitName: 'flamer1', 
                 characterClass: randomClass 
             });
-            character.cardsInMasterDeck.push(...randomClass.availableCards);
+            randomClass.availableCards.forEach(card => {
+                character.cardsInMasterDeck.push(card.Copy());
+            });
             characters.push(character);
         }
 

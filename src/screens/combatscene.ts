@@ -520,36 +520,37 @@ class CombatScene extends Phaser.Scene {
     syncHandWithGameState(): void {
         const gameState = GameState.getInstance();
         const combatState = gameState.combatState;
-
-        // Create a map of card IDs in the current hand
-        const currentHandIds = new Set(this.playerHand.map(card => card.data.id));
-
-        // Check for cards that need to be added to the hand
-        combatState.currentHand.forEach(card => {
-            if (!currentHandIds.has(card.id)) {
-                console.log("Adding card to hand: " + card.id);
-                // Find the card in draw pile or discard pile
-                const newCard = CardGuiUtils.getInstance().createCard({
+    
+        // Create a map of existing PhysicalCards by their AbstractCard's id
+        const existingCards = new Map(this.playerHand.map(card => [card.data.id, card]));
+    
+        // Update the hand based on the current game state
+        this.playerHand = combatState.currentHand.map(abstractCard => {
+            if (existingCards.has(abstractCard.id)) {
+                // If a PhysicalCard already exists for this AbstractCard, use it
+                return existingCards.get(abstractCard.id)!;
+            } else {
+                // If not, create a new PhysicalCard
+                return CardGuiUtils.getInstance().createCard({
                     scene: this,
                     x: 0,
                     y: 0,
-                    data: card,
+                    data: abstractCard,
                     location: CardScreenLocation.HAND,
                     eventCallback: ()=>{}
                 });
-                this.playerHand.push(newCard);
-                this.arrangeCards(this.playerHand, config.handY);
             }
         });
-
-        // Check for cards that need to be removed from the hand
-        this.playerHand.forEach(card => {
-            const cardData = card.data;
-            if (!combatState.currentHand.some(c => c.id === cardData.id)) {
-                console.log("Removing card from hand: " + cardData.id);
-                this.discardCardById(cardData.id);
+    
+        // Remove any PhysicalCards that are no longer in the hand
+        existingCards.forEach((physicalCard, id) => {
+            if (!combatState.currentHand.some(c => c.id === id)) {
+                physicalCard.obliterate();
             }
         });
+    
+        // Arrange the cards in the hand
+        this.arrangeCards(this.playerHand, config.handY);
     }
 
     discardCard(card: PhysicalCard): void {
@@ -562,7 +563,7 @@ class CombatScene extends Phaser.Scene {
         const card = this.playerHand.find(c => c.data.id === cardId);
         if (card) {
             this.playerHand = this.playerHand.filter(c => c !== card);
-            card.container.destroy(); // Obliterate the physical card
+            card.obliterate(); // Obliterate the physical card
         }
     }
 

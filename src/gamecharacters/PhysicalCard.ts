@@ -29,6 +29,7 @@ export class TextBox {
     background: Phaser.GameObjects.Rectangle | Phaser.GameObjects.Image | null;
     text: Phaser.GameObjects.Text;
     outline: Phaser.GameObjects.Rectangle;
+    textBoxName?: string
     constructor(params: {
         scene: Phaser.Scene,
         x?: number,
@@ -37,7 +38,8 @@ export class TextBox {
         height?: number,
         text?: string,
         style?: Phaser.Types.GameObjects.Text.TextStyle,
-        backgroundImage?: string
+        backgroundImage?: string,
+        textBoxName?: string
     }) {
         const {
             scene,
@@ -47,8 +49,10 @@ export class TextBox {
             height = 50,
             text = '',
             style = { fontSize: '16px', color: '#000' },
-            backgroundImage
+            backgroundImage,
+            textBoxName
         } = params;
+        this.textBoxName = textBoxName ?? "anonymousTextBox";
 
         if (backgroundImage) {
             this.background = scene.add.image(x, y, backgroundImage).setDisplaySize(width, height);
@@ -98,7 +102,16 @@ export class TextBox {
         if (this.text.scene === null) {
             return;
         }
-        this.text.setText(text);
+        if (this.background == null){
+            return;
+        }
+        if ((this.text.frame as any)?.data) {
+            // we do this because there are circumstances where data is not available
+            // and it crashes the whole game
+            this.text.setText(text);
+        }else{
+            console.log("text frame data is null for " + this.textBoxName);
+        }
     }
 
     setVisible(visible: boolean): void {
@@ -466,7 +479,7 @@ export class PhysicalCard {
             this.hpBox.setText(`${baseCharacter.hitpoints}/${baseCharacter.maxHitpoints}`);
         }
 
-        this.tooltipBox.text.setText(this.data.id);
+        this.tooltipBox.setText(this.data.id);
 
         this.updateVisualTags();
     }
