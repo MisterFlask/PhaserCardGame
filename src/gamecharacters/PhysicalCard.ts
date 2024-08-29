@@ -1,30 +1,7 @@
 import { AbstractCard } from "./AbstractCard";
-import { BaseCharacter } from "./AbstractCard";
+import { BaseCharacter } from "./BaseCharacter"
 
-export enum CardScreenLocation {
-    BATTLEFIELD,
-    HAND,
-    CHARACTER_ROSTER,
-    SHOP,
-    DRAW_PILE,
-    DISCARD_PILE
-}
-
-export enum CardType {
-    CHARACTER = "CHARACTER",
-    PLAYABLE = "PLAYABLE",
-    STORE = "STORE",
-    LOCATION = "LOCATION"
-}
-
-export enum CardSize {
-    SMALL = 1,
-    MEDIUM = 1.5,
-    LARGE = 2
-}
 export class TextBox {
-
-
     background: Phaser.GameObjects.Rectangle | Phaser.GameObjects.Image | null;
     text: Phaser.GameObjects.Text;
     outline: Phaser.GameObjects.Rectangle;
@@ -130,63 +107,7 @@ export class TextBox {
     }
 }
 import Phaser from 'phaser';
-
-const wordList = [
-    "apple", "banana", "cherry", "date", "elderberry",
-    "fig", "grape", "honeydew", "kiwi", "lemon",
-    "mango", "nectarine", "orange", "papaya", "quince",
-    "raspberry", "strawberry", "tangerine", "ugli", "vanilla",
-    "watermelon", "xigua", "yuzu", "zucchini", "apricot",
-    "blackberry", "coconut", "dragonfruit", "eggplant", "feijoa",
-    "guava", "huckleberry", "imbe", "jackfruit", "kumquat",
-    "lime", "mulberry", "nance", "olive", "peach",
-    "rambutan", "soursop", "tamarind", "ugni", "voavanga",
-    "wolfberry", "ximenia", "yam", "zapote", "acai",
-    "boysenberry", "cantaloupe", "durian", "elderflower", "farkleberry",
-    "gooseberry", "horned melon", "ilama", "jujube", "keppel",
-    "longan", "miracle fruit", "noni", "persimmon", "quandong",
-    "redcurrant", "salak", "tomato", "uva ursi", "velvet apple",
-    "wampee", "xoconostle", "yangmei", "ziziphus", "ackee",
-    "bilberry", "cherimoya", "damson", "entawak", "finger lime",
-    "gac", "hawthorn", "ice cream bean", "jabuticaba", "kiwano",
-    "lucuma", "mamey", "nance", "opuntia", "pawpaw",
-    "rhubarb", "soncoya", "tomatillo", "uvaia", "vanilla bean",
-    "whisper", "shadow", "breeze", "echo", "twilight",
-    "mist", "ember", "frost", "ripple", "dusk",
-    "glow", "haze", "shimmer", "spark", "zephyr",
-    "aurora", "nebula", "cosmos", "zenith", "abyss",
-    "cascade", "tempest", "vortex", "mirage", "prism",
-    "labyrinth", "enigma", "paradox", "quasar", "nexus",
-    "cipher", "phantom", "specter", "wraith", "reverie",
-    "serenity", "euphoria", "melancholy", "epiphany", "solitude",
-    "eternity", "infinity", "oblivion", "destiny", "harmony",
-    "symphony", "rhapsody", "sonata", "lullaby", "serenade",
-    "quixotic", "ephemeral", "serendipity", "mellifluous", "effervescent",
-    "luminous", "ethereal", "gossamer", "petrichor", "halcyon",
-    "nebulous", "ineffable", "eloquent", "enigmatic", "euphoria",
-    "epiphany", "quintessential", "melancholy", "ethereal", "labyrinthine",
-    "ephemeral", "cacophony", "surreptitious", "ebullient", "clandestine",
-    "effulgent", "mercurial", "ephemeral", "sonorous", "ethereal",
-    "incandescent", "mellifluous", "ephemeral", "serendipitous", "effervescent",
-    "luminescent", "ethereal", "iridescent", "ephemeral", "mellifluous",
-    "nebulous", "ineffable", "eloquent", "enigmatic", "euphoric",
-    "epiphanic", "quintessential", "melancholic", "ethereal", "labyrinthine",
-
-];
-
-export function generateWordGuid(): string {
-    const seedNumber = Math.floor(Math.random() * 0xFFFFFFFF);
-    const randomIndex1 = Math.floor(Math.random() * wordList.length);
-    const randomIndex2 = Math.floor(Math.random() * wordList.length);
-    const randomIndex3 = Math.floor(Math.random() * wordList.length);
-
-    const word1 = wordList[randomIndex1];
-    const word2 = wordList[randomIndex2];
-    const word3 = wordList[randomIndex3];
-    
-    return `${word1} ${word2} ${word3} ${seedNumber}`;
-}
-
+import { CardScreenLocation } from "./Primitives";
 
 export class PhysicalCard {
     container: Phaser.GameObjects.Container;

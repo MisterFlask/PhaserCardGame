@@ -1,13 +1,14 @@
 import Phaser from 'phaser';
 import GameImageLoader from '../utils/ImageUtils';
 import { ArcaneRitualCard,  FireballCard, GoblinCharacter, PlayerCharacter, SummonDemonCard, ToxicCloudCard } from '../gamecharacters/CharacterClasses';
-import { AbstractCard, CardType, PhysicalCard, CardScreenLocation, TextBox } from '../gamecharacters/PhysicalCard';
+import { AbstractCard,  PhysicalCard, TextBox } from '../gamecharacters/PhysicalCard';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 import CampaignScene from './campaign';
 import MapScene from './map';
 import { EncounterData } from '../encounters/encounters';
 import { BattleCardLocation, GameState } from './gamestate';
 import { DeckLogic } from '../rules/decklogic';
+import { CardScreenLocation, CardType } from '../gamecharacters/Primitives';
 
 
 const config = {
@@ -464,11 +465,12 @@ class CombatScene extends Phaser.Scene {
 
         this.draggedCard = null;
     }
+
     handleCardInteraction(usedCard: PhysicalCard, targetCard: PhysicalCard): void {
         if (usedCard && usedCard.data && targetCard && targetCard.data) {
-            if (usedCard.data.IsPerformableOn && usedCard.data.PlayCard) {
-                if (usedCard.data.IsPerformableOn(targetCard)) {
-                    usedCard.data.PlayCard(targetCard);
+            if (usedCard.data.IsPerformableOn && usedCard.data.InvokeCardEffects) {
+                if (usedCard.data.IsPerformableOn(targetCard.data)) {
+                    usedCard.data.InvokeCardEffects(targetCard.data);
                     
                     // Update visual representation of the cards
                     this.updateCardVisuals(usedCard);

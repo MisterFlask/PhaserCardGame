@@ -1,4 +1,5 @@
-import { AbstractCard, CardScreenLocation, CardType, PhysicalCard, TextBox } from "../gamecharacters/PhysicalCard";
+import { AbstractCard, PhysicalCard, TextBox } from "../gamecharacters/PhysicalCard";
+import { CardScreenLocation, CardType } from "../gamecharacters/Primitives";
 
 export interface CardConfig {
     cardWidth: number;

@@ -1,6 +1,6 @@
 import { StoreCard } from '../screens/campaign';
-import { BaseCharacter } from '../gamecharacters/AbstractCard';
-import { AbstractCard, PhysicalCard } from '../gamecharacters/PhysicalCard';
+import { BaseCharacter } from "../gamecharacters/BaseCharacter"
+import { AbstractCard } from '../gamecharacters/PhysicalCard';
 
 export class ActionManager {
     private static instance: ActionManager;
@@ -16,12 +16,58 @@ export class ActionManager {
         }
         return ActionManager.instance;
     }
-
-    public dealDamage(amount: number,
-        target: any,
+    
+    public dealDamage = ({
+        amount,
+        target,
+        sourceCharacter,
+        sourceCard
+    }: {
+        amount: number,
+        target: AbstractCard,
         sourceCharacter?: BaseCharacter,
-        sourceCard?: AbstractCard): void {
-        //todo
+        sourceCard?: AbstractCard
+    }): void => {
+        const physicalCardOfTarget = target.physicalCard;
+        if (!physicalCardOfTarget) {
+            return;
+        }
+
+            if (physicalCardOfTarget) {
+                const shakeAndFlickerAction = new GenericAction(() => {
+                    return new Promise<GameAction[]>((resolve) => {
+                        // Shake the card
+                        const originalX = physicalCardOfTarget.container.x;
+                        const shakeDistance = 5;
+                        const shakeDuration = 50;
+                        const shakeCount = 3;
+
+                        let currentShake = 0;
+                        const shakeInterval = setInterval(() => {
+                            if (currentShake >= shakeCount * 2) {
+                                clearInterval(shakeInterval);
+                                physicalCardOfTarget.container.x = originalX;
+                            } else {
+                                physicalCardOfTarget.container.x += (currentShake % 2 === 0) ? shakeDistance : -shakeDistance;
+                                currentShake++;
+                            }
+                        }, shakeDuration);
+
+                        // Flicker the card red
+                        const originalTint = physicalCardOfTarget.cardBackground.tint;
+                        physicalCardOfTarget.cardBackground.setTint(0xff0000);
+                        
+                        setTimeout(() => {
+                            physicalCardOfTarget.cardBackground.setTint(originalTint);
+                            resolve([]);
+                        }, 300);
+                    });
+                });
+                
+                this.actionQueue.addAction(shakeAndFlickerAction);
+            }
+            
+            // TODO: Implement actual damage logic here
     }
 
     public purchaseShopItem(item: StoreCard): void {
@@ -90,3 +136,13 @@ export class DealDamageAction extends GameAction {
         return []; // Return any follow-up actions if needed
     }
 }
+export class GenericAction extends GameAction {
+    constructor(private actionFunction: () => Promise<GameAction[]>) {
+        super();
+    }
+
+    async playAction(): Promise<GameAction[]> {
+        return await this.actionFunction();
+    }
+}
+

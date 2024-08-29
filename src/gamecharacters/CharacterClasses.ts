@@ -1,4 +1,4 @@
-import { BaseCharacter } from "./AbstractCard";
+import { BaseCharacter } from "./BaseCharacter"
 import { AbstractCard } from "./PhysicalCard";
 
 export class BaseCharacterClass {

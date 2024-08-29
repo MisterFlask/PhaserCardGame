@@ -1,4 +1,4 @@
-import {  PlayerCharacter } from '../gamecharacters/CharacterClasses';
+import { PlayerCharacter } from '../gamecharacters/CharacterClasses';
 import { AbstractCard } from '../gamecharacters/PhysicalCard';
 import { StoreCard } from './campaign';
 
