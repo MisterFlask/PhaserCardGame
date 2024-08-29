@@ -23,7 +23,7 @@ export class CampaignRules {
                 portraitName: 'flamer1', 
                 characterClass: randomClass 
             });
-            character.cardsInDeck.push(...randomClass.availableCards);
+            character.cardsInMasterDeck.push(...randomClass.availableCards);
             characters.push(character);
         }
 

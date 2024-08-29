@@ -1,24 +1,5 @@
+import { BaseCharacter } from "./AbstractCard";
 import { AbstractCard } from "./PhysicalCard";
-
-export class BaseCharacter extends AbstractCard{
-    name: string;
-    portraitName: string;
-    hitpoints: number;
-    maxHitpoints: number;
-
-    constructor({ name, portraitName, maxHitpoints, description }
-        : { name: string; portraitName: string; maxHitpoints: number; description?: string}) {
-        super({
-            name: name,
-            description: description || "",
-            portraitName: portraitName
-        });
-        this.name = name;
-        this.portraitName = portraitName;
-        this.maxHitpoints = maxHitpoints;
-        this.hitpoints = maxHitpoints;
-    }
-}
 
 export class BaseCharacterClass {
     constructor({ name, iconName, startingMaxHp }: { name: string; iconName: string, startingMaxHp: number }) {
@@ -43,13 +24,13 @@ export class BaseCharacterClass {
 }
 
 export class PlayerCharacter extends BaseCharacter {
-    cardsInDeck: AbstractCard[];
+    cardsInMasterDeck: AbstractCard[];
     characterClass: BaseCharacterClass;
     
     constructor({ name, portraitName, characterClass, description }
         : {name: string; portraitName: string; characterClass: BaseCharacterClass, description?: string}) {
         super({ name, portraitName, maxHitpoints: characterClass.startingMaxHp, description })
-        this.cardsInDeck = [];
+        this.cardsInMasterDeck = [];
         this.hitpoints = characterClass.startingMaxHp;
         this.maxHitpoints = characterClass.startingMaxHp;
         this.characterClass = characterClass;

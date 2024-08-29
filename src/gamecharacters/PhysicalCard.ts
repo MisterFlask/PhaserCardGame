@@ -1,5 +1,6 @@
 import { GameAction } from "../utils/ActionQueue";
-import { BaseCharacter } from "./CharacterClasses";
+import { AbstractCard } from "./AbstractCard";
+import { BaseCharacter } from "./AbstractCard";
 
 export enum CardScreenLocation {
     BATTLEFIELD,
@@ -26,8 +27,27 @@ export class TextBox {
     background: Phaser.GameObjects.Rectangle | Phaser.GameObjects.Image;
     text: Phaser.GameObjects.Text;
     outline: Phaser.GameObjects.Rectangle;
+    constructor(params: {
+        scene: Phaser.Scene,
+        x?: number,
+        y?: number,
+        width?: number,
+        height?: number,
+        text?: string,
+        style?: Phaser.Types.GameObjects.Text.TextStyle,
+        backgroundImage?: string
+    }) {
+        const {
+            scene,
+            x = 0,
+            y = 0,
+            width = 100,
+            height = 50,
+            text = '',
+            style = { fontSize: '16px', color: '#000' },
+            backgroundImage
+        } = params;
 
-    constructor(scene: Phaser.Scene, x: number = 0, y: number = 0, width: number = 100, height: number = 50, text: string = '', style: Phaser.Types.GameObjects.Text.TextStyle = { fontSize: '16px', color: '#000' }, backgroundImage?: string) {
         if (backgroundImage) {
             this.background = scene.add.image(x, y, backgroundImage).setDisplaySize(width, height);
         } else {
@@ -69,43 +89,64 @@ export class TextBox {
         this.text.destroy();
     }
 }
+import Phaser from 'phaser';
 
-export class AbstractCard {
-    name: string
-    description: string
-    portraitName: string
-    cardType: CardType
-    tooltip: string
-    characterData: BaseCharacter | null
-    size: CardSize
+const wordList = [
+    "apple", "banana", "cherry", "date", "elderberry",
+    "fig", "grape", "honeydew", "kiwi", "lemon",
+    "mango", "nectarine", "orange", "papaya", "quince",
+    "raspberry", "strawberry", "tangerine", "ugli", "vanilla",
+    "watermelon", "xigua", "yuzu", "zucchini", "apricot",
+    "blackberry", "coconut", "dragonfruit", "eggplant", "feijoa",
+    "guava", "huckleberry", "imbe", "jackfruit", "kumquat",
+    "lime", "mulberry", "nance", "olive", "peach",
+    "rambutan", "soursop", "tamarind", "ugni", "voavanga",
+    "wolfberry", "ximenia", "yam", "zapote", "acai",
+    "boysenberry", "cantaloupe", "durian", "elderflower", "farkleberry",
+    "gooseberry", "horned melon", "ilama", "jujube", "keppel",
+    "longan", "miracle fruit", "noni", "persimmon", "quandong",
+    "redcurrant", "salak", "tomato", "uva ursi", "velvet apple",
+    "wampee", "xoconostle", "yangmei", "ziziphus", "ackee",
+    "bilberry", "cherimoya", "damson", "entawak", "finger lime",
+    "gac", "hawthorn", "ice cream bean", "jabuticaba", "kiwano",
+    "lucuma", "mamey", "nance", "opuntia", "pawpaw",
+    "rhubarb", "soncoya", "tomatillo", "uvaia", "vanilla bean",
+    "whisper", "shadow", "breeze", "echo", "twilight",
+    "mist", "ember", "frost", "ripple", "dusk",
+    "glow", "haze", "shimmer", "spark", "zephyr",
+    "aurora", "nebula", "cosmos", "zenith", "abyss",
+    "cascade", "tempest", "vortex", "mirage", "prism",
+    "labyrinth", "enigma", "paradox", "quasar", "nexus",
+    "cipher", "phantom", "specter", "wraith", "reverie",
+    "serenity", "euphoria", "melancholy", "epiphany", "solitude",
+    "eternity", "infinity", "oblivion", "destiny", "harmony",
+    "symphony", "rhapsody", "sonata", "lullaby", "serenade",
+    "quixotic", "ephemeral", "serendipity", "mellifluous", "effervescent",
+    "luminous", "ethereal", "gossamer", "petrichor", "halcyon",
+    "nebulous", "ineffable", "eloquent", "enigmatic", "euphoria",
+    "epiphany", "quintessential", "melancholy", "ethereal", "labyrinthine",
+    "ephemeral", "cacophony", "surreptitious", "ebullient", "clandestine",
+    "effulgent", "mercurial", "ephemeral", "sonorous", "ethereal",
+    "incandescent", "mellifluous", "ephemeral", "serendipitous", "effervescent",
+    "luminescent", "ethereal", "iridescent", "ephemeral", "mellifluous",
+    "nebulous", "ineffable", "eloquent", "enigmatic", "euphoric",
+    "epiphanic", "quintessential", "melancholic", "ethereal", "labyrinthine",
 
-    constructor({ name, description, portraitName, cardType, tooltip, characterData, size }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: BaseCharacter, size?: CardSize }) {
-        this.name = name
-        this.description = description
-        this.portraitName = portraitName || "flamer1"
-        this.cardType = cardType || CardType.PLAYABLE
-        this.tooltip = tooltip || "Lorem ipsum dolor sit amet"
-        this.characterData = characterData || null
-        this.size = size || CardSize.SMALL
-    }
+];
 
-    IsPerformableOn(targetCard: PhysicalCard) {
-        if (this.cardType == CardType.PLAYABLE) {
-            return false
-        }
-        return true
-    }
+export function generateWordGuid(): string {
+    const seedNumber = Math.floor(Math.random() * 0xFFFFFFFF);
+    const randomIndex1 = Math.floor(Math.random() * wordList.length);
+    const randomIndex2 = Math.floor(Math.random() * wordList.length);
+    const randomIndex3 = Math.floor(Math.random() * wordList.length);
 
-
-    OnCombatStart(): GameAction[] {
-        console.log('Combat started');
-        return [];
-    }
-
-    Action(targetCard: PhysicalCard) {
-        console.log("Action performed on " + targetCard.data.name + " by  " + this.name)
-    }
+    const word1 = wordList[randomIndex1];
+    const word2 = wordList[randomIndex2];
+    const word3 = wordList[randomIndex3];
+    
+    return `${word1}-${word2}-${word3}-${seedNumber}`;
 }
+
 
 export class PhysicalCard {
     container: Phaser.GameObjects.Container;
@@ -168,17 +209,18 @@ export class PhysicalCard {
 
         // Add HP box if the card is a BaseCharacter
         if (this.data instanceof BaseCharacter) {
+            const baseCharacter = this.data as BaseCharacter;
             const cardWidth = this.cardBackground.displayWidth;
             const cardHeight = this.cardBackground.displayHeight;
-            this.hpBox = new TextBox(
-                this.scene,
-                cardWidth / 2 - 20,
-                -cardHeight / 2 + 20,
-                40,
-                20,
-                `${this.data.hitpoints}/${this.data.maxHitpoints}`,
-                { fontSize: '12px', color: '#000' }
-            );
+            this.hpBox = new TextBox({
+                scene: this.scene,
+                x: cardWidth / 2 - 20,
+                y: -cardHeight / 2 + 20,
+                width: 40,
+                height: 20,
+                text: `${baseCharacter.hitpoints}/${baseCharacter.maxHitpoints}`,
+                style: { fontSize: '12px', color: '#000' }
+            });
             this.cardContent.add([this.hpBox.background, this.hpBox.outline, this.hpBox.text]);
         } else {
             this.hpBox = null;
@@ -340,7 +382,8 @@ export class PhysicalCard {
 
         // Update HP box if it exists
         if (this.hpBox && this.data instanceof BaseCharacter) {
-            this.hpBox.setText(`${this.data.hitpoints}/${this.data.maxHitpoints}`);
+            const baseCharacter = this.data as BaseCharacter;
+            this.hpBox.setText(`${baseCharacter.hitpoints}/${baseCharacter.maxHitpoints}`);
         }
 
         this.updateVisualTags();
@@ -389,3 +432,5 @@ export abstract class AbstractCardVisualTag {
     abstract getText(): string;
     abstract updateVisuals(image: Phaser.GameObjects.Image, text: Phaser.GameObjects.Text): void;
 }
+
+export { AbstractCard };

@@ -37,19 +37,42 @@ export class CardGuiUtils {
         
         const cardImage = scene.add.image(0, -cardHeight / 4, cardTexture)
             .setDisplaySize(cardWidth / 2, cardHeight / 2);
-
-        const nameBox = new TextBox(scene, 0, cardHeight / 4, cardWidth - 10, 60, data.name, { fontSize: '16px', color: '#000', wordWrap: { width: cardWidth - 10 } });
-        const descBox = new TextBox(scene, 0, cardHeight / 2, cardWidth - 10, 60, data.description, {
-            fontSize: '12px',
-            color: '#000',
-            wordWrap: { width: cardWidth - 20 },
-            align: 'center'
+        const nameBox = new TextBox({
+            scene: scene,
+            x: 0,
+            y: cardHeight / 4,
+            width: cardWidth - 10,
+            height: 60,
+            text: data.name,
+            style: { fontSize: '16px', color: '#000', wordWrap: { width: cardWidth - 10 } }
         });
-        const tooltipBox = new TextBox(scene, cardWidth + cardWidth / 2, 0, cardWidth - 10, cardHeight, data.tooltip || '', {
-            fontSize: '12px',
-            color: '#000',
-            wordWrap: { width: cardWidth - 20 },
-            align: 'left'
+        const descBox = new TextBox({
+            scene: scene,
+            x: 0,
+            y: cardHeight / 2,
+            width: cardWidth - 10,
+            height: 60,
+            text: data.description,
+            style: {
+                fontSize: '12px',
+                color: '#000',
+                wordWrap: { width: cardWidth - 20 },
+                align: 'center'
+            }
+        });
+        const tooltipBox = new TextBox({
+            scene: scene,
+            x: cardWidth + cardWidth / 2,
+            y: 0,
+            width: cardWidth - 10,
+            height: cardHeight,
+            text: data.tooltip || '',
+            style: {
+                fontSize: '12px',
+                color: '#000',
+                wordWrap: { width: cardWidth - 20 },
+                align: 'left'
+            }
         });
 
         // Function to update background sizes

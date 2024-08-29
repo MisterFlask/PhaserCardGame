@@ -1,33 +1,13 @@
 import Phaser from 'phaser';
 import GameImageLoader from '../utils/ImageUtils';
-import { ArcaneRitualCard, BaseCharacter, FireballCard, GoblinCharacter, SummonDemonCard, ToxicCloudCard } from '../gamecharacters/CharacterClasses';
+import { ArcaneRitualCard,  FireballCard, GoblinCharacter, PlayerCharacter, SummonDemonCard, ToxicCloudCard } from '../gamecharacters/CharacterClasses';
 import { AbstractCard, CardType, PhysicalCard, CardScreenLocation, TextBox } from '../gamecharacters/PhysicalCard';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 import CampaignScene from './campaign';
 import MapScene from './map';
 import { EncounterData } from '../encounters/encounters';
+import { BattleCardLocation, GameState } from './gamestate';
 
-
-const unitData: AbstractCard[] = [
-    new AbstractCard({ name: 'Knight', description: 'A brave warrior', portraitName: 'flamer1', cardType: CardType.CHARACTER }),
-    new AbstractCard({ name: 'Archer', description: 'Skilled with a bow', portraitName: 'flamer1', cardType: CardType.CHARACTER }),
-    new AbstractCard({ name: 'Mage', description: 'Wields powerful magic', portraitName: 'flamer1', cardType: CardType.CHARACTER }),
-];
-
-const cardData: AbstractCard[] = [
-    new AbstractCard({ name: 'Fireball', description: 'Deals 3 damage to target' }),
-    new AbstractCard({ name: 'Healing Touch', description: 'Restores 2 health' }),
-    new AbstractCard({ name: 'Stone Wall', description: 'Summons a defensive barrier' }),
-    new AbstractCard({ name: 'Lightning Bolt', description: 'Strikes for 2 damage' }),
-    new AbstractCard({ name: 'Nature\'s Blessing', description: 'Grants 1 extra mana' }),
-    new AbstractCard({ name: 'Nature\'s Blessing', description: 'Grants 1 extra mana' }),
-    new AbstractCard({ name: 'Nature\'s Blessing', description: 'Grants 1 extra mana' }),
-    new AbstractCard({ name: 'Nature\'s Blessing', description: 'Grants 1 extra mana' }),
-    new FireballCard(),
-    new ToxicCloudCard(),
-    new SummonDemonCard(),
-    new ArcaneRitualCard(),
-];
 
 const config = {
     battlefieldY: 200,
@@ -39,42 +19,43 @@ const config = {
 };
 
 class CombatScene extends Phaser.Scene {
-    private playerHand: Phaser.GameObjects.Container[];
-    private battlefield: Phaser.GameObjects.Container[];
-    private playerUnits: Phaser.GameObjects.Container[];
+    private playerHand: PhysicalCard[];
+    private enemyUnits: PhysicalCard[];
+    private playerUnits: PhysicalCard[];
     private backgroundImage!: Phaser.GameObjects.Image;
     private battlefieldArea!: Phaser.GameObjects.Rectangle;
     private handArea!: Phaser.GameObjects.Rectangle;
-    private highlightedCard: Phaser.GameObjects.Container | null;
-    private draggedCard: Phaser.GameObjects.Container | null;
+    private highlightedCard: PhysicalCard | null;
+    private draggedCard: PhysicalCard | null;
     private menuButton!: Phaser.GameObjects.Text;
     private menuPanel!: Phaser.GameObjects.Container;
-    private drawPile!: Phaser.GameObjects.Container;
-    private discardPile!: Phaser.GameObjects.Container;
-    private drawPileCount: number = 30;
-    private discardPileCount: number = 0;
+    private drawPile: PhysicalCard | null;
+    private discardPile: PhysicalCard | null;
     private encounter!: EncounterData;
     private combatStatusText!: TextBox;
     private lastPerformanceLog: number = 0;
     private frameCount: number = 0;
+    private endTurnButton!: TextBox;
     
     constructor() {
         super('CombatScene');
         this.playerHand = [];
-        this.battlefield = [];
+        this.enemyUnits = [];
         this.playerUnits = [];
         this.highlightedCard = null;
         this.draggedCard = null;
+        this.drawPile = null;
+        this.discardPile = null;
     }
 
     init(data: { encounter: EncounterData }) {
         this.encounter = data.encounter;
         game.events.on('debug', console.log);
-
     }
     
     createPlayerUnits(): void {
-        unitData.forEach((data, index) => {
+        
+        GameState.getInstance().currentRunCharacters.forEach((data, index) => {
             const x = config.gameWidth - 100;
             const y = 100 + index * 180;
             const unit = CardGuiUtils.getInstance().createCard({
@@ -86,7 +67,7 @@ class CombatScene extends Phaser.Scene {
                 eventCallback: ()=>{}
             });
             (unit as any).isPlayerUnit = true;
-            this.playerUnits.push(unit.container);
+            this.playerUnits.push(unit);
         });
     }
 
@@ -94,7 +75,6 @@ class CombatScene extends Phaser.Scene {
         this.load.setBaseURL('https://raw.githubusercontent.com/');
         new GameImageLoader().loadAllImages(this.load);
     }
-
     create(): void {
         this.createOrUpdateGameAreas();
         this.createPlayerHand();
@@ -111,11 +91,21 @@ class CombatScene extends Phaser.Scene {
             this.resize();
         });    
 
-    // Set up performance monitoring
-    this.lastPerformanceLog = 0;
-    this.frameCount = 0;
+        // Set up performance monitoring
+        this.lastPerformanceLog = 0;
+        this.frameCount = 0;
 
-    this.events.on('update', (time: number, delta: number) => {
+        this.events.on('update', this.update);
+    }
+
+
+
+    private handleEndTurn(): void {
+        console.log('End turn button clicked');
+    }
+
+
+    update = (time: number, delta: number) => {
         this.frameCount++;
         
         if (time - this.lastPerformanceLog >= 1000) {
@@ -129,18 +119,38 @@ class CombatScene extends Phaser.Scene {
             this.lastPerformanceLog = time;
             this.frameCount = 0;
         }
-    });
+
+        // Check and sync hand with game state every frame
+        this.syncHandWithGameState();
+        this.updateDrawPileCount();
+        this.updateDiscardPileCount();
+    };
+
+    updateDrawPileCount(): void {
+        if (this.drawPile) {
+            const gameState = GameState.getInstance();
+            const drawPileCount = gameState.combatState.currentDrawPile.length;
+            this.drawPile.data.description = (`Draw Pile (${drawPileCount})`);
+        }
+    }
+
+    updateDiscardPileCount(): void {
+        if (this.discardPile) {
+            const gameState = GameState.getInstance();
+            const discardPileCount = gameState.combatState.currentDiscardPile.length;
+            this.discardPile.data.description=(`Discard Pile (${discardPileCount})`);
+        }
     }
     
-    arrangeCards(cardArray: Phaser.GameObjects.Container[], yPosition: number): void {
+    arrangeCards(cardArray: PhysicalCard[], yPosition: number): void {
         const totalWidth = config.gameWidth - 200;
         const cardSpacing = Math.min(CardGuiUtils.getInstance().cardConfig.cardWidth, totalWidth / (cardArray.length + 1));
 
         cardArray.forEach((card, index) => {
-            card.x = 100 + index * cardSpacing;
-            card.y = yPosition;
-            (card as any).originalDepth = index;
-            card.depth = index;
+            card.container.x = 100 + index * cardSpacing;
+            card.container.y = yPosition;
+            (card.container as any).originalDepth = index;
+            card.container.depth = index;
         });
     }
 
@@ -168,25 +178,48 @@ class CombatScene extends Phaser.Scene {
         this.createOrUpdateGameAreas();
 
         this.arrangeCards(this.playerHand, config.handY);
-        this.arrangeCards(this.battlefield, config.battlefieldY);
+        this.arrangeCards(this.enemyUnits, config.battlefieldY);
         this.playerUnits.forEach((unit, index) => {
-            unit.x = config.gameWidth - 100;
-            unit.y = 100 + index * 180;
+            unit.container.x = config.gameWidth - 100;
+            unit.container.y = 100 + index * 180;
         });
 
         // Position draw and discard piles
         if (this.drawPile) {
-            this.drawPile.setPosition(width * 0.1, config.pileY);
-            this.drawPile.removeInteractive(); // Make it not draggable
+            this.drawPile.container.setPosition(width * 0.1, config.pileY);
+            this.drawPile.container.removeInteractive(); // Make it not draggable
         }
         if (this.discardPile) {
-            this.discardPile.setPosition(width * 0.2, config.pileY);
-            this.discardPile.removeInteractive(); // Make it not draggable
+            this.discardPile.container.setPosition(width * 0.2, config.pileY);
+            this.discardPile.container.removeInteractive(); // Make it not draggable
         }
 
         // Position combat status text
         if (this.combatStatusText) {
             this.combatStatusText.setPosition(width * 0.5, config.pileY);
+        }
+
+        // Position end turn button
+        if (this.endTurnButton) {
+            this.endTurnButton.setPosition(width * 0.7, config.pileY);
+        } else {
+            this.endTurnButton = new TextBox({
+                scene: this,
+                x: width * 0.7,
+                y: config.pileY,
+                width: 120,
+                height: 40,
+                text: 'End Turn',
+                style: {
+                    fontSize: '24px',
+                    color: '#ffffff'
+                },
+                backgroundImage: 'button_background'
+            });
+            this.endTurnButton.background.setInteractive({ useHandCursor: true })
+                .on('pointerdown', this.handleEndTurn, this);
+            this.add.existing(this.endTurnButton.background);
+            this.add.existing(this.endTurnButton.text);
         }
     }
 
@@ -224,7 +257,7 @@ class CombatScene extends Phaser.Scene {
     }
 
     createPlayerHand(): void {
-        cardData.forEach((data, index) => {
+        GameState.getInstance().combatState.currentHand.forEach((data, index) => {
             const x = 100 + index * 150;
             const y = config.handY;
             const card = CardGuiUtils.getInstance().createCard({
@@ -235,7 +268,7 @@ class CombatScene extends Phaser.Scene {
                 location: CardScreenLocation.HAND,
                 eventCallback: ()=>{}
             });
-            this.playerHand.push(card.container);
+            this.playerHand.push(card);
         });
         this.arrangeCards(this.playerHand, config.handY);
     }
@@ -244,41 +277,37 @@ class CombatScene extends Phaser.Scene {
         const pileY = config.gameHeight - 100;
         
         // Create Draw Pile
-        this.drawPile = this.add.container(100, pileY);
-        const drawCard = CardGuiUtils.getInstance().createCard({
+        this.drawPile = CardGuiUtils.getInstance().createCard({
             scene: this,
-            x: 0,
-            y: 0,
-            data: new AbstractCard({ name: 'Draw Pile (' + this.drawPileCount + ')', description: 'Cards to draw', portraitName: "drawpile" }),
+            x: 100,
+            y: pileY,
+            data: new AbstractCard({ name: 'Draw Pile (' + 0 + ')', description: 'Cards to draw', portraitName: "drawpile" }),
             location: CardScreenLocation.DRAW_PILE,
             eventCallback: ()=>{}
         });
-        this.drawPile.add([drawCard.container]);
 
         // Create Discard Pile
-        this.discardPile = this.add.container(250, pileY);
-        const discardCard = CardGuiUtils.getInstance().createCard({
+        this.discardPile = CardGuiUtils.getInstance().createCard({
             scene: this,
             x: 0,
             y: 0,
-            data: new AbstractCard({ name: 'Discard Pile (' + this.discardPileCount + ')', description: 'Discarded cards', portraitName: "discardpile" }),
+            data: new AbstractCard({ name: 'Discard Pile (' + 0 + ')', description: 'Discarded cards', portraitName: "discardpile" }),
             location: CardScreenLocation.DISCARD_PILE,
             eventCallback: ()=>{}
         });
-        this.discardPile.add([discardCard.container]);
     }
     createCombatStatusText(): void {
         const x = 400;
         const y = config.gameHeight - 100;
-        this.combatStatusText = new TextBox(
-            this,
-            x,
-            y,
-            300, // Adjust width as needed
-            50,  // Adjust height as needed
-            'CURRENT COMBAT STATUS',
-            { fontSize: '24px', color: '#000', align: 'center' }
-        );
+        this.combatStatusText = new TextBox({
+            scene: this,
+            x: x,
+            y: y,
+            width: 300, // Adjust width as needed
+            height: 50,  // Adjust height as needed
+            text: 'CURRENT COMBAT STATUS',
+            style: { fontSize: '24px', color: '#000', align: 'center' }
+        });
     }
 
     createEnemyCards(): void {
@@ -293,7 +322,7 @@ class CombatScene extends Phaser.Scene {
                     eventCallback: ()=>{}
                 });
                 enemyCard.container.setDepth(1);
-                this.battlefield.push(enemyCard.container);
+                this.enemyUnits.push(enemyCard);
             });
         }
     }
@@ -348,7 +377,12 @@ class CombatScene extends Phaser.Scene {
     }
 
     handleDragStart(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container): void {
-        this.draggedCard = gameObject;
+        if ('physicalCard' in gameObject) {
+            this.draggedCard = (gameObject as any).physicalCard as PhysicalCard;
+        } else {
+            console.warn('Dragged object is not a PhysicalCard');
+            this.draggedCard = null;
+        }
     }
 
     handleDrag(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container, dragX: number, dragY: number): void {
@@ -361,29 +395,28 @@ class CombatScene extends Phaser.Scene {
 
         this.checkCardUnderPointer(pointer);
     }
-
     checkCardUnderPointer(pointer: Phaser.Input.Pointer): void {
         const cardUnderPointer = this.getCardUnderPointer(pointer);
 
         if (cardUnderPointer && cardUnderPointer !== this.draggedCard) {
             if (this.highlightedCard !== cardUnderPointer) {
-                if (this.highlightedCard) {
+                if (this.highlightedCard instanceof PhysicalCard) {
                     this.unhighlightCard(this.highlightedCard);
                 }
                 this.highlightedCard = cardUnderPointer;
                 this.highlightCard(cardUnderPointer);
             }
-        } else if (this.highlightedCard) {
+        } else if (this.highlightedCard instanceof PhysicalCard) {
             this.unhighlightCard(this.highlightedCard);
             this.highlightedCard = null;
         }
     }
 
-    getCardUnderPointer(pointer: Phaser.Input.Pointer): Phaser.GameObjects.Container | null {
-        const allCards = [...this.playerHand, ...this.battlefield, ...this.playerUnits];
+    getCardUnderPointer(pointer: Phaser.Input.Pointer): PhysicalCard | null {
+        const allCards = [...this.playerHand, ...this.enemyUnits, ...this.playerUnits];
         for (let i = allCards.length - 1; i >= 0; i--) {
             const card = allCards[i];
-            if (card !== this.draggedCard && Phaser.Geom.Rectangle.Contains(card.getBounds(), pointer.x, pointer.y)) {
+            if (card !== this.draggedCard && card.container.getBounds().contains(pointer.x, pointer.y)) {
                 return card;
             }
         }
@@ -391,79 +424,143 @@ class CombatScene extends Phaser.Scene {
     }
 
     handleDragEnd(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container): void {
-        if ((gameObject as any)?.physicalCard?.data?.cardType === CardType.CHARACTER) return;
+        const physicalCard = (gameObject as any).physicalCard as PhysicalCard;
+        if (physicalCard?.data?.cardType === CardType.CHARACTER) return;
 
         const inHand = gameObject.y > config.dividerY;
         if (inHand) {
-            this.moveCardToHand(gameObject);
+            this.moveCardToHand(physicalCard.data.id);
         } else {
-            this.moveCardToBattlefield(gameObject);
+            this.moveCardToBattlefield(physicalCard);
         }
 
         this.battlefieldArea.setVisible(false);
         this.handArea.setVisible(false);
 
         if (this.highlightedCard) {
-            this.handleCardInteraction(gameObject, this.highlightedCard);
+            this.handleCardInteraction(physicalCard, this.highlightedCard);
             this.unhighlightCard(this.highlightedCard);
             this.highlightedCard = null;
         }
 
         this.draggedCard = null;
     }
-
-    handleCardInteraction(usedCard: Phaser.GameObjects.Container, targetCard: Phaser.GameObjects.Container): void {
-        const usedCardData = (usedCard as any).physicalCard as PhysicalCard;
-        const targetCardData = (targetCard as any).physicalCard as PhysicalCard;
-
-        if (usedCardData && usedCardData.data) {
-            if (usedCardData.data.IsPerformableOn(targetCardData)){
-                usedCardData.data.Action(targetCardData);
-            }else{
-                console.log("Action not performable on " + targetCardData.data.name + " by  "+ usedCardData.data.name)
+    handleCardInteraction(usedCard: PhysicalCard, targetCard: PhysicalCard): void {
+        if (usedCard && usedCard.data && targetCard && targetCard.data) {
+            if (usedCard.data.IsPerformableOn && usedCard.data.Action) {
+                if (usedCard.data.IsPerformableOn(targetCard)) {
+                    usedCard.data.Action(targetCard);
+                    
+                    // Update visual representation of the cards
+                    this.updateCardVisuals(usedCard);
+                    this.updateCardVisuals(targetCard);
+                } else {
+                    console.log(`Action not performable on ${targetCard.data.name} by ${usedCard.data.name}`);
+                }
+            } else {
+                console.log("Card data is missing required methods");
             }
-
-            // You might want to update the visual representation of the cards here
-            // For example, updating health, removing cards, etc.
+        } else {
+            console.log("Invalid card data");
         }
     }
+
+    private updateCardVisuals(card: PhysicalCard): void {
+        // Implement logic to update card visuals
+        // For example, updating health, status effects, etc.
+        // This method should be implemented based on your game's specific requirements
+    }
+
     handleGameObjectOver(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject): void {
         if (gameObject.type === 'Container') {
             this.children.bringToTop(gameObject);
         }
     }
 
-    highlightCard(card: Phaser.GameObjects.Container): void {
-        const highlightBorder = card.getByName('highlightBorder') as Phaser.GameObjects.Rectangle;
+    highlightCard(card: PhysicalCard): void {
+        const highlightBorder = card.container.getByName('highlightBorder') as Phaser.GameObjects.Rectangle;
         if (highlightBorder) {
             highlightBorder.setVisible(true);
         }
     }
 
-    unhighlightCard(card: Phaser.GameObjects.Container): void {
-        const highlightBorder = card.getByName('highlightBorder') as Phaser.GameObjects.Rectangle;
+    unhighlightCard(card: PhysicalCard): void {
+        const highlightBorder = card.container.getByName('highlightBorder') as Phaser.GameObjects.Rectangle;
         if (highlightBorder) {
             highlightBorder.setVisible(false);
         }
     }
 
-    moveCardToHand(card: Phaser.GameObjects.Container): void {
-        if (!this.playerHand.includes(card)) {
+    moveCardToHand(cardId: string): void {
+        const card = this.findCardById(cardId);
+        if (card && !this.playerHand.includes(card)) {
             this.playerHand.push(card);
-            this.battlefield = this.battlefield.filter(c => c !== card);
-            (card as any).physicalCard.cardLocation = CardScreenLocation.HAND;
+            this.enemyUnits = this.enemyUnits.filter(c => c !== card);
+            card.cardLocation = CardScreenLocation.HAND;
+            this.arrangeCards(this.playerHand, config.handY);
         }
-        this.arrangeCards(this.playerHand, config.handY);
     }
 
-    moveCardToBattlefield(card: Phaser.GameObjects.Container): void {
-        if (!this.battlefield.includes(card)) {
-            this.battlefield.push(card);
+    moveCardToBattlefield(card: PhysicalCard): void {
+        if (!this.enemyUnits.includes(card)) {
+            this.enemyUnits.push(card);
             this.playerHand = this.playerHand.filter(c => c !== card);
         }
-        this.arrangeCards(this.battlefield, config.battlefieldY);
+        this.arrangeCards(this.enemyUnits, config.battlefieldY);
     }
 
+    syncHandWithGameState(): void {
+        const gameState = GameState.getInstance();
+        const combatState = gameState.combatState;
+
+        // Create a map of card IDs in the current hand
+        const currentHandIds = new Set(this.playerHand.map(card => card.data.id));
+
+        // Check for cards that need to be added to the hand
+        combatState.currentHand.forEach(card => {
+            if (!currentHandIds.has(card.id)) {
+                console.log("Adding card to hand: " + card.id);
+                // Find the card in draw pile or discard pile
+                const newCard = CardGuiUtils.getInstance().createCard({
+                    scene: this,
+                    x: 0,
+                    y: 0,
+                    data: card,
+                    location: CardScreenLocation.HAND,
+                    eventCallback: ()=>{}
+                });
+                this.playerHand.push(newCard);
+                this.arrangeCards(this.playerHand, config.handY);
+            }
+        });
+
+        // Check for cards that need to be removed from the hand
+        this.playerHand.forEach(card => {
+            const cardData = card.data;
+            if (!combatState.currentHand.some(c => c.id === cardData.id)) {
+                console.log("Removing card from hand: " + cardData.id);
+                this.discardCardById(cardData.id);
+            }
+        });
+    }
+
+    discardCard(card: PhysicalCard): void {
+        this.playerHand = this.playerHand.filter(c => c !== card);
+        card.container.destroy(); // Obliterate the physical card
+    }
+
+    discardCardById(cardId: string): void {
+        const card = this.playerHand.find(c => c.data.id === cardId);
+        if (card) {
+            this.playerHand = this.playerHand.filter(c => c !== card);
+            card.container.destroy(); // Obliterate the physical card
+        }
+    }
+
+    // Add these methods to resolve compilation errors
+    findCardById(cardId: string): PhysicalCard | undefined {
+        return [...this.playerHand, ...this.enemyUnits, ...this.playerUnits].find(card => card.data.id === cardId);
+    }
 }
 
 const gameconfig: Phaser.Types.Core.GameConfig = {

@@ -1,7 +1,7 @@
 import { ActionQueue, GameAction } from './ActionQueue';
 import { StoreCard } from '../screens/campaign';
 import { GameState } from '../screens/gamestate';
-import { BaseCharacter } from '../gamecharacters/CharacterClasses';
+import { BaseCharacter } from '../gamecharacters/AbstractCard';
 import { AbstractCard } from '../gamecharacters/PhysicalCard';
 
 export class ActionManager {

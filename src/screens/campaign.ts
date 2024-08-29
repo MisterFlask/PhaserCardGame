@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { PhysicalCard, CardScreenLocation, CardType } from '../gamecharacters/PhysicalCard';
-import { BaseCharacter, BaseCharacterClass, BlackhandClass, DiabolistClass, PlayerCharacter } from '../gamecharacters/CharacterClasses';
+import { BaseCharacterClass, BlackhandClass, DiabolistClass, PlayerCharacter } from '../gamecharacters/CharacterClasses';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 import { AbstractCard } from '../gamecharacters/PhysicalCard';
 import GameImageLoader from '../utils/ImageUtils';
@@ -91,6 +91,15 @@ export default class CampaignScene extends Phaser.Scene {
       }
    
       startCombatDebug() {
+        const gameState = GameState.getInstance();
+        const campaignRules = CampaignRules.getInstance();
+        
+        // Generate logical character roster
+        const characterRoster = campaignRules.generateLogicalCharacterRoster();
+        
+        gameState.currentRunCharacters = characterRoster.slice(0, 3);
+        gameState.roster = characterRoster;
+        
         this.scene.start('CombatScene', { 
           encounter: { 
             enemies: [new ClockworkAbomination(), new BaconBeast(), new BloodManipulationSlime()] 
@@ -324,7 +333,7 @@ export default class CampaignScene extends Phaser.Scene {
             // Clear current run characters and add selected characters
             gameState.currentRunCharacters = [];
             selectedCards.forEach(card => {
-                if (card.data instanceof BaseCharacter) {
+                if (card.data instanceof PlayerCharacter) {
                     gameState.addToCurrentRun(card.data);
                 }
             });
@@ -395,7 +404,7 @@ export default class CampaignScene extends Phaser.Scene {
         // Remove existing listeners set up by this function
         const pointerOverCallback = () => {
             if (card.data instanceof PlayerCharacter) {
-                this.updateDeckDisplay(card.data.cardsInDeck);
+                this.updateDeckDisplay(card.data.cardsInMasterDeck);
             }
             this.bringToFront(card);
         };

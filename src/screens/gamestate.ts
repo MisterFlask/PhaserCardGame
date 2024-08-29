@@ -1,14 +1,16 @@
-import { BaseCharacter, BaseCharacterClass, BlackhandClass, DiabolistClass } from '../gamecharacters/CharacterClasses';
+import {  PlayerCharacter } from '../gamecharacters/CharacterClasses';
+import { AbstractCard } from '../gamecharacters/PhysicalCard';
 import { StoreCard } from './campaign';
 
 export class GameState {
     private static instance: GameState;
 
-    public roster: BaseCharacter[] = [];
-    public currentRunCharacters: BaseCharacter[] = [];
+    public roster: PlayerCharacter[] = [];
+    public currentRunCharacters: PlayerCharacter[] = [];
     public shopItems: StoreCard[] = [];
     public inventory: StoreCard[] = [];
     public currencyOnHand: number = 0
+    public combatState: CombatState = new CombatState()
 
     private constructor() {}
 
@@ -20,28 +22,28 @@ export class GameState {
     }
 
     // Roster methods
-    public addToRoster(character: BaseCharacter): void {
+    public addToRoster(character: PlayerCharacter): void {
         this.roster.push(character);
     }
 
-    public removeFromRoster(character: BaseCharacter): void {
+    public removeFromRoster(character: PlayerCharacter): void {
         this.roster = this.roster.filter(c => c !== character);
     }
 
-    public getRoster(): BaseCharacter[] {
+    public getRoster(): PlayerCharacter[] {
         return [...this.roster];
     }
 
     // Current run characters methods
-    public addToCurrentRun(character: BaseCharacter): void {
+    public addToCurrentRun(character: PlayerCharacter): void {
         this.currentRunCharacters.push(character);
     }
 
-    public removeFromCurrentRun(character: BaseCharacter): void {
+    public removeFromCurrentRun(character: PlayerCharacter): void {
         this.currentRunCharacters = this.currentRunCharacters.filter(c => c !== character);
     }
 
-    public getCurrentRunCharacters(): BaseCharacter[] {
+    public getCurrentRunCharacters(): PlayerCharacter[] {
         return [...this.currentRunCharacters];
     }
 
@@ -106,6 +108,27 @@ export class GameState {
     }
 }
 
+
+export class CombatState{
+     currentCombatDeck: AbstractCard[] = []
+    currentDrawPile: AbstractCard[] = []
+    currentDiscardPile: AbstractCard[] = []
+    currentHand: AbstractCard[] = []
+
+    getBattleCardLocation = (cardId: string): BattleCardLocation => {
+        if (this.currentDrawPile.some(c => c.id === cardId)) return BattleCardLocation.DrawPile
+        if (this.currentDiscardPile.some(c => c.id === cardId)) return BattleCardLocation.DiscardPile
+        if (this.currentHand.some(c => c.id === cardId)) return BattleCardLocation.Hand
+        return BattleCardLocation.Unknown
+    }
+}
+
+export enum BattleCardLocation {
+    DrawPile,
+    DiscardPile,
+    Hand,
+    Unknown
+}
 
 export class MissionDetails{
     public difficulty: number = 1
