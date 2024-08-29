@@ -39,7 +39,7 @@ export class TextBox {
         this.text = scene.add.text(x, y, text, style);
         this.text.setOrigin(0.5);
         // Enforce text wrapping within bounds
-        this.text.setWordWrapWidth(width - 10); // Subtract padding
+        this.text.setWordWrapWidth(width - 2); // Subtract padding
         this.text.setAlign('center');
 
         // Adjust text size if it overflows

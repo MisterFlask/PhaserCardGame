@@ -434,11 +434,11 @@ class CombatScene extends Phaser.Scene {
         }
     }
 
-    getCardUnderPointer(pointer: Phaser.Input.Pointer): PhysicalCard | null {
+    getCardUnderPointer = (pointer: Phaser.Input.Pointer): PhysicalCard | null => {
         const allCards = [...this.playerHand, ...this.enemyUnits, ...this.playerUnits];
         for (let i = allCards.length - 1; i >= 0; i--) {
             const card = allCards[i];
-            if (card !== this.draggedCard && card.container.getBounds().contains(pointer.x, pointer.y)) {
+            if (card !== this.draggedCard && card.cardBackground.getBounds().contains(pointer.x, pointer.y)) {
                 return card;
             }
         }
@@ -447,14 +447,7 @@ class CombatScene extends Phaser.Scene {
 
     handleDragEnd(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container): void {
         const physicalCard = (gameObject as any).physicalCard as PhysicalCard;
-        if (physicalCard?.data?.cardType === CardType.CHARACTER) return;
-
-        const inHand = gameObject.y > config.dividerY;
-        if (inHand) {
-            this.moveCardToHand(physicalCard.data.id);
-        } else {
-            this.moveCardToBattlefield(physicalCard);
-        }
+        if (physicalCard?.data !instanceof PlayableCard) return;
 
         this.battlefieldArea.setVisible(false);
         this.handArea.setVisible(false);
