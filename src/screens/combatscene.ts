@@ -140,7 +140,8 @@ class CombatScene extends Phaser.Scene {
         if (this.drawPile) {
             const gameState = GameState.getInstance();
             const drawPileCount = gameState.combatState.currentDrawPile.length;
-            this.drawPile.data.description = (`Draw Pile (${drawPileCount})`);
+            this.drawPile.data.name = (`Draw Pile (${drawPileCount})`);
+            this.drawPile.nameBox.setText(`Draw Pile (${drawPileCount})`);
         }
     }
 
@@ -148,7 +149,8 @@ class CombatScene extends Phaser.Scene {
         if (this.discardPile) {
             const gameState = GameState.getInstance();
             const discardPileCount = gameState.combatState.currentDiscardPile.length;
-            this.discardPile.data.description=(`Discard Pile (${discardPileCount})`);
+            this.discardPile.data.name = (`Discard Pile (${discardPileCount})`);
+            this.discardPile.nameBox.setText(`Discard Pile (${discardPileCount})`);
         }
     }
     
