@@ -1,4 +1,5 @@
-import { EnemyCharacter, GoblinCharacter } from '../gamecharacters/CharacterClasses';
+import { EnemyCharacter } from '../gamecharacters/CharacterClasses';
+import { GoblinCharacter } from '../gamecharacters/SpecificClasses';
 
 // Define new character classes
 export class ClockworkAbomination extends EnemyCharacter {

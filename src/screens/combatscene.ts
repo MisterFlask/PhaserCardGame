@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import GameImageLoader from '../utils/ImageUtils';
-import { ArcaneRitualCard,  FireballCard, GoblinCharacter, PlayerCharacter, SummonDemonCard, ToxicCloudCard } from '../gamecharacters/CharacterClasses';
+import {  PlayerCharacter, } from '../gamecharacters/CharacterClasses';
 import { AbstractCard,  PhysicalCard, TextBox } from '../gamecharacters/PhysicalCard';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 import CampaignScene from './campaign';
@@ -9,6 +9,8 @@ import { EncounterData } from '../encounters/encounters';
 import { BattleCardLocation, GameState } from './gamestate';
 import { DeckLogic } from '../rules/decklogic';
 import { CardScreenLocation, CardType } from '../gamecharacters/Primitives';
+import { ActionManager } from '../utils/ActionManager';
+import { PlayableCard } from '../gamecharacters/AbstractCard';
 
 
 const config = {
@@ -467,22 +469,18 @@ class CombatScene extends Phaser.Scene {
     }
 
     handleCardInteraction(usedCard: PhysicalCard, targetCard: PhysicalCard): void {
-        if (usedCard && usedCard.data && targetCard && targetCard.data) {
-            if (usedCard.data.IsPerformableOn && usedCard.data.InvokeCardEffects) {
-                if (usedCard.data.IsPerformableOn(targetCard.data)) {
-                    usedCard.data.InvokeCardEffects(targetCard.data);
-                    
-                    // Update visual representation of the cards
-                    this.updateCardVisuals(usedCard);
-                    this.updateCardVisuals(targetCard);
-                } else {
-                    console.log(`Action not performable on ${targetCard.data.name} by ${usedCard.data.name}`);
-                }
-            } else {
-                console.log("Card data is missing required methods");
-            }
+        if (usedCard.data !instanceof PlayableCard) {
+            console.log("Used card is not a PlayableCard");
+            return;
+        }
+        const usedPlayableCard = usedCard.data as PlayableCard;
+
+        if (usedPlayableCard.IsPerformableOn(targetCard.data)) {
+            usedPlayableCard.InvokeCardEffects(targetCard.data);
+            
+            console.log("Card effects invoked: ", usedCard.data.name);
         } else {
-            console.log("Invalid card data");
+            console.log(`Action not performable on ${targetCard.data.name} by ${usedCard.data.name}`);
         }
     }
 

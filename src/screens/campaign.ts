@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { PhysicalCard, } from '../gamecharacters/PhysicalCard';
-import { BaseCharacterClass, BlackhandClass, DiabolistClass, PlayerCharacter } from '../gamecharacters/CharacterClasses';
+import { BaseCharacterClass,  PlayerCharacter } from '../gamecharacters/CharacterClasses';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 import { AbstractCard } from '../gamecharacters/PhysicalCard';
 import GameImageLoader from '../utils/ImageUtils';
@@ -88,6 +88,9 @@ export default class CampaignScene extends Phaser.Scene {
    
       toggleMenu() {
         this.menuPanel.setVisible(!this.menuPanel.visible);
+        if (this.menuPanel.visible) {
+            this.menuPanel.setDepth(Number.MAX_SAFE_INTEGER);
+        }
       }
    
       startCombatDebug() {

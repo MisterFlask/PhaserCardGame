@@ -63,7 +63,6 @@ function generateWordGuid(): string {
     return `${word1} ${word2} ${word3} ${seedNumber}`;
 }
 
-
 export class AbstractCard {
     
     public name: string
@@ -74,7 +73,7 @@ export class AbstractCard {
     characterData?: AbstractCard
     size: CardSize
     id: string = generateWordGuid()
-    physicalCard: IPhysicalCardInterface | null = null
+    physicalCard: IPhysicalCardInterface | null = null // this is a hack, it's just always PhysicalCard
 
     constructor({ name, description, portraitName, cardType, tooltip, characterData, size }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: AbstractCard, size?: CardSize }) {
         this.name = name
@@ -86,28 +85,24 @@ export class AbstractCard {
         this.size = size || CardSize.SMALL
     }
 
-    IsPerformableOn(targetCard: AbstractCard) {
-        return true
-    }
-
-
     OnCombatStart(): void {
         console.log('Combat started');
     }
-
-    InvokeCardEffects(targetCard?: AbstractCard) : void {
-
-    }
-
+    
     Copy(): AbstractCard {
-        return new AbstractCard({
-            name: this.name,
-            description: this.description,
-            portraitName: this.portraitName,
-            cardType: this.cardType,
-            tooltip: this.tooltip,
-            size: this.size,
-            characterData: this.characterData || undefined
-        });
+        const copy = Object.create(Object.getPrototypeOf(this));
+         
+        Object.assign(copy, this);
+        copy.id = generateWordGuid();
+        return copy;
     }
+}
+
+export abstract class PlayableCard extends AbstractCard {
+    constructor({ name, description, portraitName, cardType, tooltip, characterData, size }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: AbstractCard, size?: CardSize }) {
+        super({ name, description, portraitName, cardType, tooltip, characterData, size });
+    }
+
+    abstract InvokeCardEffects: (targetCard?: AbstractCard) => void;
+    abstract IsPerformableOn(targetCard: AbstractCard): boolean;
 }

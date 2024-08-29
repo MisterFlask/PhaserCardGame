@@ -1,4 +1,5 @@
-import { PlayerCharacter, BaseCharacterClass, DiabolistClass, BlackhandClass } from '../gamecharacters/CharacterClasses';
+import { PlayerCharacter, BaseCharacterClass } from '../gamecharacters/CharacterClasses';
+import { BlackhandClass, DiabolistClass } from '../gamecharacters/SpecificClasses';
 
 export class CampaignRules {
     private static instance: CampaignRules;
