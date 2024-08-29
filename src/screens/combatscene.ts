@@ -37,7 +37,9 @@ class CombatScene extends Phaser.Scene {
     private lastPerformanceLog: number = 0;
     private frameCount: number = 0;
     private endTurnButton!: TextBox;
-    
+    private hoveredCard: PhysicalCard | null = null;
+    private maxDepth: number = 1000;
+
     constructor() {
         super('CombatScene');
         this.playerHand = [];
@@ -160,7 +162,12 @@ class CombatScene extends Phaser.Scene {
             card.container.x = startX + index * cardSpacing;
             card.container.y = yPosition;
             (card.container as any).originalDepth = index;
-            card.container.depth = index;
+            if (this.hoveredCard === card) {
+                card.container.depth = this.maxDepth + index;
+            } else {
+                card.container.depth = index;
+            }
+            
         });
     }
 
@@ -341,6 +348,8 @@ class CombatScene extends Phaser.Scene {
         this.input.on('drag', this.handleDrag, this);
         this.input.on('dragend', this.handleDragEnd, this);
         this.input.on('gameobjectover', this.handleGameObjectOver, this);
+        this.input.on('gameobjectout', this.handleGameObjectOut, this);  // Add this line
+
     }
 
     createMenu(): void {
@@ -480,9 +489,31 @@ class CombatScene extends Phaser.Scene {
     }
 
     handleGameObjectOver(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject): void {
-        if (gameObject.type === 'Container') {
-            this.children.bringToTop(gameObject);
+        if (gameObject instanceof Phaser.GameObjects.Container && (gameObject as any).physicalCard instanceof PhysicalCard) {
+            const physicalCard = (gameObject as any).physicalCard as PhysicalCard;
+            this.bringCardToFront(gameObject);
+            this.hoveredCard = physicalCard;
         }
+    }
+
+    handleGameObjectOut(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject): void {
+        if (gameObject instanceof Phaser.GameObjects.Container && (gameObject as any).physicalCard instanceof PhysicalCard) {
+            const physicalCard = (gameObject as any).physicalCard as PhysicalCard;
+            this.resetCardDepth(gameObject);
+            if (this.hoveredCard === physicalCard) {
+                this.hoveredCard = null;
+            }
+        }
+    }
+
+    bringCardToFront(container: Phaser.GameObjects.Container): void {
+        this.maxDepth++;
+        container.setDepth(this.maxDepth);
+    }
+
+    resetCardDepth(container: Phaser.GameObjects.Container): void {
+        const originalDepth = (container as any).originalDepth || 0;
+        container.setDepth(originalDepth);
     }
 
     highlightCard(card: PhysicalCard): void {

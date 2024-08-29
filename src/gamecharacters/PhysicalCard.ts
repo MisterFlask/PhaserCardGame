@@ -107,7 +107,8 @@ export class TextBox {
         }
         if ((this.text.frame as any)?.data) {
             // we do this because there are circumstances where data is not available
-            // and it crashes the whole game
+            // and it crashes the whole game.  Caused by if the container gets
+            // destroyed without the listeners getting destroyed.
             this.text.setText(text);
         }else{
             console.log("text frame data is null for " + this.textBoxName);
