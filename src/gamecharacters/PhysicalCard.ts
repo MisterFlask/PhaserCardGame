@@ -45,7 +45,7 @@ export class TextBox {
         // Adjust text size if it overflows
         const originalFontSize = parseInt(style.fontSize as string);
         let currentFontSize = originalFontSize;
-        while ((this.text.height > height - 10 || this.text.width > width - 10) && currentFontSize > 8) { // Minimum font size of 8
+        while ((this.text.height > height - 1 || this.text.width > width - 1) && currentFontSize > 8) { // Minimum font size of 8
             currentFontSize--;
             this.text.setFontSize(currentFontSize);
             this.text.setWordWrapWidth(width - 10);

@@ -17,6 +17,12 @@ export class ActionManager {
         return ActionManager.instance;
     }
     
+    public discardCard = (card: AbstractCard): void => {
+        const gameState = GameState.getInstance();
+        gameState.combatState.currentDiscardPile.push(card);
+        this.actionQueue.addAction(new WaitAction(100));
+    }
+
     public dealDamage = ({
         amount,
         target,
@@ -146,3 +152,13 @@ export class GenericAction extends GameAction {
     }
 }
 
+export class WaitAction extends GameAction {
+    constructor(private milliseconds: number) {
+        super();
+    }
+
+    async playAction(): Promise<GameAction[]> {
+        await new Promise(resolve => setTimeout(resolve, this.milliseconds));
+        return [];
+    }
+}
