@@ -8,7 +8,6 @@ import MapScene from './map';
 import { EncounterData } from '../encounters/encounters';
 import { BattleCardLocation, GameState } from './gamestate';
 import { DeckLogic } from '../rules/decklogic';
-import { CardScreenLocation, CardType } from '../gamecharacters/Primitives';
 import { ActionManager } from '../utils/ActionManager';
 import { PlayableCard } from '../gamecharacters/AbstractCard';
 
@@ -75,7 +74,6 @@ class CombatScene extends Phaser.Scene {
                 x: x,
                 y: y,
                 data: data,
-                location: CardScreenLocation.CHARACTER_ROSTER,
                 eventCallback: ()=>{}
             });
             (unit as any).isPlayerUnit = true;
@@ -285,7 +283,6 @@ class CombatScene extends Phaser.Scene {
                 x: 0,
                 y: config.handY,
                 data: data,
-                location: CardScreenLocation.HAND,
                 eventCallback: ()=>{}
             });
             this.playerHand.push(card);
@@ -302,7 +299,6 @@ class CombatScene extends Phaser.Scene {
             x: 100,
             y: pileY,
             data: new AbstractCard({ name: 'Draw Pile (' + 0 + ')', description: 'Cards to draw', portraitName: "drawpile" }),
-            location: CardScreenLocation.DRAW_PILE,
             eventCallback: ()=>{}
         });
 
@@ -312,7 +308,6 @@ class CombatScene extends Phaser.Scene {
             x: 0,
             y: 0,
             data: new AbstractCard({ name: 'Discard Pile (' + 0 + ')', description: 'Discarded cards', portraitName: "discardpile" }),
-            location: CardScreenLocation.DISCARD_PILE,
             eventCallback: ()=>{}
         });
     }
@@ -338,7 +333,6 @@ class CombatScene extends Phaser.Scene {
                     x: 400 + index * 150,
                     y: config.battlefieldY,
                     data: enemy,
-                    location: CardScreenLocation.BATTLEFIELD,
                     eventCallback: ()=>{}
                 });
                 enemyCard.container.setDepth(1);
@@ -530,7 +524,6 @@ class CombatScene extends Phaser.Scene {
         if (card && !this.playerHand.includes(card)) {
             this.playerHand.push(card);
             this.enemyUnits = this.enemyUnits.filter(c => c !== card);
-            card.cardLocation = CardScreenLocation.HAND;
             this.arrangeCards(this.playerHand, config.handY);
         }
     }
@@ -579,7 +572,6 @@ class CombatScene extends Phaser.Scene {
             x: this.drawPile!.container.x,
             y: this.drawPile!.container.y,
             data: data,
-            location: CardScreenLocation.HAND,
             eventCallback: ()=>{}
         });
         // Start the card at the draw pile position

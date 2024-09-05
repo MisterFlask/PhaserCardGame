@@ -7,7 +7,7 @@ import GameImageLoader from '../utils/ImageUtils';
 import { GameState } from './gamestate';
 import { BaconBeast, BloodManipulationSlime, ClockworkAbomination } from '../encounters/encounters';
 import { CampaignRules } from '../rules/campaignrules';
-import { CardType, CardScreenLocation } from '../gamecharacters/Primitives';
+import { CardType } from '../gamecharacters/Primitives';
 
 export class StoreCard extends AbstractCard {
     price: number;
@@ -206,7 +206,6 @@ export default class CampaignScene extends Phaser.Scene {
                 x: 0,
                 y: 0,
                 data: character,
-                location: CardScreenLocation.BATTLEFIELD,
                 eventCallback: () => {}
             });
             this.addCardToSlot(card, rosterSlots[index]);
@@ -391,7 +390,6 @@ export default class CampaignScene extends Phaser.Scene {
                 x: x,
                 y: this.deckDisplayY,
                 data: card,
-                location: CardScreenLocation.BATTLEFIELD,
                 eventCallback: this.setupCardEvents
             });
             this.deckDisplayCards.push(physicalCard);
@@ -472,7 +470,6 @@ export default class CampaignScene extends Phaser.Scene {
                 x: x,
                 y: this.shopY,
                 data: item,
-                location: CardScreenLocation.SHOP,
                 eventCallback: (card) => this.setupShopCardEvents(card)
             });
             this.shopCards.push(physicalCard);

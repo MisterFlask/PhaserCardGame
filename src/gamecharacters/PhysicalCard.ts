@@ -107,7 +107,6 @@ export class TextBox {
     }
 }
 import Phaser from 'phaser';
-import { CardScreenLocation } from "./Primitives";
 
 export class PhysicalCard {
     container: Phaser.GameObjects.Container;
@@ -118,7 +117,6 @@ export class PhysicalCard {
     tooltipBox: TextBox;
     hpBox: TextBox | null;
     data: AbstractCard;
-    cardLocation: CardScreenLocation;
     visualTags: PhysicalCardVisualTag[];
     scene: Phaser.Scene;
     isSelected: boolean = false;
@@ -135,7 +133,6 @@ export class PhysicalCard {
         descBox,
         tooltipBox,
         data,
-        cardLocation,
         visualTags
     }: {
         scene: Phaser.Scene;
@@ -146,7 +143,6 @@ export class PhysicalCard {
         descBox: TextBox;
         tooltipBox: TextBox;
         data: AbstractCard;
-        cardLocation: CardScreenLocation;
         visualTags: PhysicalCardVisualTag[];
     }) {
         this.scene = scene;
@@ -158,7 +154,6 @@ export class PhysicalCard {
         this.tooltipBox = tooltipBox;
         this.data = data;
         this.data.physicalCard = this;
-        this.cardLocation = cardLocation;
         this.visualTags = [];
 
         // Create a new container for card content (excluding tooltip)

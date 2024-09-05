@@ -1,5 +1,5 @@
 import { AbstractCard, PhysicalCard, TextBox } from "../gamecharacters/PhysicalCard";
-import { CardScreenLocation, CardType } from "../gamecharacters/Primitives";
+import { CardType } from "../gamecharacters/Primitives";
 
 export interface CardConfig {
     cardWidth: number;
@@ -27,10 +27,9 @@ export class CardGuiUtils {
         x: number,
         y: number,
         data: AbstractCard,
-        location: CardScreenLocation,
         eventCallback: (card: PhysicalCard) => void
     }): PhysicalCard {
-        const { scene, x, y, data, location, eventCallback } = params;
+        const { scene, x, y, data, eventCallback } = params;
         const cardContainer = scene.add.container(x, y);
         const { cardWidth, cardHeight } = this.cardConfig;
         const cardBackground = scene.add.image(0, 0, 'greyscale').setDisplaySize(cardWidth, cardHeight);
@@ -119,7 +118,6 @@ export class CardGuiUtils {
             descBox: descBox,
             tooltipBox: tooltipBox,
             data: data,
-            cardLocation: location,
             visualTags: []
         });
 

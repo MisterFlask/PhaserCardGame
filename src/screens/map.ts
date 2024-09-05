@@ -3,7 +3,7 @@ import { AbstractCard, PhysicalCard,  } from '../gamecharacters/PhysicalCard';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 import { GameState } from './gamestate';
 import { EncounterData, EncounterManager } from '../encounters/encounters';
-import { CardType, CardSize, CardScreenLocation } from '../gamecharacters/Primitives';
+import { CardSize, CardType } from '../gamecharacters/Primitives';
 
 export class LocationCard extends AbstractCard {
     encounter: EncounterData;
@@ -76,7 +76,6 @@ export default class MapScene extends Phaser.Scene {
                 x: 0,
                 y: 0,
                 data: location,
-                location: CardScreenLocation.BATTLEFIELD,
                 eventCallback: this.setupLocationCardEvents
             });
             this.locationCards.push(card);
@@ -93,7 +92,6 @@ export default class MapScene extends Phaser.Scene {
                 x: 0,
                 y: 0,
                 data: character,
-                location: CardScreenLocation.BATTLEFIELD,
                 eventCallback: this.setupCharacterCardEvents
             });
             this.characterCards.push(card);

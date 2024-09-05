@@ -1,13 +1,3 @@
-
-export enum CardScreenLocation {
-    BATTLEFIELD,
-    HAND,
-    CHARACTER_ROSTER,
-    SHOP,
-    DRAW_PILE,
-    DISCARD_PILE
-}
-
 export enum CardType {
     CHARACTER = "CHARACTER",
     PLAYABLE = "PLAYABLE",
