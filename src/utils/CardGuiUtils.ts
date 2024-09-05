@@ -1,6 +1,13 @@
-import { AbstractCard, PhysicalCard, TextBox } from "../gamecharacters/PhysicalCard";
+import { AbstractCard, PhysicalCard } from "../gamecharacters/PhysicalCard";
 import { CardType } from "../gamecharacters/Primitives";
-
+import { Label } from 'phaser3-rex-plugins/templates/ui/ui-components.js';
+import 'phaser';
+import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
+declare module 'phaser' {
+  interface Scene {
+    rexUI: RexUIPlugin;
+  }
+}
 export interface CardConfig {
     cardWidth: number;
     cardHeight: number;
@@ -37,61 +44,49 @@ export class CardGuiUtils {
         
         const cardImage = scene.add.image(0, -cardHeight / 4, cardTexture)
             .setDisplaySize(cardWidth / 2, cardHeight / 2);
-        const nameBox = new TextBox({
-            scene: scene,
+
+        const nameLabel = scene.rexUI.add.label({
             x: 0,
             y: cardHeight / 4,
-            width: cardWidth - 10,
-            height: 60,
-            text: data.name,
-            textBoxName: "nameBox:" + data.id,
-            style: { fontSize: '16px', color: '#000', wordWrap: { width: cardWidth - 10 } }
-        });
-        const descBox = new TextBox({
-            scene: scene,
+            width: cardWidth,
+            height: 30,
+            background: scene.rexUI.add.roundRectangle(0, 0, cardWidth, 30, 5, 0xffffff),
+            text: scene.add.text(0, 0, data.name, { fontSize: '16px', color: '#000', wordWrap: { width: cardWidth - 20 } }),
+            space: { left: 10, right: 10, top: 5, bottom: 5 },
+            align: 'center'
+        }).setOrigin(0.5);
+
+        const descLabel = scene.rexUI.add.label({
             x: 0,
             y: cardHeight / 2,
-            width: cardWidth - 10,
+            width: cardWidth,
             height: 60,
-            text: data.description,
-            textBoxName: "descBox:" + data.id,
-            style: {
-                fontSize: '12px',
-                color: '#000',
-                wordWrap: { width: cardWidth - 20 },
-                align: 'center'
-            }
-        });
-        const tooltipBox = new TextBox({
-            scene: scene,
+            background: scene.rexUI.add.roundRectangle(0, 0, cardWidth, 60, 5, 0xffffff),
+            text: scene.add.text(0, 0, data.description, { fontSize: '12px', color: '#000', wordWrap: { width: cardWidth - 20 }, align: 'center' }),
+            space: { left: 10, right: 10, top: 5, bottom: 5 },
+            align: 'center'
+        }).setOrigin(0.5);
+
+        const tooltipLabel = scene.rexUI.add.label({
             x: cardWidth + cardWidth / 2,
             y: 0,
-            width: cardWidth - 10,
+            width: cardWidth,
             height: cardHeight,
-            text: data.tooltip || '',
-            textBoxName: "tooltipBox:" + data.id,
-            style: {
-                fontSize: '12px',
-                color: '#000',
-                wordWrap: { width: cardWidth - 20 },
-                align: 'left'
-            }
-        });
+            background: scene.rexUI.add.roundRectangle(0, 0, cardWidth, cardHeight, 5, 0xffffff),
+            text: scene.add.text(0, 0, data.tooltip || '', { fontSize: '12px', color: '#000', wordWrap: { width: cardWidth - 20 }, align: 'left' }),
+            space: { left: 10, right: 10, top: 10, bottom: 10 },
+            align: 'left'
+        }).setOrigin(0.5);
 
-        // Function to update background sizes
-        const updateBackgrounds = () => {
-            descBox.setSize(cardWidth - 10, descBox.text.height + 20);
-            descBox.setPosition(0, cardHeight / 2 + descBox.text.height / 4);
-            nameBox.setSize(cardWidth - 10, nameBox.text.height + 10);
-            nameBox.setPosition(0, cardHeight / 4);
-            tooltipBox.setSize(cardWidth - 10, tooltipBox.text.height + 20);
-            tooltipBox.setPosition(cardWidth + cardWidth / 2, tooltipBox.text.height / 2);
+        // Function to update label sizes
+        const updateLabelSizes = () => {
+            nameLabel.layout();
+            descLabel.layout();
+            tooltipLabel.layout();
         };
 
-        // Call updateBackgrounds initially
-        updateBackgrounds();
-        descBox.text.on('changedata', updateBackgrounds);
-        tooltipBox.text.on('changedata', updateBackgrounds);
+        // Call updateLabelSizes initially
+        updateLabelSizes();
 
         // Create hidden highlight border
         const highlightBorder = scene.add.rectangle(0, 0, cardWidth + 10, cardHeight + 10, 0xffff00)
@@ -100,10 +95,10 @@ export class CardGuiUtils {
             .setVisible(false)
             .setName('highlightBorder');
 
-        descBox.setVisible(false);
-        tooltipBox.setVisible(false);
+        descLabel.setVisible(false);
+        tooltipLabel.setVisible(false);
         
-        cardContainer.add([cardBackground, cardImage, nameBox.background!!, nameBox.text, tooltipBox.background!!, tooltipBox.text, descBox.background!!, descBox.text, highlightBorder]);
+        cardContainer.add([cardBackground, cardImage, nameLabel, tooltipLabel, descLabel, highlightBorder]);
         cardContainer.setSize(cardWidth, cardHeight);
         cardContainer.setInteractive(new Phaser.Geom.Rectangle(0, 0, cardWidth, cardHeight), Phaser.Geom.Rectangle.Contains);
 
@@ -114,9 +109,9 @@ export class CardGuiUtils {
             container: cardContainer,
             cardBackground: cardBackground,
             cardImage: cardImage,
-            nameBox: nameBox,
-            descBox: descBox,
-            tooltipBox: tooltipBox,
+            nameLabel: nameLabel,
+            descLabel: descLabel,
+            tooltipLabel: tooltipLabel,
             data: data,
             visualTags: []
         });

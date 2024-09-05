@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import GameImageLoader from '../utils/ImageUtils';
 import {  PlayerCharacter, } from '../gamecharacters/CharacterClasses';
-import { AbstractCard,  PhysicalCard, TextBox } from '../gamecharacters/PhysicalCard';
+import { AbstractCard,  PhysicalCard } from '../gamecharacters/PhysicalCard';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 import CampaignScene from './campaign';
 import MapScene from './map';
@@ -10,6 +10,7 @@ import { BattleCardLocation, GameState } from './gamestate';
 import { DeckLogic } from '../rules/decklogic';
 import { ActionManager } from '../utils/ActionManager';
 import { PlayableCard } from '../gamecharacters/AbstractCard';
+import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 
 
 const config = {
@@ -35,10 +36,10 @@ class CombatScene extends Phaser.Scene {
     private drawPile: PhysicalCard | null;
     private discardPile: PhysicalCard | null;
     private encounter!: EncounterData;
-    private combatStatusText!: TextBox;
+    private combatStatusText!: Phaser.GameObjects.Text;
     private lastPerformanceLog: number = 0;
     private frameCount: number = 0;
-    private endTurnButton!: TextBox;
+    private endTurnButton!: Phaser.GameObjects.Text;
     private hoveredCard: PhysicalCard | null = null;
     private maxDepth: number = 1000;
 
@@ -142,7 +143,7 @@ class CombatScene extends Phaser.Scene {
             const gameState = GameState.getInstance();
             const drawPileCount = gameState.combatState.currentDrawPile.length;
             this.drawPile.data.name = (`Draw Pile (${drawPileCount})`);
-            this.drawPile.nameBox.setText(`Draw Pile (${drawPileCount})`);
+            this.drawPile.nameLabel.setText(`Draw Pile (${drawPileCount})`);
         }
     }
 
@@ -151,7 +152,7 @@ class CombatScene extends Phaser.Scene {
             const gameState = GameState.getInstance();
             const discardPileCount = gameState.combatState.currentDiscardPile.length;
             this.discardPile.data.name = (`Discard Pile (${discardPileCount})`);
-            this.discardPile.nameBox.setText(`Discard Pile (${discardPileCount})`);
+            this.discardPile.nameLabel.setText(`Discard Pile (${discardPileCount})`);
         }
     }
     
@@ -223,23 +224,12 @@ class CombatScene extends Phaser.Scene {
         if (this.endTurnButton) {
             this.endTurnButton.setPosition(width * 0.7, config.pileY);
         } else {
-            this.endTurnButton = new TextBox({
-                scene: this,
-                x: width * 0.7,
-                y: config.pileY,
-                width: 120,
-                height: 40,
-                text: 'End Turn',
-                style: {
-                    fontSize: '24px',
-                    color: '#ffffff'
-                },
-                backgroundImage: 'button_background'
-            });
-            this.endTurnButton.background!!.setInteractive({ useHandCursor: true })
-                .on('pointerdown', this.handleEndTurn, this);
-            this.add.existing(this.endTurnButton.background!!);
-            this.add.existing(this.endTurnButton.text);
+            this.endTurnButton = this.add.text(width * 0.7, config.pileY, 'End Turn', {
+                fontSize: '24px',
+                color: '#ffffff'
+            })
+            .setInteractive({ useHandCursor: true })
+            .on('pointerdown', this.handleEndTurn, this);
         }
     }
 
@@ -314,14 +304,10 @@ class CombatScene extends Phaser.Scene {
     createCombatStatusText(): void {
         const x = 400;
         const y = config.gameHeight - 100;
-        this.combatStatusText = new TextBox({
-            scene: this,
-            x: x,
-            y: y,
-            width: 300, // Adjust width as needed
-            height: 50,  // Adjust height as needed
-            text: 'CURRENT COMBAT STATUS',
-            style: { fontSize: '24px', color: '#000', align: 'center' }
+        this.combatStatusText = this.add.text(x, y, 'CURRENT COMBAT STATUS', {
+            fontSize: '24px',
+            color: '#000',
+            align: 'center'
         });
     }
 
@@ -636,7 +622,14 @@ const gameconfig: Phaser.Types.Core.GameConfig = {
         roundPixels:false,
         pixelArt: false
     },
-    scene: [CampaignScene, CombatScene, MapScene]
+    scene: [CampaignScene, CombatScene, MapScene],
+    plugins: {
+        scene: [{
+            key: 'rexUI',
+            plugin: RexUIPlugin,
+            mapping: 'rexUI'
+        }]
+    }
 };
 
 const game = new Phaser.Game(gameconfig);
