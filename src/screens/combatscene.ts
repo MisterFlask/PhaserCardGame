@@ -624,16 +624,16 @@ class CombatScene extends Phaser.Scene {
 
 const gameconfig: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
+    width: 1920,
+    height: 1080,
     scale: {
-        mode: Phaser.Scale.RESIZE,
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
         parent: 'phaser-example',
-        width: '100%',
-        height: '100%',
-        resizeInterval: 1000,
     },
     render: {
         antialias: true,
-        roundPixels:false,
+        roundPixels: false,
         pixelArt: false
     },
     scene: [CampaignScene, CombatScene, MapScene]

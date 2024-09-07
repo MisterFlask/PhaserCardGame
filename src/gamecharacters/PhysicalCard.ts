@@ -50,7 +50,6 @@ export class TextBox {
             this.text.setFontSize(currentFontSize);
             this.text.setWordWrapWidth(width - 10);
         }
-
     }
 
     setPosition(x: number, y: number): void {
@@ -276,22 +275,22 @@ export class PhysicalCard {
         const cardCenterX = this.container.x;
 
         // Set tooltip text
-        this.tooltipBox.setText(this.data.tooltip);
+        this.tooltipBox.setText(this.data.id);
 
         // Calculate tooltip dimensions
-        const padding = 10;
-        const tooltipWidth = this.tooltipBox.text.width + padding * 2;
-        const tooltipHeight = this.tooltipBox.text.height + padding * 2;
+        const padding = 20;
+        const requiredTooltipWidth = this.tooltipBox.text.width + padding * 2;
+        const requiredTooltipHeight = this.tooltipBox.text.height + padding * 2;
 
         // Update tooltip background
-        this.tooltipBox.setSize(tooltipWidth, tooltipHeight);
+        this.tooltipBox.setSize(requiredTooltipWidth, requiredTooltipHeight);
 
         if (cardCenterX > gameWidth / 2) {
             // Card is on the right side, show tooltip on the left
-            this.tooltipBox.setPosition(-cardWidth - tooltipWidth / 2, 0);
+            this.tooltipBox.setPosition(-cardWidth - requiredTooltipWidth / 2, 0);
         } else {
             // Card is on the left side, show tooltip on the right
-            this.tooltipBox.setPosition(cardWidth + tooltipWidth / 2, 0);
+            this.tooltipBox.setPosition(cardWidth + requiredTooltipWidth / 2, 0);
         }
 
         // Play hover sound
@@ -348,7 +347,6 @@ export class PhysicalCard {
 
         this.nameBox.setText(this.data.name);
         this.descBox.setText(this.data.description);
-        this.tooltipBox.setText(this.data.tooltip);
 
         // Check if the texture exists before setting it
         if (this.scene.textures.exists(this.data.portraitName)) {
@@ -395,9 +393,6 @@ export class PhysicalCard {
             const baseCharacter = this.data as BaseCharacter;
             this.hpBox.setText(`${baseCharacter.hitpoints}/${baseCharacter.maxHitpoints}`);
         }
-
-        this.tooltipBox.setText(this.data.id);
-
         this.updateVisualTags();
     }
 
