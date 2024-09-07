@@ -38,11 +38,21 @@ export class DeckLogic {
     console.log('Ending turn');
     const gameState = GameState.getInstance();
     const combatState = gameState.combatState;
+
+    combatState.enemies.forEach(enemy => {
+      for (const intent of enemy.getIntents()) {
+        intent.act();
+      }
+    });
     combatState.currentDiscardPile.push(...combatState.currentHand);
     combatState.currentHand = [];
 
+
     this.drawHandForNewTurn();
   }
+
+
+  
   public drawHandForNewTurn(): AbstractCard[] {
     console.log('Drawing hand for new turn');
     const gameState = GameState.getInstance();

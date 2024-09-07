@@ -1,4 +1,5 @@
 import { AbstractCard } from "./AbstractCard";
+import { AbstractIntent } from "./AbstractIntent";
 
 export class BaseCharacter extends AbstractCard{
     name: string;
@@ -17,6 +18,10 @@ export class BaseCharacter extends AbstractCard{
         this.portraitName = portraitName;
         this.maxHitpoints = maxHitpoints;
         this.hitpoints = maxHitpoints;
+    }
+
+    public generateNewIntents(): AbstractIntent[]{
+        return [];
     }
 }
 
