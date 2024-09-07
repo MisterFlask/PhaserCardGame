@@ -31,3 +31,4 @@ export class AttackIntent extends AbstractIntent {
         ActionManager.getInstance().dealDamage({amount: this.damage, target: this.target});
     }
 }
+

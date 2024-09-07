@@ -109,7 +109,7 @@ export class ActionManager {
         allCards.forEach(card => {
             const intents = card.getIntents();
             intents.forEach(intent => {
-                intent.act(this);
+                intent.act();
             });
         });
     }

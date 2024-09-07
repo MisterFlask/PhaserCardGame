@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import GameImageLoader from '../utils/ImageUtils';
-import {  PlayerCharacter, } from '../gamecharacters/CharacterClasses';
+import { BlackhandClass, DiabolistClass } from '../gamecharacters/playerclasses';
 import { AbstractCard,  PhysicalCard, TextBox } from '../gamecharacters/PhysicalCard';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 import CampaignScene from './campaign';
