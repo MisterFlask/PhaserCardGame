@@ -54,7 +54,6 @@ export default class CampaignScene extends Phaser.Scene {
     }
 
     create = () => {
-        //todo: remove above
         this.createLayout();
         this.createCardSlots();
         this.createCharacterRoster();

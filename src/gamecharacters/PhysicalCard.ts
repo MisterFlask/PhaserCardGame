@@ -1,15 +1,121 @@
 import { AbstractCard } from "./AbstractCard";
 import { BaseCharacter } from "./BaseCharacter"
-import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
+
+export class TextBox {
+    background: Phaser.GameObjects.Rectangle | Phaser.GameObjects.Image | null;
+    text: Phaser.GameObjects.Text;
+    outline: Phaser.GameObjects.Rectangle;
+    textBoxName?: string
+    constructor(params: {
+        scene: Phaser.Scene,
+        x?: number,
+        y?: number,
+        width?: number,
+        height?: number,
+        text?: string,
+        style?: Phaser.Types.GameObjects.Text.TextStyle,
+        backgroundImage?: string,
+        textBoxName?: string
+    }) {
+        const {
+            scene,
+            x = 0,
+            y = 0,
+            width = 100,
+            height = 50,
+            text = '',
+            style = { fontSize: '16px', color: '#000' },
+            backgroundImage,
+            textBoxName
+        } = params;
+        this.textBoxName = textBoxName ?? "anonymousTextBox";
+
+        if (backgroundImage) {
+            this.background = scene.add.image(x, y, backgroundImage).setDisplaySize(width, height);
+        } else {
+            this.background = scene.add.rectangle(x, y, width, height, 0xffffff);
+        }
+        this.outline = scene.add.rectangle(x, y, width, height).setStrokeStyle(2, 0x000000);
+        this.text = scene.add.text(x, y, text, style);
+        this.text.setOrigin(0.5);
+        // Enforce text wrapping within bounds
+        this.text.setWordWrapWidth(width - 2); // Subtract padding
+        this.text.setAlign('center');
+
+        // Adjust text size if it overflows
+        const originalFontSize = parseInt(style.fontSize as string);
+        let currentFontSize = originalFontSize;
+        while ((this.text.height > height - 1 || this.text.width > width - 1) && currentFontSize > 8) { // Minimum font size of 8
+            currentFontSize--;
+            this.text.setFontSize(currentFontSize);
+            this.text.setWordWrapWidth(width - 10);
+        }
+
+    }
+
+    setPosition(x: number, y: number): void {
+        if (this.background === null) {
+            return;
+        }
+        this.background.setPosition(x, y);
+        this.outline.setPosition(x, y);
+        this.text.setPosition(x, y);
+    }
+
+    setSize(width: number, height: number): void {
+        if (this.background === null) {
+            return;
+        }
+        if (this.background instanceof Phaser.GameObjects.Rectangle) {
+            this.background.setSize(width, height);
+        } else {
+            this.background.setDisplaySize(width, height);
+        }
+        this.outline.setSize(width, height);
+    }
+
+    setText(text: string): void {
+        if (this.text.scene === null) {
+            return;
+        }
+        if (this.background == null){
+            return;
+        }
+        if ((this.text.frame as any)?.data) {
+            // we do this because there are circumstances where data is not available
+            // and it crashes the whole game.  Caused by if the container gets
+            // destroyed without the listeners getting destroyed.
+            this.text.setText(text);
+        }else{
+            console.log("text frame data is null for " + this.textBoxName);
+        }
+    }
+
+    setVisible(visible: boolean): void {
+        if (this.background === null) {
+            return;
+        }
+        this.background.setVisible(visible);
+        this.outline.setVisible(visible);
+        this.text.setVisible(visible);
+    }
+    destroy(): void {
+        if (this.background) {
+            this.background.destroy();
+        }
+        this.background = null;
+    }
+}
+import Phaser from 'phaser';
 
 export class PhysicalCard {
     container: Phaser.GameObjects.Container;
     cardBackground: Phaser.GameObjects.Image;
     cardImage: Phaser.GameObjects.Image;
-    nameLabel: RexUIPlugin.Label;
-    descLabel: RexUIPlugin.Label;
-    tooltipLabel: RexUIPlugin.Label;
-    hpLabel: RexUIPlugin.Label | null;
+    nameBox: TextBox;
+    descBox: TextBox;
+    tooltipBox: TextBox;
+    hpBox: TextBox | null;
     data: AbstractCard;
     visualTags: PhysicalCardVisualTag[];
     scene: Phaser.Scene;
@@ -18,15 +124,14 @@ export class PhysicalCard {
     private hoverSound: Phaser.Sound.BaseSound | null = null;
     private cardContent: Phaser.GameObjects.Container;
     private obliterated: boolean = false;
-
     constructor({
         scene,
         container,
         cardBackground,
         cardImage,
-        nameLabel,
-        descLabel,
-        tooltipLabel,
+        nameBox,
+        descBox,
+        tooltipBox,
         data,
         visualTags
     }: {
@@ -34,9 +139,9 @@ export class PhysicalCard {
         container: Phaser.GameObjects.Container;
         cardBackground: Phaser.GameObjects.Image;
         cardImage: Phaser.GameObjects.Image;
-        nameLabel: RexUIPlugin.Label;
-        descLabel: RexUIPlugin.Label;
-        tooltipLabel: RexUIPlugin.Label;
+        nameBox: TextBox;
+        descBox: TextBox;
+        tooltipBox: TextBox;
         data: AbstractCard;
         visualTags: PhysicalCardVisualTag[];
     }) {
@@ -44,39 +149,38 @@ export class PhysicalCard {
         this.container = container;
         this.cardBackground = cardBackground;
         this.cardImage = cardImage;
-        this.nameLabel = nameLabel;
-        this.descLabel = descLabel;
-        this.tooltipLabel = tooltipLabel;
+        this.nameBox = nameBox;
+        this.descBox = descBox;
+        this.tooltipBox = tooltipBox;
         this.data = data;
         this.data.physicalCard = this;
         this.visualTags = [];
 
         // Create a new container for card content (excluding tooltip)
         this.cardContent = this.scene.add.container();
-        this.cardContent.add([this.cardBackground, this.cardImage, this.nameLabel, this.descLabel]);
+        this.cardContent.add([this.cardBackground, this.cardImage, this.nameBox.background!!, this.nameBox.outline, this.nameBox.text, this.descBox.background!!, this.descBox.outline, this.descBox.text]);
         this.container.add(this.cardContent);
 
         // Add tooltip elements directly to the main container
-        this.container.add([this.tooltipLabel]);
+        this.container.add([this.tooltipBox.background!!, this.tooltipBox.outline, this.tooltipBox.text]);
 
-        // Add HP label if the card is a BaseCharacter
+        // Add HP box if the card is a BaseCharacter
         if (this.data instanceof BaseCharacter) {
             const baseCharacter = this.data as BaseCharacter;
             const cardWidth = this.cardBackground.displayWidth;
             const cardHeight = this.cardBackground.displayHeight;
-            this.hpLabel = this.scene.rexUI.add.label({
+            this.hpBox = new TextBox({
+                scene: this.scene,
                 x: cardWidth / 2 - 20,
                 y: -cardHeight / 2 + 20,
                 width: 40,
-                text: scene.add.text(0, 0, `${baseCharacter.hitpoints}/${baseCharacter.maxHitpoints}`, { fontSize: '12px', color: '#000' }),
-                space: { left: 2, right: 2, top: 2, bottom: 2 },
-                align: 'center'
+                height: 20,
+                text: `${baseCharacter.hitpoints}/${baseCharacter.maxHitpoints}`,
+                style: { fontSize: '12px', color: '#000' }
             });
-            if (this.hpLabel!=null){
-                this.cardContent.add(this.hpLabel);
-            }
+            this.cardContent.add([this.hpBox.background!!, this.hpBox.outline, this.hpBox.text]);
         } else {
-            this.hpLabel = null;
+            this.hpBox = null;
         }
 
         // Load the rollover sound if it's not already loaded
@@ -118,11 +222,11 @@ export class PhysicalCard {
         }
 
         // Destroy all TextBox components
-        this.nameLabel.destroy();
-        this.descLabel.destroy();
-        this.tooltipLabel.destroy();
-        if (this.hpLabel) {
-            this.hpLabel.destroy();
+        this.nameBox.destroy();
+        this.descBox.destroy();
+        this.tooltipBox.destroy();
+        if (this.hpBox) {
+            this.hpBox.destroy();
         }
 
         // Destroy the card image
@@ -162,8 +266,8 @@ export class PhysicalCard {
         }
         console.log(`Pointer over card: ${this.data.name}`);
         this.cardContent.setScale(this.data.size * 1.1);
-        this.descLabel.setVisible(true);
-        this.tooltipLabel.setVisible(true);
+        this.descBox.setVisible(true);
+        this.tooltipBox.setVisible(true);
         this.container.setDepth(1000);
 
         // Determine tooltip position based on card's position
@@ -172,22 +276,22 @@ export class PhysicalCard {
         const cardCenterX = this.container.x;
 
         // Set tooltip text
-        this.tooltipLabel.text = this.data.tooltip;
+        this.tooltipBox.setText(this.data.tooltip);
 
         // Calculate tooltip dimensions
         const padding = 10;
-        const tooltipWidth = this.tooltipLabel.width + padding * 2;
-        const tooltipHeight = this.tooltipLabel.height + padding * 2;
+        const tooltipWidth = this.tooltipBox.text.width + padding * 2;
+        const tooltipHeight = this.tooltipBox.text.height + padding * 2;
 
         // Update tooltip background
-        this.tooltipLabel.setSize(tooltipWidth, tooltipHeight);
+        this.tooltipBox.setSize(tooltipWidth, tooltipHeight);
 
         if (cardCenterX > gameWidth / 2) {
             // Card is on the right side, show tooltip on the left
-            this.tooltipLabel.setPosition(-cardWidth - tooltipWidth / 2, 0);
+            this.tooltipBox.setPosition(-cardWidth - tooltipWidth / 2, 0);
         } else {
             // Card is on the left side, show tooltip on the right
-            this.tooltipLabel.setPosition(cardWidth + tooltipWidth / 2, 0);
+            this.tooltipBox.setPosition(cardWidth + tooltipWidth / 2, 0);
         }
 
         // Play hover sound
@@ -216,8 +320,8 @@ export class PhysicalCard {
         }
         console.log(`Pointer out card: ${this.data.name}`);
         this.cardContent.setScale(this.data.size);
-        this.descLabel.setVisible(false);
-        this.tooltipLabel.setVisible(false);
+        this.descBox.setVisible(false);
+        this.tooltipBox.setVisible(false);
         this.container.setDepth(0);
 
         // Stop wiggle animation if it's still running
@@ -242,12 +346,13 @@ export class PhysicalCard {
             return;
         }
 
-        this.nameLabel.text = this.data.name;
-        this.descLabel.text = this.data.description;
-        this.tooltipLabel.text = this.data.tooltip;
+        this.nameBox.setText(this.data.name);
+        this.descBox.setText(this.data.description);
+        this.tooltipBox.setText(this.data.tooltip);
 
         // Check if the texture exists before setting it
         if (this.scene.textures.exists(this.data.portraitName)) {
+            
             // Maintain aspect ratio
             const texture = this.scene.textures.get(this.data.portraitName);
             texture.setFilter(Phaser.Textures.LINEAR);
@@ -277,13 +382,21 @@ export class PhysicalCard {
             // this.cardImage.setTexture('fallback_texture'); // Ensure you have a fallback texture
         }
 
-        // Update HP label if it exists
-        if (this.hpLabel && this.data instanceof BaseCharacter) {
+        // Position nameBox just below the portraitBox
+        const nameBoxY = this.cardImage.y + this.cardImage.displayHeight / 2 + this.nameBox.background!!.displayHeight / 2;
+        this.nameBox.setPosition(0, nameBoxY);
+
+        // Position descBox just below the nameBox
+        const descBoxY = nameBoxY + this.nameBox.background!!.displayHeight / 2 + this.descBox.background!!.displayHeight / 2;
+        this.descBox.setPosition(0, descBoxY);
+
+        // Update HP box if it exists
+        if (this.hpBox && this.data instanceof BaseCharacter) {
             const baseCharacter = this.data as BaseCharacter;
-            this.hpLabel.text = `${baseCharacter.hitpoints}/${baseCharacter.maxHitpoints}`;
+            this.hpBox.setText(`${baseCharacter.hitpoints}/${baseCharacter.maxHitpoints}`);
         }
 
-        this.tooltipLabel.text = this.data.id;
+        this.tooltipBox.setText(this.data.id);
 
         this.updateVisualTags();
     }
