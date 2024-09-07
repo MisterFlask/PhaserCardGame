@@ -1,5 +1,7 @@
 import { AbstractCard } from "./AbstractCard";
 import { BaseCharacter } from "./BaseCharacter"
+import { AbstractIntent } from "./AbstractIntent";
+import { PhysicalIntent } from "./PhysicalIntent";
 
 export class TextBox {
     background: Phaser.GameObjects.Rectangle | Phaser.GameObjects.Image | null;
@@ -123,6 +125,9 @@ export class PhysicalCard {
     private hoverSound: Phaser.Sound.BaseSound | null = null;
     private cardContent: Phaser.GameObjects.Container;
     private obliterated: boolean = false;
+    private physicalIntents: Map<string, PhysicalIntent> = new Map();
+    private intentsContainer: Phaser.GameObjects.Container;
+
     constructor({
         scene,
         container,
@@ -198,10 +203,15 @@ export class PhysicalCard {
             this.hoverSound = this.scene.sound.add('rollover6');
         }
 
+        // Create a new container for intents
+        this.intentsContainer = this.scene.add.container(0, -this.cardBackground.displayHeight / 2 - 30);
+        this.cardContent.add(this.intentsContainer);
+
         this.updateVisuals();
         this.scene.events.on('update', this.updateVisuals, this);
         this.setupInteractivity();
         this.applyCardSize();
+        this.updateIntents();
     }
 
     obliterate(): void {
@@ -394,6 +404,7 @@ export class PhysicalCard {
             this.hpBox.setText(`${baseCharacter.hitpoints}/${baseCharacter.maxHitpoints}`);
         }
         this.updateVisualTags();
+        this.updateIntents();
     }
 
     addVisualTag(tag: PhysicalCardVisualTag): void {
@@ -419,6 +430,48 @@ export class PhysicalCard {
         });
     }
 
+    updateIntents(): void {
+        const currentIntents = this.data.getIntents();
+        const currentIntentIds = new Set(currentIntents.map(intent => intent.id));
+
+        // Remove PhysicalIntents that are no longer needed
+        this.physicalIntents.forEach((physicalIntent, id) => {
+            if (!currentIntentIds.has(id)) {
+                physicalIntent.destroy();
+                this.physicalIntents.delete(id);
+            }
+        });
+
+        // Add or update PhysicalIntents
+        currentIntents.forEach((intent) => {
+            let physicalIntent = this.physicalIntents.get(intent.id);
+            if (!physicalIntent) {
+                physicalIntent = new PhysicalIntent(this.scene, intent, 0, 0);
+                this.physicalIntents.set(intent.id, physicalIntent);
+                this.intentsContainer.add(physicalIntent.getContainer());
+            } else {
+                physicalIntent.updateIntent(intent);
+            }
+        });
+
+        this.layoutIntents();
+    }
+
+    layoutIntents(): void {
+        const intents = Array.from(this.physicalIntents.values());
+        const spacing = 10;
+        let currentX = 0;
+
+        intents.forEach((physicalIntent, index) => {
+            const intentContainer = physicalIntent.getContainer();
+            intentContainer.setPosition(currentX, 0);
+            currentX += intentContainer.width + spacing;
+        });
+
+        // Center the intents container
+        this.intentsContainer.setPosition(-currentX / 2, this.intentsContainer.y);
+    }
+
     destroy(): void {
         this.scene.events.off('update', this.updateVisuals, this);
         if (this.wiggleTween) {
@@ -441,3 +494,5 @@ export abstract class AbstractCardVisualTag {
 }
 
 export { AbstractCard };
+
+

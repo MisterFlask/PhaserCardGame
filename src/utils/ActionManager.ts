@@ -1,10 +1,12 @@
 import { StoreCard } from '../screens/campaign';
 import { BaseCharacter } from "../gamecharacters/BaseCharacter"
-import { AbstractCard } from '../gamecharacters/PhysicalCard';
+import { AbstractCard, PhysicalCard } from '../gamecharacters/PhysicalCard';
+import { AbstractIntent } from "../gamecharacters/AbstractIntent";
 
 export class ActionManager {
     private static instance: ActionManager;
     private actionQueue: ActionQueue;
+    private intents: AbstractIntent[] = [];
 
     private constructor() {
         this.actionQueue = new ActionQueue();
@@ -23,6 +25,37 @@ export class ActionManager {
         this.actionQueue.addAction(new WaitAction(100));
     }
 
+    
+    private animateCardDamage(physicalCardOfTarget: PhysicalCard): Promise<void> {
+        return new Promise<void>((resolve) => {
+            // Shake the card
+            const originalX = physicalCardOfTarget.container.x;
+            const shakeDistance = 5;
+            const shakeDuration = 50;
+            const shakeCount = 3;
+
+            let currentShake = 0;
+            const shakeInterval = setInterval(() => {
+                if (currentShake >= shakeCount * 2) {
+                    clearInterval(shakeInterval);
+                    physicalCardOfTarget.container.x = originalX;
+                } else {
+                    physicalCardOfTarget.container.x += (currentShake % 2 === 0) ? shakeDistance : -shakeDistance;
+                    currentShake++;
+                }
+            }, shakeDuration);
+
+            // Flicker the card red
+            const originalTint = physicalCardOfTarget.cardBackground.tint;
+            physicalCardOfTarget.cardBackground.setTint(0xff0000);
+            
+            setTimeout(() => {
+                physicalCardOfTarget.cardBackground.setTint(originalTint);
+                resolve();
+            }, 300);
+        });
+    }
+
     public dealDamage = ({
         amount,
         target,
@@ -34,46 +67,24 @@ export class ActionManager {
         sourceCharacter?: BaseCharacter,
         sourceCard?: AbstractCard
     }): void => {
-        const physicalCardOfTarget = target.physicalCard;
+        const physicalCardOfTarget = target.physicalCard as PhysicalCard;
         if (!physicalCardOfTarget) {
             return;
         }
 
-            if (physicalCardOfTarget) {
-                const shakeAndFlickerAction = new GenericAction(() => {
-                    return new Promise<GameAction[]>((resolve) => {
-                        // Shake the card
-                        const originalX = physicalCardOfTarget.container.x;
-                        const shakeDistance = 5;
-                        const shakeDuration = 50;
-                        const shakeCount = 3;
-
-                        let currentShake = 0;
-                        const shakeInterval = setInterval(() => {
-                            if (currentShake >= shakeCount * 2) {
-                                clearInterval(shakeInterval);
-                                physicalCardOfTarget.container.x = originalX;
-                            } else {
-                                physicalCardOfTarget.container.x += (currentShake % 2 === 0) ? shakeDistance : -shakeDistance;
-                                currentShake++;
-                            }
-                        }, shakeDuration);
-
-                        // Flicker the card red
-                        const originalTint = physicalCardOfTarget.cardBackground.tint;
-                        physicalCardOfTarget.cardBackground.setTint(0xff0000);
-                        
-                        setTimeout(() => {
-                            physicalCardOfTarget.cardBackground.setTint(originalTint);
-                            resolve([]);
-                        }, 300);
-                    });
-                });
+        if (physicalCardOfTarget) {
+            const damageAction = new GenericAction(async () => {
+                await this.animateCardDamage(physicalCardOfTarget);
                 
-                this.actionQueue.addAction(shakeAndFlickerAction);
-            }
+                if (target instanceof BaseCharacter) {
+                    target.hitpoints = Math.max(0, target.hitpoints - amount);
+                }
+
+                return [];
+            });
             
-            // TODO: Implement actual damage logic here
+            this.actionQueue.addAction(damageAction);
+        }
     }
 
     public purchaseShopItem(item: StoreCard): void {
@@ -85,6 +96,22 @@ export class ActionManager {
 
     public async resolveActions(): Promise<void> {
         await this.actionQueue.resolveActions();
+    }
+
+    addIntent(intent: AbstractIntent): void {
+        this.intents.push(intent);
+    }
+
+    executeIntents(): void {
+        const gameState = GameState.getInstance();
+        const allCards = [...gameState.combatState.playerCharacters, ...gameState.combatState.enemies];
+        
+        allCards.forEach(card => {
+            const intents = card.getIntents();
+            intents.forEach(intent => {
+                intent.act(this);
+            });
+        });
     }
 }
 

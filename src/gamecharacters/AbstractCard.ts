@@ -1,4 +1,5 @@
 import { CardType, CardSize } from "./Primitives";
+import { AbstractIntent } from "./AbstractIntent";
 
 
 export interface IPhysicalCardInterface {
@@ -63,8 +64,7 @@ function generateWordGuid(): string {
     return `${word1} ${word2} ${word3} ${seedNumber}`;
 }
 
-export class AbstractCard {
-    
+export abstract class AbstractCard {
     public name: string
     public description: string
     public portraitName: string
@@ -95,6 +95,18 @@ export class AbstractCard {
         Object.assign(copy, this);
         copy.id = generateWordGuid();
         return copy;
+    }
+
+    getIntents(): AbstractIntent[] {
+        return [];
+    }
+}
+
+// dummy card implementation for ui elements that look like cards but are not playable
+export class UiCard extends AbstractCard{
+
+    constructor({ name, description, portraitName, cardType, tooltip, size }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, size?: CardSize }) {
+        super({ name:name, description:description, portraitName:portraitName, cardType:cardType, tooltip:tooltip, size:size });
     }
 }
 

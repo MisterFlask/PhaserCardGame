@@ -1,3 +1,4 @@
+import { BaseCharacter } from '../gamecharacters/BaseCharacter';
 import { PlayerCharacter } from '../gamecharacters/CharacterClasses';
 import { AbstractCard } from '../gamecharacters/PhysicalCard';
 import { StoreCard } from './campaign';
@@ -115,6 +116,9 @@ export class CombatState{
     currentDiscardPile: AbstractCard[] = []
     currentHand: AbstractCard[] = []
 
+    enemies: BaseCharacter[] = []
+    playerCharacters: BaseCharacter[] = []
+    
     getBattleCardLocation = (cardId: string): BattleCardLocation => {
         if (this.currentDrawPile.some(c => c.id === cardId)) return BattleCardLocation.DrawPile
         if (this.currentDiscardPile.some(c => c.id === cardId)) return BattleCardLocation.DiscardPile

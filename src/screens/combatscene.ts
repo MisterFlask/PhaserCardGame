@@ -9,7 +9,7 @@ import { EncounterData } from '../encounters/encounters';
 import { BattleCardLocation, GameState } from './gamestate';
 import { DeckLogic } from '../rules/decklogic';
 import { ActionManager } from '../utils/ActionManager';
-import { PlayableCard } from '../gamecharacters/AbstractCard';
+import { PlayableCard, UiCard } from '../gamecharacters/AbstractCard';
 
 
 const config = {
@@ -298,7 +298,7 @@ class CombatScene extends Phaser.Scene {
             scene: this,
             x: 100,
             y: pileY,
-            data: new AbstractCard({ name: 'Draw Pile (' + 0 + ')', description: 'Cards to draw', portraitName: "drawpile" }),
+            data: new UiCard({ name: 'Draw Pile (' + 0 + ')', description: 'Cards to draw', portraitName: "drawpile" }),
             eventCallback: ()=>{}
         });
 
@@ -307,7 +307,7 @@ class CombatScene extends Phaser.Scene {
             scene: this,
             x: 0,
             y: 0,
-            data: new AbstractCard({ name: 'Discard Pile (' + 0 + ')', description: 'Discarded cards', portraitName: "discardpile" }),
+            data: new UiCard({ name: 'Discard Pile (' + 0 + ')', description: 'Discarded cards', portraitName: "discardpile" }),
             eventCallback: ()=>{}
         });
     }
