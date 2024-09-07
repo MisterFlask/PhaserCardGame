@@ -10,6 +10,7 @@ import { BattleCardLocation, GameState } from './gamestate';
 import { DeckLogic } from '../rules/decklogic';
 import { ActionManager } from '../utils/ActionManager';
 import { PlayableCard, UiCard } from '../gamecharacters/AbstractCard';
+import { AutomatedCharacter } from '../gamecharacters/CharacterClasses';
 
 
 const config = {
@@ -88,9 +89,9 @@ class CombatScene extends Phaser.Scene {
     create(): void {
         this.createOrUpdateGameAreas();
         this.createPlayerHand();
-        this.createEnemyCards();
         this.setupEventListeners();
         this.createPlayerUnits();
+        this.createEnemyCards();
         this.createMenu();
         this.createDrawAndDiscardPiles();
         this.createCombatStatusText();
@@ -335,6 +336,9 @@ class CombatScene extends Phaser.Scene {
                     data: enemy,
                     eventCallback: ()=>{}
                 });
+                if (enemyCard.data instanceof AutomatedCharacter) {
+                    enemyCard.data.setNewIntents();
+                }
                 enemyCard.container.setDepth(1);
                 this.enemyUnits.push(enemyCard);
             });

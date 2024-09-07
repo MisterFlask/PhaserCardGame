@@ -44,6 +44,8 @@ export class DeckLogic {
         intent.act();
       }
     });
+
+    
     combatState.currentDiscardPile.push(...combatState.currentHand);
     combatState.currentHand = [];
 

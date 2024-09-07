@@ -1,9 +1,9 @@
 import { ActionManager } from "../utils/ActionManager"
 import { AbstractCard, PlayableCard } from "./AbstractCard"
 import { BaseCharacter } from "./BaseCharacter"
-import { EnemyCharacter, BaseCharacterClass } from "./CharacterClasses"
+import { AutomatedCharacter, BaseCharacterClass } from "./CharacterClasses"
 
-export class GoblinCharacter extends EnemyCharacter {
+export class GoblinCharacter extends AutomatedCharacter {
     constructor() {
         super({ name: "Goblin", portraitName: "flamer1", maxHitpoints: 10, description: "A small, mischievous creature" })
     }
@@ -38,7 +38,7 @@ export class ArcaneRitualCard extends PlayableCard {
     }
 
     IsPerformableOn = (targetCard: AbstractCard): boolean => {
-        return targetCard instanceof EnemyCharacter;
+        return targetCard instanceof AutomatedCharacter;
     }
 
     InvokeCardEffects = (targetCard?: AbstractCard): void => {
@@ -61,7 +61,7 @@ export class FireballCard extends AbstractCard {
     }
 
     IsPerformableOn = (targetCard: AbstractCard): boolean => {
-        return targetCard instanceof EnemyCharacter;
+        return targetCard instanceof AutomatedCharacter;
     }
 
     InvokeCardEffects = (targetCard?: AbstractCard): void => {

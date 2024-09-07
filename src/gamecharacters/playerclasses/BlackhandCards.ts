@@ -1,6 +1,6 @@
 import { AbstractCard, PlayableCard } from "../AbstractCard";
 import { BaseCharacter } from "../BaseCharacter";
-import { EnemyCharacter } from "../CharacterClasses";
+import { AutomatedCharacter } from "../CharacterClasses";
 import { ActionManager } from "../../utils/ActionManager";
 
 export class FireballCard extends AbstractCard {
@@ -13,7 +13,7 @@ export class FireballCard extends AbstractCard {
     }
 
     IsPerformableOn = (targetCard: AbstractCard): boolean => {
-        return targetCard instanceof EnemyCharacter;
+        return targetCard instanceof AutomatedCharacter;
     }
 
     InvokeCardEffects = (targetCard?: AbstractCard): void => {

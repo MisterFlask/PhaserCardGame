@@ -1,27 +1,40 @@
-import { EnemyCharacter } from '../gamecharacters/CharacterClasses';
+import { AbstractIntent, AttackIntent } from '../gamecharacters/AbstractIntent';
+import { AutomatedCharacter } from '../gamecharacters/CharacterClasses';
 import { GoblinCharacter } from '../gamecharacters/SpecificClasses';
 
 // Define new character classes
-export class ClockworkAbomination extends EnemyCharacter {
+export class ClockworkAbomination extends AutomatedCharacter {
     constructor() {
         super({ name: 'Clockwork Abomination', portraitName: 'Clockwork Abomination', maxHitpoints: 30, description: 'A fierce orc warrior' });
     }
-}
-
-export class BaconBeast extends EnemyCharacter {
-    constructor() {
-        super({ name: 'Breakfast Nightmares Bacon Beast', portraitName: 'Breakfast Nightmares Bacon Beast', maxHitpoints: 25, description: 'A cunning dark elf assassin' });
+    
+    override generateNewIntents(): AbstractIntent[] {
+        return [ new AttackIntent({ damage: 5, owner: this }) ]
     }
 }
 
-export class BloodManipulationSlime extends EnemyCharacter {
+export class BaconBeast extends AutomatedCharacter {
+    constructor() {
+        super({ name: 'Breakfast Nightmares Bacon Beast', portraitName: 'Breakfast Nightmares Bacon Beast', maxHitpoints: 25, description: 'A cunning dark elf assassin' });
+    }
+    
+    override generateNewIntents(): AbstractIntent[] {
+        return [ new AttackIntent({ damage: 6, owner: this }) ]
+    }
+}
+
+export class BloodManipulationSlime extends AutomatedCharacter {
     constructor() {
         super({ name: 'Blood Manipulation Slime', portraitName: 'Blood Manipulation Slime', maxHitpoints: 20, description: 'A reanimated skeleton warrior' });
+    }
+    
+    override generateNewIntents(): AbstractIntent[] {
+        return [ new AttackIntent({ damage: 10, owner: this }) ]
     }
 }
 
 export interface EncounterData {
-    enemies: EnemyCharacter[];
+    enemies: AutomatedCharacter[];
     difficulty: string;
     rewardXP: number;
     specialConditions?: string[];

@@ -20,8 +20,8 @@ export class BaseCharacter extends AbstractCard{
         this.hitpoints = maxHitpoints;
     }
 
-    public generateNewIntents(): AbstractIntent[]{
-        return [];
+    public getDamageModifier(): number{
+        return 0;
     }
 }
 
