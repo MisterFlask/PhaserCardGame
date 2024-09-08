@@ -20,7 +20,7 @@ export class PhysicalIntent {
         this.image = this.scene.add.image(0, 0, intent.imageName);
         this.image.setDisplaySize(PhysicalIntent.WIDTH, PhysicalIntent.HEIGHT);
         
-        this.text = this.scene.add.text(0, PhysicalIntent.HEIGHT / 2 + 5, intent.displayText, { fontSize: '12px', color: '#ffffff' });
+        this.text = this.scene.add.text(0, PhysicalIntent.HEIGHT / 2, intent.displayText, { fontSize: '30px', color: '#ffffff' });
         this.text.setOrigin(0.5);
         
         this.container.add([this.image, this.text]);
