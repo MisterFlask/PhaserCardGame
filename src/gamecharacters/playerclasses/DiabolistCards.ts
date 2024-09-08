@@ -1,8 +1,7 @@
 import { AbstractCard, PlayableCard } from "../AbstractCard";
 import { BaseCharacter } from "../BaseCharacter";
-import { AutomatedCharacter } from "../CharacterClasses";
 import { ActionManager } from "../../utils/ActionManager";
-
+import { AutomatedCharacter } from "../AutomatedCharacter";
 export class ArcaneRitualCard extends PlayableCard {
     constructor() {
         super({

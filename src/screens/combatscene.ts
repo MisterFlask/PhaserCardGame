@@ -10,7 +10,9 @@ import { BattleCardLocation, GameState } from './gamestate';
 import { DeckLogic } from '../rules/decklogic';
 import { ActionManager } from '../utils/ActionManager';
 import { PlayableCard, UiCard } from '../gamecharacters/AbstractCard';
-import { AutomatedCharacter } from '../gamecharacters/CharacterClasses';
+import { BaseCharacter } from '../gamecharacters/BaseCharacter';
+import { AutomatedCharacter } from '../gamecharacters/AutomatedCharacter';
+import { CombatRules } from '../rules/combatrules';
 
 
 const config = {
@@ -80,6 +82,8 @@ class CombatScene extends Phaser.Scene {
             (unit as any).isPlayerUnit = true;
             this.playerUnits.push(unit);
         });
+
+        GameState.getInstance().combatState.playerCharacters = this.playerUnits.map(card => card.data as BaseCharacter);
     }
 
     preload(): void {
@@ -112,8 +116,9 @@ class CombatScene extends Phaser.Scene {
 
 
     private handleEndTurn(): void {
-        DeckLogic.getInstance().endTurn();
         console.log('End turn button clicked');
+
+        CombatRules.endTurn();
     }
 
 
@@ -327,6 +332,7 @@ class CombatScene extends Phaser.Scene {
     }
 
     createEnemyCards(): void {
+        GameState.getInstance().combatState.enemies = this.encounter.enemies
         if (this.encounter && this.encounter.enemies) {
             this.encounter.enemies.forEach((enemy, index) => {
                 const enemyCard = CardGuiUtils.getInstance().createCard({
@@ -336,8 +342,8 @@ class CombatScene extends Phaser.Scene {
                     data: enemy,
                     eventCallback: ()=>{}
                 });
-                if (enemyCard.data instanceof AutomatedCharacter) {
-                    enemyCard.data.setNewIntents();
+                if (enemy instanceof AutomatedCharacter) {
+                    enemy.setNewIntents();
                 }
                 enemyCard.container.setDepth(1);
                 this.enemyUnits.push(enemyCard);
@@ -460,10 +466,12 @@ class CombatScene extends Phaser.Scene {
     }
 
     handleCardInteraction(usedCard: PhysicalCard, targetCard: PhysicalCard): void {
+        
         if (usedCard.data !instanceof PlayableCard) {
             console.log("Used card is not a PlayableCard");
             return;
         }
+
         const usedPlayableCard = usedCard.data as PlayableCard;
 
         if (usedPlayableCard.IsPerformableOn(targetCard.data)) {

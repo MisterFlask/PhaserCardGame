@@ -2,6 +2,7 @@ import { AbstractCard } from "./AbstractCard";
 import { BaseCharacter } from "./BaseCharacter"
 import { AbstractIntent } from "./AbstractIntent";
 import { PhysicalIntent } from "./PhysicalIntent";
+import { safeStringify } from '../utils/JsonUtils';
 
 export class TextBox {
     background: Phaser.GameObjects.Rectangle | Phaser.GameObjects.Image | null;
@@ -108,6 +109,7 @@ export class TextBox {
     }
 }
 import Phaser from 'phaser';
+import { AutomatedCharacter } from "./AutomatedCharacter";
 
 export class PhysicalCard {
     container: Phaser.GameObjects.Container;
@@ -127,6 +129,7 @@ export class PhysicalCard {
     private obliterated: boolean = false;
     private physicalIntents: Map<string, PhysicalIntent> = new Map();
     private intentsContainer: Phaser.GameObjects.Container;
+    private jsonModal: Phaser.GameObjects.Container | null = null;
 
     constructor({
         scene,
@@ -266,7 +269,8 @@ export class PhysicalCard {
     setupInteractivity(): void {
         this.container.setInteractive()
             .on('pointerover', this.onPointerOver_PhysicalCard, this)
-            .on('pointerout', this.onPointerOut_PhysicalCard, this);
+            .on('pointerout', this.onPointerOut_PhysicalCard, this)
+            .on('pointerdown', this.onPointerDown_PhysicalCard, this);
     }
 
     onPointerOver_PhysicalCard = (): void => {
@@ -339,6 +343,53 @@ export class PhysicalCard {
             this.wiggleTween = null;
             this.cardContent.setAngle(0);
         }
+    }
+
+    onPointerDown_PhysicalCard = (): void => {
+        if (this.obliterated) {
+            return;
+        }
+        console.log(`Clicked on card: ${this.data.name}`);
+        const jsonData = this.data.createJsonRepresentation();
+        this.showJsonModal(jsonData);
+    }
+
+    showJsonModal(jsonData: string): void {
+        if (this.jsonModal) {
+            this.jsonModal.destroy();
+        }
+
+        const modalWidth = this.scene.scale.width * 0.8;
+        const modalHeight = this.scene.scale.height * 0.8;
+
+        const background = this.scene.add.rectangle(0, 0, modalWidth, modalHeight, 0x000000, 0.8);
+        const text = this.scene.add.text(0, 0, jsonData, {
+            fontSize: '16px',
+            color: '#ffffff',
+            wordWrap: { width: modalWidth - 40 }
+        });
+
+        this.jsonModal = this.scene.add.container(
+            this.scene.scale.width / 2,
+            this.scene.scale.height / 2,
+            [background, text]
+        );
+
+        text.setPosition(-modalWidth / 2 + 20, -modalHeight / 2 + 20);
+
+        const closeButton = this.scene.add.text(modalWidth / 2 - 40, -modalHeight / 2 + 10, 'Close', {
+            fontSize: '20px',
+            color: '#ffffff'
+        }).setInteractive();
+
+        closeButton.on('pointerdown', () => {
+            if (this.jsonModal) {
+                this.jsonModal.destroy();
+                this.jsonModal = null;
+            }
+        });
+
+        this.jsonModal.add(closeButton);
     }
 
     updateVisuals(): void {
@@ -431,8 +482,12 @@ export class PhysicalCard {
     }
 
     updateIntents(): void {
-        const currentIntents = this.data.getIntents();
-        const currentIntentIds = new Set(currentIntents.map(intent => intent.id));
+        if (!(this.data instanceof AutomatedCharacter)) {
+            return;
+        }
+        var autoChar = this.data as AutomatedCharacter;
+        const currentIntents = autoChar.intents;
+        const currentIntentIds = new Set(currentIntents.map((intent: AbstractIntent) => intent.id));
 
         // Remove PhysicalIntents that are no longer needed
         this.physicalIntents.forEach((physicalIntent, id) => {
@@ -443,7 +498,7 @@ export class PhysicalCard {
         });
 
         // Add or update PhysicalIntents
-        currentIntents.forEach((intent) => {
+        currentIntents.forEach((intent: AbstractIntent) => {
             let physicalIntent = this.physicalIntents.get(intent.id);
             if (!physicalIntent) {
                 physicalIntent = new PhysicalIntent(this.scene, intent, 0, 0);
@@ -494,5 +549,7 @@ export abstract class AbstractCardVisualTag {
 }
 
 export { AbstractCard };
+
+
 
 

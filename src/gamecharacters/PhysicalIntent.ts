@@ -25,7 +25,7 @@ export class PhysicalIntent {
         
         this.container.add([this.image, this.text]);
         
-        this.setupTooltip();
+        //this.setupTooltip();
         this.update();
     }
 
@@ -62,5 +62,13 @@ export class PhysicalIntent {
 
     getContainer(): Phaser.GameObjects.Container {
         return this.container;
+    }
+
+    createJsonRepresentation(): string {
+        return JSON.stringify({
+            className: this.constructor.name,
+            intent: JSON.parse(this.intent.createJsonRepresentation()),
+            // Add any other relevant properties
+        }, null, 2);
     }
 }

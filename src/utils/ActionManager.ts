@@ -6,7 +6,7 @@ import { AbstractIntent } from "../gamecharacters/AbstractIntent";
 export class ActionManager {
     private static instance: ActionManager;
     private actionQueue: ActionQueue;
-    private intents: AbstractIntent[] = [];
+
 
     private constructor() {
         this.actionQueue = new ActionQueue();
@@ -98,21 +98,6 @@ export class ActionManager {
         await this.actionQueue.resolveActions();
     }
 
-    addIntent(intent: AbstractIntent): void {
-        this.intents.push(intent);
-    }
-
-    executeIntents(): void {
-        const gameState = GameState.getInstance();
-        const allCards = [...gameState.combatState.playerCharacters, ...gameState.combatState.enemies];
-        
-        allCards.forEach(card => {
-            const intents = card.getIntents();
-            intents.forEach(intent => {
-                intent.act();
-            });
-        });
-    }
 }
 
 

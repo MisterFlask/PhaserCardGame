@@ -1,7 +1,7 @@
 export default class GameImageLoader {
     // Nested object containing categories with file prefix and an array of image filenames
     private readonly images = {
-        backgrounds: {
+        map_backgrounds: {
             prefix: 'Sprites/MapBackgrounds/',
             files: [
                 'bw_hell_bazaar.png',
@@ -10,6 +10,10 @@ export default class GameImageLoader {
                 'ironlordbyron_a_fantasy_map_of_Hell_879ffbb3-754f-4c86-9688-adc2dff6495e.png',
                 'ironlordbyron_a_grand_but_blighted_landscape_of_Hell_abstract_a_1848e563-4e0f-4305-bb30-2157d516128d.png'
             ]
+        },
+        backgrounds: {
+            prefix: 'Backgrounds/',
+            files: ['greyscale.png', 'mapbackground1.png', 'vintage_brown.png', 'battleback1.png']
         },
         characters: {
             prefix: 'Portraits/BlackhandPortraits/',

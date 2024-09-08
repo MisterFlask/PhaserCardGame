@@ -1,6 +1,6 @@
 import { CardType, CardSize } from "./Primitives";
 import { AbstractIntent } from "./AbstractIntent";
-
+import { JsonRepresentable } from '../interfaces/JsonRepresentable';
 
 export interface IPhysicalCardInterface {
     container: Phaser.GameObjects.Container;
@@ -64,7 +64,7 @@ function generateWordGuid(): string {
     return `${word1} ${word2} ${word3} ${seedNumber}`;
 }
 
-export abstract class AbstractCard {
+export abstract class AbstractCard implements JsonRepresentable {
     public name: string
     public description: string
     public portraitName: string
@@ -96,9 +96,18 @@ export abstract class AbstractCard {
         copy.id = generateWordGuid();
         return copy;
     }
-
-    getIntents(): AbstractIntent[] {
-        return [];
+    
+    createJsonRepresentation(): string {
+        return JSON.stringify({
+            className: this.constructor.name,
+            id: this.id,
+            name: this.name,
+            description: this.description,
+            portraitName: this.portraitName,
+            size: this.size,
+            cardType: this.cardType,
+            tooltip: this.tooltip,
+        }, null, 2);
     }
 }
 

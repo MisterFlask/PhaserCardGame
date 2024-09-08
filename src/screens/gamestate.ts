@@ -1,3 +1,4 @@
+import { AutomatedCharacter } from '../gamecharacters/AutomatedCharacter';
 import { BaseCharacter } from '../gamecharacters/BaseCharacter';
 import { PlayerCharacter } from '../gamecharacters/CharacterClasses';
 import { AbstractCard } from '../gamecharacters/PhysicalCard';
@@ -116,7 +117,7 @@ export class CombatState{
     currentDiscardPile: AbstractCard[] = []
     currentHand: AbstractCard[] = []
 
-    enemies: BaseCharacter[] = []
+    enemies: AutomatedCharacter[] = []
     playerCharacters: BaseCharacter[] = []
     
     getBattleCardLocation = (cardId: string): BattleCardLocation => {

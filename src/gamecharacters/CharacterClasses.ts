@@ -39,22 +39,3 @@ export class PlayerCharacter extends BaseCharacter {
     }
 }
 
-// represents a character that is controlled by the game, not the player.
-// generally enemies.
-export class AutomatedCharacter extends BaseCharacter {
-    intents: AbstractIntent[] = [];
-    constructor({ name, portraitName, description, maxHitpoints }
-        : {name: string; portraitName: string; description?: string; maxHitpoints: number}) {
-        super({ name: name, portraitName: portraitName, maxHitpoints: maxHitpoints, description: description })
-    }
-
-
-    public setNewIntents(){
-        this.intents = this.generateNewIntents();
-    }
-
-    public generateNewIntents(): AbstractIntent[]{
-        return [];
-    }
-}
-

@@ -1,11 +1,16 @@
 import { ActionManager } from "../utils/ActionManager"
 import { AbstractCard, PlayableCard } from "./AbstractCard"
+import { AbstractIntent, AttackIntent } from "./AbstractIntent"
+import { AutomatedCharacter } from "./AutomatedCharacter"
 import { BaseCharacter } from "./BaseCharacter"
-import { AutomatedCharacter, BaseCharacterClass } from "./CharacterClasses"
+import {  BaseCharacterClass } from "./CharacterClasses"
 
 export class GoblinCharacter extends AutomatedCharacter {
     constructor() {
         super({ name: "Goblin", portraitName: "flamer1", maxHitpoints: 10, description: "A small, mischievous creature" })
+    }
+    generateNewIntents(): AbstractIntent[] {
+        return [new AttackIntent({owner: this, damage: 1})];
     }
 }
 

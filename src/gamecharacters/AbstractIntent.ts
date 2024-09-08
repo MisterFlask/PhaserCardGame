@@ -1,8 +1,9 @@
 import { ActionManager } from "../utils/ActionManager";
 import { TargetingUtils } from "../utils/TargetingUtils";
 import { BaseCharacter } from "./BaseCharacter";
+import { JsonRepresentable } from '../interfaces/JsonRepresentable';
 
-export abstract class AbstractIntent {
+export abstract class AbstractIntent implements JsonRepresentable {
     id: string;
     tooltipText: string;
     displayText: string;
@@ -19,6 +20,18 @@ export abstract class AbstractIntent {
     }
 
     abstract act(): void;
+
+    createJsonRepresentation(): string {
+        return JSON.stringify({
+            className: this.constructor.name,
+            id: this.id,
+            tooltipText: this.tooltipText,
+            displayText: this.displayText,
+            imageName: this.imageName,
+            target: this.target ? this.target.name : 'No target',
+            owner: this.owner.name,
+        }, null, 2);
+    }
 }
 
 
@@ -39,6 +52,15 @@ export class AttackIntent extends AbstractIntent {
         console.log('Attacking ' + this.target.name);
         ActionManager.getInstance().dealDamage({ amount: this.damage, target: this.target, sourceCharacter: this.owner });
 
+    }
+
+    createJsonRepresentation(): string {
+        const baseRepresentation = JSON.parse(super.createJsonRepresentation());
+        return JSON.stringify({
+            ...baseRepresentation,
+            className: this.constructor.name,
+            damage: this.damage,
+        }, null, 2);
     }
 }
 

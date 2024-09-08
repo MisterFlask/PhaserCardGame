@@ -1,5 +1,5 @@
 import { AbstractIntent, AttackIntent } from '../gamecharacters/AbstractIntent';
-import { AutomatedCharacter } from '../gamecharacters/CharacterClasses';
+import { AutomatedCharacter } from '../gamecharacters/AutomatedCharacter';
 import { GoblinCharacter } from '../gamecharacters/SpecificClasses';
 
 // Define new character classes
@@ -50,10 +50,21 @@ export class Encounter {
 
 export class EncounterManager {
     private static instance: EncounterManager;
-    private encounters: Encounter[];
 
     private constructor() {
-        this.encounters = [
+        
+    }
+
+    public static getInstance(): EncounterManager {
+        if (!EncounterManager.instance) {
+            EncounterManager.instance = new EncounterManager();
+        }
+        return EncounterManager.instance;
+    }
+
+    public getRandomEncounter(): EncounterData {
+
+        const encounters = [
             new Encounter({
                 enemies: [new GoblinCharacter(), new GoblinCharacter()],
                 difficulty: 'Easy',
@@ -87,17 +98,7 @@ export class EncounterManager {
                 specialConditions: ['Ambush']
             }),
         ];
-    }
-
-    public static getInstance(): EncounterManager {
-        if (!EncounterManager.instance) {
-            EncounterManager.instance = new EncounterManager();
-        }
-        return EncounterManager.instance;
-    }
-
-    public getRandomEncounter(): EncounterData {
-        const randomIndex = Math.floor(Math.random() * this.encounters.length);
-        return this.encounters[randomIndex].data;
+        const randomIndex = Math.floor(Math.random() * encounters.length);
+        return encounters[randomIndex].data;
     }
 }
