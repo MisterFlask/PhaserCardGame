@@ -130,6 +130,7 @@ export class PhysicalCard {
     private physicalIntents: Map<string, PhysicalIntent> = new Map();
     private intentsContainer: Phaser.GameObjects.Container;
     private jsonModal: Phaser.GameObjects.Container | null = null;
+    private _isHighlighted: boolean = false;
 
     constructor({
         scene,
@@ -409,9 +410,8 @@ export class PhysicalCard {
         this.nameBox.setText(this.data.name);
         this.descBox.setText(this.data.description);
 
-        // Check if the texture exists before setting it
+        // Update card image
         if (this.scene.textures.exists(this.data.portraitName)) {
-            
             // Maintain aspect ratio
             const texture = this.scene.textures.get(this.data.portraitName);
             texture.setFilter(Phaser.Textures.LINEAR);
@@ -456,6 +456,14 @@ export class PhysicalCard {
         }
         this.updateVisualTags();
         this.updateIntents();
+        this.updateHighlightVisual();
+    }
+
+    private updateHighlightVisual(): void {
+        const highlightBorder = this.container.getByName('highlightBorder') as Phaser.GameObjects.Rectangle;
+        if (highlightBorder) {
+            highlightBorder.setVisible(this._isHighlighted);
+        }
     }
 
     addVisualTag(tag: PhysicalCardVisualTag): void {
@@ -501,7 +509,7 @@ export class PhysicalCard {
         currentIntents.forEach((intent: AbstractIntent) => {
             let physicalIntent = this.physicalIntents.get(intent.id);
             if (!physicalIntent) {
-                physicalIntent = new PhysicalIntent(this.scene, intent, 0, 0);
+                physicalIntent = new PhysicalIntent(this.scene, intent, 0, 0, this.data as BaseCharacter);
                 this.physicalIntents.set(intent.id, physicalIntent);
                 this.intentsContainer.add(physicalIntent.getContainer());
             } else {
@@ -534,6 +542,15 @@ export class PhysicalCard {
             this.wiggleTween = null;
         }
         this.container.destroy();
+    }
+
+    get isHighlighted(): boolean {
+        return this._isHighlighted;
+    }
+
+    set isHighlighted(value: boolean) {
+        this._isHighlighted = value;
+        this.updateHighlightVisual();
     }
 }
 

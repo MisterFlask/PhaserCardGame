@@ -1,7 +1,9 @@
 import { AbstractIntent } from "./AbstractIntent";
 import { Scene } from "phaser";
+import { BaseCharacter } from "./BaseCharacter";
+import { JsonRepresentable } from "../interfaces/JsonRepresentable";
 
-export class PhysicalIntent {
+export class PhysicalIntent implements JsonRepresentable {
     static readonly WIDTH: number = 40;
     static readonly HEIGHT: number = 40;
 
@@ -10,8 +12,9 @@ export class PhysicalIntent {
     private container: Phaser.GameObjects.Container;
     private image: Phaser.GameObjects.Image;
     private text: Phaser.GameObjects.Text;
+    private targetedCharacter: BaseCharacter;
 
-    constructor(scene: Scene, intent: AbstractIntent, x: number, y: number) {
+    constructor(scene: Scene, intent: AbstractIntent, x: number, y: number, targetedCharacter: BaseCharacter) {
         this.scene = scene;
         this.intent = intent;
         
@@ -27,6 +30,8 @@ export class PhysicalIntent {
         
         //this.setupTooltip();
         this.update();
+        
+        this.targetedCharacter = targetedCharacter;
     }
 
     private setupTooltip(): void {
@@ -70,5 +75,9 @@ export class PhysicalIntent {
             intent: JSON.parse(this.intent.createJsonRepresentation()),
             // Add any other relevant properties
         }, null, 2);
+    }
+
+    getTargetedCharacter(): BaseCharacter {
+        return this.targetedCharacter;
     }
 }
