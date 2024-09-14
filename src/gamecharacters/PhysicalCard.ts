@@ -233,7 +233,7 @@ export class PhysicalCard {
                 targets: this.cardContent,
                 angle: { from: -2, to: 2 },
                 duration: 100,
-                repeat: -1,
+                repeat: 2,
                 yoyo: true
             });
         }

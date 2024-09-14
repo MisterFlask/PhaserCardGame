@@ -42,7 +42,9 @@ export class TextBox {
         // Create text with shadow for better readability
         this.text = scene.add.text(x, y, text, {
             ...style,
-            stroke: '#000000',
+            color: '#ffffff', // Explicitly set color to white
+            stroke: '#000000', // Change stroke to black for better contrast
+           
             strokeThickness: 2,
             // Shadows are set separately
         });
