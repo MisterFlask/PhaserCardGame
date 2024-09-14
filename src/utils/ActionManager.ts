@@ -112,7 +112,7 @@ export class ActionManager {
 
 import Phaser from 'phaser';
 import { AbstractCard } from '../gamecharacters/AbstractCard';
-import { GameState } from '../screens/GameState';
+import { GameState } from '../rules/GameState';
 
 export abstract class GameAction {
   abstract playAction(): Promise<GameAction[]>;

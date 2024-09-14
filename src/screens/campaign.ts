@@ -4,10 +4,10 @@ import { AbstractCard } from '../gamecharacters/AbstractCard';
 import { PlayerCharacter } from '../gamecharacters/CharacterClasses';
 import { CardType } from '../gamecharacters/Primitives';
 import { CampaignRules } from '../rules/CampaignRules';
+import { GameState } from '../rules/GameState';
 import { PhysicalCard, } from '../ui/PhysicalCard';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 import GameImageLoader from '../utils/ImageUtils';
-import { GameState } from './GameState';
 
 export class StoreCard extends AbstractCard {
     price: number;

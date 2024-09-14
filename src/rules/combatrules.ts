@@ -1,9 +1,9 @@
-import { AbstractCard, PlayableCard } from "../gamecharacters/AbstractCard";
+import { PlayableCard } from "../gamecharacters/AbstractCard";
 import { AutomatedCharacter } from "../gamecharacters/AutomatedCharacter";
 import { BaseCharacter } from "../gamecharacters/BaseCharacter";
-import { GameState } from "../screens/GameState";
 import { ActionManager } from "../utils/ActionManager";
 import { DeckLogic } from "./DeckLogic";
+import { GameState } from "./GameState";
 
 export class CombatRules {
   public static PlayCard = (card: PlayableCard, target: BaseCharacter): void => {

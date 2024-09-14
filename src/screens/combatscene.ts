@@ -7,6 +7,7 @@ import { AutomatedCharacter } from '../gamecharacters/AutomatedCharacter';
 import { BaseCharacter } from '../gamecharacters/BaseCharacter';
 import { CombatRules } from '../rules/CombatRules';
 import { DeckLogic } from '../rules/DeckLogic';
+import { GameState } from '../rules/GameState';
 import Menu from '../ui/Menu'; // Import the Menu class
 import { PhysicalCard } from '../ui/PhysicalCard';
 import { PhysicalIntent } from '../ui/PhysicalIntent';
@@ -14,7 +15,6 @@ import { TextBox } from '../ui/TextBox';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 import GameImageLoader from '../utils/ImageUtils';
 import CampaignScene from './campaign';
-import { GameState } from './GameState';
 import MapScene from './map';
 
 /**
