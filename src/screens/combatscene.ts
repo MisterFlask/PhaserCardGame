@@ -1,21 +1,21 @@
 // src/scenes/CombatScene.ts
 
 import Phaser from 'phaser';
-import GameImageLoader from '../utils/ImageUtils';
-import { PhysicalCard } from '../gamecharacters/PhysicalCard';
-import { CardGuiUtils } from '../utils/CardGuiUtils';
-import CampaignScene from './campaign';
-import MapScene from './map';
-import { EncounterData } from '../encounters/encounters';
-import { GameState } from './gamestate';
-import { DeckLogic } from '../rules/decklogic';
+import { EncounterData } from '../encounters/Encounters';
 import { AbstractCard, PlayableCard, UiCard } from '../gamecharacters/AbstractCard';
-import { BaseCharacter } from '../gamecharacters/BaseCharacter';
 import { AutomatedCharacter } from '../gamecharacters/AutomatedCharacter';
-import { CombatRules } from '../rules/combatrules';
-import { PhysicalIntent } from '../gamecharacters/PhysicalIntent';
+import { BaseCharacter } from '../gamecharacters/BaseCharacter';
+import { CombatRules } from '../rules/CombatRules';
+import { DeckLogic } from '../rules/DeckLogic';
 import Menu from '../ui/Menu'; // Import the Menu class
+import { PhysicalCard } from '../ui/PhysicalCard';
+import { PhysicalIntent } from '../ui/PhysicalIntent';
 import { TextBox } from '../ui/TextBox';
+import { CardGuiUtils } from '../utils/CardGuiUtils';
+import GameImageLoader from '../utils/ImageUtils';
+import CampaignScene from './campaign';
+import { GameState } from './GameState';
+import MapScene from './map';
 
 /**
  * Configuration constants for the CombatScene.

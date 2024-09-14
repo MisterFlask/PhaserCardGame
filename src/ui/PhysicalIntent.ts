@@ -1,6 +1,6 @@
-import { AbstractIntent } from "./AbstractIntent";
 import { Scene } from "phaser";
-import { BaseCharacter } from "./BaseCharacter";
+import { AbstractIntent } from "../gamecharacters/AbstractIntent";
+import { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { JsonRepresentable } from "../interfaces/JsonRepresentable";
 
 export class PhysicalIntent implements JsonRepresentable {

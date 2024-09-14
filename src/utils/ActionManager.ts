@@ -1,7 +1,6 @@
+import { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { StoreCard } from '../screens/campaign';
-import { BaseCharacter } from "../gamecharacters/BaseCharacter"
-import { PhysicalCard } from '../gamecharacters/PhysicalCard';
-import { AbstractIntent } from "../gamecharacters/AbstractIntent";
+import { PhysicalCard } from '../ui/PhysicalCard';
 
 export class ActionManager {
     private static instance: ActionManager;
@@ -112,8 +111,8 @@ export class ActionManager {
 
 
 import Phaser from 'phaser';
-import { GameState } from '../screens/gamestate';
 import { AbstractCard } from '../gamecharacters/AbstractCard';
+import { GameState } from '../screens/GameState';
 
 export abstract class GameAction {
   abstract playAction(): Promise<GameAction[]>;

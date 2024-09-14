@@ -1,11 +1,11 @@
 // src/gamecharacters/PhysicalCard.ts
 import Phaser from 'phaser';
-import { AbstractCard } from "./AbstractCard";
-import { BaseCharacter } from "./BaseCharacter";
-import { AbstractIntent } from "./AbstractIntent";
+import { AbstractCard } from "../gamecharacters/AbstractCard";
+import { AbstractIntent } from "../gamecharacters/AbstractIntent";
+import { AutomatedCharacter } from "../gamecharacters/AutomatedCharacter";
+import { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { PhysicalIntent } from "./PhysicalIntent";
-import { TextBox } from "../ui/TextBox"; // Ensure correct relative path
-import { AutomatedCharacter } from "./AutomatedCharacter";
+import { TextBox } from "./TextBox"; // Ensure correct relative path
 
 export class PhysicalCard {
     container: Phaser.GameObjects.Container;

@@ -1,6 +1,6 @@
 
 import { AbstractCard } from '../gamecharacters/AbstractCard';
-import { GameState } from '../screens/gamestate';
+import { GameState } from '../screens/GameState';
 
 export class DeckLogic {
   private static instance: DeckLogic;

@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { PhysicalIntent } from '../gamecharacters/PhysicalIntent';
+import { PhysicalIntent } from '../ui/PhysicalIntent';
 
 export class IntentEmitter extends Phaser.Events.EventEmitter {
     private static instance: IntentEmitter;

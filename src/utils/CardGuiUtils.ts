@@ -1,6 +1,6 @@
 import { AbstractCard } from "../gamecharacters/AbstractCard";
-import { PhysicalCard } from "../gamecharacters/PhysicalCard";
 import { CardType } from "../gamecharacters/Primitives";
+import { PhysicalCard } from "../ui/PhysicalCard";
 import { TextBox } from "../ui/TextBox";
 
 export interface CardConfig {

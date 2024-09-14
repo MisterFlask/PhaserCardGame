@@ -1,10 +1,10 @@
 import Phaser from 'phaser';
-import { PhysicalCard,  } from '../gamecharacters/PhysicalCard';
-import { CardGuiUtils } from '../utils/CardGuiUtils';
-import { GameState } from './gamestate';
-import { EncounterData, EncounterManager } from '../encounters/encounters';
-import { CardSize, CardType } from '../gamecharacters/Primitives';
+import { EncounterData, EncounterManager } from '../encounters/Encounters';
 import { AbstractCard } from '../gamecharacters/AbstractCard';
+import { CardSize, CardType } from '../gamecharacters/Primitives';
+import { PhysicalCard, } from '../ui/PhysicalCard';
+import { CardGuiUtils } from '../utils/CardGuiUtils';
+import { GameState } from './GameState';
 
 export class LocationCard extends AbstractCard {
     encounter: EncounterData;

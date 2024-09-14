@@ -1,5 +1,5 @@
 import { BaseCharacter } from "../gamecharacters/BaseCharacter";
-import { GameState } from "../screens/gamestate";
+import { GameState } from "../screens/GameState";
 
 export class TargetingUtils {
     private static instance: TargetingUtils;
