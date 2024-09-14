@@ -1,4 +1,4 @@
-import { PlayerCharacter, BaseCharacterClass } from '../gamecharacters/CharacterClasses';
+import { BaseCharacterClass, PlayerCharacter } from '../gamecharacters/CharacterClasses';
 import { BlackhandClass, DiabolistClass } from '../gamecharacters/SpecificClasses';
 
 export class CampaignRules {
@@ -24,8 +24,12 @@ export class CampaignRules {
                 portraitName: 'flamer1', 
                 characterClass: randomClass 
             });
+            
             randomClass.availableCards.forEach(card => {
                 character.cardsInMasterDeck.push(card.Copy());
+                character.cardsInMasterDeck.forEach(card=> {
+                    card.owner = character;
+                })
             });
             characters.push(character);
         }

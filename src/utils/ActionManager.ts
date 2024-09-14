@@ -95,6 +95,32 @@ export class ActionManager {
             return [];
         }));
     }
+    public applyBlock(params: {
+        block: number,
+        appliedViaPlayableCard?: AbstractCard,
+        blockSourceCharacter?: BaseCharacter,
+        blockTargetCharacter?: BaseCharacter
+    }): void {
+        const { block, blockTargetCharacter } = params;
+        console.log("Called ApplyBlock method in action manager. Block: " + block + " Target: " + blockTargetCharacter?.name);
+
+        if (!blockTargetCharacter) {
+            return;
+        }
+
+        this.actionQueue.addAction(new GenericAction(async () => {
+            console.log("Applying block to " + blockTargetCharacter.name);
+            // Get the physical card of the target character
+            const targetPhysicalCard = (blockTargetCharacter as any).physicalCard as PhysicalCard;
+            
+            if (targetPhysicalCard && targetPhysicalCard.blockText) {
+                // Pulse the block text box
+                targetPhysicalCard.blockText.pulseGreenBriefly()
+            }
+            blockTargetCharacter.block += block;
+            return [];
+        }));
+    }
 
 
     private animateCardDamage(physicalCardOfTarget: PhysicalCard): Promise<void> {

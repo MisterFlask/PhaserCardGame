@@ -1,9 +1,8 @@
+import { ActionManager } from "../../utils/ActionManager";
 import { AbstractCard, PlayableCard } from "../AbstractCard";
 import { BaseCharacter } from "../BaseCharacter";
-import { ActionManager } from "../../utils/ActionManager";
-import { AutomatedCharacter } from "../AutomatedCharacter";
 
-export class FireballCard extends AbstractCard {
+export class FireballCard extends PlayableCard {
     constructor() {
         super({
             name: "Fireball",
@@ -12,11 +11,7 @@ export class FireballCard extends AbstractCard {
         });
     }
 
-    IsPerformableOn = (targetCard: AbstractCard): boolean => {
-        return targetCard instanceof AutomatedCharacter;
-    }
-
-    InvokeCardEffects = (targetCard?: AbstractCard): void => {
+    override InvokeCardEffects (targetCard?: AbstractCard): void {
         if (targetCard && targetCard instanceof BaseCharacter) {
             ActionManager.getInstance().dealDamage({ target: targetCard, amount: 6 });
             console.log(`Dealt 6 damage to ${targetCard.name}`);
@@ -24,7 +19,7 @@ export class FireballCard extends AbstractCard {
     }
 }
 
-export class ToxicCloudCard extends AbstractCard {
+export class ToxicCloudCard extends PlayableCard {
     constructor() {
         super({
             name: "Toxic Cloud",
@@ -33,7 +28,7 @@ export class ToxicCloudCard extends AbstractCard {
         });
     }
 
-    InvokeCardEffects = (targetCard?: AbstractCard): void => {
+    override InvokeCardEffects (targetCard?: AbstractCard): void {
         if (targetCard && targetCard instanceof BaseCharacter) {
             //ActionManager.getInstance().applyPoison({ target: targetCard, amount: 3 });
             console.log(`Applied 3 Poison to ${targetCard.name}`);

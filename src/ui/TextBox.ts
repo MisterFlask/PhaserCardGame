@@ -6,7 +6,7 @@ export class TextBox {
     text: Phaser.GameObjects.Text;
     outline: Phaser.GameObjects.Rectangle | null = null;
     textBoxName?: string;
-
+    scene: Phaser.Scene;
     constructor(params: {
         scene: Phaser.Scene,
         x?: number,
@@ -16,7 +16,8 @@ export class TextBox {
         text?: string,
         style?: Phaser.Types.GameObjects.Text.TextStyle,
         backgroundImage?: string,
-        textBoxName?: string
+        textBoxName?: string,
+        fillColor?: number
     }) {
         const {
             scene,
@@ -27,15 +28,16 @@ export class TextBox {
             text = '',
             style = { fontSize: '18px', color: '#ffffff', fontFamily: 'Arial' },
             backgroundImage,
-            textBoxName
+            textBoxName,
+            fillColor = 0x2e2e2e
         } = params;
         this.textBoxName = textBoxName ?? "anonymousTextBox";
-
+        this.scene = scene;
         // Create background with rounded corners if no image is provided
         if (backgroundImage) {
             this.background = scene.add.image(x, y, backgroundImage).setDisplaySize(width, height).setOrigin(0.5);
         } else {
-            this.background = scene.add.rectangle(x, y, width, height, 0x2e2e2e).setOrigin(0.5);
+            this.background = scene.add.rectangle(x, y, width, height, fillColor).setOrigin(0.5);
             this.background.setStrokeStyle(2, 0xffffff); // Adding a border for better visibility
         }
 
@@ -67,6 +69,33 @@ export class TextBox {
         if (this.background === null) return;
         this.background.setPosition(x, y);
         this.text.setPosition(x, y);
+    }
+
+    pulseGreenBriefly(): void {
+        this.pulseColor(0x00ff00);
+    }
+
+    pulseRedBriefly(): void {
+        this.pulseColor(0xff0000);
+    }
+
+    private pulseColor(color: number): void {
+        if (!this.background) return;
+
+        const originalColor = this.background instanceof Phaser.GameObjects.Rectangle ? this.background.fillColor : 0xffffff;
+        
+        this.scene.tweens.add({
+            targets: this.background,
+            fillColor: { from: originalColor, to: color },
+            duration: 100,
+            yoyo: true,
+            repeat: 3,
+            onComplete: () => {
+                if (this.background instanceof Phaser.GameObjects.Rectangle) {
+                    this.background.setFillStyle(originalColor);
+                }
+            }
+        });
     }
 
     setSize(width: number, height: number): void {

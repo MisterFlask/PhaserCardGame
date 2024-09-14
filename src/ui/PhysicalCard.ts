@@ -1,8 +1,8 @@
 // src/gamecharacters/PhysicalCard.ts
 import Phaser from 'phaser';
 import { AbstractCard } from "../gamecharacters/AbstractCard";
-import { AbstractIntent } from "../gamecharacters/AbstractIntent";
-import { AutomatedCharacter } from "../gamecharacters/AutomatedCharacter";
+import { AbstractIntent } from '../gamecharacters/AbstractIntent';
+import { AutomatedCharacter } from '../gamecharacters/AutomatedCharacter';
 import { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { PhysicalIntent } from "./PhysicalIntent";
 import { TextBox } from "./TextBox"; // Ensure correct relative path
@@ -27,6 +27,9 @@ export class PhysicalCard {
     private intentsContainer: Phaser.GameObjects.Container;
     private jsonModal: Phaser.GameObjects.Container | null = null;
     private _isHighlighted: boolean = false;
+    private blocksContainer: Phaser.GameObjects.Container;
+    private blockIcon: Phaser.GameObjects.Image;
+    public blockText: TextBox;
 
     constructor({
         scene,
@@ -117,6 +120,22 @@ export class PhysicalCard {
         // Create a new container for intents
         this.intentsContainer = this.scene.add.container(0, -this.cardBackground.displayHeight / 2 - 40);
         this.cardContent.add(this.intentsContainer);
+
+        // Initialize block container
+        this.blocksContainer = this.scene.add.container(-this.cardBackground.displayWidth / 2 - 40, 0); // Position to the left
+        this.blockIcon = this.scene.add.image(0, 0, 'block_icon'); // Ensure 'block_icon' texture is loaded
+        this.blockText = new TextBox({
+            scene: this.scene,
+            x: this.blockIcon.x + this.blockIcon.displayWidth / 2 + 5,
+            y: 0,
+            width: 50,
+            height: 30,
+            text: `${this.data.block}`, // Assuming AbstractCard has a 'block' property
+            style: { fontSize: '14px', color: '#ffffff', fontFamily: 'Arial' },
+            fillColor: 0x0000ff
+        });
+        this.blocksContainer.add([/*this.blockIcon,*/ this.blockText.background!!, this.blockText.text]);
+        this.cardContent.add(this.blocksContainer);
 
         this.updateVisuals();
         this.scene.events.on('update', this.updateVisuals, this);
@@ -383,6 +402,10 @@ export class PhysicalCard {
             const baseCharacter = this.data as BaseCharacter;
             this.hpBox.setText(`${baseCharacter.hitpoints}/${baseCharacter.maxHitpoints}`);
         }
+
+        // Update block text
+        this.blockText.setText(`${this.data.block}`);
+
         this.updateVisualTags();
         this.updateIntents();
         this.updateHighlightVisual();

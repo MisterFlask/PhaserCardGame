@@ -75,11 +75,12 @@ export abstract class AbstractCard implements JsonRepresentable {
     public portraitName: string
     cardType: CardType
     public tooltip: string
-    characterData?: AbstractCard
+    owner?: AbstractCard
     size: CardSize
     id: string = generateWordGuid()
     physicalCard?: IPhysicalCardInterface // this is a hack, it's just always PhysicalCard
     team: Team
+    block: number = 0
 
     constructor({ name, description, portraitName, cardType, tooltip, characterData, size, team }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: AbstractCard, size?: CardSize, team?: Team }) {
         this.name = name
@@ -87,7 +88,7 @@ export abstract class AbstractCard implements JsonRepresentable {
         this.portraitName = portraitName || "flamer1"
         this.cardType = cardType || CardType.PLAYABLE
         this.tooltip = tooltip || "Lorem ipsum dolor sit amet"
-        this.characterData = characterData || undefined
+        this.owner = characterData || undefined
         this.size = size || CardSize.SMALL
         this.team = team || Team.ENEMY
     }
@@ -114,6 +115,9 @@ export abstract class AbstractCard implements JsonRepresentable {
             size: this.size,
             cardType: this.cardType,
             tooltip: this.tooltip,
+            owner: this.owner?.name,
+            team: this.team,
+            block: this.block
         }, null, 2);
     }
 }
@@ -128,12 +132,13 @@ export class UiCard extends AbstractCard{
 
 export abstract class PlayableCard extends AbstractCard {
     targetingType: TargetingType
-    constructor({ name, description, portraitName, cardType, tooltip, characterData, size, targetingType }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: AbstractCard, size?: CardSize, targetingType?: TargetingType}) {
+    constructor({ name, description, portraitName, cardType, tooltip, characterData, size, targetingType, owner }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: AbstractCard, size?: CardSize, targetingType?: TargetingType, owner?: BaseCharacter }) {
         super({ name, description, portraitName, cardType, tooltip, characterData, size });
         this.targetingType = targetingType || TargetingType.ENEMY;
+        this.owner = owner;
     }
 
-    abstract InvokeCardEffects: (targetCard?: AbstractCard) => void;
+    abstract InvokeCardEffects(targetCard?: AbstractCard): void;
     public IsPerformableOn(targetCard?: AbstractCard): boolean{
         return true;
     }
