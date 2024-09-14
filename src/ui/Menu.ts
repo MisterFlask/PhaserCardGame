@@ -46,6 +46,10 @@ export default class Menu {
         this.container.setAlpha(0);
     }
 
+    public updatePosition(x: number, y: number): void {
+        this.container.setPosition(x, y);
+    }
+
     /**
      * Creates the menu options as interactive containers with icons and text.
      */
