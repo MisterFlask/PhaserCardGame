@@ -8,7 +8,7 @@ import CombatSceneLayoutUtils from '../../ui/LayoutUtils';
 import { PhysicalCard } from '../../ui/PhysicalCard';
 import { CardGuiUtils } from '../../utils/CardGuiUtils';
 
-class CombatCardManager {
+export class CombatCardManager {
     private scene: Phaser.Scene;
     public playerHand: PhysicalCard[] = [];
     public enemyUnits: PhysicalCard[] = [];
@@ -39,6 +39,26 @@ class CombatCardManager {
         this.arrangeCards(this.playerHand, CombatSceneLayoutUtils.getHandY(this.scene));
     }
 
+    public addCardToDiscardPile(card: PhysicalCard): void {
+        this.scene.tweens.add({
+            targets: card.container,
+            x: this.discardPile.container.x,
+            y: this.discardPile.container.y,
+            scaleX: 0.5,
+            scaleY: 0.5,
+            alpha: 0,
+            duration: 500,
+            ease: 'Power2',
+            onComplete: () => {
+                this.discardPile.data.name = `Discard Pile (${GameState.getInstance().combatState.currentDiscardPile.length + 1})`;
+                this.discardPile.nameBox.setText(this.discardPile.data.name);
+                GameState.getInstance().combatState.currentDiscardPile.push(card.data);
+                card.obliterate(); // Remove the card after animation
+            }
+        });
+    }
+
+    
     private createPlayerUnits(): void {
         const playerCharacters = GameState.getInstance().combatState.playerCharacters;
         playerCharacters.forEach((characterData, index) => {
@@ -106,7 +126,7 @@ class CombatCardManager {
         // Remove cards no longer in hand
         existingCards.forEach((physicalCard, id) => {
             if (!state.currentHand.some(c => c.id === id)) {
-                this.discardCard(physicalCard);
+                this.discardCardAnimation(physicalCard);
             }
         });
 
@@ -151,7 +171,7 @@ class CombatCardManager {
         return card;
     }
 
-    private discardCard(card: PhysicalCard): void {
+    private discardCardAnimation(card: PhysicalCard): void {
         this.playerHand = this.playerHand.filter(c => c !== card);
 
         // Create a discard animation
@@ -186,6 +206,31 @@ class CombatCardManager {
             this.discardPile.data.name = `Discard Pile (${discardPileCount})`;
             this.discardPile.nameBox.setText(this.discardPile.data.name);
         }
+    }
+
+    public update(): void {
+        const state = GameState.getInstance().combatState.currentHand;
+        const stateIds = new Set(state.map(card => card.id));
+        const handIds = new Set(this.playerHand.map(card => card.data.id));
+
+        // Identify cards to add
+        const cardsToAdd = state.filter(card => !handIds.has(card.id));
+        cardsToAdd.forEach(cardData => {
+            const newCard = this.animateCardDraw(cardData);
+            this.playerHand.push(newCard);
+        });
+
+        // Identify cards to remove
+        const cardsToRemove = this.playerHand.filter(card => !stateIds.has(card.data.id));
+        cardsToRemove.forEach(card => {
+            this.discardCardAnimation(card);
+        });
+
+        // Arrange the hand after updates
+        this.arrangeCards(this.playerHand, CombatSceneLayoutUtils.getHandY(this.scene));
+
+        this.updateDiscardPileCount();
+        this.updateDrawPileCount();
     }
 
 }

@@ -6,25 +6,83 @@ export class ActionManager {
     private static instance: ActionManager;
     private actionQueue: ActionQueue;
 
-
-    private constructor() {
+    private constructor() { // Modified constructor
         this.actionQueue = new ActionQueue();
     }
 
-    public static getInstance(): ActionManager {
+    public static getInstance(): ActionManager { // Modified getInstance
         if (!ActionManager.instance) {
             ActionManager.instance = new ActionManager();
         }
         return ActionManager.instance;
     }
-    
-    public discardCard = (card: AbstractCard): void => {
-        const gameState = GameState.getInstance();
-        gameState.combatState.currentDiscardPile.push(card);
-        this.actionQueue.addAction(new WaitAction(100));
+
+
+    private animateDrawCard(card: AbstractCard): Promise<void> {
+        return new Promise<void>((resolve) => {
+            // Implement draw animation logic here
+            console.log(`Animating draw for card: ${card.name}`);
+            // Example animation delay
+            setTimeout(() => resolve(), 500);
+        });
     }
 
-    
+    private animateDiscardCard(card: PhysicalCard): Promise<void> {
+        return new Promise<void>((resolve) => {
+            // Implement discard animation logic here
+            console.log(`Animating discard for card: ${card.data.name}`);
+            // Example animation delay
+            setTimeout(() => resolve(), 500);
+        });
+    }
+
+    public discardCard = (card: AbstractCard): void => {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            DeckLogic.moveCardToPile(card, PileName.Discard);
+            await this.animateDiscardCard(card.physicalCard as PhysicalCard);
+            await new WaitAction(100).playAction();
+            return [];
+        }));
+    }
+
+    public drawHandForNewTurn(): void {
+        console.log('Drawing hand for new turn');
+        const gameState = GameState.getInstance();
+        const combatState = gameState.combatState;
+        const handSize = 3; // Assuming a hand size of 3 cards
+
+        this.drawCards(handSize);
+
+        console.log('State of all piles:');
+        console.log('Draw Pile:', combatState.currentDrawPile.map(card => card.name));
+        console.log('Discard Pile:', combatState.currentDiscardPile.map(card => card.name));
+        console.log('Hand:', combatState.currentHand.map(card => card.name));
+    }
+
+    private drawCards(count: number): void {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            const deckLogic = DeckLogic.getInstance();
+            const drawnCards: AbstractCard[] = [];
+            // Add a small delay after drawing each card
+            for (let i = 0; i < count; i++) {
+                const drawnCard = deckLogic.drawCards(1)[0];
+                await this.animateDrawCard(drawnCard);
+                await new WaitAction(50).playAction();
+                drawnCards.push(drawnCard);
+            }
+
+            const gameState = GameState.getInstance();
+            const combatState = gameState.combatState;
+            
+
+            console.log('Cards drawn:', drawnCards.map(card => card.name));
+            console.log('Updated hand:', combatState.currentHand.map(card => card.name));
+
+            return [];
+        }));
+    }
+
+
     private animateCardDamage(physicalCardOfTarget: PhysicalCard): Promise<void> {
         return new Promise<void>((resolve) => {
             // Shake the card
@@ -52,7 +110,7 @@ export class ActionManager {
                 originalTint = physicalCardOfTarget.cardBackground.fillColor;
                 physicalCardOfTarget.cardBackground.setFillStyle(0xff0000);
             }
-            
+
             setTimeout(() => {
                 if (physicalCardOfTarget.cardBackground instanceof Phaser.GameObjects.Image) {
                     physicalCardOfTarget.cardBackground.setTint(originalTint);
@@ -84,14 +142,14 @@ export class ActionManager {
         if (physicalCardOfTarget) {
             const damageAction = new GenericAction(async () => {
                 await this.animateCardDamage(physicalCardOfTarget);
-                
+
                 if (target instanceof BaseCharacter) {
                     target.hitpoints = Math.max(0, target.hitpoints - amount);
                 }
 
                 return [];
             });
-            
+
             this.actionQueue.addAction(damageAction);
         }
     }
@@ -106,50 +164,59 @@ export class ActionManager {
     public async resolveActions(): Promise<void> {
         await this.actionQueue.resolveActions();
     }
-
+    public discardCards(cards: AbstractCard[]): void {
+        // Queue discarding multiple cards
+        this.actionQueue.addAction(new GenericAction(async () => {
+            cards.forEach(card => {
+                this.discardCard(card);
+            });
+            return [];
+        }));
+    }
 }
 
 
 import Phaser from 'phaser';
 import { AbstractCard } from '../gamecharacters/AbstractCard';
+import { DeckLogic, PileName } from "../rules/DeckLogic";
 import { GameState } from '../rules/GameState';
 
 export abstract class GameAction {
-  abstract playAction(): Promise<GameAction[]>;
+    abstract playAction(): Promise<GameAction[]>;
 }
 
 export class ActionQueue {
-  private queue: GameAction[] = [];
-  private isResolving: boolean = false;
+    private queue: GameAction[] = [];
+    private isResolving: boolean = false;
 
-  addAction(action: GameAction): void {
-    this.queue.push(action);
-    if (!this.isResolving) {
-      this.resolveActions();
-    }
-  }
-
-  async resolveActions(): Promise<void> {
-    if (this.isResolving) return;
-    this.isResolving = true;
-
-    while (this.queue.length > 0) {
-      const currentAction = this.queue.shift();
-      if (currentAction) {
-        const newActions = await currentAction.playAction();
-        this.queue.unshift(...newActions);
-      }
-      // Add a small delay to allow for animations and prevent blocking
-      await new Promise(resolve => setTimeout(resolve, 50));
+    addAction(action: GameAction): void {
+        this.queue.push(action);
+        if (!this.isResolving) {
+            this.resolveActions();
+        }
     }
 
-    this.isResolving = false;
-  }
+    async resolveActions(): Promise<void> {
+        if (this.isResolving) return;
+        this.isResolving = true;
+
+        while (this.queue.length > 0) {
+            const currentAction = this.queue.shift();
+            if (currentAction) {
+                const newActions = await currentAction.playAction();
+                this.queue.unshift(...newActions);
+            }
+            // Add a small delay to allow for animations and prevent blocking
+            await new Promise(resolve => setTimeout(resolve, 50));
+        }
+
+        this.isResolving = false;
+    }
 }
 
 
 export class DealDamageAction extends GameAction {
-    constructor(private amount: number, 
+    constructor(private amount: number,
         private target: BaseCharacter,
         private sourceCharacter?: BaseCharacter,
         private sourceCard?: AbstractCard) {

@@ -1,6 +1,7 @@
 // src/ui/Menu.ts
 
 import Phaser from 'phaser';
+import { GameState } from '../rules/GameState';
 
 interface MenuConfig {
     scene: Phaser.Scene;
@@ -37,6 +38,12 @@ export default class Menu {
             .setOrigin(0.5)
             .setStrokeStyle(2, 0xffffff);
         this.container.add(this.background);
+
+        // Add the "Deck Contents" option
+        this.options.push({
+            text: 'Deck Contents',
+            callback: () => this.showDeckContents()
+        });
 
         // Create menu options with icons
         this.createOptions();
@@ -90,7 +97,6 @@ export default class Menu {
                     duration: 200,
                     ease: 'Power2'
                 });
-                //optionContainer.getByName('background')?.setTint(0x555555);
             });
 
             optionContainer.on('pointerout', () => {
@@ -101,7 +107,6 @@ export default class Menu {
                     duration: 200,
                     ease: 'Power2'
                 });
-                //optionContainer.getByName('background')?.setTint(0xffffff);
             });
 
             this.container.add(optionContainer);
@@ -172,5 +177,54 @@ export default class Menu {
                 this.container.setVisible(false);
             }
         });
+    }
+
+    /**
+     * Shows the deck contents in a modal window.
+     */
+    private showDeckContents(): void {
+        const gameState = GameState.getInstance();
+        const deckContents = {
+            drawPile: gameState.combatState.currentDrawPile.map(card => card.createJsonRepresentation()),
+            hand: gameState.combatState.currentHand.map(card => card.createJsonRepresentation()),
+            discardPile: gameState.combatState.currentDiscardPile.map(card => card.createJsonRepresentation())
+        };
+
+        const modalBackground = this.scene.add.rectangle(
+            this.scene.scale.width / 2,
+            this.scene.scale.height / 2,
+            this.scene.scale.width * 0.8,
+            this.scene.scale.height * 0.8,
+            0x000000,
+            0.8
+        ).setOrigin(0.5);
+
+        const modalText = this.scene.add.text(
+            this.scene.scale.width / 2,
+            this.scene.scale.height / 2,
+            JSON.stringify(deckContents, null, 2),
+            {
+                fontSize: '16px',
+                color: '#ffffff',
+                align: 'left',
+                wordWrap: { width: modalBackground.width - 40 }
+            }
+        ).setOrigin(0.5);
+
+        const closeButton = this.scene.add.text(
+            modalBackground.x + modalBackground.width / 2 - 20,
+            modalBackground.y - modalBackground.height / 2 + 20,
+            'X',
+            {
+                fontSize: '24px',
+                color: '#ffffff'
+            }
+        ).setOrigin(1, 0)
+            .setInteractive({ useHandCursor: true })
+            .on('pointerdown', () => {
+                modalBackground.destroy();
+                modalText.destroy();
+                closeButton.destroy();
+            });
     }
 }

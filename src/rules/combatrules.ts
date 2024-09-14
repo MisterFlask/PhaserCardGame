@@ -2,7 +2,6 @@ import { PlayableCard } from "../gamecharacters/AbstractCard";
 import { AutomatedCharacter } from "../gamecharacters/AutomatedCharacter";
 import { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { ActionManager } from "../utils/ActionManager";
-import { DeckLogic } from "./DeckLogic";
 import { GameState } from "./GameState";
 
 export class CombatRules {
@@ -12,6 +11,7 @@ export class CombatRules {
       card.InvokeCardEffects(target);
     }
 
+    // Queue discard action instead of direct discard
     ActionManager.getInstance().discardCard(card);
   };
 
@@ -28,11 +28,11 @@ export class CombatRules {
       }
     });
 
-    
-    combatState.currentDiscardPile.push(...combatState.currentHand);
-    combatState.currentHand = [];
+    // Queue discard actions instead of direct discard
+    ActionManager.getInstance().discardCards(combatState.currentHand);
 
-    DeckLogic.getInstance().drawHandForNewTurn();
+    // Queue draw action instead of direct draw
+    ActionManager.getInstance().drawHandForNewTurn();
   }
 
   public static ExecuteIntents(): void {

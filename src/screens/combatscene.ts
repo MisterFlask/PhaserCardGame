@@ -4,6 +4,7 @@ import Phaser from 'phaser';
 import { EncounterData } from '../encounters/Encounters';
 import { GameState } from '../rules/GameState';
 import CombatSceneLayoutUtils from '../ui/LayoutUtils';
+import { ActionManager } from '../utils/ActionManager';
 import GameImageLoader from '../utils/ImageUtils';
 import CampaignScene from './campaign';
 import MapScene from './map';
@@ -25,6 +26,7 @@ class CombatScene extends Phaser.Scene {
     private cardManager!: CombatCardManager;
     private inputHandler!: CombatInputHandler;
     private performanceMonitor!: PerformanceMonitor;
+    private background!: Phaser.GameObjects.Image;
 
     constructor() {
         super('CombatScene');
@@ -48,10 +50,11 @@ class CombatScene extends Phaser.Scene {
         this.performanceMonitor = new PerformanceMonitor(this);
 
         this.setupResizeHandler();
+        ActionManager.getInstance().drawHandForNewTurn();
     }
 
     private createBackground(): void {
-        const background = this.add.image(this.scale.width / 2, this.scale.height / 2, 'battleback1')
+        this.background = this.add.image(this.scale.width / 2, this.scale.height / 2, 'battleback1')
             .setOrigin(0.5)
             .setDisplaySize(this.scale.width, this.scale.height)
             .setDepth(-1)
@@ -95,6 +98,10 @@ class CombatScene extends Phaser.Scene {
     update(time: number, delta: number): void {
         this.performanceMonitor.update(time, delta);
         // Implement additional update logic if needed
+        // Sync the hand with the game state
+        if (this.cardManager) {
+            this.cardManager.syncHandWithGameState();
+        }
     }
 }
 /**

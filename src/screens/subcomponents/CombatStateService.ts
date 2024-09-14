@@ -20,7 +20,7 @@ class CombatStateService {
         GameState.getInstance().combatState.enemies = encounter.enemies;
         GameState.getInstance().combatState.playerCharacters = playerCharacters;
         GameState.getInstance().combatState.currentDrawPile = DeckLogic.getInstance().generateInitialCombatDeck();
-        GameState.getInstance().combatState.currentHand = DeckLogic.getInstance().drawHandForNewTurn();
+        GameState.getInstance().combatState.currentHand = [];
         GameState.getInstance().combatState.currentDiscardPile = [];
     }
 

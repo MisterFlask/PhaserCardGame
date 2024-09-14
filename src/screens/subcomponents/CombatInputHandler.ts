@@ -171,16 +171,17 @@ class CombatInputHandler {
         const playableCard = card.data as PlayableCard;
         playableCard.InvokeCardEffects();
         console.log(`Card played on battlefield: ${card.data.name}`);
-        // Implement additional logic or animations
+        this.removeCardFromHand(card);
     }
 
     private playCardOnTarget(card: PlayableCard, target: BaseCharacter): void {
         card.InvokeCardEffects(target);
         console.log(`Card played: ${card.name} on ${target.name}`);
-        // Implement additional logic or animations
+        this.removeCardFromHand(card.physicalCard as PhysicalCard);
     }
 
-    private removeCardFromHand(card: PhysicalCard): void {
+    private removeCardFromHand(card?: PhysicalCard): void {
+        if (!card) return;
         this.cardManager.playerHand = this.cardManager.playerHand.filter(c => c !== card);
     }
 

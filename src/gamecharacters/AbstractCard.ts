@@ -72,7 +72,7 @@ export abstract class AbstractCard implements JsonRepresentable {
     characterData?: AbstractCard
     size: CardSize
     id: string = generateWordGuid()
-    physicalCard: IPhysicalCardInterface | null = null // this is a hack, it's just always PhysicalCard
+    physicalCard?: IPhysicalCardInterface // this is a hack, it's just always PhysicalCard
 
     constructor({ name, description, portraitName, cardType, tooltip, characterData, size }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: AbstractCard, size?: CardSize }) {
         this.name = name
