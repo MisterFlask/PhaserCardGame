@@ -2,7 +2,7 @@
 
 import Phaser from 'phaser';
 import { EncounterData } from '../encounters/Encounters';
-import { AbstractCard, PlayableCard, UiCard } from '../gamecharacters/AbstractCard';
+import { AbstractCard, PlayableCard, TargetingType, UiCard } from '../gamecharacters/AbstractCard';
 import { AutomatedCharacter } from '../gamecharacters/AutomatedCharacter';
 import { BaseCharacter } from '../gamecharacters/BaseCharacter';
 import { CombatRules } from '../rules/CombatRules';
@@ -73,6 +73,9 @@ class CombatScene extends Phaser.Scene {
     private physicalIntents: PhysicalIntent[] = [];
     private glowEffects: Map<BaseCharacter, Phaser.GameObjects.GameObject> = new Map();
     private needsSync: boolean = false;
+
+    // New Property to Store Original Position
+    private originalCardPosition: { x: number; y: number } | null = null;
 
     /**
      * Constructor initializes the CombatScene with a unique key.
@@ -444,7 +447,8 @@ class CombatScene extends Phaser.Scene {
                     ease: 'Power2'
                 });
                 menuButton.setStyle({ backgroundColor: '#000000' });
-            });
+            })
+            .setName('MenuButton'); // Assign a name for easy reference
 
         this.add.existing(menuButton);
     }
@@ -630,9 +634,16 @@ class CombatScene extends Phaser.Scene {
     private handleDragStart(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container): void {
         if ('physicalCard' in gameObject) {
             this.draggedCard = (gameObject as any).physicalCard as PhysicalCard;
+            if (this.draggedCard) {
+                // Store the original position
+                this.originalCardPosition = { x: this.draggedCard.container.x, y: this.draggedCard.container.y };
+                // Bring the card to the front for dragging
+                this.bringCardToFront(gameObject);
+            }
         } else {
             console.warn('Dragged object is not a PhysicalCard');
             this.draggedCard = null;
+            this.originalCardPosition = null;
         }
     }
 
@@ -698,40 +709,181 @@ class CombatScene extends Phaser.Scene {
      */
     private handleDragEnd(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container): void {
         const physicalCard = (gameObject as any).physicalCard as PhysicalCard;
-        if (!(physicalCard?.data instanceof PlayableCard)) return;
+        if (!physicalCard) {
+            // If it's not a PhysicalCard, do nothing
+            return;
+        }
 
+        // Determine if the card was played
+        let wasPlayed = false;
+        const isPlayable = physicalCard.data instanceof PlayableCard;
+
+        if (isPlayable) {
+            const playableCard = physicalCard.data as PlayableCard;
+            const targetingType = this.GetTargetingType(playableCard);
+
+            if (targetingType === TargetingType.NO_TARGETING) {
+                // Check if dropped on the battlefield area
+                const droppedOnBattlefield = this.battlefieldArea.getBounds().contains(pointer.x, pointer.y);
+                if (droppedOnBattlefield) {
+                    // Play the card on the battlefield
+                    wasPlayed = true;
+                    this.playCardOnBattlefield(physicalCard);
+                }
+            } else {
+                // Targeting type requires a valid target
+                if (this.highlightedCard && this.isValidTarget(playableCard, this.highlightedCard.data)) {
+                    wasPlayed = true;
+                    this.playCardOnTarget(playableCard, this.highlightedCard.data as BaseCharacter);
+                }
+            }
+        }
+
+        if (!wasPlayed) {
+            // Animate the card back to its original position
+            if (this.originalCardPosition) {
+                this.tweens.add({
+                    targets: physicalCard.container,
+                    x: this.originalCardPosition.x,
+                    y: this.originalCardPosition.y,
+                    scaleX: 1,
+                    scaleY: 1,
+                    alpha: 1,
+                    duration: 300,
+                    ease: 'Power2',
+                    onComplete: () => {
+                        // Reset the original position
+                        this.originalCardPosition = null;
+                    }
+                });
+            } else {
+                // If original position is not stored, arrange the hand
+                this.arrangeCards(this.playerHand, config.handY);
+            }
+        } else {
+            // If played, remove from hand and add to discard pile
+            this.removeCardFromHand(physicalCard);
+            this.addCardToDiscardPile(physicalCard);
+        }
+
+        // Hide the battlefield and hand areas
         this.battlefieldArea.setVisible(false);
         this.handArea.setVisible(false);
 
+        // Reset interaction states
         if (this.highlightedCard) {
-            this.handleCardInteraction(physicalCard, this.highlightedCard);
             this.unhighlightCard(this.highlightedCard);
             this.highlightedCard = null;
         }
 
         this.draggedCard = null;
+        this.originalCardPosition = null;
+
+        // Trigger a synchronization for arranging the hand
+        this.needsSync = true;
     }
 
     /**
-     * Handles the interaction between two cards after a drag-and-drop action.
-     * @param usedCard - The card being used (dragged).
-     * @param targetCard - The target card being interacted with.
+     * Determines the targeting type of a card.
+     * Assumes the existence of this method as per the user's instruction.
+     * @param card - The AbstractCard to get the targeting type for.
+     * @returns The targeting type as a string.
      */
-    private handleCardInteraction(usedCard: PhysicalCard, targetCard: PhysicalCard): void {
-        if (!(usedCard.data instanceof PlayableCard)) {
-            console.log("Used card is not a PlayableCard");
-            return;
-        }
-
-        const usedPlayableCard = usedCard.data as PlayableCard;
-
-        if (usedPlayableCard.IsPerformableOn(targetCard.data)) {
-            usedPlayableCard.InvokeCardEffects(targetCard.data);
-            console.log(`Card effects invoked: ${usedCard.data.name} on ${targetCard.data.name}`);
-        } else {
-            console.log(`Action not performable on ${targetCard.data.name} by ${usedCard.data.name}`);
-        }
+    private GetTargetingType(card: AbstractCard): TargetingType {
+        return (card as PlayableCard).targetingType;
     }
+
+    /**
+     * Checks if the target is valid based on the card's targeting type.
+     * @param card - The PlayableCard being played.
+     * @param target - The BaseCharacter being targeted.
+     * @returns True if the target is valid, otherwise false.
+     */
+    private isValidTarget(card: PlayableCard, target: AbstractCard): boolean {
+
+
+        if (card.targetingType === TargetingType.NO_TARGETING) {
+            return true;
+        }
+
+        if (target instanceof BaseCharacter) {  
+            const targetingType = this.GetTargetingType(card);
+            // Implement the logic to verify if the target matches the targeting type
+            // For example:
+            if (targetingType === TargetingType.ENEMY) {
+                    // Add specific conditions for single target
+                    return this.isEnemy(target); // Replace with actual condition
+            }
+            else if (targetingType === TargetingType.ALLY) {
+                return this.isAlly(target); // Replace with actual condition
+            }
+        }
+
+        return false;
+    }
+
+
+    private isAlly(target: BaseCharacter): boolean {
+        return true; //dummy implementation
+    }
+
+    private isEnemy(target: BaseCharacter): boolean {
+        return true; //dummy implementation
+    }
+
+    /**
+     * Plays a card on the battlefield (for NO_TARGETING cards).
+     * @param card - The PhysicalCard being played.
+     */
+    private playCardOnBattlefield(card: PhysicalCard): void {
+        const playableCard = card.data as PlayableCard;
+        playableCard.InvokeCardEffects(); // No target
+        console.log(`Card played on battlefield: ${card.data.name}`);
+        // Optionally, add animations or additional logic here
+    }
+
+    /**
+     * Plays a card on a specific target.
+     * @param card - The PlayableCard being played.
+     * @param target - The BaseCharacter being targeted.
+     */
+    private playCardOnTarget(card: PlayableCard, target: BaseCharacter): void {
+        card.InvokeCardEffects(target);
+        console.log(`Card played: ${card.name} on ${target.name}`);
+        // Optionally, add animations or additional logic here
+    }
+
+    /**
+     * Removes a card from the player's hand.
+     * @param card - The PhysicalCard to remove.
+     */
+    private removeCardFromHand(card: PhysicalCard): void {
+        this.playerHand = this.playerHand.filter(c => c !== card);
+    }
+
+    /**
+     * Adds a card to the discard pile with an animation.
+     * @param card - The PhysicalCard to discard.
+     */
+    private addCardToDiscardPile(card: PhysicalCard): void {
+        this.tweens.add({
+            targets: card.container,
+            x: this.discardPile.container.x,
+            y: this.discardPile.container.y,
+            scaleX: 0.5,
+            scaleY: 0.5,
+            alpha: 0,
+            duration: 500,
+            ease: 'Power2',
+            onComplete: () => {
+                this.discardPile.data.name = `Discard Pile (${GameState.getInstance().combatState.currentDiscardPile.length + 1})`;
+                this.discardPile.nameBox.setText(this.discardPile.data.name);
+                GameState.getInstance().combatState.currentDiscardPile.push(card.data);
+                card.obliterate(); // Remove the card after animation
+            }
+        });
+    }
+
     private handleEndTurn(): void {
         console.log('End turn button clicked');
 

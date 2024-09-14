@@ -1,6 +1,5 @@
-import { CardType, CardSize } from "./Primitives";
-import { AbstractIntent } from "./AbstractIntent";
 import { JsonRepresentable } from '../interfaces/JsonRepresentable';
+import { CardSize, CardType } from "./Primitives";
 
 export interface IPhysicalCardInterface {
     container: Phaser.GameObjects.Container;
@@ -120,10 +119,18 @@ export class UiCard extends AbstractCard{
 }
 
 export abstract class PlayableCard extends AbstractCard {
-    constructor({ name, description, portraitName, cardType, tooltip, characterData, size }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: AbstractCard, size?: CardSize }) {
+    targetingType: TargetingType
+    constructor({ name, description, portraitName, cardType, tooltip, characterData, size, targetingType }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: AbstractCard, size?: CardSize, targetingType?: TargetingType}) {
         super({ name, description, portraitName, cardType, tooltip, characterData, size });
+        this.targetingType = targetingType || TargetingType.ENEMY;
     }
 
     abstract InvokeCardEffects: (targetCard?: AbstractCard) => void;
-    abstract IsPerformableOn(targetCard: AbstractCard): boolean;
+    abstract IsPerformableOn(targetCard?: AbstractCard): boolean;
+}
+
+export enum TargetingType{
+    ALLY,
+    ENEMY,
+    NO_TARGETING
 }
