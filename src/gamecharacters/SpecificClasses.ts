@@ -1,9 +1,9 @@
 import { ActionManager } from "../utils/ActionManager"
-import { AbstractCard, PlayableCard } from "./AbstractCard"
+import { AbstractCard, PlayableCard, TargetingType } from "./AbstractCard"
 import { AbstractIntent, AttackIntent } from "./AbstractIntent"
 import { AutomatedCharacter } from "./AutomatedCharacter"
 import { BaseCharacter } from "./BaseCharacter"
-import {  BaseCharacterClass } from "./CharacterClasses"
+import { BaseCharacterClass } from "./CharacterClasses"
 
 export class GoblinCharacter extends AutomatedCharacter {
     constructor() {
@@ -17,7 +17,6 @@ export class GoblinCharacter extends AutomatedCharacter {
 export class BlackhandClass extends BaseCharacterClass {
     constructor() {
         super({ name: "Blackhand", iconName: "blackhand_icon", startingMaxHp: 30 })
-        // Add Blackhand-specific cards here
         this.addCard(new FireballCard())
         this.addCard(new ToxicCloudCard())
     }
@@ -26,7 +25,6 @@ export class BlackhandClass extends BaseCharacterClass {
 export class DiabolistClass extends BaseCharacterClass {
     constructor() {
         super({ name: "Diabolist", iconName: "diabolist_icon", startingMaxHp: 20 })
-        // Add Diabolist-specific cards here
         this.addCard(new ArcaneRitualCard())
         this.addCard(new SummonDemonCard())
     }
@@ -38,25 +36,22 @@ export class ArcaneRitualCard extends PlayableCard {
         super({
             name: "Arcane Ritual",
             description: "Deal 4 damage to target enemy. Draw 1 card.",
-            portraitName: "gem-pendant"
+            portraitName: "gem-pendant",
+            targetingType: TargetingType.ENEMY
         });
-    }
-
-    IsPerformableOn = (targetCard: AbstractCard): boolean => {
-        return targetCard instanceof AutomatedCharacter;
     }
 
     InvokeCardEffects = (targetCard?: AbstractCard): void => {
         if (targetCard && targetCard instanceof BaseCharacter) {
             ActionManager.getInstance().dealDamage({ target: targetCard, amount: 4 });
+            ActionManager.getInstance().drawCards(1);
             console.log(`Dealt 4 damage to ${targetCard.name}`);
         }
-        // Logic for drawing a card would go here
         console.log("Drew 1 card");
     }
 }
 
-export class FireballCard extends AbstractCard {
+export class FireballCard extends PlayableCard {
     constructor() {
         super({
             name: "Fireball",
@@ -65,9 +60,6 @@ export class FireballCard extends AbstractCard {
         });
     }
 
-    IsPerformableOn = (targetCard: AbstractCard): boolean => {
-        return targetCard instanceof AutomatedCharacter;
-    }
 
     InvokeCardEffects = (targetCard?: AbstractCard): void => {
         if (targetCard && targetCard instanceof BaseCharacter) {
@@ -77,7 +69,7 @@ export class FireballCard extends AbstractCard {
     }
 }
 
-export class ToxicCloudCard extends AbstractCard {
+export class ToxicCloudCard extends PlayableCard {
     constructor() {
         super({
             name: "Toxic Cloud",
@@ -87,14 +79,11 @@ export class ToxicCloudCard extends AbstractCard {
     }
 
     InvokeCardEffects = (targetCard?: AbstractCard): void => {
-        if (targetCard && targetCard instanceof BaseCharacter) {
-            //ActionManager.getInstance().applyPoison({ target: targetCard, amount: 3 });
-            console.log(`Applied 3 Poison to ${targetCard.name}`);
-        }
+        console.log(`Applied 3 Poison to ${targetCard?.name}`);
     }
 }
 
-export class SummonDemonCard extends AbstractCard {
+export class SummonDemonCard extends PlayableCard {
     constructor() {
         super({
             name: "Summon Demon",
@@ -104,9 +93,7 @@ export class SummonDemonCard extends AbstractCard {
     }
 
     InvokeCardEffects = (targetCard?: AbstractCard): void => {
-        if (targetCard && targetCard instanceof BaseCharacter) {
-            //ActionManager.getInstance().summonDemon({ target: targetCard, amount: 5 });
-            console.log(`Summoned a 5/5 Demon minion`);
-        }
+        console.log(`Applied 3 Poison to ${targetCard?.name}`);
     }
+
 }

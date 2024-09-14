@@ -1,4 +1,5 @@
 import { JsonRepresentable } from '../interfaces/JsonRepresentable';
+import { BaseCharacter } from './BaseCharacter';
 import { CardSize, CardType } from "./Primitives";
 
 export interface IPhysicalCardInterface {
@@ -63,6 +64,11 @@ function generateWordGuid(): string {
     return `${word1} ${word2} ${word3} ${seedNumber}`;
 }
 
+export enum Team{
+    ALLY,
+    ENEMY
+}
+
 export abstract class AbstractCard implements JsonRepresentable {
     public name: string
     public description: string
@@ -73,8 +79,9 @@ export abstract class AbstractCard implements JsonRepresentable {
     size: CardSize
     id: string = generateWordGuid()
     physicalCard?: IPhysicalCardInterface // this is a hack, it's just always PhysicalCard
+    team: Team
 
-    constructor({ name, description, portraitName, cardType, tooltip, characterData, size }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: AbstractCard, size?: CardSize }) {
+    constructor({ name, description, portraitName, cardType, tooltip, characterData, size, team }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: AbstractCard, size?: CardSize, team?: Team }) {
         this.name = name
         this.description = description
         this.portraitName = portraitName || "flamer1"
@@ -82,6 +89,7 @@ export abstract class AbstractCard implements JsonRepresentable {
         this.tooltip = tooltip || "Lorem ipsum dolor sit amet"
         this.characterData = characterData || undefined
         this.size = size || CardSize.SMALL
+        this.team = team || Team.ENEMY
     }
 
     OnCombatStart(): void {
@@ -126,7 +134,32 @@ export abstract class PlayableCard extends AbstractCard {
     }
 
     abstract InvokeCardEffects: (targetCard?: AbstractCard) => void;
-    abstract IsPerformableOn(targetCard?: AbstractCard): boolean;
+    public IsPerformableOn(targetCard?: AbstractCard): boolean{
+        return true;
+    }
+
+    public IsPerformableOn_Outer(targetCard?: AbstractCard): boolean {
+
+        if (this.targetingType === TargetingType.NO_TARGETING) {
+            return true;
+        }
+
+        if (!(targetCard instanceof BaseCharacter)) {
+            return false;
+        }
+
+        const isTargetAlly = targetCard instanceof BaseCharacter && targetCard.team === Team.ALLY;
+        const isTargetEnemy = targetCard instanceof BaseCharacter && targetCard.team === Team.ENEMY;
+        switch (this.targetingType) {
+            case TargetingType.ALLY:
+                return isTargetAlly && this.IsPerformableOn(targetCard);
+            case TargetingType.ENEMY:
+                return isTargetEnemy && this.IsPerformableOn(targetCard);
+            default:
+                console.warn(`Unknown targeting type: ${this.targetingType}`);
+                return false;
+        }
+    }
 }
 
 export enum TargetingType{

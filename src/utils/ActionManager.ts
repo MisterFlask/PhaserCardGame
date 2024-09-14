@@ -59,7 +59,7 @@ export class ActionManager {
         console.log('Hand:', combatState.currentHand.map(card => card.name));
     }
 
-    private drawCards(count: number): void {
+    public drawCards(count: number): void {
         this.actionQueue.addAction(new GenericAction(async () => {
             const deckLogic = DeckLogic.getInstance();
             const drawnCards: AbstractCard[] = [];
