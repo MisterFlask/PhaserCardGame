@@ -26,7 +26,6 @@ class CombatUIManager {
         this.createEndTurnButton();
         this.createGameAreas();
     }
-
     private createMenu(): void {
         const gameWidth = this.scene.scale.width;
         const gameHeight = this.scene.scale.height;
@@ -43,6 +42,10 @@ class CombatUIManager {
             {
                 text: 'Quit',
                 callback: () => this.scene.game.destroy(true)
+            },
+            {
+                text: 'Toggle Game Areas',
+                callback: () => this.toggleGameAreas()
             }
         ];
 
@@ -90,6 +93,11 @@ class CombatUIManager {
         this.scene.add.existing(menuButton);
     }
 
+    private toggleGameAreas(): void {
+        this.battlefieldArea.setVisible(!this.battlefieldArea.visible);
+        this.handArea.setVisible(!this.handArea.visible);
+    }
+
     private createCombatStatusText(): void {
         const gameWidth = this.scene.scale.width;
         const pileY = CombatSceneLayoutUtils.getPileY(this.scene);
@@ -134,13 +142,13 @@ class CombatUIManager {
 
     public updateLayout(width: number, height: number): void {
         // Update positions based on new width and height
-        this.menu.updatePosition(width - 250, height / 2);
+        this.menu.updatePosition(width * 0.25, height / 2);
         this.combatStatusText.setPosition(width * 0.5, CombatSceneLayoutUtils.getPileY(this.scene));
         this.endTurnButton.setPosition(width * 0.7, CombatSceneLayoutUtils.getPileY(this.scene));
 
         const menuButton = this.scene.children.getByName('MenuButton') as Phaser.GameObjects.Text;
         if (menuButton) {
-            menuButton.setPosition(width - 350, 50);
+            menuButton.setPosition(width * 0.25, 50);
         }
 
         // Update game areas
@@ -157,14 +165,14 @@ class CombatUIManager {
             .setStrokeStyle(4, 0xffff00)
             .setFillStyle(0xffff00, 0.2) // Added fill for visibility
             // .setInteractive() // Removed to prevent blocking underlying events
-            .setVisible(true); // Ensure visible during testing
+            .setVisible(false); // Ensure visible during testing
 
         // Hand Area
         this.handArea = this.scene.add.rectangle(gameWidth / 2, handY, gameWidth - 100, 300)
             .setStrokeStyle(4, 0x00ff00)
             .setFillStyle(0x00ff00, 0.2) // Added fill for visibility
             // .setInteractive() // Removed to prevent blocking underlying events
-            .setVisible(true); // Ensure visible during testing
+            .setVisible(false); // Ensure visible during testing
 
         // Ensure these areas are on top of other game objects
         this.battlefieldArea.setDepth(1000);

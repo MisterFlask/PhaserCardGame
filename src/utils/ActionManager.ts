@@ -37,7 +37,7 @@ export class ActionManager {
             // Implement draw animation logic here
             console.log(`Animating draw for card: ${card.name}`);
             // Example animation delay
-            setTimeout(() => resolve(), 500);
+            setTimeout(() => resolve(), 20);
         });
     }
 
@@ -46,7 +46,7 @@ export class ActionManager {
             // Implement discard animation logic here
             console.log(`Animating discard for card: ${card.data.name}`);
             // Example animation delay
-            setTimeout(() => resolve(), 500);
+            setTimeout(() => resolve(), 20);
         });
     }
 
@@ -54,7 +54,7 @@ export class ActionManager {
         this.actionQueue.addAction(new GenericAction(async () => {
             DeckLogic.moveCardToPile(card, PileName.Discard);
             await this.animateDiscardCard(card.physicalCard as PhysicalCard);
-            await new WaitAction(100).playAction();
+            await new WaitAction(20).playAction();
             return [];
         }));
     }
