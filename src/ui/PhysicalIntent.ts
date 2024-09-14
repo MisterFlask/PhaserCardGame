@@ -2,6 +2,7 @@ import { Scene } from "phaser";
 import { AbstractIntent } from "../gamecharacters/AbstractIntent";
 import { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { JsonRepresentable } from "../interfaces/JsonRepresentable";
+import { IntentEmitter } from "../utils/intentemitter";
 
 export class PhysicalIntent implements JsonRepresentable {
     static readonly WIDTH: number = 40;
@@ -12,9 +13,8 @@ export class PhysicalIntent implements JsonRepresentable {
     private container: Phaser.GameObjects.Container;
     private image: Phaser.GameObjects.Image;
     private text: Phaser.GameObjects.Text;
-    private targetedCharacter: BaseCharacter;
 
-    constructor(scene: Scene, intent: AbstractIntent, x: number, y: number, targetedCharacter: BaseCharacter) {
+    constructor(scene: Scene, intent: AbstractIntent, x: number, y: number) {
         this.scene = scene;
         this.intent = intent;
         
@@ -28,10 +28,25 @@ export class PhysicalIntent implements JsonRepresentable {
         
         this.container.add([this.image, this.text]);
         
+        // Set interactive for the container to detect pointer events
+        this.container.setSize(PhysicalIntent.WIDTH, PhysicalIntent.HEIGHT);
+        this.container.setInteractive()
+            .on('pointerover', this.onPointerOver, this)
+            .on('pointerout', this.onPointerOut, this);
+        
         //this.setupTooltip();
         this.update();
         
-        this.targetedCharacter = targetedCharacter;
+    }
+
+    private onPointerOver(): void {
+        console.log("onPointerOver for intent: " + this.createJsonRepresentation());
+        IntentEmitter.getInstance().emitIntentHover(this);
+    }
+
+    private onPointerOut(): void {
+        console.log("onPointerOut for intent: " + this.createJsonRepresentation());
+        IntentEmitter.getInstance().emitIntentHoverEnd(this);
     }
 
     private setupTooltip(): void {
@@ -77,7 +92,7 @@ export class PhysicalIntent implements JsonRepresentable {
         }, null, 2);
     }
 
-    getTargetedCharacter(): BaseCharacter {
-        return this.targetedCharacter;
+    getTargetedCharacter(): BaseCharacter | undefined {
+        return this.intent.target;
     }
 }

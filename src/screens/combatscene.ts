@@ -14,6 +14,7 @@ import { PhysicalIntent } from '../ui/PhysicalIntent';
 import { TextBox } from '../ui/TextBox';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 import GameImageLoader from '../utils/ImageUtils';
+import { IntentEmitter } from '../utils/intentemitter';
 import CampaignScene from './campaign';
 import MapScene from './map';
 
@@ -59,6 +60,8 @@ class CombatScene extends Phaser.Scene {
     private highlightedCard: PhysicalCard | null = null;
     private draggedCard: PhysicalCard | null = null;
     private hoveredCard: PhysicalCard | null = null;
+    private highlightedIntent: PhysicalIntent | null = null;
+    private highlightedTargetCard: PhysicalCard | null = null;
 
     // Performance Monitoring
     private lastPerformanceLog: number = 0;
@@ -116,6 +119,7 @@ class CombatScene extends Phaser.Scene {
         this.setupEventListeners();
         this.setupPhysicalIntents();
         this.setupResizeHandler();
+        this.setupCombatSceneEventListeners();
 
         // Initial synchronization
         this.needsSync = true;
@@ -168,6 +172,60 @@ class CombatScene extends Phaser.Scene {
         this.time.delayedCall(100, () => {
             this.resize();
         });
+    }
+
+    /**
+     * Sets up CombatScene-specific event listeners for intent hover events.
+     */
+    private setupCombatSceneEventListeners(): void {
+        const intentEmitter = IntentEmitter.getInstance();
+        intentEmitter.on('intenthover', this.handleIntentHover, this);
+        intentEmitter.on('intenthoverend', this.handleIntentHoverEnd, this);
+    }
+
+    /**
+     * Handles the intent hover event.
+     * @param intent - The PhysicalIntent being hovered over.
+     */
+    private handleIntentHover(intent: PhysicalIntent): void {
+        // Highlight the intent itself
+        this.highlightedIntent = intent;
+        //intent.getContainer().setTint(0x00ff00); // Example highlight
+
+        // Highlight the targeted character's card
+        const targetedCharacter = intent.getTargetedCharacter();
+        if (targetedCharacter) {
+            const targetCard = this.findCardByCharacter(targetedCharacter);
+            if (targetCard) {
+                this.highlightedTargetCard = targetCard;
+                this.highlightCard(targetCard);
+            }
+        }
+    }
+
+    /**
+     * Handles the intent hover end event.
+     * @param intent - The PhysicalIntent that was hovered out.
+     */
+    private handleIntentHoverEnd(intent: PhysicalIntent): void {
+        // Remove highlight from the intent
+        this.highlightedIntent = null;
+        // intent.getContainer().clearTint(); //does not compile
+
+        // Remove highlight from the targeted character's card
+        if (this.highlightedTargetCard) {
+            this.unhighlightCard(this.highlightedTargetCard);
+            this.highlightedTargetCard = null;
+        }
+    }
+
+    /**
+     * Finds the PhysicalCard associated with a given BaseCharacter.
+     * @param character - The BaseCharacter to find the card for.
+     * @returns The corresponding PhysicalCard or undefined.
+     */
+    private findCardByCharacter(character: BaseCharacter): PhysicalCard | undefined {
+        return [...this.playerUnits, ...this.enemyUnits].find(card => card.data === character);
     }
 
     /**
@@ -732,10 +790,7 @@ class CombatScene extends Phaser.Scene {
      * @param card - The PhysicalCard to highlight.
      */
     private highlightCard(card: PhysicalCard): void {
-        const highlightBorder = card.container.getByName('highlightBorder') as Phaser.GameObjects.Rectangle;
-        if (highlightBorder) {
-            highlightBorder.setVisible(true);
-        }
+        card.highlight();
     }
 
     /**
@@ -743,10 +798,7 @@ class CombatScene extends Phaser.Scene {
      * @param card - The PhysicalCard to unhighlight.
      */
     private unhighlightCard(card: PhysicalCard): void {
-        const highlightBorder = card.container.getByName('highlightBorder') as Phaser.GameObjects.Rectangle;
-        if (highlightBorder) {
-            highlightBorder.setVisible(false);
-        }
+        card.unhighlight();
     }
 
     /**
@@ -882,6 +934,7 @@ class CombatScene extends Phaser.Scene {
 
         // Highlight cards targeted by intents
         if (hoveredIntent) {
+            console.log("Hovered intent: " + hoveredIntent.createJsonRepresentation());
             const targetedCharacter = hoveredIntent.getTargetedCharacter();
             const targetedCard = allCards.find(card => card.data === targetedCharacter);
             if (targetedCard) {

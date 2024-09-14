@@ -22,4 +22,13 @@ export class IntentEmitter extends Phaser.Events.EventEmitter {
     public emitIntentHoverEnd(intent: PhysicalIntent): void {
         this.emit('intenthoverend', intent);
     }
+
+    // Add these lines if not present
+    public emitIntentHoverOver(intent: PhysicalIntent): void {
+        this.emit('intenthoverover', intent);
+    }
+
+    public emitIntentHoverOut(intent: PhysicalIntent): void {
+        this.emit('intenthoverout', intent);
+    }
 }

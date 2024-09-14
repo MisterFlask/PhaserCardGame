@@ -267,7 +267,8 @@ export class PhysicalCard {
         if (this.obliterated) return;
         console.log(`Clicked on card: ${this.data.name}`);
         const jsonData = this.data.createJsonRepresentation();
-        this.showJsonModal(jsonData);
+        console.log("jsonData of card clicked: " + jsonData);
+        //this.showJsonModal(jsonData);
     }
 
     showJsonModal(jsonData: string): void {
@@ -437,7 +438,7 @@ export class PhysicalCard {
         currentIntents.forEach((intent: AbstractIntent) => {
             let physicalIntent = this.physicalIntents.get(intent.id);
             if (!physicalIntent) {
-                physicalIntent = new PhysicalIntent(this.scene, intent, 0, 0, this.data as BaseCharacter);
+                physicalIntent = new PhysicalIntent(this.scene, intent, 0, 0);
                 this.physicalIntents.set(intent.id, physicalIntent);
                 this.intentsContainer.add(physicalIntent.getContainer());
             } else {
@@ -479,6 +480,20 @@ export class PhysicalCard {
     set isHighlighted(value: boolean) {
         this._isHighlighted = value;
         this.updateHighlightVisual();
+    }
+
+    /**
+     * Highlights the card by changing its appearance.
+     */
+    highlight(): void {
+        this.isHighlighted = true
+    }
+
+    /**
+     * Removes the highlight from the card.
+     */
+    unhighlight(): void {
+        this.isHighlighted = false
     }
 }
 
