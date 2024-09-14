@@ -1,3 +1,4 @@
+
 import { BaseCharacter } from "./BaseCharacter";
 import { JsonRepresentable } from '../interfaces/JsonRepresentable';
 import { AbstractIntent } from "./AbstractIntent";

@@ -1,5 +1,7 @@
-import { AbstractCard, PhysicalCard, TextBox } from "../gamecharacters/PhysicalCard";
+import { AbstractCard } from "../gamecharacters/AbstractCard";
+import { PhysicalCard } from "../gamecharacters/PhysicalCard";
 import { CardType } from "../gamecharacters/Primitives";
+import { TextBox } from "../ui/TextBox";
 
 export interface CardConfig {
     cardWidth: number;

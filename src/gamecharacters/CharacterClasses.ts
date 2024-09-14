@@ -1,7 +1,5 @@
-import { PlayableCard } from "./AbstractCard";
-import { AbstractIntent } from "./AbstractIntent";
+import { AbstractCard, PlayableCard } from "./AbstractCard";
 import { BaseCharacter } from "./BaseCharacter"
-import { AbstractCard } from "./PhysicalCard";
 
 export class BaseCharacterClass {
     constructor({ name, iconName, startingMaxHp }: { name: string; iconName: string, startingMaxHp: number }) {

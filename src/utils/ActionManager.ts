@@ -1,6 +1,6 @@
 import { StoreCard } from '../screens/campaign';
 import { BaseCharacter } from "../gamecharacters/BaseCharacter"
-import { AbstractCard, PhysicalCard } from '../gamecharacters/PhysicalCard';
+import { PhysicalCard } from '../gamecharacters/PhysicalCard';
 import { AbstractIntent } from "../gamecharacters/AbstractIntent";
 
 export class ActionManager {
@@ -44,15 +44,25 @@ export class ActionManager {
                     currentShake++;
                 }
             }, shakeDuration);
-
             // Flicker the card red
-            const originalTint = physicalCardOfTarget.cardBackground.tint;
-            physicalCardOfTarget.cardBackground.setTint(0xff0000);
+            let originalTint: number;
+            if (physicalCardOfTarget.cardBackground instanceof Phaser.GameObjects.Image) {
+                originalTint = physicalCardOfTarget.cardBackground.tint;
+                physicalCardOfTarget.cardBackground.setTint(0xff0000);
+            } else if (physicalCardOfTarget.cardBackground instanceof Phaser.GameObjects.Rectangle) {
+                originalTint = physicalCardOfTarget.cardBackground.fillColor;
+                physicalCardOfTarget.cardBackground.setFillStyle(0xff0000);
+            }
             
             setTimeout(() => {
-                physicalCardOfTarget.cardBackground.setTint(originalTint);
+                if (physicalCardOfTarget.cardBackground instanceof Phaser.GameObjects.Image) {
+                    physicalCardOfTarget.cardBackground.setTint(originalTint);
+                } else if (physicalCardOfTarget.cardBackground instanceof Phaser.GameObjects.Rectangle) {
+                    physicalCardOfTarget.cardBackground.setFillStyle(originalTint);
+                }
                 resolve();
             }, 300);
+
         });
     }
 
@@ -103,6 +113,7 @@ export class ActionManager {
 
 import Phaser from 'phaser';
 import { GameState } from '../screens/gamestate';
+import { AbstractCard } from '../gamecharacters/AbstractCard';
 
 export abstract class GameAction {
   abstract playAction(): Promise<GameAction[]>;

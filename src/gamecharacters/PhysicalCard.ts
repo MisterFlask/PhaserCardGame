@@ -1,119 +1,15 @@
+// src/gamecharacters/PhysicalCard.ts
+import Phaser from 'phaser';
 import { AbstractCard } from "./AbstractCard";
-import { BaseCharacter } from "./BaseCharacter"
+import { BaseCharacter } from "./BaseCharacter";
 import { AbstractIntent } from "./AbstractIntent";
 import { PhysicalIntent } from "./PhysicalIntent";
-import { safeStringify } from '../utils/JsonUtils';
-
-export class TextBox {
-    background: Phaser.GameObjects.Rectangle | Phaser.GameObjects.Image | null;
-    text: Phaser.GameObjects.Text;
-    outline: Phaser.GameObjects.Rectangle;
-    textBoxName?: string
-    constructor(params: {
-        scene: Phaser.Scene,
-        x?: number,
-        y?: number,
-        width?: number,
-        height?: number,
-        text?: string,
-        style?: Phaser.Types.GameObjects.Text.TextStyle,
-        backgroundImage?: string,
-        textBoxName?: string
-    }) {
-        const {
-            scene,
-            x = 0,
-            y = 0,
-            width = 100,
-            height = 50,
-            text = '',
-            style = { fontSize: '16px', color: '#000' },
-            backgroundImage,
-            textBoxName
-        } = params;
-        this.textBoxName = textBoxName ?? "anonymousTextBox";
-
-        if (backgroundImage) {
-            this.background = scene.add.image(x, y, backgroundImage).setDisplaySize(width, height);
-        } else {
-            this.background = scene.add.rectangle(x, y, width, height, 0xffffff);
-        }
-        this.outline = scene.add.rectangle(x, y, width, height).setStrokeStyle(2, 0x000000);
-        this.text = scene.add.text(x, y, text, style);
-        this.text.setOrigin(0.5);
-        // Enforce text wrapping within bounds
-        this.text.setWordWrapWidth(width - 2); // Subtract padding
-        this.text.setAlign('center');
-
-        // Adjust text size if it overflows
-        const originalFontSize = parseInt(style.fontSize as string);
-        let currentFontSize = originalFontSize;
-        while ((this.text.height > height - 1 || this.text.width > width - 1) && currentFontSize > 8) { // Minimum font size of 8
-            currentFontSize--;
-            this.text.setFontSize(currentFontSize);
-            this.text.setWordWrapWidth(width - 10);
-        }
-    }
-
-    setPosition(x: number, y: number): void {
-        if (this.background === null) {
-            return;
-        }
-        this.background.setPosition(x, y);
-        this.outline.setPosition(x, y);
-        this.text.setPosition(x, y);
-    }
-
-    setSize(width: number, height: number): void {
-        if (this.background === null) {
-            return;
-        }
-        if (this.background instanceof Phaser.GameObjects.Rectangle) {
-            this.background.setSize(width, height);
-        } else {
-            this.background.setDisplaySize(width, height);
-        }
-        this.outline.setSize(width, height);
-    }
-
-    setText(text: string): void {
-        if (this.text.scene === null) {
-            return;
-        }
-        if (this.background == null){
-            return;
-        }
-        if ((this.text.frame as any)?.data) {
-            // we do this because there are circumstances where data is not available
-            // and it crashes the whole game.  Caused by if the container gets
-            // destroyed without the listeners getting destroyed.
-            this.text.setText(text);
-        }else{
-            console.log("text frame data is null for " + this.textBoxName);
-        }
-    }
-
-    setVisible(visible: boolean): void {
-        if (this.background === null) {
-            return;
-        }
-        this.background.setVisible(visible);
-        this.outline.setVisible(visible);
-        this.text.setVisible(visible);
-    }
-    destroy(): void {
-        if (this.background) {
-            this.background.destroy();
-        }
-        this.background = null;
-    }
-}
-import Phaser from 'phaser';
+import { TextBox } from "../ui/TextBox"; // Ensure correct relative path
 import { AutomatedCharacter } from "./AutomatedCharacter";
 
 export class PhysicalCard {
     container: Phaser.GameObjects.Container;
-    cardBackground: Phaser.GameObjects.Image;
+    cardBackground: Phaser.GameObjects.Rectangle | Phaser.GameObjects.Image;
     cardImage: Phaser.GameObjects.Image;
     nameBox: TextBox;
     descBox: TextBox;
@@ -145,7 +41,7 @@ export class PhysicalCard {
     }: {
         scene: Phaser.Scene;
         container: Phaser.GameObjects.Container;
-        cardBackground: Phaser.GameObjects.Image;
+        cardBackground: Phaser.GameObjects.Rectangle | Phaser.GameObjects.Image;
         cardImage: Phaser.GameObjects.Image;
         nameBox: TextBox;
         descBox: TextBox;
@@ -161,16 +57,27 @@ export class PhysicalCard {
         this.descBox = descBox;
         this.tooltipBox = tooltipBox;
         this.data = data;
-        this.data.physicalCard = this;
+        (this.data as any).physicalCard = this;
         this.visualTags = [];
 
         // Create a new container for card content (excluding tooltip)
-        this.cardContent = this.scene.add.container();
-        this.cardContent.add([this.cardBackground, this.cardImage, this.nameBox.background!!, this.nameBox.outline, this.nameBox.text, this.descBox.background!!, this.descBox.outline, this.descBox.text]);
+        this.cardContent = this.scene.add.container(0, 0);
+        this.cardContent.add([
+            this.cardBackground,
+            this.cardImage,
+            this.nameBox.background!!,
+            // No need to add outline separately as it's part of TextBox
+            this.nameBox.text,
+            this.descBox.background!!,
+            this.descBox.text
+        ]);
         this.container.add(this.cardContent);
 
         // Add tooltip elements directly to the main container
-        this.container.add([this.tooltipBox.background!!, this.tooltipBox.outline, this.tooltipBox.text]);
+        this.container.add([
+            this.tooltipBox.background!!,
+            this.tooltipBox.text
+        ]);
 
         // Add HP box if the card is a BaseCharacter
         if (this.data instanceof BaseCharacter) {
@@ -179,14 +86,14 @@ export class PhysicalCard {
             const cardHeight = this.cardBackground.displayHeight;
             this.hpBox = new TextBox({
                 scene: this.scene,
-                x: cardWidth / 2 - 20,
-                y: -cardHeight / 2 + 20,
-                width: 40,
-                height: 20,
+                x: cardWidth / 2 - 30,
+                y: -cardHeight / 2 + 30,
+                width: 60,
+                height: 30,
                 text: `${baseCharacter.hitpoints}/${baseCharacter.maxHitpoints}`,
-                style: { fontSize: '12px', color: '#000' }
+                style: { fontSize: '14px', color: '#ff0000', fontFamily: 'Arial' }
             });
-            this.cardContent.add([this.hpBox.background!!, this.hpBox.outline, this.hpBox.text]);
+            this.cardContent.add([this.hpBox.background!!, this.hpBox.text]);
         } else {
             this.hpBox = null;
         }
@@ -208,7 +115,7 @@ export class PhysicalCard {
         }
 
         // Create a new container for intents
-        this.intentsContainer = this.scene.add.container(0, -this.cardBackground.displayHeight / 2 - 30);
+        this.intentsContainer = this.scene.add.container(0, -this.cardBackground.displayHeight / 2 - 40);
         this.cardContent.add(this.intentsContainer);
 
         this.updateVisuals();
@@ -275,17 +182,23 @@ export class PhysicalCard {
     }
 
     onPointerOver_PhysicalCard = (): void => {
-        if (this.obliterated) {
-            return;
-        }
+        if (this.obliterated) return;
         console.log(`Pointer over card: ${this.data.name}`);
-        this.cardContent.setScale(this.data.size * 1.1);
+
+        // Animate scaling up with a smooth transition
+        this.scene.tweens.add({
+            targets: this.cardContent,
+            scale: this.data.size * 1.1,
+            duration: 200,
+            ease: 'Power2'
+        });
+
         this.descBox.setVisible(true);
         this.tooltipBox.setVisible(true);
         this.container.setDepth(1000);
 
         // Determine tooltip position based on card's position
-        const cardWidth = this.cardBackground.displayWidth * this.data.size;
+        const cardWidth = this.cardBackground.displayWidth * this.data.size * 1.1; // Adjust for scaling
         const gameWidth = this.scene.scale.width;
         const cardCenterX = this.container.x;
 
@@ -297,48 +210,52 @@ export class PhysicalCard {
         const requiredTooltipWidth = this.tooltipBox.text.width + padding * 2;
         const requiredTooltipHeight = this.tooltipBox.text.height + padding * 2;
 
-        // Update tooltip background
+        // Update tooltip size
         this.tooltipBox.setSize(requiredTooltipWidth, requiredTooltipHeight);
 
+        // Position tooltip with offset
         if (cardCenterX > gameWidth / 2) {
             // Card is on the right side, show tooltip on the left
-            this.tooltipBox.setPosition(-cardWidth - requiredTooltipWidth / 2, 0);
+            this.tooltipBox.setPosition(-cardWidth - requiredTooltipWidth / 2 - 10, 0);
         } else {
             // Card is on the left side, show tooltip on the right
-            this.tooltipBox.setPosition(cardWidth + requiredTooltipWidth / 2, 0);
+            this.tooltipBox.setPosition(cardWidth + requiredTooltipWidth / 2 + 10, 0);
         }
 
         // Play hover sound
         if (this.hoverSound) {
-            // this.hoverSound.play(); //tbd i now find this annoying
+            // this.hoverSound.play(); // Uncomment if desired
         }
+
         // Add wiggle animation
         if (!this.wiggleTween) {
             this.wiggleTween = this.scene.tweens.add({
                 targets: this.cardContent,
-                angle: { from: -1, to: 1 },
-                duration: 80,
-                repeat: 1,
-                yoyo: true,
-                onComplete: () => {
-                    this.cardContent.setAngle(0);
-                    this.wiggleTween = null;
-                }
+                angle: { from: -2, to: 2 },
+                duration: 100,
+                repeat: -1,
+                yoyo: true
             });
         }
     }
 
     onPointerOut_PhysicalCard = (): void => {
-        if (this.obliterated) {
-            return;
-        }
+        if (this.obliterated) return;
         console.log(`Pointer out card: ${this.data.name}`);
-        this.cardContent.setScale(this.data.size);
+
+        // Animate scaling back to original size
+        this.scene.tweens.add({
+            targets: this.cardContent,
+            scale: this.data.size,
+            duration: 200,
+            ease: 'Power2'
+        });
+
         this.descBox.setVisible(false);
         this.tooltipBox.setVisible(false);
         this.container.setDepth(0);
 
-        // Stop wiggle animation if it's still running
+        // Stop wiggle animation
         if (this.wiggleTween) {
             this.wiggleTween.stop();
             this.wiggleTween = null;
@@ -347,9 +264,7 @@ export class PhysicalCard {
     }
 
     onPointerDown_PhysicalCard = (): void => {
-        if (this.obliterated) {
-            return;
-        }
+        if (this.obliterated) return;
         console.log(`Clicked on card: ${this.data.name}`);
         const jsonData = this.data.createJsonRepresentation();
         this.showJsonModal(jsonData);
@@ -363,25 +278,36 @@ export class PhysicalCard {
         const modalWidth = this.scene.scale.width * 0.8;
         const modalHeight = this.scene.scale.height * 0.8;
 
-        const background = this.scene.add.rectangle(0, 0, modalWidth, modalHeight, 0x000000, 0.8);
+        const background = this.scene.add.rectangle(0, 0, modalWidth, modalHeight, 0x000000, 0.85).setOrigin(0.5);
+        background.setStrokeStyle(2, 0xffffff);
+
         const text = this.scene.add.text(0, 0, jsonData, {
             fontSize: '16px',
             color: '#ffffff',
+            fontFamily: 'Courier',
             wordWrap: { width: modalWidth - 40 }
         });
-
-        this.jsonModal = this.scene.add.container(
-            this.scene.scale.width / 2,
-            this.scene.scale.height / 2,
-            [background, text]
-        );
-
         text.setPosition(-modalWidth / 2 + 20, -modalHeight / 2 + 20);
+        text.setOrigin(0, 0);
 
-        const closeButton = this.scene.add.text(modalWidth / 2 - 40, -modalHeight / 2 + 10, 'Close', {
+        const closeButton = this.scene.add.text(modalWidth / 2 - 70, modalHeight / 2 - 40, 'Close', {
             fontSize: '20px',
-            color: '#ffffff'
-        }).setInteractive();
+            color: '#ff5555',
+            fontFamily: 'Arial',
+            backgroundColor: '#333333',
+            padding: { x: 10, y: 5 },
+            fixedWidth: 80,
+            fixedHeight: 30
+        }).setOrigin(0.5);
+        closeButton.setInteractive({ useHandCursor: true });
+
+        closeButton.on('pointerover', () => {
+            closeButton.setStyle({ backgroundColor: '#555555' });
+        });
+
+        closeButton.on('pointerout', () => {
+            closeButton.setStyle({ backgroundColor: '#333333' });
+        });
 
         closeButton.on('pointerdown', () => {
             if (this.jsonModal) {
@@ -390,13 +316,15 @@ export class PhysicalCard {
             }
         });
 
-        this.jsonModal.add(closeButton);
+        this.jsonModal = this.scene.add.container(
+            this.scene.scale.width / 2,
+            this.scene.scale.height / 2,
+            [background, text, closeButton]
+        );
     }
 
     updateVisuals(): void {
-        if (this.obliterated) {
-            return;
-        }
+        if (this.obliterated) return;
         if (!this.scene || !this.scene.sys) {
             console.warn('Scene is undefined in updateVisuals');
             return;
@@ -419,34 +347,34 @@ export class PhysicalCard {
             this.cardImage.texture.setFilter(Phaser.Textures.LINEAR);
             const frame = texture.get();
             const aspectRatio = frame.width / frame.height;
-            
+
             // Assuming the card background defines the available space
-            const availableWidth = this.cardBackground.displayWidth * 0.9; // 90% of card width
-            const availableHeight = this.cardBackground.displayHeight * 0.6; // 60% of card height
-            
+            const availableWidth = this.cardBackground.displayWidth * 0.8; // 80% of card width
+            const availableHeight = this.cardBackground.displayHeight * 0.5; // 50% of card height
+
             let newWidth = availableWidth;
             let newHeight = availableWidth / aspectRatio;
-            
+
             if (newHeight > availableHeight) {
                 newHeight = availableHeight;
                 newWidth = availableHeight * aspectRatio;
             }
-            
+
             this.cardImage.setDisplaySize(newWidth, newHeight);
-            
+
             // Center the image on the card
-            this.cardImage.setPosition(0, -this.cardBackground.displayHeight * 0.25); // Move image to top quarter of card
+            this.cardImage.setPosition(0, -this.cardBackground.displayHeight * 0.2); // Move image slightly upwards
         } else {
             console.warn(`Texture '${this.data.portraitName}' not found. Using fallback texture.`);
             // this.cardImage.setTexture('fallback_texture'); // Ensure you have a fallback texture
         }
 
         // Position nameBox just below the portraitBox
-        const nameBoxY = this.cardImage.y + this.cardImage.displayHeight / 2 + this.nameBox.background!!.displayHeight / 2;
+        const nameBoxY = this.cardImage.y + this.cardImage.displayHeight / 2 + this.nameBox.background!!.displayHeight / 2 + 10;
         this.nameBox.setPosition(0, nameBoxY);
 
         // Position descBox just below the nameBox
-        const descBoxY = nameBoxY + this.nameBox.background!!.displayHeight / 2 + this.descBox.background!!.displayHeight / 2;
+        const descBoxY = nameBoxY + this.nameBox.background!!.displayHeight / 2 + this.descBox.background!!.displayHeight / 2 + 10;
         this.descBox.setPosition(0, descBoxY);
 
         // Update HP box if it exists
@@ -493,7 +421,7 @@ export class PhysicalCard {
         if (!(this.data instanceof AutomatedCharacter)) {
             return;
         }
-        var autoChar = this.data as AutomatedCharacter;
+        const autoChar = this.data as AutomatedCharacter;
         const currentIntents = autoChar.intents;
         const currentIntentIds = new Set(currentIntents.map((intent: AbstractIntent) => intent.id));
 
@@ -564,9 +492,3 @@ export abstract class AbstractCardVisualTag {
     abstract getText(): string;
     abstract updateVisuals(image: Phaser.GameObjects.Image, text: Phaser.GameObjects.Text): void;
 }
-
-export { AbstractCard };
-
-
-
-

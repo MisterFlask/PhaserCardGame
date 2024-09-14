@@ -1,7 +1,7 @@
+import { AbstractCard } from '../gamecharacters/AbstractCard';
 import { AutomatedCharacter } from '../gamecharacters/AutomatedCharacter';
 import { BaseCharacter } from '../gamecharacters/BaseCharacter';
 import { PlayerCharacter } from '../gamecharacters/CharacterClasses';
-import { AbstractCard } from '../gamecharacters/PhysicalCard';
 import { StoreCard } from './campaign';
 
 export class GameState {

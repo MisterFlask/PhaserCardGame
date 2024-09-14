@@ -1,9 +1,10 @@
 import Phaser from 'phaser';
-import { AbstractCard, PhysicalCard,  } from '../gamecharacters/PhysicalCard';
+import { PhysicalCard,  } from '../gamecharacters/PhysicalCard';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 import { GameState } from './gamestate';
 import { EncounterData, EncounterManager } from '../encounters/encounters';
 import { CardSize, CardType } from '../gamecharacters/Primitives';
+import { AbstractCard } from '../gamecharacters/AbstractCard';
 
 export class LocationCard extends AbstractCard {
     encounter: EncounterData;
@@ -26,7 +27,7 @@ export class LocationCard extends AbstractCard {
     }
 
     OnLocationSelected(scene: Phaser.Scene): void {
-        console.log(`Location ${this.name} selected with encounter: ${this.encounter.enemies.map(e => e.name).join(', ')}`);
+        console.log(`Location ${this.id} selected with encounter: ${this.encounter.enemies.map(e => e.name).join(', ')}`);
         scene.scene.start('CombatScene', { encounter: this.encounter });
     }
 }

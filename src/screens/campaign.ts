@@ -2,12 +2,12 @@ import Phaser from 'phaser';
 import { PhysicalCard, } from '../gamecharacters/PhysicalCard';
 import { BaseCharacterClass,  PlayerCharacter } from '../gamecharacters/CharacterClasses';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
-import { AbstractCard } from '../gamecharacters/PhysicalCard';
 import GameImageLoader from '../utils/ImageUtils';
 import { GameState } from './gamestate';
 import { BaconBeast, BloodManipulationSlime, ClockworkAbomination } from '../encounters/encounters';
 import { CampaignRules } from '../rules/campaignrules';
 import { CardType } from '../gamecharacters/Primitives';
+import { AbstractCard } from '../gamecharacters/AbstractCard';
 
 export class StoreCard extends AbstractCard {
     price: number;

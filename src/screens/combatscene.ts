@@ -2,21 +2,20 @@
 
 import Phaser from 'phaser';
 import GameImageLoader from '../utils/ImageUtils';
-import { BlackhandClass, DiabolistClass } from '../gamecharacters/playerclasses';
-import { AbstractCard, PhysicalCard, TextBox } from '../gamecharacters/PhysicalCard';
+import { PhysicalCard } from '../gamecharacters/PhysicalCard';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 import CampaignScene from './campaign';
 import MapScene from './map';
 import { EncounterData } from '../encounters/encounters';
-import { BattleCardLocation, GameState } from './gamestate';
+import { GameState } from './gamestate';
 import { DeckLogic } from '../rules/decklogic';
-import { ActionManager } from '../utils/ActionManager';
-import { PlayableCard, UiCard } from '../gamecharacters/AbstractCard';
+import { AbstractCard, PlayableCard, UiCard } from '../gamecharacters/AbstractCard';
 import { BaseCharacter } from '../gamecharacters/BaseCharacter';
 import { AutomatedCharacter } from '../gamecharacters/AutomatedCharacter';
 import { CombatRules } from '../rules/combatrules';
 import { PhysicalIntent } from '../gamecharacters/PhysicalIntent';
 import Menu from '../ui/Menu'; // Import the Menu class
+import { TextBox } from '../ui/TextBox';
 
 /**
  * Configuration constants for the CombatScene.

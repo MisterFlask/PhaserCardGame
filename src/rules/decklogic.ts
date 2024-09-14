@@ -1,5 +1,5 @@
 
-import { AbstractCard } from '../gamecharacters/PhysicalCard';
+import { AbstractCard } from '../gamecharacters/AbstractCard';
 import { GameState } from '../screens/gamestate';
 
 export class DeckLogic {
