@@ -17,6 +17,20 @@ export class ActionManager {
         return ActionManager.instance;
     }
 
+    public playCard(card: PhysicalCard, target?: BaseCharacter) {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            const playableCard = card.data as PlayableCard;
+            if (target) {
+                playableCard.InvokeCardEffects(target);
+            } else {
+                playableCard.InvokeCardEffects();
+            }
+
+            DeckLogic.moveCardToPile(card.data, PileName.Discard);
+            await this.animateDiscardCard(card);
+            return [];
+        }));
+    }
 
     private animateDrawCard(card: AbstractCard): Promise<void> {
         return new Promise<void>((resolve) => {
@@ -175,9 +189,8 @@ export class ActionManager {
     }
 }
 
-
 import Phaser from 'phaser';
-import { AbstractCard } from '../gamecharacters/AbstractCard';
+import { AbstractCard, PlayableCard } from '../gamecharacters/AbstractCard';
 import { DeckLogic, PileName } from "../rules/DeckLogic";
 import { GameState } from '../rules/GameState';
 

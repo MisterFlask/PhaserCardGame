@@ -7,6 +7,7 @@ import { GameState } from '../../rules/GameState';
 import CombatSceneLayoutUtils from '../../ui/LayoutUtils';
 import { PhysicalCard } from '../../ui/PhysicalCard';
 import { PhysicalIntent } from '../../ui/PhysicalIntent';
+import { ActionManager } from '../../utils/ActionManager';
 import { IntentEmitter } from '../../utils/intentemitter';
 import CombatCardManager from './CombatCardManager';
 
@@ -169,15 +170,12 @@ class CombatInputHandler {
 
     private playCardOnBattlefield(card: PhysicalCard): void {
         const playableCard = card.data as PlayableCard;
-        playableCard.InvokeCardEffects();
+        ActionManager.getInstance().playCard(card);
         console.log(`Card played on battlefield: ${card.data.name}`);
-        this.removeCardFromHand(card);
     }
 
     private playCardOnTarget(card: PlayableCard, target: BaseCharacter): void {
-        card.InvokeCardEffects(target);
-        console.log(`Card played: ${card.name} on ${target.name}`);
-        this.removeCardFromHand(card.physicalCard as PhysicalCard);
+        ActionManager.getInstance().playCard(card.physicalCard as PhysicalCard, target);
     }
 
     private removeCardFromHand(card?: PhysicalCard): void {
