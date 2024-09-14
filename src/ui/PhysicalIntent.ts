@@ -9,7 +9,7 @@ export class PhysicalIntent implements JsonRepresentable {
     static readonly HEIGHT: number = 40;
 
     private scene: Scene;
-    private intent: AbstractIntent;
+    public intent: AbstractIntent;
     private container: Phaser.GameObjects.Container;
     private image: Phaser.GameObjects.Image;
     private text: Phaser.GameObjects.Text;
@@ -29,23 +29,22 @@ export class PhysicalIntent implements JsonRepresentable {
         this.container.add([this.image, this.text]);
         
         // Set interactive for the container to detect pointer events
-        this.container.setSize(PhysicalIntent.WIDTH, PhysicalIntent.HEIGHT);
-        this.container.setInteractive()
+        this.container.setSize(PhysicalIntent.WIDTH, PhysicalIntent.HEIGHT)
+            .setInteractive({ useHandCursor: true }) // Ensured cursor change
             .on('pointerover', this.onPointerOver, this)
             .on('pointerout', this.onPointerOut, this);
         
-        //this.setupTooltip();
         this.update();
         
     }
 
     private onPointerOver(): void {
-        console.log("onPointerOver for intent: " + this.createJsonRepresentation());
+        console.log(`Pointer over intent: ${this.intent.displayText}`);
         IntentEmitter.getInstance().emitIntentHover(this);
     }
 
     private onPointerOut(): void {
-        console.log("onPointerOut for intent: " + this.createJsonRepresentation());
+        console.log(`Pointer out intent: ${this.intent.displayText}`);
         IntentEmitter.getInstance().emitIntentHoverEnd(this);
     }
 

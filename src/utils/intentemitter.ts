@@ -4,6 +4,9 @@ import { PhysicalIntent } from '../ui/PhysicalIntent';
 export class IntentEmitter extends Phaser.Events.EventEmitter {
     private static instance: IntentEmitter;
 
+    public static readonly EVENT_INTENT_HOVER = 'intenthover';
+    public static readonly EVENT_INTENT_HOVER_END = 'intenthoverend';
+
     private constructor() {
         super();
     }
@@ -16,19 +19,10 @@ export class IntentEmitter extends Phaser.Events.EventEmitter {
     }
 
     public emitIntentHover(intent: PhysicalIntent): void {
-        this.emit('intenthover', intent);
+        this.emit(IntentEmitter.EVENT_INTENT_HOVER, intent);
     }
 
     public emitIntentHoverEnd(intent: PhysicalIntent): void {
-        this.emit('intenthoverend', intent);
-    }
-
-    // Add these lines if not present
-    public emitIntentHoverOver(intent: PhysicalIntent): void {
-        this.emit('intenthoverover', intent);
-    }
-
-    public emitIntentHoverOut(intent: PhysicalIntent): void {
-        this.emit('intenthoverout', intent);
+        this.emit(IntentEmitter.EVENT_INTENT_HOVER_END, intent);
     }
 }

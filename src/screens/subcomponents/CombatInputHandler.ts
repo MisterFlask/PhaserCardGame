@@ -4,8 +4,10 @@ import Phaser from 'phaser';
 import { AbstractCard, PlayableCard, TargetingType } from '../../gamecharacters/AbstractCard';
 import { BaseCharacter } from '../../gamecharacters/BaseCharacter';
 import { GameState } from '../../rules/GameState';
-import LayoutUtils from '../../ui/LayoutUtils';
+import CombatSceneLayoutUtils from '../../ui/LayoutUtils';
 import { PhysicalCard } from '../../ui/PhysicalCard';
+import { PhysicalIntent } from '../../ui/PhysicalIntent';
+import { IntentEmitter } from '../../utils/intentemitter';
 import CombatCardManager from './CombatCardManager';
 
 class CombatInputHandler {
@@ -19,6 +21,7 @@ class CombatInputHandler {
         this.scene = scene;
         this.cardManager = cardManager;
         this.setupEventListeners();
+
     }
 
     private setupEventListeners(): void {
@@ -29,6 +32,10 @@ class CombatInputHandler {
         this.scene.input.on('gameobjectout', this.handleGameObjectOut, this);
 
         this.scene.events.on('shutdown', this.removeEventListeners, this);
+
+        // Changed to listen on IntentEmitter instance
+        IntentEmitter.getInstance().on(IntentEmitter.EVENT_INTENT_HOVER, this.handleIntentHoverOver, this);
+        IntentEmitter.getInstance().on(IntentEmitter.EVENT_INTENT_HOVER_END, this.handleIntentHoverOut, this);
     }
 
     private removeEventListeners(): void {
@@ -37,6 +44,12 @@ class CombatInputHandler {
         this.scene.input.off('dragend', this.handleDragEnd, this);
         this.scene.input.off('gameobjectover', this.handleGameObjectOver, this);
         this.scene.input.off('gameobjectout', this.handleGameObjectOut, this);
+
+        this.scene.events.off('shutdown', this.removeEventListeners, this);
+
+        // Changed to remove listeners from IntentEmitter instance
+        IntentEmitter.getInstance().off(IntentEmitter.EVENT_INTENT_HOVER, this.handleIntentHoverOver, this);
+        IntentEmitter.getInstance().off(IntentEmitter.EVENT_INTENT_HOVER_END, this.handleIntentHoverOut, this);
     }
 
     private handleDragStart = (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject): void => {
@@ -60,12 +73,6 @@ class CombatInputHandler {
             this.draggedCard.container.x = dragX;
             this.draggedCard.container.y = dragY;
 
-            const inBattlefield = dragY < LayoutUtils.getDividerY(this.scene);
-            // Show/hide relevant areas if needed
-            // For example:
-            // this.scene.battlefieldArea.setVisible(inBattlefield);
-            // this.scene.handArea.setVisible(!inBattlefield);
-
             this.checkCardUnderPointer(pointer);
         }
     }
@@ -82,7 +89,7 @@ class CombatInputHandler {
             const targetingType = this.getTargetingType(playableCard);
 
             if (targetingType === TargetingType.NO_TARGETING) {
-                const droppedOnBattlefield = LayoutUtils.isDroppedOnBattlefield(this.scene, pointer);
+                const droppedOnBattlefield = CombatSceneLayoutUtils.isDroppedOnBattlefield(this.scene, pointer);
                 if (droppedOnBattlefield) {
                     wasPlayed = true;
                     this.playCardOnBattlefield(this.draggedCard);
@@ -189,7 +196,7 @@ class CombatInputHandler {
             ease: 'Power2',
             onComplete: () => {
                 this.cardManager.discardPile.data.name = `Discard Pile (${GameState.getInstance().combatState.currentDiscardPile.length + 1})`;
-                (this.cardManager.discardPile.container.getByName('nameBox') as Phaser.GameObjects.Text).setText(this.cardManager.discardPile.data.name);
+                this.cardManager.discardPile.nameBox.setText(this.cardManager.discardPile.data.name);
                 GameState.getInstance().combatState.currentDiscardPile.push(card.data);
                 card.obliterate(); // Remove the card after animation
             }
@@ -209,7 +216,7 @@ class CombatInputHandler {
                 ease: 'Power2'
             });
         } else {
-            this.cardManager.arrangeCards(this.cardManager.playerHand, LayoutUtils.getHandY(this.scene));
+            this.cardManager.arrangeCards(this.cardManager.playerHand, CombatSceneLayoutUtils.getHandY(this.scene));
         }
     }
 
@@ -253,6 +260,23 @@ class CombatInputHandler {
 
     private unhighlightCard(card: PhysicalCard): void {
         card.unhighlight();
+    }
+
+
+    private handleIntentHoverOver(intent: PhysicalIntent): void {
+        console.log('intent hover over');
+        const targetCard = intent.intent.target;
+        if (targetCard && targetCard.physicalCard) {
+            this.highlightCard(targetCard.physicalCard as PhysicalCard);
+        }
+    }
+
+    private handleIntentHoverOut(intent: PhysicalIntent): void {
+        console.log('intent hover out');
+        const targetCard = intent.intent.target;
+        if (targetCard && targetCard.physicalCard) {
+            this.unhighlightCard(targetCard.physicalCard as PhysicalCard);
+        }
     }
 }
 

@@ -3,7 +3,7 @@
 import Phaser from 'phaser';
 import { EncounterData } from '../encounters/Encounters';
 import { GameState } from '../rules/GameState';
-import LayoutUtils from '../ui/LayoutUtils';
+import CombatSceneLayoutUtils from '../ui/LayoutUtils';
 import GameImageLoader from '../utils/ImageUtils';
 import CampaignScene from './campaign';
 import MapScene from './map';
@@ -83,8 +83,8 @@ class CombatScene extends Phaser.Scene {
 
         // Rearrange cards
         if (this.cardManager) {
-            this.cardManager.arrangeCards(this.cardManager.playerHand, LayoutUtils.getHandY(this));
-            this.cardManager.arrangeCards(this.cardManager.enemyUnits, LayoutUtils.getBattlefieldY(this));
+            this.cardManager.arrangeCards(this.cardManager.playerHand, CombatSceneLayoutUtils.getHandY(this));
+            this.cardManager.arrangeCards(this.cardManager.enemyUnits, CombatSceneLayoutUtils.getBattlefieldY(this));
             this.cardManager.playerUnits.forEach((unit, index) => {
                 unit.container.x = width - 100;
                 unit.container.y = 100 + index * 180;

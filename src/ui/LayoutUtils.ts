@@ -4,7 +4,7 @@ import Phaser from 'phaser';
 import { PhysicalCard } from '../ui/PhysicalCard';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 
-class LayoutUtils {
+class CombatSceneLayoutUtils {
     static getBattlefieldY(scene: Phaser.Scene): number {
         return scene.scale.height * 0.33;
     }
@@ -42,4 +42,4 @@ class LayoutUtils {
     }
 }
 
-export default LayoutUtils;
+export default CombatSceneLayoutUtils;

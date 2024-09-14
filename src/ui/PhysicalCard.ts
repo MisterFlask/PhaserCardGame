@@ -487,6 +487,7 @@ export class PhysicalCard {
      */
     highlight(): void {
         this.isHighlighted = true
+        console.log("highlightBorder: " + this._isHighlighted);
     }
 
     /**
@@ -494,6 +495,7 @@ export class PhysicalCard {
      */
     unhighlight(): void {
         this.isHighlighted = false
+        console.log("highlightBorder: " + this._isHighlighted);
     }
 }
 

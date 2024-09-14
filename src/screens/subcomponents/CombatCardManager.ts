@@ -4,7 +4,7 @@ import Phaser from 'phaser';
 import { AbstractCard, UiCard } from '../../gamecharacters/AbstractCard';
 import { AutomatedCharacter } from '../../gamecharacters/AutomatedCharacter';
 import { GameState } from '../../rules/GameState';
-import LayoutUtils from '../../ui/LayoutUtils';
+import CombatSceneLayoutUtils from '../../ui/LayoutUtils';
 import { PhysicalCard } from '../../ui/PhysicalCard';
 import { CardGuiUtils } from '../../utils/CardGuiUtils';
 
@@ -30,13 +30,13 @@ class CombatCardManager {
             const card = CardGuiUtils.getInstance().createCard({
                 scene: this.scene,
                 x: 0,
-                y: LayoutUtils.getHandY(this.scene),
+                y: CombatSceneLayoutUtils.getHandY(this.scene),
                 data: cardData,
                 eventCallback: () => { }
             });
             this.playerHand.push(card);
         });
-        this.arrangeCards(this.playerHand, LayoutUtils.getHandY(this.scene));
+        this.arrangeCards(this.playerHand, CombatSceneLayoutUtils.getHandY(this.scene));
     }
 
     private createPlayerUnits(): void {
@@ -62,7 +62,7 @@ class CombatCardManager {
             const enemyCard = CardGuiUtils.getInstance().createCard({
                 scene: this.scene,
                 x: 400 + index * 150,
-                y: LayoutUtils.getBattlefieldY(this.scene),
+                y: CombatSceneLayoutUtils.getBattlefieldY(this.scene),
                 data: enemy,
                 eventCallback: () => { }
             });
@@ -76,7 +76,7 @@ class CombatCardManager {
 
     private createDrawAndDiscardPiles(): void {
         const gameWidth = this.scene.scale.width;
-        const pileY = LayoutUtils.getPileY(this.scene);
+        const pileY = CombatSceneLayoutUtils.getPileY(this.scene);
 
         this.drawPile = CardGuiUtils.getInstance().createCard({
             scene: this.scene,
@@ -96,7 +96,7 @@ class CombatCardManager {
     }
 
     public arrangeCards(cardArray: PhysicalCard[], yPosition: number): void {
-        LayoutUtils.arrangeCards(this.scene, cardArray, yPosition);
+        CombatSceneLayoutUtils.arrangeCards(this.scene, cardArray, yPosition);
     }
 
     public syncHandWithGameState(): void {
@@ -122,7 +122,7 @@ class CombatCardManager {
         this.playerHand = this.playerHand.filter(card => state.currentHand.some(c => c.id === card.data.id));
 
         // Arrange the hand
-        this.arrangeCards(this.playerHand, LayoutUtils.getHandY(this.scene));
+        this.arrangeCards(this.playerHand, CombatSceneLayoutUtils.getHandY(this.scene));
     }
 
     private animateCardDraw(data: AbstractCard): PhysicalCard {
@@ -140,7 +140,7 @@ class CombatCardManager {
         this.scene.tweens.add({
             targets: card.container,
             x: card.container.x,
-            y: LayoutUtils.getHandY(this.scene),
+            y: CombatSceneLayoutUtils.getHandY(this.scene),
             scaleX: 1,
             scaleY: 1,
             alpha: 1,
@@ -175,7 +175,7 @@ class CombatCardManager {
             const state = GameState.getInstance().combatState;
             const drawPileCount = state.currentDrawPile.length;
             this.drawPile.data.name = `Draw Pile (${drawPileCount})`;
-            (this.drawPile.container.getByName('nameBox') as Phaser.GameObjects.Text).setText(this.drawPile.data.name);
+            this.drawPile.nameBox.setText(this.drawPile.data.name);
         }
     }
 
@@ -184,11 +184,10 @@ class CombatCardManager {
             const state = GameState.getInstance().combatState;
             const discardPileCount = state.currentDiscardPile.length;
             this.discardPile.data.name = `Discard Pile (${discardPileCount})`;
-            (this.discardPile.container.getByName('nameBox') as Phaser.GameObjects.Text).setText(this.discardPile.data.name);
+            this.discardPile.nameBox.setText(this.discardPile.data.name);
         }
     }
 
-    // Additional card management methods...
 }
 
 export default CombatCardManager;
