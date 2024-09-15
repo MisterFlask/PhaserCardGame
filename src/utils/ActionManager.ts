@@ -162,7 +162,6 @@ export class ActionManager {
 
         });
     }
-
     public dealDamage = ({
         amount,
         target,
@@ -184,7 +183,19 @@ export class ActionManager {
                 await this.animateCardDamage(physicalCardOfTarget);
 
                 if (target instanceof BaseCharacter) {
-                    target.hitpoints = Math.max(0, target.hitpoints - amount);
+                    let remainingDamage = amount;
+                    if (target.block > 0) {
+                        if (target.block >= remainingDamage) {
+                            target.block -= remainingDamage;
+                            remainingDamage = 0;
+                        } else {
+                            remainingDamage -= target.block;
+                            target.block = 0;
+                        }
+                    }
+                    if (remainingDamage > 0) {
+                        target.hitpoints = Math.max(0, target.hitpoints - remainingDamage);
+                    }
                 }
 
                 return [];

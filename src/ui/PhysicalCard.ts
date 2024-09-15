@@ -4,6 +4,7 @@ import { AbstractCard } from "../gamecharacters/AbstractCard";
 import { AbstractIntent } from '../gamecharacters/AbstractIntent';
 import { AutomatedCharacter } from '../gamecharacters/AutomatedCharacter';
 import { BaseCharacter } from "../gamecharacters/BaseCharacter";
+import { PhysicalBuff } from './PhysicalBuff';
 import { PhysicalIntent } from "./PhysicalIntent";
 import { TextBox } from "./TextBox"; // Ensure correct relative path
 
@@ -16,7 +17,7 @@ export class PhysicalCard {
     tooltipBox: TextBox;
     hpBox: TextBox | null;
     data: AbstractCard;
-    visualTags: PhysicalCardVisualTag[];
+    visualTags: PhysicalBuff[];
     scene: Phaser.Scene;
     isSelected: boolean = false;
     private wiggleTween: Phaser.Tweens.Tween | null = null;
@@ -30,6 +31,8 @@ export class PhysicalCard {
     private blocksContainer: Phaser.GameObjects.Container;
     private blockIcon: Phaser.GameObjects.Image;
     public blockText: TextBox;
+    private buffsContainer: Phaser.GameObjects.Container;
+    private currentBuffs: Map<string, PhysicalBuff> = new Map();
 
     constructor({
         scene,
@@ -50,7 +53,7 @@ export class PhysicalCard {
         descBox: TextBox;
         tooltipBox: TextBox;
         data: AbstractCard;
-        visualTags: PhysicalCardVisualTag[];
+        visualTags: PhysicalBuff[];
     }) {
         this.scene = scene;
         this.container = container;
@@ -137,11 +140,29 @@ export class PhysicalCard {
         this.blocksContainer.add([/*this.blockIcon,*/ this.blockText.background!!, this.blockText.text]);
         this.cardContent.add(this.blocksContainer);
 
+        // Initialize the buffs container positioned to the left of the card
+        this.buffsContainer = this.scene.add.container(
+            -this.cardBackground.displayWidth / 2 - 50, // Adjust X position as needed
+            0
+        );
+        this.container.add(this.buffsContainer);
+
+        // Initialize buffs grid
+        this.initBuffsGrid();
+
         this.updateVisuals();
         this.scene.events.on('update', this.updateVisuals, this);
         this.setupInteractivity();
         this.applyCardSize();
         this.updateIntents();
+
+        if (!(this.data instanceof BaseCharacter)){
+            this.blockText.setVisible(false);
+        }
+    }
+
+    updateBuffDisplays(): void {
+        
     }
 
     obliterate(): void {
@@ -406,9 +427,12 @@ export class PhysicalCard {
         // Update block text
         this.blockText.setText(`${this.data.block}`);
 
-        this.updateVisualTags();
+        this.updateBuffDisplays();
         this.updateIntents();
         this.updateHighlightVisual();
+
+        // Sync buffs each tick
+        this.syncBuffs();
     }
 
     private updateHighlightVisual(): void {
@@ -416,29 +440,6 @@ export class PhysicalCard {
         if (highlightBorder) {
             highlightBorder.setVisible(this._isHighlighted);
         }
-    }
-
-    addVisualTag(tag: PhysicalCardVisualTag): void {
-        this.visualTags.push(tag);
-        this.cardContent.add([tag.image, tag.text]);
-        tag.tag.updateVisuals(tag.image, tag.text);
-    }
-
-    removeVisualTag(tag: PhysicalCardVisualTag): void {
-        const index = this.visualTags.indexOf(tag);
-        if (index > -1) {
-            this.visualTags.splice(index, 1);
-            this.cardContent.remove(tag.image);
-            this.cardContent.remove(tag.text);
-            tag.image.destroy();
-            tag.text.destroy();
-        }
-    }
-
-    updateVisualTags(): void {
-        this.visualTags.forEach(tag => {
-            tag.tag.updateVisuals(tag.image, tag.text);
-        });
     }
 
     updateIntents(): void {
@@ -520,15 +521,60 @@ export class PhysicalCard {
         this.isHighlighted = false
         console.log("highlightBorder: " + this._isHighlighted);
     }
+
+    // Initialize buffs grid layout
+    private initBuffsGrid(): void {
+        // Any initial setup for the buffs grid can be done here
+    }
+
+    // Sync UI buffs with the underlying AbstractCard's buffs
+    private syncBuffs(): void {
+        const characterBuffs = this.data.buffs; // Assuming AbstractCard has a 'buffs' property
+
+        // Create a set of current buff IDs
+        const currentBuffIds = new Set(characterBuffs.map(buff => buff.id));
+
+        // Remove buffs that are no longer present
+        this.currentBuffs.forEach((buffUI, id) => {
+            if (!currentBuffIds.has(id)) {
+                buffUI.destroy();
+                this.currentBuffs.delete(id);
+            }
+        });
+
+        // Add new buffs that are not currently displayed
+        characterBuffs.forEach(buff => {
+            if (!this.currentBuffs.has(buff.id)) {
+                const physicalBuff = new PhysicalBuff(this.scene, 0, 0, buff);
+                this.buffsContainer.add(physicalBuff.container);
+                this.currentBuffs.set(buff.id, physicalBuff);
+            }
+        });
+
+        // Optionally, layout the buffs in a grid
+        this.layoutBuffs();
+    }
+
+    // Layout buffs in an expandable grid
+    private layoutBuffs(): void {
+        const buffsPerRow = 3; // Adjust as needed
+        const padding = 10;
+        let index = 0;
+
+        this.currentBuffs.forEach(buffUI => {
+            const row = Math.floor(index / buffsPerRow);
+            const col = index % buffsPerRow;
+            buffUI.container.setPosition(
+                col * (buffUI.container.width + padding),
+                row * (buffUI.container.height + padding)
+            );
+            index++;
+        });
+
+        // Optionally, adjust the size of buffsContainer based on the number of buffs
+    }
 }
 
-export interface PhysicalCardVisualTag {
-    image: Phaser.GameObjects.Image;
-    text: Phaser.GameObjects.Text;
-    tag: AbstractCardVisualTag;
-}
+export abstract class AbstractCombatEvent{
 
-export abstract class AbstractCardVisualTag {
-    abstract getText(): string;
-    abstract updateVisuals(image: Phaser.GameObjects.Image, text: Phaser.GameObjects.Text): void;
 }

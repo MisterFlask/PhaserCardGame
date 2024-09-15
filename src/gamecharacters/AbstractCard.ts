@@ -1,4 +1,5 @@
 import { JsonRepresentable } from '../interfaces/JsonRepresentable';
+import { AbstractBuff } from '../ui/PhysicalBuff';
 import { BaseCharacter } from './BaseCharacter';
 import { CardSize, CardType } from "./Primitives";
 
@@ -51,7 +52,7 @@ const wordList = [
 
 ];
 
-function generateWordGuid(): string {
+export function generateWordGuid(): string {
     const seedNumber = Math.floor(Math.random() * 0xFFFFFFFF);
     const randomIndex1 = Math.floor(Math.random() * wordList.length);
     const randomIndex2 = Math.floor(Math.random() * wordList.length);
@@ -81,6 +82,7 @@ export abstract class AbstractCard implements JsonRepresentable {
     physicalCard?: IPhysicalCardInterface // this is a hack, it's just always PhysicalCard
     team: Team
     block: number = 0
+    buffs: AbstractBuff[] = [];
 
     constructor({ name, description, portraitName, cardType, tooltip, characterData, size, team }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: AbstractCard, size?: CardSize, team?: Team }) {
         this.name = name

@@ -4,6 +4,7 @@ import { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { ActionManager } from "../utils/ActionManager";
 import { GameState } from "./GameState";
 
+
 export class CombatRules {
   public static PlayCard = (card: PlayableCard, target: BaseCharacter): void => {
     // Invoke the effect of the card
@@ -34,6 +35,7 @@ export class CombatRules {
     // Queue draw action instead of direct draw
     ActionManager.getInstance().drawHandForNewTurn();
   }
+
 
   public static ExecuteIntents(): void {
     const gameState = GameState.getInstance();
