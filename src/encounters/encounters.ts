@@ -1,6 +1,7 @@
 import { AbstractIntent, AttackIntent } from '../gamecharacters/AbstractIntent';
 import { AutomatedCharacter } from '../gamecharacters/AutomatedCharacter';
-import { GoblinCharacter } from '../gamecharacters/SpecificClasses';
+import { Strong } from '../gamecharacters/buffs/Strong';
+import { GoblinCharacter } from '../gamecharacters/enemyclasses/GoblinCharacter';
 
 // Define new character classes
 export class ClockworkAbomination extends AutomatedCharacter {
@@ -16,6 +17,8 @@ export class ClockworkAbomination extends AutomatedCharacter {
 export class BaconBeast extends AutomatedCharacter {
     constructor() {
         super({ name: 'Breakfast Nightmares Bacon Beast', portraitName: 'Breakfast Nightmares Bacon Beast', maxHitpoints: 25, description: 'A cunning dark elf assassin' });
+        this.buffs.push(new Strong(2))
+
     }
     
     override generateNewIntents(): AbstractIntent[] {
@@ -26,6 +29,8 @@ export class BaconBeast extends AutomatedCharacter {
 export class BloodManipulationSlime extends AutomatedCharacter {
     constructor() {
         super({ name: 'Blood Manipulation Slime', portraitName: 'Blood Manipulation Slime', maxHitpoints: 20, description: 'A reanimated skeleton warrior' });
+        this.buffs.push(new Strong(3))
+
     }
     
     override generateNewIntents(): AbstractIntent[] {

@@ -78,10 +78,11 @@ export class CombatCardManager {
 
     private createEnemyCards(): void {
         const enemies = GameState.getInstance().combatState.enemies;
+        const cardWidth = 150; // Define card width
         enemies.forEach((enemy, index) => {
             const enemyCard = CardGuiUtils.getInstance().createCard({
                 scene: this.scene,
-                x: 400 + index * 150,
+                x: 400 + index * (cardWidth * 2), // Ensure separation of one card's width
                 y: CombatSceneLayoutUtils.getBattlefieldY(this.scene),
                 data: enemy,
                 eventCallback: () => { }

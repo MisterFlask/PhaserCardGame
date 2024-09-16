@@ -33,6 +33,7 @@ export class PhysicalCard {
     public blockText: TextBox;
     private buffsContainer: Phaser.GameObjects.Container;
     private currentBuffs: Map<string, PhysicalBuff> = new Map();
+    debugRectangle: any;
 
     constructor({
         scene,
@@ -92,8 +93,8 @@ export class PhysicalCard {
             const cardHeight = this.cardBackground.displayHeight;
             this.hpBox = new TextBox({
                 scene: this.scene,
-                x: cardWidth / 2 - 30,
-                y: -cardHeight / 2 + 30,
+                x: cardWidth / 2 - 10,
+                y: -cardHeight / 2 + 10,
                 width: 60,
                 height: 30,
                 text: `${baseCharacter.hitpoints}/${baseCharacter.maxHitpoints}`,
@@ -139,11 +140,10 @@ export class PhysicalCard {
         });
         this.blocksContainer.add([/*this.blockIcon,*/ this.blockText.background!!, this.blockText.text]);
         this.cardContent.add(this.blocksContainer);
-
         // Initialize the buffs container positioned to the left of the card
         this.buffsContainer = this.scene.add.container(
             -this.cardBackground.displayWidth / 2 - 50, // Adjust X position as needed
-            0
+            40 // Position below the block textbox
         );
         this.container.add(this.buffsContainer);
 
@@ -486,6 +486,7 @@ export class PhysicalCard {
 
         // Center the intents container
         this.intentsContainer.setPosition(-currentX / 2, this.intentsContainer.y);
+
     }
 
     destroy(): void {
@@ -554,24 +555,52 @@ export class PhysicalCard {
         // Optionally, layout the buffs in a grid
         this.layoutBuffs();
     }
-
     // Layout buffs in an expandable grid
     private layoutBuffs(): void {
         const buffsPerRow = 3; // Adjust as needed
         const padding = 10;
+        const buffWidth = 30; // Set a fixed width for each buff
+        const buffHeight = 30; // Set a fixed height for each buff
         let index = 0;
 
         this.currentBuffs.forEach(buffUI => {
             const row = Math.floor(index / buffsPerRow);
             const col = index % buffsPerRow;
+            
+            // Set the size of each buff
+            buffUI.container.setSize(buffWidth, buffHeight);
+            
             buffUI.container.setPosition(
-                col * (buffUI.container.width + padding),
-                row * (buffUI.container.height + padding)
+                col * (buffWidth + padding),
+                row * (buffHeight + padding)
             );
             index++;
         });
 
-        // Optionally, adjust the size of buffsContainer based on the number of buffs
+        // Adjust the size of buffsContainer based on the number of buffs
+        const totalRows = Math.ceil(this.currentBuffs.size / buffsPerRow);
+        const totalCols = Math.min(this.currentBuffs.size, buffsPerRow);
+        const containerWidth = totalCols * (buffWidth + padding) - padding;
+        const containerHeight = totalRows * (buffHeight + padding) - padding;
+        this.buffsContainer.setSize(containerWidth, containerHeight);
+
+        // Create a debugging rectangle around the buff grid
+        if (this.debugRectangle) {
+            this.debugRectangle.destroy();
+        }
+        /*
+        this.debugRectangle = this.scene.add.rectangle(
+            this.buffsContainer.x,
+            this.buffsContainer.y,
+            containerWidth,
+            containerHeight,
+            0xff0000,
+            0.3
+        );
+        this.debugRectangle.setOrigin(0, 0);
+        this.cardContent.add(this.debugRectangle);
+        */
+        this.cardContent.add(this.buffsContainer);
     }
 }
 

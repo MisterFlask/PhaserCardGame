@@ -7,9 +7,10 @@ export class Strong extends AbstractBuff {
     override getDescription(): string {
         return "Increases damage by [stacks]"
     }
-    constructor() {
+    constructor(stacks: number = 1) {
         super()
-        this.imageName = "muscle-up"
+        this.imageName = "weight-lifting-up"
+        this.stacks = stacks
     }
 
     override getCombatDamageDealtModifier(): number {
