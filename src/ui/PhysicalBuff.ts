@@ -8,7 +8,7 @@ export class PhysicalBuff {
     abstractBuff: AbstractBuff;
     container: Phaser.GameObjects.Container;
     image: Phaser.GameObjects.Image;
-    descriptionBox: TextBox;
+    tooltipBox: TextBox;
     scene: Phaser.Scene;
 
     constructor(scene: Phaser.Scene, x: number, y: number, abstractBuff: AbstractBuff) {
@@ -29,14 +29,14 @@ export class PhysicalBuff {
         this.text.setOrigin(0.5); // Center the text
 
         // Create the description box (initially hidden)
-        this.descriptionBox = new TextBox({
+        this.tooltipBox = new TextBox({
             scene: this.scene,
             width: 200,
             height: 100,
             text: this.abstractBuff.getDescription(),
             textBoxName: `${this.abstractBuff.getName()}Description`
         });
-        this.descriptionBox.setVisible(false);
+        this.tooltipBox.setVisible(false);
 
         // Add image and text to the container
         // Set the size of the container
@@ -62,39 +62,40 @@ export class PhysicalBuff {
         const screenHeight = this.scene.sys.game.config.height as number;
         const bufferSpace = 10;
 
-        let descX = this.container.x - this.descriptionBox.background!.width / 2 - bufferSpace;
+        let descX = this.container.x - this.tooltipBox.background!.width / 2 - bufferSpace;
         let descY = this.container.y;
 
         // If too close to the left edge, show on the right side instead
         if (descX < 0) {
-            descX = this.container.x + this.container.width / 2 + this.descriptionBox.background!.width / 2 + bufferSpace;
+            descX = this.container.x + this.container.width / 2 + this.tooltipBox.background!.width / 2 + bufferSpace;
         }
 
         // Adjust Y position if it goes off screen
-        if (descY + this.descriptionBox.background!.height / 2 > screenHeight) {
-            descY = screenHeight - this.descriptionBox.background!.height / 2 - bufferSpace;
-        } else if (descY - this.descriptionBox.background!.height / 2 < 0) {
-            descY = this.descriptionBox.background!.height / 2 + bufferSpace;
+        if (descY + this.tooltipBox.background!.height / 2 > screenHeight) {
+            descY = screenHeight - this.tooltipBox.background!.height / 2 - bufferSpace;
+        } else if (descY - this.tooltipBox.background!.height / 2 < 0) {
+            descY = this.tooltipBox.background!.height / 2 + bufferSpace;
         }
 
-        this.descriptionBox.setPosition(descX, descY);
-        this.descriptionBox.setVisible(true);
+        this.tooltipBox.setPosition(descX, descY);
+        this.tooltipBox.setVisible(true);
+        this.updateText();
     }
 
     hideDescription() {
-        this.descriptionBox.setVisible(false);
+        this.tooltipBox.setVisible(false);
     }
 
-    update() {
+    updateText() {
         // Update the text to reflect current stack count
         this.text.setText(`${this.abstractBuff.stacks}`);
         // Update the description text in case it has changed
-        this.descriptionBox.setText(this.abstractBuff.getDescription());
+        this.tooltipBox.setText(`${this.abstractBuff.getName()}: ${this.abstractBuff.getDescription()}`);
     }
 
     destroy() {
         this.container.destroy();
-        this.descriptionBox.destroy();
+        this.tooltipBox.destroy();
     }
 }
 

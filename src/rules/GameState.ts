@@ -112,14 +112,17 @@ export class GameState {
 
 
 export class CombatState{
-     currentCombatDeck: AbstractCard[] = []
+    currentCombatDeck: AbstractCard[] = []
     currentDrawPile: AbstractCard[] = []
     currentDiscardPile: AbstractCard[] = []
     currentHand: AbstractCard[] = []
 
     enemies: AutomatedCharacter[] = []
     playerCharacters: BaseCharacter[] = []
-    
+
+    public energyAvailable: number = 0
+    public maxEnergy: number = 5
+        
     getBattleCardLocation = (cardId: string): BattleCardLocation => {
         if (this.currentDrawPile.some(c => c.id === cardId)) return BattleCardLocation.DrawPile
         if (this.currentDiscardPile.some(c => c.id === cardId)) return BattleCardLocation.DiscardPile

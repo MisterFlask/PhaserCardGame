@@ -18,6 +18,7 @@ export class CombatRules {
 
 
   public static endTurn(): void {
+
     console.log('Ending turn');
     const gameState = GameState.getInstance();
     const combatState = gameState.combatState;
@@ -31,11 +32,23 @@ export class CombatRules {
 
     // Queue discard actions instead of direct discard
     ActionManager.getInstance().discardCards(combatState.currentHand);
+    CombatRules.beginTurn();
+  }
+
+
+  public static beginTurn(): void {
+    const gameState = GameState.getInstance();
+    const combatState = gameState.combatState;
+
+    combatState.enemies.forEach(enemy => {
+      enemy.setNewIntents();
+    });
 
     // Queue draw action instead of direct draw
     ActionManager.getInstance().drawHandForNewTurn();
-  }
 
+    combatState.energyAvailable = combatState.maxEnergy
+  }
 
   public static ExecuteIntents(): void {
     const gameState = GameState.getInstance();

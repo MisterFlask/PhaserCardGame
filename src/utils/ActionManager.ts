@@ -20,7 +20,14 @@ export class ActionManager {
     public playCard(card: PhysicalCard, target?: BaseCharacter) {
         this.actionQueue.addAction(new GenericAction(async () => {
             const playableCard = card.data as PlayableCard;
+            
+            let canBePlayed = playableCard.IsPerformableOn(target);
+            if (!canBePlayed){
+                return [];
+            }
+
             if (target) {
+                GameState.getInstance().combatState.energyAvailable -= playableCard.energyCost;
                 playableCard.InvokeCardEffects(target);
             } else {
                 playableCard.InvokeCardEffects();

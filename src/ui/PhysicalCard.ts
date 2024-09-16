@@ -34,6 +34,7 @@ export class PhysicalCard {
     private buffsContainer: Phaser.GameObjects.Container;
     private currentBuffs: Map<string, PhysicalBuff> = new Map();
     debugRectangle: any;
+    private cardBorder: Phaser.GameObjects.Rectangle;
 
     constructor({
         scene,
@@ -149,6 +150,19 @@ export class PhysicalCard {
 
         // Initialize buffs grid
         this.initBuffsGrid();
+
+        // Create a black border around the card background
+        this.cardBorder = this.scene.add.rectangle(
+            0,
+            0,
+            this.cardBackground.displayWidth + 4, // Slightly larger than the background
+            this.cardBackground.displayHeight + 4,
+            0x000000 // Black color
+        );
+        this.cardBorder.setStrokeStyle(2, 0x000000); // 2px thick black border
+
+        // Add the border to the cardContent container, behind other elements
+        this.cardContent.addAt(this.cardBorder, 0);
 
         this.updateVisuals();
         this.scene.events.on('update', this.updateVisuals, this);
@@ -433,6 +447,12 @@ export class PhysicalCard {
 
         // Sync buffs each tick
         this.syncBuffs();
+
+        // Update the border size to match the card background
+        this.cardBorder.setSize(
+            this.cardBackground.displayWidth + 4,
+            this.cardBackground.displayHeight + 4
+        );
     }
 
     private updateHighlightVisual(): void {

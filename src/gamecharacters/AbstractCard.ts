@@ -1,4 +1,5 @@
 import { JsonRepresentable } from '../interfaces/JsonRepresentable';
+import { GameState } from '../rules/GameState';
 import { AbstractBuff } from '../ui/PhysicalBuff';
 import { BaseCharacter } from './BaseCharacter';
 import { CardSize, CardType } from "./Primitives";
@@ -83,6 +84,7 @@ export abstract class AbstractCard implements JsonRepresentable {
     team: Team
     block: number = 0
     buffs: AbstractBuff[] = [];
+    energyCost: number = 1
 
     constructor({ name, description, portraitName, cardType, tooltip, characterData, size, team }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: AbstractCard, size?: CardSize, team?: Team }) {
         this.name = name
@@ -141,6 +143,7 @@ export abstract class PlayableCard extends AbstractCard {
     }
 
     abstract InvokeCardEffects(targetCard?: AbstractCard): void;
+
     public IsPerformableOn(targetCard?: AbstractCard): boolean{
         return true;
     }
@@ -157,15 +160,33 @@ export abstract class PlayableCard extends AbstractCard {
 
         const isTargetAlly = targetCard instanceof BaseCharacter && targetCard.team === Team.ALLY;
         const isTargetEnemy = targetCard instanceof BaseCharacter && targetCard.team === Team.ENEMY;
+        let appropriateTargeting = false;
+        let inappropriateTargetingReason = "";
         switch (this.targetingType) {
             case TargetingType.ALLY:
-                return isTargetAlly && this.IsPerformableOn(targetCard);
+                appropriateTargeting = isTargetAlly && this.IsPerformableOn(targetCard);
+                if (!appropriateTargeting) {
+                    inappropriateTargetingReason = "Target is not an ally";
+                }
             case TargetingType.ENEMY:
-                return isTargetEnemy && this.IsPerformableOn(targetCard);
+                appropriateTargeting = isTargetEnemy && this.IsPerformableOn(targetCard);
+                if (!appropriateTargeting) {
+                    inappropriateTargetingReason = "Target is not an enemy";
+                }
             default:
                 console.warn(`Unknown targeting type: ${this.targetingType}`);
-                return false;
+                appropriateTargeting = false;
         }
+        if (!appropriateTargeting) {
+            console.log("Inappropriate targeting for card: " + this.name + ". Reason: " + inappropriateTargetingReason);
+            return false;
+        }
+
+        if (GameState.getInstance().combatState.energyAvailable > this.energyCost) {
+            return false;
+        }
+        
+        return true;
     }
 }
 

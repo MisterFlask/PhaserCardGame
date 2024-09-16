@@ -2,6 +2,7 @@
 
 import Phaser from 'phaser';
 import { CombatRules } from '../../rules/CombatRules';
+import { GameState } from '../../rules/GameState';
 import { default as CombatSceneLayoutUtils, default as LayoutUtils } from '../../ui/LayoutUtils';
 import Menu from '../../ui/Menu';
 import { TextBox } from '../../ui/TextBox';
@@ -18,6 +19,7 @@ class CombatUIManager {
     public endTurnButton!: TextBox;
     public battlefieldArea!: Phaser.GameObjects.Rectangle;
     public handArea!: Phaser.GameObjects.Rectangle;
+    public energyDisplay!: TextBox;
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -25,7 +27,46 @@ class CombatUIManager {
         this.createCombatStatusText();
         this.createEndTurnButton();
         this.createGameAreas();
+        this.createEnergyDisplay();
     }
+
+    private createEnergyDisplay(): void {
+        const gameWidth = this.scene.scale.width;
+        const gameHeight = this.scene.scale.height;
+        const pileY = CombatSceneLayoutUtils.getPileY(this.scene);
+
+        this.energyDisplay = new TextBox({
+            scene: this.scene,
+            x: 100,  // Positioned toward the left
+            y: pileY,  // Same Y as the draw pile
+            width: 100,
+            height: 40,
+            text: this.getEnergyText(),
+            style: {
+                fontSize: '24px',
+                color: '#ffffff',
+                fontFamily: 'Arial'
+            },
+            fillColor: 0x0000ff,  // Blue background
+            textBoxName: 'EnergyDisplay'
+        });
+
+        // Update the energy display whenever the game state changes
+        this.scene.events.on('update', this.updateEnergyDisplay, this);
+    }
+
+    private getEnergyText(): string {
+        const gameState = GameState.getInstance();
+        return `${gameState.combatState.energyAvailable}/${gameState.combatState.maxEnergy}`;
+    }
+
+    private updateEnergyDisplay(): void {
+        if (this.energyDisplay.text.text !== this.getEnergyText()){
+            this.energyDisplay.pulseGreenBriefly();
+            this.energyDisplay.setText(this.getEnergyText());
+        }
+    }
+
     private createMenu(): void {
         const gameWidth = this.scene.scale.width;
         const gameHeight = this.scene.scale.height;
@@ -153,6 +194,10 @@ class CombatUIManager {
 
         // Update game areas
         this.updateGameAreas();
+
+        // Update energy display position
+        const pileY = CombatSceneLayoutUtils.getPileY(this.scene);
+        this.energyDisplay.setPosition(100, pileY);
     }
     
     private createGameAreas(): void {
