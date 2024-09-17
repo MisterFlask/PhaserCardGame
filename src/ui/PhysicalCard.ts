@@ -236,6 +236,11 @@ export class PhysicalCard {
     }
 
     onPointerOver_PhysicalCard = (): void => {
+        // Bring the card to the top within its parent container
+        if (this.container.parentContainer) {
+            this.container.parentContainer.bringToTop(this.container);
+        }
+
         if (this.obliterated) return;
         console.log(`Pointer over card: ${this.data.name}`);
 

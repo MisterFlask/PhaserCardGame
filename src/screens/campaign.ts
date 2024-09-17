@@ -5,12 +5,14 @@ import { PlayerCharacter } from '../gamecharacters/CharacterClasses';
 import { CardType } from '../gamecharacters/Primitives';
 import { CampaignRules } from '../rules/CampaignRules';
 import { GameState } from '../rules/GameState';
+import InventoryPanel from '../ui/InventoryPanel';
 import { PhysicalCard, } from '../ui/PhysicalCard';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 import GameImageLoader from '../utils/ImageUtils';
 
 export class StoreCard extends AbstractCard {
     price: number;
+    public name: string;
 
     constructor({ name, description, portraitName, tooltip, price }: { name: string; description: string; portraitName?: string, tooltip?: string, price: number}) {
         super(
@@ -23,6 +25,7 @@ export class StoreCard extends AbstractCard {
             }
         );
         this.price = price;
+        this.name = name;
     }
     
     OnPurchase = (): void => {
@@ -48,6 +51,7 @@ export default class CampaignScene extends Phaser.Scene {
     private debugGraphics!: Phaser.GameObjects.Graphics;
     private menuButton!: Phaser.GameObjects.Text;
     private menuPanel!: Phaser.GameObjects.Container;
+    private inventoryPanel!: InventoryPanel;
 
     constructor() {
         super('Campaign');
@@ -61,6 +65,7 @@ export default class CampaignScene extends Phaser.Scene {
         this.createDeckDisplay();
         this.createShop();
         this.createMenu();
+        this.inventoryPanel = new InventoryPanel(this);
 
         // Listen for resize events
         this.scale.on('resize', this.resize, this);
@@ -169,6 +174,9 @@ export default class CampaignScene extends Phaser.Scene {
 
         // Reposition menu button
         this.menuButton.setPosition(10, 10);
+
+        // Reposition inventory button
+        this.inventoryPanel.resize(width, height);
 
         this.updateDebugGraphics();
     }

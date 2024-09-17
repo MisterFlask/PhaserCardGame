@@ -3,6 +3,7 @@
 import Phaser from 'phaser';
 import { EncounterData } from '../encounters/Encounters';
 import { GameState } from '../rules/GameState';
+import InventoryPanel from '../ui/InventoryPanel';
 import CombatSceneLayoutUtils from '../ui/LayoutUtils';
 import { ActionManager } from '../utils/ActionManager';
 import GameImageLoader from '../utils/ImageUtils';
@@ -13,6 +14,7 @@ import CombatInputHandler from './subcomponents/CombatInputHandler';
 import CombatStateService from './subcomponents/CombatStateService';
 import CombatUIManager from './subcomponents/CombatUiManager';
 import PerformanceMonitor from './subcomponents/PerformanceMonitor';
+
 /**
  * Interface for initializing CombatScene with necessary data.
  */
@@ -20,13 +22,13 @@ export interface CombatSceneData {
     encounter: EncounterData;
 }
 
-
 class CombatScene extends Phaser.Scene {
     private uiManager!: CombatUIManager;
     private cardManager!: CombatCardManager;
     private inputHandler!: CombatInputHandler;
     private performanceMonitor!: PerformanceMonitor;
     private background!: Phaser.GameObjects.Image;
+    private inventoryPanel!: InventoryPanel;
 
     constructor() {
         super('CombatScene');
@@ -51,6 +53,8 @@ class CombatScene extends Phaser.Scene {
 
         this.setupResizeHandler();
         ActionManager.getInstance().drawHandForNewTurn();
+
+        this.inventoryPanel = new InventoryPanel(this);
     }
 
     private createBackground(): void {
@@ -92,6 +96,9 @@ class CombatScene extends Phaser.Scene {
                 unit.container.y = 100 + index * 180;
             });
         }
+
+        // Reposition inventory button
+        this.inventoryPanel.resize(width, height);
     }
 
     update(time: number, delta: number): void {
@@ -103,6 +110,7 @@ class CombatScene extends Phaser.Scene {
         }
     }
 }
+
 /**
  * Phaser game configuration.
  */
@@ -125,6 +133,5 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
 
 // Instantiate and start the Phaser game
 const game = new Phaser.Game(gameConfig);
-
 
 export default CombatScene;
