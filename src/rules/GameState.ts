@@ -3,6 +3,7 @@ import { AutomatedCharacter } from '../gamecharacters/AutomatedCharacter';
 import { BaseCharacter } from '../gamecharacters/BaseCharacter';
 import { PlayerCharacter } from '../gamecharacters/CharacterClasses';
 import { StoreCard } from '../screens/campaign';
+import { LocationCard } from '../screens/map';
 import { PhysicalCard } from '../ui/PhysicalCard';
 
 export class GameState {
@@ -14,6 +15,12 @@ export class GameState {
     public inventory: StoreCard[] = [];
     public currencyOnHand: number = 0
     public combatState: CombatState = new CombatState()
+
+    // Add tracking for player's current location
+    public currentLocation: LocationCard | null = null;
+
+    // Add all location cards
+    public locations: LocationCard[] = [];
 
     private constructor() {}
 
@@ -133,6 +140,23 @@ export class GameState {
         state.inventory = parsedState.inventory.map((itemData: any) => new StoreCard(itemData));
 
         return state;
+    }
+
+    // Add methods for managing locations
+    public setCurrentLocation(location: LocationCard): void {
+        this.currentLocation = location;
+    }
+
+    public getCurrentLocation(): LocationCard | null {
+        return this.currentLocation;
+    }
+
+    public setLocations(locations: LocationCard[]): void {
+        this.locations = locations;
+    }
+
+    public getLocations(): LocationCard[] {
+        return [...this.locations];
     }
 }
 

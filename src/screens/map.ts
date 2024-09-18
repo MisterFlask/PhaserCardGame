@@ -8,6 +8,7 @@ import { CardGuiUtils } from '../utils/CardGuiUtils';
 
 export class LocationCard extends AbstractCard {
     encounter: EncounterData;
+    public adjacentLocations: LocationCard[] = []; // New property for adjacency
 
     constructor({ name, description, portraitName, tooltip }: { name: string; description: string; portraitName?: string; tooltip?: string }) {
         const encounter = EncounterManager.getInstance().getRandomEncounter();
@@ -24,6 +25,10 @@ export class LocationCard extends AbstractCard {
         });
 
         this.encounter = encounter;
+    }
+
+    setAdjacent(location: LocationCard) {
+        this.adjacentLocations.push(location);
     }
 
     OnLocationSelected(scene: Phaser.Scene): void {
@@ -61,28 +66,80 @@ export default class MapScene extends Phaser.Scene {
     }
 
     createBackground() {
-        this.background = this.add.image(0, 0, 'mapbackground1');
-        this.background.setOrigin(0, 0);
+        this.background = this.add.image(this.scale.width / 2, this.scale.height / 2, 'mapbackground1'); // Center the background
+        this.background.setOrigin(0.5, 0.5);
         this.resizeBackground();
     }
 
     createLocationCards() {
-        const locations = [
-            new LocationCard({ name: 'Forest', description: 'A dense, mysterious forest' }),
-            new LocationCard({ name: 'Mountain', description: 'A treacherous mountain range' }),
-            new LocationCard({ name: 'Castle', description: 'An ancient, fortified castle' })
+        const { width, height } = this.scale;
+
+        const locationData = [
+            { 
+                card: new LocationCard({ name: 'Entrance', description: 'The entrance to the dungeon' }),
+                position: { x: 0, y: -200 }
+            },
+            { 
+                card: new LocationCard({ name: 'North Wing', description: 'The northern section of the dungeon' }),
+                position: { x: -150, y: -100 }
+            },
+            { 
+                card: new LocationCard({ name: 'East Wing', description: 'The eastern section of the dungeon' }),
+                position: { x: 150, y: -100 }
+            },
+            { 
+                card: new LocationCard({ name: 'West Wing', description: 'The western section of the dungeon' }),
+                position: { x: -150, y: 100 }
+            },
+            { 
+                card: new LocationCard({ name: 'South Wing', description: 'The southern section of the dungeon' }),
+                position: { x: 150, y: 100 }
+            },
+            { 
+                card: new LocationCard({ name: 'Boss Room', description: 'The final challenge awaits' }),
+                position: { x: 0, y: 200 }
+            }
         ];
 
-        locations.forEach((location, index) => {
+        // Define adjacency
+        locationData[0].card.setAdjacent(locationData[1].card); // Entrance -> North Wing
+        locationData[0].card.setAdjacent(locationData[2].card); // Entrance -> East Wing
+        locationData[0].card.setAdjacent(locationData[3].card); // Entrance -> West Wing
+        locationData[0].card.setAdjacent(locationData[4].card); // Entrance -> South Wing
+        locationData[4].card.setAdjacent(locationData[5].card); // South Wing -> Boss Room
+
+        GameState.getInstance().setLocations(locationData.map(ld => ld.card));
+        GameState.getInstance().setCurrentLocation(locationData[0].card); // Set Entrance as starting location
+
+        locationData.forEach((ld) => {
             const card = CardGuiUtils.getInstance().createCard({
                 scene: this,
-                x: 0,
-                y: 0,
-                data: location,
+                x: ld.position.x + width / 2, // Adjusted X position
+                y: ld.position.y + height / 2, // Adjusted Y position
+                data: ld.card,
                 eventCallback: this.setupLocationCardEvents
             });
             this.locationCards.push(card);
         });
+
+        // Add marker for current location
+        const currentLocation = GameState.getInstance().getCurrentLocation();
+        const currentCard = this.locationCards.find(c => c.data === currentLocation);
+        if (currentCard) {
+            const marker = this.add.circle(currentCard.container.x, currentCard.container.y, 30, 0x00ff00, 0.5);
+            currentCard.container.add(marker);
+        }
+
+        // Add indicators for adjacent locations
+        if (currentLocation) {
+            currentLocation.adjacentLocations.forEach(adjacent => {
+                const adjacentCard = this.locationCards.find(c => c.data === adjacent);
+                if (adjacentCard) {
+                    const indicator = this.add.circle(adjacentCard.container.x, adjacentCard.container.y, 25, 0x0000ff, 0.5);
+                    adjacentCard.container.add(indicator);
+                }
+            });
+        }
     }
 
     createCharacterCards() {
@@ -163,7 +220,14 @@ export default class MapScene extends Phaser.Scene {
         card.container.setInteractive();
         card.container.on('pointerdown', () => {
             if (card.data instanceof LocationCard) {
-                card.data.OnLocationSelected(this);
+                const gameState = GameState.getInstance();
+                const currentLocation = gameState.getCurrentLocation();
+                if (currentLocation?.adjacentLocations.includes(card.data)) {
+                    gameState.setCurrentLocation(card.data);
+                    card.data.OnLocationSelected(this);
+                } else {
+                    console.log('Cannot move to non-adjacent location.');
+                }
             }
         });
     }
@@ -175,7 +239,6 @@ export default class MapScene extends Phaser.Scene {
     resize() {
         const { width, height } = this.scale;
         this.resizeBackground();
-        this.positionLocationCards(width, height);
         this.positionCharacterCards(width, height);
         this.positionAbortButton(width, height);
         this.positionCampaignStatusText(width, height);
@@ -186,16 +249,6 @@ export default class MapScene extends Phaser.Scene {
         if (this.background) {
             this.background.setDisplaySize(width, height);
         }
-    }
-
-    positionLocationCards(width: number, height: number) {
-        const centerY = height / 2;
-        const cardSpacing = width * 0.25; // Increased spacing for larger cards
-        const startX = width / 2 - cardSpacing;
-
-        this.locationCards.forEach((card, index) => {
-            card.container.setPosition(startX + index * cardSpacing, centerY);
-        });
     }
 
     positionCharacterCards(width: number, height: number) {
