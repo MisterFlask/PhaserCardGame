@@ -28,6 +28,8 @@ export class LocationCard extends AbstractCard {
 
     OnLocationSelected(scene: Phaser.Scene): void {
         console.log(`Location ${this.id} selected with encounter: ${this.encounter.enemies.map(e => e.name).join(', ')}`);
+        
+        GameState.getInstance().eliminatePhysicalCardsBetweenScenes();
         scene.scene.start('CombatScene', { encounter: this.encounter });
     }
 }

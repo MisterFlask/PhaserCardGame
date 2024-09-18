@@ -220,6 +220,19 @@ export class PhysicalCard {
         if (this.container) {
             this.container.destroy();
         }
+
+        if (this.buffsContainer){
+            this.buffsContainer.destroy();
+        }
+
+        if (this.blocksContainer){
+            this.blocksContainer.destroy();
+        }
+
+        if (this.intentsContainer){
+            this.intentsContainer.destroy();
+        }
+
         this.obliterated = true;
     }
 
@@ -450,14 +463,27 @@ export class PhysicalCard {
         this.updateIntents();
         this.updateHighlightVisual();
 
-        // Sync buffs each tick
-        this.syncBuffs();
+        if (!this.buffsContainer.scene?.sys) {
+            console.warn('Scene is undefined in updateVisuals (FOR THE CARD BUFF SPECIFICALLY): ' + this.data.name);
+            this.buffsContainer.scene = this.scene;
+        }else{
+            // Sync buffs each tick
+            this.syncBuffs();
+        }
 
         // Update the border size to match the card background
-        this.cardBorder.setSize(
+        this.cardBorder.setDisplaySize(
             this.cardBackground.displayWidth + 4,
             this.cardBackground.displayHeight + 4
         );
+
+        if (this.data instanceof BaseCharacter) {
+            if (this.data.hitpoints <= 0) {
+                this.cardImage.setTint(0x808080); // Apply greyscale tint
+            } else {
+                this.cardImage.clearTint(); // Remove tint if HP is above 0
+            }
+        }
     }
 
     private updateHighlightVisual(): void {

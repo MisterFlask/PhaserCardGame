@@ -74,15 +74,25 @@ class CombatUIManager {
         const menuOptions: MenuOption[] = [
             {
                 text: 'Start New Game',
-                callback: () => this.scene.scene.restart()
+                callback: () => {
+                    GameState.getInstance().eliminatePhysicalCardsBetweenScenes();
+                    this.scene.scene.restart();
+                }
             },
             {
                 text: 'New Campaign',
-                callback: () => this.scene.scene.start('Campaign')
+                
+                callback: () => {
+                    this.scene.scene.start('Campaign');
+                    GameState.getInstance().eliminatePhysicalCardsBetweenScenes();
+                }
             },
             {
                 text: 'Quit',
-                callback: () => this.scene.game.destroy(true)
+                callback: () => {
+                    this.scene.game.destroy(true);
+                    GameState.getInstance().eliminatePhysicalCardsBetweenScenes();
+                }
             },
             {
                 text: 'Toggle Game Areas',

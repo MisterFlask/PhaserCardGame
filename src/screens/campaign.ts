@@ -108,6 +108,7 @@ export default class CampaignScene extends Phaser.Scene {
         gameState.currentRunCharacters = characterRoster.slice(0, 3);
         gameState.roster = characterRoster;
 
+        GameState.getInstance().eliminatePhysicalCardsBetweenScenes();
         this.scene.start('CombatScene', { 
           encounter: { 
             enemies: [new ClockworkAbomination(), new BaconBeast(), new BloodManipulationSlime()] 
@@ -361,6 +362,7 @@ export default class CampaignScene extends Phaser.Scene {
             console.log('Updated GameState:', gameState);
             // Transition to the next scene or start the game
 
+            GameState.getInstance().eliminatePhysicalCardsBetweenScenes();
             // Switch to the "map" scene
             this.scene.start('MapScene');
         } else {

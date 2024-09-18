@@ -1,0 +1,105 @@
+{
+  "items": [
+    {
+      "name": "NexxiGen Solutions",
+      "description": "A biotech company specializing in human augmentation and cybernetic enhancements, promising users enhanced abilities and longer lifespans, but often at the cost of their humanity. They thrive on the elite's desire for superiority.",
+      "core_industries": "Biotechnology, Cybernetics",
+      "negative_externalities": "Dependence on proprietary tech leading to illegal hacking surgeries",
+      "ceo": "Elara Voss",
+      "ceo_description": "A visionary tech mogul known for her charismatic yet manipulative persona; she’s rumored to have undergone more enhancements than her clients.",
+      "ceo_demeanor": "Charming but elusive, with an unsettling gaze.",
+      "company_motto": "‘Become the future, live forever.’",
+      "ceo_nationality": "American"
+    },
+    {
+      "name": "Synthex Dynamics",
+      "description": "Creators of synthetic lifeforms, Synthex Dynamics produces biomechanical pets and workforce assistants, marketed as the perfect companions for the lonely and overworked. However, they often malfunction and become hazardous.",
+      "core_industries": "Synthetic Biology, Robotics",
+      "negative_externalities": "Unregulated release of malfunctioning units",
+      "ceo": "Kaito Yoshida",
+      "ceo_description": "A genius inventor who often prioritizes profit over safety, he’s publicly altruistic but privately indifferent.",
+      "ceo_demeanor": "Enigmatic, with a penchant for dark humor.",
+      "company_motto": "‘Life reimagined.’",
+      "ceo_nationality": "Japanese"
+    },
+    {
+      "name": "Cloudrider Corp",
+      "description": "A conglomerate that controls the media through virtual reality and augmented experiences, providing alternative realities that pacify and distract the populace from their grim existences.",
+      "core_industries": "Media, Virtual Reality",
+      "negative_externalities": "Mental health decline due to over-reliance on escapism",
+      "ceo": "Greta Montalvo",
+      "ceo_description": "A media mogul with a flair for dramatic public appearances; often compared to a cult leader.",
+      "ceo_demeanor": "Theatrical and bombastic.",
+      "company_motto": "‘Escape to elevate.’",
+      "ceo_nationality": "Spanish"
+    },
+    {
+      "name": "HoloGuard Technologies",
+      "description": "Specializes in holographic security systems and surveillance, providing cities with ‘peace of mind’ while infringing on privacy rights extensively.",
+      "core_industries": "Security, Surveillance Technology",
+      "negative_externalities": "Invasion of privacy; misuse of data",
+      "ceo": "Rashid Malek",
+      "ceo_description": "A former military strategist turned corporate kingpin, he presents himself as a guardian of safety while profiting from fear.",
+      "ceo_demeanor": "Calculating and prudent, excels in manipulation.",
+      "company_motto": "‘Securing your future.’",
+      "ceo_nationality": "Middle Eastern"
+    },
+    {
+      "name": "Neptune's Eye",
+      "description": "A neon-lit design and lifestyle brand that creates trendy, water-themed wearables and lifestyle products, tying into global climate change while paradoxically glamorizing the crisis.",
+      "core_industries": "Fashion, Sustainability",
+      "negative_externalities": "Encourages consumption of fast-fashion with greenwashing facade",
+      "ceo": "Aurora Winters",
+      "ceo_description": "An environmental activist turned business mogul known for her paradoxical approach to climate and capitalism.",
+      "ceo_demeanor": "Sleek, with a sharp tongue; exudes both warmth and aloofness.",
+      "company_motto": "‘Flow with style.’",
+      "ceo_nationality": "Canadian"
+    },
+    {
+      "name": "GigaVolt Energy",
+      "description": "A global leader in energy solutions, GigaVolt harnesses renewable sources but still profits from environmentally damaging practices, promising sustainability while feeding into corporate greed.",
+      "core_industries": "Energy, Sustainability",
+      "negative_externalities": "Greenwashing; dependency on toxic materials for solar tech",
+      "ceo": "Samuel Cray",
+      "ceo_description": "A hard-edged businessman known for his aggressive takeovers and shadowy connections in the energy sector.",
+      "ceo_demeanor": "Cold and calculating; values profit over planet.",
+      "company_motto": "‘Powering your world, sustainably.'",
+      "ceo_nationality": "British"
+    },
+    {
+      "name": "CodexRealms",
+      "description": "An immense digital landscape marketing itself as an immersive educational platform, attracting the youth and chained to debt as they 'learn' in debt-accruing modules.",
+      "core_industries": "Education, Virtual Reality",
+      "negative_externalities": "Systems that foster financial exploitation and student debt",
+      "ceo": "Lucia Vargas",
+      "ceo_description": "An ambitious entrepreneur with a knack for persuasive marketing, she’s known to manipulate education as a means of profit.",
+      "ceo_demeanor": "Charismatic and eloquent, but ruthless when needed.",
+      "company_motto": "‘Knowledge is the new currency.’",
+      "ceo_nationality": "Mexican"
+    },
+    {
+      "name": "MonoCore Systems",
+      "description": "Producers of solitary economy systems that promote work-from-home solutions via minimalistic technology fostering isolation under the guise of efficiency and creativity.",
+      "core_industries": "Technology, Workspace Solutions",
+      "negative_externalities": "Increased social isolation; adverse mental health effects",
+      "ceo": "Naomi Albright",
+      "ceo_description": "A tech visionary with a penchant for dystopian themes, her ideas often blur ethical lines.",
+      "ceo_demeanor": "Visionary yet detached; often lost in her thoughts.",
+      "company_motto": "‘Work better, alone.’",
+      "ceo_nationality": "Australian"
+    },
+    {
+      "name": "Panoptic Clarity",
+      "description": "Provides cutting-edge neural-link technologies allowing users enhanced perception and cognitive enhancement, paradoxically leading to widespread social addiction and disconnection from reality.",
+      "core_industries": "Neurology, Cognitive Tech",
+      "negative_externalities": "Neural dependency and loss of privacy,"
+    },
+    {
+      "ceo": "Victor Pershing",
+      "ceo_description": "A megalomaniac who advocates for complete mind control as a means of societal improvement; rumored to undergo his own human experiments.",
+      "ceo_demeanor": "Eccentric, but offers a magnetic allure.",
+      "company_motto": "‘See beyond the veil.’",
+      "ceo_nationality": "American"
+    }
+  ]
+}

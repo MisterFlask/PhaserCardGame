@@ -18,10 +18,17 @@ export class CombatRules {
 
 
   public static endTurn(): void {
-
     console.log('Ending turn');
     const gameState = GameState.getInstance();
     const combatState = gameState.combatState;
+
+    // {{ edit_1 }}
+    // Remove intents from dead enemies
+    combatState.enemies.forEach(enemy => {
+      if (enemy.hitpoints <= 0) {
+        enemy.intents = [];
+      }
+    });
 
     combatState.enemies.forEach(enemy => {
       for (const intent of enemy.intents) {
@@ -40,8 +47,12 @@ export class CombatRules {
     const gameState = GameState.getInstance();
     const combatState = gameState.combatState;
 
+    // {{ edit_2 }}
+    // Prevent dead enemies from gaining new intents
     combatState.enemies.forEach(enemy => {
-      enemy.setNewIntents();
+      if (enemy.hitpoints > 0) {
+        enemy.setNewIntents();
+      }
     });
 
     // Queue draw action instead of direct draw

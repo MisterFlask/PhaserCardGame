@@ -1,0 +1,29 @@
+{
+  "items": [
+    {
+      "description": "They operate with advanced bio-augmentation that enhances reflexes and strength, making them formidable in close-quarters combat. Their main weapon is a dual-wielded railgun system that fires hyper-kinetic projectiles, while their tactical drones provide real-time surveillance and targeting assistance.",
+      "theme": "Hemera",
+      "aesthetics": "Bright metallic colors, holographic patterns, tactical exosuits with integrated LED displays."
+    },
+    {
+      "description": "Specializing in psychological warfare, they use drone swarms equipped with sonic disruptors to create chaos and panic. Their signature technique is using holographic projections to create life-like diversions, allowing for stealthy extraction or elimination.",
+      "theme": "Harpy",
+      "aesthetics": "Feathered accessories, flowing fabrics mimicking bird wings, dark sunglasses, and vibrant tattoos."
+    },
+    {
+      "description": "They implement advanced synthetic organisms that can mimic human behavior, infiltrating high-security areas as disguised assets. Their signature weapon is a smart blade that can adjust its shape and lethality based on user input, and they deploy nanobots for sabotage tasks.",
+      "theme": "Cerberus",
+      "aesthetics": "Tactical camouflage suits with built-in armor plating, heavy-duty boots, and visors displaying real-time biometrics."
+    },
+    {
+      "description": "They utilize ancient warfare tactics combined with cutting-edge technology, employing energy-based spears that can overload systems on contact. Their strategy revolves around coordinated strikes and sabotage of key infrastructures, harnessing electromagnetic pulses to disable enemy tech.",
+      "theme": "Ptah",
+      "aesthetics": "Hieroglyphic designs etched into cybernetic augmentations, earthy tones, and combat robes with integrated tech."
+    },
+    {
+      "description": "Skilled operatives utilizing virtual reality to conduct simulations and plan missions with extreme precision. Their weaponry includes adaptive plasma pistols that adjust damage output based on environmental data, and they make extensive use of sensory deception tactics to confuse opponents.",
+      "theme": "Heimdall",
+      "aesthetics": "Elaborate cyber helmets with augmented reality interfaces, sleek armor, and urban camouflage patterns that shift with the surroundings."
+    }
+  ]
+}

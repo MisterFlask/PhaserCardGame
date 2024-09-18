@@ -3,6 +3,7 @@ import { AutomatedCharacter } from '../gamecharacters/AutomatedCharacter';
 import { BaseCharacter } from '../gamecharacters/BaseCharacter';
 import { PlayerCharacter } from '../gamecharacters/CharacterClasses';
 import { StoreCard } from '../screens/campaign';
+import { PhysicalCard } from '../ui/PhysicalCard';
 
 export class GameState {
     private static instance: GameState;
@@ -21,6 +22,31 @@ export class GameState {
             GameState.instance = new GameState();
         }
         return GameState.instance;
+    }
+
+    private obliteratePhysicalCard(item: AbstractCard): void {
+        if (item.physicalCard) {
+            const card = item.physicalCard as PhysicalCard;
+            card.obliterate();
+            (item as any).physicalCard = null;
+        }
+    }
+
+    private obliteratePhysicalCardsForArray(items: (AbstractCard | StoreCard)[]): void {
+        items.forEach(item => this.obliteratePhysicalCard(item));
+    }
+
+    public eliminatePhysicalCardsBetweenScenes(){
+        // for each physicalCard linked to by each AbstractCard we track, obliterate it and set it to null
+        this.obliteratePhysicalCardsForArray(this.roster);
+        this.obliteratePhysicalCardsForArray(this.currentRunCharacters);
+        this.obliteratePhysicalCardsForArray(this.combatState.playerCharacters);
+        
+        // Note: Removed the enemyCharacters line as it doesn't exist on CombatState
+        // If you need to handle enemy characters, ensure CombatState has this property
+        // this.obliteratePhysicalCardsForArray(this.combatState.enemyCharacters);
+
+        this.obliteratePhysicalCardsForArray(this.inventory);
     }
 
     // Roster methods
