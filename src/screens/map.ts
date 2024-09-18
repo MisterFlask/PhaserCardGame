@@ -21,7 +21,7 @@ export class LocationCard extends AbstractCard {
             portraitName,
             cardType: CardType.CHARACTER,
             tooltip,
-            size: CardSize.MEDIUM
+            size: CardSize.SMALL
         });
 
         this.encounter = encounter;
