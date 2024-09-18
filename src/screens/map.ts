@@ -122,23 +122,22 @@ export default class MapScene extends Phaser.Scene {
             this.locationCards.push(card);
         });
 
-        // Add marker for current location
+        // Add player location icon
         const currentLocation = GameState.getInstance().getCurrentLocation();
-        const currentCard = this.locationCards.find(c => c.data === currentLocation);
-        if (currentCard) {
-            const marker = this.add.circle(currentCard.container.x, currentCard.container.y, 30, 0x00ff00, 0.5);
-            currentCard.container.add(marker);
-        }
+        const currentLocationCard = this.locationCards.find(card => card.data === currentLocation);
+        if (currentLocationCard) {
+            // Get the dimensions of the card portrait
+            const portraitWidth = currentLocationCard.cardImage.displayWidth;
+            const portraitHeight = currentLocationCard.cardImage.displayHeight;
 
-        // Add indicators for adjacent locations
-        if (currentLocation) {
-            currentLocation.adjacentLocations.forEach(adjacent => {
-                const adjacentCard = this.locationCards.find(c => c.data === adjacent);
-                if (adjacentCard) {
-                    const indicator = this.add.circle(adjacentCard.container.x, adjacentCard.container.y, 25, 0x0000ff, 0.5);
-                    adjacentCard.container.add(indicator);
-                }
-            });
+            // Create a new image with the same dimensions as the card portrait
+            const currentLocationIcon = this.add.image(0, -currentLocationCard.cardBackground.displayHeight / 4, 'cursed-star');
+            currentLocationIcon.setDisplaySize(portraitWidth, portraitHeight);
+            currentLocationIcon.setDepth(1);
+            currentLocationCard.container.add(currentLocationIcon);
+
+            // Optionally, add a glow effect to make it stand out
+            const glowFX = currentLocationIcon.preFX?.addGlow(0xffff00, 4, 0, false, 0.1, 16);
         }
     }
 

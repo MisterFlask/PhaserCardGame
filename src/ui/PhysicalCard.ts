@@ -17,7 +17,7 @@ export class PhysicalCard {
     tooltipBox: TextBox;
     hpBox: TextBox | null;
     data: AbstractCard;
-    visualTags: PhysicalBuff[];
+    physicalBuffs: PhysicalBuff[];
     scene: Phaser.Scene;
     isSelected: boolean = false;
     private wiggleTween: Phaser.Tweens.Tween | null = null;
@@ -66,7 +66,7 @@ export class PhysicalCard {
         this.tooltipBox = tooltipBox;
         this.data = data;
         (this.data as any).physicalCard = this;
-        this.visualTags = [];
+        this.physicalBuffs = [];
 
         // Create a new container for card content (excluding tooltip)
         this.cardContent = this.scene.add.container(0, 0);
@@ -173,10 +173,6 @@ export class PhysicalCard {
         if (!(this.data instanceof BaseCharacter)){
             this.blockText.setVisible(false);
         }
-    }
-
-    updateBuffDisplays(): void {
-        
     }
 
     obliterate(): void {
@@ -459,7 +455,6 @@ export class PhysicalCard {
         // Update block text
         this.blockText.setText(`${this.data.block}`);
 
-        this.updateBuffDisplays();
         this.updateIntents();
         this.updateHighlightVisual();
 
