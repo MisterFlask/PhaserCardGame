@@ -2,10 +2,9 @@ import { AbstractCard } from '../gamecharacters/AbstractCard';
 import { AutomatedCharacter } from '../gamecharacters/AutomatedCharacter';
 import { BaseCharacter } from '../gamecharacters/BaseCharacter';
 import { PlayerCharacter } from '../gamecharacters/CharacterClasses';
+import { LocationCard } from '../maplogic/LocationCard';
 import { StoreCard } from '../screens/campaign';
-import { LocationCard } from '../screens/map';
 import { PhysicalCard } from '../ui/PhysicalCard';
-
 export class GameState {
     private static instance: GameState;
 

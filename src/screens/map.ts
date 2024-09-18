@@ -1,43 +1,13 @@
+// src/scenes/MapScene.ts
+
 import Phaser from 'phaser';
-import { EncounterData, EncounterManager } from '../encounters/Encounters';
-import { AbstractCard } from '../gamecharacters/AbstractCard';
-import { CardSize, CardType } from '../gamecharacters/Primitives';
+import { AdjacencyManager } from '../maplogic/AdjacencyManager';
+import { LocationCard } from '../maplogic/LocationCard';
+import { LocationManager } from '../maplogic/LocationManager';
+import { SpatialManager } from '../maplogic/SpatialManager';
 import { GameState } from '../rules/GameState';
-import { PhysicalCard, } from '../ui/PhysicalCard';
+import { PhysicalCard } from '../ui/PhysicalCard';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
-
-export class LocationCard extends AbstractCard {
-    encounter: EncounterData;
-    public adjacentLocations: LocationCard[] = []; // New property for adjacency
-
-    constructor({ name, description, portraitName, tooltip }: { name: string; description: string; portraitName?: string; tooltip?: string }) {
-        const encounter = EncounterManager.getInstance().getRandomEncounter();
-        const encounterDescription = `Encounter: ${encounter.enemies.map(e => e.name).join(', ')}`;
-        const fullDescription = `${description}\n\n${encounterDescription}`;
-
-        super({
-            name,
-            description: fullDescription,
-            portraitName,
-            cardType: CardType.CHARACTER,
-            tooltip,
-            size: CardSize.SMALL
-        });
-
-        this.encounter = encounter;
-    }
-
-    setAdjacent(location: LocationCard) {
-        this.adjacentLocations.push(location);
-    }
-
-    OnLocationSelected(scene: Phaser.Scene): void {
-        console.log(`Location ${this.id} selected with encounter: ${this.encounter.enemies.map(e => e.name).join(', ')}`);
-        
-        GameState.getInstance().eliminatePhysicalCardsBetweenScenes();
-        scene.scene.start('CombatScene', { encounter: this.encounter });
-    }
-}
 
 export default class MapScene extends Phaser.Scene {
     private locationCards: PhysicalCard[] = [];
@@ -46,23 +16,60 @@ export default class MapScene extends Phaser.Scene {
     private abortButton: Phaser.GameObjects.Container | null = null;
     private campaignStatusText: Phaser.GameObjects.Text | null = null;
 
+    // Managers
+    private locationManager: LocationManager;
+    private spatialManager: SpatialManager;
+    private adjacencyManager: AdjacencyManager;
+
+    // Graphics for adjacency lines
+    private adjacencyGraphics: Phaser.GameObjects.Graphics | null = null;
+
     constructor() {
         super('MapScene');
+        this.locationManager = new LocationManager();
+        this.spatialManager = new SpatialManager(800, 600); // Initial dummy values, will update in create()
+        this.adjacencyManager = new AdjacencyManager(0.3, 1); // Adjust sparseness and minConnections here
     }
 
     preload() {
         this.load.image('mapbackground1', 'https://raw.githubusercontent.com/MisterFlask/PhaserCardGame/master/resources/Sprites/Backgrounds/mapbackground1.png');
+        this.load.image('cursed-star', 'path_to_cursed_star_image.png'); // Ensure you have this asset
     }
 
-    create() {
+    create() {        
+
+        // Update spatial manager with actual dimensions
+        const { width, height } = this.scale;
+        this.spatialManager.updateDimensions(width, height);
+
         this.createBackground();
-        this.createLocationCards();
+        this.createAdjacencyGraphics();
+        this.generateAndPlaceLocations();
+        this.createPhysicalLocationCards();
         this.createCharacterCards();
+        this.createAdjacencyLines();
         this.createAbortButton();
         this.createCampaignStatusText();
 
         this.scale.on('resize', this.resize, this);
         this.resize();
+        // Call the update function
+        this.events.on('update', this.update, this);
+    }
+
+    createAdjacencyGraphics() {
+        this.adjacencyGraphics = new Phaser.GameObjects.Graphics(this, { lineStyle: { width: 2, color: 0xffffff } });
+        this.add.existing(this.adjacencyGraphics!);
+    }
+
+    generateAndPlaceLocations() {
+        this.locationManager.initializeLocations();
+
+        const locations = GameState.getInstance().locations;
+        this.spatialManager.arrangeLocations(locations);
+        this.adjacencyManager.generateAdjacencies(locations);
+        GameState.getInstance().setLocations(locations);
+        GameState.getInstance().setCurrentLocation(locations[0]); // Set Entrance as starting location
     }
 
     createBackground() {
@@ -71,74 +78,72 @@ export default class MapScene extends Phaser.Scene {
         this.resizeBackground();
     }
 
-    createLocationCards() {
+    createPhysicalLocationCards() {
         const { width, height } = this.scale;
+        const locations = GameState.getInstance().getLocations();
 
-        const locationData = [
-            { 
-                card: new LocationCard({ name: 'Entrance', description: 'The entrance to the dungeon' }),
-                position: { x: 0, y: -200 }
-            },
-            { 
-                card: new LocationCard({ name: 'North Wing', description: 'The northern section of the dungeon' }),
-                position: { x: -150, y: -100 }
-            },
-            { 
-                card: new LocationCard({ name: 'East Wing', description: 'The eastern section of the dungeon' }),
-                position: { x: 150, y: -100 }
-            },
-            { 
-                card: new LocationCard({ name: 'West Wing', description: 'The western section of the dungeon' }),
-                position: { x: -150, y: 100 }
-            },
-            { 
-                card: new LocationCard({ name: 'South Wing', description: 'The southern section of the dungeon' }),
-                position: { x: 150, y: 100 }
-            },
-            { 
-                card: new LocationCard({ name: 'Boss Room', description: 'The final challenge awaits' }),
-                position: { x: 0, y: 200 }
-            }
-        ];
-
-        // Define adjacency
-        locationData[0].card.setAdjacent(locationData[1].card); // Entrance -> North Wing
-        locationData[0].card.setAdjacent(locationData[2].card); // Entrance -> East Wing
-        locationData[0].card.setAdjacent(locationData[3].card); // Entrance -> West Wing
-        locationData[0].card.setAdjacent(locationData[4].card); // Entrance -> South Wing
-        locationData[4].card.setAdjacent(locationData[5].card); // South Wing -> Boss Room
-
-        GameState.getInstance().setLocations(locationData.map(ld => ld.card));
-        GameState.getInstance().setCurrentLocation(locationData[0].card); // Set Entrance as starting location
-
-        locationData.forEach((ld) => {
+        locations.forEach(location => {
             const card = CardGuiUtils.getInstance().createCard({
                 scene: this,
-                x: ld.position.x + width / 2, // Adjusted X position
-                y: ld.position.y + height / 2, // Adjusted Y position
-                data: ld.card,
+                x: location.xPos,
+                y: location.yPos,
+                data: location,
                 eventCallback: this.setupLocationCardEvents
             });
+            card.container.setDepth(10); // Increased depth to ensure visibility
             this.locationCards.push(card);
         });
 
         // Add player location icon
+        this.updatePlayerLocationIcon();
+    }
+
+    updatePlayerLocationIcon() {
         const currentLocation = GameState.getInstance().getCurrentLocation();
-        const currentLocationCard = this.locationCards.find(card => card.data === currentLocation);
+        const currentLocationCard = this.locationCards.find(card => card.data.id === currentLocation?.id);
         if (currentLocationCard) {
+            // Remove existing icons if any
+            currentLocationCard.container.list.forEach(child => {
+                if (child.name === "currentLocationIcon") {
+                    child.destroy();
+                }
+            });
+
             // Get the dimensions of the card portrait
             const portraitWidth = currentLocationCard.cardImage.displayWidth;
             const portraitHeight = currentLocationCard.cardImage.displayHeight;
 
             // Create a new image with the same dimensions as the card portrait
             const currentLocationIcon = this.add.image(0, -currentLocationCard.cardBackground.displayHeight / 4, 'cursed-star');
-            currentLocationIcon.setDisplaySize(portraitWidth, portraitHeight);
+            currentLocationIcon.setDisplaySize(portraitWidth / 2, portraitHeight / 2); // Adjust size as needed
             currentLocationIcon.setDepth(1);
+            currentLocationIcon.setName("currentLocationIcon");
             currentLocationCard.container.add(currentLocationIcon);
 
             // Optionally, add a glow effect to make it stand out
-            const glowFX = currentLocationIcon.preFX?.addGlow(0xffff00, 4, 0, false, 0.1, 16);
+            // Note: Phaser doesn't have a built-in glow effect. You might need a shader or use a plugin.
         }
+    }
+
+    createAdjacencyLines() {
+        this.adjacencyGraphics!.clear();
+        this.adjacencyGraphics!.lineStyle(2, 0xaaaaaa, 1);
+
+        const locations = GameState.getInstance().getLocations();
+
+        locations.forEach(location => {
+            const fromX = location.xPos;
+            const fromY = location.yPos;
+
+            location.adjacentLocations.forEach(adj => {
+                // To prevent drawing duplicate lines, only draw if adj's id is greater
+                if (adj.id > location.id) {
+                    const toX = adj.xPos;
+                    const toY = adj.yPos;
+                    this.adjacencyGraphics!.strokeLineShape(new Phaser.Geom.Line(fromX, fromY, toX, toY));
+                }
+            });
+        });
     }
 
     createCharacterCards() {
@@ -158,10 +163,11 @@ export default class MapScene extends Phaser.Scene {
     }
 
     createAbortButton() {
+        const { width, height } = this.scale;
         const buttonWidth = 300;
         const buttonHeight = 80;
-        const buttonX = this.scale.width / 2;
-        const buttonY = this.scale.height - 60;
+        const buttonX = width / 2;
+        const buttonY = height - 60;
 
         const button = this.add.rectangle(0, 0, buttonWidth, buttonHeight, 0xff0000);
         const abortText = this.add.text(0, -15, 'ABORT MISSION', { fontSize: '32px', color: '#ffffff' }).setOrigin(0.5);
@@ -176,8 +182,9 @@ export default class MapScene extends Phaser.Scene {
     }
 
     createCampaignStatusText() {
+        const { width, height } = this.scale;
         const padding = 20;
-        const x = this.scale.width - padding;
+        const x = width - padding;
         const y = padding;
         this.campaignStatusText = this.add.text(x, y, this.getCampaignStatusText(), {
             fontSize: '18px',
@@ -224,11 +231,17 @@ export default class MapScene extends Phaser.Scene {
                 if (currentLocation?.adjacentLocations.includes(card.data)) {
                     gameState.setCurrentLocation(card.data);
                     card.data.OnLocationSelected(this);
+                    this.updatePlayerLocationIcon();
                 } else {
                     console.log('Cannot move to non-adjacent location.');
                 }
             }
         });
+    }
+
+    update() {
+        this.resize();
+
     }
 
     setupCharacterCardEvents = (card: PhysicalCard) => {
@@ -238,9 +251,12 @@ export default class MapScene extends Phaser.Scene {
     resize() {
         const { width, height } = this.scale;
         this.resizeBackground();
+        this.spatialManager.updateDimensions(width, height);
         this.positionCharacterCards(width, height);
         this.positionAbortButton(width, height);
         this.positionCampaignStatusText(width, height);
+        this.spatialManager.placePositions(GameState.getInstance().getLocations());
+        this.createAdjacencyLines();
     }
 
     resizeBackground() {
@@ -271,5 +287,21 @@ export default class MapScene extends Phaser.Scene {
             const padding = 20;
             this.campaignStatusText.setPosition(width - padding, padding);
         }
+    }
+
+    arrangeLocationCards() {
+        const locations = GameState.getInstance().getLocations();
+        const { width, height } = this.scale; // Ensure correct dimensions
+
+        locations.forEach(location => {
+            const card = this.locationCards.find(c => c.data === location);
+            if (card) {
+                card.container.setPosition(
+                    Phaser.Math.Clamp(location.xPos, 0, width), // Clamp xPos
+                    Phaser.Math.Clamp(location.yPos, 0, height) // Clamp yPos
+                );
+                
+            }
+        });
     }
 }
