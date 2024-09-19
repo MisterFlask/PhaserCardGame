@@ -17,26 +17,27 @@ export class SpatialManager {
     }
 
     public arrangeLocations(locations: LocationCard[]): void {
-        const centralArea = {
-            minX: this.width / 6,
-            maxX: (5 * this.width) / 6,
-            minY: this.height / 6,
-            maxY: (5 * this.height) / 6
-        };
+        const numLocations = locations.length;
+        const numCols = Math.ceil(Math.sqrt(numLocations));
+        const numRows = Math.ceil(numLocations / numCols);
+        const horizontalSpacing = (this.width - 2 * this.padding) / numCols;
+        const verticalSpacing = (this.height - 2 * this.padding) / numRows;
+        const perturbation = 50; // Maximum random offset in pixels
 
-        locations.forEach(location => {
-            let position: Phaser.Math.Vector2;
-            let attempts = 0;
-            do {
-                const x = Phaser.Math.Between(centralArea.minX, centralArea.maxX);
-                const y = Phaser.Math.Between(centralArea.minY, centralArea.maxY);
-                position = new Phaser.Math.Vector2(x, y);
-                attempts++;
-                if (attempts > 100) break; // Prevent infinite loops
-            } while (!this.isPositionValid(position, locations));
+        locations.forEach((location, index) => {
+            const row = Math.floor(index / numCols);
+            const col = index % numCols;
 
-            location.setPosition(position.x, position.y);
-            console.log(`Location ${location.id}: x=${location.xPos}, y=${location.yPos}`);
+            const baseX = this.padding + col * horizontalSpacing + horizontalSpacing / 2;
+            const baseY = this.padding + row * verticalSpacing + verticalSpacing / 2;
+
+            const offsetX = Phaser.Math.Between(-perturbation, perturbation);
+            const offsetY = Phaser.Math.Between(-perturbation, perturbation);
+
+            const finalX = Phaser.Math.Clamp(baseX + offsetX, this.padding, this.width - this.padding);
+            const finalY = Phaser.Math.Clamp(baseY + offsetY, this.padding, this.height - this.padding);
+
+            location.setPosition(finalX, finalY);
         });
     }
 

@@ -12,21 +12,25 @@ interface LocationPair {
 export class AdjacencyManager {
     private sparseness: number; // Probability to create an adjacency between any two nodes
     private minConnections: number; // Minimum number of connections per location
+    private maxAdjacencyDistance: number; // Maximum distance to consider for adjacency
 
-    constructor(sparseness: number = 0.3, minConnections: number = 1) {
+    constructor(sparseness: number = 0.3, minConnections: number = 1, maxAdjacencyDistance: number = 200) {
         this.sparseness = sparseness;
         this.minConnections = minConnections;
+        this.maxAdjacencyDistance = maxAdjacencyDistance; // Initialize max adjacency distance
     }
 
     public generateAdjacencies(locations: LocationCard[]): void {
-        // Step 1: Calculate distances between all pairs
+        // Step 1: Calculate distances between all pairs within maxAdjacencyDistance
         const pairs: LocationPair[] = [];
         for (let i = 0; i < locations.length; i++) {
             for (let j = i + 1; j < locations.length; j++) {
                 const locA = locations[i];
                 const locB = locations[j];
                 const distance = this.calculateDistance(locA, locB);
-                pairs.push({ a: locA, b: locB, distance });
+                if (distance <= this.maxAdjacencyDistance) { // Only consider nearby locations
+                    pairs.push({ a: locA, b: locB, distance });
+                }
             }
         }
 

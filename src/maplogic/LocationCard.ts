@@ -12,7 +12,7 @@ export class LocationCard extends AbstractCard {
     public xPos: number = 0;
     public yPos: number = 0;
 
-    constructor({ name, description, portraitName, tooltip }: { name: string; description: string; portraitName?: string; tooltip?: string }) {
+    constructor({ name, description, portraitName, tooltip, size }: { name: string; description: string; portraitName?: string; tooltip?: string; size: CardSize }) { // Added 'size' parameter
         const encounter = EncounterManager.getInstance().getRandomEncounter();
         const encounterDescription = `Encounter: ${encounter.enemies.map(e => e.name).join(', ')}`;
         const fullDescription = `${description}\n\n${encounterDescription}`;
@@ -23,7 +23,7 @@ export class LocationCard extends AbstractCard {
             portraitName,
             cardType: CardType.CHARACTER,
             tooltip,
-            size: CardSize.MEDIUM
+            size // Pass the size parameter
         });
 
         this.encounter = encounter;

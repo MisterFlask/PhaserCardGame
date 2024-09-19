@@ -2,7 +2,7 @@ import { JsonRepresentable } from '../interfaces/JsonRepresentable';
 import { GameState } from '../rules/GameState';
 import { AbstractBuff } from '../ui/PhysicalBuff';
 import { BaseCharacter } from './BaseCharacter';
-import { CardSize, CardType } from "./Primitives";
+import { CardSize, CardType } from './Primitives'; // Ensure enums are imported from Primitives
 
 export interface IPhysicalCardInterface {
     container: Phaser.GameObjects.Container;
@@ -50,7 +50,6 @@ const wordList = [
     "luminescent", "ethereal", "iridescent", "ephemeral", "mellifluous",
     "nebulous", "ineffable", "eloquent", "enigmatic", "euphoric",
     "epiphanic", "quintessential", "melancholic", "ethereal", "labyrinthine",
-
 ];
 
 export function generateWordGuid(): string {

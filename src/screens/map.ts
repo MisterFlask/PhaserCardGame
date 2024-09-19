@@ -65,11 +65,12 @@ export default class MapScene extends Phaser.Scene {
     generateAndPlaceLocations() {
         this.locationManager.initializeLocations();
 
-        const locations = GameState.getInstance().locations;
-        this.spatialManager.arrangeLocations(locations);
-        this.adjacencyManager.generateAdjacencies(locations);
-        GameState.getInstance().setLocations(locations);
-        GameState.getInstance().setCurrentLocation(locations[0]); // Set Entrance as starting location
+        const allLocations = GameState.getInstance().locations;
+        const selectedLocations = Phaser.Math.RND.shuffle(allLocations.slice()).slice(0, 9);
+        GameState.getInstance().setLocations(selectedLocations);
+        this.spatialManager.arrangeLocations(selectedLocations);
+        this.adjacencyManager.generateAdjacencies(selectedLocations);
+        GameState.getInstance().setCurrentLocation(selectedLocations[0]); // Set Entrance as starting location
     }
 
     createBackground() {
