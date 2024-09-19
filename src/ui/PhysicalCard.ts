@@ -233,7 +233,7 @@ export class PhysicalCard {
     }
 
     applyCardSize(): void {
-        const scale = this.data.size;
+        const scale = this.data.size.sizeModifier;
         this.cardContent.setScale(scale);
     }
 
@@ -256,7 +256,7 @@ export class PhysicalCard {
         // Animate scaling up with a smooth transition
         this.scene.tweens.add({
             targets: this.cardContent,
-            scale: this.data.size * 1.1,
+            scale: this.data.size.sizeModifier * 1.1,
             duration: 200,
             ease: 'Power2'
         });
@@ -266,7 +266,7 @@ export class PhysicalCard {
         this.container.setDepth(1000);
 
         // Determine tooltip position based on card's position
-        const cardWidth = this.cardBackground.displayWidth * this.data.size * 1.1; // Adjust for scaling
+        const cardWidth = this.cardBackground.displayWidth * this.data.size.sizeModifier * 1.1; // Adjust for scaling
         const gameWidth = this.scene.scale.width;
         const cardCenterX = this.container.x;
 
