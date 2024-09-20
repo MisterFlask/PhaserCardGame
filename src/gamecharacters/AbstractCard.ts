@@ -1,6 +1,7 @@
 import { JsonRepresentable } from '../interfaces/JsonRepresentable';
 import { GameState } from '../rules/GameState';
 import { AbstractBuff } from '../ui/PhysicalBuff';
+import { AbstractIntent } from './AbstractIntent'; // Import AbstractIntent
 import { BaseCharacter } from './BaseCharacter';
 import { CardSize, CardType } from './Primitives'; // Ensure enums are imported from Primitives
 
@@ -122,6 +123,27 @@ export abstract class AbstractCard implements JsonRepresentable {
             team: this.team,
             block: this.block
         }, null, 2);
+    }
+
+    getIntentsTargetingThisCharacter(): AbstractIntent[] {
+        if (!(this instanceof BaseCharacter)) {
+            return [];
+        }
+
+        const gameState = GameState.getInstance();
+        const livingEnemies = gameState.combatState.enemies.filter(enemy => enemy.hitpoints > 0);
+        
+        const targetingIntents: AbstractIntent[] = [];
+
+        for (const enemy of livingEnemies) {
+            for (const intent of enemy.intents) {
+                if (intent.target === this) {
+                    targetingIntents.push(intent);
+                }
+            }
+        }
+
+        return targetingIntents;
     }
 }
 

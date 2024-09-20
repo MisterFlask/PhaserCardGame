@@ -4,6 +4,7 @@ import { AbstractCard } from "../gamecharacters/AbstractCard";
 import { AbstractIntent } from '../gamecharacters/AbstractIntent';
 import { AutomatedCharacter } from '../gamecharacters/AutomatedCharacter';
 import { BaseCharacter } from "../gamecharacters/BaseCharacter";
+import { IncomingIntent } from "./IncomingIntent"; // Import the new class
 import { PhysicalBuff } from './PhysicalBuff';
 import { PhysicalIntent } from "./PhysicalIntent";
 import { TextBox } from "./TextBox"; // Ensure correct relative path
@@ -35,6 +36,9 @@ export class PhysicalCard {
     private currentBuffs: Map<string, PhysicalBuff> = new Map();
     debugRectangle: any;
     private cardBorder: Phaser.GameObjects.Rectangle;
+    private incomingIntentsContainer: Phaser.GameObjects.Container;
+    private incomingIntents: Map<string, IncomingIntent> = new Map();
+    glowEffect?: Phaser.FX.Glow;
 
     constructor({
         scene,
@@ -163,6 +167,16 @@ export class PhysicalCard {
 
         // Add the border to the cardContent container, behind other elements
         this.cardContent.addAt(this.cardBorder, 0);
+
+        // Initialize incoming intents container positioned to the left of the buffs
+        this.incomingIntentsContainer = this.scene.add.container(
+            -this.cardBackground.displayWidth / 2 - 60, // Adjust X position as needed
+            this.buffsContainer.y // Align vertically with buffs
+        );
+        this.container.add(this.incomingIntentsContainer);
+
+        // Initialize the targeting intents grid
+        this.initTargetingIntentsGrid();
 
         this.updateVisuals();
         this.scene.events.on('update', this.updateVisuals, this);
@@ -479,6 +493,9 @@ export class PhysicalCard {
                 this.cardImage.clearTint(); // Remove tint if HP is above 0
             }
         }
+
+        // Sync incoming intents
+        this.syncIncomingIntents();
     }
 
     private updateHighlightVisual(): void {
@@ -551,6 +568,7 @@ export class PhysicalCard {
     set isHighlighted(value: boolean) {
         this._isHighlighted = value;
         this.updateHighlightVisual();
+        this.setGlow(value)
     }
 
     /**
@@ -647,6 +665,77 @@ export class PhysicalCard {
         this.cardContent.add(this.debugRectangle);
         */
         this.cardContent.add(this.buffsContainer);
+    }
+
+    /**
+     * Initialize targeting intents grid layout
+     */
+    private initTargetingIntentsGrid(): void {
+        // Any initial setup for the targeting intents grid can be done here
+    }
+
+    /**
+     * Sync incoming intents with the underlying AbstractCard's incoming intents
+     */
+    private syncIncomingIntents(): void {
+        const targetedIntents = this.data.getIntentsTargetingThisCharacter();
+        
+        const currentIntentIds = new Set(targetedIntents.map(intent => intent.id));
+
+        // Remove intents that are no longer present
+        this.incomingIntents.forEach((intentUI, id) => {
+            if (!currentIntentIds.has(id)) {
+                intentUI.destroy();
+                this.incomingIntents.delete(id);
+            }
+        });
+
+        // Add new intents
+        targetedIntents.forEach(intent => {
+            if (!this.incomingIntents.has(intent.id)) {
+                const targetingIntent = new IncomingIntent(this.scene, intent, 0, 0);
+                this.incomingIntents.set(intent.id, targetingIntent);
+                this.incomingIntentsContainer.add(targetingIntent.getContainer());
+            } else {
+                this.incomingIntents.get(intent.id)?.updateIntent(intent);
+            }
+        });
+
+        this.layoutTargetingIntents();
+    }
+
+
+    /**
+     * Make the entire card glow or stop glowing.
+     * @param isGlowing - True to make the card glow, false to stop glowing.
+     */
+    public setGlow(isGlowing: boolean): void {
+
+        if (isGlowing) {
+            this.glowEffect =  this.cardContent.postFX.addGlow(0xffffff, 0, 0, false, 0.1, 16);
+        } else if (this.glowEffect) {
+            this.cardContent.postFX.remove(this.glowEffect)
+        }
+    }
+
+    /**
+     * Layout the targeting intents in a column
+     */
+    private layoutTargetingIntents(): void {
+        const intents = Array.from(this.incomingIntents.values());
+        const spacing = 10;
+        let currentY = 0;
+
+        intents.forEach((targetingIntent, index) => {
+            targetingIntent.setPosition(0, currentY);
+            currentY += IncomingIntent.HEIGHT + spacing;
+        });
+
+        // Optionally, adjust the container's position or size
+        this.incomingIntentsContainer.setPosition(
+            -this.cardBackground.displayWidth / 2 - 60, // Left of buffs
+            0 // Center vertically
+        );
     }
 }
 

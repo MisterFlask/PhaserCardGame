@@ -120,9 +120,6 @@ export default class MapScene extends Phaser.Scene {
             currentLocationIcon.setDepth(1);
             currentLocationIcon.setName("currentLocationIcon");
             currentLocationCard.container.add(currentLocationIcon);
-
-            // Optionally, add a glow effect to make it stand out
-            // Note: Phaser doesn't have a built-in glow effect. You might need a shader or use a plugin.
         }
     }
 

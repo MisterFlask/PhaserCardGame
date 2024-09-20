@@ -231,6 +231,7 @@ export class ActionManager {
             return [];
         }));
     }
+
 }
 
 import Phaser from 'phaser';
