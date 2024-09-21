@@ -6,12 +6,10 @@ import { LocationCard } from './LocationCard';
 export class SpatialManager {
     private width: number;
     private height: number;
-    private padding: number;
 
-    constructor(width: number, height: number, padding: number = 100) {
+    constructor(width: number, height: number) {
         this.width = width;
         this.height = height;
-        this.padding = padding;
     }
 
     public arrangeLocations(): void {
@@ -24,8 +22,7 @@ export class SpatialManager {
             floors.get(location.floor)!.push(location);
         });
 
-        const totalFloors = floors.size;
-        const floorHeight = (this.height - 2 * this.padding) / totalFloors;
+        const floorHeight = 300;
         const leftMargin = this.width / 6;
         const usableWidth = (2 * this.width) / 3;
 
@@ -38,7 +35,7 @@ export class SpatialManager {
             
             floorLocations.forEach((location, index) => {
                 const x = leftMargin + index * roomWidth;
-                const y = this.height - (this.padding + floorNumber * floorHeight);
+                const y = floorHeight * floorNumber;
                 location.setPosition(x, y);
             });
         });

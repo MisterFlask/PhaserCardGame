@@ -14,11 +14,13 @@ export class AdjacencyManager {
     private sparseness: number; // Probability to create an adjacency between any two nodes
     private minConnections: number; // Minimum number of connections per location
     private maxAdjacencyDistance: number; // Maximum distance to consider for adjacency
+    private maxIndexDifference: number; // Maximum difference in room indexes for adjacency
 
-    constructor(sparseness: number = 0.3, minConnections: number = 1, maxAdjacencyDistance: number = 200) {
+    constructor(sparseness: number = 0.3, minConnections: number = 1, maxAdjacencyDistance: number = 200, maxIndexDifference: number = 2) {
         this.sparseness = sparseness;
         this.minConnections = minConnections;
-        this.maxAdjacencyDistance = maxAdjacencyDistance; // Initialize max adjacency distance
+        this.maxAdjacencyDistance = maxAdjacencyDistance;
+        this.maxIndexDifference = maxIndexDifference;
     }
 
     public generateAdjacencies(): void {
@@ -33,7 +35,7 @@ export class AdjacencyManager {
             floors.get(floor)!.push(loc);
         });
 
-        // Step 2: Connect nodes between floors
+        // Step 2: Connect nodes between adjacent floors only
         const sortedFloors = Array.from(floors.keys()).sort((a, b) => a - b);
         for (let i = 0; i < sortedFloors.length - 1; i++) {
             const currentFloor = floors.get(sortedFloors[i])!;
@@ -42,7 +44,10 @@ export class AdjacencyManager {
             currentFloor.forEach(loc => {
                 // Ensure each node connects to 1-3 nodes on the next floor
                 const connections = Phaser.Math.Between(1, 3);
-                const shuffledNext = Phaser.Utils.Array.Shuffle(nextFloor.slice());
+                const validNextFloorNodes = nextFloor.filter(nextLoc => 
+                    Math.abs(nextLoc.roomNumber - loc.roomNumber) <= this.maxIndexDifference
+                );
+                const shuffledNext = Phaser.Utils.Array.Shuffle(validNextFloorNodes.slice());
                 for (let j = 0; j < connections && j < shuffledNext.length; j++) {
                     this.addAdjacency(loc, shuffledNext[j]);
                 }
@@ -61,7 +66,7 @@ export class AdjacencyManager {
         // Step 4: Ensure at least one valid path from Entrance to Boss
         this.ensurePath(floors, sortedFloors, bossNode);
 
-        // Step 5: Optionally add branching paths
+        // Step 5: Optionally add branching paths (only between adjacent floors)
         this.addBranchingPaths(floors, sortedFloors);
 
         // Step 6: Ensure the graph is fully connected
@@ -72,7 +77,10 @@ export class AdjacencyManager {
         let current = floors.get(sortedFloors[0])![0]; // Entrance node
         for (let i = 1; i < sortedFloors.length; i++) {
             const nextFloor = floors.get(sortedFloors[i])!;
-            const nextNode = nextFloor[0]; // Choose the first node for the path
+            const validNextNodes = nextFloor.filter(nextLoc => 
+                Math.abs(nextLoc.roomNumber - current.roomNumber) <= this.maxIndexDifference
+            );
+            const nextNode = validNextNodes[0] || nextFloor[0]; // Choose the first valid node or fallback to first node
             this.addAdjacency(current, nextNode);
             current = nextNode;
         }
@@ -80,21 +88,22 @@ export class AdjacencyManager {
     }
 
     private addBranchingPaths(floors: Map<number, LocationCard[]>, sortedFloors: number[]): void {
-        // Example: Add additional random adjacencies to create branches
-        floors.forEach((floorLocations, floorNumber) => {
-            if (floorNumber < sortedFloors.length - 1) {
-                const nextFloor = floors.get(sortedFloors[floorNumber + 1])!;
-                floorLocations.forEach(loc => {
-                    if (Phaser.Math.FloatBetween(0, 1) < 0.3) { // 30% chance to add a branch
-                        const potential = nextFloor.filter(l => !loc.adjacentLocations.includes(l));
-                        if (potential.length > 0) {
-                            const target = Phaser.Utils.Array.GetRandom(potential);
-                            this.addAdjacency(loc, target);
-                        }
+        for (let i = 0; i < sortedFloors.length - 1; i++) {
+            const currentFloor = floors.get(sortedFloors[i])!;
+            const nextFloor = floors.get(sortedFloors[i + 1])!;
+            currentFloor.forEach(loc => {
+                if (Phaser.Math.FloatBetween(0, 1) < 0.3) { // 30% chance to add a branch
+                    const potential = nextFloor.filter(l => 
+                        !loc.adjacentLocations.includes(l) && 
+                        Math.abs(l.roomNumber - loc.roomNumber) <= this.maxIndexDifference
+                    );
+                    if (potential.length > 0) {
+                        const target = Phaser.Utils.Array.GetRandom(potential);
+                        this.addAdjacency(loc, target);
                     }
-                });
-            }
-        });
+                }
+            });
+        }
     }
 
     private calculateDistance(a: LocationCard, b: LocationCard): number {
@@ -137,11 +146,11 @@ export class AdjacencyManager {
 
         // Connect disconnected locations to the main component
         disconnected.forEach(loc => {
-            // Find the closest location in the visited set
+            // Find the closest location in the visited set on the same floor or adjacent floors
             let closest: LocationCard | null = null;
             let minDistance = Infinity;
             locations.forEach(other => {
-                if (visited.has(other)) {
+                if (visited.has(other) && Math.abs(other.floor - loc.floor) <= 1 && Math.abs(other.roomNumber - loc.roomNumber) <= this.maxIndexDifference) {
                     const distance = this.calculateDistance(loc, other);
                     if (distance < minDistance) {
                         minDistance = distance;
@@ -164,5 +173,9 @@ export class AdjacencyManager {
 
     public setMinConnections(minConnections: number): void {
         this.minConnections = minConnections;
+    }
+
+    public setMaxIndexDifference(maxIndexDifference: number): void {
+        this.maxIndexDifference = maxIndexDifference;
     }
 }

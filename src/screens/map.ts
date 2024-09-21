@@ -59,6 +59,26 @@ export default class MapScene extends Phaser.Scene {
         this.resize();
         // Call the update function
         this.events.on('update', this.update, this);
+        this.updateHighlights();
+    }
+
+
+    updateHighlights(){
+        // the current room should glow in green; the next options for rooms should glow in yellow.
+        const currentLocation = GameState.getInstance().getCurrentLocation();
+        const currentLocationCard = this.locationCards.find(card => card.data.id === currentLocation?.id);
+        if (currentLocationCard) {
+            currentLocationCard.glowColor = 0x00ff00;
+            currentLocationCard.isHighlighted = true;
+        }
+        const nextLocations = currentLocation?.adjacentLocations;
+        nextLocations?.forEach(loc => {
+            const nextLocationCard = this.locationCards.find(card => card.data.id === loc.id);
+            if (nextLocationCard) {
+                nextLocationCard.glowColor = 0xffff00;
+                nextLocationCard.isHighlighted = true;
+            }
+        });
     }
 
     createAdjacencyGraphics() {

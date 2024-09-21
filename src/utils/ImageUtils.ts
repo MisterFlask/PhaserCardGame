@@ -89,11 +89,7 @@ export default class GameImageLoader {
         map_icons: {
             prefix: 'Sprites/MapIcons/',
             files: [
-                'campfire.png', 'Circle.png', 'coins (1).png', 'diamond-hilt.png',
-                'east_india_co.png', 'hell_fight.png',
-                'ironlordbyron_parchment_texture_6107e36b-8c96-402b-87e4-aac39c89d980.png',
-                'minotaur.png', 'plain-circle (1).png', 'plain-circle.png', 'robber.png',
-                'sauron_pic.png', 'swordwoman.png', 'warlock-eye.png', 'watchtower.png'
+                'boss-icon.png', 'elite-icon.svg', 'entrance-icon.png', 'event-icon.svg', 'rest-icon.svg', 'shop-icon.svg', 'room-fight-icon.svg'
             ]
         },
         mission_icons: {

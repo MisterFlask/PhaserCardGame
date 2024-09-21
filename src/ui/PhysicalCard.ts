@@ -39,6 +39,7 @@ export class PhysicalCard {
     private incomingIntentsContainer: Phaser.GameObjects.Container;
     private incomingIntents: Map<string, IncomingIntent> = new Map();
     glowEffect?: Phaser.FX.Glow;
+    glowColor: number = 0xffff00; //yellow
 
     constructor({
         scene,
@@ -720,7 +721,7 @@ export class PhysicalCard {
     public setGlow(isGlowing: boolean): void {
         if (isGlowing && !this.glowEffect) {
             // Create a more intense glow effect
-            this.glowEffect = this.cardContent.postFX.addGlow(0xffff00, 4, 0, false, 0.8, 10);
+            this.glowEffect = this.cardContent.postFX.addGlow(this.glowColor, 4, 0, false, 0.8, 4);
             
             // Add a pulsating animation to make it more noticeable
             this.scene.tweens.add({

@@ -67,6 +67,7 @@ export class EntranceCard extends LocationCard {
             floor,
             index
         });
+        this.portraitName = 'entrance-icon';
     }
 }
 
@@ -79,6 +80,7 @@ export class BossCard extends LocationCard {
             floor,
             index
         });
+        this.portraitName = 'boss-icon';
     }
 }
 
@@ -91,6 +93,7 @@ export class RestSiteCard extends LocationCard {
             floor,
             index
         });
+        this.portraitName = 'rest-icon';
     }
 }
 
@@ -103,6 +106,7 @@ export class NormalRoomCard extends LocationCard {
             floor,
             index
         });
+        this.portraitName = 'room-fight-icon';
     }
 }
 
@@ -115,6 +119,7 @@ export class EliteRoomCard extends LocationCard {
             floor,
             index
         });
+        this.portraitName = 'elite-icon';
     }
 }
 
@@ -127,6 +132,7 @@ export class ShopCard extends LocationCard {
             floor,
             index
         });
+        this.portraitName = 'shop-icon';
     }
 }
 
@@ -139,6 +145,7 @@ export class TreasureRoomCard extends LocationCard {
             floor,
             index
         });
+        this.portraitName = 'treasure-icon';
     }
 }
 
@@ -151,5 +158,6 @@ export class EventRoomCard extends LocationCard {
             floor,
             index
         });
+        this.portraitName = 'event-icon';
     }
 }
