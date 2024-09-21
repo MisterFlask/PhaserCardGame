@@ -1,7 +1,8 @@
+import { JsonRepresentable } from '../interfaces/JsonRepresentable';
 import { ActionManager } from "../utils/ActionManager";
 import { TargetingUtils } from "../utils/TargetingUtils";
+import { generateWordGuid } from "./AbstractCard";
 import { BaseCharacter } from "./BaseCharacter";
-import { JsonRepresentable } from '../interfaces/JsonRepresentable';
 
 export abstract class AbstractIntent implements JsonRepresentable {
     id: string;
@@ -10,8 +11,8 @@ export abstract class AbstractIntent implements JsonRepresentable {
     imageName: string;
     target?: BaseCharacter;
     owner: BaseCharacter;
-    constructor({ id, tooltipText, displayText, imageName, target, owner }: { id: string, tooltipText: string, displayText: string, imageName: string, target: BaseCharacter | undefined, owner: BaseCharacter }) {
-        this.id = id;
+    constructor({tooltipText, displayText, imageName, target, owner }: { tooltipText: string, displayText: string, imageName: string, target: BaseCharacter | undefined, owner: BaseCharacter }) {
+        this.id = generateWordGuid();
         this.tooltipText = tooltipText;
         this.displayText = displayText;
         this.imageName = imageName;
@@ -38,7 +39,7 @@ export abstract class AbstractIntent implements JsonRepresentable {
 export class AttackIntent extends AbstractIntent {
     damage: number;
     constructor({ target, damage, owner }: { target?: BaseCharacter | undefined, damage: number, owner: BaseCharacter }) {
-        super({ id: 'Attack', tooltipText: 'Attacking for ' + damage + ' damage', displayText: damage.toString(), imageName: 'knife-thrust', target: target, owner: owner });
+        super({  tooltipText: 'Attacking for ' + damage + ' damage', displayText: damage.toString(), imageName: 'knife-thrust', target: target, owner: owner });
         this.damage = damage;
         if (!this.target) {
             this.target = TargetingUtils.getInstance().selectRandomPlayerCharacter();

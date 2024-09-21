@@ -23,7 +23,8 @@ export class IncomingIntent {
         
         this.text = this.scene.add.text(0, IncomingIntent.HEIGHT / 2, intent.displayText, { fontSize: '30px', color: '#ffffff' });
         this.text.setOrigin(0.5);
-        
+        this.text.setShadow(2, 2, '#000000', 3, true, true);
+
         this.container.add([this.image, this.text]);
         
         // Set interactive for the container to detect pointer events

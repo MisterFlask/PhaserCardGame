@@ -1,5 +1,4 @@
-import { AbstractBuff } from "../../ui/PhysicalBuff";
-
+import { AbstractBuff } from "./AbstractBuff";
 export class Strong extends AbstractBuff {
     override getName(): string {
         return "Strong"

@@ -252,7 +252,12 @@ export class PhysicalCard {
     }
 
     setupInteractivity(): void {
-        this.container.setInteractive()
+        this.container.setInteractive(new Phaser.Geom.Rectangle(
+            -this.cardBackground.displayWidth / 2,
+            -this.cardBackground.displayHeight / 2,
+            this.cardBackground.displayWidth,
+            this.cardBackground.displayHeight
+        ), Phaser.Geom.Rectangle.Contains)
             .on('pointerover', this.onPointerOver_PhysicalCard, this)
             .on('pointerout', this.onPointerOut_PhysicalCard, this)
             .on('pointerdown', this.onPointerDown_PhysicalCard, this);
@@ -322,13 +327,17 @@ export class PhysicalCard {
     }
 
     onPointerOut_PhysicalCard = (): void => {
-        if (this.obliterated) return;
+        if (this.obliterated) {
+            console.log("obliterated card, so ignoring pointer out: " + this.data.name);
+            return;
+        };
+
         console.log(`Pointer out card: ${this.data.name}`);
 
         // Animate scaling back to original size
         this.scene.tweens.add({
             targets: this.cardContent,
-            scale: this.data.size,
+            scale: this.data.size.sizeModifier,
             duration: 200,
             ease: 'Power2'
         });
@@ -731,28 +740,25 @@ export class PhysicalCard {
             this.glowEffect = undefined;
         }
     }
-
     /**
-     * Layout the targeting intents in a column
+     * Layout the targeting intents in a row that expands leftward
      */
     private layoutTargetingIntents(): void {
         const intents = Array.from(this.incomingIntents.values());
         const spacing = 10;
-        let currentY = 0;
-
-        intents.forEach((targetingIntent, index) => {
-            targetingIntent.setPosition(0, currentY);
-            currentY += IncomingIntent.HEIGHT + spacing;
+        const totalIntents = intents.length;
+        const totalWidth = totalIntents * IncomingIntent.WIDTH + (totalIntents - 1) * spacing;
+        let currentX = 0;
+    
+        intents.forEach((targetingIntent) => {
+            targetingIntent.setPosition(currentX, 0);
+            currentX -= IncomingIntent.WIDTH + spacing;
         });
-
-        // Optionally, adjust the container's position or size
+    
+        // Position the container based on totalWidth to ensure all intents are visible
         this.incomingIntentsContainer.setPosition(
-            -this.cardBackground.displayWidth / 2 - 60, // Left of buffs
-            0 // Center vertically
+            -this.cardBackground.displayWidth / 2 - 60 + totalWidth,
+            -this.cardBackground.displayHeight / 2
         );
     }
-}
-
-export abstract class AbstractCombatEvent{
-
 }

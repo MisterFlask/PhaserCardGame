@@ -16,7 +16,6 @@ export class CombatRules {
     ActionManager.getInstance().discardCard(card);
   };
 
-
   public static endTurn(): void {
     console.log('Ending turn');
     const gameState = GameState.getInstance();
@@ -42,12 +41,21 @@ export class CombatRules {
     CombatRules.beginTurn();
   }
 
+  public static handleDeath(character: BaseCharacter, killer: BaseCharacter | null): void {
+    if (character instanceof AutomatedCharacter){
+      character.intents = [];
+    }
+    character.buffs = [];
+    
+  }
+
+
+
 
   public static beginTurn(): void {
     const gameState = GameState.getInstance();
     const combatState = gameState.combatState;
 
-    // {{ edit_2 }}
     // Prevent dead enemies from gaining new intents
     combatState.enemies.forEach(enemy => {
       if (enemy.hitpoints > 0) {
@@ -64,16 +72,16 @@ export class CombatRules {
   public static ExecuteIntents(): void {
     const gameState = GameState.getInstance();
     const allCards = [...gameState.combatState.playerCharacters, ...gameState.combatState.enemies];
-    
+
     allCards.forEach(card => {
-        if (card instanceof AutomatedCharacter) {
-            var autoChar = card as AutomatedCharacter;
-            const intents = autoChar.intents;
-            intents.forEach(intent => {
-                intent.act();
-            });
-        }
+      if (card instanceof AutomatedCharacter) {
+        var autoChar = card as AutomatedCharacter;
+        const intents = autoChar.intents;
+        intents.forEach(intent => {
+          intent.act();
+        });
+      }
     });
-}
-  
+  }
+
 }

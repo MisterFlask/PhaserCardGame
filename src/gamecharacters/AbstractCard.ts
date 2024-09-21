@@ -1,8 +1,8 @@
 import { JsonRepresentable } from '../interfaces/JsonRepresentable';
 import { GameState } from '../rules/GameState';
-import { AbstractBuff } from '../ui/PhysicalBuff';
 import { AbstractIntent } from './AbstractIntent'; // Import AbstractIntent
 import { BaseCharacter } from './BaseCharacter';
+import { AbstractBuff } from './buffs/AbstractBuff';
 import { CardSize, CardType } from './Primitives'; // Ensure enums are imported from Primitives
 
 export interface IPhysicalCardInterface {
@@ -121,7 +121,8 @@ export abstract class AbstractCard implements JsonRepresentable {
             tooltip: this.tooltip,
             owner: this.owner?.name,
             team: this.team,
-            block: this.block
+            block: this.block,
+            IncomingIntents: this.getIntentsTargetingThisCharacter().map(intent => intent.createJsonRepresentation())
         }, null, 2);
     }
 

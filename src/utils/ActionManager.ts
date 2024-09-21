@@ -102,6 +102,8 @@ export class ActionManager {
             return [];
         }));
     }
+
+
     public applyBlock(params: {
         block: number,
         appliedViaPlayableCard?: AbstractCard,
@@ -169,21 +171,27 @@ export class ActionManager {
 
         });
     }
+
+    
     public dealDamage = ({
         amount,
         target,
         sourceCharacter,
-        sourceCard
+        sourceCard,
+        fromAttack
     }: {
         amount: number,
-        target: AbstractCard,
+        target: BaseCharacter,
         sourceCharacter?: BaseCharacter,
-        sourceCard?: AbstractCard
+        sourceCard?: PlayableCard,
+        fromAttack?: boolean
     }): void => {
         const physicalCardOfTarget = target.physicalCard as PhysicalCard;
         if (!physicalCardOfTarget) {
             return;
         }
+
+        fromAttack = fromAttack || true;
 
         if (physicalCardOfTarget) {
             const damageAction = new GenericAction(async () => {
@@ -200,9 +208,37 @@ export class ActionManager {
                             target.block = 0;
                         }
                     }
+                    // Create a DamageInfo object to pass to the buff effects
+                    const damageInfo = new DamageInfo();
+                    damageInfo.damageDealt = amount;
+                    damageInfo.damageTaken = remainingDamage;
+                    damageInfo.damageBlocked = amount - remainingDamage;
+
+                    // Activate OnStriking effects for the attacker's buffs
+                    if (sourceCharacter) {
+                        sourceCharacter.buffs.forEach(buff => {
+                            const _buff = buff as AbstractBuff
+                            _buff.onOwnerStriking(target, sourceCard || null, damageInfo);
+                        });
+
+                    }
+
+                    if (fromAttack){
+                        // Activate OnStruck effects for the defender's buffs
+                        target.buffs.forEach(buff => {
+                            const _buff = buff as AbstractBuff
+                            _buff.onOwnerStruck(sourceCharacter || null, sourceCard || null, damageInfo);
+                        });
+                    }
+
                     if (remainingDamage > 0) {
+
                         target.hitpoints = Math.max(0, target.hitpoints - remainingDamage);
                     }
+                }
+                // Handle death if hitpoints reach 0
+                if (target.hitpoints <= 0) {
+                    CombatRules.handleDeath(target as BaseCharacter, sourceCharacter as BaseCharacter | null);
                 }
 
                 return [];
@@ -236,6 +272,9 @@ export class ActionManager {
 
 import Phaser from 'phaser';
 import { AbstractCard, PlayableCard } from '../gamecharacters/AbstractCard';
+import { AbstractBuff } from "../gamecharacters/buffs/AbstractBuff";
+import { CombatRules } from "../rules/CombatRules";
+import { DamageInfo } from "../rules/DamageInfo";
 import { DeckLogic, PileName } from "../rules/DeckLogic";
 import { GameState } from '../rules/GameState';
 

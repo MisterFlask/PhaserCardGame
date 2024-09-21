@@ -1,6 +1,4 @@
-import { generateWordGuid } from '../gamecharacters/AbstractCard';
-import { BaseCharacter } from "../gamecharacters/BaseCharacter";
-import { AbstractCombatEvent } from './PhysicalCard';
+import { AbstractBuff } from '../gamecharacters/buffs/AbstractBuff';
 import { TextBox } from './TextBox';
 
 export class PhysicalBuff {
@@ -99,55 +97,6 @@ export class PhysicalBuff {
     }
 }
 
-
-export abstract class AbstractBuff {
-
-    public static applyBuffToCharacter(character: BaseCharacter, buff: AbstractBuff){
-        // Check if the character already has a buff of the same type
-        let existingBuff = character.buffs.find(existingBuff => existingBuff.constructor === buff.constructor);
-        if (existingBuff) {
-            existingBuff = existingBuff as AbstractBuff
-            if (existingBuff.stackable) {
-                // If the buff is stackable, increase its stack count
-                existingBuff.stacks = ((existingBuff as any).stacks || 1) + 1;
-            }else{
-            // If the buff is not stackable, we'll just log this information
-            console.log(`Buff ${existingBuff.getName()} is not stackable. Ignoring new application.`);
-            }
-            // If not stackable, we don't add a new one or modify the existing one
-        } else {
-            // If the buff doesn't exist, add it to the character's buffs
-            character.buffs.push(buff);
-        }
-    }
-
-    imageName: string = "PLACEHOLDER_IMAGE";
-    id: string = generateWordGuid();
-    stackable: boolean = true;
-    stacks: number = 1;
-
-    abstract getName(): string;
-    abstract getDescription(): string;
-
-
-    getCombatDamageDealtModifier(): number {
-        return 0;
-    }
-    getBlockDealtModifier(): number {
-        return 0;
-    }
-    getCombatDamageTakenModifier(): number {
-        return 0;
-    }
-    getBlockTakenModifier(): number {
-        return 0;
-    }
-    onEvent(item: AbstractCombatEvent){
-        
-    }
-    
-
-}
 
 // Add subclasses for location buffs
 
