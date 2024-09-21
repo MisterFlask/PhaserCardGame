@@ -25,7 +25,7 @@ export class LocationManager {
             for (let i = 0; i < numNodesOnThisFloor; i++) {
                 let location: LocationCard;
 
-                if (i === 0 && floor === 1) {
+                if (i === Math.floor(numNodesOnThisFloor/2) && floor === 1) {
                     location = new EntranceCard(floor, i); // Step 5. Entrance node at floor 1
                     GameState.getInstance().setCurrentLocation(location);
                 } else if (floor === numberOfFloors && i === numNodesOnThisFloor -1) {
@@ -62,9 +62,45 @@ export class LocationManager {
                 floorLocationData[index] = new RestSiteCard(floor, index);
             }
 
+            // Cull unreachable rooms
+            //const reachableRooms = this.findReachableRooms(floorLocationData);
+            //floorLocationData = reachableRooms;
+
+
             locationData.push(...floorLocationData);
         }
 
+
+
+
         GameState.getInstance().setLocations(locationData);
+    }
+
+    findReachableRooms(floorLocationData: LocationCard[]): LocationCard[] {
+        const reachableRooms: LocationCard[] = [];
+        const visited = new Set<LocationCard>();
+        const queue: LocationCard[] = [];
+
+        // Start from the entrance room
+        const entrance = GameState.getInstance().getCurrentLocation()
+        if (entrance && floorLocationData.includes(entrance)) {
+            queue.push(entrance);
+            visited.add(entrance);
+        }
+
+        while (queue.length > 0) {
+            const currentRoom = queue.shift()!;
+            reachableRooms.push(currentRoom);
+
+            // Check adjacent rooms
+            for (const adjacentRoom of currentRoom.adjacentLocations) {
+                if (!visited.has(adjacentRoom) && floorLocationData.includes(adjacentRoom)) {
+                    visited.add(adjacentRoom);
+                    queue.push(adjacentRoom);
+                }
+            }
+        }
+
+        return reachableRooms;
     }
 }

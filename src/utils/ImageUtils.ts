@@ -89,7 +89,7 @@ export default class GameImageLoader {
         map_icons: {
             prefix: 'Sprites/MapIcons/',
             files: [
-                'boss-icon.png', 'elite-icon.svg', 'entrance-icon.png', 'event-icon.svg', 'rest-icon.svg', 'shop-icon.svg', 'room-fight-icon.svg'
+                'boss-icon.png', 'elite-icon.svg', 'entrance-icon.png', 'event-icon.svg', 'rest-icon.svg', 'shop-icon.svg', 'room-fight-icon.svg', 'treasure-icon.svg'
             ]
         },
         mission_icons: {
