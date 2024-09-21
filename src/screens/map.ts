@@ -7,14 +7,17 @@ import { LocationManager } from '../maplogic/LocationManager';
 import { SpatialManager } from '../maplogic/SpatialManager';
 import { GameState } from '../rules/GameState';
 import { PhysicalCard } from '../ui/PhysicalCard';
+import { TextBox } from '../ui/TextBox';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 
 export default class MapScene extends Phaser.Scene {
     private locationCards: PhysicalCard[] = [];
     private characterCards: PhysicalCard[] = [];
     private background: Phaser.GameObjects.Image | null = null;
-    private abortButton: Phaser.GameObjects.Container | null = null;
+    private abortButton: TextBox | null = null;
     private campaignStatusText: Phaser.GameObjects.Text | null = null;
+    private moveUpButton: TextBox | null = null;
+    private moveDownButton: TextBox | null = null;
 
     // Managers
     private locationManager: LocationManager;
@@ -50,6 +53,7 @@ export default class MapScene extends Phaser.Scene {
         this.createAdjacencyLines();
         this.createAbortButton();
         this.createCampaignStatusText();
+        this.createCameraButtons();
 
         this.scale.on('resize', this.resize, this);
         this.resize();
@@ -64,13 +68,8 @@ export default class MapScene extends Phaser.Scene {
 
     generateAndPlaceLocations() {
         this.locationManager.initializeLocations();
-
-        const allLocations = GameState.getInstance().locations;
-        const selectedLocations = Phaser.Math.RND.shuffle(allLocations.slice()).slice(0, 9);
-        GameState.getInstance().setLocations(selectedLocations);
-        this.spatialManager.arrangeLocations(selectedLocations);
-        this.adjacencyManager.generateAdjacencies(selectedLocations);
-        GameState.getInstance().setCurrentLocation(selectedLocations[0]); // Set Entrance as starting location
+        this.adjacencyManager.generateAdjacencies();
+        this.spatialManager.arrangeLocations(); // Ensure positions are placed
     }
 
     createBackground() {
@@ -167,16 +166,30 @@ export default class MapScene extends Phaser.Scene {
         const buttonX = width / 2;
         const buttonY = height - 60;
 
-        const button = this.add.rectangle(0, 0, buttonWidth, buttonHeight, 0xff0000);
-        const abortText = this.add.text(0, -15, 'ABORT MISSION', { fontSize: '32px', color: '#ffffff' }).setOrigin(0.5);
-        const feeText = this.add.text(0, 20, '(fee: 50% of current revenues)', { fontSize: '16px', color: '#ffffff' }).setOrigin(0.5);
-
-        this.abortButton = this.add.container(buttonX, buttonY, [button, abortText, feeText]);
-        this.abortButton.setSize(buttonWidth, buttonHeight);
-        this.abortButton.setInteractive({ useHandCursor: true })
-            .on('pointerover', () => button.setFillStyle(0xff3333))
-            .on('pointerout', () => button.setFillStyle(0xff0000))
+        this.abortButton = new TextBox({
+            scene: this,
+            x: buttonX,
+            y: buttonY,
+            width: buttonWidth,
+            height: buttonHeight,
+            text: 'ABORT MISSION\n(fee: 50% of current revenues)',
+            style: { fontSize: '24px', color: '#ffffff', align: 'center' },
+            fillColor: 0xff0000,
+            textBoxName: 'abortButton'
+        });
+        this.abortButton.background?.setInteractive({ useHandCursor: true })
+            .on('pointerover', () => {
+                if (this.abortButton?.background instanceof Phaser.GameObjects.Rectangle) {
+                    this.abortButton.background.setFillStyle(0xff3333);
+                }
+            })
+            .on('pointerout', () => {
+                if (this.abortButton?.background instanceof Phaser.GameObjects.Rectangle) {
+                    this.abortButton.background.setFillStyle(0xff0000);
+                }
+            })
             .on('pointerdown', () => this.onAbortMission());
+        this.abortButton.setScrollFactor(0);
     }
 
     createCampaignStatusText() {
@@ -189,6 +202,7 @@ export default class MapScene extends Phaser.Scene {
             color: '#ffffff',
             align: 'right'
         }).setOrigin(1, 0);
+        this.campaignStatusText.setScrollFactor(0); // Keep UI fixed
     }
 
     getCampaignStatusText(): string {
@@ -253,7 +267,7 @@ export default class MapScene extends Phaser.Scene {
         this.positionCharacterCards(width, height);
         this.positionAbortButton(width, height);
         this.positionCampaignStatusText(width, height);
-        this.spatialManager.placePositions(GameState.getInstance().getLocations());
+        this.spatialManager.arrangeLocations();
         this.createAdjacencyLines();
     }
 
@@ -271,6 +285,8 @@ export default class MapScene extends Phaser.Scene {
 
         this.characterCards.forEach((card, index) => {
             card.container.setPosition(rightEdge, startY + index * cardSpacing);
+            // Set a fixed scroll factor to keep character cards stationary
+            card.container.setScrollFactor(0);
         });
     }
 
@@ -301,5 +317,63 @@ export default class MapScene extends Phaser.Scene {
                 
             }
         });
+    }
+
+    createCameraButtons() {
+        const { width, height } = this.scale;
+        const buttonWidth = 100;
+        const buttonHeight = 50;
+        const padding = 20;
+
+        // Move Up Button
+        this.moveUpButton = new TextBox({
+            scene: this,
+            x: padding + buttonWidth / 2,
+            y: padding + buttonHeight / 2,
+            width: buttonWidth,
+            height: buttonHeight,
+            text: 'Move Up',
+            style: { fontSize: '20px', color: '#000000' },
+            fillColor: 0x00ff00,
+            textBoxName: 'moveUpButton'
+        });
+        this.moveUpButton.background?.setInteractive({ useHandCursor: true })
+            .on('pointerdown', () => this.panCameraUp());
+        this.moveUpButton.setScrollFactor(0);
+
+        // Move Down Button
+        this.moveDownButton = new TextBox({
+            scene: this,
+            x: padding + buttonWidth / 2,
+            y: padding + buttonHeight * 1.5 + 10,
+            width: buttonWidth,
+            height: buttonHeight,
+            text: 'Move Down',
+            style: { fontSize: '20px', color: '#000000' },
+            fillColor: 0x00ff00,
+            textBoxName: 'moveDownButton'
+        });
+        this.moveDownButton.background?.setInteractive({ useHandCursor: true })
+            .on('pointerdown', () => this.panCameraDown());
+        this.moveDownButton.setScrollFactor(0);
+
+        // Add scroll wheel functionality for camera panning
+        this.input.on('wheel', (pointer: Phaser.Input.Pointer, gameObjects: Phaser.GameObjects.GameObject[], deltaX: number, deltaY: number, deltaZ: number) => {
+            if (deltaY > 0) {
+                this.panCameraDown();
+            } else if (deltaY < 0) {
+                this.panCameraUp();
+            }
+        });
+    }
+
+    panCameraUp() {
+        console.log("panCameraUp");
+        this.cameras.main.scrollY -= 50; // Adjust pan amount as needed
+    }
+
+    panCameraDown() {
+        console.log("panCameraDown");
+        this.cameras.main.scrollY += 50;
     }
 }

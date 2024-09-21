@@ -138,4 +138,12 @@ export class TextBox {
         this.text.destroy();
         this.background = null;
     }
+
+    // Add this method to the TextBox class
+    setScrollFactor(factor: number): void {
+        if (this.background) {
+            this.background.setScrollFactor(factor);
+        }
+        this.text.setScrollFactor(factor);
+    }
 }

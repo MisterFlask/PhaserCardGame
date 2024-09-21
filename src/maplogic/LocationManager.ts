@@ -1,8 +1,7 @@
 // src/managers/LocationManager.ts
 
-import { CardSize } from '../gamecharacters/Primitives'; // Update the import
 import { GameState } from "../rules/GameState";
-import { LocationCard } from "./LocationCard";
+import { BossCard, EliteRoomCard, EntranceCard, EventRoomCard, LocationCard, NormalRoomCard, RestSiteCard, ShopCard, TreasureRoomCard } from "./LocationCard";
 
 export class LocationManager {
 
@@ -10,22 +9,62 @@ export class LocationManager {
     }
 
     public initializeLocations() {
-        // Define your location data here. Increased the number of locations and set size to SMALL.
-        const locationData = [
-            { name: 'Entrance', description: 'The entrance to the dungeon', size: CardSize.SMALL },
-            { name: 'North Wing', description: 'The northern section of the dungeon', size: CardSize.SMALL },
-            { name: 'East Wing', description: 'The eastern section of the dungeon', size: CardSize.SMALL },
-            { name: 'West Wing', description: 'The western section of the dungeon', size: CardSize.SMALL },
-            { name: 'South Wing', description: 'The southern section of the dungeon', size: CardSize.SMALL },
-            { name: 'Boss Room', description: 'The final challenge awaits', size: CardSize.SMALL },
-            { name: 'Library', description: 'A room filled with ancient tomes', size: CardSize.SMALL },
-            { name: 'Armory', description: 'Storage of old and new weapons', size: CardSize.SMALL },
-            { name: 'Alchemy Lab', description: 'Where potions are brewed', size: CardSize.SMALL },
-            { name: 'Guard Quarters', description: 'Living space for dungeon guards', size: CardSize.SMALL },
-            { name: 'Hidden Chamber', description: 'A secret room with unknown secrets', size: CardSize.SMALL },
-            { name: 'Treasure Vault', description: 'Room filled with treasures and gold', size: CardSize.SMALL }
-        ];
+        const numberOfFloors = 9; // Step 2. Set number of floors between 3 and 5
 
-        GameState.getInstance().locations = locationData.map(data => new LocationCard(data));
+        const locationData: LocationCard[] = [];
+
+        for (let floor = 1; floor <= numberOfFloors; floor++) { // Step 3. For each floor
+            const numNodesOnThisFloor = 5; // Step 3a. Create 5-8 nodes per floor
+
+            let floorLocationData: LocationCard[] = [];
+            
+
+            // Ensure at least one Rest Site per floor
+            let restSiteAssigned = false;
+
+            for (let i = 0; i < numNodesOnThisFloor; i++) {
+                let location: LocationCard;
+
+                if (i === 0 && floor === 1) {
+                    location = new EntranceCard(floor, i); // Step 5. Entrance node at floor 1
+                    GameState.getInstance().setCurrentLocation(location);
+                } else if (floor === numberOfFloors && i === numNodesOnThisFloor -1) {
+                    location = new BossCard(floor, i); // Step 6. Boss node at top floor
+                } else {
+                    const rand = Phaser.Math.FloatBetween(0, 1);
+                    if (!restSiteAssigned && i === numNodesOnThisFloor - 2) { // Ensure at least one Rest Site
+                        location = new RestSiteCard(floor, i);
+                        restSiteAssigned = true;
+                    } else if (rand < 0.6) {
+                        location = new NormalRoomCard(floor, i);
+                    } else if (rand < 0.7) {
+                        location = new RestSiteCard(floor, i);
+                    } else if (rand < 0.8) {
+                        location = new EliteRoomCard(floor, i);
+                    } else if (rand < 0.85) {
+                        location = new ShopCard(floor, i);
+                    } else if (rand < 0.9) {
+                        location = new TreasureRoomCard(floor, i);
+                    } else {
+                        location = new EventRoomCard(floor, i);
+                    }
+                }
+
+                location.floor = floor;
+                location.roomNumber = i;
+                floorLocationData.push(location);
+            }
+
+
+            // Ensure at least one Rest Site
+            if (!floorLocationData.some(card => card instanceof RestSiteCard)) {
+                const index = Phaser.Math.Between(1, floorLocationData.length - 2);
+                floorLocationData[index] = new RestSiteCard(floor, index);
+            }
+
+            locationData.push(...floorLocationData);
+        }
+
+        GameState.getInstance().setLocations(locationData);
     }
 }

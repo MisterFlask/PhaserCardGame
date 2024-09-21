@@ -1,5 +1,6 @@
 // src/managers/AdjacencyManager.ts
 
+import { GameState } from "../rules/GameState";
 import { LocationCard } from "./LocationCard";
 
 
@@ -20,69 +21,80 @@ export class AdjacencyManager {
         this.maxAdjacencyDistance = maxAdjacencyDistance; // Initialize max adjacency distance
     }
 
-    public generateAdjacencies(locations: LocationCard[]): void {
-        // Step 1: Calculate distances between all pairs within maxAdjacencyDistance
-        const pairs: LocationPair[] = [];
-        for (let i = 0; i < locations.length; i++) {
-            for (let j = i + 1; j < locations.length; j++) {
-                const locA = locations[i];
-                const locB = locations[j];
-                const distance = this.calculateDistance(locA, locB);
-                if (distance <= this.maxAdjacencyDistance) { // Only consider nearby locations
-                    pairs.push({ a: locA, b: locB, distance });
-                }
-            }
-        }
-
-        // Step 2: Sort pairs by distance (ascending)
-        pairs.sort((pair1, pair2) => pair1.distance - pair2.distance);
-
-        // Step 3: Initialize adjacency list
+    public generateAdjacencies(): void {
+        // Step 1: Organize locations by floor
+        const locations = GameState.getInstance().getLocations();
+        const floors: Map<number, LocationCard[]> = new Map();
         locations.forEach(loc => {
-            loc.adjacentLocations = []; // Reset existing adjacencies
+            const floor = loc.floor;
+            if (!floors.has(floor)) {
+                floors.set(floor, []);
+            }
+            floors.get(floor)!.push(loc);
         });
 
-        // Step 4: Create adjacencies based on sorted distances and sparseness
-        for (const pair of pairs) {
-            const { a, b } = pair;
-            // Avoid duplicate adjacencies
-            if (a.adjacentLocations.includes(b) || b.adjacentLocations.includes(a)) {
-                continue;
-            }
-
-            // Determine adjacency based on sparseness
-            const probability = this.sparseness;
-            if (Math.random() < probability) {
-                this.addAdjacency(a, b);
-            }
+        // Step 2: Connect nodes between floors
+        const sortedFloors = Array.from(floors.keys()).sort((a, b) => a - b);
+        for (let i = 0; i < sortedFloors.length - 1; i++) {
+            const currentFloor = floors.get(sortedFloors[i])!;
+            const nextFloor = floors.get(sortedFloors[i + 1])!;
+            
+            currentFloor.forEach(loc => {
+                // Ensure each node connects to 1-3 nodes on the next floor
+                const connections = Phaser.Math.Between(1, 3);
+                const shuffledNext = Phaser.Utils.Array.Shuffle(nextFloor.slice());
+                for (let j = 0; j < connections && j < shuffledNext.length; j++) {
+                    this.addAdjacency(loc, shuffledNext[j]);
+                }
+            });
         }
 
-        // Step 5: Ensure each location has at least `minConnections` adjacencies
-        locations.forEach(loc => {
-            while (loc.adjacentLocations.length < this.minConnections) {
-                // Find the closest location not already connected
-                const potentialConnections = pairs
-                    .filter(pair => (pair.a === loc || pair.b === loc))
-                    .filter(pair => !loc.adjacentLocations.includes(pair.a === loc ? pair.b : pair.a));
+        // Step 3: Connect all nodes on the penultimate floor to the Boss node
+        const penultimateFloor = sortedFloors[sortedFloors.length - 2];
+        const bossFloor = sortedFloors[sortedFloors.length - 1];
+        const bossNode = floors.get(bossFloor)![0]; // Assuming single Boss node
 
-                if (potentialConnections.length === 0) break; // No more possible connections
-
-                // Sort by distance
-                potentialConnections.sort((p1, p2) => p1.distance - p2.distance);
-
-                // Connect to the closest possible location
-                const closestPair = potentialConnections[0];
-                if (closestPair) {
-                    const other = closestPair.a === loc ? closestPair.b : closestPair.a;
-                    this.addAdjacency(loc, other);
-                } else {
-                    break;
-                }
-            }
+        floors.get(penultimateFloor)!.forEach(loc => {
+            this.addAdjacency(loc, bossNode);
         });
+
+        // Step 4: Ensure at least one valid path from Entrance to Boss
+        this.ensurePath(floors, sortedFloors, bossNode);
+
+        // Step 5: Optionally add branching paths
+        this.addBranchingPaths(floors, sortedFloors);
 
         // Step 6: Ensure the graph is fully connected
         this.ensureFullConnectivity(locations);
+    }
+
+    private ensurePath(floors: Map<number, LocationCard[]>, sortedFloors: number[], bossNode: LocationCard): void {
+        let current = floors.get(sortedFloors[0])![0]; // Entrance node
+        for (let i = 1; i < sortedFloors.length; i++) {
+            const nextFloor = floors.get(sortedFloors[i])!;
+            const nextNode = nextFloor[0]; // Choose the first node for the path
+            this.addAdjacency(current, nextNode);
+            current = nextNode;
+        }
+        this.addAdjacency(current, bossNode);
+    }
+
+    private addBranchingPaths(floors: Map<number, LocationCard[]>, sortedFloors: number[]): void {
+        // Example: Add additional random adjacencies to create branches
+        floors.forEach((floorLocations, floorNumber) => {
+            if (floorNumber < sortedFloors.length - 1) {
+                const nextFloor = floors.get(sortedFloors[floorNumber + 1])!;
+                floorLocations.forEach(loc => {
+                    if (Phaser.Math.FloatBetween(0, 1) < 0.3) { // 30% chance to add a branch
+                        const potential = nextFloor.filter(l => !loc.adjacentLocations.includes(l));
+                        if (potential.length > 0) {
+                            const target = Phaser.Utils.Array.GetRandom(potential);
+                            this.addAdjacency(loc, target);
+                        }
+                    }
+                });
+            }
+        });
     }
 
     private calculateDistance(a: LocationCard, b: LocationCard): number {
