@@ -53,6 +53,18 @@ export class PhysicalBuff {
         this.container.setInteractive(new Phaser.Geom.Rectangle(-20, -20, 40, 40), Phaser.Geom.Rectangle.Contains);
         this.container.on('pointerover', this.showDescription, this);
         this.container.on('pointerout', this.hideDescription, this);
+
+        // Add a tween to briefly enlarge the buff when it's added
+        this.scene.tweens.add({
+            targets: this.container,
+            scale: { from: 1, to: 1.2 },
+            duration: 200,
+            yoyo: true,
+            ease: 'Power2',
+            onComplete: () => {
+                this.container.setScale(1); // Ensure scale resets to original
+            }
+        });
     }
 
     showDescription() {

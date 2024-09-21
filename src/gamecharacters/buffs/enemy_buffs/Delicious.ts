@@ -16,13 +16,13 @@ export class Delicious extends AbstractBuff {
     constructor(stacks: number = 1) {
 
         super();
-        this.imageName = "delicious-icon"; // Replace with actual icon name
+        this.imageName = "pizza-slice"; // Replace with actual icon name
         this.stacks = stacks;
         this.stackable = true; // This buff now stacks
     }
 
     override onOwnerStruck(strikingUnit: BaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void {
         const strongBuff = new Strong(this.stacks);
-        AbstractBuff.applyBuffToCharacter(strikingUnit, strongBuff);
+        AbstractBuff._applyBuffToCharacter(strikingUnit, strongBuff);
     }
 }

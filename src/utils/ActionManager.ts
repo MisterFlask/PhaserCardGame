@@ -17,6 +17,31 @@ export class ActionManager {
         return ActionManager.instance;
     }
 
+    public applyBuffToCharacter(character: BaseCharacter, buff: AbstractBuff): void {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            AbstractBuff._applyBuffToCharacter(character, buff);
+            console.log(`Applied buff ${buff.getName()} to ${character.name}`);
+            // You might want to add some animation or visual feedback here
+            await new WaitAction(20).playAction(); // Short delay for visual feedback
+            return [];
+        }));
+    }
+
+    /**
+     * wraps a thing in an action so it can be queued
+     */
+    public genericAction(name: string, action: () => Promise<void>): void {
+        console.log("enqueued action: " + name);
+        this.actionQueue.addAction(new GenericAction(async () => {
+            console.log("beginning action: " + name);
+            await action();
+            console.log("ending action: " + name);
+            return [];
+        }));
+    }
+
+
+
     public playCard(card: PhysicalCard, target?: BaseCharacter) {
         this.actionQueue.addAction(new GenericAction(async () => {
             const playableCard = card.data as PlayableCard;

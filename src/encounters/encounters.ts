@@ -1,5 +1,7 @@
 import { AbstractIntent, AttackIntent } from '../gamecharacters/AbstractIntent';
 import { AutomatedCharacter } from '../gamecharacters/AutomatedCharacter';
+import { Delicious } from '../gamecharacters/buffs/enemy_buffs/Delicious';
+import { Stressful } from '../gamecharacters/buffs/standard/Stressful';
 import { Strong } from '../gamecharacters/buffs/Strong';
 import { GoblinCharacter } from '../gamecharacters/enemyclasses/GoblinCharacter';
 
@@ -18,9 +20,11 @@ export class BaconBeast extends AutomatedCharacter {
     constructor() {
         super({ name: 'Breakfast Nightmares Bacon Beast', portraitName: 'Breakfast Nightmares Bacon Beast', maxHitpoints: 25, description: 'A cunning dark elf assassin' });
         this.buffs.push(new Strong(2))
-
+        this.buffs.push(new Delicious(1));
+        this.buffs.push(new Stressful(1));
     }
     
+
     override generateNewIntents(): AbstractIntent[] {
         return [ new AttackIntent({ damage: 6, owner: this }) ]
     }
