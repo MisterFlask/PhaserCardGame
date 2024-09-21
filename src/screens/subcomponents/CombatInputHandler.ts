@@ -23,6 +23,8 @@ class CombatInputHandler {
         this.cardManager = cardManager;
         this.setupEventListeners();
 
+        IntentEmitter.getInstance().on(IntentEmitter.EVENT_INCOMING_INTENT_HOVER, this.onIncomingIntentHover, this);
+        IntentEmitter.getInstance().on(IntentEmitter.EVENT_INCOMING_INTENT_HOVER_END, this.onIncomingIntentHoverEnd, this);
     }
 
     private setupEventListeners(): void {
@@ -275,6 +277,20 @@ class CombatInputHandler {
         const targetCard = intent.intent.target;
         if (targetCard && targetCard.physicalCard) {
             this.unhighlightCard(targetCard.physicalCard as PhysicalCard);
+        }
+    }
+
+    private onIncomingIntentHover(owner: BaseCharacter): void {
+        const enemyPhysicalCard = owner.physicalCard as PhysicalCard;
+        if (enemyPhysicalCard) {
+            enemyPhysicalCard.highlight();
+        }
+    }
+
+    private onIncomingIntentHoverEnd(owner: BaseCharacter): void {
+        const enemyPhysicalCard = owner.physicalCard as PhysicalCard;
+        if (enemyPhysicalCard) {
+            enemyPhysicalCard.unhighlight();
         }
     }
 }

@@ -704,17 +704,31 @@ export class PhysicalCard {
         this.layoutTargetingIntents();
     }
 
-
     /**
-     * Make the entire card glow or stop glowing.
+     * Make the entire card glow or stop glowing with a dramatic and unmistakable effect.
      * @param isGlowing - True to make the card glow, false to stop glowing.
      */
     public setGlow(isGlowing: boolean): void {
-
-        if (isGlowing) {
-            this.glowEffect =  this.cardContent.postFX.addGlow(0xffffff, 0, 0, false, 0.1, 16);
+        if (isGlowing && !this.glowEffect) {
+            // Create a more intense glow effect
+            this.glowEffect = this.cardContent.postFX.addGlow(0xffff00, 4, 0, false, 0.8, 10);
+            
+            // Add a pulsating animation to make it more noticeable
+            this.scene.tweens.add({
+                targets: this.glowEffect,
+                outerStrength: 8,
+                yoyo: true,
+                repeat: -1,
+                duration: 1000,
+                ease: 'Sine.easeInOut'
+            });
         } else if (this.glowEffect) {
-            this.cardContent.postFX.remove(this.glowEffect)
+            // Stop the pulsating animation
+            this.scene.tweens.killTweensOf(this.glowEffect);
+            
+            // Remove the glow effect
+            this.cardContent.postFX.remove(this.glowEffect);
+            this.glowEffect = undefined;
         }
     }
 

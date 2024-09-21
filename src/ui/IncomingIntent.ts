@@ -1,5 +1,6 @@
 import { Scene } from "phaser";
 import { AbstractIntent } from "../gamecharacters/AbstractIntent";
+import { IntentEmitter } from "../utils/intentemitter";
 
 export class IncomingIntent {
     static readonly WIDTH: number = 40;
@@ -30,6 +31,14 @@ export class IncomingIntent {
             .setInteractive({ useHandCursor: true })
             .on('pointerover', this.onPointerOver, this)
             .on('pointerout', this.onPointerOut, this);
+        
+        this.container.on('pointerover', () => {
+            IntentEmitter.getInstance().emitIncomingIntentHover(this.intent.owner);
+        });
+
+        this.container.on('pointerout', () => {
+            IntentEmitter.getInstance().emitIncomingIntentHoverEnd(this.intent.owner);
+        });
         
         this.update();
     }
