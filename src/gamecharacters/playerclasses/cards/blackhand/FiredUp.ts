@@ -6,21 +6,22 @@ export class FiredUp extends PlayableCard {
         super({
             name: "Fired Up",
             description: `_`,
-            portraitName: "fired-up",
+            portraitName: "enrage",
             targetingType: TargetingType.NO_TARGETING,
         });
         this.magicNumber = 6;
+        this.energyCost = 3;
     }
 
     override get description(): string {
-        return `Gain ${this.magicNumber} Fire.`;
+        return `Gain ${this.magicNumber} [Fire].`;
     }
     
     override InvokeCardEffects(targetCard?: BaseCharacter): void {
         if (this.owner) {
             this.actionManager.modifyFire(this.magicNumber, this.owner);
 
-            console.log(`Gained ${this.magicNumber} Fire`);
+            console.log(`Gained ${this.magicNumber} [Fire]`);
         }
     }
 }

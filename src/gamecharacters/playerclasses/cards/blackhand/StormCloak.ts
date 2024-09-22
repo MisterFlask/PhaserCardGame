@@ -9,11 +9,12 @@ export class StormCloak extends PlayableCard {
         super({
             name: "Storm Cloak",
             description: `_`,
-            portraitName: "shield",
+            portraitName: "firewall",
             targetingType: TargetingType.ENEMY,
         });
         this.baseBlock = 5
         this.magicNumber = 1
+        this.energyCost = 2;
     }
 
     override scaleBlock(inputBlock: number): number {

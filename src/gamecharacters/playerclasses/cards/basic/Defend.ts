@@ -13,6 +13,7 @@ export class Defend extends PlayableCard {
             targetingType: TargetingType.ENEMY,
         });
         this.baseBlock = 5
+        this.energyCost = 2;
     }
 
     override get description(): string {

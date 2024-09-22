@@ -7,11 +7,12 @@ export class FlamePistol extends PlayableCard {
         super({
             name: "Flame Pistol",
             description: `_`,
-            portraitName: "flame-pistol",
+            portraitName: "fire-ray",
             targetingType: TargetingType.ENEMY,
         });
         this.baseDamage = 3;
         this.magicNumber = 1;
+        this.energyCost = 2;
     }
 
     override get description(): string {

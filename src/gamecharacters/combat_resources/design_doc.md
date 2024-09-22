@@ -43,3 +43,12 @@ For each 3 you get, the whole party gains 1 Strength.
 
 # Auto Balancing Mechanism
 Chance to get a particular card decreased for every time you've gotten that card in the run.  (Subtle effect.)
+
+
+
+# Card Creation Guidelines
+
+* Cards may EITHER use a particular resource, OR gain you that particular resource, but not both.
+* Cards MAY use a resource and gain a different resource.
+* Cards may also just not use resources; this is fine.
+* Status effects are allowed to scale off of resources
