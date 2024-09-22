@@ -28,7 +28,7 @@ export class LocationManager {
                 if (i === Math.floor(numNodesOnThisFloor/2) && floor === 1) {
                     location = new EntranceCard(floor, i); // Step 5. Entrance node at floor 1
                     GameState.getInstance().setCurrentLocation(location);
-                } else if (floor === numberOfFloors && i === numNodesOnThisFloor -1) {
+                } else if (floor === numberOfFloors && i === Math.floor(numNodesOnThisFloor/2)) {
                     location = new BossCard(floor, i); // Step 6. Boss node at top floor
                 } else {
                     const rand = Phaser.Math.FloatBetween(0, 1);
@@ -56,10 +56,11 @@ export class LocationManager {
             }
 
 
-            // Ensure at least one Rest Site
-            if (!floorLocationData.some(card => card instanceof RestSiteCard)) {
-                const index = Phaser.Math.Between(1, floorLocationData.length - 2);
-                floorLocationData[index] = new RestSiteCard(floor, index);
+            // remove all non-boss rooms from the last floor, and all non-entrance rooms from the first floor
+            if (floor === numberOfFloors) {
+                floorLocationData = floorLocationData.filter(card => card instanceof BossCard);
+            } else if (floor === 1) {
+                floorLocationData = floorLocationData.filter(card => card instanceof EntranceCard);
             }
 
             // Cull unreachable rooms

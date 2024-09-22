@@ -161,6 +161,9 @@ export class GameState {
 
 
 export class CombatState{
+
+    characterHoveredOver_transient?: BaseCharacter
+
     currentCombatDeck: AbstractCard[] = []
     currentDrawPile: AbstractCard[] = []
     currentDiscardPile: AbstractCard[] = []
@@ -168,6 +171,8 @@ export class CombatState{
 
     enemies: AutomatedCharacter[] = []
     playerCharacters: BaseCharacter[] = []
+
+    combatResources: CombatResources = new CombatResources()
 
     public energyAvailable: number = 0
     public maxEnergy: number = 5
@@ -192,3 +197,82 @@ export class MissionDetails{
     public reward: number = 10
 }
 
+export class CombatResources{
+    modifyLight(byAmount: number){
+        this.light.value += byAmount;
+        console.log(`Modified Light by ${byAmount}. New value: ${this.light.value}`);
+    }
+
+    modifyFire(byAmount: number){
+        this.fire.value += byAmount;
+        console.log(`Modified Fire by ${byAmount}. New value: ${this.fire.value}`);
+    }
+    modifyIce(byAmount: number){
+        this.ice.value += byAmount;
+        console.log(`Modified Ice by ${byAmount}. New value: ${this.ice.value}`);
+    }
+    modifyMind(byAmount: number){
+        this.mind.value += byAmount;
+        console.log(`Modified Mind by ${byAmount}. New value: ${this.mind.value}`);
+    }
+    modifyIron(byAmount: number){
+        this.iron.value += byAmount;
+        console.log(`Modified Iron by ${byAmount}. New value: ${this.iron.value}`);
+    }
+    modifyGold(byAmount: number){
+        this.gold.value += byAmount;
+        console.log(`Modified Gold by ${byAmount}. New value: ${this.gold.value}`);
+    }
+    modifyMuscle(byAmount: number){
+        this.muscle.value += byAmount;
+        console.log(`Modified Muscle by ${byAmount}. New value: ${this.muscle.value}`);
+    }
+
+    light: CombatResource = new CombatResource(
+        "Light",
+        "10% chance to block additional stress when it would be applied (caps at 75%). Decreases by 1 each turn."
+    );
+
+    fire: CombatResource = new CombatResource(
+        "Fire",
+        "5% chance to empower a random attack card in hand at beginning of turn, doubling its damage for that turn until played.  Decreases by 1 each turn."
+    );
+
+    iron: CombatResource = new CombatResource(
+        "Iron",
+        "5% chance to empower a random defense card in hand at beginning of turn, doubling its defense for that turn until played. Decreases by 1 each turn."
+    );
+
+    mind: CombatResource = new CombatResource(
+        "Mind",
+        "For each Mind-granting card in your deck, 10% chance to get additional card reward option.  Decreases by 1 each turn."
+    );
+
+    ice: CombatResource = new CombatResource(
+        "Ice",
+        "For each Ice-granting card in your deck at the end of the run, gain additional shareholder satisfaction.  Decreases by 1 each turn."
+    );
+
+    gold: CombatResource = new CombatResource(
+        "Gold",
+        "For each Gold-granting card in your deck at the end of the run, you get 10 additional wealth. Decreases by 1 each turn."
+    );
+
+    muscle: CombatResource = new CombatResource(
+        "Muscle",
+        "For each 3 you get, the whole party gains 1 Strength. Decreases by 1 each turn."
+    );
+}
+
+export class CombatResource{
+    name: string
+    description: string
+    value: number
+
+    constructor(name: string, description: string, initialValue: number = 0) {
+        this.name = name;
+        this.description = description;
+        this.value = initialValue;
+    }
+    
+}

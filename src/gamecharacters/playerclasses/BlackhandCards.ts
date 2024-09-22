@@ -13,7 +13,7 @@ export class FireballCard extends PlayableCard {
 
     override InvokeCardEffects (targetCard?: AbstractCard): void {
         if (targetCard && targetCard instanceof BaseCharacter) {
-            ActionManager.getInstance().dealDamage({ target: targetCard, amount: 6 });
+            ActionManager.getInstance().dealDamage({ target: targetCard, baseDamageAmount: 6 });
             console.log(`Dealt 6 damage to ${targetCard.name}`);
         }
     }

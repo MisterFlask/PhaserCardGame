@@ -57,6 +57,7 @@ export abstract class AbstractBuff {
     stacks: number = 1;
     counter: number = -1;
     showCounter: boolean = false;
+    isDebuff: boolean = false;
 
     abstract getName(): string;
 
@@ -98,8 +99,6 @@ export abstract class AbstractBuff {
 
     }
 
-
-
     onTurnStart() {
 
     }
@@ -109,8 +108,6 @@ export abstract class AbstractBuff {
     }
 
     onEvent(item: AbstractCombatEvent) {
-
-
 
     }
 }

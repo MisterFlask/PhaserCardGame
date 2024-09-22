@@ -1,4 +1,5 @@
 import { BaseCharacter } from "../gamecharacters/BaseCharacter";
+import { GameState } from "../rules/GameState";
 import { StoreCard } from '../screens/campaign';
 import { PhysicalCard } from '../ui/PhysicalCard';
 
@@ -39,8 +40,6 @@ export class ActionManager {
             return [];
         }));
     }
-
-
 
     public playCard(card: PhysicalCard, target?: BaseCharacter) {
         this.actionQueue.addAction(new GenericAction(async () => {
@@ -130,16 +129,20 @@ export class ActionManager {
 
 
     public applyBlock(params: {
-        block: number,
-        appliedViaPlayableCard?: AbstractCard,
+        baseBlockValue: number,
+        appliedViaPlayableCard?: PlayableCard,
         blockSourceCharacter?: BaseCharacter,
         blockTargetCharacter?: BaseCharacter
     }): void {
-        const { block, blockTargetCharacter } = params;
-        console.log("Called ApplyBlock method in action manager. Block: " + block + " Target: " + blockTargetCharacter?.name);
+        let { baseBlockValue, blockTargetCharacter, appliedViaPlayableCard, blockSourceCharacter } = params;
+        console.log("Called ApplyBlock method in action manager. Block: " + baseBlockValue + " Target: " + blockTargetCharacter?.name);
 
         if (!blockTargetCharacter) {
             return;
+        }
+
+        if (appliedViaPlayableCard){
+            baseBlockValue = appliedViaPlayableCard.scaleBlock(baseBlockValue)
         }
 
         this.actionQueue.addAction(new GenericAction(async () => {
@@ -151,7 +154,7 @@ export class ActionManager {
                 // Pulse the block text box
                 targetPhysicalCard.blockText.pulseGreenBriefly()
             }
-            blockTargetCharacter.block += block;
+            blockTargetCharacter.block += baseBlockValue;
             return [];
         }));
     }
@@ -199,13 +202,13 @@ export class ActionManager {
 
     
     public dealDamage = ({
-        amount,
+        baseDamageAmount,
         target,
         sourceCharacter,
         sourceCard,
         fromAttack
     }: {
-        amount: number,
+        baseDamageAmount: number,
         target: BaseCharacter,
         sourceCharacter?: BaseCharacter,
         sourceCard?: PlayableCard,
@@ -218,12 +221,17 @@ export class ActionManager {
 
         fromAttack = fromAttack || true;
 
+
+        if (sourceCard){
+            baseDamageAmount = sourceCard.scaleDamage(baseDamageAmount)
+        }
+
         if (physicalCardOfTarget) {
             const damageAction = new GenericAction(async () => {
                 await this.animateCardDamage(physicalCardOfTarget);
 
                 if (target instanceof BaseCharacter) {
-                    let remainingDamage = amount;
+                    let remainingDamage = baseDamageAmount;
                     if (target.block > 0) {
                         if (target.block >= remainingDamage) {
                             target.block -= remainingDamage;
@@ -235,9 +243,9 @@ export class ActionManager {
                     }
                     // Create a DamageInfo object to pass to the buff effects
                     const damageInfo = new DamageInfo();
-                    damageInfo.damageDealt = amount;
+                    damageInfo.damageDealt = baseDamageAmount;
                     damageInfo.damageTaken = remainingDamage;
-                    damageInfo.damageBlocked = amount - remainingDamage;
+                    damageInfo.damageBlocked = baseDamageAmount - remainingDamage;
 
                     // Activate OnStriking effects for the attacker's buffs
                     if (sourceCharacter) {
@@ -293,15 +301,52 @@ export class ActionManager {
         }));
     }
 
+    public modifyFire(amount: number, sourceCharacterIfAny?: BaseCharacter): void {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            GameState.getInstance().combatState.combatResources.modifyFire(amount);
+            return [];
+        }));
+    }
+    public modifyIce(amount: number, sourceCharacterIfAny?: BaseCharacter): void {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            GameState.getInstance().combatState.combatResources.modifyIce(amount);
+            return [];
+        }));
+    }
+    public modifyMind(amount: number, sourceCharacterIfAny? : BaseCharacter): void {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            GameState.getInstance().combatState.combatResources.modifyMind(amount);
+            return [];
+        }));
+    }
+    public modifyIron(amount: number, sourceCharacterIfAny?: BaseCharacter): void {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            GameState.getInstance().combatState.combatResources.modifyIron(amount);
+            return [];
+        }));
+    }
+    public modifyGold(amount: number, sourceCharacterIfAny?: BaseCharacter): void {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            GameState.getInstance().combatState.combatResources.modifyGold(amount);
+            return [];
+        }));
+    }
+    public modifyMuscle(amount: number, sourceCharacterIfAny?: BaseCharacter): void {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            GameState.getInstance().combatState.combatResources.modifyMuscle(amount);
+            return [];
+        }));
+    }
 }
 
-import Phaser from 'phaser';
+
+
+    import Phaser from 'phaser';
 import { AbstractCard, PlayableCard } from '../gamecharacters/AbstractCard';
 import { AbstractBuff } from "../gamecharacters/buffs/AbstractBuff";
 import { CombatRules } from "../rules/CombatRules";
 import { DamageInfo } from "../rules/DamageInfo";
 import { DeckLogic, PileName } from "../rules/DeckLogic";
-import { GameState } from '../rules/GameState';
 
 export abstract class GameAction {
     abstract playAction(): Promise<GameAction[]>;
@@ -373,3 +418,4 @@ export class WaitAction extends GameAction {
         return [];
     }
 }
+

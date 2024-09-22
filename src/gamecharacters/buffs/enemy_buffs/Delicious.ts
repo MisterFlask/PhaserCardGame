@@ -1,4 +1,5 @@
 import { DamageInfo } from "../../../rules/DamageInfo";
+import { ActionManager } from "../../../utils/ActionManager";
 import { PlayableCard } from "../../AbstractCard";
 import { BaseCharacter } from "../../BaseCharacter";
 import { AbstractBuff } from "../AbstractBuff";
@@ -23,6 +24,6 @@ export class Delicious extends AbstractBuff {
 
     override onOwnerStruck(strikingUnit: BaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void {
         const strongBuff = new Strong(this.stacks);
-        AbstractBuff._applyBuffToCharacter(strikingUnit, strongBuff);
+        ActionManager.getInstance().applyBuffToCharacter(strikingUnit, strongBuff);
     }
 }

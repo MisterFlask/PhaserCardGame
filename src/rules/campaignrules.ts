@@ -21,7 +21,7 @@ export class CampaignRules {
             const randomClass = classes[Math.floor(Math.random() * classes.length)];
             const character = new PlayerCharacter({ 
                 name: `Character ${i + 1} (${randomClass.name})`, 
-                portraitName: 'flamer1', 
+                portraitName: 'placeholder', 
                 characterClass: randomClass 
             });
             

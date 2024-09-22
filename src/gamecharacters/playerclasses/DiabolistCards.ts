@@ -14,9 +14,9 @@ export class ArcaneRitualCard extends PlayableCard {
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         if (targetCard && targetCard instanceof BaseCharacter) {
-            ActionManager.getInstance().dealDamage({ target: targetCard, amount: 4 });
+            ActionManager.getInstance().dealDamage({ target: targetCard, baseDamageAmount: 4 });
             ActionManager.getInstance().drawCards(1);
-            ActionManager.getInstance().applyBlock({ block: 4, blockTargetCharacter: this.owner as BaseCharacter , appliedViaPlayableCard: this, blockSourceCharacter: this.owner as BaseCharacter});
+            ActionManager.getInstance().applyBlock({ baseBlockValue: 4, blockTargetCharacter: this.owner as BaseCharacter , appliedViaPlayableCard: this, blockSourceCharacter: this.owner as BaseCharacter});
             console.log(`Dealt 4 damage to ${targetCard.name}`);
         }
         console.log("Drew 1 card");

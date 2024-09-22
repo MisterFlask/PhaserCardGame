@@ -20,14 +20,12 @@ export class Poison extends AbstractBuff {
         const owner = this.getOwner();
         if (owner) {
             // Apply poison damage
-            ActionManager.getInstance().dealDamage({ amount: this.stacks, target: owner, fromAttack: false });
+            ActionManager.getInstance().dealDamage({ baseDamageAmount: this.stacks, target: owner, fromAttack: false });
             console.log(`${owner.name} took ${this.stacks} poison damage`);
 
             // Halve the poison stacks, rounding down
-            ActionManager.getInstance().genericAction("reduce poison", async () => {
-                this.stacks = Math.floor(this.stacks / 2);
-                console.log(`${owner.name}'s poison reduced to ${this.stacks} stacks`);
-            });
+            this.stacks = Math.floor(this.stacks / 2);
+
 
 
         }

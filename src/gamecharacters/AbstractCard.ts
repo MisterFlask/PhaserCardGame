@@ -1,5 +1,6 @@
 import { JsonRepresentable } from '../interfaces/JsonRepresentable';
-import { GameState } from '../rules/GameState';
+import { CombatResources, CombatState, GameState } from '../rules/GameState';
+import { ActionManager } from '../utils/ActionManager';
 import { AbstractIntent } from './AbstractIntent'; // Import AbstractIntent
 import { BaseCharacter } from './BaseCharacter';
 import { AbstractBuff } from './buffs/AbstractBuff';
@@ -72,12 +73,28 @@ export enum Team{
 }
 
 export abstract class AbstractCard implements JsonRepresentable {
-    public name: string
-    public description: string
+    public get name(): string {
+        return this._name;
+    }
+
+    public set name(value: string) {
+        this._name = value;
+    }
+
+    public get description(): string {
+        return this._description;
+    }
+
+    public set description(value: string) {
+        this._description = value;
+    }
+
+    protected _name: string;
+    protected _description: string;
     public portraitName: string
     cardType: CardType
     public tooltip: string
-    owner?: AbstractCard
+    owner?: BaseCharacter
     size: CardSize
     id: string = generateWordGuid()
     physicalCard?: IPhysicalCardInterface // this is a hack, it's just always PhysicalCard
@@ -87,12 +104,12 @@ export abstract class AbstractCard implements JsonRepresentable {
     energyCost: number = 1
 
     constructor({ name, description, portraitName, cardType, tooltip, characterData, size, team }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: AbstractCard, size?: CardSize, team?: Team }) {
-        this.name = name
-        this.description = description
+        this._name = name
+        this._description = description
         this.portraitName = portraitName || "flamer1"
         this.cardType = cardType || CardType.PLAYABLE
         this.tooltip = tooltip || "Lorem ipsum dolor sit amet"
-        this.owner = characterData || undefined
+        this.owner = characterData as BaseCharacter || undefined
         this.size = size || CardSize.SMALL
         this.team = team || Team.ENEMY
     }
@@ -164,6 +181,147 @@ export abstract class PlayableCard extends AbstractCard {
         this.owner = owner;
     }
 
+
+
+    public scaleBlock(inputBlock: number): number{
+        return inputBlock;
+    }
+    
+    public scaleDamage(inputBlock: number): number{
+        return inputBlock;
+    }
+
+    public scaleMagicNumber(inputBlock: number): number{
+        return inputBlock;
+    }
+
+    public baseDamage: number = 0
+    public baseBlock: number = 0
+    public magicNumber: number = 0
+
+    get hoveredCharacter(): BaseCharacter | undefined {
+        return GameState.getInstance().combatState.characterHoveredOver_transient;
+    }
+    get combatState() : CombatState{
+        return GameState.getInstance().combatState;
+    }
+    get actionManager() : ActionManager{
+        return ActionManager.getInstance();
+    }
+
+    get fire(): number {
+        return this.combatResources.fire.value;
+    }
+
+    get ice(): number {
+        return this.combatResources.ice.value;
+    }
+
+    get mind(): number {
+        return this.combatResources.mind.value;
+    }
+
+    get iron(): number {
+        return this.combatResources.iron.value;
+    }
+
+    get gold(): number {
+        return this.combatResources.gold.value;
+    }
+
+    get muscle(): number {
+        return this.combatResources.muscle.value;
+    }
+
+    get light(): number {
+        return this.combatResources.light.value;
+    }
+
+    protected dealDamageToTarget(targetCard?: BaseCharacter): void {
+        if (targetCard) {
+            this.actionManager.dealDamage({
+                baseDamageAmount: this.baseDamage,
+                target: targetCard,
+                sourceCharacter: this.owner,
+                fromAttack: true,
+                sourceCard: this
+            });
+            console.log(`Dealt ${this.getDisplayedDamage(targetCard)} damage to ${targetCard.name}`);
+        }
+    }
+
+    protected applyBlockToTarget(targetCard?: BaseCharacter): void {
+        if (targetCard) {
+            this.actionManager.applyBlock({
+                blockTargetCharacter: targetCard,
+                baseBlockValue: this.baseBlock,
+                appliedViaPlayableCard: this,
+                blockSourceCharacter: this.owner
+            });
+        }
+    }
+    
+    get combatResources() : CombatResources{
+        return GameState.getInstance().combatState.combatResources;
+    }
+    
+    get randomEnemy() : BaseCharacter | undefined {
+        const livingEnemies = this.combatState.enemies.filter(enemy => enemy.hitpoints > 0);
+        
+        if (livingEnemies.length === 0) {
+            return undefined;
+        }
+
+        return livingEnemies[Math.floor(Math.random() * livingEnemies.length)];
+    }
+
+
+    public getDisplayedBlock(targetedCharacterIfAny?: BaseCharacter){
+        if (!this.owner) {
+            return this.baseBlock;
+        }
+
+        let totalBlock = this.scaleBlock(this.baseBlock);
+
+        for (const buff of this.owner.buffs) {
+            totalBlock += buff.getBlockSentModifier();
+        }
+
+        // Apply block received modifiers from the targeted character
+        if (targetedCharacterIfAny) {
+            for (const buff of targetedCharacterIfAny.buffs) {
+                totalBlock = buff.getBlockReceivedModifier();
+            }
+        }
+
+        return totalBlock;
+    }
+
+    public getDisplayedDamage(targetedCharacterIfAny: BaseCharacter | undefined){
+        if (!this.owner) {
+            return this.baseDamage;
+        }
+
+        let totalDamage = this.scaleDamage(this.baseDamage);
+
+        for (const buff of this.owner.buffs) {
+            totalDamage += buff.getCombatDamageDealtModifier();
+        }
+
+        // Apply block received modifiers from the targeted character
+        if (targetedCharacterIfAny) {
+            for (const buff of targetedCharacterIfAny.buffs) {
+                totalDamage = buff.getCombatDamageTakenModifier();
+            }
+        }
+
+        return totalDamage;
+    }
+
+    public getDisplayedMagicNumber(targetedCharacterIfAny: BaseCharacter | undefined){
+        return this.scaleMagicNumber(this.magicNumber)
+    }
+
     abstract InvokeCardEffects(targetCard?: AbstractCard): void;
 
     public IsPerformableOn(targetCard?: AbstractCard): boolean{
@@ -216,4 +374,10 @@ export enum TargetingType{
     ALLY,
     ENEMY,
     NO_TARGETING
+}
+
+export enum PlayableCardType {
+    Attack = "Attack",
+    Skill = "Skill",
+    Power = "Power",
 }

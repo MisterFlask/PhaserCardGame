@@ -15,13 +15,31 @@ export default class GameImageLoader {
             prefix: 'Backgrounds/',
             files: ['greyscale.png', 'mapbackground1.png', 'vintage_brown.png', 'battleback1.png']
         },
-        characters: {
+        portraits_blackhand: {
             prefix: 'Portraits/BlackhandPortraits/',
-            files: ['flamer1.svg']
+            files: [
+              "blackhand_1.png",
+              "blackhand_2.png",
+              "blackhand_3.png",
+              "blackhand_4.png",
+              "blackhand_5.png",
+              "blackhand_6.png"
+            ]
+        },
+        portraits_diabolist: {
+            prefix: 'Portraits/BlackhandPortraits/',
+            files: [
+              "blackhand_1.png",
+              "blackhand_2.png",
+              "blackhand_3.png",
+              "blackhand_4.png",
+              "blackhand_5.png",
+              "blackhand_6.png"
+            ]
         },
         ui: {
             prefix: 'UI/',
-            files: ['drawpile.svg', 'discardpile.svg']
+            files: ['drawpile.svg', 'discardpile.svg', 'placeholdler.png']
         },
         cards_blackhand: {
             prefix: 'Sprites/Cards/Blackhand/',
@@ -146,5 +164,13 @@ export default class GameImageLoader {
                 }
             });
         }
+    }
+
+    public getRandomImageFromCategory(category: keyof typeof this.images): string {
+        const categoryData = this.images[category];
+        const randomIndex = Math.floor(Math.random() * categoryData.files.length);
+        
+        const randomFile = categoryData.files[randomIndex];
+        return randomFile.replace(/\.(png|svg)$/, '');
     }
 }

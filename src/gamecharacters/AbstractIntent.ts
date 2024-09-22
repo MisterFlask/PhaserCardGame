@@ -51,7 +51,7 @@ export class AttackIntent extends AbstractIntent {
             throw new Error('Target cannot be null');
         }
         console.log('Attacking ' + this.target.name);
-        ActionManager.getInstance().dealDamage({ amount: this.damage, target: this.target, sourceCharacter: this.owner });
+        ActionManager.getInstance().dealDamage({ baseDamageAmount: this.damage, target: this.target, sourceCharacter: this.owner });
 
     }
 
