@@ -26,6 +26,15 @@ export class CampaignRules {
                 portraitName: randomClass.getPortraitNameAtRandom(Gender.Female), //todo: make this random
                 characterClass: randomClass 
             });
+
+            // Reroll portrait up to 5 times to avoid duplicates
+            let portraitName = randomClass.getPortraitNameAtRandom(Gender.Female);
+            let attempts = 0;
+            while (attempts < 5 && characters.some(c => c.portraitName === portraitName)) {
+                portraitName = randomClass.getPortraitNameAtRandom(Gender.Female);
+                attempts++;
+            }
+            character.portraitName = portraitName;
             
             randomClass.availableCards.forEach(card => {
                 character.cardsInMasterDeck.push(card.Copy());
