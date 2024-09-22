@@ -12,7 +12,6 @@ import GameImageLoader from '../utils/ImageUtils';
 
 export class StoreCard extends AbstractCard {
     price: number;
-    public name: string;
 
     constructor({ name, description, portraitName, tooltip, price }: { name: string; description: string; portraitName?: string, tooltip?: string, price: number}) {
         super(

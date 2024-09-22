@@ -1,6 +1,8 @@
 import { BaseCharacterClass, PlayerCharacter } from '../gamecharacters/CharacterClasses';
-import { BlackhandClass, DiabolistClass } from '../gamecharacters/SpecificClasses';
+import { BlackhandClass } from '../gamecharacters/playerclasses/BlackhandClass';
+import { DiabolistClass } from '../gamecharacters/playerclasses/DiabolistClass';
 
+import { Gender } from '../gamecharacters/BaseCharacter';
 export class CampaignRules {
     private static instance: CampaignRules;
 
@@ -21,7 +23,7 @@ export class CampaignRules {
             const randomClass = classes[Math.floor(Math.random() * classes.length)];
             const character = new PlayerCharacter({ 
                 name: `Character ${i + 1} (${randomClass.name})`, 
-                portraitName: 'placeholder', 
+                portraitName: randomClass.getPortraitNameAtRandom(Gender.Female), //todo: make this random
                 characterClass: randomClass 
             });
             

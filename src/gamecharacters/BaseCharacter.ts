@@ -1,12 +1,17 @@
-import { AbstractCard } from "./AbstractCard";
 import { JsonRepresentable } from '../interfaces/JsonRepresentable';
-import { AbstractIntent } from "./AbstractIntent";
+import { AbstractCard } from "./AbstractCard";
 
+
+export enum Gender{
+    Male,
+    Female
+}
 export class BaseCharacter extends AbstractCard implements JsonRepresentable {
-    name: string;
     portraitName: string;
     hitpoints: number;
     maxHitpoints: number;
+    gender: Gender = Gender.Female;
+
 
     constructor({ name, portraitName, maxHitpoints, description }
         : { name: string; portraitName: string; maxHitpoints: number; description?: string}) {

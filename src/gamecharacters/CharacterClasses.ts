@@ -1,7 +1,9 @@
-import { AbstractCard, PlayableCard } from "./AbstractCard";
-import { BaseCharacter } from "./BaseCharacter"
+import { AbstractCard } from "./AbstractCard";
+import { BaseCharacter, Gender } from "./BaseCharacter";
 
-export class BaseCharacterClass {
+
+
+export abstract class BaseCharacterClass {
     constructor({ name, iconName, startingMaxHp }: { name: string; iconName: string, startingMaxHp: number }) {
         this.name = name
         this.iconName = iconName
@@ -14,8 +16,10 @@ export class BaseCharacterClass {
     availableCards: AbstractCard[]
     startingMaxHp: number
 
+    abstract getPortraitNameAtRandom(gender: Gender): string;
+
     addCard(card: AbstractCard) {
-        this.availableCards.push(card)
+        this.availableCards.push(card);
     }
 
     createCharacterFromClass(){

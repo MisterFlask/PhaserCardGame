@@ -1,6 +1,6 @@
 # CAMPAIGN RESOURCES
 
-- Moxy
+- Prophecy
 
 - Competitive Advantage
 

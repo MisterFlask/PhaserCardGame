@@ -43,5 +43,5 @@ function formatImages(folderPath: string, prefix: string): void {
 // Usage example:
 // formatImages('/path/to/image/folder', 'image');
 
-formatImages('./resources/Portraits/BlackhandPortraits', 'blackhand');
+formatImages('./resources/Portraits/BlackhandPortraits/female', 'blackhand_female');
 

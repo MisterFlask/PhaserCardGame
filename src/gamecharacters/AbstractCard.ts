@@ -106,7 +106,7 @@ export abstract class AbstractCard implements JsonRepresentable {
     constructor({ name, description, portraitName, cardType, tooltip, characterData, size, team }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: AbstractCard, size?: CardSize, team?: Team }) {
         this._name = name
         this._description = description
-        this.portraitName = portraitName || "flamer1"
+        this.portraitName = portraitName || "placeholder"
         this.cardType = cardType || CardType.PLAYABLE
         this.tooltip = tooltip || "Lorem ipsum dolor sit amet"
         this.owner = characterData as BaseCharacter || undefined
@@ -260,7 +260,7 @@ export abstract class PlayableCard extends AbstractCard {
             });
         }
     }
-    
+
     get combatResources() : CombatResources{
         return GameState.getInstance().combatState.combatResources;
     }

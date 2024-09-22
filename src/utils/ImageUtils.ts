@@ -1,6 +1,6 @@
 export default class GameImageLoader {
     // Nested object containing categories with file prefix and an array of image filenames
-    private readonly images = {
+    private static readonly images = {
         map_backgrounds: {
             prefix: 'Sprites/MapBackgrounds/',
             files: [
@@ -15,27 +15,25 @@ export default class GameImageLoader {
             prefix: 'Backgrounds/',
             files: ['greyscale.png', 'mapbackground1.png', 'vintage_brown.png', 'battleback1.png']
         },
-        portraits_blackhand: {
-            prefix: 'Portraits/BlackhandPortraits/',
+        portraits_blackhand_female: {
+            prefix: 'Portraits/BlackhandPortraits/female/',
             files: [
-              "blackhand_1.png",
-              "blackhand_2.png",
-              "blackhand_3.png",
-              "blackhand_4.png",
-              "blackhand_5.png",
-              "blackhand_6.png"
-            ]
+                "blackhand_female_1.png",
+                "blackhand_female_2.png",
+                "blackhand_female_3.png",
+                "blackhand_female_4.png",
+                "blackhand_female_5.png",
+                "blackhand_female_6.png"
+              ]
         },
-        portraits_diabolist: {
-            prefix: 'Portraits/BlackhandPortraits/',
+        portraits_diabolist_female: {
+            prefix: 'Portraits/DiabolistPortraits/female/',
             files: [
-              "blackhand_1.png",
-              "blackhand_2.png",
-              "blackhand_3.png",
-              "blackhand_4.png",
-              "blackhand_5.png",
-              "blackhand_6.png"
-            ]
+                "diabolist_female_1.png",
+                "diabolist_female_2.png",
+                "diabolist_female_3.png",
+                "diabolist_female_4.png"
+              ]
         },
         ui: {
             prefix: 'UI/',
@@ -143,8 +141,8 @@ export default class GameImageLoader {
      * @param loader - The Phaser loader object.
      */
     public loadAllImages(loader: Phaser.Loader.LoaderPlugin): void {
-        for (const category in this.images) {
-            const categoryData = this.images[category as keyof typeof this.images];
+        for (const category in GameImageLoader.images) {
+            const categoryData = GameImageLoader.images[category as keyof typeof GameImageLoader.images];
             categoryData.files.forEach((file: string) => {
                 const key = file.replace(/\.(png|svg)$/, '');
                 if (file.endsWith('.svg')) {
@@ -166,7 +164,7 @@ export default class GameImageLoader {
         }
     }
 
-    public getRandomImageFromCategory(category: keyof typeof this.images): string {
+    public static getRandomImageNameFromCategory(category: keyof typeof this.images): string {
         const categoryData = this.images[category];
         const randomIndex = Math.floor(Math.random() * categoryData.files.length);
         
