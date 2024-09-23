@@ -1,6 +1,7 @@
 // src/utils/LayoutUtils.ts
 
 import Phaser from 'phaser';
+import CombatInputHandler from '../screens/subcomponents/CombatInputHandler';
 import { PhysicalCard } from '../ui/PhysicalCard';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 
@@ -29,10 +30,12 @@ class CombatSceneLayoutUtils {
         const startX = (totalWidth - totalCardsWidth) / 2;
 
         cardArray.forEach((card, index) => {
-            card.container.x = startX + index * cardSpacing;
-            card.container.y = yPosition;
-            (card.container as any).originalDepth = index;
-            // Implement depth logic if needed
+            // Don't move the card that is being dragged
+            if (CombatInputHandler.draggedCard !== card) {
+                card.container.x = startX + index * cardSpacing;
+                card.container.y = yPosition;
+                (card.container as any).originalDepth = index;
+            }
         });
     }
 

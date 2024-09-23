@@ -14,7 +14,7 @@ import CombatCardManager from './CombatCardManager';
 class CombatInputHandler {
     private scene: Phaser.Scene;
     private cardManager: CombatCardManager;
-    private draggedCard: PhysicalCard | null = null;
+    public static draggedCard: PhysicalCard | null = null;
     private originalCardPosition: { x: number; y: number } | null = null;
     private highlightedCard: PhysicalCard | null = null;
 
@@ -57,45 +57,47 @@ class CombatInputHandler {
 
     private handleDragStart = (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject): void => {
         if ('physicalCard' in gameObject) {
-            this.draggedCard = (gameObject as any).physicalCard as PhysicalCard;
-            if (this.draggedCard) {
-                this.originalCardPosition = { x: this.draggedCard.container.x, y: this.draggedCard.container.y };
+            CombatInputHandler.draggedCard = (gameObject as any).physicalCard as PhysicalCard;
+            if (CombatInputHandler.draggedCard) {
+                this.originalCardPosition = { x: CombatInputHandler.draggedCard.container.x, y: CombatInputHandler.draggedCard.container.y };
                 if (gameObject.parentContainer) {
                     this.bringCardToFront(gameObject.parentContainer);
                 }
             }
         } else {
             console.warn('Dragged object is not a PhysicalCard');
-            this.draggedCard = null;
+            CombatInputHandler.draggedCard = null;
             this.originalCardPosition = null;
         }
     }
 
-    private handleDrag = (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject, dragX: number, dragY: number): void => {
-        if (this.draggedCard) {
-            this.draggedCard.container.x = dragX;
-            this.draggedCard.container.y = dragY;
+    private handleDrag(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject, dragX: number, dragY: number): void {
+        if (CombatInputHandler.draggedCard) {
+            CombatInputHandler.draggedCard.container.x = dragX;
+            CombatInputHandler.draggedCard.container.y = dragY;
 
             this.checkCardUnderPointer(pointer);
         }
     }
 
-    private handleDragEnd = (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject): void => {
-        if (!this.draggedCard) return;
+    private handleDragEnd(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject): void {
+        if (!CombatInputHandler.draggedCard) return;
 
-        const isPlayable = this.draggedCard.data instanceof PlayableCard;
+        console.log('handleDragEnd triggered on CombatInputHandler');
+
+        const isPlayable = CombatInputHandler.draggedCard.data instanceof PlayableCard;
 
         let wasPlayed = false;
 
         if (isPlayable) {
-            const playableCard = this.draggedCard.data as PlayableCard;
+            const playableCard = CombatInputHandler.draggedCard.data as PlayableCard;
             const targetingType = this.getTargetingType(playableCard);
 
             if (targetingType === TargetingType.NO_TARGETING) {
                 const droppedOnBattlefield = CombatSceneLayoutUtils.isDroppedOnBattlefield(this.scene, pointer);
                 if (droppedOnBattlefield) {
                     wasPlayed = true;
-                    this.playCardOnBattlefield(this.draggedCard);
+                    this.playCardOnBattlefield(CombatInputHandler.draggedCard);
                 }
             } else {
                 if (this.highlightedCard && this.isValidTarget(playableCard, this.highlightedCard.data)) {
@@ -108,8 +110,8 @@ class CombatInputHandler {
         if (!wasPlayed) {
             this.animateCardBack();
         } else {
-            this.removeCardFromHand(this.draggedCard);
-            this.addCardToDiscardPile(this.draggedCard);
+            this.removeCardFromHand(CombatInputHandler.draggedCard);
+            this.addCardToDiscardPile(CombatInputHandler.draggedCard);
         }
 
         this.resetDragState();
@@ -205,9 +207,9 @@ class CombatInputHandler {
     }
 
     private animateCardBack(): void {
-        if (this.draggedCard && this.originalCardPosition) {
+        if (CombatInputHandler.draggedCard && this.originalCardPosition) {
             this.scene.tweens.add({
-                targets: this.draggedCard.container,
+                targets: CombatInputHandler.draggedCard.container,
                 x: this.originalCardPosition.x,
                 y: this.originalCardPosition.y,
                 scaleX: 1,
@@ -222,7 +224,7 @@ class CombatInputHandler {
     }
 
     private resetDragState(): void {
-        this.draggedCard = null;
+        CombatInputHandler.draggedCard = null;
         this.originalCardPosition = null;
         this.highlightedCard = null;
     }
@@ -230,7 +232,7 @@ class CombatInputHandler {
     private checkCardUnderPointer(pointer: Phaser.Input.Pointer): void {
         const cardUnderPointer = this.getCardUnderPointer(pointer);
 
-        if (cardUnderPointer && cardUnderPointer !== this.draggedCard) {
+        if (cardUnderPointer && cardUnderPointer !== CombatInputHandler.draggedCard) {
             if (this.highlightedCard !== cardUnderPointer) {
                 if (this.highlightedCard) {
                     this.unhighlightCard(this.highlightedCard);
@@ -248,7 +250,7 @@ class CombatInputHandler {
         const allCards = [...this.cardManager.playerHand, ...this.cardManager.enemyUnits, ...this.cardManager.playerUnits];
         for (let i = allCards.length - 1; i >= 0; i--) {
             const card = allCards[i];
-            if (card !== this.draggedCard && card.cardBackground.getBounds().contains(pointer.x, pointer.y)) {
+            if (card !== CombatInputHandler.draggedCard && card.cardBackground.getBounds().contains(pointer.x, pointer.y)) {
                 return card;
             }
         }
