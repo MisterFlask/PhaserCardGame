@@ -1,6 +1,6 @@
 // src/gamecharacters/PhysicalCard.ts
 import Phaser from 'phaser';
-import { AbstractCard } from "../gamecharacters/AbstractCard";
+import { AbstractCard, PlayableCard } from "../gamecharacters/AbstractCard";
 import { AbstractIntent } from '../gamecharacters/AbstractIntent';
 import { AutomatedCharacter } from '../gamecharacters/AutomatedCharacter';
 import { BaseCharacter } from "../gamecharacters/BaseCharacter";
@@ -40,6 +40,7 @@ export class PhysicalCard {
     private incomingIntents: Map<string, IncomingIntent> = new Map();
     glowEffect?: Phaser.FX.Glow;
     glowColor: number = 0xffff00; //yellow
+    private costBox: TextBox | null = null; // Add costBox property
 
     constructor({
         scene,
@@ -109,6 +110,24 @@ export class PhysicalCard {
             this.cardContent.add([this.hpBox.background!!, this.hpBox.text]);
         } else {
             this.hpBox = null;
+        }
+
+        // Add cost box if the card is a PlayableCard
+        if (this.data instanceof PlayableCard) {
+            const playableCard = this.data as PlayableCard;
+            const cardWidth = this.cardBackground.displayWidth;
+            const cardHeight = this.cardBackground.displayHeight;
+            this.costBox = new TextBox({
+                scene: this.scene,
+                x: cardWidth / 2 - 10,
+                y: -cardHeight / 2 + 10,
+                width: 30,
+                height: 30,
+                text: `${playableCard.energyCost}`,
+                style: { fontSize: '14px', color: '#ffffff', fontFamily: 'Arial' },
+                fillColor: 0x0000ff
+            });
+            this.cardContent.add([this.costBox.background!!, this.costBox.text]);
         }
 
         // Load the rollover sound if it's not already loaded
@@ -474,6 +493,12 @@ export class PhysicalCard {
         if (this.hpBox && this.data instanceof BaseCharacter) {
             const baseCharacter = this.data as BaseCharacter;
             this.hpBox.setText(`${baseCharacter.hitpoints}/${baseCharacter.maxHitpoints}`);
+        }
+
+        // Update cost box if it exists
+        if (this.costBox && this.data instanceof PlayableCard) {
+            const playableCard = this.data as PlayableCard;
+            this.costBox.setText(`${playableCard.energyCost}`);
         }
 
         // Update block text
