@@ -54,6 +54,7 @@ export abstract class AbstractBuff {
     imageName: string = "PLACEHOLDER_IMAGE";
     id: string = generateWordGuid();
     stackable: boolean = true;
+    // Note we have a different subsystem responsible for removing the buff once stacks is at 0.  That is not the responsibility of Invoke()
     stacks: number = 1;
     counter: number = -1;
     showCounter: boolean = false;
@@ -77,8 +78,13 @@ export abstract class AbstractBuff {
         return 0;
     }
 
+    // this is a percentage modifier on top of damage sent by the owner.  If this is "100" that means 100% more damage is sent.  If this is -100 then this means the character does no damage.  Standard is 0, which means no modifier.
+    // Note this does not take into account blocking in any way.
+    getPercentCombatDamageDealtModifier(): number {
+        return 0;
+    }
     // this is a percentage modifier on top of damage taken.  If this is "100" that means 100% more damage is taken.  If this is -100 then this means the character takes no damage.  Standard is 0, which means no modifier.
-    // Note this applies to both blocked and unblocked damage equally; it effectively multiplies the damage sent by the given percentage.
+    // Note this does not take into account blocking in any way.
     getPercentCombatDamageTakenModifier(): number {
         return 0;
     }
@@ -91,10 +97,16 @@ export abstract class AbstractBuff {
         return 0;
     }
 
+    /**
+     * This is called when the owner of the buff is struck by an attack.  It CANNOT BE USED to modify damage received; use getPercentCombatDamageTakenModifier or getCombatDamageTakenModifier instead for that.
+     */
     onOwnerStruck(strikingUnit: BaseCharacter | null, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo) {
 
     }
 
+    /**
+     * This is called when the owner of the buff is striking another unit.  It CANNOT BE USED to modify damage dealt; use getPercentCombatDamageDealtModifier or getCombatDamageDealtModifier instead for that.
+     */
     onOwnerStriking(struckUnit: BaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo) {
 
     }

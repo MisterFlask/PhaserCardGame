@@ -25,9 +25,6 @@ export class Poison extends AbstractBuff {
 
             // Halve the poison stacks, rounding down
             this.stacks = Math.floor(this.stacks / 2);
-
-
-
         }
     }
 

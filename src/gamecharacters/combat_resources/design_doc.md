@@ -52,3 +52,5 @@ Chance to get a particular card decreased for every time you've gotten that card
 * Cards MAY use a resource and gain a different resource.
 * Cards may also just not use resources; this is fine.
 * Status effects are allowed to scale off of resources
+
+

@@ -37,7 +37,7 @@ export default class GameImageLoader {
         },
         ui: {
             prefix: 'UI/',
-            files: ['drawpile.svg', 'discardpile.svg', 'placeholder.png']
+            files: ['drawpile.svg', 'discardpile.svg', 'placeholder.png', 'oops_image.webp']
         },
         cards_blackhand: {
             prefix: 'Sprites/Cards/Blackhand/',
