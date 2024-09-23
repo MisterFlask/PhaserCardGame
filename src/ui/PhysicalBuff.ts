@@ -49,8 +49,10 @@ export class PhysicalBuff {
         this.text.setPosition(0, 0);
         this.container.add([this.image, this.text]);
 
+        // Adjust the interactive area to match the container's size
+        this.container.setInteractive(new Phaser.Geom.Rectangle(-containerSize / 2, -containerSize / 2, containerSize, containerSize), Phaser.Geom.Rectangle.Contains);
+        
         // Add mouse over and mouse out events
-        this.container.setInteractive(new Phaser.Geom.Rectangle(-20, -20, 40, 40), Phaser.Geom.Rectangle.Contains);
         this.container.on('pointerover', this.showDescription, this);
         this.container.on('pointerout', this.hideDescription, this);
 
@@ -68,19 +70,22 @@ export class PhysicalBuff {
     }
 
     showDescription() {
-        const screenWidth = this.scene.sys.game.config.width as number;
-        const screenHeight = this.scene.sys.game.config.height as number;
         const bufferSpace = 10;
 
-        let descX = this.container.x - this.tooltipBox.background!.width / 2 - bufferSpace;
-        let descY = this.container.y;
+        // Get the container's world position
+        const containerWorldPosition = this.container.getWorldTransformMatrix();
+
+        let descX = containerWorldPosition.tx - this.tooltipBox.background!.width / 2 - bufferSpace;
+        let descY = containerWorldPosition.ty;
 
         // If too close to the left edge, show on the right side instead
         if (descX < 0) {
-            descX = this.container.x + this.container.width / 2 + this.tooltipBox.background!.width / 2 + bufferSpace;
+            descX = containerWorldPosition.tx + this.container.width / 2 + this.tooltipBox.background!.width / 2 + bufferSpace;
         }
 
         // Adjust Y position if it goes off screen
+        const screenWidth = this.scene.sys.game.config.width as number;
+        const screenHeight = this.scene.sys.game.config.height as number;
         if (descY + this.tooltipBox.background!.height / 2 > screenHeight) {
             descY = screenHeight - this.tooltipBox.background!.height / 2 - bufferSpace;
         } else if (descY - this.tooltipBox.background!.height / 2 < 0) {
@@ -89,6 +94,7 @@ export class PhysicalBuff {
 
         this.tooltipBox.setPosition(descX, descY);
         this.tooltipBox.setVisible(true);
+        this.tooltipBox.setDepth(1000); // Ensure the tooltip is above all other elements
         this.updateText();
     }
 

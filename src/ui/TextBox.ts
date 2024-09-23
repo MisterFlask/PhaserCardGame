@@ -7,6 +7,8 @@ export class TextBox {
     outline: Phaser.GameObjects.Rectangle | null = null;
     textBoxName?: string;
     scene: Phaser.Scene;
+    expandDirection: 'up' | 'down';
+
     constructor(params: {
         scene: Phaser.Scene,
         x?: number,
@@ -17,7 +19,8 @@ export class TextBox {
         style?: Phaser.Types.GameObjects.Text.TextStyle,
         backgroundImage?: string,
         textBoxName?: string,
-        fillColor?: number
+        fillColor?: number,
+        expandDirection?: 'up' | 'down'
     }) {
         const {
             scene,
@@ -33,6 +36,7 @@ export class TextBox {
         } = params;
         this.textBoxName = textBoxName ?? "anonymousTextBox";
         this.scene = scene;
+        this.expandDirection = params.expandDirection ?? 'down';
         // Create background with rounded corners if no image is provided
         if (backgroundImage) {
             this.background = scene.add.image(x, y, backgroundImage).setDisplaySize(width, height).setOrigin(0.5);
@@ -118,8 +122,32 @@ export class TextBox {
         }
         if ((this.text.frame as any)?.data) {
             this.text.setText(text);
+            this.adjustTextBoxSize();
         } else{
             console.log("text frame data is null for " + this.textBoxName);
+        }
+    }
+
+    private adjustTextBoxSize(): void {
+
+        if (!(this.background instanceof Phaser.GameObjects.Rectangle)){
+            return;
+        }
+        if (this.background === null){
+            return;
+        }
+        const padding = 10;
+        const maxWidth = this.background.width;
+        const maxHeight = this.background.height;
+
+        if (this.text.height > maxHeight - padding) {
+            const newHeight = this.text.height + padding;
+            this.setSize(maxWidth, newHeight);
+
+            if (this.expandDirection === 'up') {
+                const newY = this.background.y - (newHeight - maxHeight) / 2;
+                this.setPosition(this.background.x, newY);
+            }
         }
     }
 
@@ -145,5 +173,12 @@ export class TextBox {
             this.background.setScrollFactor(factor);
         }
         this.text.setScrollFactor(factor);
+    }
+
+    setDepth(depth: number): void {
+        if (this.background) {
+            this.background.setDepth(depth);
+        }
+        this.text.setDepth(depth);
     }
 }

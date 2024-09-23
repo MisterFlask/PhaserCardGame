@@ -20,6 +20,7 @@ class CombatUIManager {
     public battlefieldArea!: Phaser.GameObjects.Rectangle;
     public handArea!: Phaser.GameObjects.Rectangle;
     public energyDisplay!: TextBox;
+    public resourceIndicators: Phaser.GameObjects.Container[] = [];
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -28,6 +29,7 @@ class CombatUIManager {
         this.createEndTurnButton();
         this.createGameAreas();
         this.createEnergyDisplay();
+        this.createResourceIndicators(); // Add this line
     }
 
     private createEnergyDisplay(): void {
@@ -273,6 +275,57 @@ class CombatUIManager {
 
         // Remove global pointer events
         this.scene.input.off('pointermove', this.handlePointerMove, this);
+    }
+    private createResourceIndicators(): void {
+        const resources = GameState.getInstance().combatState.combatResources;
+        const resourceArray = [
+            resources.light,
+            resources.fire,
+            resources.iron,
+            resources.mind,
+            resources.ice,
+            resources.gold,
+            resources.muscle
+        ];
+
+        const gameWidth = this.scene.scale.width;
+        const gameHeight = this.scene.scale.height;
+        const startX = gameWidth - 150;
+        const startY = gameHeight - 350;
+        const spacingY = 50;
+
+        resourceArray.forEach((resource, index) => {
+            const icon = this.scene.add.image(startX, startY + index * spacingY, resource.icon).setDisplaySize(32, 32);
+            const text = this.scene.add.text(startX + 40, startY + index * spacingY, `${resource.name}: ${resource.value}`, {
+                fontSize: '20px',
+                color: '#ffffff',
+                fontFamily: 'Arial'
+            });
+            text.setShadow(2, 2, '#000000', 2, true, true); // Add drop shadow
+
+            const container = this.scene.add.container(0, 0, [icon, text]);
+            this.resourceIndicators.push(container);
+        });
+
+        this.scene.events.on('update', this.updateResourceIndicators, this);
+    }
+
+    private updateResourceIndicators(): void {
+        const resources = GameState.getInstance().combatState.combatResources;
+        const resourceArray = [
+            resources.light,
+            resources.fire,
+            resources.iron,
+            resources.mind,
+            resources.ice,
+            resources.gold,
+            resources.muscle
+        ];
+        this.resourceIndicators.forEach((container, index) => {
+            const resource = resourceArray[index];
+            const text = container.getAt(1) as Phaser.GameObjects.Text;
+            text.setText(`${resource.name}: ${resource.value}`);
+        });
     }
 }
 

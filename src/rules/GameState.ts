@@ -265,14 +265,15 @@ export class CombatResources{
 }
 
 export class CombatResource{
-    name: string
-    description: string
-    value: number
+    name: string;
+    description: string;
+    value: number;
+    icon: string; // Add icon property
 
-    constructor(name: string, description: string, initialValue: number = 0) {
+    constructor(name: string, description: string, initialValue: number = 0, icon: string = 'placeholder') {
         this.name = name;
         this.description = description;
         this.value = initialValue;
+        this.icon = icon; // Initialize icon
     }
-    
 }
