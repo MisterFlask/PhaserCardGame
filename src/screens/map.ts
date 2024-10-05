@@ -93,8 +93,9 @@ export default class MapScene extends Phaser.Scene {
     }
 
     createBackground() {
-        this.background = this.add.image(this.scale.width / 2, this.scale.height / 2, 'mapbackground1'); // Center the background
+        this.background = this.add.image(this.scale.width / 2, this.scale.height / 2, 'mapbackground1');
         this.background.setOrigin(0.5, 0.5);
+        this.background.setScrollFactor(0); // Add this line
         this.resizeBackground();
     }
 
@@ -289,12 +290,18 @@ export default class MapScene extends Phaser.Scene {
         this.positionCampaignStatusText(width, height);
         this.spatialManager.arrangeLocations();
         this.createAdjacencyLines();
+
+        // Add these lines to ensure the background stays centered
+        if (this.background) {
+            this.background.setPosition(width / 2, height / 2);
+        }
     }
 
     resizeBackground() {
         const { width, height } = this.scale;
         if (this.background) {
             this.background.setDisplaySize(width, height);
+            this.background.setPosition(width / 2, height / 2);
         }
     }
 
