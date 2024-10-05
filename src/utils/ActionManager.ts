@@ -1,6 +1,6 @@
 import { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { GameState } from "../rules/GameState";
-import { StoreCard } from '../screens/campaign';
+import { StoreCard } from '../screens/Campaign';
 import { PhysicalCard } from '../ui/PhysicalCard';
 
 export class ActionManager {
