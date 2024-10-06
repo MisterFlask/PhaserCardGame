@@ -8,6 +8,6 @@ export class GoblinCharacter extends AutomatedCharacter {
         this.buffs.push(new Strong(2))
     }
     override generateNewIntents(): AbstractIntent[] {
-        return [new AttackIntent({ owner: this, damage: 1  })];
+        return [new AttackIntent({ owner: this, baseDamage: 1  })];
     }
 }

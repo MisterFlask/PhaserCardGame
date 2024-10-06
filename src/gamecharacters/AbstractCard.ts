@@ -1,10 +1,10 @@
+import { IAbstractCard } from './IAbstractCard';
 import { JsonRepresentable } from '../interfaces/JsonRepresentable';
-import { CombatResources, CombatState, GameState } from '../rules/GameState';
-import { ActionManager } from '../utils/ActionManager';
+import {  GameState } from '../rules/GameState';
 import { AbstractIntent } from './AbstractIntent'; // Import AbstractIntent
-import { BaseCharacter } from './BaseCharacter';
 import { AbstractBuff } from './buffs/AbstractBuff';
 import { CardSize, CardType } from './Primitives'; // Ensure enums are imported from Primitives
+import { IBaseCharacter } from './IBaseCharacter';
 
 export interface IPhysicalCardInterface {
     container: Phaser.GameObjects.Container;
@@ -76,7 +76,7 @@ export enum Team{
     ENEMY
 }
 
-export abstract class AbstractCard implements JsonRepresentable {
+export abstract class AbstractCard implements IAbstractCard {
     public get name(): string {
         return this._name;
     }
@@ -98,7 +98,7 @@ export abstract class AbstractCard implements JsonRepresentable {
     public portraitName: string
     cardType: CardType
     public tooltip: string
-    owner?: BaseCharacter
+    owner?: IBaseCharacter
     size: CardSize
     id: string
     physicalCard?: IPhysicalCardInterface // this is a hack, it's just always PhysicalCard
@@ -114,7 +114,7 @@ export abstract class AbstractCard implements JsonRepresentable {
         this.portraitName = portraitName || "placeholder"
         this.cardType = cardType || CardType.PLAYABLE
         this.tooltip = tooltip || "Lorem ipsum dolor sit amet"
-        this.owner = characterData as BaseCharacter || undefined
+        this.owner = characterData as unknown as IBaseCharacter || undefined
         this.size = size || CardSize.SMALL
         this.team = team || Team.ENEMY
     }
@@ -144,29 +144,7 @@ export abstract class AbstractCard implements JsonRepresentable {
             owner: this.owner?.name,
             team: this.team,
             block: this.block,
-            IncomingIntents: this.getIntentsTargetingThisCharacter().map(intent => intent.createJsonRepresentation())
         }, null, 2);
-    }
-
-    getIntentsTargetingThisCharacter(): AbstractIntent[] {
-        if (!(this instanceof BaseCharacter)) {
-            return [];
-        }
-
-        const gameState = GameState.getInstance();
-        const livingEnemies = gameState.combatState.enemies.filter(enemy => enemy.hitpoints > 0);
-        
-        const targetingIntents: AbstractIntent[] = [];
-
-        for (const enemy of livingEnemies) {
-            for (const intent of enemy.intents) {
-                if (intent.target === this) {
-                    targetingIntents.push(intent);
-                }
-            }
-        }
-
-        return targetingIntents;
     }
 }
 

@@ -1,5 +1,6 @@
 import { AutomatedCharacter } from "../gamecharacters/AutomatedCharacter";
 import { BaseCharacter } from "../gamecharacters/BaseCharacter";
+import { IBaseCharacter } from "../gamecharacters/IBaseCharacter";
 import { PlayableCard } from "../gamecharacters/PlayableCard";
 import { ActionManager } from "../utils/ActionManager";
 import { GameState } from "./GameState";
@@ -52,7 +53,7 @@ export class CombatRules {
         CombatRules.beginTurn();
     }
 
-    public static handleDeath(character: BaseCharacter, killer: BaseCharacter | null): void {
+    public static handleDeath(character: IBaseCharacter, killer: IBaseCharacter | null): void {
         if (character instanceof AutomatedCharacter){
             character.intents = [];
         }
@@ -91,6 +92,10 @@ export class CombatRules {
         });
     }
 
+
+    /**
+     * The only time target is null is when we're calculating the damage of something hypothetically
+     */
     public static calculateDamage = ({
         baseDamageAmount,
         target,
@@ -99,8 +104,8 @@ export class CombatRules {
         fromAttack = true
     }: {
         baseDamageAmount: number,
-        target: BaseCharacter,
-        sourceCharacter?: BaseCharacter,
+        target?: IBaseCharacter,
+        sourceCharacter?: IBaseCharacter,
         sourceCard?: PlayableCard,
         fromAttack?: boolean
     }): DamageCalculationResult => {
@@ -111,7 +116,7 @@ export class CombatRules {
             totalDamage *= (1 + buff.getPercentCombatDamageDealtModifier() / 100);
         });
         // Apply target character buffs
-        target.buffs.forEach(buff => {
+        target?.buffs.forEach(buff => {
             totalDamage += buff.getCombatDamageTakenModifier();
             totalDamage *= (1 + buff.getPercentCombatDamageTakenModifier() / 100);
         });
@@ -126,12 +131,12 @@ export class CombatRules {
         let blockedDamage = 0;
         let unblockedDamage = totalDamage;
 
-        if (target.block >= totalDamage) {
+        if (target?.block || 0 >= totalDamage) {
             blockedDamage = totalDamage;
             unblockedDamage = 0;
         } else {
-            blockedDamage = target.block;
-            unblockedDamage = totalDamage - target.block;
+            blockedDamage = target?.block || 0;
+            unblockedDamage = totalDamage - blockedDamage;
         }
 
         return new DamageCalculationResult(totalDamage, blockedDamage, unblockedDamage);

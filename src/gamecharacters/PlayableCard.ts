@@ -3,7 +3,7 @@ import { ActionManager } from "../utils/ActionManager";
 import { AbstractCard, TargetingType, Team } from "./AbstractCard";
 import { BaseCharacter } from "./BaseCharacter";
 import { CardType, CardSize } from "./Primitives";
-
+import { IBaseCharacter } from "./IBaseCharacter";
 export abstract class PlayableCard extends AbstractCard {
     targetingType: TargetingType
     constructor({ name, description, portraitName, cardType, tooltip, characterData, size, targetingType, owner }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: AbstractCard, size?: CardSize, targetingType?: TargetingType, owner?: BaseCharacter }) {
@@ -66,7 +66,7 @@ export abstract class PlayableCard extends AbstractCard {
         return this.combatResources.light.value;
     }
 
-    protected dealDamageToTarget(targetCard?: BaseCharacter): void {
+    protected dealDamageToTarget(targetCard?: IBaseCharacter): void {
         if (targetCard) {
             this.actionManager.dealDamage({
                 baseDamageAmount: this.baseDamage,
@@ -79,7 +79,7 @@ export abstract class PlayableCard extends AbstractCard {
         }
     }
 
-    protected applyBlockToTarget(targetCard?: BaseCharacter): void {
+    protected applyBlockToTarget(targetCard?: IBaseCharacter): void {
         if (targetCard) {
             this.actionManager.applyBlock({
                 blockTargetCharacter: targetCard,
@@ -126,7 +126,7 @@ export abstract class PlayableCard extends AbstractCard {
         return totalBlock;
     }
 
-    public getDisplayedDamage(targetedCharacterIfAny: BaseCharacter | undefined){
+    public getDisplayedDamage(targetedCharacterIfAny: IBaseCharacter | undefined){
         if (!this.owner) {
             return this.baseDamage;
         }

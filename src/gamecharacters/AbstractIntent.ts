@@ -1,4 +1,5 @@
 import { JsonRepresentable } from '../interfaces/JsonRepresentable';
+import { CombatRules } from '../rules/CombatRules';
 import { ActionManager } from "../utils/ActionManager";
 import { TargetingUtils } from "../utils/TargetingUtils";
 import { generateWordGuid } from "./AbstractCard";
@@ -6,19 +7,18 @@ import { BaseCharacter } from "./BaseCharacter";
 
 export abstract class AbstractIntent implements JsonRepresentable {
     id: string;
-    tooltipText: string;
-    displayText: string;
     imageName: string;
     target?: BaseCharacter;
     owner: BaseCharacter;
-    constructor({tooltipText, displayText, imageName, target, owner }: { tooltipText: string, displayText: string, imageName: string, target: BaseCharacter | undefined, owner: BaseCharacter }) {
-        this.tooltipText = tooltipText;
-        this.displayText = displayText;
+    constructor({imageName, target, owner }: {imageName: string, target: BaseCharacter | undefined, owner: BaseCharacter }) {
         this.imageName = imageName;
         this.target = target;
         this.owner = owner;
-        this.id = generateWordGuid(this.displayText);
+        this.id = generateWordGuid(this.displayText());
     }
+
+    abstract tooltipText(): string;
+    abstract displayText(): string;
 
     abstract act(): void;
 
@@ -26,8 +26,6 @@ export abstract class AbstractIntent implements JsonRepresentable {
         return JSON.stringify({
             className: this.constructor.name,
             id: this.id,
-            tooltipText: this.tooltipText,
-            displayText: this.displayText,
             imageName: this.imageName,
             target: this.target ? this.target.name : 'No target',
             owner: this.owner.name,
@@ -37,13 +35,25 @@ export abstract class AbstractIntent implements JsonRepresentable {
 
 
 export class AttackIntent extends AbstractIntent {
-    damage: number;
-    constructor({ target, damage, owner }: { target?: BaseCharacter | undefined, damage: number, owner: BaseCharacter }) {
-        super({  tooltipText: 'Attacking for ' + damage + ' damage', displayText: damage.toString(), imageName: 'knife-thrust', target: target, owner: owner });
-        this.damage = damage;
+    baseDamage: number;
+    constructor({ target, baseDamage, owner }: { target?: BaseCharacter | undefined, baseDamage: number, owner: BaseCharacter }) {
+        super({ imageName: 'knife-thrust', target: target, owner: owner });
+        this.baseDamage = baseDamage;
         if (!this.target) {
             this.target = TargetingUtils.getInstance().selectRandomPlayerCharacter();
         }
+    }
+
+    tooltipText(): string {
+        return 'Attacking for ' + this.displayedDamage() + ' damage';
+    }
+
+    displayText(): string {
+        return this.displayedDamage().toString();
+    }
+
+    displayedDamage(): number {
+        return CombatRules.calculateDamage({ baseDamageAmount: this.baseDamage, target: this.target!, sourceCharacter: this.owner, sourceCard: undefined, fromAttack: true }).totalDamage;
     }
 
     act(): void {
@@ -51,7 +61,7 @@ export class AttackIntent extends AbstractIntent {
             throw new Error('Target cannot be null');
         }
         console.log('Attacking ' + this.target.name);
-        ActionManager.getInstance().dealDamage({ baseDamageAmount: this.damage, target: this.target, sourceCharacter: this.owner });
+        ActionManager.getInstance().dealDamage({ baseDamageAmount: this.baseDamage, target: this.target, sourceCharacter: this.owner });
 
     }
 
@@ -60,7 +70,7 @@ export class AttackIntent extends AbstractIntent {
         return JSON.stringify({
             ...baseRepresentation,
             className: this.constructor.name,
-            damage: this.damage,
+            damage: this.baseDamage,
         }, null, 2);
     }
 }

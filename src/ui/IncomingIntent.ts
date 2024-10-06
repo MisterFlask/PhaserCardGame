@@ -21,7 +21,7 @@ export class IncomingIntent {
         this.image = this.scene.add.image(0, 0, intent.imageName);
         this.image.setDisplaySize(IncomingIntent.WIDTH, IncomingIntent.HEIGHT);
         
-        this.text = this.scene.add.text(0, IncomingIntent.HEIGHT / 2, intent.displayText, { fontSize: '30px', color: '#ffffff' });
+        this.text = this.scene.add.text(0, IncomingIntent.HEIGHT / 2, intent.displayText(), { fontSize: '30px', color: '#ffffff' });
         this.text.setOrigin(0.5);
         this.text.setShadow(2, 2, '#000000', 3, true, true);
 
@@ -56,13 +56,13 @@ export class IncomingIntent {
 
     update(): void {
         this.image.setTexture(this.intent.imageName);
-        this.text.setText(this.intent.displayText);
+        this.text.setText(this.intent.displayText());
     }
 
     updateIntent(newIntent: AbstractIntent): void {
         this.intent = newIntent;
         this.image.setTexture(this.intent.imageName);
-        this.text.setText(this.intent.displayText);
+        this.text.setText(this.intent.displayText());
     }
 
     setPosition(x: number, y: number): void {

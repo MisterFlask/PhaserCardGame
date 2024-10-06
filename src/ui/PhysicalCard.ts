@@ -714,8 +714,11 @@ export class PhysicalCard {
      * Sync incoming intents with the underlying AbstractCard's incoming intents
      */
     private syncIncomingIntents(): void {
-        const targetedIntents = this.data.getIntentsTargetingThisCharacter();
-        
+        if (!(this.data instanceof BaseCharacter)) {
+            return;
+        }
+        const baseCharacter = this.data as BaseCharacter;
+        const targetedIntents = baseCharacter.getIntentsTargetingThisCharacter();
         const currentIntentIds = new Set(targetedIntents.map(intent => intent.id));
 
         // Remove intents that are no longer present

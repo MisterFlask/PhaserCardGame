@@ -12,7 +12,7 @@ export class ClockworkAbomination extends AutomatedCharacter {
     }
     
     override generateNewIntents(): AbstractIntent[] {
-        return [ new AttackIntent({ damage: 5, owner: this }) ]
+        return [ new AttackIntent({ baseDamage: 5, owner: this }) ]
     }
 }
 
@@ -26,7 +26,7 @@ export class BaconBeast extends AutomatedCharacter {
     
 
     override generateNewIntents(): AbstractIntent[] {
-        return [ new AttackIntent({ damage: 6, owner: this }) ]
+        return [ new AttackIntent({ baseDamage: 6, owner: this }) ]
     }
 }
 
@@ -38,7 +38,7 @@ export class BloodManipulationSlime extends AutomatedCharacter {
     }
     
     override generateNewIntents(): AbstractIntent[] {
-        return [ new AttackIntent({ damage: 10, owner: this }) ]
+        return [ new AttackIntent({ baseDamage: 10, owner: this }) ]
     }
 }
 

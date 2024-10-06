@@ -1,11 +1,23 @@
+import { IAbstractBuff } from '../IAbstractBuff';
 import { AbstractCombatEvent } from "../../rules/AbstractCombatEvent";
 import { DamageInfo } from "../../rules/DamageInfo";
 import { GameState } from "../../rules/GameState";
 import { generateWordGuid } from "../AbstractCard";
 import { BaseCharacter } from "../BaseCharacter";
 import { PlayableCard } from "../PlayableCard";
+import { IBaseCharacter } from '../IBaseCharacter';
 
-export abstract class AbstractBuff {
+export abstract class AbstractBuff implements IAbstractBuff {
+
+    constructor() {
+        this.imageName = "PLACEHOLDER_IMAGE";
+        this.id = generateWordGuid();
+        this.stackable = true;
+        this.stacks = 1;
+        this.counter = -1;
+        this.showCounter = false;
+        this.isDebuff = false;
+    }
 
     public getOwner(): BaseCharacter | null {
         // Import GameState if not already imported at the top of the file
@@ -101,14 +113,14 @@ export abstract class AbstractBuff {
     /**
      * This is called when the owner of the buff is struck by an attack.  It CANNOT BE USED to modify damage received; use getPercentCombatDamageTakenModifier or getCombatDamageTakenModifier instead for that.
      */
-    onOwnerStruck(strikingUnit: BaseCharacter | null, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo) {
+    onOwnerStruck(strikingUnit: IBaseCharacter | null, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo) {
 
     }
 
     /**
      * This is called when the owner of the buff is striking another unit.  It CANNOT BE USED to modify damage dealt; use getPercentCombatDamageDealtModifier or getCombatDamageDealtModifier instead for that.
      */
-    onOwnerStriking(struckUnit: BaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo) {
+    onOwnerStriking(struckUnit: IBaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo) {
 
     }
 

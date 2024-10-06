@@ -131,8 +131,8 @@ export class ActionManager {
     public applyBlock(params: {
         baseBlockValue: number,
         appliedViaPlayableCard?: PlayableCard,
-        blockSourceCharacter?: BaseCharacter,
-        blockTargetCharacter?: BaseCharacter
+        blockSourceCharacter?: IBaseCharacter,
+        blockTargetCharacter?: IBaseCharacter
     }): void {
         let { baseBlockValue, blockTargetCharacter, appliedViaPlayableCard, blockSourceCharacter } = params;
         console.log("Called ApplyBlock method in action manager. Block: " + baseBlockValue + " Target: " + blockTargetCharacter?.name);
@@ -209,8 +209,8 @@ export class ActionManager {
         fromAttack
     }: {
         baseDamageAmount: number,
-        target: BaseCharacter,
-        sourceCharacter?: BaseCharacter,
+        target: IBaseCharacter,
+        sourceCharacter?: IBaseCharacter,
         sourceCard?: PlayableCard,
         fromAttack?: boolean
     }): void => {
@@ -249,7 +249,7 @@ export class ActionManager {
 
         // Handle death if hitpoints reach 0
         if (target.hitpoints <= 0) {
-            CombatRules.handleDeath(target as BaseCharacter, sourceCharacter as BaseCharacter | null);
+            CombatRules.handleDeath(target, sourceCharacter || null);
         }
     }
 
@@ -320,6 +320,7 @@ import { CombatRules, DamageCalculationResult } from "../rules/CombatRules";
 import { DamageInfo } from "../rules/DamageInfo";
 import { DeckLogic, PileName } from "../rules/DeckLogic";
 import { PlayableCard } from "../gamecharacters/PlayableCard";
+import { IBaseCharacter } from "../gamecharacters/IBaseCharacter";
 
 export abstract class GameAction {
     abstract playAction(): Promise<GameAction[]>;

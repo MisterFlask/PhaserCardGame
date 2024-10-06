@@ -20,7 +20,7 @@ export class FiredUp extends PlayableCard {
     
     override InvokeCardEffects(targetCard?: BaseCharacter): void {
         if (this.owner) {
-            this.actionManager.modifyFire(this.magicNumber, this.owner);
+            this.actionManager.modifyFire(this.magicNumber, this.owner as BaseCharacter);
 
             console.log(`Gained ${this.magicNumber} [Fire]`);
         }
