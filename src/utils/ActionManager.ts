@@ -221,63 +221,35 @@ export class ActionManager {
 
         fromAttack = fromAttack || true;
 
+        const damageResult: DamageCalculationResult = CombatRules.calculateDamage({
+            baseDamageAmount,
+            target,
+            sourceCharacter,
+            sourceCard,
+            fromAttack
+        });
 
-        if (sourceCard){
-            baseDamageAmount = sourceCard.scaleDamage(baseDamageAmount)
+        if (fromAttack){
+            // Activate OnStruck effects for the defender's buffs
+            target.buffs.forEach(buff => {
+                const _buff = buff as AbstractBuff;
+                _buff.onOwnerStruck(sourceCharacter || null, sourceCard || null, {
+                    damageDealt: damageResult.totalDamage,
+                    damageTaken: damageResult.unblockedDamage,
+                    damageBlocked: damageResult.blockedDamage
+                });
+            });
         }
 
-        if (physicalCardOfTarget) {
-            const damageAction = new GenericAction(async () => {
-                await this.animateCardDamage(physicalCardOfTarget);
+        if (damageResult.unblockedDamage > 0) {
+            target.hitpoints = Math.max(0, target.hitpoints - damageResult.unblockedDamage);
+        }
 
-                if (target instanceof BaseCharacter) {
-                    let remainingDamage = baseDamageAmount;
-                    if (target.block > 0) {
-                        if (target.block >= remainingDamage) {
-                            target.block -= remainingDamage;
-                            remainingDamage = 0;
-                        } else {
-                            remainingDamage -= target.block;
-                            target.block = 0;
-                        }
-                    }
-                    // Create a DamageInfo object to pass to the buff effects
-                    const damageInfo = new DamageInfo();
-                    damageInfo.damageDealt = baseDamageAmount;
-                    damageInfo.damageTaken = remainingDamage;
-                    damageInfo.damageBlocked = baseDamageAmount - remainingDamage;
+        console.log(`Damage Calculation: Total Damage: ${damageResult.totalDamage}, Blocked Damage: ${damageResult.blockedDamage}, Unblocked Damage: ${damageResult.unblockedDamage}`);
 
-                    // Activate OnStriking effects for the attacker's buffs
-                    if (sourceCharacter) {
-                        sourceCharacter.buffs.forEach(buff => {
-                            const _buff = buff as AbstractBuff
-                            _buff.onOwnerStriking(target, sourceCard || null, damageInfo);
-                        });
-
-                    }
-
-                    if (fromAttack){
-                        // Activate OnStruck effects for the defender's buffs
-                        target.buffs.forEach(buff => {
-                            const _buff = buff as AbstractBuff
-                            _buff.onOwnerStruck(sourceCharacter || null, sourceCard || null, damageInfo);
-                        });
-                    }
-
-                    if (remainingDamage > 0) {
-
-                        target.hitpoints = Math.max(0, target.hitpoints - remainingDamage);
-                    }
-                }
-                // Handle death if hitpoints reach 0
-                if (target.hitpoints <= 0) {
-                    CombatRules.handleDeath(target as BaseCharacter, sourceCharacter as BaseCharacter | null);
-                }
-
-                return [];
-            });
-
-            this.actionQueue.addAction(damageAction);
+        // Handle death if hitpoints reach 0
+        if (target.hitpoints <= 0) {
+            CombatRules.handleDeath(target as BaseCharacter, sourceCharacter as BaseCharacter | null);
         }
     }
 
@@ -344,7 +316,7 @@ export class ActionManager {
     import Phaser from 'phaser';
 import { AbstractCard, PlayableCard } from '../gamecharacters/AbstractCard';
 import { AbstractBuff } from "../gamecharacters/buffs/AbstractBuff";
-import { CombatRules } from "../rules/CombatRules";
+import { CombatRules, DamageCalculationResult } from "../rules/CombatRules";
 import { DamageInfo } from "../rules/DamageInfo";
 import { DeckLogic, PileName } from "../rules/DeckLogic";
 

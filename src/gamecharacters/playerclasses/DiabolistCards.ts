@@ -1,7 +1,6 @@
 import { ActionManager } from "../../utils/ActionManager";
 import { AbstractCard, PlayableCard, TargetingType } from "../AbstractCard";
 import { BaseCharacter } from "../BaseCharacter";
-
 export class ArcaneRitualCard extends PlayableCard {
     constructor() {
         super({

@@ -54,7 +54,8 @@ const wordList = [
     "epiphanic", "quintessential", "melancholic", "ethereal", "labyrinthine",
 ];
 
-export function generateWordGuid(): string {
+export function generateWordGuid(baseId: string = ""): string {
+
     const seedNumber = Math.floor(Math.random() * 0xFFFFFFFF);
     const randomIndex1 = Math.floor(Math.random() * wordList.length);
     const randomIndex2 = Math.floor(Math.random() * wordList.length);
@@ -64,7 +65,10 @@ export function generateWordGuid(): string {
     const word2 = wordList[randomIndex2];
     const word3 = wordList[randomIndex3];
     
-    return `${word1} ${word2} ${word3} ${seedNumber}`;
+    if (baseId === ""){
+        return `${word1} ${word2} ${word3} ${seedNumber}`;
+    }
+    return `${baseId} ${word1} ${word2}`;
 }
 
 export enum Team{
@@ -96,7 +100,7 @@ export abstract class AbstractCard implements JsonRepresentable {
     public tooltip: string
     owner?: BaseCharacter
     size: CardSize
-    id: string = generateWordGuid()
+    id: string
     physicalCard?: IPhysicalCardInterface // this is a hack, it's just always PhysicalCard
     team: Team
     block: number = 0
@@ -105,6 +109,7 @@ export abstract class AbstractCard implements JsonRepresentable {
 
     constructor({ name, description, portraitName, cardType, tooltip, characterData, size, team }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: AbstractCard, size?: CardSize, team?: Team }) {
         this._name = name
+        this.id = generateWordGuid(name)
         this._description = description
         this.portraitName = portraitName || "placeholder"
         this.cardType = cardType || CardType.PLAYABLE
@@ -180,8 +185,6 @@ export abstract class PlayableCard extends AbstractCard {
         this.targetingType = targetingType || TargetingType.ENEMY;
         this.owner = owner;
     }
-
-
 
     public scaleBlock(inputBlock: number): number{
         return inputBlock;

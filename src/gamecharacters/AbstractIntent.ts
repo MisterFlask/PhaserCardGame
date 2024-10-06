@@ -12,12 +12,12 @@ export abstract class AbstractIntent implements JsonRepresentable {
     target?: BaseCharacter;
     owner: BaseCharacter;
     constructor({tooltipText, displayText, imageName, target, owner }: { tooltipText: string, displayText: string, imageName: string, target: BaseCharacter | undefined, owner: BaseCharacter }) {
-        this.id = generateWordGuid();
         this.tooltipText = tooltipText;
         this.displayText = displayText;
         this.imageName = imageName;
         this.target = target;
         this.owner = owner;
+        this.id = generateWordGuid(this.displayText);
     }
 
     abstract act(): void;
