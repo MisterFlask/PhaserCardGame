@@ -141,10 +141,6 @@ export class ActionManager {
             return;
         }
 
-        if (appliedViaPlayableCard){
-            baseBlockValue = appliedViaPlayableCard.scaleBlock(baseBlockValue)
-        }
-
         this.actionQueue.addAction(new GenericAction(async () => {
             console.log("Applying block to " + blockTargetCharacter.name);
             // Get the physical card of the target character
@@ -158,7 +154,6 @@ export class ActionManager {
             return [];
         }));
     }
-
 
     private animateCardDamage(physicalCardOfTarget: PhysicalCard): Promise<void> {
         return new Promise<void>((resolve) => {
@@ -273,9 +268,9 @@ export class ActionManager {
         }));
     }
 
-    public modifyFire(amount: number, sourceCharacterIfAny?: BaseCharacter): void {
+    public modifyFog(amount: number, sourceCharacterIfAny?: BaseCharacter): void {
         this.actionQueue.addAction(new GenericAction(async () => {
-            GameState.getInstance().combatState.combatResources.modifyFire(amount);
+            GameState.getInstance().combatState.combatResources.modifyFog(amount);
             return [];
         }));
     }
@@ -285,9 +280,9 @@ export class ActionManager {
             return [];
         }));
     }
-    public modifyMind(amount: number, sourceCharacterIfAny? : BaseCharacter): void {
+    public modifyPages(amount: number, sourceCharacterIfAny? : BaseCharacter): void {
         this.actionQueue.addAction(new GenericAction(async () => {
-            GameState.getInstance().combatState.combatResources.modifyMind(amount);
+            GameState.getInstance().combatState.combatResources.modifyPages(amount);
             return [];
         }));
     }
@@ -303,9 +298,9 @@ export class ActionManager {
             return [];
         }));
     }
-    public modifyMuscle(amount: number, sourceCharacterIfAny?: BaseCharacter): void {
+    public modifyThunder(amount: number, sourceCharacterIfAny?: BaseCharacter): void {
         this.actionQueue.addAction(new GenericAction(async () => {
-            GameState.getInstance().combatState.combatResources.modifyMuscle(amount);
+            GameState.getInstance().combatState.combatResources.modifyThunder(amount);
             return [];
         }));
     }

@@ -1,5 +1,6 @@
 // grant 5 block to the targeted character
 
+import { CombatResource, GameState } from "../../../../rules/GameState";
 import { TargetingType } from "../../../AbstractCard";
 import { BaseCharacter } from "../../../BaseCharacter";
 import { PlayableCard } from "../../../PlayableCard";
@@ -14,16 +15,17 @@ export class StormCloak extends PlayableCard {
             targetingType: TargetingType.ENEMY,
         });
         this.baseBlock = 5
-        this.magicNumber = 1
         this.energyCost = 2;
+
+        this.resourceScalings.push({
+            resource: GameState.getInstance().combatState.combatResources.ice,
+            blockScaling: 2
+        })
     }
 
-    override scaleBlock(inputBlock: number): number {
-        return inputBlock + this.magicNumber * this.ice
-    }
 
     override get description(): string {
-        return `Grant ${this.getDisplayedBlock(this.hoveredCharacter)} Block to the targeted character, plus ${this.magicNumber} * [Ice].`;
+        return `Grant ${this.getDisplayedBlock()} Block to the targeted character.`;
     }
     
     override InvokeCardEffects(targetCard?: BaseCharacter): void {

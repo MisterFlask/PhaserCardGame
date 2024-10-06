@@ -53,6 +53,20 @@ export class CombatRules {
         CombatRules.beginTurn();
     }
 
+    public static calculateBlockSentToCharacterByCard(card: PlayableCard, sourceCharacter: BaseCharacter, targetCharacter: BaseCharacter): number{
+        let totalBlock = card.getBaseBlockAfterResourceScaling();
+
+        for (const buff of sourceCharacter.buffs) {
+            totalBlock += buff.getBlockSentModifier();
+        }
+
+        for (const buff of targetCharacter.buffs) {
+            totalBlock += buff.getBlockReceivedModifier();
+        }
+
+        return totalBlock;
+    }
+
     public static handleDeath(character: IBaseCharacter, killer: IBaseCharacter | null): void {
         if (character instanceof AutomatedCharacter){
             character.intents = [];
@@ -94,7 +108,8 @@ export class CombatRules {
 
 
     /**
-     * The only time target is null is when we're calculating the damage of something hypothetically
+     * The only time target is null is when we're calculating the damage of something hypothetically.
+     * Base damage is AFTER resource-based scaling.
      */
     public static calculateDamage = ({
         baseDamageAmount,
@@ -125,7 +140,7 @@ export class CombatRules {
         totalDamage = Math.max(0, totalDamage);
 
         if (sourceCard){
-            totalDamage = sourceCard.scaleDamage(totalDamage);
+            totalDamage = totalDamage;
         }
 
         let blockedDamage = 0;

@@ -51,9 +51,9 @@ export class CardGuiUtils {
         });
         const descBox = new TextBox({
             scene: scene,
-            x: 0,
+            x: -20,
             y: cardHeight / 2,
-            width: cardWidth - 10,
+            width: cardWidth + 40,
             height: 60,
             text: data.description,
             textBoxName: "descBox:" + data.id,

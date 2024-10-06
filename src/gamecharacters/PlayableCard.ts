@@ -1,32 +1,24 @@
-import { GameState, CombatState, CombatResources } from "../rules/GameState";
+import { GameState, CombatState, CombatResources, CombatResource } from "../rules/GameState";
 import { ActionManager } from "../utils/ActionManager";
 import { AbstractCard, TargetingType, Team } from "./AbstractCard";
 import { BaseCharacter } from "./BaseCharacter";
 import { CardType, CardSize } from "./Primitives";
 import { IBaseCharacter } from "./IBaseCharacter";
+import { CombatRules } from "../rules/CombatRules";
 export abstract class PlayableCard extends AbstractCard {
     targetingType: TargetingType
+
+    resourceScalings: CardResourceScaling[] = []
     constructor({ name, description, portraitName, cardType, tooltip, characterData, size, targetingType, owner }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: AbstractCard, size?: CardSize, targetingType?: TargetingType, owner?: BaseCharacter }) {
         super({ name, description, portraitName, cardType, tooltip, characterData, size });
         this.targetingType = targetingType || TargetingType.ENEMY;
         this.owner = owner;
     }
 
-    public scaleBlock(inputBlock: number): number{
-        return inputBlock;
-    }
-    
-    public scaleDamage(inputBlock: number): number{
-        return inputBlock;
-    }
-
-    public scaleMagicNumber(inputBlock: number): number{
-        return inputBlock;
-    }
 
     public baseDamage: number = 0
     public baseBlock: number = 0
-    public magicNumber: number = 0
+    public baseMagicNumber: number = 0
 
     get hoveredCharacter(): BaseCharacter | undefined {
         return GameState.getInstance().combatState.characterHoveredOver_transient;
@@ -38,16 +30,13 @@ export abstract class PlayableCard extends AbstractCard {
         return ActionManager.getInstance();
     }
 
-    get fire(): number {
-        return this.combatResources.fire.value;
-    }
 
     get ice(): number {
         return this.combatResources.ice.value;
     }
 
-    get mind(): number {
-        return this.combatResources.mind.value;
+    get pages(): number {
+        return this.combatResources.pages.value;
     }
 
     get iron(): number {
@@ -58,12 +47,12 @@ export abstract class PlayableCard extends AbstractCard {
         return this.combatResources.gold.value;
     }
 
-    get muscle(): number {
-        return this.combatResources.muscle.value;
+    get fog(): number {
+        return this.combatResources.fog.value;
     }
 
-    get light(): number {
-        return this.combatResources.light.value;
+    get thunder(): number {
+        return this.combatResources.thunder.value;
     }
 
     protected dealDamageToTarget(targetCard?: IBaseCharacter): void {
@@ -75,10 +64,15 @@ export abstract class PlayableCard extends AbstractCard {
                 fromAttack: true,
                 sourceCard: this
             });
-            console.log(`Dealt ${this.getDisplayedDamage(targetCard)} damage to ${targetCard.name}`);
+            console.log(`Dealt ${this.getDisplayedDamage()} damage to ${targetCard.name}`);
         }
     }
 
+    private getRelevantResourceValue(resourceScaling: CardResourceScaling): number{
+        var resources = GameState.getInstance().combatState.combatResources
+        return resources.getCombatResource(resourceScaling.resource).value
+    }
+    
     protected applyBlockToTarget(targetCard?: IBaseCharacter): void {
         if (targetCard) {
             this.actionManager.applyBlock({
@@ -105,50 +99,69 @@ export abstract class PlayableCard extends AbstractCard {
     }
 
 
-    public getDisplayedBlock(targetedCharacterIfAny?: BaseCharacter){
+    public getDisplayedBlock(targetedCharacterIfAny?: BaseCharacter):string{
         if (!this.owner) {
-            return this.baseBlock;
+            return this.getBaseBlockAfterResourceScaling().toString();
         }
 
-        let totalBlock = this.scaleBlock(this.baseBlock);
+        return CombatRules.calculateBlockSentToCharacterByCard(this, this.owner as BaseCharacter, targetedCharacterIfAny as BaseCharacter).toString();
+    }
+    public getBaseDamageAfterResourceScaling(): number {
+        let scaledDamage = this.baseDamage;
 
-        for (const buff of this.owner.buffs) {
-            totalBlock += buff.getBlockSentModifier();
+        // Apply resource scalings
+        for (const scaling of this.resourceScalings) {
+            scaledDamage += (scaling.attackScaling ?? 0) + this.getRelevantResourceValue(scaling);
         }
 
-        // Apply block received modifiers from the targeted character
-        if (targetedCharacterIfAny) {
-            for (const buff of targetedCharacterIfAny.buffs) {
-                totalBlock = buff.getBlockReceivedModifier();
-            }
-        }
-
-        return totalBlock;
+        return scaledDamage;
     }
 
-    public getDisplayedDamage(targetedCharacterIfAny: IBaseCharacter | undefined){
-        if (!this.owner) {
-            return this.baseDamage;
+    public getBaseBlockAfterResourceScaling(): number {
+        let scaledBlock = this.baseBlock;
+
+        // Apply resource scalings
+        for (const scaling of this.resourceScalings) {
+            scaledBlock += (scaling.blockScaling ?? 0) + this.getRelevantResourceValue(scaling);
         }
 
-        let totalDamage = this.scaleDamage(this.baseDamage);
-
-        for (const buff of this.owner.buffs) {
-            totalDamage += buff.getCombatDamageDealtModifier();
-        }
-
-        // Apply block received modifiers from the targeted character
-        if (targetedCharacterIfAny) {
-            for (const buff of targetedCharacterIfAny.buffs) {
-                totalDamage = buff.getCombatDamageTakenModifier();
-            }
-        }
-
-        return totalDamage;
+        return scaledBlock;
     }
 
-    public getDisplayedMagicNumber(targetedCharacterIfAny: BaseCharacter | undefined){
-        return this.scaleMagicNumber(this.magicNumber)
+    public getBaseMagicNumberAfterResourceScaling(): number {
+        let scaledMagicNumber = this.baseMagicNumber;
+
+        // Apply resource scalings
+        for (const scaling of this.resourceScalings) {
+            scaledMagicNumber += (scaling.magicNumberScaling ?? 0) + this.getRelevantResourceValue(scaling);
+        }
+
+        return scaledMagicNumber;
+    }
+
+    public getDisplayedDamage(selectedCharacter?: BaseCharacter): string{
+        if (!this.owner) {
+            return this.baseDamage.toString();
+        }
+
+        var targetedCharacterIfAny = selectedCharacter ?? this.hoveredCharacter;
+
+        const damageCalcResult = CombatRules.calculateDamage({
+            baseDamageAmount: this.baseDamage,
+            target: targetedCharacterIfAny,
+            sourceCharacter: this.owner,
+            sourceCard: this,
+            fromAttack: true
+        });
+
+        let totalDamage = damageCalcResult.totalDamage;
+
+
+        return totalDamage.toString();
+    }
+
+    public getDisplayedMagicNumber(targetedCharacterIfAny?: BaseCharacter): string{
+        return this.getBaseMagicNumberAfterResourceScaling().toString();
     }
 
     abstract InvokeCardEffects(targetCard?: AbstractCard): void;
@@ -197,4 +210,11 @@ export abstract class PlayableCard extends AbstractCard {
         
         return true;
     }
+}
+
+export interface CardResourceScaling{
+    resource: CombatResource
+    attackScaling?: number
+    blockScaling?: number
+    magicNumberScaling?: number
 }

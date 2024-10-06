@@ -16,12 +16,12 @@ export class FireAxe extends PlayableCard {
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage(this.hoveredCharacter)} damage. Double damage if the target is Smoldering.`;
+        return `Deal ${this.getDisplayedDamage()} damage. Double damage if the target is Smoldering.`;
     }
     
     override InvokeCardEffects(targetCard?: BaseCharacter): void {
         if (targetCard && targetCard instanceof BaseCharacter) {
-            let damageAmount = this.baseDamage;
+            let damageAmount = this.getBaseDamageAfterResourceScaling();
             if (targetCard.buffs.some(buff => buff instanceof Smoldering)) {
                 damageAmount *= 2;
             }

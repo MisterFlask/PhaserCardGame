@@ -29,7 +29,7 @@ export class TextBox {
             width = 150,
             height = 60,
             text = '',
-            style = { fontSize: '18px', color: '#ffffff', fontFamily: 'Arial' },
+            style = { fontSize: '18px', color: '#ffffff', fontFamily: 'Verdana' },
             backgroundImage,
             textBoxName,
             fillColor = 0x2e2e2e
@@ -50,8 +50,8 @@ export class TextBox {
             ...style,
             color: '#ffffff', // Explicitly set color to white
             stroke: '#000000', // Change stroke to black for better contrast
-           
             strokeThickness: 2,
+            resolution: 1, // Add this line to improve text sharpness
             // Shadows are set separately
         });
         this.text.setOrigin(0.5);
@@ -59,13 +59,28 @@ export class TextBox {
         this.text.setAlign('center');
         this.text.setShadow(2, 2, '#000000', 2, false, true); // offsetX, offsetY, color, blur, shadowStroke, shadowFill
 
-        // Adjust text size if it overflows
-        const originalFontSize = parseInt(style.fontSize as string);
-        let currentFontSize = originalFontSize;
-        while ((this.text.height > height - 10 || this.text.width > width - 10) && currentFontSize > 10) { // Minimum font size of 10
-            currentFontSize--;
-            this.text.setFontSize(currentFontSize);
-            this.text.setWordWrapWidth(width - 20);
+        // Expand the text box if text overflows
+        const padding = 10;
+        let newWidth = Math.max(width, this.text.width + padding * 2);
+        let newHeight = Math.max(height, this.text.height + padding * 2);
+
+        // Expand downward and to each side
+        if (newWidth > width || newHeight > height) {
+            const widthIncrease = newWidth - width;
+            const heightIncrease = newHeight - height;
+            
+            this.background.setSize(newWidth, newHeight);
+            this.background.setPosition(
+                this.background.x - widthIncrease / 2,
+                this.background.y + (this.expandDirection === 'down' ? heightIncrease / 2 : 0)
+            );
+            
+            this.text.setPosition(
+                this.text.x - widthIncrease / 2,
+                this.text.y + (this.expandDirection === 'down' ? heightIncrease / 2 : 0)
+            );
+            
+            this.text.setWordWrapWidth(newWidth - padding * 2);
         }
     }
 

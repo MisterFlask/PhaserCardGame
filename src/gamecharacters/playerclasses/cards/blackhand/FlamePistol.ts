@@ -1,3 +1,4 @@
+import { GameState } from "../../../../rules/GameState";
 import { TargetingType } from "../../../AbstractCard";
 import { BaseCharacter } from "../../../BaseCharacter";
 import { Smoldering } from "../../../buffs/blackhand/Smoldering";
@@ -12,18 +13,23 @@ export class FlamePistol extends PlayableCard {
             targetingType: TargetingType.ENEMY,
         });
         this.baseDamage = 3;
-        this.magicNumber = 1;
+        this.baseMagicNumber = 1;
         this.energyCost = 2;
+
+        this.resourceScalings.push({
+            resource: GameState.getInstance().combatState.combatResources.thunder,
+            attackScaling: 1
+        })
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage(this.hoveredCharacter)} damage and apply ${this.magicNumber} Smoldering to the target.`;
+        return `Deal ${this.getDisplayedDamage()} damage and apply ${this.getDisplayedMagicNumber()} Smoldering to the target.`;
     }
     
     override InvokeCardEffects(targetCard?: BaseCharacter): void {
         if (targetCard && targetCard instanceof BaseCharacter) {
             this.dealDamageToTarget(targetCard);
-            this.actionManager.applyBuffToCharacter(targetCard, new Smoldering(this.magicNumber));
+            this.actionManager.applyBuffToCharacter(targetCard, new Smoldering(this.getBaseMagicNumberAfterResourceScaling()));
         }
     }
 }

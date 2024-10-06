@@ -10,16 +10,17 @@ export class Smoldering extends AbstractBuff {
         this.stacks = stacks;
         this.isDebuff = true;
     }
+
     getName(): string {
         return "Smoldering";
     }
 
     getDescription(): string {
-        return `Deals 5 damage at end of each turn, plus 1 per 2 [F]. Lasts for ${this.stacks} more turn${this.stacks !== 1 ? 's' : ''}.`;
+        return `Deals 5 damage at end of each turn, plus 1 per [Thunder]. Lasts for ${this.stacks} more turn${this.stacks !== 1 ? 's' : ''}.`;
     }
 
     override onTurnEnd(): void {
-        ActionManager.getInstance().dealDamage({ target: this.getOwner()!, baseDamageAmount: 5 + Math.floor(GameState.getInstance().combatState.combatResources.fire.value / 2)});
+        ActionManager.getInstance().dealDamage({ target: this.getOwner()!, baseDamageAmount: 5 + GameState.getInstance().combatState.combatResources.thunder.value, fromAttack: false});
         this.stacks--;
     }
 }

@@ -278,15 +278,7 @@ class CombatUIManager {
     }
     private createResourceIndicators(): void {
         const resources = GameState.getInstance().combatState.combatResources;
-        const resourceArray = [
-            resources.light,
-            resources.fire,
-            resources.iron,
-            resources.mind,
-            resources.ice,
-            resources.gold,
-            resources.muscle
-        ];
+        const resourceArray = resources.resources();
 
         const gameWidth = this.scene.scale.width;
         const gameHeight = this.scene.scale.height;
@@ -313,13 +305,12 @@ class CombatUIManager {
     private updateResourceIndicators(): void {
         const resources = GameState.getInstance().combatState.combatResources;
         const resourceArray = [
-            resources.light,
-            resources.fire,
+            resources.thunder,
             resources.iron,
-            resources.mind,
+            resources.pages,
             resources.ice,
             resources.gold,
-            resources.muscle
+            resources.fog
         ];
         this.resourceIndicators.forEach((container, index) => {
             const resource = resourceArray[index];

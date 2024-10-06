@@ -398,7 +398,8 @@ export class PhysicalCard {
             fontSize: '16px',
             color: '#ffffff',
             fontFamily: 'Courier',
-            wordWrap: { width: modalWidth - 40 }
+            wordWrap: { width: modalWidth - 40 },
+            resolution: 2, // Add this line
         });
         text.setPosition(-modalWidth / 2 + 20, -modalHeight / 2 + 20);
         text.setOrigin(0, 0);
@@ -410,7 +411,8 @@ export class PhysicalCard {
             backgroundColor: '#333333',
             padding: { x: 10, y: 5 },
             fixedWidth: 80,
-            fixedHeight: 30
+            fixedHeight: 30,
+            resolution: 2, // Add this line
         }).setOrigin(0.5);
         closeButton.setInteractive({ useHandCursor: true });
 

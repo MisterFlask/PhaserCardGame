@@ -198,22 +198,14 @@ export class MissionDetails{
 }
 
 export class CombatResources{
-    modifyLight(byAmount: number){
-        this.light.value += byAmount;
-        console.log(`Modified Light by ${byAmount}. New value: ${this.light.value}`);
-    }
 
-    modifyFire(byAmount: number){
-        this.fire.value += byAmount;
-        console.log(`Modified Fire by ${byAmount}. New value: ${this.fire.value}`);
-    }
     modifyIce(byAmount: number){
         this.ice.value += byAmount;
         console.log(`Modified Ice by ${byAmount}. New value: ${this.ice.value}`);
     }
-    modifyMind(byAmount: number){
-        this.mind.value += byAmount;
-        console.log(`Modified Mind by ${byAmount}. New value: ${this.mind.value}`);
+    modifyPages(byAmount: number){
+        this.pages.value += byAmount;
+        console.log(`Modified Mind by ${byAmount}. New value: ${this.pages.value}`);
     }
     modifyIron(byAmount: number){
         this.iron.value += byAmount;
@@ -223,44 +215,51 @@ export class CombatResources{
         this.gold.value += byAmount;
         console.log(`Modified Gold by ${byAmount}. New value: ${this.gold.value}`);
     }
-    modifyMuscle(byAmount: number){
-        this.muscle.value += byAmount;
-        console.log(`Modified Muscle by ${byAmount}. New value: ${this.muscle.value}`);
+    modifyFog(byAmount: number){
+        this.fog.value += byAmount;
+        console.log(`Modified Fog by ${byAmount}. New value: ${this.fog.value}`);
+    }
+    modifyThunder(byAmount: number){
+        this.thunder.value += byAmount;
+        console.log(`Modified Thunder by ${byAmount}. New value: ${this.thunder.value}`);
     }
 
-    light: CombatResource = new CombatResource(
-        "Light",
-        "10% chance to block additional stress when it would be applied (caps at 75%). Decreases by 1 each turn."
-    );
+    getCombatResource(resource: CombatResource): CombatResource{
+        return this.resources().find(r => r.name === resource.name)!
+    }
 
-    fire: CombatResource = new CombatResource(
-        "Fire",
-        "5% chance to empower a random attack card in hand at beginning of turn, doubling its damage for that turn until played.  Decreases by 1 each turn."
+    resources(): CombatResource[]{
+        return [this.thunder, this.ice, this.pages, this.iron, this.gold, this.fog]
+    }
+
+    thunder: CombatResource = new CombatResource(
+        "Thunder",
+        "At the start of turn, if you have 2 Thunder, decrease it by 2 and a random ally gains 2 Strength."
     );
 
     iron: CombatResource = new CombatResource(
         "Iron",
-        "5% chance to empower a random defense card in hand at beginning of turn, doubling its defense for that turn until played. Decreases by 1 each turn."
+        "At beginning of turn, gain 1 Temp Strength for each Iron value.  Decreases by 1 at end of turn."
     );
 
-    mind: CombatResource = new CombatResource(
-        "Mind",
-        "For each Mind-granting card in your deck, 10% chance to get additional card reward option.  Decreases by 1 each turn."
+    pages: CombatResource = new CombatResource(
+        "Pages",
+        "If you obtain 4 Pages in a combat, gain an additional card reward option.  If you gain 10, get 2 instead."
     );
 
     ice: CombatResource = new CombatResource(
         "Ice",
-        "For each Ice-granting card in your deck at the end of the run, gain additional shareholder satisfaction.  Decreases by 1 each turn."
+        "Grant 1 Stress Block at beginning of turn for each 1 Ice value."
+    );
+
+    fog: CombatResource = new CombatResource(
+        "Fog",
+        "If you have >4 Fog at beginning of turn, gain Sneak Attack to your hand and decrease Fog by 4. [Replays next card played by a character.]"
     );
 
     gold: CombatResource = new CombatResource(
         "Gold",
-        "For each Gold-granting card in your deck at the end of the run, you get 10 additional wealth. Decreases by 1 each turn."
-    );
-
-    muscle: CombatResource = new CombatResource(
-        "Muscle",
-        "For each 3 you get, the whole party gains 1 Strength. Decreases by 1 each turn."
+        "At end of combat, gain a Loot reward option for each 2 Gold value. [this is distinct from ordinary card rewards]"
     );
 }
 
