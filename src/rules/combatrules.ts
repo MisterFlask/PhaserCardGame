@@ -56,12 +56,16 @@ export class CombatRules {
     public static calculateBlockSentToCharacterByCard(card: PlayableCard, sourceCharacter: BaseCharacter, targetCharacter: BaseCharacter): number{
         let totalBlock = card.getBaseBlockAfterResourceScaling();
 
-        for (const buff of sourceCharacter.buffs) {
-            totalBlock += buff.getBlockSentModifier();
+        if (sourceCharacter) {
+            for (const buff of sourceCharacter.buffs) {
+                totalBlock += buff.getBlockSentModifier();
+            }
         }
 
-        for (const buff of targetCharacter.buffs) {
-            totalBlock += buff.getBlockReceivedModifier();
+        if (targetCharacter) {
+            for (const buff of targetCharacter.buffs) {
+                totalBlock += buff.getBlockReceivedModifier();
+            }
         }
 
         return totalBlock;

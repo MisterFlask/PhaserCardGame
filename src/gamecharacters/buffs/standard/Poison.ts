@@ -7,7 +7,7 @@ export class Poison extends AbstractBuff {
     }
 
     override getDescription(): string {
-        return `At the end of turn, lose ${this.stacks} HP, then halve the poison stacks.`;
+        return `At the end of turn, lose ${this.getStacksDisplayText()} HP, then halve the poison stacks.`;
     }
 
     constructor(stacks: number = 1) {

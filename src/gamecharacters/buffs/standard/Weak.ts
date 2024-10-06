@@ -6,7 +6,7 @@ export class Weak extends AbstractBuff {
     }
 
     override getDescription(): string {
-        return `Reduces damage dealt by 33% for ${this.stacks} turn${this.stacks > 1 ? 's' : ''}.`;
+        return `Reduces damage dealt by 33% for ${this.getStacksDisplayText()} turn[s].`;
     }
 
     constructor(stacks: number = 1) {

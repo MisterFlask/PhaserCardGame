@@ -4,7 +4,7 @@ export class Strong extends AbstractBuff {
         return "Strong"
     }
     override getDescription(): string {
-        return "Increases damage by [stacks]"
+        return `Increases damage by ${this.getStacksDisplayText()}`
     }
     constructor(stacks: number = 1) {
         super()

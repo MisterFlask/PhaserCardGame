@@ -9,7 +9,7 @@ export class Stress extends AbstractBuff {
     }
 
     override getDescription(): string {
-        return `Current stress level: ${this.stacks}. When stress is above 10, character receives double damage.`;
+        return `Current stress level: ${this.getStacksDisplayText()}. When stress is above 10, character receives double damage.`;
     }
 
     constructor(stacks: number = 0) {

@@ -11,7 +11,7 @@ export class Stressful extends AbstractBuff {
     }
 
     override getDescription(): string {
-        return `Applies ${this.stacks} additional Stress whenever it successfully damages someone.`;
+        return `Applies ${this.getStacksDisplayText()} additional Stress whenever it successfully damages someone.`;
     }
 
     constructor(stacks: number = 1) {
