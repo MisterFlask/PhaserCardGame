@@ -1,8 +1,9 @@
 import { AbstractCombatEvent } from "../../rules/AbstractCombatEvent";
 import { DamageInfo } from "../../rules/DamageInfo";
 import { GameState } from "../../rules/GameState";
-import { generateWordGuid, PlayableCard } from "../AbstractCard";
+import { generateWordGuid } from "../AbstractCard";
 import { BaseCharacter } from "../BaseCharacter";
+import { PlayableCard } from "../PlayableCard";
 
 export abstract class AbstractBuff {
 

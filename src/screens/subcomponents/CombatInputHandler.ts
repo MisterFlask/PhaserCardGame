@@ -1,7 +1,7 @@
 // src/managers/CombatInputHandler.ts
 
 import Phaser from 'phaser';
-import { AbstractCard, PlayableCard, TargetingType } from '../../gamecharacters/AbstractCard';
+import { AbstractCard, TargetingType } from '../../gamecharacters/AbstractCard';
 import { BaseCharacter } from '../../gamecharacters/BaseCharacter';
 import { GameState } from '../../rules/GameState';
 import CombatSceneLayoutUtils from '../../ui/LayoutUtils';
@@ -10,6 +10,7 @@ import { PhysicalIntent } from '../../ui/PhysicalIntent';
 import { ActionManager } from '../../utils/ActionManager';
 import { IntentEmitter } from '../../utils/intentemitter';
 import CombatCardManager from './CombatCardManager';
+import { PlayableCard } from '../../gamecharacters/PlayableCard';
 
 class CombatInputHandler {
     private scene: Phaser.Scene;

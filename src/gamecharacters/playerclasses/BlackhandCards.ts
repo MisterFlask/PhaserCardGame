@@ -1,6 +1,7 @@
 import { ActionManager } from "../../utils/ActionManager";
-import { AbstractCard, PlayableCard } from "../AbstractCard";
+import { AbstractCard } from "../AbstractCard";
 import { BaseCharacter } from "../BaseCharacter";
+import { PlayableCard } from "../PlayableCard";
 
 export class FireballCard extends PlayableCard {
     constructor() {

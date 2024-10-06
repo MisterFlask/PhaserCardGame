@@ -1,6 +1,6 @@
 // src/gamecharacters/PhysicalCard.ts
 import Phaser from 'phaser';
-import { AbstractCard, PlayableCard } from "../gamecharacters/AbstractCard";
+import { AbstractCard } from "../gamecharacters/AbstractCard";
 import { AbstractIntent } from '../gamecharacters/AbstractIntent';
 import { AutomatedCharacter } from '../gamecharacters/AutomatedCharacter';
 import { BaseCharacter } from "../gamecharacters/BaseCharacter";
@@ -8,6 +8,7 @@ import { IncomingIntent } from "./IncomingIntent"; // Import the new class
 import { PhysicalBuff } from './PhysicalBuff';
 import { PhysicalIntent } from "./PhysicalIntent";
 import { TextBox } from "./TextBox"; // Ensure correct relative path
+import { PlayableCard } from '../gamecharacters/PlayableCard';
 
 export class PhysicalCard {
     container: Phaser.GameObjects.Container;

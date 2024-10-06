@@ -1,7 +1,8 @@
 // grant 5 block to the targeted character
 
-import { PlayableCard, TargetingType } from "../../../AbstractCard";
+import { TargetingType } from "../../../AbstractCard";
 import { BaseCharacter } from "../../../BaseCharacter";
+import { PlayableCard } from "../../../PlayableCard";
 
 
 export class StormCloak extends PlayableCard {

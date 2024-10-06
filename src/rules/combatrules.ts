@@ -1,6 +1,6 @@
-import { PlayableCard } from "../gamecharacters/AbstractCard";
 import { AutomatedCharacter } from "../gamecharacters/AutomatedCharacter";
 import { BaseCharacter } from "../gamecharacters/BaseCharacter";
+import { PlayableCard } from "../gamecharacters/PlayableCard";
 import { ActionManager } from "../utils/ActionManager";
 import { GameState } from "./GameState";
 

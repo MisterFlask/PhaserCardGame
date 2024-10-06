@@ -1,6 +1,7 @@
-import { PlayableCard, TargetingType } from "../../../AbstractCard";
+import { TargetingType } from "../../../AbstractCard";
 import { BaseCharacter } from "../../../BaseCharacter";
 import { Smoldering } from "../../../buffs/blackhand/Smoldering";
+import { PlayableCard } from "../../../PlayableCard";
 
 export class FireAxe extends PlayableCard {
     constructor() {

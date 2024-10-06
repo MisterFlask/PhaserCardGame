@@ -1,5 +1,5 @@
 import { DamageInfo } from "../../../rules/DamageInfo";
-import { PlayableCard } from "../../AbstractCard";
+import { PlayableCard } from "../../PlayableCard";
 import { BaseCharacter } from "../../BaseCharacter";
 import { AbstractBuff } from "../AbstractBuff";
 

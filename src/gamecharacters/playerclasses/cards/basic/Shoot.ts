@@ -1,5 +1,6 @@
-import { PlayableCard, TargetingType } from "../../../AbstractCard";
+import { TargetingType } from "../../../AbstractCard";
 import { BaseCharacter } from "../../../BaseCharacter";
+import { PlayableCard } from "../../../PlayableCard";
 
 export class Shoot extends PlayableCard {
     constructor() {

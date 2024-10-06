@@ -1,6 +1,6 @@
 import { DamageInfo } from "../../../rules/DamageInfo";
 import { ActionManager } from "../../../utils/ActionManager";
-import { PlayableCard } from "../../AbstractCard";
+import { PlayableCard } from "../../PlayableCard";
 import { BaseCharacter } from "../../BaseCharacter";
 import { AbstractBuff } from "../AbstractBuff";
 import { Strong } from "../Strong";

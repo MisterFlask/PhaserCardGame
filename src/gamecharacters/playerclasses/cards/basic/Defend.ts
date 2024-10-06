@@ -1,8 +1,9 @@
 // grant 5 block to the targeted character
 
 import { ActionManager } from "../../../../utils/ActionManager";
-import { AbstractCard, PlayableCard, TargetingType } from "../../../AbstractCard";
+import { AbstractCard, TargetingType } from "../../../AbstractCard";
 import { BaseCharacter } from "../../../BaseCharacter";
+import { PlayableCard } from "../../../PlayableCard";
 
 export class Defend extends PlayableCard {
     constructor() {

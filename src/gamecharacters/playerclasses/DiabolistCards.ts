@@ -1,6 +1,7 @@
 import { ActionManager } from "../../utils/ActionManager";
-import { AbstractCard, PlayableCard, TargetingType } from "../AbstractCard";
+import { TargetingType, AbstractCard } from "../AbstractCard";
 import { BaseCharacter } from "../BaseCharacter";
+import { PlayableCard } from "../PlayableCard";
 export class ArcaneRitualCard extends PlayableCard {
     constructor() {
         super({
@@ -21,9 +22,6 @@ export class ArcaneRitualCard extends PlayableCard {
         console.log("Drew 1 card");
     }
 }
-
-
-
 
 export class SummonDemonCard extends PlayableCard {
     constructor() {

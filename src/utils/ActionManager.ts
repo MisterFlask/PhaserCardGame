@@ -314,11 +314,12 @@ export class ActionManager {
 
 
     import Phaser from 'phaser';
-import { AbstractCard, PlayableCard } from '../gamecharacters/AbstractCard';
+import { AbstractCard } from '../gamecharacters/AbstractCard';
 import { AbstractBuff } from "../gamecharacters/buffs/AbstractBuff";
 import { CombatRules, DamageCalculationResult } from "../rules/CombatRules";
 import { DamageInfo } from "../rules/DamageInfo";
 import { DeckLogic, PileName } from "../rules/DeckLogic";
+import { PlayableCard } from "../gamecharacters/PlayableCard";
 
 export abstract class GameAction {
     abstract playAction(): Promise<GameAction[]>;
