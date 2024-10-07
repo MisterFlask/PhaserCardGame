@@ -9,6 +9,7 @@ import { GameState } from '../rules/GameState';
 import { PhysicalCard } from '../ui/PhysicalCard';
 import { TextBox } from '../ui/TextBox';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
+import { SceneChanger } from './SceneChanger';
 
 export default class MapScene extends Phaser.Scene {
     private locationCards: PhysicalCard[] = [];
@@ -34,6 +35,11 @@ export default class MapScene extends Phaser.Scene {
         this.adjacencyManager = new AdjacencyManager(0.3, 1); // Adjust sparseness and minConnections here
     }
 
+
+    init() {
+        SceneChanger.setCurrentScene(this);
+    }
+    
     preload() {
         this.load.image('mapbackground1', 'https://raw.githubusercontent.com/MisterFlask/PhaserCardGame/master/resources/Sprites/Backgrounds/mapbackground1.png');
         this.load.image('cursed-star', 'path_to_cursed_star_image.png'); // Ensure you have this asset

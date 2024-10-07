@@ -9,6 +9,7 @@ import InventoryPanel from '../ui/InventoryPanel';
 import { PhysicalCard, } from '../ui/PhysicalCard';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 import GameImageLoader from '../utils/ImageUtils';
+import { SceneChanger } from './SceneChanger';
 
 export class StoreCard extends AbstractCard {
     price: number;
@@ -54,6 +55,10 @@ export default class CampaignScene extends Phaser.Scene {
 
     constructor() {
         super('Campaign');
+    }
+
+    init = () => {
+        SceneChanger.setCurrentScene(this);
     }
 
     create = () => {

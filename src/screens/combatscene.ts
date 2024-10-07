@@ -14,6 +14,7 @@ import CombatInputHandler from './subcomponents/CombatInputHandler';
 import CombatStateService from './subcomponents/CombatStateService';
 import PerformanceMonitor from './subcomponents/PerformanceMonitor';
 import CombatUIManager from './subcomponents/CombatUiManager';
+import { SceneChanger } from './SceneChanger';
 
 /**
  * Interface for initializing CombatScene with necessmorniary data.
@@ -40,6 +41,7 @@ class CombatScene extends Phaser.Scene {
     }
 
     init(data: CombatSceneData): void {
+        SceneChanger.setCurrentScene(this);
         ActionManager.init(this);
         const stateService = CombatStateService.getInstance();
         stateService.initializeCombat(data.encounter, GameState.getInstance().currentRunCharacters);

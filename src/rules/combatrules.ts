@@ -1,7 +1,9 @@
+import { AbstractCard } from "../gamecharacters/AbstractCard";
 import { AutomatedCharacter } from "../gamecharacters/AutomatedCharacter";
 import { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { IBaseCharacter } from "../gamecharacters/IBaseCharacter";
 import { PlayableCard } from "../gamecharacters/PlayableCard";
+import { SceneChanger } from "../screens/SceneChanger";
 import { ActionManager } from "../utils/ActionManager";
 import { GameState } from "./GameState";
 
@@ -88,6 +90,34 @@ export class CombatRules {
             character.intents = [];
         }
         character.buffs = [];
+
+        // Remove all cards belonging to the dead character from hand, discard, and draw piles
+        const gameState = GameState.getInstance();
+        const combatState = gameState.combatState;
+
+        const removeDeadCharacterCards = (pile: AbstractCard[]) => {
+            return pile.filter(card => card.owner !== character);
+        };
+
+        combatState.currentHand = removeDeadCharacterCards(combatState.currentHand );
+        combatState.currentDiscardPile = removeDeadCharacterCards(combatState.currentDiscardPile );
+        combatState.currentDrawPile = removeDeadCharacterCards(combatState.currentDrawPile );
+    }
+
+    public static handleStateBasedEffects(){
+        const gameState = GameState.getInstance();
+        const combatState = gameState.combatState;
+
+        // Check if all enemies are defeated
+        const allEnemiesDefeated = combatState.enemies.every(enemy => enemy.hitpoints <= 0);
+
+        if (allEnemiesDefeated) {
+            // End combat and return to map screen
+            ActionManager.getInstance().genericAction("End Combat", async () => {
+               
+                SceneChanger.switchToMapScene();
+            });
+        }
     }
 
     public static beginTurn(): void {
