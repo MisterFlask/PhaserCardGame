@@ -6,6 +6,15 @@ import { GameState } from '../../rules/GameState';
 import { default as CombatSceneLayoutUtils, default as LayoutUtils } from '../../ui/LayoutUtils';
 import Menu from '../../ui/Menu';
 import { TextBox } from '../../ui/TextBox';
+import CardRewardScreen, { CardReward, CardRewardScreenData } from './CardRewardScreen';
+import { AbstractCard } from '../../gamecharacters/AbstractCard';
+import { SceneChanger } from '../SceneChanger';
+import { Defend } from '../../gamecharacters/playerclasses/cards/basic/Defend';
+import { Shoot } from '../../gamecharacters/playerclasses/cards/basic/Shoot';
+import { StoreCard } from '../Campaign';
+import { BaseCharacter } from '../../gamecharacters/BaseCharacter';
+import { PlayableCard } from '../../gamecharacters/PlayableCard';
+import { PlayerCharacter } from '../../gamecharacters/CharacterClasses';
 
 interface MenuOption {
     text: string;
@@ -23,10 +32,17 @@ class CombatUIManager {
     public energyDisplay!: TextBox;
     public resourceIndicators: Phaser.GameObjects.Container[] = [];
     private subtitleTextBox?: TextBox;
+    private cardRewardScreen!: CardRewardScreen;
+    private combatEnded: boolean = false;
 
     private constructor(scene: Phaser.Scene) {
         this.scene = scene;
         this.createUI();
+        this.createCardRewardScreen(); // Initialize CardRewardScreen
+
+        // Add listener for scene shutdown to clean up event listeners and resources
+        this.scene.events.once('shutdown', this.obliterate, this);
+        this.scene.events.once('destroy', this.obliterate, this);
     }
 
     public static getInstance(): CombatUIManager {
@@ -37,9 +53,8 @@ class CombatUIManager {
     }
 
     public static initialize(scene: Phaser.Scene): void {
-        if (!CombatUIManager.instance) {
-            CombatUIManager.instance = new CombatUIManager(scene);
-        }
+        CombatUIManager.instance?.obliterate()
+        CombatUIManager.instance = new CombatUIManager(scene);
     }
 
     private createUI(): void {
@@ -118,6 +133,18 @@ class CombatUIManager {
             {
                 text: 'Toggle Game Areas',
                 callback: () => this.toggleGameAreas()
+            },
+            {
+                text: 'debug:killAllEnemies',
+                callback: () => {
+                    const gameState = GameState.getInstance();
+                    gameState.combatState.enemies.forEach(enemy => {
+                        enemy.hitpoints = 0;
+                    });
+                    console.log("All enemies defeated for debugging purposes.");
+                    // Manually trigger combat end
+                    this.onCombatEnd();
+                }
             }
         ];
 
@@ -289,12 +316,20 @@ class CombatUIManager {
         this.handArea.setPosition(gameWidth / 2, handY).setSize(gameWidth - 100, 300);
     }
 
-    private removeEventListeners(): void {
-        // ... existing removals ...
-
+    private obliterate(): void {
         // Remove global pointer events
         this.scene.input.off('pointermove', this.handlePointerMove, this);
+
+        // Cleanup resource indicators to prevent memory leaks and undefined references
+        this.resourceIndicators.forEach(container => container.destroy());
+        this.resourceIndicators = [];
+
+        // Additional cleanup if necessary
+        // e.g., remove update event listeners
+        this.scene.events.off('update', this.updateResourceIndicators, this);
+        
     }
+
     private createResourceIndicators(): void {
         const resources = GameState.getInstance().combatState.combatResources;
         const resourceArray = resources.resources();
@@ -362,6 +397,76 @@ class CombatUIManager {
             this.subtitleTextBox.setVisible(false);
         }
     }
+
+    private createCardRewardScreen(): void {
+        this.cardRewardScreen = new CardRewardScreen({
+            scene: this.scene,
+            rewards: [], // Initially empty
+            onSelect: this.handleCardSelect.bind(this),
+            onSkip: this.handleSkip.bind(this)
+        });
+        this.cardRewardScreen.container.setDepth(1001); // Ensure it's on top of other UI
+        this.cardRewardScreen.hide();
+    }
+
+    /**
+     * Call this method when combat ends to show the card reward screen.
+     */
+    public onCombatEnd(): void {
+        if (this.combatEnded) return;
+        this.combatEnded = true;
+
+        const rewardCards = this.determineCardRewards();
+        this.cardRewardScreen.rewards = rewardCards; // Update rewards
+        this.cardRewardScreen.displayRewardCards();
+        this.cardRewardScreen.show();
+    }
+
+    /**
+     * Stubbed method to determine which card rewards to provide.
+     */
+    private determineCardRewards(): CardReward[] {
+        // TODO: Implement logic to decide which cards to reward
+        // For now, returning three dummy cards
+
+        const characters = GameState.getInstance().getCurrentRunCharacters()
+        const rewards= []
+        for (const character of characters){
+            rewards.push(new CardReward(new Defend(), character))
+        }
+        return rewards
+    }
+
+    /**
+     * Handle when a card is selected from the reward screen.
+     * @param selectedCard The card selected by the player.
+     */
+    private handleCardSelect(selectedCard: CardReward): void {
+        console.log("Card selected:", selectedCard.card.name);
+        // Add the selected card to the player's deck
+        // GameState.getInstance().playerDeck.addCard(selectedCard);
+        this.goToMap();
+    }
+
+    /**
+     * Handle when the player decides to skip taking a card reward.
+     */
+    private handleSkip(): void {
+        console.log("Skip selected.");
+        this.goToMap();
+    }
+
+    /**
+     * Transition to the Map scene.
+     */
+    private goToMap(): void {
+        SceneChanger.switchToMapScene();
+    }
+
+    // ... existing methods ...
+
+    // Optionally, listen to combat state changes to trigger onCombatEnd
+    // This might involve emitting events from CombatScene when enemies are defeated
 }
 
 export default CombatUIManager;

@@ -1,0 +1,165 @@
+import Phaser from 'phaser';
+import { AbstractCard } from '../../gamecharacters/AbstractCard';
+import { TextBox } from '../../ui/TextBox';
+import { ActionManager } from '../../utils/ActionManager';
+import { SceneChanger } from '../SceneChanger';
+import { CardGuiUtils } from '../../utils/CardGuiUtils';
+import { PhysicalCard } from '../../ui/PhysicalCard';
+import { PlayerCharacter } from '../../gamecharacters/CharacterClasses';
+import { PlayableCard } from '../../gamecharacters/PlayableCard';
+
+/**
+ * Interface for initializing CardRewardScreen with necessary data.
+ */
+export interface CardRewardScreenData {
+    rewards: CardReward[];
+    scene: Phaser.Scene;
+    onSelect: (selectedCard: CardReward) => void;
+    onSkip: () => void;
+}
+
+class CardRewardScreen {
+    private scene: Phaser.Scene;
+    public container: Phaser.GameObjects.Container;
+    public rewards: CardReward[];
+    private onSelect: (selectedCard: CardReward) => void;
+    private onSkip: () => void;
+    private selectButton!: TextBox;
+    private isCardSelected: boolean = false;
+
+    constructor(params: CardRewardScreenData) {
+        this.scene = params.scene;
+        this.rewards = params.rewards;
+        this.onSelect = params.onSelect;
+        this.onSkip = params.onSkip;
+
+        this.container = this.scene.add.container(this.scene.scale.width / 2, this.scene.scale.height / 2);
+        this.createBackground();
+        this.displayRewardCards();
+        this.createActionButton();
+        this.hide(); // Initially hidden
+    }
+
+    private createBackground(): void {
+        const background = this.scene.add.rectangle(0, 0, 800, 600, 0x000000, 0.8)
+            .setOrigin(0.5)
+            .setStrokeStyle(4, 0xffffff);
+        this.container.add(background);
+    }
+
+    public displayRewardCards(): void {
+        const cardSpacing = 220;
+        const startX = -cardSpacing;
+        const yPosition = -100;
+
+        const cardGuiUtils = CardGuiUtils.getInstance(); // Get instance of CardGuiUtils
+
+        this.rewards.forEach((cardReward, index) => {
+            const physicalCard = cardGuiUtils.createCard({
+                scene: this.scene,
+                x: startX + index * cardSpacing,
+                y: yPosition,
+                data: cardReward.card,
+                eventCallback: (cardInstance: PhysicalCard) => {
+                    cardInstance.container.setInteractive({ useHandCursor: true });
+                    cardInstance.container.on('pointerdown', () => {
+                        console.log("Card clicked:", cardReward.card.name);
+                        this.isCardSelected = true;
+                        this.onSelect(cardReward);
+                        this.hide();
+                    });
+                }
+            });
+
+            // Add the physical card to the container
+            this.container.add(physicalCard.container);
+
+            // Add owner's name text under the card
+            const ownerNameText = this.scene.add.text(
+                physicalCard.container.x,
+                physicalCard.container.y + physicalCard.container.height / 2 + 20,
+                cardReward.owner.name,
+                {
+                    fontSize: '16px',
+                    color: '#ffffff',
+                    fontFamily: 'Arial',
+                    align: 'center'
+                }
+            ).setOrigin(0.5, 0);
+
+            this.container.add(ownerNameText);
+        });
+    }
+
+    private createActionButton(): void {
+        const buttonText = "Go to Map";
+        this.selectButton = new TextBox({
+            scene: this.scene,
+            x: 0,
+            y: 250,
+            width: 300,
+            height: 50,
+            text: buttonText,
+            style: { fontSize: '24px', color: '#ffffff', fontFamily: 'Arial', align: 'center' },
+            fillColor: 0x007700
+        });
+
+        this.selectButton.background!!.setInteractive({ useHandCursor: true })
+            .on('pointerdown', () => {
+                console.log("Go to Map button clicked.");
+                if (this.rewards.length > 0 && !this.isCardSelected) {
+                    console.log("Please select a card before proceeding.");
+                    return;
+                }
+                this.onSkip();
+                this.hide();
+            })
+            .on('pointerover', () => {
+                if (this.selectButton.background instanceof Phaser.GameObjects.Rectangle) {
+                    this.selectButton.background.setFillStyle(0x00aa00);
+                }
+            })
+            .on('pointerout', () => {
+                if (this.selectButton.background instanceof Phaser.GameObjects.Rectangle) {
+                    this.selectButton.background.setFillStyle(0x007700);
+                }
+            });
+
+        this.container.add(this.selectButton.background!!);
+        this.container.add(this.selectButton.text);
+    }
+
+    public show(): void {
+        this.container.setVisible(true);
+        this.scene.tweens.add({
+            targets: this.container,
+            alpha: { from: 0, to: 1 },
+            duration: 500,
+            ease: 'Power2'
+        });
+    }
+
+    public hide(): void {
+        this.scene.tweens.add({
+            targets: this.container,
+            alpha: { from: 1, to: 0 },
+            duration: 500,
+            ease: 'Power2',
+            onComplete: () => {
+                this.container.setVisible(false);
+            }
+        });
+    }
+}
+
+export class CardReward{
+    card: AbstractCard
+    owner: PlayerCharacter
+
+    constructor(card: PlayableCard, owner: PlayerCharacter){
+        this.card = card
+        this.owner = owner
+    }
+}
+
+export default CardRewardScreen;

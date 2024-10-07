@@ -112,11 +112,7 @@ export class CombatRules {
         const allEnemiesDefeated = combatState.enemies.every(enemy => enemy.hitpoints <= 0);
 
         if (allEnemiesDefeated) {
-            // End combat and return to map screen
-            ActionManager.getInstance().genericAction("End Combat", async () => {
-               
-                SceneChanger.switchToMapScene();
-            });
+            //todo
         }
     }
 

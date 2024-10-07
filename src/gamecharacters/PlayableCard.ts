@@ -16,6 +16,12 @@ export abstract class PlayableCard extends AbstractCard {
         this.owner = owner;
     }
 
+
+    public ownedBy(owner: BaseCharacter): this {
+        this.owner = owner;
+        return this;
+    }
+
     public baseDamage: number = 0
     public baseBlock: number = 0
     public baseMagicNumber: number = 0

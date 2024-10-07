@@ -15,6 +15,9 @@ export class BaseCharacter extends AbstractCard implements IBaseCharacter {
     maxHitpoints: number;
     gender: Gender = Gender.Female;
 
+    isDead(): boolean {
+        return this.hitpoints <= 0;
+    }
     getIntentsTargetingThisCharacter(): AbstractIntent[] {
 
         const gameState = GameState.getInstance();

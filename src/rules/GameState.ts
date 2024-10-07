@@ -93,6 +93,7 @@ export class GameState {
     // Inventory methods
     public addToInventory(item: StoreCard): void {
         this.inventory.push(item);
+        // Optionally, update UI or perform additional actions
     }
 
     public removeFromInventory(item: StoreCard): void {
@@ -157,6 +158,8 @@ export class GameState {
     public getLocations(): LocationCard[] {
         return [...this.locations];
     }
+
+    // Ensure that AbstractCard can be treated as StoreCard or adjust types accordingly
 }
 
 

@@ -208,6 +208,8 @@ export class PhysicalCard {
         if (!(this.data instanceof BaseCharacter)){
             this.blockText.setVisible(false);
         }
+        this.scene.events.once('shutdown', this.obliterate, this);
+        this.scene.events.once('destroy', this.obliterate, this);
     }
 
     obliterate(): void {
@@ -480,8 +482,8 @@ export class PhysicalCard {
             // Center the image on the card
             this.cardImage.setPosition(0, -this.cardBackground.displayHeight * 0.2); // Move image slightly upwards
         } else {
-            console.warn(`Texture '${this.data.portraitName}' not found. Using fallback texture.`);
-            // this.cardImage.setTexture('fallback_texture'); // Ensure you have a fallback texture
+            // console.warn(`Texture '${this.data.portraitName}' not found. Using fallback texture.`);
+            // this.cardImage.setTexture('placeholder');
         }
 
         // Position nameBox just below the portraitBox

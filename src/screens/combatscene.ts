@@ -62,6 +62,15 @@ class CombatScene extends Phaser.Scene {
         ActionManager.getInstance().drawHandForNewTurn();
 
         this.inventoryPanel = new InventoryPanel(this);
+        this.events.once('shutdown', this.obliterate, this);
+        this.events.once('destroy', this.obliterate, this);
+    }
+
+    private obliterate(): void {
+        this.events.off('shutdown', this.obliterate, this);
+        this.events.off('destroy', this.obliterate, this);
+        // Remove resize event listener
+        this.scale.off('resize', this.resize, this);
     }
 
     private createBackground(): void {
@@ -115,6 +124,18 @@ class CombatScene extends Phaser.Scene {
         if (this.cardManager) {
             this.cardManager.syncHandWithGameState();
         }
+
+        // Check if combat is finished
+        if (this.isCombatFinished()) {
+            this.uiManager.onCombatEnd();
+        }
+    }
+
+    /**
+     * Determine if combat is finished (all enemies are dead).
+     */
+    private isCombatFinished(): boolean {
+        return GameState.getInstance().combatState.enemies.every(enemy => enemy.isDead());
     }
 }
 
