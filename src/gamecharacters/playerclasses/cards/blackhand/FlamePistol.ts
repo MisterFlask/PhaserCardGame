@@ -29,7 +29,7 @@ export class FlamePistol extends PlayableCard {
     override InvokeCardEffects(targetCard?: BaseCharacter): void {
         if (targetCard && targetCard instanceof BaseCharacter) {
             this.dealDamageToTarget(targetCard);
-            this.actionManager.applyBuffToCharacter(targetCard, new Smoldering(this.getBaseMagicNumberAfterResourceScaling()));
+            this.actionManager.applyBuffToCharacter(targetCard, new Smoldering(this.getBaseMagicNumberAfterResourceScaling()), this.owner as BaseCharacter);
         }
     }
 }

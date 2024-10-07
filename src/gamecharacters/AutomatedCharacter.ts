@@ -4,6 +4,9 @@ import { JsonRepresentable } from '../interfaces/JsonRepresentable';
 import { AbstractIntent } from "./AbstractIntent";
 
 export abstract class AutomatedCharacter extends BaseCharacter implements JsonRepresentable {
+    removeIntent(intent: AbstractIntent) {
+        this.intents = this.intents.filter(i => i.id !== intent.id);
+    }
     intents: AbstractIntent[] = [];
 
     constructor({ 

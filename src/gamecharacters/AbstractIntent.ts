@@ -1,5 +1,6 @@
 import { JsonRepresentable } from '../interfaces/JsonRepresentable';
 import { CombatRules } from '../rules/CombatRules';
+import { PhysicalCard } from '../ui/PhysicalCard';
 import { ActionManager } from "../utils/ActionManager";
 import { TargetingUtils } from "../utils/TargetingUtils";
 import { generateWordGuid } from "./AbstractCard";
@@ -70,6 +71,8 @@ export class AttackIntent extends AbstractIntent {
             throw new Error('Target cannot be null');
         }
         console.log('Attacking ' + this.target.name);
+        ActionManager.getInstance().tiltCharacter(this.owner);
+
         ActionManager.getInstance().dealDamage({ baseDamageAmount: this.baseDamage, target: this.target, sourceCharacter: this.owner });
 
     }
@@ -106,6 +109,7 @@ export class ApplyDebuffToAllPlayerCharactersIntent extends AbstractIntent {
         }
         console.log(`Applying ${this.debuff.stacks} stack(s) of ${this.debuff.getName()} to ${this.target.name}`);
         for (const target of TargetingUtils.getInstance().selectAllPlayerCharacters()) {
+            ActionManager.getInstance().tiltCharacter(this.owner);
             ActionManager.getInstance().applyBuffToCharacter(target, this.debuff);
         }
     }
@@ -142,6 +146,8 @@ export class ApplyDebuffToRandomCharacterIntent extends AbstractIntent {
         if (!this.target) {
             throw new Error('Target cannot be null');
         }
+        ActionManager.getInstance().tiltCharacter(this.owner);
+
         console.log(`Applying ${this.debuff.stacks} stack(s) of ${this.debuff.getName()} to ${this.target.name}`);
         ActionManager.getInstance().applyBuffToCharacter(this.target, this.debuff);
     }
@@ -174,6 +180,7 @@ export class ApplyBuffToSelfIntent extends AbstractIntent {
     }
 
     act(): void {
+        ActionManager.getInstance().tiltCharacter(this.owner);
         console.log(`Applying ${this.buff.stacks} stack(s) of ${this.buff.getName()} to allies`);
         ActionManager.getInstance().applyBuffToCharacter(this.owner, this.buff);
     }
@@ -194,6 +201,7 @@ export class DoSomethingIntent extends AbstractIntent {
     action: () => void;
     constructor({ owner, action, imageName }: { owner: BaseCharacter, action: () => void, imageName?: string }) {
         super({ imageName: imageName ?? 'uncertainty', target: undefined, owner: owner });
+        ActionManager.getInstance().animateAttackerTilt(owner.physicalCard as PhysicalCard);
         this.action = action;
     }
 

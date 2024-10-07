@@ -6,9 +6,26 @@ import { PhysicalCard } from '../ui/PhysicalCard';
 export class ActionManager {
     private static instance: ActionManager;
     private actionQueue: ActionQueue;
+    private scene!: Scene;
 
     private constructor() { // Modified constructor
         this.actionQueue = new ActionQueue();
+    }
+
+
+    public static performAsyncronously(action: () => Promise<void>): void {
+        const actionManager = ActionManager.getInstance();
+        actionManager.actionQueue.addAction(new GenericAction(async () => {
+            await action();
+            return [];
+        }));
+    }
+
+    public static init(scene: Scene) {
+        if (!ActionManager.instance) {
+            ActionManager.instance = new ActionManager();
+        }
+        this.getInstance().scene = scene;
     }
 
     public static getInstance(): ActionManager { // Modified getInstance
@@ -18,7 +35,11 @@ export class ActionManager {
         return ActionManager.instance;
     }
 
-    public applyBuffToCharacter(character: BaseCharacter, buff: AbstractBuff): void {
+    public tiltCharacter(character: BaseCharacter){
+        this.animateAttackerTilt(character.physicalCard as PhysicalCard);
+    }
+
+    public applyBuffToCharacter(character: BaseCharacter, buff: AbstractBuff, sourceCharacter?: BaseCharacter): void {
         this.actionQueue.addAction(new GenericAction(async () => {
             AbstractBuff._applyBuffToCharacter(character, buff);
             console.log(`Applied buff ${buff.getName()} to ${character.name}`);
@@ -44,9 +65,9 @@ export class ActionManager {
     public playCard(card: PhysicalCard, target?: BaseCharacter) {
         this.actionQueue.addAction(new GenericAction(async () => {
             const playableCard = card.data as PlayableCard;
-            
+
             let canBePlayed = playableCard.IsPerformableOn(target);
-            if (!canBePlayed){
+            if (!canBePlayed) {
                 return [];
             }
 
@@ -118,7 +139,7 @@ export class ActionManager {
 
             const gameState = GameState.getInstance();
             const combatState = gameState.combatState;
-            
+
 
             console.log('Cards drawn:', drawnCards.map(card => card.name));
             console.log('Updated hand:', combatState.currentHand.map(card => card.name));
@@ -145,7 +166,7 @@ export class ActionManager {
             console.log("Applying block to " + blockTargetCharacter.name);
             // Get the physical card of the target character
             const targetPhysicalCard = (blockTargetCharacter as any).physicalCard as PhysicalCard;
-            
+
             if (targetPhysicalCard && targetPhysicalCard.blockText) {
                 // Pulse the block text box
                 targetPhysicalCard.blockText.pulseGreenBriefly()
@@ -247,6 +268,82 @@ export class ActionManager {
                 CombatRules.handleDeath(target, sourceCharacter || null);
             }
 
+            // {{ edit_2 }}
+            // Animate the defender jiggle and glow based on unblocked damage
+            if (damageResult.unblockedDamage > 0) {
+                // Unblocked damage dealt: glow red
+                this.animateDefenderJiggleAndGlow(physicalCardOfTarget, 0xff0000); // Red color
+            } else {
+                // No unblocked damage: glow white
+                this.animateDefenderJiggleAndGlow(physicalCardOfTarget, 0xffffff); // White color
+            }
+
+            return [];
+        }));
+    }
+
+    // {{ edit_3 }}
+    /**
+     * Animates the attacker tilting briefly to simulate an attack.
+     * @param attacker The PhysicalCard of the attacker.
+     */
+    public animateAttackerTilt(attacker: PhysicalCard): void {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            // Tilt to the right
+
+            this.scene.tweens.add({
+                targets: attacker.container,
+                angle: 15,
+                duration: 100,
+                yoyo: true,
+                ease: 'Power1'
+            });
+
+            // Wait for the tilt animation to complete
+            await new WaitAction(200).playAction();
+            return [];
+        }));
+    }
+
+    // {{ edit_4 }}
+    /**
+     * Animates the defender by jiggling and glowing with the specified color.
+     * @param defender The PhysicalCard of the defender.
+     * @param color The color to glow (e.g., red for damage dealt, white otherwise).
+     */
+    private animateDefenderJiggleAndGlow(defender: PhysicalCard, color: number): void {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            // Jiggle the defender
+            this.scene.tweens.add({
+                targets: defender.container,
+                x: defender.container.x + 10,
+                duration: 100,
+                yoyo: true,
+                repeat: 2,
+                ease: 'Power1'
+            });
+
+            // Glow effect based on damage
+            if (defender.cardBackground instanceof Phaser.GameObjects.Image) {
+                this.scene.tweens.add({
+                    targets: defender.cardBackground,
+                    tint: color,
+                    duration: 100,
+                    yoyo: true,
+                    ease: 'Power1'
+                });
+            } else if (defender.cardBackground instanceof Phaser.GameObjects.Rectangle) {
+                this.scene.tweens.add({
+                    targets: defender.cardBackground,
+                    fillColor: color,
+                    duration: 100,
+                    yoyo: true,
+                    ease: 'Power1'
+                });
+            }
+
+            // Wait for the jiggling and glow animation to complete
+            await new WaitAction(300).playAction();
             return [];
         }));
     }
@@ -283,7 +380,7 @@ export class ActionManager {
             return [];
         }));
     }
-    public modifyPages(amount: number, sourceCharacterIfAny? : BaseCharacter): void {
+    public modifyPages(amount: number, sourceCharacterIfAny?: BaseCharacter): void {
         this.actionQueue.addAction(new GenericAction(async () => {
             GameState.getInstance().combatState.combatResources.modifyPages(amount);
             return [];
@@ -323,11 +420,65 @@ export class ActionManager {
             return [];
         }));
     }
+
+}
+
+// {{ edit_1 }}
+// Define ActionNode class outside of ActionManager to ensure proper scope
+class ActionNode {
+    constructor(public action: GameAction) { }
+    public children: ActionNode[] = [];
+}
+
+export class ActionQueue {
+    private queue: ActionNode[] = [];
+    private currentActionNode: ActionNode | null = null;
+    private isResolving: boolean = false;
+
+    addAction(action: GameAction): void {
+        if (this.currentActionNode) {
+            this.currentActionNode.children.push(new ActionNode(action));
+        } else {
+            this.queue.push(new ActionNode(action));
+        }
+        if (!this.isResolving) {
+            this.resolveActions();
+        }
+    }
+
+    async resolveActions(): Promise<void> {
+        if (this.isResolving) return;
+        this.isResolving = true;
+
+        while (this.queue.length > 0) {
+            const currentNode = this.queue.pop();
+            if (currentNode) {
+                this.currentActionNode = currentNode;
+                const newActions = await currentNode.action.playAction();
+                for (const action of newActions) {
+                    this.currentActionNode?.children.push(new ActionNode(action));
+                }
+                // Process child actions first (depth-first)
+                while (currentNode.children.length > 0) {
+                    const childNode = currentNode.children.pop();
+                    if (childNode) {
+                        this.queue.push(childNode);
+                    }
+                }
+                // {{ edit_2 }}
+                // Reset currentActionNode after processing its children
+                this.currentActionNode = null;
+            }
+            // Add a small delay to allow for animations and prevent blocking
+            await new Promise(resolve => setTimeout(resolve, 50));
+        }
+
+        this.isResolving = false;
+    }
 }
 
 
-
-    import Phaser from 'phaser';
+import Phaser, { Scene } from 'phaser';
 import { AbstractCard } from '../gamecharacters/AbstractCard';
 import { AbstractBuff } from "../gamecharacters/buffs/AbstractBuff";
 import { CombatRules, DamageCalculationResult } from "../rules/CombatRules";
@@ -340,37 +491,6 @@ import CombatUIManager from "../screens/subcomponents/CombatUiManager";
 export abstract class GameAction {
     abstract playAction(): Promise<GameAction[]>;
 }
-
-export class ActionQueue {
-    private queue: GameAction[] = [];
-    private isResolving: boolean = false;
-
-    addAction(action: GameAction): void {
-        this.queue.push(action);
-        if (!this.isResolving) {
-            this.resolveActions();
-        }
-    }
-
-    async resolveActions(): Promise<void> {
-        if (this.isResolving) return;
-        this.isResolving = true;
-
-        while (this.queue.length > 0) {
-            const currentAction = this.queue.shift();
-            if (currentAction) {
-                const newActions = await currentAction.playAction();
-                this.queue.unshift(...newActions);
-            }
-            // Add a small delay to allow for animations and prevent blocking
-            await new Promise(resolve => setTimeout(resolve, 50));
-        }
-
-        this.isResolving = false;
-    }
-}
-
-
 
 export class GenericAction extends GameAction {
     constructor(private actionFunction: () => Promise<GameAction[]>) {

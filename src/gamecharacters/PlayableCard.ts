@@ -140,13 +140,13 @@ export abstract class PlayableCard extends AbstractCard {
 
     public getDisplayedDamage(selectedCharacter?: BaseCharacter): string{
         if (!this.owner) {
-            return this.baseDamage.toString();
+            return this.getBaseDamageAfterResourceScaling().toString();
         }
 
         var targetedCharacterIfAny = selectedCharacter ?? this.hoveredCharacter;
 
         const damageCalcResult = CombatRules.calculateDamage({
-            baseDamageAmount: this.baseDamage,
+            baseDamageAmount: this.getBaseDamageAfterResourceScaling(),
             target: targetedCharacterIfAny,
             sourceCharacter: this.owner,
             sourceCard: this,

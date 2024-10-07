@@ -42,10 +42,11 @@ export class CombatRules {
         });
 
         combatState.enemies.forEach(enemy => {
-            for (const intent of enemy.intents) {
+            for (const intent of [...enemy.intents]) {
                 // Display the intent's title or tooltip text
                 ActionManager.getInstance().displaySubtitle(intent.title || intent.tooltipText());
 
+                
                 // Queue the intent's action
                 intent.act();
 
@@ -53,7 +54,9 @@ export class CombatRules {
                 ActionManager.getInstance().hideSubtitle();
 
                 // Set new intents for the enemy
-                enemy.setNewIntents();
+                ActionManager.performAsyncronously(async () => {
+                    await enemy.removeIntent(intent);
+                });
             }
         });
 

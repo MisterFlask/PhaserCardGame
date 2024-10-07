@@ -16,7 +16,7 @@ import PerformanceMonitor from './subcomponents/PerformanceMonitor';
 import CombatUIManager from './subcomponents/CombatUiManager';
 
 /**
- * Interface for initializing CombatScene with necessary data.
+ * Interface for initializing CombatScene with necessmorniary data.
  */
 export interface CombatSceneData {
     encounter: EncounterData;
@@ -40,6 +40,7 @@ class CombatScene extends Phaser.Scene {
     }
 
     init(data: CombatSceneData): void {
+        ActionManager.init(this);
         const stateService = CombatStateService.getInstance();
         stateService.initializeCombat(data.encounter, GameState.getInstance().currentRunCharacters);
     }
