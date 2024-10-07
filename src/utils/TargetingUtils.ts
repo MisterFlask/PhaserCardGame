@@ -21,4 +21,9 @@ export class TargetingUtils {
         const randomIndex = Math.floor(Math.random() * playerCharacters.length);
         return playerCharacters[randomIndex];
     }
+
+    public selectAllPlayerCharacters(): BaseCharacter[] {
+        const gameState = GameState.getInstance();
+        return gameState.combatState.playerCharacters;
+    }
 }

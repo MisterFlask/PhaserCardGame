@@ -1,6 +1,7 @@
-import { AbstractIntent, AttackIntent } from '../gamecharacters/AbstractIntent';
+import { AbstractIntent, ApplyDebuffToRandomCharacterIntent, AttackIntent } from '../gamecharacters/AbstractIntent';
 import { AutomatedCharacter } from '../gamecharacters/AutomatedCharacter';
 import { Delicious } from '../gamecharacters/buffs/enemy_buffs/Delicious';
+import { Stress } from '../gamecharacters/buffs/standard/Stress';
 import { Stressful } from '../gamecharacters/buffs/standard/Stressful';
 import { Strong } from '../gamecharacters/buffs/Strong';
 import { GoblinCharacter } from '../gamecharacters/enemyclasses/GoblinCharacter';
@@ -12,7 +13,7 @@ export class ClockworkAbomination extends AutomatedCharacter {
     }
     
     override generateNewIntents(): AbstractIntent[] {
-        return [ new AttackIntent({ baseDamage: 5, owner: this }) ]
+        return [ new ApplyDebuffToRandomCharacterIntent({ debuff: new Stress(5), owner: this }) ]
     }
 }
 
@@ -72,7 +73,6 @@ export class EncounterManager {
     }
 
     public getRandomEncounter(): EncounterData {
-
         const encounters = [
             new Encounter({
                 enemies: [new GoblinCharacter(), new GoblinCharacter()],

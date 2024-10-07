@@ -58,7 +58,7 @@ export abstract class PlayableCard extends AbstractCard {
     protected dealDamageToTarget(targetCard?: IBaseCharacter): void {
         if (targetCard) {
             this.actionManager.dealDamage({
-                baseDamageAmount: this.baseDamage,
+                baseDamageAmount: this.getBaseDamageAfterResourceScaling(),
                 target: targetCard,
                 sourceCharacter: this.owner,
                 fromAttack: true,
@@ -77,7 +77,7 @@ export abstract class PlayableCard extends AbstractCard {
         if (targetCard) {
             this.actionManager.applyBlock({
                 blockTargetCharacter: targetCard,
-                baseBlockValue: this.baseBlock,
+                baseBlockValue: this.getBaseBlockAfterResourceScaling(),
                 appliedViaPlayableCard: this,
                 blockSourceCharacter: this.owner
             });

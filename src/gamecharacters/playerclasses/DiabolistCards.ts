@@ -6,20 +6,22 @@ export class ArcaneRitualCard extends PlayableCard {
     constructor() {
         super({
             name: "Arcane Ritual",
-            description: "Deal 4 damage to target enemy. Draw 1 card. Gain 4 block.",
+            description: `Deal 4 damage to target enemy. Draw 1 card. Gain 4 block to Diabolist.`,
             portraitName: "gem-pendant",
             targetingType: TargetingType.ENEMY
         });
     }
 
+    override get description(): string {
+        return `Deal ${this.getDisplayedDamage()} damage to target enemy. Draw 1 card. Gain ${this.getDisplayedBlock()} block to Diabolist.`;
+    }
+
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         if (targetCard && targetCard instanceof BaseCharacter) {
-            ActionManager.getInstance().dealDamage({ target: targetCard, baseDamageAmount: 4 });
+            this.dealDamageToTarget(targetCard);
             ActionManager.getInstance().drawCards(1);
-            ActionManager.getInstance().applyBlock({ baseBlockValue: 4, blockTargetCharacter: this.owner as BaseCharacter , appliedViaPlayableCard: this, blockSourceCharacter: this.owner as BaseCharacter});
-            console.log(`Dealt 4 damage to ${targetCard.name}`);
+            this.applyBlockToTarget(this.owner);
         }
-        console.log("Drew 1 card");
     }
 }
 
