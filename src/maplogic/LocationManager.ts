@@ -8,7 +8,7 @@ export class LocationManager {
     constructor() {
     }
 
-    public initializeLocations() {
+    public initializeLocations() : LocationCard[]{
         const numberOfFloors = 9; // Step 2. Set number of floors between 3 and 5
 
         const locationData: LocationCard[] = [];
@@ -73,8 +73,7 @@ export class LocationManager {
 
 
 
-
-        GameState.getInstance().setLocations(locationData);
+        return locationData;
     }
 
     findReachableRooms(floorLocationData: LocationCard[]): LocationCard[] {

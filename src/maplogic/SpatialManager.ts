@@ -12,7 +12,7 @@ export class SpatialManager {
         this.height = height;
     }
 
-    public arrangeLocations(): void {
+    public enrichLocationsWithPositioning(): void {
         const locations = GameState.getInstance().getLocations();
         const floors = new Map<number, LocationCard[]>();
         locations.forEach(location => {

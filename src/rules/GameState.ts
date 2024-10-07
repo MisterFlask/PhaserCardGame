@@ -17,7 +17,7 @@ export class GameState {
 
     // Add tracking for player's current location
     public currentLocation: LocationCard | null = null;
-
+    public mapInitialized: boolean = false;
     // Add all location cards
     public locations: LocationCard[] = [];
 

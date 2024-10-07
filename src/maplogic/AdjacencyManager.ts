@@ -23,7 +23,7 @@ export class AdjacencyManager {
         this.maxIndexDifference = maxIndexDifference;
     }
 
-    public generateAdjacencies(): void {
+    public enrichLocationsWithAdjacencies(): void {
         // Step 1: Organize locations by floor
         const locations = GameState.getInstance().getLocations();
         const floors: Map<number, LocationCard[]> = new Map();

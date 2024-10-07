@@ -92,10 +92,17 @@ export default class MapScene extends Phaser.Scene {
         this.add.existing(this.adjacencyGraphics!);
     }
 
-    generateAndPlaceLocations() {
-        this.locationManager.initializeLocations();
-        this.adjacencyManager.generateAdjacencies();
-        this.spatialManager.arrangeLocations(); // Ensure positions are placed
+    public generateAndPlaceLocations(force: boolean = false) {
+        if (GameState.getInstance().mapInitialized && !force) {
+            return;
+        }
+        
+        var locationData = this.locationManager.initializeLocations();
+        GameState.getInstance().setLocations(locationData);
+
+        this.adjacencyManager.enrichLocationsWithAdjacencies();
+        this.spatialManager.enrichLocationsWithPositioning();
+        GameState.getInstance().mapInitialized = true;
     }
 
     createBackground() {
@@ -294,7 +301,7 @@ export default class MapScene extends Phaser.Scene {
         this.positionCharacterCards(width, height);
         this.positionAbortButton(width, height);
         this.positionCampaignStatusText(width, height);
-        this.spatialManager.arrangeLocations();
+        this.spatialManager.enrichLocationsWithPositioning();
         this.createAdjacencyLines();
 
         // Add these lines to ensure the background stays centered
