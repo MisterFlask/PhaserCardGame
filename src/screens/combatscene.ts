@@ -12,8 +12,8 @@ import MapScene from './Map';
 import CombatCardManager from './subcomponents/CombatCardManager';
 import CombatInputHandler from './subcomponents/CombatInputHandler';
 import CombatStateService from './subcomponents/CombatStateService';
-import CombatUIManager from './subcomponents/CombatUiManager';
 import PerformanceMonitor from './subcomponents/PerformanceMonitor';
+import CombatUIManager from './subcomponents/CombatUiManager';
 
 /**
  * Interface for initializing CombatScene with necessary data.
@@ -46,7 +46,11 @@ class CombatScene extends Phaser.Scene {
 
     create(): void {
         this.createBackground();
-        this.uiManager = new CombatUIManager(this);
+
+        // Initialize CombatUIManager as a singleton
+        CombatUIManager.initialize(this);
+        this.uiManager = CombatUIManager.getInstance();
+
         this.cardManager = new CombatCardManager(this);
         this.inputHandler = new CombatInputHandler(this, this.cardManager);
         this.performanceMonitor = new PerformanceMonitor(this);

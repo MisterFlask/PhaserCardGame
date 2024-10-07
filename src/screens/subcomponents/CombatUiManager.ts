@@ -13,6 +13,7 @@ interface MenuOption {
 }
 
 class CombatUIManager {
+    private static instance: CombatUIManager;
     private scene: Phaser.Scene;
     public menu!: Menu;
     public combatStatusText!: TextBox;
@@ -21,9 +22,27 @@ class CombatUIManager {
     public handArea!: Phaser.GameObjects.Rectangle;
     public energyDisplay!: TextBox;
     public resourceIndicators: Phaser.GameObjects.Container[] = [];
+    private subtitleTextBox?: TextBox;
 
-    constructor(scene: Phaser.Scene) {
+    private constructor(scene: Phaser.Scene) {
         this.scene = scene;
+        this.createUI();
+    }
+
+    public static getInstance(): CombatUIManager {
+        if (!CombatUIManager.instance) {
+            throw new Error('CombatUIManager not initialized');
+        }
+        return CombatUIManager.instance;
+    }
+
+    public static initialize(scene: Phaser.Scene): void {
+        if (!CombatUIManager.instance) {
+            CombatUIManager.instance = new CombatUIManager(scene);
+        }
+    }
+
+    private createUI(): void {
         this.createMenu();
         this.createCombatStatusText();
         this.createEndTurnButton();
@@ -317,6 +336,31 @@ class CombatUIManager {
             const text = container.getAt(1) as Phaser.GameObjects.Text;
             text.setText(`${resource.name}: ${resource.value}`);
         });
+    }
+
+    public async showSubtitle(text: string): Promise<void> {
+        if (!this.subtitleTextBox) {
+            this.subtitleTextBox = new TextBox({
+                scene: this.scene,
+                x: this.scene.scale.width / 2,
+                y: 50,
+                width: 400,
+                height: 50,
+                text: text,
+                style: { fontSize: '24px', color: '#ffffff' },
+                expandDirection: 'down'
+            });
+            this.subtitleTextBox.setDepth(100); // Ensure it's on top
+        } else {
+            this.subtitleTextBox.setText(text);
+            this.subtitleTextBox.setVisible(true);
+        }
+    }
+
+    public async hideSubtitle(): Promise<void> {
+        if (this.subtitleTextBox) {
+            this.subtitleTextBox.setVisible(false);
+        }
     }
 }
 

@@ -11,14 +11,15 @@ export interface IAbstractBuff {
     counter: number;
     showCounter: boolean;
     isDebuff: boolean;
-
+    
+    getOwnerAsPlayableCard(): PlayableCard | null;
     getName(): string;
     getDescription(): string;
     getStacksDisplayText(): string;
-    getOwner(): BaseCharacter | null;
-    getCombatDamageDealtModifier(): number;
+    getOwnerAsCharacter(): BaseCharacter | null;
+    getCombatDamageDealtModifier(target:BaseCharacter): number;
     getBlockSentModifier(): number;
-    getPercentCombatDamageDealtModifier(): number;
+    getPercentCombatDamageDealtModifier(target: BaseCharacter): number;
     getPercentCombatDamageTakenModifier(): number;
     getCombatDamageTakenModifier(): number;
     getBlockReceivedModifier(): number;

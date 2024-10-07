@@ -18,13 +18,12 @@ export class Defend extends PlayableCard {
     }
 
     override get description(): string {
-        return `Grant ${this.getDisplayedBlock(this.hoveredCharacter)} Block to the targeted character.`;
+        return `Grant ${this.getDisplayedBlock()} Block to the targeted character.`;
     }
     
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         if (targetCard && targetCard instanceof BaseCharacter) {
-            ActionManager.getInstance().applyBlock({ blockTargetCharacter: targetCard!, baseBlockValue: this.baseBlock, appliedViaPlayableCard: this ,  blockSourceCharacter: this.owner!});
-            console.log(`Granted ${this.getDisplayedBlock(this.hoveredCharacter)} Block to ${targetCard.name}`);
+            this.applyBlockToTarget(targetCard);
         }
     }
 }

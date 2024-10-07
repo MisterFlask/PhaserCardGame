@@ -195,7 +195,6 @@ export class ActionManager {
         });
     }
 
-    
     public dealDamage = ({
         baseDamageAmount,
         target,
@@ -209,43 +208,47 @@ export class ActionManager {
         sourceCard?: PlayableCard,
         fromAttack?: boolean
     }): void => {
-        const physicalCardOfTarget = target.physicalCard as PhysicalCard;
-        if (!physicalCardOfTarget) {
-            return;
-        }
+        this.actionQueue.addAction(new GenericAction(async () => {
+            const physicalCardOfTarget = target.physicalCard as PhysicalCard;
+            if (!physicalCardOfTarget) {
+                return [];
+            }
 
-        fromAttack = fromAttack || true;
+            fromAttack = fromAttack || true;
 
-        const damageResult: DamageCalculationResult = CombatRules.calculateDamage({
-            baseDamageAmount,
-            target,
-            sourceCharacter,
-            sourceCard,
-            fromAttack
-        });
-
-        if (fromAttack){
-            // Activate OnStruck effects for the defender's buffs
-            target.buffs.forEach(buff => {
-                const _buff = buff as AbstractBuff;
-                _buff.onOwnerStruck(sourceCharacter || null, sourceCard || null, {
-                    damageDealt: damageResult.totalDamage,
-                    damageTaken: damageResult.unblockedDamage,
-                    damageBlocked: damageResult.blockedDamage
-                });
+            const damageResult: DamageCalculationResult = CombatRules.calculateDamage({
+                baseDamageAmount,
+                target,
+                sourceCharacter,
+                sourceCard,
+                fromAttack
             });
-        }
 
-        if (damageResult.unblockedDamage > 0) {
-            target.hitpoints = Math.max(0, target.hitpoints - damageResult.unblockedDamage);
-        }
+            if (fromAttack) {
+                // Activate OnStruck effects for the defender's buffs
+                target.buffs.forEach(buff => {
+                    const _buff = buff as AbstractBuff;
+                    _buff.onOwnerStruck(sourceCharacter || null, sourceCard || null, {
+                        damageDealt: damageResult.totalDamage,
+                        damageTaken: damageResult.unblockedDamage,
+                        damageBlocked: damageResult.blockedDamage
+                    });
+                });
+            }
 
-        console.log(`Damage Calculation: Total Damage: ${damageResult.totalDamage}, Blocked Damage: ${damageResult.blockedDamage}, Unblocked Damage: ${damageResult.unblockedDamage}`);
+            if (damageResult.unblockedDamage > 0) {
+                target.hitpoints = Math.max(0, target.hitpoints - damageResult.unblockedDamage);
+            }
 
-        // Handle death if hitpoints reach 0
-        if (target.hitpoints <= 0) {
-            CombatRules.handleDeath(target, sourceCharacter || null);
-        }
+            console.log(`Damage Calculation: Total Damage: ${damageResult.totalDamage}, Blocked Damage: ${damageResult.blockedDamage}, Unblocked Damage: ${damageResult.unblockedDamage}`);
+
+            // Handle death if hitpoints reach 0
+            if (target.hitpoints <= 0) {
+                CombatRules.handleDeath(target, sourceCharacter || null);
+            }
+
+            return [];
+        }));
     }
 
     public purchaseShopItem(item: StoreCard): void {
@@ -304,6 +307,22 @@ export class ActionManager {
             return [];
         }));
     }
+
+    public displaySubtitle(text: string): void {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            await CombatUIManager.getInstance().showSubtitle(text);
+            // Small delay to ensure the subtitle appears before the next action
+            await new WaitAction(50).playAction();
+            return [];
+        }));
+    }
+
+    public hideSubtitle(): void {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            await CombatUIManager.getInstance().hideSubtitle();
+            return [];
+        }));
+    }
 }
 
 
@@ -316,6 +335,7 @@ import { DamageInfo } from "../rules/DamageInfo";
 import { DeckLogic, PileName } from "../rules/DeckLogic";
 import { PlayableCard } from "../gamecharacters/PlayableCard";
 import { IBaseCharacter } from "../gamecharacters/IBaseCharacter";
+import CombatUIManager from "../screens/subcomponents/CombatUiManager";
 
 export abstract class GameAction {
     abstract playAction(): Promise<GameAction[]>;
@@ -351,22 +371,7 @@ export class ActionQueue {
 }
 
 
-export class DealDamageAction extends GameAction {
-    constructor(private amount: number,
-        private target: BaseCharacter,
-        private sourceCharacter?: BaseCharacter,
-        private sourceCard?: AbstractCard) {
-        super();
-    }
 
-    async playAction(): Promise<GameAction[]> {
-        console.log(`Dealing ${this.amount} damage to ${this.target} from ${this.sourceCharacter?.name} with ${this.sourceCard?.name}`);
-        // In a real game, you'd apply the damage to the target here
-        // Simulate a delay for animation
-        await new Promise(resolve => setTimeout(resolve, 500));
-        return []; // Return any follow-up actions if needed
-    }
-}
 export class GenericAction extends GameAction {
     constructor(private actionFunction: () => Promise<GameAction[]>) {
         super();

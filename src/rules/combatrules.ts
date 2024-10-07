@@ -43,7 +43,16 @@ export class CombatRules {
 
         combatState.enemies.forEach(enemy => {
             for (const intent of enemy.intents) {
+                // Display the intent's title or tooltip text
+                ActionManager.getInstance().displaySubtitle(intent.title || intent.tooltipText());
+
+                // Queue the intent's action
                 intent.act();
+
+                // Hide the subtitle after the action completes
+                ActionManager.getInstance().hideSubtitle();
+
+                // Set new intents for the enemy
                 enemy.setNewIntents();
             }
         });
@@ -131,7 +140,7 @@ export class CombatRules {
         let totalDamage = baseDamageAmount;
         
         sourceCharacter?.buffs.forEach(buff => {
-            totalDamage += buff.getCombatDamageDealtModifier();
+            totalDamage += buff.getCombatDamageDealtModifier(target as BaseCharacter);
             totalDamage *= (1 + buff.getPercentCombatDamageDealtModifier() / 100);
         });
         // Apply target character buffs
@@ -140,6 +149,11 @@ export class CombatRules {
             totalDamage *= (1 + buff.getPercentCombatDamageTakenModifier() / 100);
         });
 
+        //apply playable card buffs
+        sourceCard?.buffs.forEach(buff => {
+            totalDamage += buff.getCombatDamageDealtModifier(target as BaseCharacter);
+            totalDamage *= (1 + buff.getPercentCombatDamageDealtModifier() / 100);
+        });
         // Ensure damage doesn't go below 0
         totalDamage = Math.max(0, totalDamage);
 

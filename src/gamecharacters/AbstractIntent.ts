@@ -11,11 +11,14 @@ export abstract class AbstractIntent implements JsonRepresentable {
     imageName: string;
     target?: BaseCharacter;
     owner: BaseCharacter;
+    title: string;
+
     constructor({imageName, target, owner }: {imageName: string, target: BaseCharacter | undefined, owner: BaseCharacter }) {
         this.imageName = imageName;
         this.target = target;
         this.owner = owner;
         this.id = generateWordGuid(this.displayText());
+        this.title = '';
     }
 
     abstract tooltipText(): string;
@@ -31,6 +34,11 @@ export abstract class AbstractIntent implements JsonRepresentable {
             target: this.target ? this.target.name : 'No target',
             owner: this.owner.name,
         }, null, 2);
+    }
+
+    withTitle(title: string): this {
+        this.title = title;
+        return this;
     }
 }
 

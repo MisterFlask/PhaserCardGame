@@ -5,6 +5,7 @@ import { BaseCharacter } from "./BaseCharacter";
 import { CardType, CardSize } from "./Primitives";
 import { IBaseCharacter } from "./IBaseCharacter";
 import { CombatRules } from "../rules/CombatRules";
+import { AbstractBuff } from "./buffs/AbstractBuff";
 export abstract class PlayableCard extends AbstractCard {
     targetingType: TargetingType
 
@@ -14,7 +15,6 @@ export abstract class PlayableCard extends AbstractCard {
         this.targetingType = targetingType || TargetingType.ENEMY;
         this.owner = owner;
     }
-
 
     public baseDamage: number = 0
     public baseBlock: number = 0
@@ -30,29 +30,28 @@ export abstract class PlayableCard extends AbstractCard {
         return ActionManager.getInstance();
     }
 
-
-    get ice(): number {
-        return this.combatResources.ice.value;
+    get ice(): CombatResource {
+        return this.combatResources.ice;
     }
 
-    get pages(): number {
-        return this.combatResources.pages.value;
+    get pages(): CombatResource {
+        return this.combatResources.pages;
     }
 
-    get iron(): number {
-        return this.combatResources.iron.value;
+    get iron(): CombatResource {
+        return this.combatResources.iron;
     }
 
-    get gold(): number {
-        return this.combatResources.gold.value;
+    get gold(): CombatResource {
+        return this.combatResources.gold;
     }
 
-    get fog(): number {
-        return this.combatResources.fog.value;
+    get fog(): CombatResource {
+        return this.combatResources.fog;
     }
 
-    get thunder(): number {
-        return this.combatResources.thunder.value;
+    get thunder(): CombatResource {
+        return this.combatResources.thunder;
     }
 
     protected dealDamageToTarget(targetCard?: IBaseCharacter): void {

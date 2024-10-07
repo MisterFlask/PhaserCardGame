@@ -15,19 +15,12 @@ export class Shoot extends PlayableCard {
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage(this.hoveredCharacter)} damage.`;
+        return `Deal ${this.getDisplayedDamage()} damage.`;
     }
     
     override InvokeCardEffects(targetCard?: BaseCharacter): void {
         if (targetCard && targetCard instanceof BaseCharacter) {
-            this.actionManager.dealDamage({
-                baseDamageAmount: this.baseDamage,
-                target: targetCard,
-                sourceCharacter: this.owner!,
-                fromAttack: true,
-                sourceCard: this
-            });
-            console.log(`Dealt ${this.getDisplayedDamage(targetCard)} damage to ${targetCard.name}`);
+            this.dealDamageToTarget(targetCard);
         }
     }
 }

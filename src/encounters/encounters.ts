@@ -13,7 +13,7 @@ export class ClockworkAbomination extends AutomatedCharacter {
     }
     
     override generateNewIntents(): AbstractIntent[] {
-        return [ new ApplyDebuffToRandomCharacterIntent({ debuff: new Stress(5), owner: this }) ]
+        return [ new ApplyDebuffToRandomCharacterIntent({ debuff: new Stress(5), owner: this }).withTitle("fascination") ]
     }
 }
 
@@ -27,7 +27,7 @@ export class BaconBeast extends AutomatedCharacter {
     
 
     override generateNewIntents(): AbstractIntent[] {
-        return [ new AttackIntent({ baseDamage: 6, owner: this }) ]
+        return [ new AttackIntent({ baseDamage: 6, owner: this }).withTitle("bite") ]
     }
 }
 
@@ -39,7 +39,7 @@ export class BloodManipulationSlime extends AutomatedCharacter {
     }
     
     override generateNewIntents(): AbstractIntent[] {
-        return [ new AttackIntent({ baseDamage: 10, owner: this }) ]
+        return [ new AttackIntent({ baseDamage: 10, owner: this }).withTitle("rapture") ]
     }
 }
 

@@ -18,8 +18,25 @@ export abstract class AbstractBuff implements IAbstractBuff {
         this.showCounter = false;
         this.isDebuff = false;
     }
+    public getOwnerAsPlayableCard(): PlayableCard | null {
+        // Import GameState if not already imported at the top of the file
 
-    public getOwner(): BaseCharacter | null {
+        // Find the owner of this buff by searching through all characters in the combat state
+        const gameState = GameState.getInstance();
+        const combatState = gameState.combatState;
+        const allPlayableCards = [...combatState.currentDrawPile, ...combatState.currentHand, ...combatState.currentDiscardPile];
+        const owner = allPlayableCards.find(card => card.buffs.some(buff => buff.id === this.id));
+
+        if (!owner) {
+            console.warn(`No owner found for buff ${this.getName()} with id ${this.id}`);
+            return null;
+        }
+
+        return owner as PlayableCard;
+    }
+
+
+    public getOwnerAsCharacter(): BaseCharacter | null {
         // Import GameState if not already imported at the top of the file
 
         // Find the owner of this buff by searching through all characters in the combat state
@@ -83,7 +100,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
     // this is a FLAT modifier on top of damage taken, not percentage-based.
     //  this refers to pre-block damage.
-    getCombatDamageDealtModifier(): number {
+    getCombatDamageDealtModifier(target: IBaseCharacter): number {
         return 0;
     }
 
@@ -133,6 +150,13 @@ export abstract class AbstractBuff implements IAbstractBuff {
     }
 
     onEvent(item: AbstractCombatEvent) {
+
+    }
+
+
+    ////////////////// PLAYABLE CARD METHODS //////////////////
+
+    public onCardInvoked(target?: BaseCharacter){
 
     }
 }
