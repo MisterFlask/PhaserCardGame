@@ -66,6 +66,10 @@ export default class MapScene extends Phaser.Scene {
         // Call the update function
         this.events.on('update', this.update, this);
         this.updateHighlights();
+
+        this.events.on('shutdown', () => {
+            this.destroy();
+        });
     }
 
 
@@ -415,5 +419,54 @@ export default class MapScene extends Phaser.Scene {
     panCameraDown() {
         console.log("panCameraDown");
         this.cameras.main.scrollY += 50;
+    }
+
+    destroy(fromScene?: boolean) {
+        // Destroy location cards
+        this.locationCards.forEach(card => card.destroy());
+        this.locationCards = [];
+
+        // Destroy character cards
+        this.characterCards.forEach(card => card.destroy());
+        this.characterCards = [];
+
+        // Destroy background
+        if (this.background) {
+            this.background.destroy();
+            this.background = null;
+        }
+
+        // Destroy abort button
+        if (this.abortButton) {
+            this.abortButton.destroy();
+            this.abortButton = null;
+        }
+
+        // Destroy campaign status text
+        if (this.campaignStatusText) {
+            this.campaignStatusText.destroy();
+            this.campaignStatusText = null;
+        }
+
+        // Destroy move buttons
+        if (this.moveUpButton) {
+            this.moveUpButton.destroy();
+            this.moveUpButton = null;
+        }
+        if (this.moveDownButton) {
+            this.moveDownButton.destroy();
+            this.moveDownButton = null;
+        }
+
+        // Destroy adjacency graphics
+        if (this.adjacencyGraphics) {
+            this.adjacencyGraphics.destroy();
+            this.adjacencyGraphics = null;
+        }
+
+        // Remove event listeners
+        this.scale.off('resize', this.resize);
+        this.events.off('update', this.update);
+        this.input.off('wheel');
     }
 }

@@ -55,6 +55,7 @@ export class LocationCard extends AbstractCard {
         GameState.getInstance().eliminatePhysicalCardsBetweenScenes();
         scene.scene.start('CombatScene', { encounter: this.encounter });
     }
+
 }
 
 // Add specific LocationCard subclasses
