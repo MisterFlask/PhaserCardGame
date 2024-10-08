@@ -10,6 +10,8 @@ export class ArcaneRitualCard extends PlayableCard {
             portraitName: "gem-pendant",
             targetingType: TargetingType.ENEMY
         });
+        this.baseDamage = 4;
+        this.baseBlock = 4;
     }
 
     override get description(): string {

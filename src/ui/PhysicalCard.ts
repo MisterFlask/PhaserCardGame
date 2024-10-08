@@ -95,7 +95,7 @@ export class PhysicalCard {
 
         
         // Add HP box if the card is a BaseCharacter
-        if (this.data.typeTag === "BaseCharacter") {
+        if (this.data.isBaseCharacter()) {
             const baseCharacter = this.data as BaseCharacterType;
             const cardWidth = this.cardBackground.displayWidth;
             const cardHeight = this.cardBackground.displayHeight;
@@ -205,7 +205,7 @@ export class PhysicalCard {
         this.applyCardSize();
         this.updateIntents();
 
-        if (!(this.data.typeTag === "BaseCharacter")){
+        if (!(this.data.isBaseCharacter())){
             this.blockText.setVisible(false);
         }
         this.scene.events.once('shutdown', this.obliterate, this);
@@ -495,7 +495,7 @@ export class PhysicalCard {
         this.descBox.setPosition(0, descBoxY);
 
         // Update HP box if it exists
-        if (this.hpBox && this.data.typeTag == "BaseCharacter") {
+        if (this.hpBox && this.data.isBaseCharacter()) {
             const baseCharacter = this.data as BaseCharacterType;
             this.hpBox.setText(`${baseCharacter.hitpoints}/${baseCharacter.maxHitpoints}`);
         }
@@ -526,7 +526,7 @@ export class PhysicalCard {
             this.cardBackground.displayHeight + 4
         );
 
-        if (this.data.typeTag == "BaseCharacter") {
+        if (this.data.isBaseCharacter()) {
             const baseCharacter = this.data as BaseCharacterType;
             if (baseCharacter.hitpoints <= 0) {
                 this.cardImage.setTint(0x808080); // Apply greyscale tint
@@ -719,7 +719,7 @@ export class PhysicalCard {
      * Sync incoming intents with the underlying AbstractCard's incoming intents
      */
     private syncIncomingIntents(): void {
-        if (!(this.data.typeTag === "BaseCharacter")) {
+        if (!(this.data.isBaseCharacter())) {
             return;
         }
         const baseCharacter = this.data as BaseCharacterType;

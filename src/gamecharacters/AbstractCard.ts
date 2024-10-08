@@ -95,6 +95,18 @@ export abstract class AbstractCard implements IAbstractCard {
         this._description = value;
     }
 
+    public isBaseCharacter(): boolean{
+        return this.hasOwnProperty('hitpoints');
+    }
+
+    public isAutomatedCharacter(): boolean{
+        return this.hasOwnProperty('intents');
+    }
+    
+    public isPlayableCard(): boolean{
+        return this.hasOwnProperty('targetingType');
+    }
+
     protected _name: string;
     protected _description: string;
     public portraitName: string

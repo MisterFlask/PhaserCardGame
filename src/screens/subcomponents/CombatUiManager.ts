@@ -15,6 +15,7 @@ import { BaseCharacter } from '../../gamecharacters/BaseCharacter';
 import { PlayableCard } from '../../gamecharacters/PlayableCard';
 import { PlayerCharacter } from '../../gamecharacters/CharacterClasses';
 import { ActionManager } from '../../utils/ActionManager';
+import { SubtitleManager } from '../../ui/SubtitleManager';
 
 interface MenuOption {
     text: string;
@@ -37,6 +38,7 @@ class CombatUIManager {
 
     private constructor(scene: Phaser.Scene) {
         this.scene = scene;
+        SubtitleManager.setInstance(scene);
         this.createUI();
         this.createCardRewardScreen(); // Initialize CardRewardScreen
 

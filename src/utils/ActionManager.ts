@@ -496,7 +496,7 @@ export class ActionManager {
         const allCards = [...gameState.combatState.playerCharacters, ...gameState.combatState.enemies];
 
         allCards.forEach(card => {
-            if (card.typeTag === "AutomatedCharacter") {
+            if (card.isAutomatedCharacter()) {
                 var autoChar = card as AutomatedCharacterType;
                 const intents = autoChar.intents;
                 intents.forEach(intent => {

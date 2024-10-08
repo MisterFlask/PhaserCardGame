@@ -9,6 +9,10 @@ export class SubtitleManager {
         this.scene = scene;
     }
 
+    public static setInstance(scene: Phaser.Scene): void {
+        SubtitleManager.instance = new SubtitleManager(scene);
+    }
+
     public static getInstance(scene?: Phaser.Scene): SubtitleManager {
         if (!SubtitleManager.instance) {
             if (!scene) {

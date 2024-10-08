@@ -38,8 +38,7 @@ export class CombatRules {
     }
 
     public static handleDeath(character: IBaseCharacter, killer: IBaseCharacter | null): void {
-        if (character.typeTag === "AutomatedCharacter"){
-            
+        if (character.isAutomatedCharacter()){
             (character as AutomatedCharacterType).intents = [];
         }
         character.buffs = [];

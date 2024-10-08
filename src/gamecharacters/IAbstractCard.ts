@@ -21,6 +21,10 @@ export interface IAbstractCard extends JsonRepresentable {
     energyCost: number;
     physicalCard?: IPhysicalCardInterface | undefined;
 
+    isBaseCharacter(): boolean;
+    isAutomatedCharacter(): boolean;
+    isPlayableCard(): boolean;
+
     OnCombatStart(): void;
     Copy(): IAbstractCard;
 }
