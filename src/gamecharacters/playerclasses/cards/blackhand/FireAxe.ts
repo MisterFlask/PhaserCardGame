@@ -1,6 +1,7 @@
+import { GameState } from "../../../../rules/GameState";
 import { TargetingType } from "../../../AbstractCard";
 import { BaseCharacter } from "../../../BaseCharacter";
-import { Smoldering } from "../../../buffs/blackhand/Smoldering";
+import { Burning } from "../../../buffs/standard/Burning";
 import { PlayableCard } from "../../../PlayableCard";
 
 export class FireAxe extends PlayableCard {
@@ -12,29 +13,18 @@ export class FireAxe extends PlayableCard {
             targetingType: TargetingType.ENEMY,
         });
         this.baseDamage = 6;
+        this.baseMagicNumber = 3;
         this.energyCost = 1;
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage. Double damage if the target is Smoldering.`;
+        return `Deal ${this.getDisplayedDamage()} damage. Apply ${this.getDisplayedMagicNumber()} Burning.`;
     }
     
     override InvokeCardEffects(targetCard?: BaseCharacter): void {
         if (targetCard && targetCard instanceof BaseCharacter) {
-            let damageAmount = this.getBaseDamageAfterResourceScaling();
-            if (targetCard.buffs.some(buff => buff instanceof Smoldering)) {
-                damageAmount *= 2;
-            }
-            
-            this.actionManager.dealDamage({
-                baseDamageAmount: damageAmount,
-                target: targetCard,
-                sourceCharacter: this.owner!,
-                fromAttack: true,
-                sourceCard: this
-            });
-            
-            console.log(`Dealt ${damageAmount} damage to ${targetCard.name}`);
+            this.dealDamageToTarget(targetCard);
+            this.actionManager.applyBuffToCharacter(targetCard, new Burning(this.getBaseMagicNumberAfterResourceScaling()), this.owner as BaseCharacter);
         }
     }
 }

@@ -18,8 +18,26 @@ export abstract class PlayableCard extends AbstractCard {
         this.price = price ?? 100;
     }
 
-    
-    OnPurchase = (): void => {
+    forEachAlly(callback: (ally: BaseCharacter) => void): void {
+        this.combatState.playerCharacters
+            .filter(char => char.team === Team.ALLY)
+            .forEach(callback);
+    }
+
+    forEachEnemy(callback: (enemy: BaseCharacter) => void): void {
+        this.combatState.enemies
+            .filter(char => char.team === Team.ENEMY)
+            .forEach(callback);
+    }
+
+    performActionOnRandomEnemy(callback: (enemy: BaseCharacter) => void): void {
+        const randomEnemy = this.randomEnemy();
+        if (randomEnemy) {
+            callback(randomEnemy);
+        }
+    }
+
+    OnPurchase(): void{
         console.log('Item purchased');
     }
 
@@ -99,7 +117,7 @@ export abstract class PlayableCard extends AbstractCard {
         return GameState.getInstance().combatState.combatResources;
     }
     
-    get randomEnemy() : BaseCharacter | undefined {
+    randomEnemy() : BaseCharacter | undefined {
         const livingEnemies = this.combatState.enemies.filter(enemy => enemy.hitpoints > 0);
         
         if (livingEnemies.length === 0) {

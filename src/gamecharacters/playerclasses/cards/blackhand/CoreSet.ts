@@ -1,5 +1,5 @@
 /**
- * 
+ * BURNING:  Halves each turn.
  * 
  * 
 **Blackhand Core Set**
@@ -26,13 +26,13 @@ Uncommons:
 
 Rare:
 * Gasman:  Smoldering deal an additional 4 damage per turn.  Apply 1 Fumes to all enemies.  Power.  Cost 2.
-* The Scent of Weakness:  Power:  applying Weak also applies Vulnerable.
+* The Scent of Weakness:  Power:  Whenever an enemy becomes Weak, they gain the same amount of Vulnerable.
 
 Madman:
 
 Uncommons:
 * Rage-Fueled Axe:  Deals 8 damage.  Do it again for every card that has been exhausted this turn.
-* It Was An Axe-ident:  Deal 10 damage.  Lethal: Play it again.  Cost 1.
+* It Was An Axe-ident:  Deal 10 damage.  Lethal: Play it again.  Volatile.  Cost 1.
 * Random Axe Of Kindness:  Grant 10 block to target ally.  Deal 10 damage to two random enemies.  Cost 3.
 
 Rares:
@@ -40,3 +40,4 @@ Rares:
 * Axe-Crazy:  The first time you play a card with Axe in the name each turn, play it again.  Add a Fire Axe to the bottom of your draw pile.  Cost 1. Power.
 * Potent Distraction:  Apply 7 Burning to ALL enemies.  All allies gain 4 Defense.
  */
+

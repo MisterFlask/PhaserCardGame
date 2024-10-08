@@ -3,6 +3,12 @@ import { GameState } from "../rules/GameState";
 import { PhysicalCard } from '../ui/PhysicalCard';
 
 export class ActionManager {
+    exhaustCard(ownerCard: PlayableCard) {
+        throw new Error("Method not implemented.");
+    }
+    exhaustRandomCardInHand() {
+        throw new Error("Method not implemented.");
+    }
     private static instance: ActionManager;
     private actionQueue: ActionQueue;
     private scene!: Scene;

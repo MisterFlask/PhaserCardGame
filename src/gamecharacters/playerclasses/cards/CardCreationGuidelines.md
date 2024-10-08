@@ -1,0 +1,19 @@
+
+
+# Rules
+1. Always implement the PlayableCard class.  InvokeCardEffects is where the actual logic goes of playing the card.
+2. Avoid hardcoding specific numbers in the description() method.  Instead use getDisplayedDamage(), getDisplayedBlock(), and getDisplayedMagicNumber() to display the values.
+3. Use the forEachAlly and forEachEnemy methods to iterate over the characters in the combat state.
+4. Use the performActionOnRandomEnemy method to perform an action on a random enemy.
+5. Use the OnPurchase method to perform an action when the card is purchased.
+7. Use the baseDamage, baseBlock, and baseMagicNumber properties to set the base values of the card.
+
+# Card Buffs
+Playable cards may have buffs (read: instances of AbstractBuff.)  These can be either buffs or debuffs; there is a flag (isDebuff) that determines this and that's set in the cosntructor.  AbstractBuffs implement various triggered effects; e.g. "ExhaustBuff" when added to a card makes it exhaust when played.
+
+You MAY have to create a new implementation of AbstractBuff.  This is necessary if the buff has special logic, such as "PyrestarterBuff" in "Pyrestarter".
+
+# Card Resource Scaling
+Some cards have resource scaling.  This is defined in the constructor of the card with a new CardResourceScaling object.  These objects have a resource property which is the CombatResource that the scaling should apply to, and a multiplier which is multiplied with the card's base value to get the final value.  See "StormCloak" for an example.
+
+

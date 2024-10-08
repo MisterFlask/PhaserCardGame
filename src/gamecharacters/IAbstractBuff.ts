@@ -17,9 +17,9 @@ export interface IAbstractBuff {
     getDescription(): string;
     getStacksDisplayText(): string;
     getOwnerAsCharacter(): BaseCharacter | null;
-    getCombatDamageDealtModifier(target:BaseCharacter): number;
+    getCombatDamageDealtModifier(target?:BaseCharacter): number;
     getBlockSentModifier(): number;
-    getPercentCombatDamageDealtModifier(target: BaseCharacter): number;
+    getPercentCombatDamageDealtModifier(target?: BaseCharacter): number;
     getPercentCombatDamageTakenModifier(): number;
     getCombatDamageTakenModifier(): number;
     getBlockReceivedModifier(): number;

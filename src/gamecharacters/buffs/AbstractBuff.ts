@@ -100,7 +100,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
     // this is a FLAT modifier on top of damage taken, not percentage-based.
     //  this refers to pre-block damage.
-    getCombatDamageDealtModifier(target: IBaseCharacter): number {
+    getCombatDamageDealtModifier(target?: BaseCharacter): number {
         return 0;
     }
 
@@ -115,7 +115,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
     }
     // this is a percentage modifier on top of damage taken.  If this is "100" that means 100% more damage is taken.  If this is -100 then this means the character takes no damage.  Standard is 0, which means no modifier.
     // Note this does not take into account blocking in any way.
-    getPercentCombatDamageTakenModifier(): number {
+    getPercentCombatDamageTakenModifier(target?: IBaseCharacter): number {
         return 0;
     }
     // this is a FLAT modifier on top of damage taken, not percentage-based.
