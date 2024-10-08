@@ -7,6 +7,7 @@ import { CardSize, CardType } from '../gamecharacters/Primitives';
 import { GameState } from '../rules/GameState';
 
 export class LocationCard extends AbstractCard {
+    override typeTag = "LocationCard";
     encounter: EncounterData;
     public adjacentLocations: LocationCard[] = []; // New property for adjacency
     public xPos: number = 0;

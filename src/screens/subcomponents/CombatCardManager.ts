@@ -1,12 +1,13 @@
 // src/managers/CombatCardManager.ts
 
 import Phaser from 'phaser';
-import { AbstractCard, UiCard } from '../../gamecharacters/AbstractCard';
+import {  UiCard } from '../../gamecharacters/AbstractCard';
 import { AutomatedCharacter } from '../../gamecharacters/AutomatedCharacter';
 import { GameState } from '../../rules/GameState';
 import CombatSceneLayoutUtils from '../../ui/LayoutUtils';
 import { PhysicalCard } from '../../ui/PhysicalCard';
 import { CardGuiUtils } from '../../utils/CardGuiUtils';
+import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
 
 export class CombatCardManager {
     private scene: Phaser.Scene;
@@ -134,7 +135,7 @@ export class CombatCardManager {
         // Add new cards to hand
         state.currentHand.forEach(abstractCard => {
             if (!existingCards.has(abstractCard.id)) {
-                const newCard = this.animateCardDraw(abstractCard);
+                const newCard = this.animateCardDraw(abstractCard as IAbstractCard);
                 this.playerHand.push(newCard);
             }
         });
@@ -146,7 +147,7 @@ export class CombatCardManager {
         this.arrangeCards(this.playerHand, CombatSceneLayoutUtils.getHandY(this.scene));
     }
 
-    private animateCardDraw(data: AbstractCard): PhysicalCard {
+    private animateCardDraw(data: IAbstractCard): PhysicalCard {
         const card = CardGuiUtils.getInstance().createCard({
             scene: this.scene,
             x: this.drawPile.container.x,

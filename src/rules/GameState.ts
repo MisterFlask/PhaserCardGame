@@ -1,7 +1,7 @@
-import { AbstractCard } from '../gamecharacters/AbstractCard';
 import { AutomatedCharacter } from '../gamecharacters/AutomatedCharacter';
 import { BaseCharacter } from '../gamecharacters/BaseCharacter';
 import { PlayerCharacter } from '../gamecharacters/CharacterClasses';
+import { IAbstractCard } from '../gamecharacters/IAbstractCard';
 import { PlayableCard } from '../gamecharacters/PlayableCard';
 import { LocationCard } from '../maplogic/LocationCard';
 import { PhysicalCard } from '../ui/PhysicalCard';
@@ -30,7 +30,7 @@ export class GameState {
         return GameState.instance;
     }
 
-    private obliteratePhysicalCard(item: AbstractCard): void {
+    private obliteratePhysicalCard(item: IAbstractCard): void {
         if (item.physicalCard) {
             const card = item.physicalCard as PhysicalCard;
             card.obliterate();
@@ -38,7 +38,7 @@ export class GameState {
         }
     }
 
-    private obliteratePhysicalCardsForArray(items: (AbstractCard | PlayableCard)[]): void {
+    private obliteratePhysicalCardsForArray(items: (IAbstractCard | PlayableCard)[]): void {
         items.forEach(item => this.obliteratePhysicalCard(item));
     }
 
@@ -154,10 +154,10 @@ export class CombatState{
 
     characterHoveredOver_transient?: BaseCharacter
 
-    currentCombatDeck: AbstractCard[] = []
-    currentDrawPile: AbstractCard[] = []
-    currentDiscardPile: AbstractCard[] = []
-    currentHand: AbstractCard[] = []
+    currentCombatDeck: IAbstractCard[] = []
+    currentDrawPile: IAbstractCard[] = []
+    currentDiscardPile: IAbstractCard[] = []
+    currentHand: IAbstractCard[] = []
 
     enemies: AutomatedCharacter[] = []
     playerCharacters: BaseCharacter[] = []

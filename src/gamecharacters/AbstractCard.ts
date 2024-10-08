@@ -1,17 +1,15 @@
 import { IAbstractCard } from './IAbstractCard';
-import { JsonRepresentable } from '../interfaces/JsonRepresentable';
-import {  GameState } from '../rules/GameState';
-import { AbstractIntent } from './AbstractIntent'; // Import AbstractIntent
 import { AbstractBuff } from './buffs/AbstractBuff';
 import { CardSize, CardType } from './Primitives'; // Ensure enums are imported from Primitives
 import { IBaseCharacter } from './IBaseCharacter';
-import { ActionManager } from '../utils/ActionManager';
-import { BaseCharacter } from './BaseCharacter';
+import { TextBox } from '../ui/TextBox';
 
 export interface IPhysicalCardInterface {
     container: Phaser.GameObjects.Container;
-    cardBackground: Phaser.GameObjects.Image;
+    cardBackground: Phaser.GameObjects.Image | Phaser.GameObjects.Rectangle;
     cardImage: Phaser.GameObjects.Image;
+    data: IAbstractCard;
+    blockText: TextBox;
 }
 
 const wordList = [
@@ -79,6 +77,8 @@ export enum Team{
 }
 
 export abstract class AbstractCard implements IAbstractCard {
+
+    public typeTag: string = "AbstractCard"
     public get name(): string {
         return this._name;
     }
@@ -136,15 +136,6 @@ export abstract class AbstractCard implements IAbstractCard {
         Object.assign(copy, this);
         copy.id = generateWordGuid();
         return copy;
-    }
-
-    addBuffs(buffs: AbstractBuff[]): void {
-        buffs.forEach(buff => {
-            ActionManager.getInstance().applyBuffToCharacter(this.owner as BaseCharacter, buff);
-        }); 
-    }
-    addBuff(buff: AbstractBuff): void {
-        ActionManager.getInstance().applyBuffToCharacter(this.owner as BaseCharacter, buff);
     }
     
     createJsonRepresentation(): string {

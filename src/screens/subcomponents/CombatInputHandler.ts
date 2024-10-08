@@ -11,6 +11,7 @@ import { ActionManager } from '../../utils/ActionManager';
 import { IntentEmitter } from '../../utils/intentemitter';
 import CombatCardManager from './CombatCardManager';
 import { PlayableCard } from '../../gamecharacters/PlayableCard';
+import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
 
 class CombatInputHandler {
     private scene: Phaser.Scene;
@@ -150,7 +151,7 @@ class CombatInputHandler {
         return card.targetingType;
     }
 
-    private isValidTarget(card: PlayableCard, target: AbstractCard): boolean {
+    private isValidTarget(card: PlayableCard, target: IAbstractCard): boolean {
         if (card.targetingType === TargetingType.NO_TARGETING) return true;
 
         if (target instanceof BaseCharacter) {

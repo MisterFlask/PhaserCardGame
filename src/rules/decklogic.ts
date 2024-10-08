@@ -1,4 +1,4 @@
-import { AbstractCard } from '../gamecharacters/AbstractCard';
+import { IAbstractCard } from '../gamecharacters/IAbstractCard';
 import { GameState } from './GameState';
 
 
@@ -19,10 +19,10 @@ export class DeckLogic {
     return DeckLogic.instance;
   }
 
-  public generateInitialCombatDeck(): AbstractCard[] {
+  public generateInitialCombatDeck(): IAbstractCard[] {
     const gameState = GameState.getInstance();
     const selectedCharacters = gameState.getCurrentRunCharacters();
-    let initialDeck: AbstractCard[] = [];
+    let initialDeck: IAbstractCard[] = [];
 
     for (const character of selectedCharacters) {
       initialDeck = initialDeck.concat(character.cardsInMasterDeck);
@@ -39,10 +39,10 @@ export class DeckLogic {
     return array;
   }
 
-  public drawCards(count: number): AbstractCard[] {
+  public drawCards(count: number): IAbstractCard[] {
     const gameState = GameState.getInstance();
     const combatState = gameState.combatState;
-    const drawnCards: AbstractCard[] = [];
+    const drawnCards: IAbstractCard[] = [];
 
     for (let i = 0; i < count; i++) {
       if (combatState.currentDrawPile.length === 0) {
@@ -71,7 +71,7 @@ export class DeckLogic {
     return drawnCards;
   }
 
-  public static moveCardToPile(card: AbstractCard, pile: PileName): void {
+  public static moveCardToPile(card: IAbstractCard, pile: PileName): void {
       const gameState = GameState.getInstance();
       const combatState = gameState.combatState;
 
@@ -93,7 +93,7 @@ export class DeckLogic {
       }
   }
 
-  private static removeCardFromAllPiles(card: AbstractCard): void {
+  private static removeCardFromAllPiles(card: IAbstractCard): void {
     const gameState = GameState.getInstance();
     const combatState = gameState.combatState;
 

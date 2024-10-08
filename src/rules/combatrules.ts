@@ -1,11 +1,9 @@
-import { AbstractCard } from "../gamecharacters/AbstractCard";
-import { AutomatedCharacter } from "../gamecharacters/AutomatedCharacter";
-import { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { IBaseCharacter } from "../gamecharacters/IBaseCharacter";
-import { PlayableCard } from "../gamecharacters/PlayableCard";
-import { SceneChanger } from "../screens/SceneChanger";
-import { ActionManager } from "../utils/ActionManager";
 import { GameState } from "./GameState";
+
+
+import { AutomatedCharacterType, BaseCharacterType, PlayableCardType } from "../Types";
+import { IAbstractCard } from "../gamecharacters/IAbstractCard";
 
 export class DamageCalculationResult {
     totalDamage: number;
@@ -20,54 +18,8 @@ export class DamageCalculationResult {
 }
 
 export class CombatRules {
-    public static PlayCard = (card: PlayableCard, target: BaseCharacter): void => {
-        // Invoke the effect of the card
-        if (card.IsPerformableOn(target)) {
-            card.InvokeCardEffects(target);
-        }
 
-        // Queue discard action instead of direct discard
-        ActionManager.getInstance().discardCard(card);
-    };
-
-    public static endTurn(): void {
-        console.log('Ending turn');
-        const gameState = GameState.getInstance();
-        const combatState = gameState.combatState;
-
-        // {{ edit_1 }}
-        // Remove intents from dead enemies
-        combatState.enemies.forEach(enemy => {
-            if (enemy.hitpoints <= 0) {
-                enemy.intents = [];
-            }
-        });
-
-        combatState.enemies.forEach(enemy => {
-            for (const intent of [...enemy.intents]) {
-                // Display the intent's title or tooltip text
-                ActionManager.getInstance().displaySubtitle(intent.title || intent.tooltipText());
-
-                
-                // Queue the intent's action
-                intent.act();
-
-                // Hide the subtitle after the action completes
-                ActionManager.getInstance().hideSubtitle();
-
-                // Set new intents for the enemy
-                ActionManager.performAsyncronously(async () => {
-                    await enemy.removeIntent(intent);
-                });
-            }
-        });
-
-        // Queue discard actions instead of direct discard
-        ActionManager.getInstance().discardCards(combatState.currentHand);
-        CombatRules.beginTurn();
-    }
-
-    public static calculateBlockSentToCharacterByCard(card: PlayableCard, sourceCharacter: IBaseCharacter, targetCharacter: IBaseCharacter): number{
+    public static calculateBlockSentToCharacterByCard(card: PlayableCardType, sourceCharacter: IBaseCharacter, targetCharacter: IBaseCharacter): number{
         let totalBlock = card.getBaseBlockAfterResourceScaling();
 
         if (sourceCharacter) {
@@ -86,8 +38,9 @@ export class CombatRules {
     }
 
     public static handleDeath(character: IBaseCharacter, killer: IBaseCharacter | null): void {
-        if (character instanceof AutomatedCharacter){
-            character.intents = [];
+        if (character.typeTag === "AutomatedCharacter"){
+            
+            (character as AutomatedCharacterType).intents = [];
         }
         character.buffs = [];
 
@@ -95,7 +48,7 @@ export class CombatRules {
         const gameState = GameState.getInstance();
         const combatState = gameState.combatState;
 
-        const removeDeadCharacterCards = (pile: AbstractCard[]) => {
+        const removeDeadCharacterCards = (pile: IAbstractCard[]) => {
             return pile.filter(card => card.owner !== character);
         };
 
@@ -116,38 +69,6 @@ export class CombatRules {
         }
     }
 
-    public static beginTurn(): void {
-        const gameState = GameState.getInstance();
-        const combatState = gameState.combatState;
-
-        // Prevent dead enemies from gaining new intents
-        combatState.enemies.forEach(enemy => {
-            if (enemy.hitpoints > 0) {
-                enemy.setNewIntents();
-            }
-        });
-
-        // Queue draw action instead of direct draw
-        ActionManager.getInstance().drawHandForNewTurn();
-
-        combatState.energyAvailable = combatState.maxEnergy
-    }
-
-    public static ExecuteIntents(): void {
-        const gameState = GameState.getInstance();
-        const allCards = [...gameState.combatState.playerCharacters, ...gameState.combatState.enemies];
-
-        allCards.forEach(card => {
-            if (card instanceof AutomatedCharacter) {
-                var autoChar = card as AutomatedCharacter;
-                const intents = autoChar.intents;
-                intents.forEach(intent => {
-                    intent.act();
-                });
-            }
-        });
-    }
-
 
     /**
      * The only time target is null is when we're calculating the damage of something hypothetically.
@@ -163,13 +84,13 @@ export class CombatRules {
         baseDamageAmount: number,
         target?: IBaseCharacter,
         sourceCharacter?: IBaseCharacter,
-        sourceCard?: PlayableCard,
+        sourceCard?: PlayableCardType,
         fromAttack?: boolean
     }): DamageCalculationResult => {
         let totalDamage = baseDamageAmount;
         
         sourceCharacter?.buffs.forEach(buff => {
-            totalDamage += buff.getCombatDamageDealtModifier(target as BaseCharacter);
+            totalDamage += buff.getCombatDamageDealtModifier(target as BaseCharacterType);
             totalDamage *= (1 + buff.getAdditionalPercentCombatDamageDealtModifier() / 100);
         });
         // Apply target character buffs
@@ -180,7 +101,7 @@ export class CombatRules {
 
         //apply playable card buffs
         sourceCard?.buffs.forEach(buff => {
-            totalDamage += buff.getCombatDamageDealtModifier(target as BaseCharacter);
+            totalDamage += buff.getCombatDamageDealtModifier(target as BaseCharacterType);
             totalDamage *= (1 + buff.getAdditionalPercentCombatDamageDealtModifier() / 100);
         });
         // Ensure damage doesn't go below 0

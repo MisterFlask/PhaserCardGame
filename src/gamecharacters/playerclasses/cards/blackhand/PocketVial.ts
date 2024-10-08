@@ -6,10 +6,11 @@ import { VolatileBuff } from "../../../buffs/playable_card/VolatileCardBuff";
 import { Weak } from "../../../buffs/standard/Weak";
 import { IBaseCharacter } from "../../../IBaseCharacter";
 import { PlayableCard, CardRarity } from "../../../PlayableCard";
+import { PlayableCardWithHelpers } from "../../../PlayableCardWithHelpers";
 import { CardType } from "../../../Primitives";
 
 
-export class PocketVial extends PlayableCard {
+export class PocketVial extends PlayableCardWithHelpers {
     constructor() {
         super({
             name: "Pocket Vial",
@@ -32,7 +33,7 @@ export class PocketVial extends PlayableCard {
             const totalDamage = this.getBaseDamageAfterResourceScaling() + smolderingCount;
             
             this.dealDamageToTarget(targetCard as BaseCharacter);
-            targetCard.addBuff(new Weak(this.getBaseMagicNumberAfterResourceScaling()));
+            this.addBuff(targetCard as BaseCharacter, new Weak(this.getBaseMagicNumberAfterResourceScaling()));
         }
     }
 }

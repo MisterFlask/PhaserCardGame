@@ -6,6 +6,7 @@ import { IPhysicalCardInterface, Team } from './AbstractCard';
 import { IBaseCharacter } from './IBaseCharacter';
 
 export interface IAbstractCard extends JsonRepresentable {
+    typeTag: string;
     name: string;
     description: string;
     portraitName: string;

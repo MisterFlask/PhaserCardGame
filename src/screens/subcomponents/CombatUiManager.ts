@@ -14,6 +14,7 @@ import { Shoot } from '../../gamecharacters/playerclasses/cards/basic/Shoot';
 import { BaseCharacter } from '../../gamecharacters/BaseCharacter';
 import { PlayableCard } from '../../gamecharacters/PlayableCard';
 import { PlayerCharacter } from '../../gamecharacters/CharacterClasses';
+import { ActionManager } from '../../utils/ActionManager';
 
 interface MenuOption {
     text: string;
@@ -231,7 +232,7 @@ class CombatUIManager {
 
         this.endTurnButton.background!!.setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
-                CombatRules.endTurn();
+                ActionManager.endTurn();
             });
 
         this.scene.add.existing(this.endTurnButton.background!!);

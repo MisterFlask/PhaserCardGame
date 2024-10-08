@@ -1,9 +1,18 @@
-import { BaseCharacter } from "../gamecharacters/BaseCharacter";
+
 import { GameState } from "../rules/GameState";
-import { PhysicalCard } from '../ui/PhysicalCard';
+
+import Phaser, { Scene } from 'phaser';
+import { IPhysicalCardInterface } from '../gamecharacters/AbstractCard';
+import { AbstractBuff } from "../gamecharacters/buffs/AbstractBuff";
+import { CombatRules, DamageCalculationResult } from "../rules/CombatRules";
+import { DeckLogic, PileName } from "../rules/DeckLogic";
+import { IBaseCharacter } from "../gamecharacters/IBaseCharacter";
+import { AutomatedCharacterType, BaseCharacterType, PlayableCardType } from "../Types";
+import { IAbstractCard } from "../gamecharacters/IAbstractCard";
+import { SubtitleManager } from "../ui/SubtitleManager";
 
 export class ActionManager {
-    exhaustCard(ownerCard: PlayableCard) {
+    exhaustCard(ownerCard: PlayableCardType) {
         throw new Error("Method not implemented.");
     }
     exhaustRandomCardInHand() {
@@ -40,13 +49,13 @@ export class ActionManager {
         return ActionManager.instance;
     }
 
-    public tiltCharacter(character: BaseCharacter){
-        this.animateAttackerTilt(character.physicalCard as PhysicalCard);
+    public tiltCharacter(character: BaseCharacterType){
+        this.animateAttackerTilt(character.physicalCard!);
     }
 
     public applyBuffToCharacter(character: IBaseCharacter, buff: AbstractBuff, sourceCharacter?: IBaseCharacter): void {
         this.actionQueue.addAction(new GenericAction(async () => {
-            AbstractBuff._applyBuffToCharacter(character as BaseCharacter, buff);
+            AbstractBuff._applyBuffToCharacter(character as BaseCharacterType, buff);
             console.log(`Applied buff ${buff.getName()} to ${character.name}`);
             // You might want to add some animation or visual feedback here
             await new WaitAction(20).playAction(); // Short delay for visual feedback
@@ -67,9 +76,9 @@ export class ActionManager {
         }));
     }
 
-    public playCard(card: PhysicalCard, target?: BaseCharacter) {
+    public playCard(card: IPhysicalCardInterface, target?: BaseCharacterType) {
         this.actionQueue.addAction(new GenericAction(async () => {
-            const playableCard = card.data as PlayableCard;
+            const playableCard = card.data as PlayableCardType;
 
             let canBePlayed = playableCard.IsPerformableOn(target);
             if (!canBePlayed) {
@@ -89,7 +98,7 @@ export class ActionManager {
         }));
     }
 
-    private animateDrawCard(card: AbstractCard): Promise<void> {
+    private animateDrawCard(card: IAbstractCard): Promise<void> {
         return new Promise<void>((resolve) => {
             // Implement draw animation logic here
             console.log(`Animating draw for card: ${card.name}`);
@@ -98,7 +107,7 @@ export class ActionManager {
         });
     }
 
-    private animateDiscardCard(card: PhysicalCard): Promise<void> {
+    private animateDiscardCard(card: IPhysicalCardInterface): Promise<void> {
         return new Promise<void>((resolve) => {
             // Implement discard animation logic here
             console.log(`Animating discard for card: ${card.data.name}`);
@@ -107,10 +116,10 @@ export class ActionManager {
         });
     }
 
-    public discardCard = (card: AbstractCard): void => {
+    public discardCard = (card: IAbstractCard): void => {
         this.actionQueue.addAction(new GenericAction(async () => {
             DeckLogic.moveCardToPile(card, PileName.Discard);
-            await this.animateDiscardCard(card.physicalCard as PhysicalCard);
+            await this.animateDiscardCard(card.physicalCard!);
             await new WaitAction(20).playAction();
             return [];
         }));
@@ -133,7 +142,7 @@ export class ActionManager {
     public drawCards(count: number): void {
         this.actionQueue.addAction(new GenericAction(async () => {
             const deckLogic = DeckLogic.getInstance();
-            const drawnCards: AbstractCard[] = [];
+            const drawnCards: IAbstractCard[] = [];
             // Add a small delay after drawing each card
             for (let i = 0; i < count; i++) {
                 const drawnCard = deckLogic.drawCards(1)[0];
@@ -156,7 +165,7 @@ export class ActionManager {
 
     public applyBlock(params: {
         baseBlockValue: number,
-        appliedViaPlayableCard?: PlayableCard,
+        appliedViaPlayableCard?: PlayableCardType,
         blockSourceCharacter?: IBaseCharacter,
         blockTargetCharacter?: IBaseCharacter
     }): void {
@@ -170,7 +179,7 @@ export class ActionManager {
         this.actionQueue.addAction(new GenericAction(async () => {
             console.log("Applying block to " + blockTargetCharacter.name);
             // Get the physical card of the target character
-            const targetPhysicalCard = (blockTargetCharacter as any).physicalCard as PhysicalCard;
+            const targetPhysicalCard = (blockTargetCharacter as any).physicalCard as IPhysicalCardInterface;
 
             if (targetPhysicalCard && targetPhysicalCard.blockText) {
                 // Pulse the block text box
@@ -181,7 +190,7 @@ export class ActionManager {
         }));
     }
 
-    private animateCardDamage(physicalCardOfTarget: PhysicalCard): Promise<void> {
+    private animateCardDamage(physicalCardOfTarget: IPhysicalCardInterface): Promise<void> {
         return new Promise<void>((resolve) => {
             // Shake the card
             const originalX = physicalCardOfTarget.container.x;
@@ -231,11 +240,11 @@ export class ActionManager {
         baseDamageAmount: number,
         target: IBaseCharacter,
         sourceCharacter?: IBaseCharacter,
-        sourceCard?: PlayableCard,
+        sourceCard?: PlayableCardType,
         fromAttack?: boolean
     }): void => {
         this.actionQueue.addAction(new GenericAction(async () => {
-            const physicalCardOfTarget = target.physicalCard as PhysicalCard;
+            const physicalCardOfTarget = target.physicalCard;
             if (!physicalCardOfTarget) {
                 return [];
             }
@@ -292,7 +301,7 @@ export class ActionManager {
      * Animates the attacker tilting briefly to simulate an attack.
      * @param attacker The PhysicalCard of the attacker.
      */
-    public animateAttackerTilt(attacker: PhysicalCard): void {
+    public animateAttackerTilt(attacker: IPhysicalCardInterface): void {
         this.actionQueue.addAction(new GenericAction(async () => {
             // Tilt to the right
 
@@ -316,7 +325,7 @@ export class ActionManager {
      * @param defender The PhysicalCard of the defender.
      * @param color The color to glow (e.g., red for damage dealt, white otherwise).
      */
-    private animateDefenderJiggleAndGlow(defender: PhysicalCard, color: number): void {
+    private animateDefenderJiggleAndGlow(defender: IPhysicalCardInterface, color: number): void {
         this.actionQueue.addAction(new GenericAction(async () => {
             // Jiggle the defender
             this.scene.tweens.add({
@@ -328,8 +337,9 @@ export class ActionManager {
                 ease: 'Power1'
             });
 
+            var bg = defender.cardBackground;
             // Glow effect based on damage
-            if (defender.cardBackground instanceof Phaser.GameObjects.Image) {
+            if (bg instanceof Phaser.GameObjects.Image) {
                 this.scene.tweens.add({
                     targets: defender.cardBackground,
                     tint: color,
@@ -337,7 +347,7 @@ export class ActionManager {
                     yoyo: true,
                     ease: 'Power1'
                 });
-            } else if (defender.cardBackground instanceof Phaser.GameObjects.Rectangle) {
+            } else if (bg instanceof Phaser.GameObjects.Rectangle) {
                 this.scene.tweens.add({
                     targets: defender.cardBackground,
                     fillColor: color,
@@ -353,7 +363,7 @@ export class ActionManager {
         }));
     }
 
-    public purchaseShopItem(item: PlayableCard): void {
+    public purchaseShopItem(item: PlayableCardType): void {
         item.OnPurchase();
         const inventory = GameState.getInstance().getInventory();
         inventory.push(item);
@@ -363,7 +373,7 @@ export class ActionManager {
     public async resolveActions(): Promise<void> {
         await this.actionQueue.resolveActions();
     }
-    public discardCards(cards: AbstractCard[]): void {
+    public discardCards(cards: IAbstractCard[]): void {
         // Queue discarding multiple cards
         this.actionQueue.addAction(new GenericAction(async () => {
             cards.forEach(card => {
@@ -373,37 +383,37 @@ export class ActionManager {
         }));
     }
 
-    public modifyFog(amount: number, sourceCharacterIfAny?: BaseCharacter): void {
+    public modifyFog(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
         this.actionQueue.addAction(new GenericAction(async () => {
             GameState.getInstance().combatState.combatResources.modifyFog(amount);
             return [];
         }));
     }
-    public modifyIce(amount: number, sourceCharacterIfAny?: BaseCharacter): void {
+    public modifyIce(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
         this.actionQueue.addAction(new GenericAction(async () => {
             GameState.getInstance().combatState.combatResources.modifyIce(amount);
             return [];
         }));
     }
-    public modifyPages(amount: number, sourceCharacterIfAny?: BaseCharacter): void {
+    public modifyPages(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
         this.actionQueue.addAction(new GenericAction(async () => {
             GameState.getInstance().combatState.combatResources.modifyPages(amount);
             return [];
         }));
     }
-    public modifyIron(amount: number, sourceCharacterIfAny?: BaseCharacter): void {
+    public modifyIron(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
         this.actionQueue.addAction(new GenericAction(async () => {
             GameState.getInstance().combatState.combatResources.modifyIron(amount);
             return [];
         }));
     }
-    public modifyGold(amount: number, sourceCharacterIfAny?: BaseCharacter): void {
+    public modifyGold(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
         this.actionQueue.addAction(new GenericAction(async () => {
             GameState.getInstance().combatState.combatResources.modifyGold(amount);
             return [];
         }));
     }
-    public modifyThunder(amount: number, sourceCharacterIfAny?: BaseCharacter): void {
+    public modifyThunder(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
         this.actionQueue.addAction(new GenericAction(async () => {
             GameState.getInstance().combatState.combatResources.modifyThunder(amount);
             return [];
@@ -412,16 +422,94 @@ export class ActionManager {
 
     public displaySubtitle(text: string): void {
         this.actionQueue.addAction(new GenericAction(async () => {
-            await CombatUIManager.getInstance().showSubtitle(text);
+            await SubtitleManager.getInstance().showSubtitle(text);
             // Small delay to ensure the subtitle appears before the next action
             await new WaitAction(50).playAction();
             return [];
         }));
     }
+    public static PlayCard = (card: PlayableCardType, target: BaseCharacterType): void => {
+        // Invoke the effect of the card
+        if (card.IsPerformableOn(target)) {
+            card.InvokeCardEffects(target);
+        }
+
+        // Queue discard action instead of direct discard
+        ActionManager.getInstance().discardCard(card);
+    };
+
+    public static endTurn(): void {
+        console.log('Ending turn');
+        const gameState = GameState.getInstance();
+        const combatState = gameState.combatState;
+
+        // {{ edit_1 }}
+        // Remove intents from dead enemies
+        combatState.enemies.forEach(enemy => {
+            if (enemy.hitpoints <= 0) {
+                enemy.intents = [];
+            }
+        });
+
+        combatState.enemies.forEach(enemy => {
+            for (const intent of [...enemy.intents]) {
+                // Display the intent's title or tooltip text
+                ActionManager.getInstance().displaySubtitle(intent.title || intent.tooltipText());
+
+                
+                // Queue the intent's action
+                intent.act();
+
+                // Hide the subtitle after the action completes
+                ActionManager.getInstance().hideSubtitle();
+
+                // Set new intents for the enemy
+                ActionManager.performAsyncronously(async () => {
+                    await enemy.removeIntent(intent);
+                });
+            }
+        });
+
+        // Queue discard actions instead of direct discard
+        ActionManager.getInstance().discardCards(combatState.currentHand);
+        ActionManager.beginTurn();
+    }
+    public static beginTurn(): void {
+        const gameState = GameState.getInstance();
+        const combatState = gameState.combatState;
+
+        // Prevent dead enemies from gaining new intents
+        combatState.enemies.forEach(enemy => {
+            if (enemy.hitpoints > 0) {
+                enemy.setNewIntents();
+            }
+        });
+
+        // Queue draw action instead of direct draw
+        ActionManager.getInstance().drawHandForNewTurn();
+
+        combatState.energyAvailable = combatState.maxEnergy
+    }
+
+    public static ExecuteIntents(): void {
+        const gameState = GameState.getInstance();
+        const allCards = [...gameState.combatState.playerCharacters, ...gameState.combatState.enemies];
+
+        allCards.forEach(card => {
+            if (card.typeTag === "AutomatedCharacter") {
+                var autoChar = card as AutomatedCharacterType;
+                const intents = autoChar.intents;
+                intents.forEach(intent => {
+                    intent.act();
+                });
+            }
+        });
+    }
+
 
     public hideSubtitle(): void {
         this.actionQueue.addAction(new GenericAction(async () => {
-            await CombatUIManager.getInstance().hideSubtitle();
+            await SubtitleManager.getInstance().hideSubtitle();
             return [];
         }));
     }
@@ -481,17 +569,6 @@ export class ActionQueue {
         this.isResolving = false;
     }
 }
-
-
-import Phaser, { Scene } from 'phaser';
-import { AbstractCard } from '../gamecharacters/AbstractCard';
-import { AbstractBuff } from "../gamecharacters/buffs/AbstractBuff";
-import { CombatRules, DamageCalculationResult } from "../rules/CombatRules";
-import { DamageInfo } from "../rules/DamageInfo";
-import { DeckLogic, PileName } from "../rules/DeckLogic";
-import { PlayableCard } from "../gamecharacters/PlayableCard";
-import { IBaseCharacter } from "../gamecharacters/IBaseCharacter";
-import CombatUIManager from "../screens/subcomponents/CombatUiManager";
 
 export abstract class GameAction {
     abstract playAction(): Promise<GameAction[]>;

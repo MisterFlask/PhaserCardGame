@@ -1,9 +1,9 @@
 import { GameState, CombatState, CombatResources, CombatResource } from "../rules/GameState";
-import { ActionManager } from "../utils/ActionManager";
 import { AbstractCard, TargetingType, Team } from "./AbstractCard";
 import { CardType, CardSize } from "./Primitives";
 import { CombatRules } from "../rules/CombatRules";
 import { IBaseCharacter } from "./IBaseCharacter";
+import { ActionManager } from "../utils/ActionManager";
 
 export enum CardRarity {
     COMMON,
@@ -15,6 +15,7 @@ export enum CardRarity {
 
 export abstract class PlayableCard extends AbstractCard {
     targetingType: TargetingType;
+    override typeTag = "PlayableCard";
     price: number;
     rarity: CardRarity; // Added card rarity
 

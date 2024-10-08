@@ -10,6 +10,8 @@ export enum Gender{
     Female
 }
 export class BaseCharacter extends AbstractCard implements IBaseCharacter {
+    override typeTag = "BaseCharacter";
+
     portraitName: string;
     hitpoints: number;
     maxHitpoints: number;

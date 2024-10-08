@@ -1,14 +1,13 @@
 // src/gamecharacters/PhysicalCard.ts
 import Phaser from 'phaser';
-import { AbstractCard } from "../gamecharacters/AbstractCard";
 import { AbstractIntent } from '../gamecharacters/AbstractIntent';
-import { AutomatedCharacter } from '../gamecharacters/AutomatedCharacter';
-import { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { IncomingIntent } from "./IncomingIntent"; // Import the new class
 import { PhysicalBuff } from './PhysicalBuff';
 import { PhysicalIntent } from "./PhysicalIntent";
 import { TextBox } from "./TextBox"; // Ensure correct relative path
 import { PlayableCard } from '../gamecharacters/PlayableCard';
+import { AbstractCardType, AutomatedCharacterType, BaseCharacterType } from '../Types';
+import { IAbstractCard } from '../gamecharacters/IAbstractCard';
 
 export class PhysicalCard {
     container: Phaser.GameObjects.Container;
@@ -18,7 +17,7 @@ export class PhysicalCard {
     descBox: TextBox;
     tooltipBox: TextBox;
     hpBox: TextBox | null;
-    data: AbstractCard;
+    data: IAbstractCard;
     physicalBuffs: PhysicalBuff[];
     scene: Phaser.Scene;
     isSelected: boolean = false;
@@ -61,7 +60,7 @@ export class PhysicalCard {
         nameBox: TextBox;
         descBox: TextBox;
         tooltipBox: TextBox;
-        data: AbstractCard;
+        data: IAbstractCard;
         visualTags: PhysicalBuff[];
     }) {
         this.scene = scene;
@@ -94,9 +93,10 @@ export class PhysicalCard {
             this.tooltipBox.text
         ]);
 
+        
         // Add HP box if the card is a BaseCharacter
-        if (this.data instanceof BaseCharacter) {
-            const baseCharacter = this.data as BaseCharacter;
+        if (this.data.typeTag === "BaseCharacter") {
+            const baseCharacter = this.data as BaseCharacterType;
             const cardWidth = this.cardBackground.displayWidth;
             const cardHeight = this.cardBackground.displayHeight;
             this.hpBox = new TextBox({
@@ -205,7 +205,7 @@ export class PhysicalCard {
         this.applyCardSize();
         this.updateIntents();
 
-        if (!(this.data instanceof BaseCharacter)){
+        if (!(this.data.typeTag === "BaseCharacter")){
             this.blockText.setVisible(false);
         }
         this.scene.events.once('shutdown', this.obliterate, this);
@@ -495,8 +495,8 @@ export class PhysicalCard {
         this.descBox.setPosition(0, descBoxY);
 
         // Update HP box if it exists
-        if (this.hpBox && this.data instanceof BaseCharacter) {
-            const baseCharacter = this.data as BaseCharacter;
+        if (this.hpBox && this.data.typeTag == "BaseCharacter") {
+            const baseCharacter = this.data as BaseCharacterType;
             this.hpBox.setText(`${baseCharacter.hitpoints}/${baseCharacter.maxHitpoints}`);
         }
 
@@ -526,8 +526,9 @@ export class PhysicalCard {
             this.cardBackground.displayHeight + 4
         );
 
-        if (this.data instanceof BaseCharacter) {
-            if (this.data.hitpoints <= 0) {
+        if (this.data.typeTag == "BaseCharacter") {
+            const baseCharacter = this.data as BaseCharacterType;
+            if (baseCharacter.hitpoints <= 0) {
                 this.cardImage.setTint(0x808080); // Apply greyscale tint
             } else {
                 this.cardImage.clearTint(); // Remove tint if HP is above 0
@@ -546,10 +547,10 @@ export class PhysicalCard {
     }
 
     updateIntents(): void {
-        if (!(this.data instanceof AutomatedCharacter)) {
+        if (typeof (this.data as any).generateNewIntents !== 'function') {
             return;
         }
-        const autoChar = this.data as AutomatedCharacter;
+        const autoChar = this.data as AutomatedCharacterType;
         const currentIntents = autoChar.intents;
         const currentIntentIds = new Set(currentIntents.map((intent: AbstractIntent) => intent.id));
 
@@ -718,10 +719,10 @@ export class PhysicalCard {
      * Sync incoming intents with the underlying AbstractCard's incoming intents
      */
     private syncIncomingIntents(): void {
-        if (!(this.data instanceof BaseCharacter)) {
+        if (!(this.data.typeTag === "BaseCharacter")) {
             return;
         }
-        const baseCharacter = this.data as BaseCharacter;
+        const baseCharacter = this.data as BaseCharacterType;
         const targetedIntents = baseCharacter.getIntentsTargetingThisCharacter();
         const currentIntentIds = new Set(targetedIntents.map(intent => intent.id));
 
