@@ -156,7 +156,19 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
     ////////////////// PLAYABLE CARD METHODS //////////////////
 
+    public onDiscard(){
+
+    }
+
     public onCardInvoked(target?: BaseCharacter){
+
+    }
+
+    public onLethal(target: BaseCharacter | null){
+
+    }
+
+    public onExhaust(){
 
     }
 }
