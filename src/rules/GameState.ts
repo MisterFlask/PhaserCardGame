@@ -2,16 +2,16 @@ import { AbstractCard } from '../gamecharacters/AbstractCard';
 import { AutomatedCharacter } from '../gamecharacters/AutomatedCharacter';
 import { BaseCharacter } from '../gamecharacters/BaseCharacter';
 import { PlayerCharacter } from '../gamecharacters/CharacterClasses';
+import { PlayableCard } from '../gamecharacters/PlayableCard';
 import { LocationCard } from '../maplogic/LocationCard';
-import { StoreCard } from '../screens/Campaign';
 import { PhysicalCard } from '../ui/PhysicalCard';
 export class GameState {
     private static instance: GameState;
 
     public roster: PlayerCharacter[] = [];
     public currentRunCharacters: PlayerCharacter[] = [];
-    public shopItems: StoreCard[] = [];
-    public inventory: StoreCard[] = [];
+    public shopItems: PlayableCard[] = [];
+    public inventory: PlayableCard[] = [];
     public currencyOnHand: number = 0
     public combatState: CombatState = new CombatState()
 
@@ -38,7 +38,7 @@ export class GameState {
         }
     }
 
-    private obliteratePhysicalCardsForArray(items: (AbstractCard | StoreCard)[]): void {
+    private obliteratePhysicalCardsForArray(items: (AbstractCard | PlayableCard)[]): void {
         items.forEach(item => this.obliteratePhysicalCard(item));
     }
 
@@ -82,25 +82,25 @@ export class GameState {
     }
 
     // Shop items methods
-    public setShopItems(items: StoreCard[]): void {
+    public setShopItems(items: PlayableCard[]): void {
         this.shopItems = items;
     }
 
-    public getShopItems(): StoreCard[] {
+    public getShopItems(): PlayableCard[] {
         return [...this.shopItems];
     }
 
     // Inventory methods
-    public addToInventory(item: StoreCard): void {
+    public addToInventory(item: PlayableCard): void {
         this.inventory.push(item);
         // Optionally, update UI or perform additional actions
     }
 
-    public removeFromInventory(item: StoreCard): void {
+    public removeFromInventory(item: PlayableCard): void {
         this.inventory = this.inventory.filter(i => i !== item);
     }
 
-    public getInventory(): StoreCard[] {
+    public getInventory(): PlayableCard[] {
         return [...this.inventory];
     }
 
@@ -127,19 +127,6 @@ export class GameState {
             inventory: this.inventory
         };
         return JSON.stringify(serializableState);
-    }
-
-    // Deserializer function
-    public static deserialize(serializedState: string): GameState {
-        const state = GameState.getInstance();
-        const parsedState = JSON.parse(serializedState);
-
-        // todo: character roster
-        
-        state.shopItems = parsedState.shopItems.map((itemData: any) => new StoreCard(itemData));
-        state.inventory = parsedState.inventory.map((itemData: any) => new StoreCard(itemData));
-
-        return state;
     }
 
     // Add methods for managing locations

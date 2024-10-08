@@ -10,28 +10,7 @@ import { PhysicalCard, } from '../ui/PhysicalCard';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 import GameImageLoader from '../utils/ImageUtils';
 import { SceneChanger } from './SceneChanger';
-
-export class StoreCard extends AbstractCard {
-    price: number;
-
-    constructor({ name, description, portraitName, tooltip, price }: { name: string; description: string; portraitName?: string, tooltip?: string, price: number}) {
-        super(
-            {
-                name: name,
-                description: description,
-                portraitName: portraitName,
-                cardType: CardType.STORE,
-                tooltip: tooltip
-            }
-        );
-        this.price = price;
-        this.name = name;
-    }
-    
-    OnPurchase = (): void => {
-        console.log('Item purchased');
-    }
-}
+import { PlayableCard } from '../gamecharacters/PlayableCard';
 
 interface CardSlot {
     container: Phaser.GameObjects.Container;
@@ -175,7 +154,7 @@ export default class CampaignScene extends Phaser.Scene {
         this.updateDeckDisplay(this.deckDisplayCards.map(card => card.data as AbstractCard));
 
         // Update shop cards
-        this.positionShopCards(this.shopCards.map(card => card.data as StoreCard));
+        this.positionShopCards(this.shopCards.map(card => card.data as PlayableCard));
 
         // Reposition menu button
         this.menuButton.setPosition(10, 10);
@@ -355,7 +334,7 @@ export default class CampaignScene extends Phaser.Scene {
 
             // Add purchased items to inventory
             selectedShopCards.forEach(card => {
-                if (card.data instanceof StoreCard) {
+                if (card.data instanceof PlayableCard) {
                     gameState.addToInventory(card.data);
                 }
             });
@@ -455,15 +434,15 @@ export default class CampaignScene extends Phaser.Scene {
 
     createShop = () => {
         const shopItems = [
-            new StoreCard({ name: 'Cargo', description: 'Increases carrying capacity', portraitName: '', tooltip: 'Carry more items', price: 100 }),
-            new StoreCard({ name: 'Medkit', description: 'Restores health', portraitName: '', tooltip: 'Heal your character', price: 50 }),
-            new StoreCard({ name: 'Ammo Pack', description: 'Replenishes ammunition', portraitName: '', tooltip: 'Refill your ammo', price: 75 })
+            new CargoCard(),
+            new MedkitCard(),
+            new AmmoPackCard()
         ];
 
         this.positionShopCards(shopItems);
     }
 
-    positionShopCards = (shopItems: StoreCard[]) => {
+    positionShopCards = (shopItems: PlayableCard[]) => {
         // Clear existing shop cards and slots
         // Remove all existing shop card event handlers
         this.shopCards.forEach(card => {
@@ -535,5 +514,66 @@ export default class CampaignScene extends Phaser.Scene {
                 border.setVisible(false);
             }
         }
+    }
+}
+class CargoCard extends PlayableCard {
+    constructor() {
+        super({ 
+            name: 'Cargo', 
+            description: 'Increases carrying capacity', 
+            portraitName: '', 
+            tooltip: 'Carry more items', 
+            price: 100, 
+            cardType: CardType.STORE 
+        });
+    }
+
+    OnPurchase = (): void => {
+        console.log('Cargo item purchased');
+        // Additional logic for CargoCard purchase
+    }
+    InvokeCardEffects(targetCard?: AbstractCard): void {
+    }
+}
+
+class MedkitCard extends PlayableCard {
+    constructor() {
+        super({ 
+            name: 'Medkit', 
+            description: 'Restores health', 
+            portraitName: '', 
+            tooltip: 'Heal your character', 
+            price: 50, 
+            cardType: CardType.STORE 
+        });
+    }
+
+    OnPurchase = (): void => {
+        console.log('Medkit item purchased');
+        // Additional logic for MedkitCard purchase
+    }
+
+    InvokeCardEffects(targetCard?: AbstractCard): void {
+    }
+}
+
+class AmmoPackCard extends PlayableCard {
+    constructor() {
+        super({ 
+            name: 'Ammo Pack', 
+            description: 'Replenishes ammunition', 
+            portraitName: '', 
+            tooltip: 'Refill your ammo', 
+            price: 75, 
+            cardType: CardType.STORE 
+        });
+    }
+
+    OnPurchase = (): void => {
+        console.log('Ammo Pack item purchased');
+        // Additional logic for AmmoPackCard purchase
+    }
+    
+    InvokeCardEffects(targetCard?: AbstractCard): void {
     }
 }

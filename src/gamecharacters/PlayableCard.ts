@@ -8,14 +8,20 @@ import { CombatRules } from "../rules/CombatRules";
 import { AbstractBuff } from "./buffs/AbstractBuff";
 export abstract class PlayableCard extends AbstractCard {
     targetingType: TargetingType
+    price: number;
 
     resourceScalings: CardResourceScaling[] = []
-    constructor({ name, description, portraitName, cardType, tooltip, characterData, size, targetingType, owner }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: AbstractCard, size?: CardSize, targetingType?: TargetingType, owner?: BaseCharacter }) {
+    constructor({ name, description, portraitName, cardType, tooltip, characterData, size, targetingType, owner, price }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: AbstractCard, size?: CardSize, targetingType?: TargetingType, owner?: BaseCharacter, price?: number }) {
         super({ name, description, portraitName, cardType, tooltip, characterData, size });
         this.targetingType = targetingType || TargetingType.ENEMY;
         this.owner = owner;
+        this.price = price ?? 100;
     }
 
+    
+    OnPurchase = (): void => {
+        console.log('Item purchased');
+    }
 
     public ownedBy(owner: BaseCharacter): this {
         this.owner = owner;

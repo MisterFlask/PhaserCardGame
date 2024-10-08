@@ -1,6 +1,5 @@
 import { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { GameState } from "../rules/GameState";
-import { StoreCard } from '../screens/Campaign';
 import { PhysicalCard } from '../ui/PhysicalCard';
 
 export class ActionManager {
@@ -348,7 +347,7 @@ export class ActionManager {
         }));
     }
 
-    public purchaseShopItem(item: StoreCard): void {
+    public purchaseShopItem(item: PlayableCard): void {
         item.OnPurchase();
         const inventory = GameState.getInstance().getInventory();
         inventory.push(item);

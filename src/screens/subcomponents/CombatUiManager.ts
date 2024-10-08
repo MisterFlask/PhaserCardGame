@@ -11,7 +11,6 @@ import { AbstractCard } from '../../gamecharacters/AbstractCard';
 import { SceneChanger } from '../SceneChanger';
 import { Defend } from '../../gamecharacters/playerclasses/cards/basic/Defend';
 import { Shoot } from '../../gamecharacters/playerclasses/cards/basic/Shoot';
-import { StoreCard } from '../Campaign';
 import { BaseCharacter } from '../../gamecharacters/BaseCharacter';
 import { PlayableCard } from '../../gamecharacters/PlayableCard';
 import { PlayerCharacter } from '../../gamecharacters/CharacterClasses';
