@@ -24,7 +24,7 @@ export class Smokescreen extends PlayableCard {
 	
 	override InvokeCardEffects(): void {
 		this.forEachEnemy(enemy => {
-			this.actionManager.applyBuffToCharacter(enemy, new Smoldering(this.getBaseMagicNumberAfterResourceScaling()), this.owner as BaseCharacter);
+			this.actionManager.applyBuffToCharacter(enemy as BaseCharacter, new Smoldering(this.getBaseMagicNumberAfterResourceScaling()), this.owner as BaseCharacter);
 		});
 
 		this.forEachAlly(ally => {

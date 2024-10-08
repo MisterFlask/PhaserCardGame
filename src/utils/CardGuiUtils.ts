@@ -109,7 +109,7 @@ export class CardGuiUtils {
         cardContainer.setSize(cardWidth, cardHeight);
         cardContainer.setInteractive(new Phaser.Geom.Rectangle(0, 0, cardWidth, cardHeight), Phaser.Geom.Rectangle.Contains);
 
-        if (data.cardType == CardType.PLAYABLE) scene.input.setDraggable(cardContainer);
+        if (data.cardType == CardType.SKILL) scene.input.setDraggable(cardContainer);
 
         const physicalCard = new PhysicalCard({
             scene: scene,

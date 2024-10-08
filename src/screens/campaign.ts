@@ -524,7 +524,7 @@ class CargoCard extends PlayableCard {
             portraitName: '', 
             tooltip: 'Carry more items', 
             price: 100, 
-            cardType: CardType.STORE 
+            cardType: CardType.POWER 
         });
     }
 
@@ -544,7 +544,7 @@ class MedkitCard extends PlayableCard {
             portraitName: '', 
             tooltip: 'Heal your character', 
             price: 50, 
-            cardType: CardType.STORE 
+            cardType: CardType.POWER 
         });
     }
 
@@ -565,7 +565,7 @@ class AmmoPackCard extends PlayableCard {
             portraitName: '', 
             tooltip: 'Refill your ammo', 
             price: 75, 
-            cardType: CardType.STORE 
+            cardType: CardType.POWER 
         });
     }
 

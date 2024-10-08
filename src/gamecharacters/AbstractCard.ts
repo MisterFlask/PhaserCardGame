@@ -5,6 +5,8 @@ import { AbstractIntent } from './AbstractIntent'; // Import AbstractIntent
 import { AbstractBuff } from './buffs/AbstractBuff';
 import { CardSize, CardType } from './Primitives'; // Ensure enums are imported from Primitives
 import { IBaseCharacter } from './IBaseCharacter';
+import { ActionManager } from '../utils/ActionManager';
+import { BaseCharacter } from './BaseCharacter';
 
 export interface IPhysicalCardInterface {
     container: Phaser.GameObjects.Container;
@@ -112,11 +114,16 @@ export abstract class AbstractCard implements IAbstractCard {
         this.id = generateWordGuid(name)
         this._description = description
         this.portraitName = portraitName || "placeholder"
-        this.cardType = cardType || CardType.PLAYABLE
+        this.cardType = cardType || CardType.SKILL
         this.tooltip = tooltip || "Lorem ipsum dolor sit amet"
         this.owner = characterData as unknown as IBaseCharacter || undefined
         this.size = size || CardSize.SMALL
         this.team = team || Team.ENEMY
+    }
+
+    getBuffStacks(buffName: string): number {
+        const buff = this.buffs.find(buff => buff.getName() === buffName);
+        return buff ? buff.stacks : 0;
     }
 
     OnCombatStart(): void {
@@ -129,6 +136,15 @@ export abstract class AbstractCard implements IAbstractCard {
         Object.assign(copy, this);
         copy.id = generateWordGuid();
         return copy;
+    }
+
+    addBuffs(buffs: AbstractBuff[]): void {
+        buffs.forEach(buff => {
+            ActionManager.getInstance().applyBuffToCharacter(this.owner as BaseCharacter, buff);
+        }); 
+    }
+    addBuff(buff: AbstractBuff): void {
+        ActionManager.getInstance().applyBuffToCharacter(this.owner as BaseCharacter, buff);
     }
     
     createJsonRepresentation(): string {

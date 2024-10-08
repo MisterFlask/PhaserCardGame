@@ -67,7 +67,7 @@ export class CombatRules {
         CombatRules.beginTurn();
     }
 
-    public static calculateBlockSentToCharacterByCard(card: PlayableCard, sourceCharacter: BaseCharacter, targetCharacter: BaseCharacter): number{
+    public static calculateBlockSentToCharacterByCard(card: PlayableCard, sourceCharacter: IBaseCharacter, targetCharacter: IBaseCharacter): number{
         let totalBlock = card.getBaseBlockAfterResourceScaling();
 
         if (sourceCharacter) {

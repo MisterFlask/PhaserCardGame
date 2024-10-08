@@ -11,7 +11,7 @@ export class ToxicSpill extends PlayableCard {
     constructor() {
         super({
             name: "Toxic Spill",
-            cardType: CardType.CHARACTER,
+            cardType: CardType.ATTACK,
             rarity: CardRarity.COMMON,
             targetingType: TargetingType.ENEMY,
         }); 

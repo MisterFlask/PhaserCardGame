@@ -25,7 +25,7 @@ export class LocationCard extends AbstractCard {
             name: fullName,
             description: fullDescription,
             portraitName,
-            cardType: CardType.CHARACTER,
+            cardType: CardType.ATTACK,
             tooltip,
             size // Pass the size parameter
         });

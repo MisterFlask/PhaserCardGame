@@ -1,4 +1,4 @@
-import { TargetingType } from "../../../AbstractCard";
+import { AbstractCard, TargetingType } from "../../../AbstractCard";
 import { BaseCharacter } from "../../../BaseCharacter";
 import { Burning } from "../../../buffs/standard/Burning";
 import { PlayableCard } from "../../../PlayableCard";
@@ -23,7 +23,7 @@ export class Pyrestarter extends PlayableCard {
         return `Apply ${this.getDisplayedBlock()} block to ALL party members. The rest of this turn, attacks from your party apply ${this.getDisplayedMagicNumber()} Burning per hit.`;
     }
 
-    override InvokeCardEffects(): void {
+    override InvokeCardEffects(targetCard?: AbstractCard): void {
         this.forEachAlly(ally => {
             this.applyBlockToTarget(ally);
             this.actionManager.applyBuffToCharacter(ally, new PyrestarterBuff(this.getBaseMagicNumberAfterResourceScaling()));

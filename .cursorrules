@@ -14,4 +14,16 @@ You MAY have to create a new implementation of AbstractBuff.  This is necessary 
 # Card Resource Scaling
 Some cards have resource scaling.  This is defined in the constructor of the card with a new CardResourceScaling object.  These objects have a resource property which is the CombatResource that the scaling should apply to, and a multiplier which is multiplied with the card's base value to get the final value.  See "StormCloak" for an example.
 
+You MUST use the method signature     override InvokeCardEffects(targetCard?: AbstractCard): void when implementing the InvokeCardEffects method.
 
+Make sure the new card has a NO-ARGS CONSTRUCTOR.
+
+When adding a new card, ONLY use the following super constructor parameters;
+{
+            name: "Pocket Vial",
+            cardType: CardType.ATTACK,
+            targetingType: TargetingType.ENEMY,
+            rarity: CardRarity.COMMON,
+        }
+
+        Beyond that, just set other values in the constructor or deal with them in the relevant methods.

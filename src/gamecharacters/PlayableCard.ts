@@ -1,11 +1,9 @@
 import { GameState, CombatState, CombatResources, CombatResource } from "../rules/GameState";
 import { ActionManager } from "../utils/ActionManager";
 import { AbstractCard, TargetingType, Team } from "./AbstractCard";
-import { BaseCharacter } from "./BaseCharacter";
 import { CardType, CardSize } from "./Primitives";
-import { IBaseCharacter } from "./IBaseCharacter";
 import { CombatRules } from "../rules/CombatRules";
-import { AbstractBuff } from "./buffs/AbstractBuff";
+import { IBaseCharacter } from "./IBaseCharacter";
 
 export enum CardRarity {
     COMMON,
@@ -21,7 +19,7 @@ export abstract class PlayableCard extends AbstractCard {
     rarity: CardRarity; // Added card rarity
 
     resourceScalings: CardResourceScaling[] = [];
-    constructor({ name, description, portraitName, cardType, tooltip, characterData, size, targetingType, owner, price, rarity }: { name: string; description?: string; portraitName?: string; cardType?: CardType; tooltip?: string; characterData?: AbstractCard; size?: CardSize; targetingType?: TargetingType; owner?: BaseCharacter; price?: number; rarity?: CardRarity }) {
+    constructor({ name, description, portraitName, cardType, tooltip, characterData, size, targetingType, owner, price, rarity }: { name: string; description?: string; portraitName?: string; cardType?: CardType; tooltip?: string; characterData?: AbstractCard; size?: CardSize; targetingType?: TargetingType; owner?: IBaseCharacter; price?: number; rarity?: CardRarity }) {
         super({ name, description: description ?? "_", portraitName, cardType, tooltip, characterData, size });
         this.targetingType = targetingType ?? TargetingType.ENEMY;
         this.owner = owner;
@@ -32,7 +30,7 @@ export abstract class PlayableCard extends AbstractCard {
     /**
      * DO NOT OVERRIDE.
      */
-    forEachAlly(callback: (ally: BaseCharacter) => void): void {
+    forEachAlly(callback: (ally: IBaseCharacter) => void): void {
         this.combatState.playerCharacters
             .filter(char => char.team === Team.ALLY)
             .forEach(callback);
@@ -41,7 +39,7 @@ export abstract class PlayableCard extends AbstractCard {
     /**
      * DO NOT OVERRIDE.
      */
-    forEachEnemy(callback: (enemy: BaseCharacter) => void): void {
+    forEachEnemy(callback: (enemy: IBaseCharacter) => void): void {
         this.combatState.enemies
             .filter(char => char.team === Team.ENEMY)
             .forEach(callback);
@@ -50,7 +48,7 @@ export abstract class PlayableCard extends AbstractCard {
     /**
      * DO NOT OVERRIDE.
      */
-    performActionOnRandomEnemy(callback: (enemy: BaseCharacter) => void): void {
+    performActionOnRandomEnemy(callback: (enemy: IBaseCharacter) => void): void {
         const randomEnemy = this.randomEnemy();
         if (randomEnemy) {
             callback(randomEnemy);
@@ -64,7 +62,7 @@ export abstract class PlayableCard extends AbstractCard {
     /**
      * DO NOT OVERRIDE.
      */
-    public ownedBy(owner: BaseCharacter): this {
+    public ownedBy(owner: IBaseCharacter): this {
         this.owner = owner;
         return this;
     }
@@ -76,7 +74,7 @@ export abstract class PlayableCard extends AbstractCard {
     /**
      * DO NOT OVERRIDE.
      */
-    get hoveredCharacter(): BaseCharacter | undefined {
+    get hoveredCharacter(): IBaseCharacter | undefined {
         return GameState.getInstance().combatState.characterHoveredOver_transient;
     }
     /**
@@ -164,7 +162,7 @@ export abstract class PlayableCard extends AbstractCard {
     /**
      * DO NOT OVERRIDE.
      */
-    randomEnemy(): BaseCharacter | undefined {
+    randomEnemy(): IBaseCharacter | undefined {
         const livingEnemies = this.combatState.enemies.filter(enemy => enemy.hitpoints > 0);
 
         if (livingEnemies.length === 0) {
@@ -177,12 +175,12 @@ export abstract class PlayableCard extends AbstractCard {
     /**
      * DO NOT OVERRIDE.
      */
-    public getDisplayedBlock(targetedCharacterIfAny?: BaseCharacter): string {
+    public getDisplayedBlock(targetedCharacterIfAny?: IBaseCharacter): string {
         if (!this.owner) {
             return this.getBaseBlockAfterResourceScaling().toString();
         }
 
-        return CombatRules.calculateBlockSentToCharacterByCard(this, this.owner as BaseCharacter, targetedCharacterIfAny as BaseCharacter).toString();
+        return CombatRules.calculateBlockSentToCharacterByCard(this, this.owner as IBaseCharacter, targetedCharacterIfAny as IBaseCharacter).toString();
     }
     /**
      * DO NOT OVERRIDE.
@@ -229,7 +227,7 @@ export abstract class PlayableCard extends AbstractCard {
     /**
      * DO NOT OVERRIDE.
      */
-    public getDisplayedDamage(selectedCharacter?: BaseCharacter): string {
+    public getDisplayedDamage(selectedCharacter?: IBaseCharacter): string {
         if (!this.owner) {
             return this.getBaseDamageAfterResourceScaling().toString();
         }
@@ -249,7 +247,7 @@ export abstract class PlayableCard extends AbstractCard {
         return totalDamage.toString();
     }
 
-    public getDisplayedMagicNumber(targetedCharacterIfAny?: BaseCharacter): string {
+    public getDisplayedMagicNumber(targetedCharacterIfAny?: IBaseCharacter): string {
         return this.getBaseMagicNumberAfterResourceScaling().toString();
     }
 
@@ -259,18 +257,25 @@ export abstract class PlayableCard extends AbstractCard {
         return true;
     }
 
+    private IsIBaseCharacter(targetCard?: AbstractCard): boolean {
+        if (!targetCard) {
+            return false;
+        }
+        return ('hitpoints' in targetCard && 'maxHitpoints' in targetCard && 'gender' in targetCard)
+    }
+
     public IsPerformableOn_Outer(targetCard?: AbstractCard): boolean {
 
         if (this.targetingType === TargetingType.NO_TARGETING) {
             return true;
         }
 
-        if (!(targetCard instanceof BaseCharacter)) {
+        if (!targetCard || !this.IsIBaseCharacter(targetCard)) { // ugh, close enough
             return false;
         }
 
-        const isTargetAlly = targetCard instanceof BaseCharacter && targetCard.team === Team.ALLY;
-        const isTargetEnemy = targetCard instanceof BaseCharacter && targetCard.team === Team.ENEMY;
+        const isTargetAlly = this.IsIBaseCharacter(targetCard) && targetCard.team === Team.ALLY;
+        const isTargetEnemy = this.IsIBaseCharacter(targetCard) && targetCard.team === Team.ENEMY;
         let appropriateTargeting = false;
         let inappropriateTargetingReason = "";
         switch (this.targetingType) {

@@ -25,7 +25,7 @@ export class ReIgnition extends PlayableCard {
             this.applyBlockToTarget(targetCard);
             
             this.forEachEnemy(enemy => {
-                this.actionManager.applyBuffToCharacter(enemy, new Burning(this.getBaseMagicNumberAfterResourceScaling()), this.owner as BaseCharacter);
+                this.actionManager.applyBuffToCharacter(enemy as BaseCharacter, new Burning(this.getBaseMagicNumberAfterResourceScaling()), this.owner as BaseCharacter);
             });
         }
     }

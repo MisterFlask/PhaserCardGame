@@ -1,8 +1,10 @@
 export enum CardType {
-    CHARACTER = "CHARACTER",
-    PLAYABLE = "PLAYABLE",
-    STORE = "STORE",
-    LOCATION = "LOCATION"
+    ATTACK = "ATTACK",
+    SKILL = "SKILL",
+    POWER = "POWER",
+    ITEM = "ITEM",
+    
+    NON_PLAYABLE = "NON_PLAYABLE",
 }
 
 export class CardSize {

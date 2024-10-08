@@ -16,9 +16,9 @@ export class VolatileBuff extends AbstractBuff {
             let targetCard: BaseCharacter | undefined;
 
             if (ownerCard.targetingType === TargetingType.ENEMY) {
-                targetCard = ownerCard.randomEnemy();
+                targetCard = ownerCard.randomEnemy() as BaseCharacter;
             } else if (ownerCard.targetingType === TargetingType.ALLY) {
-                targetCard = ownerCard.hoveredCharacter;
+                targetCard = ownerCard.hoveredCharacter as BaseCharacter;
             } else {
                 targetCard = undefined;
             }

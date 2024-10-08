@@ -44,9 +44,9 @@ export class ActionManager {
         this.animateAttackerTilt(character.physicalCard as PhysicalCard);
     }
 
-    public applyBuffToCharacter(character: BaseCharacter, buff: AbstractBuff, sourceCharacter?: BaseCharacter): void {
+    public applyBuffToCharacter(character: IBaseCharacter, buff: AbstractBuff, sourceCharacter?: IBaseCharacter): void {
         this.actionQueue.addAction(new GenericAction(async () => {
-            AbstractBuff._applyBuffToCharacter(character, buff);
+            AbstractBuff._applyBuffToCharacter(character as BaseCharacter, buff);
             console.log(`Applied buff ${buff.getName()} to ${character.name}`);
             // You might want to add some animation or visual feedback here
             await new WaitAction(20).playAction(); // Short delay for visual feedback
