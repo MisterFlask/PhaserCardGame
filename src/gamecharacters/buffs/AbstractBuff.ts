@@ -110,12 +110,12 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
     // this is a percentage modifier on top of damage sent by the owner.  If this is "100" that means 100% more damage is sent.  If this is -100 then this means the character does no damage.  Standard is 0, which means no modifier.
     // Note this does not take into account blocking in any way.
-    getPercentCombatDamageDealtModifier(): number {
+    getAdditionalPercentCombatDamageDealtModifier(target?: IBaseCharacter): number {
         return 0;
     }
     // this is a percentage modifier on top of damage taken.  If this is "100" that means 100% more damage is taken.  If this is -100 then this means the character takes no damage.  Standard is 0, which means no modifier.
     // Note this does not take into account blocking in any way.
-    getPercentCombatDamageTakenModifier(target?: IBaseCharacter): number {
+    getAdditionalPercentCombatDamageTakenModifier(): number {
         return 0;
     }
     // this is a FLAT modifier on top of damage taken, not percentage-based.

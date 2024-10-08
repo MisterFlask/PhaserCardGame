@@ -170,18 +170,18 @@ export class CombatRules {
         
         sourceCharacter?.buffs.forEach(buff => {
             totalDamage += buff.getCombatDamageDealtModifier(target as BaseCharacter);
-            totalDamage *= (1 + buff.getPercentCombatDamageDealtModifier() / 100);
+            totalDamage *= (1 + buff.getAdditionalPercentCombatDamageDealtModifier() / 100);
         });
         // Apply target character buffs
         target?.buffs.forEach(buff => {
             totalDamage += buff.getCombatDamageTakenModifier();
-            totalDamage *= (1 + buff.getPercentCombatDamageTakenModifier() / 100);
+            totalDamage *= (1 + buff.getAdditionalPercentCombatDamageTakenModifier() / 100);
         });
 
         //apply playable card buffs
         sourceCard?.buffs.forEach(buff => {
             totalDamage += buff.getCombatDamageDealtModifier(target as BaseCharacter);
-            totalDamage *= (1 + buff.getPercentCombatDamageDealtModifier() / 100);
+            totalDamage *= (1 + buff.getAdditionalPercentCombatDamageDealtModifier() / 100);
         });
         // Ensure damage doesn't go below 0
         totalDamage = Math.max(0, totalDamage);

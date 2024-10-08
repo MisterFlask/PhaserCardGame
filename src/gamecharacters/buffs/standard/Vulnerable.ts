@@ -16,7 +16,7 @@ export class Vulnerable extends AbstractBuff {
         this.stackable = true;
     }
 
-    override getPercentCombatDamageTakenModifier(): number {
+    override getAdditionalPercentCombatDamageTakenModifier(): number {
         return 50; // Increases damage taken by 50%
     }
 

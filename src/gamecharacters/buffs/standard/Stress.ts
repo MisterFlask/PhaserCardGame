@@ -19,7 +19,7 @@ export class Stress extends AbstractBuff {
         this.stackable = true;
     }
 
-    override getPercentCombatDamageTakenModifier(): number {
+    override getAdditionalPercentCombatDamageTakenModifier(): number {
         if (this.stacks > 10) {
             return 100;
         } else {

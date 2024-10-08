@@ -23,16 +23,7 @@ export class AxeMeAQuestion extends PlayableCard {
   }
 
   override InvokeCardEffects(target?: BaseCharacter): void {
-    if (!target) return;
     this.dealDamageToTarget(target);
-  }
-
-  override getDisplayedDamage(selectedCharacter?: BaseCharacter): string {
-    let damage = super.getDisplayedDamage(selectedCharacter);
-    if (selectedCharacter?.buffs.some(buff => buff instanceof Burning)) {
-      return `${damage} (${parseInt(damage) * 2})`;
-    }
-    return damage;
   }
 }
 
@@ -51,8 +42,7 @@ class AxeCritBuff extends AbstractBuff {
     return "Crits against Burning targets.";
   }
 
-  override getPercentCombatDamageDealtModifier(): number {
-    const target = this.getOwnerAsPlayableCard()?.hoveredCharacter;
+  override getAdditionalPercentCombatDamageDealtModifier(target?: IBaseCharacter): number {
     if (target && target.buffs.some(buff => buff instanceof Burning)) {
       return 100; // 100% increase in damage, effectively doubling it
     }

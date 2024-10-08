@@ -19,8 +19,8 @@ export interface IAbstractBuff {
     getOwnerAsCharacter(): BaseCharacter | null;
     getCombatDamageDealtModifier(target?:BaseCharacter): number;
     getBlockSentModifier(): number;
-    getPercentCombatDamageDealtModifier(target?: BaseCharacter): number;
-    getPercentCombatDamageTakenModifier(): number;
+    getAdditionalPercentCombatDamageDealtModifier(target?: BaseCharacter): number;
+    getAdditionalPercentCombatDamageTakenModifier(): number;
     getCombatDamageTakenModifier(): number;
     getBlockReceivedModifier(): number;
     onOwnerStruck(strikingUnit: BaseCharacter | null, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void;

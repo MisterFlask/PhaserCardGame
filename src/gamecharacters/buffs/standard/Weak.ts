@@ -16,7 +16,7 @@ export class Weak extends AbstractBuff {
         this.stackable = true;
     }
 
-    override getPercentCombatDamageDealtModifier(): number {
+    override getAdditionalPercentCombatDamageDealtModifier(): number {
         return -33; // Reduces damage dealt by 33%
     }
 
