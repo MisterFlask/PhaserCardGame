@@ -11,6 +11,7 @@ interface CardSelectionParams {
     instructions: string;
     min: number;
     max: number;
+    cancellable: boolean;
 }
 
 class CardSelectionManager {
@@ -24,6 +25,8 @@ class CardSelectionManager {
     private instructionsBox!: TextBox;
     private submitButton!: TextBox;
     private overlay!: Phaser.GameObjects.Rectangle;
+    private cancellable: boolean;
+    private cancelButton!: TextBox;
 
     constructor(params: CardSelectionParams) {
         this.scene = params.scene;
@@ -32,6 +35,7 @@ class CardSelectionManager {
         this.instructions = params.instructions;
         this.min = params.min;
         this.max = params.max;
+        this.cancellable = params.cancellable;
     }
 
     public start(): void {
@@ -40,6 +44,35 @@ class CardSelectionManager {
         this.createSubmitButton();
         this.setupCardInteractions();
         this.disableOtherInteractions();
+        if (this.cancellable) {
+            this.createCancelButton();
+        }
+    }
+
+    private createCancelButton(): void {
+        this.cancelButton = new TextBox({
+            scene: this.scene,
+            x: (this.scene.scale.width / 4) * 3, // Positioning the cancel button on the right
+            y: this.scene.scale.height - 100,
+            width: 200,
+            height: 50,
+            text: 'Cancel',
+            style: { fontSize: '28px', color: '#ffffff' },
+            fillColor: 0x555555,
+            textBoxName: 'CardSelectionCancelButton'
+        });
+
+        this.cancelButton.background!!.setInteractive({ useHandCursor: true })
+            .on('pointerdown', this.onCancel, this)
+            .on('pointerover', () => {
+                this.cancelButton.background?.setFillStyle(0x777777);
+            })
+            .on('pointerout', () => {
+                this.cancelButton.background?.setFillStyle(0x555555);
+            });
+
+        this.scene.add.existing(this.cancelButton.background!!);
+        this.scene.add.existing(this.cancelButton.text);
     }
 
     private createOverlay(): void {
@@ -73,7 +106,7 @@ class CardSelectionManager {
     private createSubmitButton(): void {
         this.submitButton = new TextBox({
             scene: this.scene,
-            x: this.scene.scale.width / 2,
+            x: this.scene.scale.width / 4, // Positioning the submit button on the left
             y: this.scene.scale.height - 100,
             width: 200,
             height: 50,
@@ -131,6 +164,10 @@ class CardSelectionManager {
         }
     }
 
+    private onCancel(): void {
+        this.exitSelectionMode();
+    }
+
     private disableOtherInteractions(): void {
         const combatUiManager = CombatUiManager.getInstance();
         combatUiManager.disableInteractions();
@@ -145,6 +182,7 @@ class CardSelectionManager {
         this.overlay.destroy();
         this.instructionsBox.destroy();
         this.submitButton.destroy();
+        this.cancelButton.destroy();
         this.unhighlightAllSelectedCards();
         this.enableOtherInteractions();
         this.cleanupCardInteractions();

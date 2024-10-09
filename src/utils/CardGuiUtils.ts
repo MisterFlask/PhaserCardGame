@@ -121,7 +121,8 @@ export class CardGuiUtils {
             descBox: descBox,
             tooltipBox: tooltipBox,
             data: data,
-            visualTags: []
+            visualTags: [],
+            cardConfig: this.cardConfig
         });
 
         (cardContainer as any).physicalCard = physicalCard;

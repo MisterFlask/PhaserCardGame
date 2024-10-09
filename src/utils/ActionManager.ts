@@ -553,16 +553,23 @@ export class ActionManager {
             return [];
         }));
     }
-
     public requireCardSelection(params: {
-        action: (selectedCards: PlayableCardType[]) => void;
         name: string;
         instructions: string;
         min: number;
         max: number;
+        cancellable: boolean;
+        action: (selectedCards: PlayableCardType[]) => void;
     }): void {
         const combatUiManager = CombatUiManager.getInstance();
         const scene = combatUiManager.scene; // Assuming CombatUiManager can provide the current scene
+
+
+        // if the min number of cards is greater than the current hand size, just perform the action on the set of cards that are in the player's hand.
+        if (params.min > GameState.getInstance().combatState.currentHand.length) {
+            params.action(GameState.getInstance().combatState.currentHand as PlayableCardType[]);
+            return;
+        }
 
         const selectionManager = new CardSelectionManager({
             scene: scene,
@@ -570,7 +577,8 @@ export class ActionManager {
             name: params.name,
             instructions: params.instructions,
             min: params.min,
-            max: params.max
+            max: params.max,
+            cancellable: params.cancellable
         });
 
         selectionManager.start();

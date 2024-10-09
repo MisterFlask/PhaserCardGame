@@ -8,10 +8,14 @@ import { TextBox } from "./TextBox"; // Ensure correct relative path
 import { AbstractCardType, AutomatedCharacterType, BaseCharacterType, PlayableCardType } from '../Types';
 import { IAbstractCard } from '../gamecharacters/IAbstractCard';
 import { IPhysicalCardInterface } from '../gamecharacters/AbstractCard';
+import type { CardConfig } from '../utils/CardGuiUtils';
 
 export class PhysicalCard implements IPhysicalCardInterface {
+    cardConfig: CardConfig;
+
     container: Phaser.GameObjects.Container;
-    cardBackground: Phaser.GameObjects.Rectangle | Phaser.GameObjects.Image;
+    cardBackgroundAsRectangle?: Phaser.GameObjects.Rectangle;
+    cardBackground: Phaser.GameObjects.Image;
     cardImage: Phaser.GameObjects.Image;
     nameBox: TextBox;
     descBox: TextBox;
@@ -45,26 +49,31 @@ export class PhysicalCard implements IPhysicalCardInterface {
     constructor({
         scene,
         container,
+        cardBackgroundAsRectangle,
         cardBackground,
         cardImage,
         nameBox,
         descBox,
         tooltipBox,
         data,
-        visualTags
+        visualTags,
+        cardConfig
     }: {
         scene: Phaser.Scene;
         container: Phaser.GameObjects.Container;
-        cardBackground: Phaser.GameObjects.Rectangle | Phaser.GameObjects.Image;
+        cardBackgroundAsRectangle?: Phaser.GameObjects.Rectangle;
+        cardBackground: Phaser.GameObjects.Image;
         cardImage: Phaser.GameObjects.Image;
         nameBox: TextBox;
         descBox: TextBox;
         tooltipBox: TextBox;
         data: IAbstractCard;
         visualTags: PhysicalBuff[];
+        cardConfig: CardConfig;
     }) {
         this.scene = scene;
         this.container = container;
+        this.cardBackgroundAsRectangle = cardBackgroundAsRectangle;
         this.cardBackground = cardBackground;
         this.cardImage = cardImage;
         this.nameBox = nameBox;
@@ -73,7 +82,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
         this.data = data;
         (this.data as any).physicalCard = this;
         this.physicalBuffs = [];
-
+        this.cardConfig = cardConfig;
         // Create a new container for card content (excluding tooltip)
         this.cardContent = this.scene.add.container(0, 0);
         this.cardContent.add([
@@ -85,6 +94,9 @@ export class PhysicalCard implements IPhysicalCardInterface {
             this.descBox.background!!,
             this.descBox.text
         ]);
+        if (this.cardBackgroundAsRectangle){
+            this.cardContent.add(this.cardBackgroundAsRectangle);
+        }
         this.container.add(this.cardContent);
 
         // Add tooltip elements directly to the main container
@@ -93,7 +105,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
             this.tooltipBox.text
         ]);
 
-        
+
         // Add HP box if the card is a BaseCharacter
         if (this.data.isBaseCharacter()) {
             const baseCharacter = this.data as BaseCharacterType;
@@ -444,6 +456,10 @@ export class PhysicalCard implements IPhysicalCardInterface {
     }
 
     updateVisuals(): void {
+        this.cardBorder.setDisplaySize(this.cardConfig.cardWidth + 4, this.cardConfig.cardHeight + 4);
+        this.cardBackground.setDisplaySize(this.cardConfig.cardWidth, this.cardConfig.cardHeight);
+        this.cardBackgroundAsRectangle?.setDisplaySize(this.cardConfig.cardWidth, this.cardConfig.cardHeight);
+        
         if (this.obliterated) return;
         if (!this.scene || !this.scene.sys) {
             console.warn('Scene is undefined in updateVisuals');
@@ -523,11 +539,12 @@ export class PhysicalCard implements IPhysicalCardInterface {
             this.syncBuffs();
         }
 
-        // Update the border size to match the card background
-        this.cardBorder.setDisplaySize(
+        // Update the size of the rectangle background
+        this.cardBackgroundAsRectangle?.setDisplaySize(
             this.cardBackground.displayWidth + 4,
             this.cardBackground.displayHeight + 4
         );
+
 
         if (this.data.isBaseCharacter()) {
             const baseCharacter = this.data as BaseCharacterType;

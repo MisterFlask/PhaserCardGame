@@ -1,6 +1,7 @@
 import ImageUtils from "../../utils/ImageUtils";
 import { Gender } from "../BaseCharacter";
 import { BaseCharacterClass } from "../CharacterClasses";
+import { Rummage } from "./cards/basic/Rummage";
 import { FireAxe } from "./cards/blackhand/FireAxe";
 import { FiredUp } from "./cards/blackhand/FiredUp";
 import { FlamePistol } from "./cards/blackhand/FlamePistol";
@@ -17,5 +18,6 @@ export class BlackhandClass extends BaseCharacterClass {
         this.addCard(new FlamePistol())
         this.addCard(new StormCloak())
         this.addCard(new FiredUp())
+        this.addCard(new Rummage())
     }
 }

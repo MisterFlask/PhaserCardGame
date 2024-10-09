@@ -1,6 +1,7 @@
 import ImageUtils from "../../utils/ImageUtils";
 import { Gender } from "../BaseCharacter";
 import { BaseCharacterClass } from "../CharacterClasses";
+import { Rummage } from "./cards/basic/Rummage";
 import { ArcaneRitualCard, SummonDemonCard } from "./DiabolistCards";
 
 export class DiabolistClass extends BaseCharacterClass {
@@ -12,5 +13,6 @@ export class DiabolistClass extends BaseCharacterClass {
         // Add Diabolist-specific cards here
         this.addCard(new ArcaneRitualCard())
         this.addCard(new SummonDemonCard())
+        this.addCard(new Rummage())
     }
 }
