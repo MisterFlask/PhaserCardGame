@@ -14,7 +14,7 @@ interface CardSelectionParams {
     cancellable: boolean;
 }
 
-class CardSelectionManager {
+class CardSelectionFromHandManager {
     private scene: Phaser.Scene;
     private action: (selectedCards: PlayableCard[]) => void;
     private name: string;
@@ -203,4 +203,4 @@ class CardSelectionManager {
     }
 }
 
-export default CardSelectionManager;
+export default CardSelectionFromHandManager;

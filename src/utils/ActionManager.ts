@@ -9,7 +9,7 @@ import { IBaseCharacter } from "../gamecharacters/IBaseCharacter";
 import { AutomatedCharacterType, BaseCharacterType, PlayableCardType } from "../Types";
 import { IAbstractCard } from "../gamecharacters/IAbstractCard";
 import { SubtitleManager } from "../ui/SubtitleManager";
-import CardSelectionManager from '../ui/CardSelectionManager';
+import CardSelectionFromHandManager from '../ui/CardSelectionFromHandManager';
 import CombatUiManager from "../screens/subcomponents/CombatUiManager";
 
 export class ActionManager {
@@ -571,7 +571,7 @@ export class ActionManager {
             return;
         }
 
-        const selectionManager = new CardSelectionManager({
+        const selectionManager = new CardSelectionFromHandManager({
             scene: scene,
             action: params.action,
             name: params.name,
