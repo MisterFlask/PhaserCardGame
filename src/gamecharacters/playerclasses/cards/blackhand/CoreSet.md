@@ -1,7 +1,4 @@
-/**
- * BURNING:  Halves each turn.
- * 
- * 
+
 **Blackhand Core Set**
 Commons:
 *  Re-ignition:  Cost 1. Target ally gains 10 block.  Apply 2 Burning to all enemies.  
@@ -28,7 +25,7 @@ Rare:
 * Gasman:  Smoldering deal an additional 4 damage per turn.  Apply 1 Fumes to all enemies.  Power.  Cost 2.
 * The Scent of Weakness:  Power:  Whenever an enemy becomes Weak, they gain the same amount of Vulnerable.
 
-Madman:
+**Madman**
 
 Uncommons:
 * Rage-Fueled Axe:  Deals 8 damage.  Do it again for every card that has been exhausted this turn.
@@ -39,5 +36,4 @@ Rares:
 * The Insanity Defense:  Block 25 damage.  The whole party takes 3 Stress.  Volatile.  Cost 3.
 * Axe-Crazy:  The first time you play a card with Axe in the name each turn, play it again.  Add a Fire Axe to the bottom of your draw pile.  Cost 1. Power.
 * Potent Distraction:  Apply 7 Burning to ALL enemies.  All allies gain 4 Defense.
- */
 

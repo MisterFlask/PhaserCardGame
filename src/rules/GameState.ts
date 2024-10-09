@@ -158,6 +158,7 @@ export class CombatState{
     currentDrawPile: IAbstractCard[] = []
     currentDiscardPile: IAbstractCard[] = []
     currentHand: IAbstractCard[] = []
+    currentExhaustPile: IAbstractCard[] = []
 
     enemies: AutomatedCharacter[] = []
     playerCharacters: BaseCharacter[] = []

@@ -5,7 +5,8 @@ import { GameState } from './GameState';
 export enum PileName {
   Draw = "draw",
   Discard = "discard",
-  Hand = "hand"
+  Hand = "hand",
+  Exhaust = "exhaust"
 }
 export class DeckLogic {
   private static instance: DeckLogic;
@@ -87,6 +88,10 @@ export class DeckLogic {
           case PileName.Hand:
               this.removeCardFromAllPiles(card);
               combatState.currentHand.push(card);
+              break;
+          case PileName.Exhaust:
+              this.removeCardFromAllPiles(card);
+              combatState.currentExhaustPile.push(card);
               break;
           default:
               console.warn(`Unknown pile: ${pile}`);

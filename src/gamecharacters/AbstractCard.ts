@@ -102,7 +102,7 @@ export abstract class AbstractCard implements IAbstractCard {
     public isAutomatedCharacter(): boolean{
         return this.hasOwnProperty('intents');
     }
-    
+
     public isPlayableCard(): boolean{
         return this.hasOwnProperty('targetingType');
     }
@@ -148,6 +148,10 @@ export abstract class AbstractCard implements IAbstractCard {
         Object.assign(copy, this);
         copy.id = generateWordGuid();
         return copy;
+    }
+
+    hasBuff(buffName: string): boolean {
+        return this.buffs.some(buff => buff.getName() === buffName);
     }
     
     createJsonRepresentation(): string {

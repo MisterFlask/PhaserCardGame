@@ -1,10 +1,10 @@
-import { IAbstractBuff } from '../IAbstractBuff';
-import { AbstractCombatEvent } from "../../rules/AbstractCombatEvent";
-import { DamageInfo } from "../../rules/DamageInfo";
+import type { IAbstractBuff } from '../IAbstractBuff';
+import type { AbstractCombatEvent } from "../../rules/AbstractCombatEvent";
+import type { DamageInfo } from "../../rules/DamageInfo";
 import { GameState } from "../../rules/GameState";
 import { generateWordGuid } from "../AbstractCard";
-import { BaseCharacter } from "../BaseCharacter";
-import { PlayableCard } from "../PlayableCard";
+import type { BaseCharacter } from "../BaseCharacter";
+import type { PlayableCard } from "../PlayableCard";
 import { IBaseCharacter } from '../IBaseCharacter';
 
 export abstract class AbstractBuff implements IAbstractBuff {
@@ -17,6 +17,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
         this.counter = -1;
         this.showCounter = false;
         this.isDebuff = false;
+        this.canGoNegative = false;
     }
     public getOwnerAsPlayableCard(): PlayableCard | null {
         // Import GameState if not already imported at the top of the file
@@ -74,13 +75,17 @@ export abstract class AbstractBuff implements IAbstractBuff {
             // If the buff doesn't exist, add it to the character's buffs
             character.buffs.push(buff);
         }
+
+        if (!buff.stackable && buff.stacks > 1){
+            buff.stacks = 1;
+        }
     }
 
     getStacksDisplayText(): string {
         if (this.stacks > 0) return `${this.stacks}`;
         else return "[stacks]";
     }
-
+    canGoNegative: boolean = false;
     imageName: string = "PLACEHOLDER_IMAGE";
     id: string = generateWordGuid();
     stackable: boolean = true;
@@ -170,5 +175,11 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
     public onExhaust(){
 
+    }
+
+
+    // 
+    public onFatal(killedUnit: BaseCharacter){
+        
     }
 }

@@ -13,11 +13,28 @@ import { SubtitleManager } from "../ui/SubtitleManager";
 
 export class ActionManager {
     exhaustCard(ownerCard: PlayableCardType) {
-        throw new Error("Method not implemented.");
+        this.actionQueue.addAction(new GenericAction(async () => {
+            DeckLogic.moveCardToPile(ownerCard, PileName.Exhaust);
+            console.log(`Exhausted card ${ownerCard.name}`);
+            await new WaitAction(20).playAction(); // Short delay for visual feedback
+            return [];
+        }));
     }
+
     exhaustRandomCardInHand() {
-        throw new Error("Method not implemented.");
+        this.actionQueue.addAction(new GenericAction(async () => {
+            const hand = GameState.getInstance().combatState.currentHand;
+            if (hand.length > 0) {
+                const randomIndex = Phaser.Math.Between(0, hand.length - 1);
+                const randomCard = hand[randomIndex];
+                DeckLogic.moveCardToPile(randomCard, PileName.Exhaust);
+                console.log(`Exhausted random card ${randomCard.name}`);
+                await new WaitAction(20).playAction(); // Short delay for visual feedback
+            }
+            return [];
+        }));
     }
+
     private static instance: ActionManager;
     private actionQueue: ActionQueue;
     private scene!: Scene;
@@ -57,6 +74,27 @@ export class ActionManager {
         this.actionQueue.addAction(new GenericAction(async () => {
             AbstractBuff._applyBuffToCharacter(character as BaseCharacterType, buff);
             console.log(`Applied buff ${buff.getName()} to ${character.name}`);
+            // You might want to add some animation or visual feedback here
+            await new WaitAction(20).playAction(); // Short delay for visual feedback
+            return [];
+        }));
+    }
+
+    public removeBuffFromCharacter(character: IBaseCharacter, buffName: string, stacksToRemove?: number): void {
+        this.actionQueue.addAction(new GenericAction(async () => {
+
+
+            const buff = character.buffs.find(b => b.getName() === buffName);
+            if (buff) {
+                if (!stacksToRemove){
+                    buff.stacks = 0
+                }
+                else{
+                    buff.stacks -= stacksToRemove;
+                }
+            }
+            
+            console.log(`Removed buff ${buffName} from ${character.name}`);
             // You might want to add some animation or visual feedback here
             await new WaitAction(20).playAction(); // Short delay for visual feedback
             return [];

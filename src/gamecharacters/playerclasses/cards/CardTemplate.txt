@@ -5,47 +5,43 @@ import { TargetingType } from '../../../AbstractCard';
 import { AbstractBuff } from '../../../buffs/AbstractBuff';
 import { IBaseCharacter } from '../../../IBaseCharacter';
 
-export class AxeMeAQuestion extends PlayableCard {
+export class <CARD_NAME> extends PlayableCard {
   constructor() {
     super({
-      name: 'Axe Me a Question',
-      description: '_',
-      portraitName: 'axe-question',
+      name: 'CARD_NAME',
+      portraitName: 'CARD_PORTRAIT_NAME',
       targetingType: TargetingType.ENEMY,
     });
     this.baseDamage = 13;
     this.energyCost = 2;
+    this.baseMagicNumber = 2;
+    this.baseBlock = 5;
     this.buffs.push(new AxeCritBuff());
   }
 
   override get description(): string {
-    return `Deal ${this.getDisplayedDamage()} damage. Crits against Burning enemies.`;
+    return `Deal ${this.getDisplayedDamage()} damage.  Receieve ${this.getDisplayedBlock()} block.  Crits against burning enemies.`;
   }
 
   override InvokeCardEffects(target?: BaseCharacter): void {
-    this.dealDamageToTarget(target as BaseCharacter);
+    this.dealDamageToTarget(target);
   }
 }
 
-class AxeCritBuff extends AbstractBuff {
+// Buff template
+class <BUFF_NAME> extends AbstractBuff {
   constructor() {
     super();
-    this.imageName = "axe-crit";
-    this.stackable = false;
+    this.imageName = "<image_name>";
+    this.stackable = true;//typically
   }
 
   override getName(): string {
-    return "Axe Crit";
+    return "<NAME>";
   }
 
   override getDescription(): string {
-    return "Crits against Burning targets.";
+    return "increases damage by ${this.getStacksDisplayText()}.";
   }
 
-  override getAdditionalPercentCombatDamageDealtModifier(target?: IBaseCharacter): number {
-    if (target && target.buffs.some(buff => buff instanceof Burning)) {
-      return 100; // 100% increase in damage, effectively doubling it
-    }
-    return 0;
-  }
 }
