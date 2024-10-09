@@ -1,4 +1,3 @@
-
 import { GameState } from "../rules/GameState";
 
 import Phaser, { Scene } from 'phaser';
@@ -10,6 +9,8 @@ import { IBaseCharacter } from "../gamecharacters/IBaseCharacter";
 import { AutomatedCharacterType, BaseCharacterType, PlayableCardType } from "../Types";
 import { IAbstractCard } from "../gamecharacters/IAbstractCard";
 import { SubtitleManager } from "../ui/SubtitleManager";
+import CardSelectionManager from '../ui/CardSelectionManager';
+import CombatUiManager from "../screens/subcomponents/CombatUiManager";
 
 export class ActionManager {
     exhaustCard(ownerCard: PlayableCardType) {
@@ -20,6 +21,7 @@ export class ActionManager {
             return [];
         }));
     }
+
 
     exhaustRandomCardInHand() {
         this.actionQueue.addAction(new GenericAction(async () => {
@@ -552,6 +554,28 @@ export class ActionManager {
         }));
     }
 
+    public requireCardSelection(params: {
+        action: (selectedCards: PlayableCardType[]) => void;
+        name: string;
+        instructions: string;
+        min: number;
+        max: number;
+    }): void {
+        const combatUiManager = CombatUiManager.getInstance();
+        const scene = combatUiManager.scene; // Assuming CombatUiManager can provide the current scene
+
+        const selectionManager = new CardSelectionManager({
+            scene: scene,
+            action: params.action,
+            name: params.name,
+            instructions: params.instructions,
+            min: params.min,
+            max: params.max
+        });
+
+        selectionManager.start();
+    }
+
 }
 
 // {{ edit_1 }}
@@ -632,4 +656,3 @@ export class WaitAction extends GameAction {
         return [];
     }
 }
-

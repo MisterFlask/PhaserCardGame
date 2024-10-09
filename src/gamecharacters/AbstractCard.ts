@@ -10,6 +10,10 @@ export interface IPhysicalCardInterface {
     cardImage: Phaser.GameObjects.Image;
     data: IAbstractCard;
     blockText: TextBox;
+    highlight(): void;
+    unhighlight(): void;
+
+    setInteractive(isInteractive: boolean): void;
 }
 
 const wordList = [

@@ -5,11 +5,11 @@ import { IncomingIntent } from "./IncomingIntent"; // Import the new class
 import { PhysicalBuff } from './PhysicalBuff';
 import { PhysicalIntent } from "./PhysicalIntent";
 import { TextBox } from "./TextBox"; // Ensure correct relative path
-import { PlayableCard } from '../gamecharacters/PlayableCard';
-import { AbstractCardType, AutomatedCharacterType, BaseCharacterType } from '../Types';
+import { AbstractCardType, AutomatedCharacterType, BaseCharacterType, PlayableCardType } from '../Types';
 import { IAbstractCard } from '../gamecharacters/IAbstractCard';
+import { IPhysicalCardInterface } from '../gamecharacters/AbstractCard';
 
-export class PhysicalCard {
+export class PhysicalCard implements IPhysicalCardInterface {
     container: Phaser.GameObjects.Container;
     cardBackground: Phaser.GameObjects.Rectangle | Phaser.GameObjects.Image;
     cardImage: Phaser.GameObjects.Image;
@@ -114,8 +114,8 @@ export class PhysicalCard {
         }
 
         // Add cost box if the card is a PlayableCard
-        if (this.data instanceof PlayableCard) {
-            const playableCard = this.data as PlayableCard;
+        if (this.data.isPlayableCard()) {
+            const playableCard = this.data as PlayableCardType;
             const cardWidth = this.cardBackground.displayWidth;
             const cardHeight = this.cardBackground.displayHeight;
             this.costBox = new TextBox({
@@ -210,6 +210,9 @@ export class PhysicalCard {
         }
         this.scene.events.once('shutdown', this.obliterate, this);
         this.scene.events.once('destroy', this.obliterate, this);
+    }
+    setInteractive(isInteractive: boolean): void {
+        this.container.setInteractive(isInteractive);
     }
 
     obliterate(): void {
@@ -501,8 +504,8 @@ export class PhysicalCard {
         }
 
         // Update cost box if it exists
-        if (this.costBox && this.data instanceof PlayableCard) {
-            const playableCard = this.data as PlayableCard;
+        if (this.costBox && this.data.isPlayableCard()) {
+            const playableCard = this.data as PlayableCardType;
             this.costBox.setText(`${playableCard.energyCost}`);
         }
 

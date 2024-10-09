@@ -1,21 +1,17 @@
 // src/subcomponents/CombatUIManager.ts
 
 import Phaser from 'phaser';
-import { CombatRules } from '../../rules/CombatRules';
 import { GameState } from '../../rules/GameState';
 import { default as CombatSceneLayoutUtils, default as LayoutUtils } from '../../ui/LayoutUtils';
 import Menu from '../../ui/Menu';
 import { TextBox } from '../../ui/TextBox';
 import CardRewardScreen, { CardReward, CardRewardScreenData } from './CardRewardScreen';
-import { AbstractCard } from '../../gamecharacters/AbstractCard';
 import { SceneChanger } from '../SceneChanger';
 import { Defend } from '../../gamecharacters/playerclasses/cards/basic/Defend';
-import { Shoot } from '../../gamecharacters/playerclasses/cards/basic/Shoot';
-import { BaseCharacter } from '../../gamecharacters/BaseCharacter';
-import { PlayableCard } from '../../gamecharacters/PlayableCard';
-import { PlayerCharacter } from '../../gamecharacters/CharacterClasses';
 import { ActionManager } from '../../utils/ActionManager';
 import { SubtitleManager } from '../../ui/SubtitleManager';
+import { AbstractCardType, PlayableCardType } from '../../Types';
+import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
 
 interface MenuOption {
     text: string;
@@ -24,7 +20,7 @@ interface MenuOption {
 
 class CombatUIManager {
     private static instance: CombatUIManager;
-    private scene: Phaser.Scene;
+    public scene: Phaser.Scene;
     public menu!: Menu;
     public combatStatusText!: TextBox;
     public endTurnButton!: TextBox;
@@ -232,12 +228,12 @@ class CombatUIManager {
             backgroundImage: 'button_background'
         });
 
-        this.endTurnButton.background!!.setInteractive({ useHandCursor: true })
+        this.endTurnButton.backgroundImage!!.setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
                 ActionManager.endTurn();
             });
 
-        this.scene.add.existing(this.endTurnButton.background!!);
+        this.scene.add.existing(this.endTurnButton.backgroundImage!!);
         this.scene.add.existing(this.endTurnButton.text);
     }
 
@@ -469,6 +465,23 @@ class CombatUIManager {
 
     // Optionally, listen to combat state changes to trigger onCombatEnd
     // This might involve emitting events from CombatScene when enemies are defeated
+
+    public disableInteractions(): void {
+        // Disable end turn button
+        this.endTurnButton.setInteractive(false);
+        // Disable menu
+    }
+
+    public enableInteractions(): void {
+        // Enable end turn button
+        this.endTurnButton.setInteractive(true);
+        // Enable menu
+    }
+
+    public getPlayerHandCards(): IAbstractCard[] {
+        // Return the list of PlayableCard instances in the player's hand
+        return GameState.getInstance().combatState.currentHand;
+    }
 }
 
 export default CombatUIManager;

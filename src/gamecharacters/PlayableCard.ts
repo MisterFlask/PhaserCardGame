@@ -305,6 +305,14 @@ export abstract class PlayableCard extends AbstractCard {
 
         return true;
     }
+
+    public highlight(): void {
+        this.physicalCard?.highlight(); // Example: Green tint for selection
+    }
+
+    public unhighlight(): void {
+        this.physicalCard?.unhighlight();
+    }
 }
 
 export interface CardResourceScaling {

@@ -2,7 +2,8 @@
 import Phaser from 'phaser';
 
 export class TextBox {
-    background: Phaser.GameObjects.Rectangle | Phaser.GameObjects.Image | null;
+    background: Phaser.GameObjects.Rectangle | null;
+    backgroundImage: Phaser.GameObjects.Image | null;
     text: Phaser.GameObjects.Text;
     outline: Phaser.GameObjects.Rectangle | null = null;
     textBoxName?: string;
@@ -39,10 +40,12 @@ export class TextBox {
         this.expandDirection = params.expandDirection ?? 'down';
         // Create background with rounded corners if no image is provided
         if (backgroundImage) {
-            this.background = scene.add.image(x, y, backgroundImage).setDisplaySize(width, height).setOrigin(0.5);
+            this.backgroundImage = scene.add.image(x, y, backgroundImage).setDisplaySize(width, height).setOrigin(0.5);
+            this.background = null;
         } else {
             this.background = scene.add.rectangle(x, y, width, height, fillColor).setOrigin(0.5);
             this.background.setStrokeStyle(2, 0xffffff); // Adding a border for better visibility
+            this.backgroundImage = null;
         }
 
         // Create text with shadow for better readability
@@ -69,11 +72,21 @@ export class TextBox {
             const widthIncrease = newWidth - width;
             const heightIncrease = newHeight - height;
             
-            this.background.setSize(newWidth, newHeight);
-            this.background.setPosition(
-                this.background.x - widthIncrease / 2,
-                this.background.y + (this.expandDirection === 'down' ? heightIncrease / 2 : 0)
-            );
+            if (this.background) {
+                this.background.setSize(newWidth, newHeight);
+                this.background.setPosition(
+                    this.background.x - widthIncrease / 2,
+                    this.background.y + (this.expandDirection === 'down' ? heightIncrease / 2 : 0)
+                );
+            }
+            
+            if (this.backgroundImage) {
+                this.backgroundImage.setDisplaySize(newWidth, newHeight);
+                this.backgroundImage.setPosition(
+                    this.backgroundImage.x - widthIncrease / 2,
+                    this.backgroundImage.y + (this.expandDirection === 'down' ? heightIncrease / 2 : 0)
+                );
+            }
             
             this.text.setPosition(
                 this.text.x - widthIncrease / 2,
@@ -85,8 +98,12 @@ export class TextBox {
     }
 
     setPosition(x: number, y: number): void {
-        if (this.background === null) return;
-        this.background.setPosition(x, y);
+        if (this.background) {
+            this.background.setPosition(x, y);
+        }
+        if (this.backgroundImage) {
+            this.backgroundImage.setPosition(x, y);
+        }
         this.text.setPosition(x, y);
     }
 
@@ -99,31 +116,28 @@ export class TextBox {
     }
 
     private pulseColor(color: number): void {
-        if (!this.background) return;
-
-        const originalColor = this.background instanceof Phaser.GameObjects.Rectangle ? this.background.fillColor : 0xffffff;
-        
-        this.scene.tweens.add({
-            targets: this.background,
-            fillColor: { from: originalColor, to: color },
-            duration: 100,
-            yoyo: true,
-            repeat: 3,
-            onComplete: () => {
-                if (this.background instanceof Phaser.GameObjects.Rectangle) {
-                    this.background.setFillStyle(originalColor);
+        if (this.background) {
+            const originalColor = this.background.fillColor;
+            this.scene.tweens.add({
+                targets: this.background,
+                fillColor: { from: originalColor, to: color },
+                duration: 100,
+                yoyo: true,
+                repeat: 3,
+                onComplete: () => {
+                    this.background?.setFillStyle(originalColor);
                 }
-            }
-        });
+            });
+        }
     }
 
     setSize(width: number, height: number): void {
-        if (this.background === null) return;
-        if (this.background instanceof Phaser.GameObjects.Rectangle) {
+        if (this.background) {
             this.background.setSize(width, height);
             this.background.setStrokeStyle(2, 0xffffff); // Reapply border if needed
-        } else {
-            this.background.setDisplaySize(width, height);
+        }
+        if (this.backgroundImage) {
+            this.backgroundImage.setDisplaySize(width, height);
         }
         this.text.setWordWrapWidth(width - 20);
     }
@@ -132,7 +146,7 @@ export class TextBox {
         if (this.text.scene === null) {
             return;
         }
-        if (this.background == null){
+        if (this.background == null && this.backgroundImage == null){
             return;
         }
         if ((this.text.frame as any)?.data) {
@@ -144,33 +158,40 @@ export class TextBox {
     }
 
     private adjustTextBoxSize(): void {
+        if (this.background) {
+            const padding = 10;
+            const maxWidth = this.background.width;
+            const maxHeight = this.background.height;
 
-        if (!(this.background instanceof Phaser.GameObjects.Rectangle)){
-            return;
-        }
-        if (this.background === null){
-            return;
-        }
-        const padding = 10;
-        const maxWidth = this.background.width;
-        const maxHeight = this.background.height;
+            if (this.text.height > maxHeight - padding) {
+                const newHeight = this.text.height + padding;
+                this.setSize(maxWidth, newHeight);
 
-        if (this.text.height > maxHeight - padding) {
-            const newHeight = this.text.height + padding;
-            this.setSize(maxWidth, newHeight);
-
-            if (this.expandDirection === 'up') {
-                const newY = this.background.y - (newHeight - maxHeight) / 2;
-                this.setPosition(this.background.x, newY);
+                if (this.expandDirection === 'up') {
+                    const newY = this.background.y - (newHeight - maxHeight) / 2;
+                    this.setPosition(this.background.x, newY);
+                }
             }
         }
     }
 
-    setVisible(visible: boolean): void {
-        if (this.background === null) {
-            return;
+    setInteractive(interactive: boolean): void {
+        if (this.background) {
+            this.background.setInteractive(interactive ? { useHandCursor: true } : undefined);
         }
-        this.background.setVisible(visible);
+        if (this.backgroundImage) {
+            this.backgroundImage.setInteractive(interactive ? { useHandCursor: true } : undefined);
+        }
+        this.text.setInteractive(interactive ? { useHandCursor: true } : undefined);
+    }
+    
+    setVisible(visible: boolean): void {
+        if (this.background) {
+            this.background.setVisible(visible);
+        }
+        if (this.backgroundImage) {
+            this.backgroundImage.setVisible(visible);
+        }
         this.text.setVisible(visible);
     }
 
@@ -178,8 +199,12 @@ export class TextBox {
         if (this.background) {
             this.background.destroy();
         }
+        if (this.backgroundImage) {
+            this.backgroundImage.destroy();
+        }
         this.text.destroy();
         this.background = null;
+        this.backgroundImage = null;
     }
 
     // Add this method to the TextBox class
@@ -187,12 +212,18 @@ export class TextBox {
         if (this.background) {
             this.background.setScrollFactor(factor);
         }
+        if (this.backgroundImage) {
+            this.backgroundImage.setScrollFactor(factor);
+        }
         this.text.setScrollFactor(factor);
     }
 
     setDepth(depth: number): void {
         if (this.background) {
             this.background.setDepth(depth);
+        }
+        if (this.backgroundImage) {
+            this.backgroundImage.setDepth(depth);
         }
         this.text.setDepth(depth);
     }
