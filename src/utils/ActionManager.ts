@@ -76,8 +76,6 @@ export class ActionManager {
 
     public removeBuffFromCharacter(character: IBaseCharacter, buffName: string, stacksToRemove?: number): void {
         this.actionQueue.addAction(new GenericAction(async () => {
-
-
             const buff = character.buffs.find(b => b.getName() === buffName);
             if (buff) {
                 if (!stacksToRemove){
@@ -128,6 +126,19 @@ export class ActionManager {
             await this.animateDiscardCard(card);
             return [];
         }));
+    }
+
+    public stateBasedEffects(){
+        const gameState = GameState.getInstance();
+        const combatState = gameState.combatState;
+
+        combatState.allPlayerAndEnemyCharacters.forEach(character => {
+            character.buffs.slice().forEach(buff => { // Create a copy of buffs
+                if (buff.stacks <= 0) {
+                    character.buffs = character.buffs.filter(existingBuff => existingBuff !== buff);
+                }
+            });
+        });
     }
 
     private animateDrawCard(card: IAbstractCard): Promise<void> {
@@ -294,6 +305,9 @@ export class ActionManager {
             if (damageResult.unblockedDamage > 0) {
                 target.hitpoints = Math.max(0, target.hitpoints - damageResult.unblockedDamage);
             }
+            if (damageResult.blockedDamage > 0) {
+                target.block = Math.max(0, target.block - damageResult.blockedDamage);
+            }
 
             if (fromAttack) {
                 // Activate OnStruck effects for the defender's buffs
@@ -340,7 +354,6 @@ export class ActionManager {
                 isBlocked: damageResult.unblockedDamage === 0
             });
 
-            // {{ edit_2 }}
             // Animate the defender jiggle and glow based on unblocked damage
             if (damageResult.unblockedDamage > 0) {
                 // Unblocked damage dealt: glow red
@@ -740,6 +753,7 @@ export class ActionQueue {
             await new Promise(resolve => setTimeout(resolve, 50));
         }
 
+        ActionManager.getInstance().stateBasedEffects();
         this.isResolving = false;
     }
 }
