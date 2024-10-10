@@ -104,7 +104,7 @@ export abstract class PlayableCard extends AbstractCard {
     }
 
     get gold(): CombatResource {
-        return this.combatResources.gold;
+        return this.combatResources.venture;
     }
 
     get fog(): CombatResource {
@@ -112,7 +112,7 @@ export abstract class PlayableCard extends AbstractCard {
     }
 
     get thunder(): CombatResource {
-        return this.combatResources.thunder;
+        return this.combatResources.powder;
     }
 
     /**

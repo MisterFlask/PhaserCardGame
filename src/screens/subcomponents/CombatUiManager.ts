@@ -357,11 +357,11 @@ class CombatUIManager {
     private updateResourceIndicators(): void {
         const resources = GameState.getInstance().combatState.combatResources;
         const resourceArray = [
-            resources.thunder,
+            resources.powder,
             resources.iron,
             resources.pages,
             resources.ice,
-            resources.gold,
+            resources.venture,
             resources.fog
         ];
         this.resourceIndicators.forEach((container, index) => {

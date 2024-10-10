@@ -65,7 +65,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
             existingBuff = existingBuff as AbstractBuff
             if (existingBuff.stackable) {
                 // If the buff is stackable, increase its stack count
-                existingBuff.stacks = ((existingBuff as any).stacks || 1) + 1;
+                existingBuff.stacks += buff.stacks;
             } else {
                 // If the buff is not stackable, we'll just log this information
                 console.log(`Buff ${existingBuff.getName()} is not stackable. Ignoring new application.`);

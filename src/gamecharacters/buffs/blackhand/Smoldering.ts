@@ -20,7 +20,7 @@ export class Smoldering extends AbstractBuff {
     }
 
     override onTurnEnd(): void {
-        ActionManager.getInstance().dealDamage({ target: this.getOwnerAsCharacter()!, baseDamageAmount: 3 + GameState.getInstance().combatState.combatResources.thunder.value, fromAttack: false});
+        ActionManager.getInstance().dealDamage({ target: this.getOwnerAsCharacter()!, baseDamageAmount: 3 + GameState.getInstance().combatState.combatResources.powder.value, fromAttack: false});
         this.stacks--;
     }
 }

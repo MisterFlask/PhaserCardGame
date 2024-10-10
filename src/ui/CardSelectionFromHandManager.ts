@@ -71,6 +71,8 @@ class CardSelectionFromHandManager {
                 this.cancelButton.background?.setFillStyle(0x555555);
             });
 
+        this.cancelButton.setDepth(2);
+
         this.scene.add.existing(this.cancelButton.background!!);
         this.scene.add.existing(this.cancelButton.text);
     }
@@ -84,6 +86,7 @@ class CardSelectionFromHandManager {
             0x000000,
             0.5
         );
+        this.overlay.setDepth(1);
         this.overlay.setInteractive();
     }
 
@@ -116,6 +119,8 @@ class CardSelectionFromHandManager {
             textBoxName: 'CardSelectionSubmitButton'
         });
 
+        this.submitButton.setDepth(2);
+
         this.submitButton.background!!.setInteractive({ useHandCursor: true })
             .on('pointerdown', this.onSubmit, this)
             .on('pointerover', () => {
@@ -133,7 +138,8 @@ class CardSelectionFromHandManager {
         const combatUiManager = CombatUiManager.getInstance();
         const handCards = combatUiManager.getPlayerHandCards(); // Assumes a method to get player's hand cards
 
-        handCards.forEach(card => {
+        handCards.forEach((card, i) => {
+            card.physicalCard?.container.setDepth(4 + i);
             card.physicalCard?.container.setInteractive()
                 .on('pointerdown', () => this.toggleCardSelection(card as PlayableCard));
         });

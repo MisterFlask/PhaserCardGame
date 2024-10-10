@@ -382,7 +382,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
         this.descBox.setVisible(false);
         this.tooltipBox.setVisible(false);
-        this.container.setDepth(0);
+        this.container.setDepth(4);
 
         // Stop wiggle animation
         if (this.wiggleTween) {

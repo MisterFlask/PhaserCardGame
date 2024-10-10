@@ -203,16 +203,16 @@ export class CombatResources{
         console.log(`Modified Iron by ${byAmount}. New value: ${this.iron.value}`);
     }
     modifyGold(byAmount: number){
-        this.gold.value += byAmount;
-        console.log(`Modified Gold by ${byAmount}. New value: ${this.gold.value}`);
+        this.venture.value += byAmount;
+        console.log(`Modified Gold by ${byAmount}. New value: ${this.venture.value}`);
     }
     modifyFog(byAmount: number){
         this.fog.value += byAmount;
         console.log(`Modified Fog by ${byAmount}. New value: ${this.fog.value}`);
     }
     modifyThunder(byAmount: number){
-        this.thunder.value += byAmount;
-        console.log(`Modified Thunder by ${byAmount}. New value: ${this.thunder.value}`);
+        this.powder.value += byAmount;
+        console.log(`Modified Thunder by ${byAmount}. New value: ${this.powder.value}`);
     }
 
     getCombatResource(resource: CombatResource): CombatResource{
@@ -220,17 +220,17 @@ export class CombatResources{
     }
 
     resources(): CombatResource[]{
-        return [this.thunder, this.ice, this.pages, this.iron, this.gold, this.fog]
+        return [this.powder, this.ice, this.pages, this.iron, this.venture, this.fog]
     }
 
-    thunder: CombatResource = new CombatResource(
-        "Thunder",
-        "At the start of turn, if you have 2 Thunder, decrease it by 2 and a random ally gains 2 Strength."
+    powder: CombatResource = new CombatResource(
+        "Powder",
+        "At the start of turn, if you have 2 Powder, decrease it by 2 and a random ally gains 2 Strength."
     );
 
     iron: CombatResource = new CombatResource(
         "Iron",
-        "At beginning of turn, gain 1 Temp Strength for each Iron value.  Decreases by 1 at end of turn."
+        "At beginning of turn, gain 1 Block for each Iron value.  Decreases by 1 at end of turn."
     );
 
     pages: CombatResource = new CombatResource(
@@ -248,9 +248,9 @@ export class CombatResources{
         "If you have >4 Fog at beginning of turn, gain Sneak Attack to your hand and decrease Fog by 4. [Replays next card played by a character.]"
     );
 
-    gold: CombatResource = new CombatResource(
-        "Gold",
-        "At end of combat, gain a Loot reward option for each 2 Gold value. [this is distinct from ordinary card rewards]"
+    venture: CombatResource = new CombatResource(
+        "Venture",
+        "At end of combat, gain a Loot reward option for each 2 Venture value. [this is distinct from ordinary card rewards]"
     );
 }
 

@@ -143,7 +143,7 @@ class CombatInputHandler {
 
     private resetCardDepth(container: Phaser.GameObjects.Container): void {
         // Reset depth based on original logic or other criteria
-        const originalDepth = (container as any).originalDepth || 0;
+        const originalDepth = (container as any).originalDepth || 4;
         container.setDepth(originalDepth);
     }
 
