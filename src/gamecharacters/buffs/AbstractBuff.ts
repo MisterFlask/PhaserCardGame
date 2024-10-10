@@ -59,6 +59,12 @@ export abstract class AbstractBuff implements IAbstractBuff {
     * Generally you'll want to use the ActionManager method for this since that allows game animations to play.
     */
     public static _applyBuffToCharacter(character: BaseCharacter, buff: AbstractBuff) {
+        if (character == null) {
+            return;
+        }
+        if (character.buffs == null) {
+            character.buffs = [];
+        }
         // Check if the character already has a buff of the same type
         let existingBuff = character.buffs.find(existingBuff => existingBuff.constructor === buff.constructor);
         if (existingBuff) {

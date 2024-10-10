@@ -19,7 +19,7 @@ export class Rummage extends PlayableCard {
 
   override InvokeCardEffects(targetCard?: AbstractCard): void {
     this.actionManager.requireCardSelection({name: "discard_card", instructions: "Discard a card to draw 2 cards", min: 1, max: 1, cancellable: true, action: (selectedCards: AbstractCard[]) => {
-      this.actionManager.discardCard(selectedCards[0]);
+      this.actionManager.basicDiscardCard(selectedCards[0]);
       this.actionManager.drawCards(2);
     }});
   }

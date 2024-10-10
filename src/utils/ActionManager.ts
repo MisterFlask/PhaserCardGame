@@ -13,15 +13,6 @@ import CardSelectionFromHandManager from '../ui/CardSelectionFromHandManager';
 import CombatUiManager from "../screens/subcomponents/CombatUiManager";
 
 export class ActionManager {
-    exhaustCard(ownerCard: PlayableCardType) {
-        this.actionQueue.addAction(new GenericAction(async () => {
-            DeckLogic.moveCardToPile(ownerCard, PileName.Exhaust);
-            console.log(`Exhausted card ${ownerCard.name}`);
-            await new WaitAction(20).playAction(); // Short delay for visual feedback
-            return [];
-        }));
-    }
-
 
     exhaustRandomCardInHand() {
         this.actionQueue.addAction(new GenericAction(async () => {
@@ -29,9 +20,7 @@ export class ActionManager {
             if (hand.length > 0) {
                 const randomIndex = Phaser.Math.Between(0, hand.length - 1);
                 const randomCard = hand[randomIndex];
-                DeckLogic.moveCardToPile(randomCard, PileName.Exhaust);
-                console.log(`Exhausted random card ${randomCard.name}`);
-                await new WaitAction(20).playAction(); // Short delay for visual feedback
+                ActionManager.getInstance().exhaustCard(randomCard as PlayableCardType);
             }
             return [];
         }));
@@ -73,6 +62,9 @@ export class ActionManager {
     }
 
     public applyBuffToCharacter(character: IBaseCharacter, buff: AbstractBuff, sourceCharacter?: IBaseCharacter): void {
+        if (character == null || buff == null) {
+            return;
+        }
         this.actionQueue.addAction(new GenericAction(async () => {
             AbstractBuff._applyBuffToCharacter(character as BaseCharacterType, buff);
             console.log(`Applied buff ${buff.getName()} to ${character.name}`);
@@ -156,7 +148,7 @@ export class ActionManager {
         });
     }
 
-    public discardCard = (card: IAbstractCard): void => {
+    public basicDiscardCard = (card: IAbstractCard): void => {
         this.actionQueue.addAction(new GenericAction(async () => {
             DeckLogic.moveCardToPile(card, PileName.Discard);
             await this.animateDiscardCard(card.physicalCard!);
@@ -299,6 +291,10 @@ export class ActionManager {
                 fromAttack
             });
 
+            if (damageResult.unblockedDamage > 0) {
+                target.hitpoints = Math.max(0, target.hitpoints - damageResult.unblockedDamage);
+            }
+
             if (fromAttack) {
                 // Activate OnStruck effects for the defender's buffs
                 target.buffs.forEach(buff => {
@@ -309,18 +305,40 @@ export class ActionManager {
                         damageBlocked: damageResult.blockedDamage
                     });
                 });
-            }
 
-            if (damageResult.unblockedDamage > 0) {
-                target.hitpoints = Math.max(0, target.hitpoints - damageResult.unblockedDamage);
+                // now for every buff on the source character, invoke its onOwnerStriking method
+                sourceCharacter?.buffs.forEach(buff => {
+                    buff.onOwnerStriking(target as BaseCharacterType, sourceCard || null, {
+                        damageDealt: damageResult.totalDamage,
+                        damageTaken: damageResult.unblockedDamage,
+                        damageBlocked: damageResult.blockedDamage
+                    });
+                });
             }
 
             console.log(`Damage Calculation: Total Damage: ${damageResult.totalDamage}, Blocked Damage: ${damageResult.blockedDamage}, Unblocked Damage: ${damageResult.unblockedDamage}`);
 
             // Handle death if hitpoints reach 0
             if (target.hitpoints <= 0) {
+                // Activate onFatal effects for the defender's buffs
+                sourceCharacter?.buffs.forEach(buff => {
+                    buff.onFatal(target as BaseCharacterType)
+                });
+
+                // now we do the same operation on the attacker's card that killed it
+                sourceCard?.buffs.forEach(buff => {
+                    buff.onFatal(target as BaseCharacterType)
+                });
+
                 CombatRules.handleDeath(target, sourceCharacter || null);
             }
+
+            // Display the damage number
+            this.displayDamageNumber({
+                target,
+                damageAmount: damageResult.totalDamage,
+                isBlocked: damageResult.unblockedDamage === 0
+            });
 
             // {{ edit_2 }}
             // Animate the defender jiggle and glow based on unblocked damage
@@ -358,6 +376,8 @@ export class ActionManager {
             return [];
         }));
     }
+
+    
 
     // {{ edit_4 }}
     /**
@@ -413,11 +433,11 @@ export class ActionManager {
     public async resolveActions(): Promise<void> {
         await this.actionQueue.resolveActions();
     }
-    public discardCards(cards: IAbstractCard[]): void {
+    public basicDiscardCards(cards: IAbstractCard[]): void {
         // Queue discarding multiple cards
         this.actionQueue.addAction(new GenericAction(async () => {
             cards.forEach(card => {
-                this.discardCard(card);
+                this.basicDiscardCard(card);
             });
             return [];
         }));
@@ -449,13 +469,13 @@ export class ActionManager {
     }
     public modifyGold(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
         this.actionQueue.addAction(new GenericAction(async () => {
-            GameState.getInstance().combatState.combatResources.modifyGold(amount);
+            GameState.getInstance().combatState.combatResources.modifyVenture(amount);
             return [];
         }));
     }
     public modifyThunder(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
         this.actionQueue.addAction(new GenericAction(async () => {
-            GameState.getInstance().combatState.combatResources.modifyThunder(amount);
+            GameState.getInstance().combatState.combatResources.modifyPowder(amount);
             return [];
         }));
     }
@@ -472,10 +492,15 @@ export class ActionManager {
         // Invoke the effect of the card
         if (card.IsPerformableOn(target)) {
             card.InvokeCardEffects(target);
+            
+            // now for each buff on the card, invoke its onCardInvoked effect
+            card.buffs.forEach(buff => {
+                buff.onCardInvoked(target);
+            });
         }
 
         // Queue discard action instead of direct discard
-        ActionManager.getInstance().discardCard(card);
+        ActionManager.getInstance().basicDiscardCard(card);
     };
 
     public static endTurn(): void {
@@ -510,10 +535,42 @@ export class ActionManager {
             }
         });
 
+        // end turn buffs
+        combatState.allPlayerAndEnemyCharacters.forEach(character => {
+            character.buffs.forEach(buff => {
+                buff.onTurnEnd();
+            });
+        });
+
+        
         // Queue discard actions instead of direct discard
-        ActionManager.getInstance().discardCards(combatState.currentHand);
+        ActionManager.getInstance().basicDiscardCards(combatState.currentHand);
         ActionManager.beginTurn();
     }
+
+
+    public activeDiscardCard(card: PlayableCardType): void {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            this.basicDiscardCard(card);
+            for (const buff of card.buffs) {
+                buff.onDiscard();
+            }
+            return [];
+        }));
+    }
+
+    public exhaustCard(card: PlayableCardType): void {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            DeckLogic.moveCardToPile(card, PileName.Exhaust);
+            console.log(`Exhausted card ${card.name}`);
+            await new WaitAction(20).playAction(); // Short delay for visual feedback
+            for (const buff of card.buffs) {
+                buff.onExhaust();
+            }
+            return [];
+        }));
+    }
+
     public static beginTurn(): void {
         const gameState = GameState.getInstance();
         const combatState = gameState.combatState;
@@ -527,6 +584,12 @@ export class ActionManager {
 
         // Queue draw action instead of direct draw
         ActionManager.getInstance().drawHandForNewTurn();
+
+        combatState.allPlayerAndEnemyCharacters.forEach(character => {
+            character.buffs.forEach(buff => {
+                buff.onTurnStart();
+            });
+        });
 
         combatState.energyAvailable = combatState.maxEnergy
     }
@@ -584,6 +647,47 @@ export class ActionManager {
         selectionManager.start();
     }
 
+    private displayDamageNumber(params: {
+        target: IBaseCharacter,
+        damageAmount: number,
+        isBlocked: boolean
+    }): void {
+        const { target, damageAmount, isBlocked } = params;
+        const color = isBlocked ? "#0000ff" : "#ff0000"; // Blue for blocked, red for real damage
+
+        if (target.physicalCard == null) {
+            return;
+        }
+
+        console.log(`Displaying damage number: ${damageAmount} for ${target.name}`);
+        this.actionQueue.addAction(new GenericAction(async () => {
+            const scene = this.scene;
+            const text = scene.add.text(
+                target.physicalCard!.container.x, 
+                target.physicalCard!.container.y - 50, // Position above the card
+                damageAmount.toString(), 
+                {
+                    font: 'bold 32px Arial',
+                    color: '#ffffff',
+                    stroke: color,//'#000000',
+                    strokeThickness: 2
+                }
+            );
+            text.setDepth(2000);
+
+            scene.tweens.add({
+                targets: text,
+                y: text.y - 50, // Drift upwards
+                alpha: 0, // Fade out
+                duration: 3000, // 1 second
+                ease: 'Power1',
+                onComplete: () => text.destroy()
+            });
+
+            await new WaitAction(1).playAction(); // Not really waiting.
+            return [];
+        }));
+    }
 }
 
 // {{ edit_1 }}

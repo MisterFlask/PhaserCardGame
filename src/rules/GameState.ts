@@ -1,9 +1,8 @@
-import { AutomatedCharacter } from '../gamecharacters/AutomatedCharacter';
-import { BaseCharacter } from '../gamecharacters/BaseCharacter';
 import { PlayerCharacter } from '../gamecharacters/CharacterClasses';
 import { IAbstractCard } from '../gamecharacters/IAbstractCard';
 import { PlayableCard } from '../gamecharacters/PlayableCard';
 import { LocationCard } from '../maplogic/LocationCard';
+import { BaseCharacterType, AutomatedCharacterType } from '../Types';
 import { PhysicalCard } from '../ui/PhysicalCard';
 export class GameState {
     private static instance: GameState;
@@ -152,7 +151,7 @@ export class GameState {
 
 export class CombatState{
 
-    characterHoveredOver_transient?: BaseCharacter
+    characterHoveredOver_transient?: BaseCharacterType
 
     currentCombatDeck: IAbstractCard[] = []
     currentDrawPile: IAbstractCard[] = []
@@ -160,8 +159,12 @@ export class CombatState{
     currentHand: IAbstractCard[] = []
     currentExhaustPile: IAbstractCard[] = []
 
-    enemies: AutomatedCharacter[] = []
-    playerCharacters: BaseCharacter[] = []
+    enemies: AutomatedCharacterType[] = []
+    playerCharacters: BaseCharacterType[] = []
+
+    get allPlayerAndEnemyCharacters(): (BaseCharacterType)[] {
+        return [...this.playerCharacters, ...this.enemies];
+    }
 
     combatResources: CombatResources = new CombatResources()
 
@@ -202,7 +205,7 @@ export class CombatResources{
         this.iron.value += byAmount;
         console.log(`Modified Iron by ${byAmount}. New value: ${this.iron.value}`);
     }
-    modifyGold(byAmount: number){
+    modifyVenture(byAmount: number){
         this.venture.value += byAmount;
         console.log(`Modified Gold by ${byAmount}. New value: ${this.venture.value}`);
     }
@@ -210,7 +213,7 @@ export class CombatResources{
         this.fog.value += byAmount;
         console.log(`Modified Fog by ${byAmount}. New value: ${this.fog.value}`);
     }
-    modifyThunder(byAmount: number){
+    modifyPowder(byAmount: number){
         this.powder.value += byAmount;
         console.log(`Modified Thunder by ${byAmount}. New value: ${this.powder.value}`);
     }
