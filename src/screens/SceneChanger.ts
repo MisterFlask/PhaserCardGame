@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
-import { GameState } from '../rules/GameState';
 import { EncounterData } from '../encounters/Encounters';
+import { GameState } from '../rules/GameState';
 
 export class SceneChanger {
     private static currentScene: Phaser.Scene | null = null;

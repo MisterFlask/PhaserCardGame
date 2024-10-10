@@ -2,7 +2,7 @@ import { Scene } from "phaser";
 import { AbstractIntent } from "../gamecharacters/AbstractIntent";
 import { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { JsonRepresentable } from "../interfaces/JsonRepresentable";
-import { IntentEmitter } from "../utils/intentemitter";
+import { IntentEmitter } from "../utils/IntentEmitter";
 
 export class PhysicalIntent implements JsonRepresentable {
     static readonly WIDTH: number = 40;

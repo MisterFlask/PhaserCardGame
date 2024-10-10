@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { BaconBeast, BloodManipulationSlime, ClockworkAbomination } from '../encounters/Encounters';
 import { AbstractCard } from '../gamecharacters/AbstractCard';
 import { PlayerCharacter } from '../gamecharacters/CharacterClasses';
+import { PlayableCard } from '../gamecharacters/PlayableCard';
 import { CardType } from '../gamecharacters/Primitives';
 import { CampaignRules } from '../rules/CampaignRules';
 import { GameState } from '../rules/GameState';
@@ -10,7 +11,6 @@ import { PhysicalCard, } from '../ui/PhysicalCard';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 import GameImageLoader from '../utils/ImageUtils';
 import { SceneChanger } from './SceneChanger';
-import { PlayableCard } from '../gamecharacters/PlayableCard';
 
 interface CardSlot {
     container: Phaser.GameObjects.Container;

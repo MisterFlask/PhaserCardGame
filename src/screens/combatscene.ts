@@ -9,12 +9,12 @@ import { ActionManager } from '../utils/ActionManager';
 import GameImageLoader from '../utils/ImageUtils';
 import CampaignScene from './Campaign';
 import MapScene from './Map';
+import { SceneChanger } from './SceneChanger';
 import CombatCardManager from './subcomponents/CombatCardManager';
 import CombatInputHandler from './subcomponents/CombatInputHandler';
 import CombatStateService from './subcomponents/CombatStateService';
-import PerformanceMonitor from './subcomponents/PerformanceMonitor';
 import CombatUIManager from './subcomponents/CombatUiManager';
-import { SceneChanger } from './SceneChanger';
+import PerformanceMonitor from './subcomponents/PerformanceMonitor';
 
 /**
  * Interface for initializing CombatScene with necessmorniary data.
