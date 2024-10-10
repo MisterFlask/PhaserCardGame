@@ -1,9 +1,8 @@
-import { CardRarity, PlayableCard } from './PlayableCard';
+import { AbstractCard, TargetingType } from './AbstractCard';
 import { AbstractBuff } from './buffs/AbstractBuff';
 import { IBaseCharacter } from './IBaseCharacter';
-import { AbstractCard, TargetingType } from './AbstractCard';
-import { CardType, CardSize } from './Primitives';
-import { ActionManager } from '../utils/ActionManager';
+import { CardRarity, PlayableCard, } from './PlayableCard';
+import { CardSize, CardType } from './Primitives';
 
 export abstract class PlayableCardWithHelpers extends PlayableCard {
     constructor({ name, description, portraitName, cardType, tooltip, characterData, size, targetingType, owner, price, rarity }: { name: string; description?: string; portraitName?: string; cardType?: CardType; tooltip?: string; characterData?: AbstractCard; size?: CardSize; targetingType?: TargetingType; owner?: IBaseCharacter; price?: number; rarity?: CardRarity }) {
@@ -12,9 +11,5 @@ export abstract class PlayableCardWithHelpers extends PlayableCard {
 
     addBuff(target: IBaseCharacter, buff: AbstractBuff): void {
         this.actionManager.applyBuffToCharacter(target, buff, this.owner);
-    }
-
-    get actionManager(): ActionManager {
-        return ActionManager.getInstance();
     }
 }

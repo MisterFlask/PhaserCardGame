@@ -8,9 +8,9 @@ import { SpatialManager } from '../maplogic/SpatialManager';
 import { GameState } from '../rules/GameState';
 import { PhysicalCard } from '../ui/PhysicalCard';
 import { TextBox } from '../ui/TextBox';
+import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 import { SceneChanger } from './SceneChanger';
-
 export default class MapScene extends Phaser.Scene {
     private locationCards: PhysicalCard[] = [];
     private characterCards: PhysicalCard[] = [];
@@ -45,8 +45,8 @@ export default class MapScene extends Phaser.Scene {
         this.load.image('cursed-star', 'path_to_cursed_star_image.png'); // Ensure you have this asset
     }
 
-    create() {        
-
+    create =  () => {        
+        ActionManagerFetcher.initActionManager();
         // Update spatial manager with actual dimensions
         const { width, height } = this.scale;
         this.spatialManager.updateDimensions(width, height);

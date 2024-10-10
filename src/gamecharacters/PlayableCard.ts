@@ -1,9 +1,10 @@
-import { GameState, CombatState, CombatResources, CombatResource } from "../rules/GameState";
-import { AbstractCard, TargetingType, Team } from "./AbstractCard";
-import { CardType, CardSize } from "./Primitives";
 import { CombatRules } from "../rules/CombatRules";
+import { CombatResource, CombatResources, CombatState, GameState } from "../rules/GameState";
+import type { ActionManager } from "../utils/ActionManager";
+import { ActionManagerFetcher } from "../utils/ActionManagerFetcher";
+import { AbstractCard, TargetingType, Team } from "./AbstractCard";
 import { IBaseCharacter } from "./IBaseCharacter";
-import { ActionManager } from "../utils/ActionManager";
+import { CardSize, CardType } from "./Primitives";
 
 export enum CardRarity {
     COMMON,
@@ -88,7 +89,7 @@ export abstract class PlayableCard extends AbstractCard {
      * DO NOT OVERRIDE.
      */
     get actionManager(): ActionManager {
-        return ActionManager.getInstance();
+        return ActionManagerFetcher.getActionManager();
     }
 
     get ice(): CombatResource {

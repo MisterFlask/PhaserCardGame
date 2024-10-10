@@ -1,11 +1,10 @@
 // grant 5 block to the targeted character
 
-import { ActionManager } from "../../../../utils/ActionManager";
+import { BaseCharacterType } from "../../../../Types";
 import { AbstractCard, TargetingType } from "../../../AbstractCard";
-import { BaseCharacter } from "../../../BaseCharacter";
-import { PlayableCard } from "../../../PlayableCard";
+import { PlayableCardWithHelpers } from "../../../PlayableCardWithHelpers";
 
-export class Defend extends PlayableCard {
+export class Defend extends PlayableCardWithHelpers {
     constructor() {
         super({
             name: "Defend",
@@ -22,8 +21,8 @@ export class Defend extends PlayableCard {
     }
     
     override InvokeCardEffects(targetCard?: AbstractCard): void {
-        if (targetCard && targetCard instanceof BaseCharacter) {
-            this.applyBlockToTarget(targetCard);
+        if (targetCard && targetCard.isBaseCharacter()) {
+            this.applyBlockToTarget(targetCard as BaseCharacterType);
         }
     }
 }

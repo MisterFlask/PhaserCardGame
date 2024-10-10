@@ -8,6 +8,7 @@ import { CampaignRules } from '../rules/CampaignRules';
 import { GameState } from '../rules/GameState';
 import InventoryPanel from '../ui/InventoryPanel';
 import { PhysicalCard, } from '../ui/PhysicalCard';
+import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 import GameImageLoader from '../utils/ImageUtils';
 import { SceneChanger } from './SceneChanger';
@@ -40,7 +41,8 @@ export default class CampaignScene extends Phaser.Scene {
         SceneChanger.setCurrentScene(this);
     }
 
-    create = () => {
+    create =  () => {
+        ActionManagerFetcher.initActionManager();
         this.createLayout();
         this.createCardSlots();
         this.createCharacterRoster();

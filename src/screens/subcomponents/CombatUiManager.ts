@@ -1,17 +1,16 @@
 // src/subcomponents/CombatUIManager.ts
 
 import Phaser from 'phaser';
+import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
+import { Defend } from '../../gamecharacters/playerclasses/cards/basic/Defend';
 import { GameState } from '../../rules/GameState';
 import { default as CombatSceneLayoutUtils, default as LayoutUtils } from '../../ui/LayoutUtils';
 import Menu from '../../ui/Menu';
-import { TextBox } from '../../ui/TextBox';
-import CardRewardScreen, { CardReward, CardRewardScreenData } from './CardRewardScreen';
-import { SceneChanger } from '../SceneChanger';
-import { Defend } from '../../gamecharacters/playerclasses/cards/basic/Defend';
-import { ActionManager } from '../../utils/ActionManager';
 import { SubtitleManager } from '../../ui/SubtitleManager';
-import { AbstractCardType, PlayableCardType } from '../../Types';
-import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
+import { TextBox } from '../../ui/TextBox';
+import { ActionManager } from '../../utils/ActionManager';
+import { SceneChanger } from '../SceneChanger';
+import CardRewardScreen, { CardReward } from './CardRewardScreen';
 
 interface MenuOption {
     text: string;
@@ -37,6 +36,10 @@ class CombatUIManager {
         SubtitleManager.setInstance(scene);
         this.createUI();
         this.createCardRewardScreen(); // Initialize CardRewardScreen
+
+        // Subscribe to interaction events
+        this.scene.events.on('disableInteractions', this.disableInteractions, this);
+        this.scene.events.on('enableInteractions', this.enableInteractions, this);
 
         // Add listener for scene shutdown to clean up event listeners and resources
         this.scene.events.once('shutdown', this.obliterate, this);
@@ -318,6 +321,10 @@ class CombatUIManager {
         // Remove global pointer events
         this.scene.input.off('pointermove', this.handlePointerMove, this);
 
+        // Remove event listeners for interaction events
+        this.scene.events.off('disableInteractions', this.disableInteractions, this);
+        this.scene.events.off('enableInteractions', this.enableInteractions, this);
+
         // Cleanup resource indicators to prevent memory leaks and undefined references
         this.resourceIndicators.forEach(container => container.destroy());
         this.resourceIndicators = [];
@@ -325,7 +332,6 @@ class CombatUIManager {
         // Additional cleanup if necessary
         // e.g., remove update event listeners
         this.scene.events.off('update', this.updateResourceIndicators, this);
-        
     }
 
     private createResourceIndicators(): void {

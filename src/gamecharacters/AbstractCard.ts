@@ -1,8 +1,10 @@
-import { IAbstractCard } from './IAbstractCard';
-import { AbstractBuff } from './buffs/AbstractBuff';
-import { CardSize, CardType } from './Primitives'; // Ensure enums are imported from Primitives
-import { IBaseCharacter } from './IBaseCharacter';
 import { TextBox } from '../ui/TextBox';
+import type { ActionManager } from '../utils/ActionManager';
+import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
+import { AbstractBuff } from './buffs/AbstractBuff';
+import { IAbstractCard } from './IAbstractCard';
+import { IBaseCharacter } from './IBaseCharacter';
+import { CardSize, CardType } from './Primitives'; // Ensure enums are imported from Primitives
 
 export interface IPhysicalCardInterface {
     container: Phaser.GameObjects.Container;
@@ -109,6 +111,11 @@ export abstract class AbstractCard implements IAbstractCard {
 
     public isPlayableCard(): boolean{
         return this.hasOwnProperty('targetingType');
+    }
+    public _actionManager!: ActionManager;
+
+    public get actionManager(): ActionManager{
+        return ActionManagerFetcher.getActionManager();
     }
 
     protected _name: string;

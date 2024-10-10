@@ -6,6 +6,7 @@ import { GameState } from '../rules/GameState';
 import InventoryPanel from '../ui/InventoryPanel';
 import CombatSceneLayoutUtils from '../ui/LayoutUtils';
 import { ActionManager } from '../utils/ActionManager';
+import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
 import GameImageLoader from '../utils/ImageUtils';
 import CampaignScene from './Campaign';
 import MapScene from './Map';
@@ -48,6 +49,8 @@ class CombatScene extends Phaser.Scene {
     }
 
     create(): void {
+
+        ActionManagerFetcher.initActionManager();
         this.createBackground();
 
         // Initialize CombatUIManager as a singleton

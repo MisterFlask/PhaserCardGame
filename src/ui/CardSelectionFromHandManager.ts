@@ -1,12 +1,11 @@
 import Phaser from 'phaser';
-import CombatUiManager from '../screens/subcomponents/CombatUiManager';
-import { PlayableCard } from '../gamecharacters/PlayableCard';
+import { GameState } from '../rules/GameState';
+import { PlayableCardType } from '../Types';
 import { TextBox } from './TextBox';
-import Menu from './Menu';
 
 interface CardSelectionParams {
     scene: Phaser.Scene;
-    action: (selectedCards: PlayableCard[]) => void;
+    action: (selectedCards: PlayableCardType[]) => void;
     name: string;
     instructions: string;
     min: number;
@@ -16,12 +15,12 @@ interface CardSelectionParams {
 
 class CardSelectionFromHandManager {
     private scene: Phaser.Scene;
-    private action: (selectedCards: PlayableCard[]) => void;
+    private action: (selectedCards: PlayableCardType[]) => void;
     private name: string;
     private instructions: string;
     private min: number;
     private max: number;
-    private selectedCards: Set<PlayableCard> = new Set();
+    private selectedCards: Set<PlayableCardType> = new Set();
     private instructionsBox!: TextBox;
     private submitButton!: TextBox;
     private overlay!: Phaser.GameObjects.Rectangle;
@@ -135,17 +134,16 @@ class CardSelectionFromHandManager {
     }
 
     private setupCardInteractions(): void {
-        const combatUiManager = CombatUiManager.getInstance();
-        const handCards = combatUiManager.getPlayerHandCards(); // Assumes a method to get player's hand cards
+        const handCards = GameState.getInstance().combatState.currentHand; // Assumes a method to get player's hand cards
 
         handCards.forEach((card, i) => {
             card.physicalCard?.container.setDepth(4 + i);
             card.physicalCard?.container.setInteractive()
-                .on('pointerdown', () => this.toggleCardSelection(card as PlayableCard));
+                .on('pointerdown', () => this.toggleCardSelection(card as PlayableCardType));
         });
     }
 
-    private toggleCardSelection(card: PlayableCard): void {
+    private toggleCardSelection(card: PlayableCardType): void {
         if (this.selectedCards.has(card)) {
             this.selectedCards.delete(card);
             card.unhighlight();
@@ -175,13 +173,13 @@ class CardSelectionFromHandManager {
     }
 
     private disableOtherInteractions(): void {
-        const combatUiManager = CombatUiManager.getInstance();
-        combatUiManager.disableInteractions();
+        // Emit an event to disable interactions
+        this.scene.events.emit('disableInteractions');
     }
 
     private enableOtherInteractions(): void {
-        const combatUiManager = CombatUiManager.getInstance();
-        combatUiManager.enableInteractions();
+        // Emit an event to enable interactions
+        this.scene.events.emit('enableInteractions');
     }
 
     private exitSelectionMode(): void {
@@ -200,8 +198,7 @@ class CardSelectionFromHandManager {
     }
 
     private cleanupCardInteractions(): void {
-        const combatUiManager = CombatUiManager.getInstance();
-        const handCards = combatUiManager.getPlayerHandCards();
+        const handCards = GameState.getInstance().combatState.currentHand;
 
         handCards.forEach(card => {
             card.physicalCard?.container.off('pointerdown', this.toggleCardSelection, this);
