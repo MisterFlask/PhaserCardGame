@@ -32,6 +32,9 @@ export default class CampaignScene extends Phaser.Scene {
     private menuButton!: Phaser.GameObjects.Text;
     private menuPanel!: Phaser.GameObjects.Container;
     private inventoryPanel!: InventoryPanel;
+    private deckDisplayContainer!: Phaser.GameObjects.Container;
+    private deckScrollPosition: number = 0;
+    private readonly SCROLL_SPEED: number = 4;
 
     constructor() {
         super('Campaign');
@@ -44,6 +47,7 @@ export default class CampaignScene extends Phaser.Scene {
     create =  () => {
         ActionManagerFetcher.initActionManager();
         this.createLayout();
+        this.createDeckDisplayContainer(); // Add this line here
         this.createCardSlots();
         this.createCharacterRoster();
         this.createEmbarkButton();
@@ -57,6 +61,7 @@ export default class CampaignScene extends Phaser.Scene {
         this.createDebugGraphics();
         this.updateDebugGraphics();
         this.resize();
+        this.input.on('wheel', this.handleMouseWheel, this);
     }
 
     createMenu() {
@@ -360,47 +365,66 @@ export default class CampaignScene extends Phaser.Scene {
         this.updateDeckDisplay([]);
     }
 
+    createDeckDisplayContainer() {
+        if (!this.deckDisplayContainer) {
+            this.deckDisplayContainer = this.add.container(0, this.deckDisplayY);
+            this.add.existing(this.deckDisplayContainer);
+        }
+    }
+
+    handleMouseWheel = (pointer: Phaser.Input.Pointer, gameObjects: Phaser.GameObjects.GameObject[], deltaX: number, deltaY: number, deltaZ: number) => {
+        // Scroll left or right based on wheel movement
+        console.log('Mouse wheel event detected:', { deltaX, deltaY, deltaZ });
+        this.deckScrollPosition += deltaY * this.SCROLL_SPEED;
+        this.updateDeckDisplayPosition();
+    }
+
+    updateDeckDisplayPosition() {
+        this.deckDisplayContainer.setX(-this.deckScrollPosition);
+    }
+
     updateDeckDisplay = (cards: AbstractCard[]) => {
+        // Ensure the container exists
+        this.createDeckDisplayContainer();
+
+        this.deckDisplayContainer.removeAll();
         // Clear existing deck display
-        // Remove all event handlers from deckDisplayCards
         this.deckDisplayCards.forEach(card => {
             card.container.removeAllListeners();
+            card.destroy();
         });
-        this.deckDisplayCards.forEach(card => card.destroy());
         this.deckDisplayCards = [];
-
-        // Remove existing deck slots
-        this.cardSlots = this.cardSlots.filter(slot => slot.type !== 'deck');
 
         // Create new deck display
         const { width } = this.scale;
         const cardWidth = width * 0.1;
         const cardSpacing = width * 0.01;
-        const startX = (width - (cards.length * (cardWidth + cardSpacing))) / 2;
 
         cards.forEach((card, index) => {
-            const x = startX + index * (cardWidth + cardSpacing);
+            const x = index * (cardWidth + cardSpacing);
             const physicalCard = CardGuiUtils.getInstance().createCard({
                 scene: this,
                 x: x,
-                y: this.deckDisplayY,
+                y: 0,
                 data: card,
                 eventCallback: this.setupCardEvents
             });
             this.deckDisplayCards.push(physicalCard);
-            
-            // Create a new slot for this deck card
-            this.createSlot(x, this.deckDisplayY, 'deck');
-            const slot = this.cardSlots[this.cardSlots.length - 1];
-            this.addCardToSlot(physicalCard, slot);
+            this.deckDisplayContainer.add(physicalCard.container);
         });
+
+        // Reset scroll position
+        this.deckScrollPosition = 0;
+        this.updateDeckDisplayPosition();
     }
 
     setupCardHover = (card: PhysicalCard) => {
-        // Remove existing listeners set up by this function
         const pointerOverCallback = () => {
             if (card.data instanceof PlayerCharacter) {
                 this.updateDeckDisplay(card.data.cardsInMasterDeck);
+                // Reset scroll position when mousing over a new character
+                this.deckScrollPosition = 0;
+                this.updateDeckDisplayPosition();
             }
             this.bringToFront(card);
         };

@@ -1,8 +1,9 @@
-import { GameState } from "../../../../rules/GameState";
-import { TargetingType } from "../../../AbstractCard";
-import { BaseCharacter } from "../../../BaseCharacter";
-import { Smoldering } from "../../../buffs/blackhand/Smoldering";
-import { PlayableCard } from "../../../PlayableCard";
+import { GameState } from "../../../../../rules/GameState";
+import { TargetingType } from "../../../../AbstractCard";
+import { BaseCharacter } from "../../../../BaseCharacter";
+import { Smoldering } from "../../../../buffs/blackhand/Smoldering";
+import { PlayableCard } from "../../../../PlayableCard";
+import { CardType } from "../../../../Primitives";
 
 export class FlamePistol extends PlayableCard {
     constructor() {
@@ -11,6 +12,7 @@ export class FlamePistol extends PlayableCard {
             description: `_`,
             portraitName: "fire-ray",
             targetingType: TargetingType.ENEMY,
+            cardType: CardType.ATTACK,
         });
         this.baseDamage = 3;
         this.baseMagicNumber = 1;

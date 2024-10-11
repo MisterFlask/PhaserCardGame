@@ -1,13 +1,18 @@
-import type { IAbstractBuff } from '../IAbstractBuff';
 import type { AbstractCombatEvent } from "../../rules/AbstractCombatEvent";
 import type { DamageInfo } from "../../rules/DamageInfo";
 import { GameState } from "../../rules/GameState";
+import { ActionManager } from "../../utils/ActionManager";
+import { ActionManagerFetcher } from "../../utils/ActionManagerFetcher";
 import { generateWordGuid } from "../AbstractCard";
 import type { BaseCharacter } from "../BaseCharacter";
-import type { PlayableCard } from "../PlayableCard";
+import type { IAbstractBuff } from '../IAbstractBuff';
 import { IBaseCharacter } from '../IBaseCharacter';
-
+import type { PlayableCard } from "../PlayableCard";
 export abstract class AbstractBuff implements IAbstractBuff {
+
+    get actionManager(): ActionManager {
+        return ActionManagerFetcher.getActionManager();
+    }
 
     constructor() {
         this.imageName = "PLACEHOLDER_IMAGE";
@@ -157,6 +162,10 @@ export abstract class AbstractBuff implements IAbstractBuff {
     }
 
     onTurnEnd() {
+
+    }
+
+    onBuffApplied(character: IBaseCharacter, buffApplied: AbstractBuff, previousStacks: number, changeInStacks: number) {
 
     }
 

@@ -1,8 +1,7 @@
-import { GameState } from "../../../../rules/GameState";
-import { TargetingType } from "../../../AbstractCard";
-import { BaseCharacter } from "../../../BaseCharacter";
-import { Burning } from "../../../buffs/standard/Burning";
-import { PlayableCard } from "../../../PlayableCard";
+import { TargetingType } from "../../../../AbstractCard";
+import { BaseCharacter } from "../../../../BaseCharacter";
+import { Burning } from "../../../../buffs/standard/Burning";
+import { PlayableCard } from "../../../../PlayableCard";
 
 export class FireAxe extends PlayableCard {
     constructor() {

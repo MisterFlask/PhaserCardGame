@@ -233,7 +233,7 @@ class CombatUIManager {
 
         this.endTurnButton.backgroundImage!!.setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
-                ActionManager.endTurn();
+                ActionManager.getInstance().endTurn();
             });
 
         this.scene.add.existing(this.endTurnButton.backgroundImage!!);

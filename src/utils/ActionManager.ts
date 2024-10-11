@@ -3,14 +3,14 @@ import { GameState } from "../rules/GameState";
 import Phaser, { Scene } from 'phaser';
 import { IPhysicalCardInterface } from '../gamecharacters/AbstractCard';
 import { AbstractBuff } from "../gamecharacters/buffs/AbstractBuff";
+import { IAbstractCard } from "../gamecharacters/IAbstractCard";
+import { IBaseCharacter } from "../gamecharacters/IBaseCharacter";
 import { CombatRules, DamageCalculationResult } from "../rules/CombatRules";
 import { DeckLogic, PileName } from "../rules/DeckLogic";
-import { IBaseCharacter } from "../gamecharacters/IBaseCharacter";
-import { AutomatedCharacterType, BaseCharacterType, PlayableCardType } from "../Types";
-import { IAbstractCard } from "../gamecharacters/IAbstractCard";
-import { SubtitleManager } from "../ui/SubtitleManager";
-import CardSelectionFromHandManager from '../ui/CardSelectionFromHandManager';
 import CombatUiManager from "../screens/subcomponents/CombatUiManager";
+import { AutomatedCharacterType, BaseCharacterType, PlayableCardType } from "../Types";
+import CardSelectionFromHandManager from '../ui/CardSelectionFromHandManager';
+import { SubtitleManager } from "../ui/SubtitleManager";
 
 export class ActionManager {
 
@@ -35,7 +35,7 @@ export class ActionManager {
     }
 
 
-    public static performAsyncronously(action: () => Promise<void>): void {
+    public performAsyncronously(action: () => Promise<void>): void {
         const actionManager = ActionManager.getInstance();
         actionManager.actionQueue.addAction(new GenericAction(async () => {
             await action();
@@ -501,7 +501,7 @@ export class ActionManager {
             return [];
         }));
     }
-    public static PlayCard = (card: PlayableCardType, target: BaseCharacterType): void => {
+    public PlayCard = (card: PlayableCardType, target: BaseCharacterType): void => {
         // Invoke the effect of the card
         if (card.IsPerformableOn(target)) {
             card.InvokeCardEffects(target);
@@ -516,7 +516,7 @@ export class ActionManager {
         ActionManager.getInstance().basicDiscardCard(card);
     };
 
-    public static endTurn(): void {
+    public endTurn(): void {
         console.log('Ending turn');
         const gameState = GameState.getInstance();
         const combatState = gameState.combatState;
@@ -532,17 +532,17 @@ export class ActionManager {
         combatState.enemies.forEach(enemy => {
             for (const intent of [...enemy.intents]) {
                 // Display the intent's title or tooltip text
-                ActionManager.getInstance().displaySubtitle(intent.title || intent.tooltipText());
+                this.displaySubtitle(intent.title || intent.tooltipText());
 
                 
                 // Queue the intent's action
                 intent.act();
 
                 // Hide the subtitle after the action completes
-                ActionManager.getInstance().hideSubtitle();
+                this.hideSubtitle();
 
                 // Set new intents for the enemy
-                ActionManager.performAsyncronously(async () => {
+                this.performAsyncronously(async () => {
                     await enemy.removeIntent(intent);
                 });
             }
