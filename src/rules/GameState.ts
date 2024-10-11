@@ -2,7 +2,7 @@ import { PlayerCharacter } from '../gamecharacters/CharacterClasses';
 import { IAbstractCard } from '../gamecharacters/IAbstractCard';
 import { PlayableCard } from '../gamecharacters/PlayableCard';
 import { LocationCard } from '../maplogic/LocationCard';
-import { BaseCharacterType, AutomatedCharacterType } from '../Types';
+import { AutomatedCharacterType, BaseCharacterType } from '../Types';
 import { PhysicalCard } from '../ui/PhysicalCard';
 export class GameState {
     private static instance: GameState;
@@ -161,6 +161,8 @@ export class CombatState{
 
     enemies: AutomatedCharacterType[] = []
     playerCharacters: BaseCharacterType[] = []
+
+    currentTurn: number = 0
 
     get allPlayerAndEnemyCharacters(): (BaseCharacterType)[] {
         return [...this.playerCharacters, ...this.enemies];

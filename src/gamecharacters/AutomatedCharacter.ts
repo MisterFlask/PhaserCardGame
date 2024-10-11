@@ -39,4 +39,6 @@ export abstract class AutomatedCharacter extends BaseCharacter implements JsonRe
     public setNewIntents(): void {
         this.intents = this.generateNewIntents();
     }
+
+    
 }

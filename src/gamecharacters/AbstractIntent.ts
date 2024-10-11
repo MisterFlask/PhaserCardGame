@@ -1,5 +1,6 @@
 import { JsonRepresentable } from '../interfaces/JsonRepresentable';
 import { CombatRules } from '../rules/CombatRules';
+import { GameState } from '../rules/GameState';
 import { PhysicalCard } from '../ui/PhysicalCard';
 import { ActionManager } from "../utils/ActionManager";
 import { TargetingUtils } from "../utils/TargetingUtils";
@@ -195,6 +196,45 @@ export class ApplyBuffToSelfIntent extends AbstractIntent {
         }, null, 2);
     }
 }
+
+export class IntentListCreator {
+    static selectRandomIntents(intentLists: AbstractIntent[][]): AbstractIntent[] {
+        if (intentLists.length === 0) {
+            return [];
+        }
+        const randomIndex = Math.floor(Math.random() * intentLists.length);
+        return intentLists[randomIndex];
+    }
+
+    static iterateIntents(intentLists: AbstractIntent[][]): AbstractIntent[] {
+        if (intentLists.length === 0) {
+            return [];
+        }
+        
+        const gameState = GameState.getInstance();
+        const currentTurn = gameState.combatState.currentTurn;
+        
+        const index = currentTurn % intentLists.length;
+        return intentLists[index];
+    }
+
+    static iterateIntentsWithRepeatingLastElement(intentLists: AbstractIntent[][]): AbstractIntent[] {
+        if (intentLists.length === 0) {
+            return [];
+        }
+        
+        const gameState = GameState.getInstance();
+        const currentTurn = gameState.combatState.currentTurn;
+        
+        if (currentTurn < intentLists.length) {
+            return intentLists[currentTurn];
+        } else {
+            return intentLists[intentLists.length - 1];
+        }
+    }
+}
+
+
 
 
 export class DoSomethingIntent extends AbstractIntent {

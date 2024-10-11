@@ -110,11 +110,11 @@ class CardSelectionFromHandManager {
             scene: this.scene,
             x: this.scene.scale.width / 4, // Positioning the submit button on the left
             y: this.scene.scale.height - 100,
-            width: 200,
+            width: 300, // Increased width to accommodate longer text
             height: 50,
-            text: 'Submit',
-            style: { fontSize: '28px', color: '#ffffff' },
-            fillColor: 0x555555,
+            text: `Select ${this.min} more card${this.min > 1 ? 's' : ''}`,
+            style: { fontSize: '24px', color: '#ffffff', wordWrap: { width: 280 } },
+            fillColor: 0x888888,
             textBoxName: 'CardSelectionSubmitButton'
         });
 
@@ -123,14 +123,38 @@ class CardSelectionFromHandManager {
         this.submitButton.background!!.setInteractive({ useHandCursor: true })
             .on('pointerdown', this.onSubmit, this)
             .on('pointerover', () => {
-                this.submitButton.background?.setFillStyle(0x777777);
+                if (this.selectedCards.size >= this.min && this.selectedCards.size <= this.max) {
+                    this.submitButton.background?.setFillStyle(0x777777);
+                }
             })
             .on('pointerout', () => {
-                this.submitButton.background?.setFillStyle(0x555555);
+                if (this.selectedCards.size >= this.min && this.selectedCards.size <= this.max) {
+                    this.submitButton.background?.setFillStyle(0x555555);
+                }
             });
 
         this.scene.add.existing(this.submitButton.background!!);
         this.scene.add.existing(this.submitButton.text);
+
+        this.updateSubmitButton();
+    }
+
+    private updateSubmitButton(): void {
+        const selectedCount = this.selectedCards.size;
+        const remainingCount = Math.max(this.min - selectedCount, 0);
+
+        if (selectedCount >= this.min && selectedCount <= this.max) {
+            this.submitButton.text.setText('Submit');
+            this.submitButton.background?.setFillStyle(0x555555);
+            this.submitButton.background?.setInteractive({ useHandCursor: true });
+        } else {
+            const buttonText = remainingCount > 0 
+                ? `Select ${remainingCount} more card${remainingCount > 1 ? 's' : ''}`
+                : `Too many cards selected`;
+            this.submitButton.text.setText(buttonText);
+            this.submitButton.background?.setFillStyle(0x888888);
+            this.submitButton.background?.disableInteractive();
+        }
     }
 
     private setupCardInteractions(): void {
@@ -156,15 +180,13 @@ class CardSelectionFromHandManager {
                 console.log(`You can select up to ${this.max} cards.`);
             }
         }
+        this.updateSubmitButton();
     }
 
     private onSubmit(): void {
         if (this.selectedCards.size >= this.min && this.selectedCards.size <= this.max) {
             this.action(Array.from(this.selectedCards));
             this.exitSelectionMode();
-        } else {
-            // Optionally, provide feedback to the player
-            console.log(`Please select between ${this.min} and ${this.max} cards.`);
         }
     }
 
