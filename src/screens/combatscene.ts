@@ -15,6 +15,7 @@ import CombatCardManager from './subcomponents/CombatCardManager';
 import CombatInputHandler from './subcomponents/CombatInputHandler';
 import CombatStateService from './subcomponents/CombatStateService';
 import CombatUIManager from './subcomponents/CombatUiManager';
+import { DetailsScreenManager } from './subcomponents/DetailsScreenManager';
 import PerformanceMonitor from './subcomponents/PerformanceMonitor';
 
 /**
@@ -31,6 +32,7 @@ class CombatScene extends Phaser.Scene {
     private performanceMonitor!: PerformanceMonitor;
     private background!: Phaser.GameObjects.Image;
     private inventoryPanel!: InventoryPanel;
+    private detailsScreenManager!: DetailsScreenManager;
 
     constructor() {
         super('CombatScene');
@@ -60,6 +62,9 @@ class CombatScene extends Phaser.Scene {
         this.cardManager = new CombatCardManager(this);
         this.inputHandler = new CombatInputHandler(this, this.cardManager);
         this.performanceMonitor = new PerformanceMonitor(this);
+
+        // Initialize DetailsScreenManager
+        this.detailsScreenManager = new DetailsScreenManager(this);
 
         this.setupResizeHandler();
         ActionManager.getInstance().drawHandForNewTurn();
@@ -132,6 +137,10 @@ class CombatScene extends Phaser.Scene {
         if (this.isCombatFinished()) {
             this.uiManager.onCombatEnd();
         }
+
+        // Update DetailsScreenManager
+        const hoveredCard =GameState.getInstance().combatState.cardHoveredOver_transient;
+        this.detailsScreenManager.update(hoveredCard);
     }
 
     /**

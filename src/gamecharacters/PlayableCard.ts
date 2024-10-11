@@ -1,5 +1,6 @@
 import { CombatRules } from "../rules/CombatRules";
 import { CombatResource, CombatResources, CombatState, GameState } from "../rules/GameState";
+import { BaseCharacterType } from "../Types";
 import type { ActionManager } from "../utils/ActionManager";
 import { ActionManagerFetcher } from "../utils/ActionManagerFetcher";
 import { AbstractCard, TargetingType, Team } from "./AbstractCard";
@@ -77,8 +78,16 @@ export abstract class PlayableCard extends AbstractCard {
      * DO NOT OVERRIDE.
      */
     get hoveredCharacter(): IBaseCharacter | undefined {
-        return GameState.getInstance().combatState.characterHoveredOver_transient;
+        var card = GameState.getInstance().combatState.cardHoveredOver_transient;
+        if (!card) {
+            return undefined;
+        }
+        if (card.isBaseCharacter()){
+            return card as BaseCharacterType;            
+        }
+        return undefined;
     }
+
     /**
      * DO NOT OVERRIDE.
      */

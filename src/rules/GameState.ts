@@ -1,9 +1,10 @@
-import { PlayerCharacter } from '../gamecharacters/CharacterClasses';
-import { IAbstractCard } from '../gamecharacters/IAbstractCard';
-import { PlayableCard } from '../gamecharacters/PlayableCard';
-import { LocationCard } from '../maplogic/LocationCard';
-import { AutomatedCharacterType, BaseCharacterType } from '../Types';
-import { PhysicalCard } from '../ui/PhysicalCard';
+import type { AbstractCard } from '../gamecharacters/AbstractCard';
+import type { PlayerCharacter } from '../gamecharacters/CharacterClasses';
+import type { IAbstractCard } from '../gamecharacters/IAbstractCard';
+import type { PlayableCard } from '../gamecharacters/PlayableCard';
+import type { LocationCard } from '../maplogic/LocationCard';
+import type { AutomatedCharacterType, BaseCharacterType } from '../Types';
+import type { PhysicalCard } from '../ui/PhysicalCard';
 export class GameState {
     private static instance: GameState;
 
@@ -151,7 +152,7 @@ export class GameState {
 
 export class CombatState{
 
-    characterHoveredOver_transient?: BaseCharacterType
+    cardHoveredOver_transient?: AbstractCard
 
     currentCombatDeck: IAbstractCard[] = []
     currentDrawPile: IAbstractCard[] = []

@@ -1,14 +1,15 @@
 // src/gamecharacters/PhysicalCard.ts
 import Phaser from 'phaser';
+import { AutomatedCharacterType, BaseCharacterType, PlayableCardType } from '../Types';
+import type { AbstractCard, IPhysicalCardInterface } from '../gamecharacters/AbstractCard';
 import { AbstractIntent } from '../gamecharacters/AbstractIntent';
+import { IAbstractCard } from '../gamecharacters/IAbstractCard';
+import { GameState } from '../rules/GameState';
+import type { CardConfig } from '../utils/CardGuiUtils';
 import { IncomingIntent } from "./IncomingIntent"; // Import the new class
 import { PhysicalBuff } from './PhysicalBuff';
 import { PhysicalIntent } from "./PhysicalIntent";
 import { TextBox } from "./TextBox"; // Ensure correct relative path
-import { AbstractCardType, AutomatedCharacterType, BaseCharacterType, PlayableCardType } from '../Types';
-import { IAbstractCard } from '../gamecharacters/IAbstractCard';
-import { IPhysicalCardInterface } from '../gamecharacters/AbstractCard';
-import type { CardConfig } from '../utils/CardGuiUtils';
 
 export class PhysicalCard implements IPhysicalCardInterface {
     cardConfig: CardConfig;
@@ -180,7 +181,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
         this.cardContent.add(this.blocksContainer);
         // Initialize the buffs container positioned to the left of the card
         this.buffsContainer = this.scene.add.container(
-            -this.cardBackground.displayWidth / 2 - 50, // Adjust X position as needed
+            -this.cardBackground.displayWidth / 2 - 100, // Adjust X position as needed
             40 // Position below the block textbox
         );
         this.container.add(this.buffsContainer);
@@ -306,6 +307,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
         if (this.container.parentContainer) {
             this.container.parentContainer.bringToTop(this.container);
         }
+
+        GameState.getInstance().combatState.cardHoveredOver_transient = this.data as AbstractCard;
 
         if (this.obliterated) return;
         console.log(`Pointer over card: ${this.data.name}`);
@@ -677,9 +680,10 @@ export class PhysicalCard implements IPhysicalCardInterface {
             }
         });
 
-        // Optionally, layout the buffs in a grid
         this.layoutBuffs();
+
     }
+
     // Layout buffs in an expandable grid
     private layoutBuffs(): void {
         const buffsPerRow = 3; // Adjust as needed
@@ -690,7 +694,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
         this.currentBuffs.forEach(buffUI => {
             const row = Math.floor(index / buffsPerRow);
-            const col = index % buffsPerRow;
+            const col = (buffsPerRow - 1) - (index % buffsPerRow); // Change to expand to the left
             
             // Set the size of each buff
             buffUI.container.setSize(buffWidth, buffHeight);
@@ -713,18 +717,6 @@ export class PhysicalCard implements IPhysicalCardInterface {
         if (this.debugRectangle) {
             this.debugRectangle.destroy();
         }
-        /*
-        this.debugRectangle = this.scene.add.rectangle(
-            this.buffsContainer.x,
-            this.buffsContainer.y,
-            containerWidth,
-            containerHeight,
-            0xff0000,
-            0.3
-        );
-        this.debugRectangle.setOrigin(0, 0);
-        this.cardContent.add(this.debugRectangle);
-        */
         this.cardContent.add(this.buffsContainer);
     }
 
