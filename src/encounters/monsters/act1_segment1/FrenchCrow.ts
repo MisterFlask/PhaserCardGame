@@ -11,7 +11,7 @@ import { Strong } from '../../../gamecharacters/buffs/standard/Strong';
 export class FrenchCrow extends AutomatedCharacter {
     constructor() {
         super({
-            name: "Le Siffleur du Néant",
+            name: "Crow",
             portraitName: "Eldritch Corruption Crow",
             maxHitpoints: 10,
             description: "A pest that tends to materialize in the wake of the French cults."

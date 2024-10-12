@@ -1,10 +1,9 @@
-import { PlayableCardWithHelpers } from '../../../PlayableCardWithHelpers';
+import { AbstractCard, TargetingType } from '../../../AbstractCard';
 import { IBaseCharacter } from '../../../IBaseCharacter';
-import { Burning } from '../../../buffs/standard/Burning';
-import { Smoldering } from '../../../buffs/blackhand/Smoldering';
-import { TargetingType, AbstractCard } from '../../../AbstractCard';
 import { CardRarity } from '../../../PlayableCard';
+import { PlayableCardWithHelpers } from '../../../PlayableCardWithHelpers';
 import { CardType } from '../../../Primitives';
+import { Smoldering } from '../../../buffs/blackhand/Smoldering';
 import { ExplosiveFinishCardBuff } from '../../../buffs/standard/ExplosiveFinishCardBuff';
 
 export class AndThenHeExploded extends PlayableCardWithHelpers {
@@ -30,10 +29,10 @@ export class AndThenHeExploded extends PlayableCardWithHelpers {
 
         var target = targetCard as unknown as IBaseCharacter
 
-        this.dealDamageToTarget(target);
+        this.dealDamageToTarget(targetCard);
 
         if (target.hasBuff(new Smoldering(1).getName())) {
-            this.dealDamageToTarget(target);
+            this.dealDamageToTarget(targetCard);
         }
     }
 }

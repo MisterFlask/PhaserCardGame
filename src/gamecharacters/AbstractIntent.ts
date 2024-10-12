@@ -81,6 +81,54 @@ export class SummonIntent extends AbstractIntent {
     }
 }
 
+export class AddCardToPileIntent extends AbstractIntent {
+    cardToAdd: PlayableCard;
+    pileName: 'draw' | 'discard' | 'hand';
+
+    constructor({ cardToAdd, pileName, owner }: { cardToAdd: PlayableCard, pileName: 'draw' | 'discard' | 'hand', owner: BaseCharacter }) {
+        super({ imageName: 'card-plus', target: undefined, owner: owner });
+        this.cardToAdd = cardToAdd;
+        this.pileName = pileName;
+    }
+
+    tooltipText(): string {
+        return `Add ${this.cardToAdd.name} to ${this.pileName} pile`;
+    }
+
+    displayText(): string {
+        return "Add Card";
+    }
+
+    act(): void {
+        console.log(`Adding ${this.cardToAdd.name} to ${this.pileName} pile`);
+        const gameState = GameState.getInstance();
+        const combatState = gameState.combatState;
+
+        switch (this.pileName) {
+            case 'draw':
+                combatState.currentDrawPile.push(this.cardToAdd);
+                break;
+            case 'discard':
+                combatState.currentDiscardPile.push(this.cardToAdd);
+                break;
+            case 'hand':
+                combatState.currentHand.push(this.cardToAdd);
+                break;
+        }
+    }
+
+    createJsonRepresentation(): string {
+        const baseRepresentation = JSON.parse(super.createJsonRepresentation());
+        return JSON.stringify({
+            ...baseRepresentation,
+            className: this.constructor.name,
+            cardToAdd: this.cardToAdd.name,
+            pileName: this.pileName,
+        }, null, 2);
+    }
+}
+
+
 
 export class AttackIntent extends AbstractIntent {
     baseDamage: number;

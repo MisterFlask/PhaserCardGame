@@ -136,7 +136,10 @@ export abstract class PlayableCard extends AbstractCard {
     /**
      * DO NOT OVERRIDE.
      */
-    protected dealDamageToTarget(targetCard?: IBaseCharacter, callback?: (damageResult: DamageCalculationResult) => void): void {
+    protected dealDamageToTarget(targetCard?: AbstractCard, callback?: (damageResult: DamageCalculationResult) => void): void {
+        if (!(targetCard instanceof BaseCharacter)) {
+            return;
+        }
         if (targetCard) {
             this.actionManager.dealDamage({
                 baseDamageAmount: this.getBaseDamageAfterResourceScaling(),
