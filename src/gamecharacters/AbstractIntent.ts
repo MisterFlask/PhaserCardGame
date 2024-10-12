@@ -5,6 +5,7 @@ import { PhysicalCard } from '../ui/PhysicalCard';
 import { ActionManager } from "../utils/ActionManager";
 import { TargetingUtils } from "../utils/TargetingUtils";
 import { AbstractCard, generateWordGuid } from "./AbstractCard";
+import { AutomatedCharacter } from './AutomatedCharacter';
 import { BaseCharacter } from "./BaseCharacter";
 import { AbstractBuff } from './buffs/AbstractBuff';
 import { PlayableCard } from './PlayableCard';
@@ -42,6 +43,41 @@ export abstract class AbstractIntent implements JsonRepresentable {
     withTitle(title: string): this {
         this.title = title;
         return this;
+    }
+}
+export class SummonIntent extends AbstractIntent {
+    monsterToSummon: AutomatedCharacter;
+
+    constructor({ monsterToSummon, owner }: { monsterToSummon: AutomatedCharacter, owner: BaseCharacter }) {
+        super({ imageName: 'summon', target: undefined, owner: owner });
+        this.monsterToSummon = monsterToSummon;
+    }
+
+    tooltipText(): string {
+        return `Summon ${this.monsterToSummon.name}`;
+    }
+
+    displayText(): string {
+        return "Summon";
+    }
+
+    act(): void {
+        console.log(`Summoning ${this.monsterToSummon.name}`);
+        const gameState = GameState.getInstance();
+        const combatState = gameState.combatState;
+
+        // Create a new instance of the monster to summon
+        // Add the new monster to the combat state
+        combatState.enemies.push(this.monsterToSummon);
+    }
+
+    createJsonRepresentation(): string {
+        const baseRepresentation = JSON.parse(super.createJsonRepresentation());
+        return JSON.stringify({
+            ...baseRepresentation,
+            className: this.constructor.name,
+            monsterToSummon: this.monsterToSummon.name,
+        }, null, 2);
     }
 }
 

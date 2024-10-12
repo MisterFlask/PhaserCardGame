@@ -12,7 +12,7 @@ export class FrenchLumberjack extends AutomatedCharacter {
             name: "Le Bûcheron Robuste",
             portraitName: "Eldritch Soldier Gunner",
             maxHitpoints: 60,
-            description: "too many unsanctioned pine dimensions"
+            description: "Too many unsanctioned pine dimensions.  Culling necessary."
         });
         
         // Apply initial Regeneration buff
