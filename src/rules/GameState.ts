@@ -154,7 +154,6 @@ export class CombatState{
 
     cardHoveredOver_transient?: AbstractCard
 
-    currentCombatDeck: IAbstractCard[] = []
     currentDrawPile: IAbstractCard[] = []
     currentDiscardPile: IAbstractCard[] = []
     currentHand: IAbstractCard[] = []
@@ -167,6 +166,10 @@ export class CombatState{
 
     get allPlayerAndEnemyCharacters(): (BaseCharacterType)[] {
         return [...this.playerCharacters, ...this.enemies];
+    }
+
+    get allCardsInAllPilesExceptExhaust(): IAbstractCard[] {
+        return [...this.currentDrawPile, ...this.currentDiscardPile, ...this.currentHand];
     }
 
     combatResources: CombatResources = new CombatResources()

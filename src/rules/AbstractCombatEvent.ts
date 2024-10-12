@@ -1,4 +1,4 @@
 export abstract class AbstractCombatEvent {
-    abstract applyEvent(): void;
+    abstract printJson(): void;
 }
 

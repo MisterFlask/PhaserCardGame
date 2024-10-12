@@ -103,6 +103,17 @@ export class CombatRules {
             totalDamage += buff.getCombatDamageDealtModifier(target as BaseCharacterType);
             totalDamage *= (1 + buff.getAdditionalPercentCombatDamageDealtModifier() / 100);
         });
+
+        // Process buffs on target for damageCappedAt
+        if (target) {
+            const damageCap = target.buffs.reduce((cap, buff) => {
+                const buffCap = buff.getDamagePerHitCappedAt();
+                return Math.min(cap, buffCap);
+            }, Infinity);
+
+            totalDamage = Math.min(totalDamage, damageCap);
+        }
+
         // Ensure damage doesn't go below 0
         totalDamage = Math.max(0, totalDamage);
 

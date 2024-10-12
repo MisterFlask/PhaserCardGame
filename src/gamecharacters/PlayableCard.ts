@@ -4,6 +4,7 @@ import { BaseCharacterType } from "../Types";
 import type { ActionManager } from "../utils/ActionManager";
 import { ActionManagerFetcher } from "../utils/ActionManagerFetcher";
 import { AbstractCard, TargetingType, Team } from "./AbstractCard";
+import { BaseCharacter } from "./BaseCharacter";
 import { IBaseCharacter } from "./IBaseCharacter";
 import { CardSize, CardType } from "./Primitives";
 
@@ -161,6 +162,10 @@ export abstract class PlayableCard extends AbstractCard {
                 blockSourceCharacter: this.owner
             });
         }
+    }    
+
+    onAcquisition(newOwner: BaseCharacter){
+
     }
 
     /**

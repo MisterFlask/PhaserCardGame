@@ -8,8 +8,8 @@ export interface IAbstractBuff {
     id: string;
     stackable: boolean;
     stacks: number;
-    counter: number;
-    showCounter: boolean;
+    secondaryStacks: number;
+    showSecondaryStacks: boolean;
     isDebuff: boolean;
     
     getOwnerAsPlayableCard(): PlayableCard | null;

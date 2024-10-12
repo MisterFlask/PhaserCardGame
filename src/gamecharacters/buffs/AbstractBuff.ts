@@ -19,8 +19,8 @@ export abstract class AbstractBuff implements IAbstractBuff {
         this.id = generateWordGuid();
         this.stackable = true;
         this.stacks = 1;
-        this.counter = -1;
-        this.showCounter = false;
+        this.secondaryStacks = -1;
+        this.showSecondaryStacks = false;
         this.isDebuff = false;
         this.canGoNegative = false;
     }
@@ -102,8 +102,8 @@ export abstract class AbstractBuff implements IAbstractBuff {
     stackable: boolean = true;
     // Note we have a different subsystem responsible for removing the buff once stacks is at 0.  That is not the responsibility of Invoke()
     stacks: number = 1;
-    counter: number = -1;
-    showCounter: boolean = false;
+    secondaryStacks: number = -1;
+    showSecondaryStacks: boolean = false;
     isDebuff: boolean = false;
 
     abstract getName(): string;
@@ -131,7 +131,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
     }
     // this is a percentage modifier on top of damage taken.  If this is "100" that means 100% more damage is taken.  If this is -100 then this means the character takes no damage.  Standard is 0, which means no modifier.
     // Note this does not take into account blocking in any way.
-    getAdditionalPercentCombatDamageTakenModifier(): number {
+    getAdditionalPercentCombatDamageTakenModifier(sourceCard?: PlayableCard): number {
         return 0;
     }
     // this is a FLAT modifier on top of damage taken, not percentage-based.
@@ -141,6 +141,11 @@ export abstract class AbstractBuff implements IAbstractBuff {
     }
     getBlockReceivedModifier(): number {
         return 0;
+    }
+
+
+    getDamagePerHitCappedAt(): number {
+        return Infinity;
     }
 
     /**
@@ -173,6 +178,14 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
     }
 
+    onCombatStart(){
+
+    }
+
+    onCombatEnd(){
+
+    }
+
 
     ////////////////// PLAYABLE CARD METHODS //////////////////
 
@@ -180,7 +193,11 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
     }
 
-    public onCardInvoked(target?: BaseCharacter){
+    public onThisCardInvoked(target?: BaseCharacter){
+
+    }
+
+    public onAnyCardInvoked(target?: BaseCharacter){
 
     }
 
@@ -197,4 +214,23 @@ export abstract class AbstractBuff implements IAbstractBuff {
     public onFatal(killedUnit: BaseCharacter){
         
     }
+
+    // Applies to character buffs ONLY.  If true, buff is not removed at end of combat.
+    public isPersistentBetweenCombats: boolean = false;
+
+    // Applies to character buffs ONLY.  If true, buff is not removed at end of the run (meaning it's basically forever on this character)
+    public isPersonaTrait: boolean = false;
+
+    // done for bloodprice buffs.
+    canPayThisMuchMissingEnergy(energyNeeded: number): number {
+        return 0;
+    }
+
+    // done for bloodprice buffs.
+    // returns the amount of energy paid for by executing this.
+    provideMissingEnergy_returnsAmountProvided(energyNeeded: number): number {
+        return 0;
+    }
+
+    
 }

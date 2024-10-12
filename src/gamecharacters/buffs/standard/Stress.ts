@@ -1,6 +1,6 @@
 import { DamageInfo } from "../../../rules/DamageInfo";
-import { PlayableCard } from "../../PlayableCard";
 import { BaseCharacter } from "../../BaseCharacter";
+import { PlayableCard } from "../../PlayableCard";
 import { AbstractBuff } from "../AbstractBuff";
 
 export class Stress extends AbstractBuff {
@@ -9,7 +9,7 @@ export class Stress extends AbstractBuff {
     }
 
     override getDescription(): string {
-        return `Current stress level: ${this.getStacksDisplayText()}. When stress is above 10, character receives double damage.`;
+        return `Current stress level: ${this.getStacksDisplayText()}. When stress is above ${this.secondaryStacks}, character receives double damage.`;
     }
 
     constructor(stacks: number = 0) {
@@ -17,6 +17,9 @@ export class Stress extends AbstractBuff {
         this.imageName = "shattered-heart"; // Replace with actual icon name
         this.stacks = stacks;
         this.stackable = true;
+        this.isPersistentBetweenCombats = true;
+        this.secondaryStacks = 10;
+        this.showSecondaryStacks = true;
     }
 
     override getAdditionalPercentCombatDamageTakenModifier(): number {

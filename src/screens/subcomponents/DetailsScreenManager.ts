@@ -12,7 +12,7 @@ export class DetailsScreenManager {
         this.scene = scene;
         this.detailsContainer = this.scene.add.container(0, 0)
             .setVisible(false)
-            .setDepth(100); // Ensure the container is rendered above other game objects
+            .setDepth(3000); // Ensure the container is rendered above other game objects
         this.setupKeyboardListener();
     }
 

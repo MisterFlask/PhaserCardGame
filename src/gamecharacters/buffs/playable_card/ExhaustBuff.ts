@@ -1,7 +1,6 @@
 import { ActionManager } from "../../../utils/ActionManager";
-import { AbstractBuff } from "../AbstractBuff";
-import { PlayableCard } from "../../PlayableCard";
 import { BaseCharacter } from "../../BaseCharacter";
+import { AbstractBuff } from "../AbstractBuff";
 
 export class ExhaustBuff extends AbstractBuff {
     constructor() {
@@ -9,7 +8,7 @@ export class ExhaustBuff extends AbstractBuff {
         this.isDebuff = false;
     }
 
-    public onCardInvoked(target?: BaseCharacter): void {
+    public onThisCardInvoked(target?: BaseCharacter): void {
         const ownerCard = this.getOwnerAsPlayableCard();
         if (ownerCard) {
             // Exhaust the card when played

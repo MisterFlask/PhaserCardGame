@@ -2,9 +2,13 @@ import { GameState } from "../rules/GameState";
 
 import Phaser, { Scene } from 'phaser';
 import { IPhysicalCardInterface } from '../gamecharacters/AbstractCard';
+import { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { AbstractBuff } from "../gamecharacters/buffs/AbstractBuff";
 import { IAbstractCard } from "../gamecharacters/IAbstractCard";
 import { IBaseCharacter } from "../gamecharacters/IBaseCharacter";
+import { PlayableCard } from "../gamecharacters/PlayableCard";
+import { ProcBroadcaster } from "../gamecharacters/procs/ProcBroadcaster";
+import { AbstractCombatEvent } from "../rules/AbstractCombatEvent";
 import { CombatRules, DamageCalculationResult } from "../rules/CombatRules";
 import { DeckLogic, PileName } from "../rules/DeckLogic";
 import CombatUiManager from "../screens/subcomponents/CombatUiManager";
@@ -13,6 +17,16 @@ import CardSelectionFromHandManager from '../ui/CardSelectionFromHandManager';
 import { SubtitleManager } from "../ui/SubtitleManager";
 
 export class ActionManager {
+    heal(character: BaseCharacter, amount: number) {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            character.hitpoints += amount;
+            if (character.hitpoints > character.maxHitpoints) {
+                character.hitpoints = character.maxHitpoints;
+            }
+
+            return [];
+        }));
+    }
 
     exhaustRandomCardInHand() {
         this.actionQueue.addAction(new GenericAction(async () => {
@@ -115,12 +129,52 @@ export class ActionManager {
                 return [];
             }
 
+            // Handle missing energy using buffs
+            const gameState = GameState.getInstance();
+            const combatState = gameState.combatState;
+            let missingEnergy = playableCard.energyCost - combatState.energyAvailable;
+
+            let missingEnergyBuffs: AbstractBuff[] = []; // Iterate over all card buffs to handle missing energy
+            for (const buff of card.data.buffs) { 
+
+                if (missingEnergy <= 0) {
+                    break;
+                }
+
+                const maxProvidedIfWePayAltCost = buff.canPayThisMuchMissingEnergy(missingEnergy);
+
+                if (maxProvidedIfWePayAltCost <= 0){
+                    continue;
+                }
+
+                const energyToCover = Math.min(missingEnergy, maxProvidedIfWePayAltCost);
+                if (maxProvidedIfWePayAltCost > 0){
+                    console.log("can pay " + energyToCover + " from " + buff.getName());
+                    missingEnergy -= energyToCover;
+                    missingEnergyBuffs.push(buff);
+                }
+
+            }
+
+            // After processing all buffs, check if missing energy is still greater than 0
+            if (missingEnergy > 0) {
+                // Not all missing energy could be covered
+                this.displaySubtitle("Not enough energy to play this card.");
+                return [];
+            }
+
             if (target) {
-                GameState.getInstance().combatState.energyAvailable -= playableCard.energyCost;
+                combatState.energyAvailable -= playableCard.energyCost;
                 playableCard.InvokeCardEffects(target);
             } else {
                 playableCard.InvokeCardEffects();
             }
+
+            // now we pay the missing energy
+            missingEnergyBuffs.forEach(buff => {
+                console.log("paying missing energy for " + buff.getName());
+                buff.provideMissingEnergy_returnsAmountProvided(missingEnergy);
+            });
 
             DeckLogic.moveCardToPile(card.data, PileName.Discard);
             await this.animateDiscardCard(card);
@@ -508,7 +562,7 @@ export class ActionManager {
             
             // now for each buff on the card, invoke its onCardInvoked effect
             card.buffs.forEach(buff => {
-                buff.onCardInvoked(target);
+                buff.onThisCardInvoked(target);
             });
         }
 
@@ -580,6 +634,9 @@ export class ActionManager {
             for (const buff of card.buffs) {
                 buff.onExhaust();
             }
+
+            ProcBroadcaster.getInstance().broadcastCombatEvent(new ExhaustEvent(card));
+
             return [];
         }));
     }
@@ -780,5 +837,14 @@ export class WaitAction extends GameAction {
     async playAction(): Promise<GameAction[]> {
         await new Promise(resolve => setTimeout(resolve, this.milliseconds));
         return [];
+    }
+}
+
+export class ExhaustEvent extends AbstractCombatEvent {
+    printJson(): void {
+        console.log(`{"event": "ExhaustEvent", "card": "${this.card.name}"}`);
+    }
+    constructor(public card: PlayableCard) {
+        super();
     }
 }
