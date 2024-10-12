@@ -1,5 +1,4 @@
-import { AbstractCombatEvent } from "../../../rules/AbstractCombatEvent";
-import { CardPlayedEvent } from "../../../rules/CardPlayedEvent";
+import { PlayableCard } from "../../PlayableCard";
 import { AbstractBuff } from "../AbstractBuff";
 import { Strong } from "../standard/Strong";
 
@@ -18,8 +17,8 @@ export class Muse extends AbstractBuff {
         return `Whenever a cost 0 card is played, gain ${this.getStacksDisplayText()} Strength.`;
     }
 
-    override onEvent(event: AbstractCombatEvent): void {
-        if (event instanceof CardPlayedEvent && event.card.energyCost === 0) {
+    override onAnyCardPlayed(playedCard: PlayableCard): void {
+        if (playedCard.energyCost === 0) {
             const owner = this.getOwnerAsCharacter();
             if (owner) {
                 this.actionManager.applyBuffToCharacter(owner, new Strong(this.stacks));

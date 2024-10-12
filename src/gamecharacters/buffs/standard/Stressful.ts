@@ -1,7 +1,7 @@
 import { DamageInfo } from "../../../rules/DamageInfo";
 import { ActionManager } from "../../../utils/ActionManager";
-import { PlayableCard } from "../../PlayableCard";
 import { BaseCharacter } from "../../BaseCharacter";
+import { PlayableCard } from "../../PlayableCard";
 import { AbstractBuff } from "../AbstractBuff";
 import { Stress } from "./Stress";
 
@@ -22,7 +22,7 @@ export class Stressful extends AbstractBuff {
     }
 
     override onOwnerStriking(struckUnit: BaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void {
-        if (damageInfo.damageTaken > 0) {
+        if (damageInfo.unblockedDamageTaken > 0) {
             const stressBuff = new Stress(this.stacks);
             ActionManager.getInstance().applyBuffToCharacter(struckUnit, stressBuff);
             console.log(`${struckUnit.name} received ${this.stacks} Stress from Stressful effect`);

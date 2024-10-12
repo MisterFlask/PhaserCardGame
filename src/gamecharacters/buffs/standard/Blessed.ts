@@ -1,5 +1,5 @@
 import { IBaseCharacter } from "../../IBaseCharacter";
-import { AbstractBuff } from "../AbstractBuff";
+import { AbstractBuff, BuffApplicationResult } from "../AbstractBuff";
 
 export class Blessed extends AbstractBuff {
     constructor(stacks: number = 1) {
@@ -17,12 +17,11 @@ export class Blessed extends AbstractBuff {
     override getDescription(): string {
         return `Negates the next ${this.getStacksDisplayText()} debuff${this.stacks > 1 ? 's' : ''} applied.`;
     }
-
-    /// gets run AFTER buff is applied.
-    override onBuffApplied(character: IBaseCharacter, buffApplied: AbstractBuff, previousStacks: number, changeInStacks: number) {
-        if (changeInStacks > 0 && !buffApplied.isDebuff) {
-            this.actionManager.removeBuffFromCharacter(character, buffApplied.id, buffApplied.stacks);
+    override interceptBuffApplication(character: IBaseCharacter, buffApplied: AbstractBuff, previousStacks: number, changeInStacks: number): BuffApplicationResult {
+        if (changeInStacks > 0 && buffApplied.isDebuff) {
             this.stacks--;
+            return { logicTriggered: true, newChangeInStacks: 0 };
         }
+        return { logicTriggered: false, newChangeInStacks: changeInStacks };
     }
 }

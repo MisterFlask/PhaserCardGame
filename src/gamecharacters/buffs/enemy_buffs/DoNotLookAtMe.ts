@@ -1,6 +1,7 @@
 import { BaseCharacter } from "../../BaseCharacter";
+import { PlayableCard } from "../../PlayableCard";
 import { AbstractBuff } from "../AbstractBuff";
-import { Stress } from "./Stress";
+import { Stress } from "../standard/Stress";
 
 export class DoNotLookAtMe extends AbstractBuff {
     constructor(stacks: number = 1) {
@@ -18,7 +19,7 @@ export class DoNotLookAtMe extends AbstractBuff {
         return `Whenever targeted by a card, applies ${this.getStacksDisplayText()} Stress to the owner.`;
     }
 
-    override onAnyCardPlayed(target?: BaseCharacter): void {
+    public onAnyCardPlayed(playedCard: PlayableCard, target?: BaseCharacter){
         if (target && target === this.getOwnerAsCharacter()) {
             const owner = this.getOwnerAsCharacter();
             if (owner) {

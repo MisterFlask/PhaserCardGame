@@ -3,6 +3,7 @@ export enum CardType {
     SKILL = "SKILL",
     POWER = "POWER",
     ITEM = "ITEM",
+    STATUS = "STATUS",
     
     NON_PLAYABLE = "NON_PLAYABLE",
 }

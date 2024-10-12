@@ -19,7 +19,7 @@ export class Smoldering extends AbstractBuff {
         return `Deals 3 damage at end of each turn, plus 1 per [Thunder]. Lasts for ${this.stacks} more turn${this.stacks !== 1 ? 's' : ''}.`;
     }
 
-    override onTurnEnd(): void {
+    override onTurnEnd_CharacterBuff(): void {
         ActionManager.getInstance().dealDamage({ target: this.getOwnerAsCharacter()!, baseDamageAmount: 3 + GameState.getInstance().combatState.combatResources.powder.value, fromAttack: false});
         this.stacks--;
     }

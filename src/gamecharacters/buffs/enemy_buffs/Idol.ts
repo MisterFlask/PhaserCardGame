@@ -19,7 +19,7 @@ export class Idol extends AbstractBuff {
         return `When this character is attacked, ALL enemy intents focus on the attacker.`;
     }
 
-    override onOwnerStruck(strikingUnit: BaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void {
+    override onOwnerStruck_CannotModifyDamage(strikingUnit: BaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void {
         const gameState = GameState.getInstance();
         const combatState = gameState.combatState;
 

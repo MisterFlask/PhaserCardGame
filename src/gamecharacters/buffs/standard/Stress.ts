@@ -30,8 +30,8 @@ export class Stress extends AbstractBuff {
         }
     }
         
-    override onOwnerStruck(strikingUnit: BaseCharacter | null, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void {
-        if (damageInfo.damageTaken > 0) {
+    override onOwnerStruck_CannotModifyDamage(strikingUnit: BaseCharacter | null, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void {
+        if (damageInfo.unblockedDamageTaken > 0) {
             this.stacks += 1;
             console.log(`${this.getOwnerAsCharacter()?.name}'s stress increased to ${this.stacks}`);
         }

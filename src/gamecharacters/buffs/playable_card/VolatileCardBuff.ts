@@ -9,7 +9,7 @@ export class VolatileBuff extends AbstractBuff {
         this.isDebuff = false;
     }
 
-    public onDiscard(): void {
+    public onActiveDiscard(): void {
         const ownerCard = this.getOwnerAsPlayableCard();
         if (ownerCard) {
             // Use its this card's effects instead. Targets random enemy if it needs a target.

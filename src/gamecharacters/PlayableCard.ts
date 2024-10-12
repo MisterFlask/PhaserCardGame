@@ -1,4 +1,4 @@
-import { CombatRules } from "../rules/CombatRules";
+import { CombatRules, DamageCalculationResult } from "../rules/CombatRules";
 import { CombatResource, CombatResources, CombatState, GameState } from "../rules/GameState";
 import { BaseCharacterType } from "../Types";
 import type { ActionManager } from "../utils/ActionManager";
@@ -9,11 +9,13 @@ import { IBaseCharacter } from "./IBaseCharacter";
 import { CardSize, CardType } from "./Primitives";
 
 export enum CardRarity {
+    TOKEN,
     COMMON,
     UNCOMMON,
     RARE,
     EPIC,
-    LEGENDARY
+    LEGENDARY,
+    SPECIAL
 }
 
 export abstract class PlayableCard extends AbstractCard {
@@ -129,14 +131,15 @@ export abstract class PlayableCard extends AbstractCard {
     /**
      * DO NOT OVERRIDE.
      */
-    protected dealDamageToTarget(targetCard?: IBaseCharacter): void {
+    protected dealDamageToTarget(targetCard?: IBaseCharacter, callback?: (damageResult: DamageCalculationResult) => void): void {
         if (targetCard) {
             this.actionManager.dealDamage({
                 baseDamageAmount: this.getBaseDamageAfterResourceScaling(),
                 target: targetCard,
                 sourceCharacter: this.owner,
                 fromAttack: true,
-                sourceCard: this
+                sourceCard: this,
+                callback: callback
             });
             console.log(`Dealt ${this.getDisplayedDamage()} damage to ${targetCard.name}`);
         }

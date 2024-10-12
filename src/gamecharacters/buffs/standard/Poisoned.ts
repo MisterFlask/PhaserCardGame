@@ -16,7 +16,7 @@ export class Poison extends AbstractBuff {
         this.stacks = stacks;
         this.stackable = true;
     }
-    override onTurnEnd(): void {
+    override onTurnEnd_CharacterBuff(): void {
         const owner = this.getOwnerAsCharacter();
         if (owner) {
             // Apply poison damage

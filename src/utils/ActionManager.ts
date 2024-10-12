@@ -27,7 +27,36 @@ export class ActionManager {
             return [];
         }));
     }
+    public createCardToDrawPile(card: PlayableCard) {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            const gameState = GameState.getInstance();
+            gameState.combatState.currentDrawPile.push(card);
+            return [];
+        }));
+    }
 
+    public createCardToHand(card: PlayableCard) {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            const gameState = GameState.getInstance();
+            gameState.combatState.currentHand.push(card);
+            return [];
+        }));
+    }
+
+    public moveCardToPile(card: PlayableCard, pileName: PileName) {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            DeckLogic.moveCardToPile(card, pileName);
+            return [];
+        }));
+    }
+
+    public createCardToDiscardPile(card: PlayableCard) {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            const gameState = GameState.getInstance();
+            gameState.combatState.currentDiscardPile.push(card);
+            return [];
+        }));
+    }
     exhaustRandomCardInHand() {
         this.actionQueue.addAction(new GenericAction(async () => {
             const hand = GameState.getInstance().combatState.currentHand;
@@ -73,6 +102,14 @@ export class ActionManager {
 
     public tiltCharacter(character: BaseCharacterType){
         this.animateAttackerTilt(character.physicalCard!);
+    }
+
+    public applyBuffToCard(card: PlayableCard, buff: AbstractBuff) {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            card.buffs.push(buff);
+            console.log(`Applied buff ${buff.getName()} to card ${card.name}`);
+            return [];
+        }));
     }
 
     public applyBuffToCharacter(character: IBaseCharacter, buff: AbstractBuff, sourceCharacter?: IBaseCharacter): void {
@@ -332,13 +369,15 @@ export class ActionManager {
         target,
         sourceCharacter,
         sourceCard,
-        fromAttack
+        fromAttack,
+        callback
     }: {
         baseDamageAmount: number,
         target: IBaseCharacter,
         sourceCharacter?: IBaseCharacter,
         sourceCard?: PlayableCardType,
-        fromAttack?: boolean
+        fromAttack?: boolean,
+        callback?: (damageResult: DamageCalculationResult) => void
     }): void => {
         this.actionQueue.addAction(new GenericAction(async () => {
             const physicalCardOfTarget = target.physicalCard;
@@ -367,9 +406,9 @@ export class ActionManager {
                 // Activate OnStruck effects for the defender's buffs
                 target.buffs.forEach(buff => {
                     const _buff = buff as AbstractBuff;
-                    _buff.onOwnerStruck(sourceCharacter || null, sourceCard || null, {
+                    _buff.onOwnerStruck_CannotModifyDamage(sourceCharacter || null, sourceCard || null, {
                         damageDealt: damageResult.totalDamage,
-                        damageTaken: damageResult.unblockedDamage,
+                        unblockedDamageTaken: damageResult.unblockedDamage,
                         damageBlocked: damageResult.blockedDamage
                     });
                 });
@@ -378,7 +417,7 @@ export class ActionManager {
                 sourceCharacter?.buffs.forEach(buff => {
                     buff.onOwnerStriking(target as BaseCharacterType, sourceCard || null, {
                         damageDealt: damageResult.totalDamage,
-                        damageTaken: damageResult.unblockedDamage,
+                        unblockedDamageTaken: damageResult.unblockedDamage,
                         damageBlocked: damageResult.blockedDamage
                     });
                 });
@@ -416,6 +455,8 @@ export class ActionManager {
                 // No unblocked damage: glow white
                 this.animateDefenderJiggleAndGlow(physicalCardOfTarget, 0xffffff); // White color
             }
+
+            callback?.(damageResult);
 
             return [];
         }));
@@ -605,7 +646,7 @@ export class ActionManager {
         // end turn buffs
         combatState.allPlayerAndEnemyCharacters.forEach(character => {
             character.buffs.forEach(buff => {
-                buff.onTurnEnd();
+                buff.onTurnEnd_CharacterBuff();
             });
         });
 
@@ -620,7 +661,7 @@ export class ActionManager {
         this.actionQueue.addAction(new GenericAction(async () => {
             this.basicDiscardCard(card);
             for (const buff of card.buffs) {
-                buff.onDiscard();
+                buff.onActiveDiscard();
             }
             return [];
         }));

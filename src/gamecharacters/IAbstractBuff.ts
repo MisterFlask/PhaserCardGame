@@ -23,9 +23,9 @@ export interface IAbstractBuff {
     getAdditionalPercentCombatDamageTakenModifier(): number;
     getCombatDamageTakenModifier(): number;
     getBlockReceivedModifier(): number;
-    onOwnerStruck(strikingUnit: BaseCharacter | null, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void;
+    onOwnerStruck_CannotModifyDamage(strikingUnit: BaseCharacter | null, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void;
     onOwnerStriking(struckUnit: BaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void;
     onTurnStart(): void;
-    onTurnEnd(): void;
+    onTurnEnd_CharacterBuff(): void;
     onEvent(item: AbstractCombatEvent): void;
 }

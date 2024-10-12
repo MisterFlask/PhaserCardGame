@@ -1,10 +1,10 @@
+import { ActionManager } from "../../../../utils/ActionManager";
 import { AbstractCard, TargetingType } from "../../../AbstractCard";
 import { BaseCharacter } from "../../../BaseCharacter";
-import { Burning } from "../../../buffs/standard/Burning";
-import { PlayableCard } from "../../../PlayableCard";
 import { AbstractBuff } from "../../../buffs/AbstractBuff";
+import { Burning } from "../../../buffs/standard/Burning";
 import { IBaseCharacter } from "../../../IBaseCharacter";
-import { ActionManager } from "../../../../utils/ActionManager";
+import { PlayableCard } from "../../../PlayableCard";
 
 export class Pyrestarter extends PlayableCard {
     constructor() {
@@ -58,7 +58,7 @@ export class PyrestarterBuff extends AbstractBuff {
         }
     }
 
-    override onTurnEnd(): void {
+    override onTurnEnd_CharacterBuff(): void {
         this.stacks = 0;
     }
 }

@@ -42,6 +42,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
     }
 
 
+
     public getOwnerAsCharacter(): BaseCharacter | null {
         // Import GameState if not already imported at the top of the file
 
@@ -151,7 +152,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
     /**
      * This is called when the owner of the buff is struck by an attack.  It CANNOT BE USED to modify damage received; use getPercentCombatDamageTakenModifier or getCombatDamageTakenModifier instead for that.
      */
-    onOwnerStruck(strikingUnit: IBaseCharacter | null, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo) {
+    onOwnerStruck_CannotModifyDamage(strikingUnit: IBaseCharacter | null, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo) {
 
     }
 
@@ -166,12 +167,16 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
     }
 
-    onTurnEnd() {
+    onTurnEnd_CharacterBuff() {
 
     }
 
     onBuffApplied(character: IBaseCharacter, buffApplied: AbstractBuff, previousStacks: number, changeInStacks: number) {
 
+    }
+
+    interceptBuffApplication(character: IBaseCharacter, buffApplied: AbstractBuff, previousStacks: number, changeInStacks: number) : BuffApplicationResult {
+        return {logicTriggered: false, newChangeInStacks: changeInStacks};
     }
 
     onEvent(item: AbstractCombatEvent) {
@@ -189,7 +194,11 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
     ////////////////// PLAYABLE CARD METHODS //////////////////
 
-    public onDiscard(){
+    public onActiveDiscard(){
+
+    }
+
+    public onInHandAtEndOfTurn(){
 
     }
 
@@ -215,6 +224,11 @@ export abstract class AbstractBuff implements IAbstractBuff {
         
     }
 
+
+    public shouldRetainAfterTurnEnds(): boolean {
+        return false;
+    }
+
     // Applies to character buffs ONLY.  If true, buff is not removed at end of combat.
     public isPersistentBetweenCombats: boolean = false;
 
@@ -233,4 +247,11 @@ export abstract class AbstractBuff implements IAbstractBuff {
     }
 
     
+    
+}
+
+
+export class BuffApplicationResult {
+    newChangeInStacks: number = 0;
+    logicTriggered: boolean = false;
 }

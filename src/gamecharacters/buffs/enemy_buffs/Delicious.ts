@@ -21,7 +21,7 @@ export class Delicious extends AbstractBuff {
         this.stackable = true; // This buff now stacks
     }
 
-    override onOwnerStruck(strikingUnit: BaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void {
+    override onOwnerStruck_CannotModifyDamage(strikingUnit: BaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void {
         const strongBuff = new Strong(this.stacks);
         ActionManager.getInstance().applyBuffToCharacter(strikingUnit, strongBuff);
     }
