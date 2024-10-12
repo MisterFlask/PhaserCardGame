@@ -7,7 +7,7 @@ export class Burning extends AbstractBuff {
     }
 
     override getDescription(): string {
-        return `At the end of turn, lose ${this.getStacksDisplayText()} HP, then halve the burning stacks.`;
+        return `At the end of turn, take ${this.getStacksDisplayText()} damage, then halve the burning stacks.`;
     }
 
     constructor(stacks: number = 1) {

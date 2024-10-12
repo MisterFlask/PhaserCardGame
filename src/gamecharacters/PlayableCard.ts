@@ -65,6 +65,11 @@ export abstract class PlayableCard extends AbstractCard {
         console.log('Item purchased');
     }
 
+
+    isUnplayable(): boolean {
+        return false;
+    }
+
     /**
      * DO NOT OVERRIDE.
      */

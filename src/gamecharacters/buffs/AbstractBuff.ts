@@ -121,7 +121,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
         return 0;
     }
 
-    getBlockSentModifier(): number {
+    getBlockSentModifier(target: IBaseCharacter): number {
         return 0;
     }
 
@@ -137,7 +137,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
     }
     // this is a FLAT modifier on top of damage taken, not percentage-based.
     //  this refers to pre-block damage.
-    getCombatDamageTakenModifier(): number {
+    getCombatDamageTakenModifier(sourceCharacter?: IBaseCharacter, sourceCard?: PlayableCard): number {
         return 0;
     }
     getBlockReceivedModifier(): number {

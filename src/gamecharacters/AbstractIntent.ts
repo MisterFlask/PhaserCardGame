@@ -4,9 +4,10 @@ import { GameState } from '../rules/GameState';
 import { PhysicalCard } from '../ui/PhysicalCard';
 import { ActionManager } from "../utils/ActionManager";
 import { TargetingUtils } from "../utils/TargetingUtils";
-import { generateWordGuid } from "./AbstractCard";
+import { AbstractCard, generateWordGuid } from "./AbstractCard";
 import { BaseCharacter } from "./BaseCharacter";
 import { AbstractBuff } from './buffs/AbstractBuff';
+import { PlayableCard } from './PlayableCard';
 
 export abstract class AbstractIntent implements JsonRepresentable {
     id: string;
@@ -76,6 +77,100 @@ export class AttackIntent extends AbstractIntent {
 
         ActionManager.getInstance().dealDamage({ baseDamageAmount: this.baseDamage, target: this.target, sourceCharacter: this.owner });
 
+    }
+
+    createJsonRepresentation(): string {
+        const baseRepresentation = JSON.parse(super.createJsonRepresentation());
+        return JSON.stringify({
+            ...baseRepresentation,
+            className: this.constructor.name,
+            damage: this.baseDamage,
+        }, null, 2);
+    }
+}
+
+export class TagCardsIntent extends AbstractIntent {
+    buffs: AbstractBuff[];
+    numCardsToTag: number;
+    pileToTagFrom: 'draw' | 'discard';
+
+    constructor({ buffs, numCardsToTag, pileToTagFrom, owner }: { buffs: AbstractBuff[], numCardsToTag: number, pileToTagFrom: 'draw' | 'discard', owner: BaseCharacter }) {
+        super({ imageName: 'tag', target: undefined, owner: owner });
+        this.buffs = buffs;
+        this.numCardsToTag = numCardsToTag;
+        this.pileToTagFrom = pileToTagFrom;
+    }
+
+    tooltipText(): string {
+        const buffNames = this.buffs.map(buff => buff.getName()).join(', ');
+        return `Tag ${this.numCardsToTag} random card${this.numCardsToTag > 1 ? 's' : ''} in the ${this.pileToTagFrom} pile with ${buffNames}`;
+    }
+
+    displayText(): string {
+        return `Tag ${this.numCardsToTag}`;
+    }
+
+    act(): void {
+        console.log(`Tagging ${this.numCardsToTag} cards in the ${this.pileToTagFrom} pile`);
+        const gameState = GameState.getInstance();
+        const pile = this.pileToTagFrom === 'draw' ? gameState.combatState.currentDrawPile : gameState.combatState.currentDiscardPile;
+        
+        // Shallow clone the pile to avoid modifying the original
+        const clonedPile = [...pile];
+        // Shuffle the pile to ensure randomness
+        const cardsToTag = TargetingUtils.getInstance().selectRandomCardsFromPile(clonedPile as AbstractCard[], this.numCardsToTag);
+        
+        console.log(`Tagging ${cardsToTag.length} cards from the ${this.pileToTagFrom} pile`);
+        
+        for (const card of cardsToTag) {
+            for (const buff of this.buffs) {
+                ActionManager.getInstance().applyBuffToCard(card as PlayableCard, buff);
+            }
+        }
+    }
+
+    createJsonRepresentation(): string {
+        const baseRepresentation = JSON.parse(super.createJsonRepresentation());
+        return JSON.stringify({
+            ...baseRepresentation,
+            className: this.constructor.name,
+            buffs: this.buffs.map(buff => buff.getName()),
+            numCardsToTag: this.numCardsToTag,
+            pileToTagFrom: this.pileToTagFrom,
+        }, null, 2);
+    }
+}
+
+
+export class AttackAllPlayerCharactersIntent extends AbstractIntent {
+    baseDamage: number;
+
+    constructor({ baseDamage, owner }: { baseDamage: number, owner: BaseCharacter }) {
+        super({ imageName: 'area-damage', target: undefined, owner: owner });
+        this.baseDamage = baseDamage;
+    }
+
+    tooltipText(): string {
+        return `Attacking all players for ${this.displayedDamage()} damage`;
+    }
+
+    displayText(): string {
+        return this.displayedDamage().toString();
+    }
+
+    displayedDamage(): number {
+        const randomTarget = TargetingUtils.getInstance().selectRandomPlayerCharacter();
+        return CombatRules.calculateDamage({ baseDamageAmount: this.baseDamage, target: randomTarget, sourceCharacter: this.owner, sourceCard: undefined, fromAttack: true }).totalDamage;
+    }
+
+    act(): void {
+        console.log('Attacking all player characters');
+        ActionManager.getInstance().tiltCharacter(this.owner);
+
+        const playerCharacters = TargetingUtils.getInstance().selectAllPlayerCharacters();
+        for (const target of playerCharacters) {
+            ActionManager.getInstance().dealDamage({ baseDamageAmount: this.baseDamage, target: target, sourceCharacter: this.owner });
+        }
     }
 
     createJsonRepresentation(): string {
@@ -163,6 +258,39 @@ export class ApplyDebuffToRandomCharacterIntent extends AbstractIntent {
         }, null, 2);
     }
 }
+
+export class BlockForSelfIntent extends AbstractIntent {
+    blockAmount: number;
+
+    constructor({ blockAmount, owner }: { blockAmount: number, owner: BaseCharacter }) {
+        super({ imageName: 'shield', target: undefined, owner: owner });
+        this.blockAmount = blockAmount;
+    }
+
+    tooltipText(): string {
+        return `Gaining ${this.blockAmount} Block`;
+    }
+
+    displayText(): string {
+        return `${this.blockAmount}`;
+    }
+
+    act(): void {
+        ActionManager.getInstance().tiltCharacter(this.owner);
+        console.log(`${this.owner.name} is gaining ${this.blockAmount} Block`);
+        ActionManager.getInstance().applyBlock({ baseBlockValue: this.blockAmount, blockSourceCharacter: this.owner, blockTargetCharacter: this.owner });
+    }
+
+    createJsonRepresentation(): string {
+        const baseRepresentation = JSON.parse(super.createJsonRepresentation());
+        return JSON.stringify({
+            ...baseRepresentation,
+            className: this.constructor.name,
+            blockAmount: this.blockAmount,
+        }, null, 2);
+    }
+}
+
 
 export class ApplyBuffToSelfIntent extends AbstractIntent {
     buff: AbstractBuff;

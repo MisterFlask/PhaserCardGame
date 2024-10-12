@@ -83,7 +83,10 @@ export default class GameImageLoader {
                 'Corrupted Legendary Knight Sen.png', 'Corrupted Spider.png', 'Demon Critter Squirrel.png',
                 'Dryads Mage.png', 'Eldritch Corruption Obelisk.png', 'Eldritch Corruption Treant.png',
                 'Golems Eye Golem.png', 'Hero Magic Knightess.png', 'Slime Darkii.png', 'Slime Fireii.png',
-                'Slime Iceii.png', 'Slime RPG Basic.png'
+                'Slime Iceii.png', 'Slime RPG Basic.png',
+
+                // french
+                "Eldritch Corruption Deer.png", "Eldritch Soldier Gunner.png", "Eldritch Corruption Crow.png"
             ]
         },
         attributes_and_augments: {

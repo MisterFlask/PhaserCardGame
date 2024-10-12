@@ -1,0 +1,1 @@
+// card rewards for this character have a 30% chance to have the Strong buff.

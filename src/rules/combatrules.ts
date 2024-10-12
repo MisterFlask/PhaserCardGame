@@ -24,7 +24,7 @@ export class CombatRules {
 
         if (sourceCharacter) {
             for (const buff of sourceCharacter.buffs) {
-                totalBlock += buff.getBlockSentModifier();
+                totalBlock += buff.getBlockSentModifier(targetCharacter as BaseCharacterType);
             }
         }
 

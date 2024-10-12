@@ -1,6 +1,7 @@
 import { AbstractCombatEvent } from "../rules/AbstractCombatEvent";
 import { DamageInfo } from "../rules/DamageInfo";
 import { BaseCharacter } from "./BaseCharacter";
+import { IBaseCharacter } from "./IBaseCharacter";
 import { PlayableCard } from "./PlayableCard";
 
 export interface IAbstractBuff {
@@ -18,7 +19,7 @@ export interface IAbstractBuff {
     getStacksDisplayText(): string;
     getOwnerAsCharacter(): BaseCharacter | null;
     getCombatDamageDealtModifier(target?:BaseCharacter): number;
-    getBlockSentModifier(): number;
+    getBlockSentModifier(target: IBaseCharacter): number;
     getAdditionalPercentCombatDamageDealtModifier(target?: BaseCharacter): number;
     getAdditionalPercentCombatDamageTakenModifier(): number;
     getCombatDamageTakenModifier(): number;

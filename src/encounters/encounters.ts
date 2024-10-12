@@ -43,9 +43,20 @@ export class BloodManipulationSlime extends AutomatedCharacter {
     }
 }
 
+// basically two acts, boss fight in middle and end.  Sixteen combats in total.
+export enum ActSegment{
+    Act1_Segment1 = "Act 1 - Segment 1",
+    Act1_Segment2 = "Act 1 - Segment 2",
+    Boss_Act1 = "Boss Fight - Act 1",
+    Act2_Segment1 = "Act 2 - Segment 1",
+    Act2_Segment2 = "Act 2 - Segment 2",
+    Boss_Act2 = "Boss Fight - Act 2",
+}
+
+
 export interface EncounterData {
     enemies: AutomatedCharacter[];
-    difficulty: string;
+    difficulty: ActSegment;
     rewardXP: number;
     specialConditions?: string[];
 }
@@ -76,33 +87,33 @@ export class EncounterManager {
         const encounters = [
             new Encounter({
                 enemies: [new GoblinCharacter(), new GoblinCharacter()],
-                difficulty: 'Easy',
+                difficulty: ActSegment.Act1_Segment1,
                 rewardXP: 100
             }),
             new Encounter({
                 enemies: [new ClockworkAbomination(), new GoblinCharacter()],
-                difficulty: 'Medium',
+                difficulty: ActSegment.Act1_Segment2,
                 rewardXP: 150
             }),
             new Encounter({
                 enemies: [new BaconBeast(), new BloodManipulationSlime()],
-                difficulty: 'Hard',
+                difficulty: ActSegment.Boss_Act1,
                 rewardXP: 200,
                 specialConditions: ['Darkness']
             }),
             new Encounter({
                 enemies: [new ClockworkAbomination(), new ClockworkAbomination()],
-                difficulty: 'Hard',
+                difficulty: ActSegment.Act2_Segment1,
                 rewardXP: 250
             }),
             new Encounter({
                 enemies: [new GoblinCharacter(), new GoblinCharacter(), new GoblinCharacter()],
-                difficulty: 'Medium',
+                difficulty: ActSegment.Act2_Segment2,
                 rewardXP: 180
             }),
             new Encounter({
                 enemies: [new BaconBeast(), new ClockworkAbomination(), new GoblinCharacter()],
-                difficulty: 'Very Hard',
+                difficulty: ActSegment.Boss_Act2,
                 rewardXP: 300,
                 specialConditions: ['Ambush']
             }),

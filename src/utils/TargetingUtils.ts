@@ -1,3 +1,4 @@
+import { AbstractCard } from "../gamecharacters/AbstractCard";
 import { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { GameState } from "../rules/GameState";
 
@@ -10,6 +11,15 @@ export class TargetingUtils {
             TargetingUtils.instance = new TargetingUtils();
         }
         return TargetingUtils.instance;
+    }
+
+    public selectRandomCardsFromPile(pile: AbstractCard[], n: number): AbstractCard[] {
+        if (n <= 0) {
+            return [];
+        }
+
+        const shuffled = [...pile].sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, Math.min(n, pile.length));
     }
 
     public selectRandomPlayerCharacter(): BaseCharacter {
