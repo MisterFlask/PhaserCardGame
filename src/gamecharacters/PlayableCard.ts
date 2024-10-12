@@ -122,7 +122,7 @@ export abstract class PlayableCard extends AbstractCard {
         return this.combatResources.fog;
     }
 
-    get thunder(): CombatResource {
+    get powder(): CombatResource {
         return this.combatResources.powder;
     }
 

@@ -20,6 +20,10 @@ export class Balefire extends PlayableCard {
         this.baseMagicNumber = 3; // Number of times damage is dealt
         this.buffs.push(new BloodPriceBuff(3));
         this.buffs.push(new GiantKiller(1));
+        this.resourceScalings.push({
+            resource: this.powder,
+            attackScaling: 1,
+        });
     }
 
     override get description(): string {

@@ -2,7 +2,7 @@ import { GameState } from "../../../../../rules/GameState";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
 import { Stress } from "../../../../buffs/standard/Stress";
-import { Strong } from "../../../../buffs/Strong";
+import { Strong } from "../../../../buffs/standard/Strong";
 import { CardRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 

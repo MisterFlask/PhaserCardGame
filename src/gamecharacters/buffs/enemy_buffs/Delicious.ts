@@ -1,10 +1,9 @@
 import { DamageInfo } from "../../../rules/DamageInfo";
 import { ActionManager } from "../../../utils/ActionManager";
-import { PlayableCard } from "../../PlayableCard";
 import { BaseCharacter } from "../../BaseCharacter";
+import { PlayableCard } from "../../PlayableCard";
 import { AbstractBuff } from "../AbstractBuff";
-import { Strong } from "../Strong";
-
+import { Strong } from "../standard/Strong";
 export class Delicious extends AbstractBuff {
     override getName(): string {
         return "Delicious";

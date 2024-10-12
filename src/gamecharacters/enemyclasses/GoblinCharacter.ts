@@ -1,6 +1,6 @@
 import { AbstractIntent, AttackIntent } from "../AbstractIntent";
 import { AutomatedCharacter } from "../AutomatedCharacter";
-import { Strong } from "../buffs/Strong";
+import { Strong } from "../buffs/standard/Strong";
 
 export class GoblinCharacter extends AutomatedCharacter {
     constructor() {

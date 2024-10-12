@@ -3,7 +3,7 @@ import { AutomatedCharacter } from '../gamecharacters/AutomatedCharacter';
 import { Delicious } from '../gamecharacters/buffs/enemy_buffs/Delicious';
 import { Stress } from '../gamecharacters/buffs/standard/Stress';
 import { Stressful } from '../gamecharacters/buffs/standard/Stressful';
-import { Strong } from '../gamecharacters/buffs/Strong';
+import { Strong } from '../gamecharacters/buffs/standard/Strong';
 import { GoblinCharacter } from '../gamecharacters/enemyclasses/GoblinCharacter';
 
 // Define new character classes

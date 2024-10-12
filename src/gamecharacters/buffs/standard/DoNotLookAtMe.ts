@@ -18,7 +18,7 @@ export class DoNotLookAtMe extends AbstractBuff {
         return `Whenever targeted by a card, applies ${this.getStacksDisplayText()} Stress to the owner.`;
     }
 
-    override onAnyCardInvoked(target?: BaseCharacter): void {
+    override onAnyCardPlayed(target?: BaseCharacter): void {
         if (target && target === this.getOwnerAsCharacter()) {
             const owner = this.getOwnerAsCharacter();
             if (owner) {
