@@ -1,7 +1,7 @@
-import { TargetingType } from "../../../AbstractCard";
-import { BaseCharacter } from "../../../BaseCharacter";
-import { Burning } from "../../../buffs/standard/Burning";
-import { PlayableCard } from "../../../PlayableCard";
+import { TargetingType } from "../../../../AbstractCard";
+import { BaseCharacter } from "../../../../BaseCharacter";
+import { Burning } from "../../../../buffs/standard/Burning";
+import { PlayableCard } from "../../../../PlayableCard";
 
 export class ReIgnition extends PlayableCard {
     constructor() {
@@ -17,7 +17,7 @@ export class ReIgnition extends PlayableCard {
     }
 
     override get description(): string {
-        return `Target ally gains ${this.getDisplayedBlock()} block. Apply ${this.getDisplayedMagicNumber()} Burning to all enemies.`;
+        return `Target ally gains ${this.getDisplayedBlock()} block.  Apply ${this.getDisplayedMagicNumber()} Burning to all enemies.`;
     }
     
     override InvokeCardEffects(targetCard?: BaseCharacter): void {

@@ -16,7 +16,7 @@ export class Smoldering extends AbstractBuff {
     }
 
     getDescription(): string {
-        return `Deals 3 damage at end of each turn, plus 1 per [Thunder]. Lasts for ${this.stacks} more turn${this.stacks !== 1 ? 's' : ''}.`;
+        return `Deals 3 damage at end of each turn, plus 1 per [Powder]. Lasts for ${this.stacks} more turn${this.stacks !== 1 ? 's' : ''}.`;
     }
 
     override onTurnEnd_CharacterBuff(): void {

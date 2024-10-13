@@ -581,7 +581,7 @@ export class ActionManager {
             return [];
         }));
     }
-    public modifyThunder(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
+    public modifyPowder(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
         this.actionQueue.addAction(new GenericAction(async () => {
             GameState.getInstance().combatState.combatResources.modifyPowder(amount);
             return [];

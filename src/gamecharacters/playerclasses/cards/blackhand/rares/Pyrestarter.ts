@@ -1,10 +1,10 @@
-import { ActionManager } from "../../../../utils/ActionManager";
-import { AbstractCard, TargetingType } from "../../../AbstractCard";
-import { BaseCharacter } from "../../../BaseCharacter";
-import { AbstractBuff } from "../../../buffs/AbstractBuff";
-import { Burning } from "../../../buffs/standard/Burning";
-import { IBaseCharacter } from "../../../IBaseCharacter";
-import { PlayableCard } from "../../../PlayableCard";
+import { ActionManager } from "../../../../../utils/ActionManager";
+import { AbstractCard, TargetingType } from "../../../../AbstractCard";
+import { BaseCharacter } from "../../../../BaseCharacter";
+import { AbstractBuff } from "../../../../buffs/AbstractBuff";
+import { Burning } from "../../../../buffs/standard/Burning";
+import { IBaseCharacter } from "../../../../IBaseCharacter";
+import { PlayableCard } from "../../../../PlayableCard";
 
 export class Pyrestarter extends PlayableCard {
     constructor() {

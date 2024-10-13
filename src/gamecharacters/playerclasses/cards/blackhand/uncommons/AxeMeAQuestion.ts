@@ -1,9 +1,9 @@
-import { PlayableCard } from '../../../PlayableCard';
-import { BaseCharacter } from '../../../BaseCharacter';
-import { Burning } from '../../../buffs/standard/Burning';
-import { TargetingType } from '../../../AbstractCard';
-import { AbstractBuff } from '../../../buffs/AbstractBuff';
-import { IBaseCharacter } from '../../../IBaseCharacter';
+import { PlayableCard } from '../../../../PlayableCard';
+import { BaseCharacter } from '../../../../BaseCharacter';
+import { Burning } from '../../../../buffs/standard/Burning';
+import { TargetingType } from '../../../../AbstractCard';
+import { AbstractBuff } from '../../../../buffs/AbstractBuff';
+import { IBaseCharacter } from '../../../../IBaseCharacter';
 
 export class AxeMeAQuestion extends PlayableCard {
   constructor() {

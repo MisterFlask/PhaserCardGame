@@ -1,10 +1,10 @@
-import { AbstractCard, TargetingType } from '../../../AbstractCard';
-import { IBaseCharacter } from '../../../IBaseCharacter';
-import { CardRarity } from '../../../PlayableCard';
-import { PlayableCardWithHelpers } from '../../../PlayableCardWithHelpers';
-import { CardType } from '../../../Primitives';
-import { Smoldering } from '../../../buffs/blackhand/Smoldering';
-import { ExplosiveFinishCardBuff } from '../../../buffs/standard/ExplosiveFinishCardBuff';
+import { AbstractCard, TargetingType } from '../../../../AbstractCard';
+import { IBaseCharacter } from '../../../../IBaseCharacter';
+import { CardRarity } from '../../../../PlayableCard';
+import { PlayableCardWithHelpers } from '../../../../PlayableCardWithHelpers';
+import { CardType } from '../../../../Primitives';
+import { Burning } from '../../../../buffs/standard/Burning';
+import { ExplosiveFinishCardBuff } from '../../../../buffs/standard/ExplosiveFinishCardBuff';
 
 export class AndThenHeExploded extends PlayableCardWithHelpers {
     constructor() {
@@ -20,7 +20,7 @@ export class AndThenHeExploded extends PlayableCardWithHelpers {
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage. If the target has Smoldering, do it again. Fatal: all enemies gain 10 Burning.`;
+        return `Deal ${this.getDisplayedDamage()} damage. If the target has Burning, do it again. Fatal: all enemies gain 10 Burning.`;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
@@ -31,9 +31,8 @@ export class AndThenHeExploded extends PlayableCardWithHelpers {
 
         this.dealDamageToTarget(targetCard);
 
-        if (target.hasBuff(new Smoldering(1).getName())) {
+        if (target.hasBuff(new Burning(1).getName())) {
             this.dealDamageToTarget(targetCard);
         }
     }
 }
-

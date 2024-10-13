@@ -1,7 +1,5 @@
+import { AbstractCard, TargetingType } from '../../../AbstractCard';
 import { PlayableCard } from '../../../PlayableCard';
-import { BaseCharacter } from '../../../BaseCharacter';
-import { TargetingType, AbstractCard } from '../../../AbstractCard';
-import { ActionManager } from '../../../../utils/ActionManager';
 
 export class Rummage extends PlayableCard {
   constructor() {

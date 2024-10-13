@@ -45,7 +45,7 @@ export abstract class PlayableCard extends AbstractCard {
     /**
      * DO NOT OVERRIDE.
      */
-    forEachEnemy(callback: (enemy: IBaseCharacter) => void): void {
+    forEachEnemy(callback: (enemy: BaseCharacter) => void): void {
         this.combatState.enemies
             .filter(char => char.team === Team.ENEMY)
             .forEach(callback);
@@ -54,7 +54,7 @@ export abstract class PlayableCard extends AbstractCard {
     /**
      * DO NOT OVERRIDE.
      */
-    performActionOnRandomEnemy(callback: (enemy: IBaseCharacter) => void): void {
+    performActionOnRandomEnemy(callback: (enemy: BaseCharacter) => void): void {
         const randomEnemy = this.randomEnemy();
         if (randomEnemy) {
             callback(randomEnemy);
@@ -189,7 +189,7 @@ export abstract class PlayableCard extends AbstractCard {
     /**
      * DO NOT OVERRIDE.
      */
-    randomEnemy(): IBaseCharacter | undefined {
+    randomEnemy(): BaseCharacter | undefined {
         const livingEnemies = this.combatState.enemies.filter(enemy => enemy.hitpoints > 0);
 
         if (livingEnemies.length === 0) {

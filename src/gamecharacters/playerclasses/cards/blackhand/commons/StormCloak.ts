@@ -1,9 +1,9 @@
 // grant 5 block to the targeted character
 
-import { CombatResource, GameState } from "../../../../rules/GameState";
-import { TargetingType } from "../../../AbstractCard";
-import { BaseCharacter } from "../../../BaseCharacter";
-import { PlayableCard } from "../../../PlayableCard";
+import { GameState } from "../../../../../rules/GameState";
+import { TargetingType } from "../../../../AbstractCard";
+import { BaseCharacter } from "../../../../BaseCharacter";
+import { PlayableCard } from "../../../../PlayableCard";
 
 
 export class StormCloak extends PlayableCard {

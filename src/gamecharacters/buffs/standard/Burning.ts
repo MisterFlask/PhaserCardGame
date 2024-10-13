@@ -1,13 +1,17 @@
+import { GameState } from "../../../rules/GameState";
 import { ActionManager } from "../../../utils/ActionManager";
 import { AbstractBuff } from "../AbstractBuff";
 
 export class Burning extends AbstractBuff {
+    private readonly baseDamage: number = 4;
+
     override getName(): string {
         return "Burning";
     }
 
     override getDescription(): string {
-        return `At the end of turn, take ${this.getStacksDisplayText()} damage, then halve the burning stacks.`;
+        const totalDamage = this.baseDamage + GameState.getInstance().combatState.combatResources.powder.value;
+        return `At the end of turn, take ${totalDamage} damage for ${this.getStacksDisplayText()} turns.`;
     }
 
     constructor(stacks: number = 1) {
@@ -20,13 +24,15 @@ export class Burning extends AbstractBuff {
     override onTurnEnd_CharacterBuff(): void {
         const owner = this.getOwnerAsCharacter();
         if (owner) {
-            // Apply burning damage
-            ActionManager.getInstance().dealDamage({ baseDamageAmount: this.stacks, target: owner, fromAttack: false });
-            console.log(`${owner.name} took ${this.stacks} burning damage`);
+            const powderAmount = GameState.getInstance().combatState.combatResources.powder.value;
+            const totalDamage = this.baseDamage + powderAmount;
 
-            // Halve the burning stacks, rounding down
-            this.stacks = Math.floor(this.stacks / 2);
+            // Apply burning damage
+            ActionManager.getInstance().dealDamage({ baseDamageAmount: totalDamage, target: owner, fromAttack: false });
+            console.log(`${owner.name} took ${totalDamage} burning damage (${this.baseDamage} base + ${powderAmount} Powder)`);
+
+            // Reduce stacks by 1
+            this.stacks--;
         }
     }
-
 }

@@ -2,18 +2,18 @@ import ImageUtils from "../../utils/ImageUtils";
 import { Gender } from "../BaseCharacter";
 import { BaseCharacterClass } from "../CharacterClasses";
 import { Rummage } from "./cards/basic/Rummage";
-import { AndThenHeExploded } from "./cards/blackhand/AndThenHeExploded";
 import { FireAxe } from "./cards/blackhand/commons/FireAxe";
 import { FlamePistol } from "./cards/blackhand/commons/FlamePistol";
-import { FiredUp } from "./cards/blackhand/FiredUp";
-import { HazmatSpecialist } from "./cards/blackhand/HazmatSpecialist";
-import { PocketVial } from "./cards/blackhand/PocketVial";
-import { Pyrestarter } from "./cards/blackhand/Pyrestarter";
-import { RageFueledAxe } from "./cards/blackhand/RageFueledAxe";
-import { ReIgnition } from "./cards/blackhand/ReIgnition";
-import { Smokescreen } from "./cards/blackhand/Smokescreen";
-import { StormCloak } from "./cards/blackhand/StormCloak";
-import { ToxicSpill } from "./cards/blackhand/ToxicSpill";
+import { PocketVial } from "./cards/blackhand/commons/PocketVial";
+import { RageFueledAxe } from "./cards/blackhand/commons/RageFueledAxe";
+import { StormCloak } from "./cards/blackhand/commons/StormCloak";
+import { InfernaliteCache } from "./cards/blackhand/rares/InfernaliteCache";
+import { Pyrestarter } from "./cards/blackhand/rares/Pyrestarter";
+import { ToxicSpill } from "./cards/blackhand/rares/ToxicSpill";
+import { AndThenHeExploded } from "./cards/blackhand/uncommons/AndThenHeExploded";
+import { HazmatSpecialist } from "./cards/blackhand/uncommons/HazmatSpecialist";
+import { ReIgnition } from "./cards/blackhand/uncommons/ReIgnition";
+import { Smokescreen } from "./cards/blackhand/uncommons/Smokescreen";
 
 export class BlackhandClass extends BaseCharacterClass {
     getPortraitNameAtRandom(gender: Gender): string {
@@ -25,10 +25,9 @@ export class BlackhandClass extends BaseCharacterClass {
         this.addCard(new FireAxe())
         this.addCard(new FlamePistol())
         this.addCard(new StormCloak())
-        this.addCard(new FiredUp())
         this.addCard(new Rummage())
         this.addCard(new AndThenHeExploded())
-        this.addCard(new FiredUp())
+        this.addCard(new InfernaliteCache())
         this.addCard(new FlamePistol())
         this.addCard(new HazmatSpecialist())
         this.addCard(new PocketVial())

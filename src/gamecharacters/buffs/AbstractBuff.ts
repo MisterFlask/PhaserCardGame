@@ -1,6 +1,6 @@
 import type { AbstractCombatEvent } from "../../rules/AbstractCombatEvent";
 import type { DamageInfo } from "../../rules/DamageInfo";
-import { GameState } from "../../rules/GameState";
+import { CombatResources, CombatState, GameState } from "../../rules/GameState";
 import { ActionManager } from "../../utils/ActionManager";
 import { ActionManagerFetcher } from "../../utils/ActionManagerFetcher";
 import { generateWordGuid } from "../AbstractCard";
@@ -12,6 +12,14 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
     get actionManager(): ActionManager {
         return ActionManagerFetcher.getActionManager();
+    }
+
+    get combatState(): CombatState {
+        return GameState.getInstance().combatState;
+    }
+
+    get combatResources(): CombatResources {
+        return this.combatState.combatResources;
     }
 
     constructor() {
@@ -102,10 +110,37 @@ export abstract class AbstractBuff implements IAbstractBuff {
     id: string = generateWordGuid();
     stackable: boolean = true;
     // Note we have a different subsystem responsible for removing the buff once stacks is at 0.  That is not the responsibility of Invoke()
-    stacks: number = 1;
     secondaryStacks: number = -1;
     showSecondaryStacks: boolean = false;
     isDebuff: boolean = false;
+
+    private _stacks: number = 1;
+
+    get stacks(): number {
+        return this._stacks;
+    }
+
+    set stacks(value: number) {
+        this._stacks = value;
+        if (this._stacks <= 0 && !this.canGoNegative) {
+            const owner = this.getOwnerAsCharacter();
+            if (owner) {
+                const index = owner.buffs.indexOf(this);
+                if (index > -1) {
+                    owner.buffs.splice(index, 1);
+                }
+            }
+            // if the owner is a card:
+            const ownerCard = this.getOwnerAsPlayableCard();
+            if (ownerCard) {
+                const index = ownerCard.buffs.indexOf(this);
+                if (index > -1) {
+                    ownerCard.buffs.splice(index, 1);
+                }
+            }
+        }
+    }
+
 
     abstract getName(): string;
 

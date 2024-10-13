@@ -12,7 +12,7 @@ export class FrenchMime extends AutomatedCharacter {
             name: "Le Mime Explosif",
             portraitName: "Eldritch Mime",
             maxHitpoints: 20,
-            description: "the white face paint isn’t for show; it's a seal. a binding."
+            description: "the white face paint isn’t for show.  it's a seal.  a binding."
         });
         
         this.buffs.push(new DoNotLookAtMe(1));
