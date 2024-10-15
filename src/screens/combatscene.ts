@@ -73,9 +73,9 @@ class CombatScene extends Phaser.Scene {
         this.shopOverlay = new ShopOverlay(this);
 
         // Set up the onCardClick handler
-        this.inputHandler.onCardClick = (card: AbstractCard) => {
+        this.inputHandler.addCardClickListener((card: AbstractCard) => {
             this.shopOverlay.handleCardClick(card);
-        };
+        });
 
         this.setupResizeHandler();
         ActionManager.getInstance().drawHandForNewTurn();

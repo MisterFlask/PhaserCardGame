@@ -5,6 +5,7 @@ import { EncounterData, EncounterManager } from '../encounters/Encounters';
 import { AbstractCard } from '../gamecharacters/AbstractCard';
 import { CardSize, CardType } from '../gamecharacters/Primitives';
 import { GameState } from '../rules/GameState';
+import { SceneChanger } from '../screens/SceneChanger';
 
 export class LocationCard extends AbstractCard {
     override typeTag = "LocationCard";
@@ -135,6 +136,13 @@ export class ShopCard extends LocationCard {
             index
         });
         this.portraitName = 'shop-icon';
+    }
+
+    override OnLocationSelected(scene: Phaser.Scene): void {
+        console.log(`Location ${this.id} selected with encounter: ${this.encounter.enemies.map(e => e.name).join(', ')}`);
+        
+        GameState.getInstance().eliminatePhysicalCardsBetweenScenes();
+        SceneChanger.switchToCombatScene({ encounter: EncounterManager.getInstance().getShopEncounter().data });
     }
 }
 

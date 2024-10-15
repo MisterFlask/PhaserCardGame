@@ -5,15 +5,20 @@ import { BaseCharacter } from '../../gamecharacters/BaseCharacter';
 import { PlayableCard } from '../../gamecharacters/PlayableCard';
 import { Rummage } from '../../gamecharacters/playerclasses/cards/basic/Rummage';
 import { GameState } from '../../rules/GameState';
+import { PhysicalCard } from '../../ui/PhysicalCard';
+import { TextBox } from '../../ui/TextBox';
+import { CardGuiUtils } from '../../utils/CardGuiUtils';
 
 export class ShopOverlay {
     private scene: Phaser.Scene;
     private overlay: Phaser.GameObjects.Container;
     private isVisible: boolean = false;
+    private cardGuiUtils: CardGuiUtils;
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
-        this.overlay = this.scene.add.container(0, 0).setVisible(false);
+        this.overlay = this.scene.add.container(0, 0).setVisible(false).setDepth(2000);
+        this.cardGuiUtils = CardGuiUtils.getInstance();
         this.createOverlay();
     }
 
@@ -33,13 +38,22 @@ export class ShopOverlay {
         const inventoryContainer = this.scene.add.container(width - 300, 100);
 
         // Add close button
-        const closeButton = this.scene.add.text(width - 50, 50, 'X', { fontSize: '24px', color: '#ffffff' });
-        closeButton.setInteractive();
-        closeButton.on('pointerdown', this.hide.bind(this));
+        const closeButton = new TextBox({
+            scene: this.scene,
+            x: width - 50,
+            y: 50,
+            width: 40,
+            height: 40,
+            text: 'X',
+            style: { fontSize: '24px', color: '#ffffff' },
+            textBoxName: 'closeButton'
+        });
+        closeButton.setInteractive(true);
+        closeButton.background?.on('pointerdown', this.hide.bind(this));
 
-        this.overlay.add([background, title, shopItemsContainer, inventoryContainer, closeButton]);
+        this.overlay.add([background, title, shopItemsContainer, inventoryContainer, closeButton.background!, closeButton.text]);
 
-        // Populate shop items and inventory (to be implemented)
+        // Populate shop items and inventory
         this.populateShopItems(shopItemsContainer);
         this.populateInventory(inventoryContainer);
     }
@@ -47,20 +61,52 @@ export class ShopOverlay {
     private populateShopItems(container: Phaser.GameObjects.Container): void {
         const shopItems = this.getShopItems();
         shopItems.forEach((item, index) => {
-            const itemText = this.scene.add.text(0, index * 30, `${item.name} - ${item.surfaceValue} gold`, { fontSize: '18px', color: '#ffffff' });
-            itemText.setInteractive();
-            itemText.on('pointerdown', () => this.buyItem(item));
-            container.add(itemText);
+            const physicalCard = this.cardGuiUtils.createCard({
+                scene: this.scene,
+                x: 0,
+                y: index * 180,
+                data: item,
+                eventCallback: (card: PhysicalCard) => this.buyItem(item)
+            });
+            
+            const priceText = new TextBox({
+                scene: this.scene,
+                x: physicalCard.container.x + 60,
+                y: physicalCard.container.y + 100,
+                width: 100,
+                height: 30,
+                text: `${item.surfaceValue} gold`,
+                style: { fontSize: '16px', color: '#ffffff' },
+                textBoxName: `priceTag_${item.name}`
+            });
+            
+            container.add([physicalCard.container, priceText.background!, priceText.text]);
         });
     }
 
     private populateInventory(container: Phaser.GameObjects.Container): void {
         const inventory = GameState.getInstance().inventory;
         inventory.forEach((item, index) => {
-            const itemText = this.scene.add.text(0, index * 30, `${item.name} - Sell for ${item.hellValue} gold`, { fontSize: '18px', color: '#ffffff' });
-            itemText.setInteractive();
-            itemText.on('pointerdown', () => this.sellItem(item));
-            container.add(itemText);
+            const physicalCard = this.cardGuiUtils.createCard({
+                scene: this.scene,
+                x: 0,
+                y: index * 180,
+                data: item,
+                eventCallback: (card: PhysicalCard) => this.sellItem(item)
+            });
+            
+            const sellPriceText = new TextBox({
+                scene: this.scene,
+                x: physicalCard.container.x + 60,
+                y: physicalCard.container.y + 100,
+                width: 100,
+                height: 30,
+                text: `Sell: ${item.hellValue} gold`,
+                style: { fontSize: '16px', color: '#ffffff' },
+                textBoxName: `sellPriceTag_${item.name}`
+            });
+            
+            container.add([physicalCard.container, sellPriceText.background!, sellPriceText.text]);
         });
     }
 
@@ -99,7 +145,9 @@ export class ShopOverlay {
     }
 
     public handleCardClick(card: AbstractCard): void {
+        console.log('Card clicked (shop handler)');
         if (card instanceof BaseCharacter && card.name == new ShopGuy().name) {
+            console.log('Shop clicked');
             this.toggle();
         }
     }

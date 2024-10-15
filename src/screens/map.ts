@@ -278,13 +278,15 @@ export default class MapScene extends Phaser.Scene {
             if (card.data instanceof LocationCard) {
                 const gameState = GameState.getInstance();
                 const currentLocation = gameState.getCurrentLocation();
-                if (currentLocation?.adjacentLocations.includes(card.data)) {
-                    gameState.setCurrentLocation(card.data);
-                    card.data.OnLocationSelected(this);
-                    this.updatePlayerLocationIcon();
-                } else {
-                    console.log('Cannot move to non-adjacent location.');
-                }
+
+                // NOTE: this is a temporary solution to allow the player to move to any location for debugging
+                // if (currentLocation?.adjacentLocations.includes(card.data)) {
+                gameState.setCurrentLocation(card.data);
+                card.data.OnLocationSelected(this);
+                this.updatePlayerLocationIcon();
+                // } else {
+                //     console.log('Cannot move to non-adjacent location.');
+                // }
             }
         });
     }

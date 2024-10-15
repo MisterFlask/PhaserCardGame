@@ -20,7 +20,6 @@ class CombatInputHandler {
     public static draggedCard: PhysicalCard | null = null;
     private originalCardPosition: { x: number; y: number } | null = null;
     private highlightedCard: PhysicalCard | null = null;
-    public onCardClick: ((card: AbstractCard) => void) | null = null;
     private cardClickListeners: ((card: AbstractCard) => void)[] = [];
 
     constructor(scene: Phaser.Scene, cardManager: CombatCardManager) {
