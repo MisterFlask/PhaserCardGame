@@ -51,6 +51,7 @@ export enum ActSegment{
     Act2_Segment1 = "Act 2 - Segment 1",
     Act2_Segment2 = "Act 2 - Segment 2",
     Boss_Act2 = "Boss Fight - Act 2",
+    Special = "Special",
 }
 
 
@@ -63,9 +64,19 @@ export interface EncounterData {
 
 export class Encounter {
     data: EncounterData;
-
+    peaceful: boolean = false;
     constructor(data: EncounterData) {
         this.data = data;
+    }
+}
+
+export class ShopGuy extends AutomatedCharacter {
+    constructor() {
+        super({ name: 'Shop Guy', portraitName: 'ShopGuy', maxHitpoints: 10, description: 'this aint a charity' });
+    }
+
+    override generateNewIntents(): AbstractIntent[] {
+        return [ new AttackIntent({ baseDamage: 10, owner: this }).withTitle("rapture") ]
     }
 }
 
@@ -82,6 +93,14 @@ export class EncounterManager {
         }
         return EncounterManager.instance;
     }
+
+    public getShopEncounter(): Encounter {
+        return new Encounter({
+            enemies: [new ShopGuy()],
+            difficulty: ActSegment.Special,
+            rewardXP: 0
+        });
+    }   
 
     public getRandomEncounter(): EncounterData {
         const encounters = [

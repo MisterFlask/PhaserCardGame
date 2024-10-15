@@ -21,15 +21,17 @@ export enum CardRarity {
 export abstract class PlayableCard extends AbstractCard {
     targetingType: TargetingType;
     override typeTag = "PlayableCard";
-    price: number;
+    public surfaceValue: number;
+    public hellValue: number;
     rarity: CardRarity; // Added card rarity
 
     resourceScalings: CardResourceScaling[] = [];
-    constructor({ name, description, portraitName, cardType, tooltip, characterData, size, targetingType, owner, price, rarity }: { name: string; description?: string; portraitName?: string; cardType?: CardType; tooltip?: string; characterData?: AbstractCard; size?: CardSize; targetingType?: TargetingType; owner?: IBaseCharacter; price?: number; rarity?: CardRarity }) {
+    constructor({ name, description, portraitName, cardType, tooltip, characterData, size, targetingType, owner, price: surfaceValue, rarity }: { name: string; description?: string; portraitName?: string; cardType?: CardType; tooltip?: string; characterData?: AbstractCard; size?: CardSize; targetingType?: TargetingType; owner?: IBaseCharacter; price?: number; rarity?: CardRarity }) {
         super({ name, description: description ?? "_", portraitName, cardType, tooltip, characterData, size });
         this.targetingType = targetingType ?? TargetingType.ENEMY;
         this.owner = owner;
-        this.price = price ?? 100;
+        this.surfaceValue = surfaceValue ?? 100;
+        this.hellValue = 100;
         this.rarity = rarity ?? CardRarity.COMMON; // Default to COMMON if not provided
     }
 

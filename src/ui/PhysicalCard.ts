@@ -3,7 +3,6 @@ import Phaser from 'phaser';
 import { AutomatedCharacterType, BaseCharacterType, PlayableCardType } from '../Types';
 import type { AbstractCard, IPhysicalCardInterface } from '../gamecharacters/AbstractCard';
 import { AbstractIntent } from '../gamecharacters/AbstractIntent';
-import { IAbstractCard } from '../gamecharacters/IAbstractCard';
 import { GameState } from '../rules/GameState';
 import type { CardConfig } from '../utils/CardGuiUtils';
 import { IncomingIntent } from "./IncomingIntent"; // Import the new class
@@ -22,7 +21,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
     descBox: TextBox;
     tooltipBox: TextBox;
     hpBox: TextBox | null;
-    data: IAbstractCard;
+    data: AbstractCard;
     physicalBuffs: PhysicalBuff[];
     scene: Phaser.Scene;
     isSelected: boolean = false;
@@ -68,7 +67,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
         nameBox: TextBox;
         descBox: TextBox;
         tooltipBox: TextBox;
-        data: IAbstractCard;
+        data: AbstractCard;
         visualTags: PhysicalBuff[];
         cardConfig: CardConfig;
     }) {

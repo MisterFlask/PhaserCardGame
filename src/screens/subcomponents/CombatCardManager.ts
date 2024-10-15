@@ -1,13 +1,13 @@
 // src/managers/CombatCardManager.ts
 
 import Phaser from 'phaser';
-import {  UiCard } from '../../gamecharacters/AbstractCard';
+import { AbstractCard, UiCard } from '../../gamecharacters/AbstractCard';
 import { AutomatedCharacter } from '../../gamecharacters/AutomatedCharacter';
+import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
 import { GameState } from '../../rules/GameState';
 import CombatSceneLayoutUtils from '../../ui/LayoutUtils';
 import { PhysicalCard } from '../../ui/PhysicalCard';
 import { CardGuiUtils } from '../../utils/CardGuiUtils';
-import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
 
 export class CombatCardManager {
     private scene: Phaser.Scene;
@@ -32,7 +32,7 @@ export class CombatCardManager {
                 scene: this.scene,
                 x: 0,
                 y: CombatSceneLayoutUtils.getHandY(this.scene),
-                data: cardData,
+                data: cardData as AbstractCard,
                 eventCallback: () => { }
             });
             this.playerHand.push(card);
@@ -152,7 +152,7 @@ export class CombatCardManager {
             scene: this.scene,
             x: this.drawPile.container.x,
             y: this.drawPile.container.y,
-            data: data,
+            data: data as AbstractCard,
             eventCallback: () => { }
         });
         card.container.setScale(0.5);

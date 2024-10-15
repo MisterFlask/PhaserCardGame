@@ -1,6 +1,7 @@
 // src/managers/CombatInputHandler.ts
 
 import Phaser from 'phaser';
+import type { AbstractCard } from '../../gamecharacters/AbstractCard';
 import { TargetingType } from '../../gamecharacters/AbstractCard';
 import { BaseCharacter } from '../../gamecharacters/BaseCharacter';
 import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
@@ -19,11 +20,14 @@ class CombatInputHandler {
     public static draggedCard: PhysicalCard | null = null;
     private originalCardPosition: { x: number; y: number } | null = null;
     private highlightedCard: PhysicalCard | null = null;
+    public onCardClick: ((card: AbstractCard) => void) | null = null;
+    private cardClickListeners: ((card: AbstractCard) => void)[] = [];
 
     constructor(scene: Phaser.Scene, cardManager: CombatCardManager) {
         this.scene = scene;
         this.cardManager = cardManager;
         this.setupEventListeners();
+        this.setupCardClickListeners();
 
         IntentEmitter.getInstance().on(IntentEmitter.EVENT_INCOMING_INTENT_HOVER, this.onIncomingIntentHover, this);
         IntentEmitter.getInstance().on(IntentEmitter.EVENT_INCOMING_INTENT_HOVER_END, this.onIncomingIntentHoverEnd, this);
@@ -55,6 +59,35 @@ class CombatInputHandler {
         // Changed to remove listeners from IntentEmitter instance
         IntentEmitter.getInstance().off(IntentEmitter.EVENT_INTENT_HOVER, this.handleIntentHoverOver, this);
         IntentEmitter.getInstance().off(IntentEmitter.EVENT_INTENT_HOVER_END, this.handleIntentHoverOut, this);
+
+        this.removeCardClickListeners();
+        this.cardClickListeners = []; // Clear all listeners
+    }
+
+    private setupCardClickListeners(): void {
+        const allCards = [
+            ...this.cardManager.playerHand,
+            ...this.cardManager.enemyUnits,
+            ...this.cardManager.playerUnits
+        ];
+
+        allCards.forEach(card => {
+            card.container.setInteractive();
+            card.container.on('pointerdown', () => this.handleCardClick(card));
+        });
+    }
+
+    private removeCardClickListeners(): void {
+        const allCards = [
+            ...this.cardManager.playerHand,
+            ...this.cardManager.enemyUnits,
+            ...this.cardManager.playerUnits
+        ];
+
+        allCards.forEach(card => {
+            card.container.off('pointerdown');
+            card.container.disableInteractive();
+        });
     }
 
     private handleDragStart = (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject): void => {
@@ -81,6 +114,8 @@ class CombatInputHandler {
             this.checkCardUnderPointer(pointer);
         }
     }
+
+    
 
     private handleDragEnd(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject): void {
         if (!CombatInputHandler.draggedCard) return;
@@ -296,6 +331,18 @@ class CombatInputHandler {
         if (enemyPhysicalCard) {
             enemyPhysicalCard.unhighlight();
         }
+    }
+
+    public addCardClickListener(listener: (card: AbstractCard) => void): void {
+        this.cardClickListeners.push(listener);
+    }
+
+    public removeCardClickListener(listener: (card: AbstractCard) => void): void {
+        this.cardClickListeners = this.cardClickListeners.filter(l => l !== listener);
+    }
+
+    private handleCardClick(card: PhysicalCard): void {
+        this.cardClickListeners.forEach(listener => listener(card.data as AbstractCard));
     }
 }
 

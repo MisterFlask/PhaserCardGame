@@ -1,5 +1,4 @@
-import { AbstractCard } from "../gamecharacters/AbstractCard";
-import { IAbstractCard } from "../gamecharacters/IAbstractCard";
+import type { AbstractCard } from "../gamecharacters/AbstractCard";
 import { CardType } from "../gamecharacters/Primitives";
 import { PhysicalCard } from "../ui/PhysicalCard";
 import { TextBox } from "../ui/TextBox";
@@ -29,7 +28,7 @@ export class CardGuiUtils {
         scene: Phaser.Scene,
         x: number,
         y: number,
-        data: IAbstractCard,
+        data: AbstractCard,
         eventCallback: (card: PhysicalCard) => void
     }): PhysicalCard {
         const { scene, x, y, data, eventCallback } = params;

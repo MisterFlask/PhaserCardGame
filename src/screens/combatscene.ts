@@ -2,6 +2,7 @@
 
 import Phaser from 'phaser';
 import { EncounterData } from '../encounters/Encounters';
+import type { AbstractCard } from '../gamecharacters/AbstractCard';
 import { GameState } from '../rules/GameState';
 import InventoryPanel from '../ui/InventoryPanel';
 import CombatSceneLayoutUtils from '../ui/LayoutUtils';
@@ -17,6 +18,7 @@ import CombatStateService from './subcomponents/CombatStateService';
 import CombatUIManager from './subcomponents/CombatUiManager';
 import { DetailsScreenManager } from './subcomponents/DetailsScreenManager';
 import PerformanceMonitor from './subcomponents/PerformanceMonitor';
+import { ShopOverlay } from './subcomponents/ShopOverlay';
 
 /**
  * Interface for initializing CombatScene with necessmorniary data.
@@ -33,6 +35,7 @@ class CombatScene extends Phaser.Scene {
     private background!: Phaser.GameObjects.Image;
     private inventoryPanel!: InventoryPanel;
     private detailsScreenManager!: DetailsScreenManager;
+    private shopOverlay!: ShopOverlay;
 
     constructor() {
         super('CombatScene');
@@ -65,6 +68,14 @@ class CombatScene extends Phaser.Scene {
 
         // Initialize DetailsScreenManager
         this.detailsScreenManager = new DetailsScreenManager(this);
+
+        // Initialize ShopOverlay
+        this.shopOverlay = new ShopOverlay(this);
+
+        // Set up the onCardClick handler
+        this.inputHandler.onCardClick = (card: AbstractCard) => {
+            this.shopOverlay.handleCardClick(card);
+        };
 
         this.setupResizeHandler();
         ActionManager.getInstance().drawHandForNewTurn();
