@@ -2,10 +2,10 @@ import { AbstractBuff } from '../gamecharacters/buffs/AbstractBuff';
 import { TextBox } from './TextBox';
 
 export class PhysicalBuff {
-    text: Phaser.GameObjects.Text;
     abstractBuff: AbstractBuff;
     container: Phaser.GameObjects.Container;
     image: Phaser.GameObjects.Image;
+    textBox: TextBox;
     tooltipBox: TextBox;
     scene: Phaser.Scene;
 
@@ -18,13 +18,17 @@ export class PhysicalBuff {
         this.image = scene.add.image(0, 0, abstractBuff.imageName);
         this.image.setScale(0.5); // Adjust scale as needed
 
-        // Create the text
-        this.text = scene.add.text(0, 0, `${abstractBuff.stacks}`, {
-            fontSize: '14px',
-            color: '#ffffff',
-            fontFamily: 'Arial'
+        // Create the text using TextBox
+        this.textBox = new TextBox({
+            scene: this.scene,
+            x: 0,
+            y: 0,
+            width: 30,
+            height: 30,
+            text: `${abstractBuff.stacks}`,
+            style: { fontSize: '14px', color: '#ffffff', fontFamily: 'Arial' }
         });
-        this.text.setOrigin(0.5); // Center the text
+        this.textBox.setPosition(this.textBox.x, this.textBox.y - this.textBox.height / 2); // Center the text vertically
 
         // Create the description box (initially hidden)
         this.tooltipBox = new TextBox({
@@ -36,7 +40,6 @@ export class PhysicalBuff {
         });
         this.tooltipBox.setVisible(false);
 
-        // Add image and text to the container
         // Set the size of the container
         const containerSize = 40; // Adjust this value as needed
         this.container.setSize(containerSize, containerSize);
@@ -46,8 +49,8 @@ export class PhysicalBuff {
         
         // Center the image and text in the container
         this.image.setPosition(0, 0);
-        this.text.setPosition(0, 0);
-        this.container.add([this.image, this.text]);
+        this.textBox.setPosition(0, 0);
+        this.container.add([this.image, this.textBox]);
 
         // Adjust the interactive area to match the container's size
         this.container.setInteractive(new Phaser.Geom.Rectangle(-containerSize / 2, -containerSize / 2, containerSize, containerSize), Phaser.Geom.Rectangle.Contains);
@@ -75,21 +78,21 @@ export class PhysicalBuff {
         // Get the container's world position
         const containerWorldPosition = this.container.getWorldTransformMatrix();
 
-        let descX = containerWorldPosition.tx - this.tooltipBox.background!.width / 2 - bufferSpace;
+        let descX = containerWorldPosition.tx - this.tooltipBox.width / 2 - bufferSpace;
         let descY = containerWorldPosition.ty;
 
         // If too close to the left edge, show on the right side instead
         if (descX < 0) {
-            descX = containerWorldPosition.tx + this.container.width / 2 + this.tooltipBox.background!.width / 2 + bufferSpace;
+            descX = containerWorldPosition.tx + this.container.width / 2 + this.tooltipBox.width / 2 + bufferSpace;
         }
 
         // Adjust Y position if it goes off screen
         const screenWidth = this.scene.sys.game.config.width as number;
         const screenHeight = this.scene.sys.game.config.height as number;
-        if (descY + this.tooltipBox.background!.height / 2 > screenHeight) {
-            descY = screenHeight - this.tooltipBox.background!.height / 2 - bufferSpace;
-        } else if (descY - this.tooltipBox.background!.height / 2 < 0) {
-            descY = this.tooltipBox.background!.height / 2 + bufferSpace;
+        if (descY + this.tooltipBox.height / 2 > screenHeight) {
+            descY = screenHeight - this.tooltipBox.height / 2 - bufferSpace;
+        } else if (descY - this.tooltipBox.height / 2 < 0) {
+            descY = this.tooltipBox.height / 2 + bufferSpace;
         }
 
         this.tooltipBox.setPosition(descX, descY);
@@ -104,7 +107,7 @@ export class PhysicalBuff {
 
     updateText() {
         // Update the text to reflect current stack count
-        this.text.setText(`${this.abstractBuff.stacks}`);
+        this.textBox.setText(`${this.abstractBuff.stacks}`);
         // Update the description text in case it has changed
         this.tooltipBox.setText(`${this.abstractBuff.getName()}: ${this.abstractBuff.getDescription()}`);
     }

@@ -88,23 +88,16 @@ export class PhysicalCard implements IPhysicalCardInterface {
         this.cardContent.add([
             this.cardBackground,
             this.cardImage,
-            this.nameBox.background!!,
-            // No need to add outline separately as it's part of TextBox
-            this.nameBox.text,
-            this.descBox.background!!,
-            this.descBox.text
+            this.nameBox,
+            this.descBox
         ]);
         if (this.cardBackgroundAsRectangle){
             this.cardContent.add(this.cardBackgroundAsRectangle);
         }
         this.container.add(this.cardContent);
 
-        // Add tooltip elements directly to the main container
-        this.container.add([
-            this.tooltipBox.background!!,
-            this.tooltipBox.text
-        ]);
-
+        // Add tooltip directly to the main container
+        this.container.add(this.tooltipBox);
 
         // Add HP box if the card is a BaseCharacter
         if (this.data.isBaseCharacter()) {
@@ -120,7 +113,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
                 text: `${baseCharacter.hitpoints}/${baseCharacter.maxHitpoints}`,
                 style: { fontSize: '14px', color: '#ff0000', fontFamily: 'Arial' }
             });
-            this.cardContent.add([this.hpBox.background!!, this.hpBox.text]);
+            this.cardContent.add(this.hpBox);
         } else {
             this.hpBox = null;
         }
@@ -140,7 +133,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
                 style: { fontSize: '14px', color: '#ffffff', fontFamily: 'Arial' },
                 fillColor: 0x0000ff
             });
-            this.cardContent.add([this.costBox.background!!, this.costBox.text]);
+            this.cardContent.add(this.costBox);
         }
 
         // Load the rollover sound if it's not already loaded
@@ -176,7 +169,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
             style: { fontSize: '14px', color: '#ffffff', fontFamily: 'Arial' },
             fillColor: 0x0000ff
         });
-        this.blocksContainer.add([/*this.blockIcon,*/ this.blockText.background!!, this.blockText.text]);
+        this.blocksContainer.add(this.blockText);
         this.cardContent.add(this.blocksContainer);
         // Initialize the buffs container positioned to the left of the card
         this.buffsContainer = this.scene.add.container(
@@ -334,8 +327,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
         // Calculate tooltip dimensions
         const padding = 20;
-        const requiredTooltipWidth = this.tooltipBox.text.width + padding * 2;
-        const requiredTooltipHeight = this.tooltipBox.text.height + padding * 2;
+        const requiredTooltipWidth = this.tooltipBox.width + padding * 2;
+        const requiredTooltipHeight = this.tooltipBox.height + padding * 2;
 
         // Update tooltip size
         this.tooltipBox.setSize(requiredTooltipWidth, requiredTooltipHeight);
@@ -458,10 +451,14 @@ export class PhysicalCard implements IPhysicalCardInterface {
     }
 
     updateVisuals(): void {
+        // Update card background and border sizes
         this.cardBorder.setDisplaySize(this.cardConfig.cardWidth + 4, this.cardConfig.cardHeight + 4);
         this.cardBackground.setDisplaySize(this.cardConfig.cardWidth, this.cardConfig.cardHeight);
         this.cardBackgroundAsRectangle?.setDisplaySize(this.cardConfig.cardWidth, this.cardConfig.cardHeight);
         
+        // Ensure the container's size bounds the entire card background
+        this.container.setSize(this.cardConfig.cardWidth + 4, this.cardConfig.cardHeight + 4);
+
         if (this.obliterated) return;
         if (!this.scene || !this.scene.sys) {
             console.warn('Scene is undefined in updateVisuals');
@@ -475,6 +472,18 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
         this.nameBox.setText(this.data.name);
         this.descBox.setText(this.data.description);
+
+        // Update HP box if it exists
+        if (this.hpBox && this.data.isBaseCharacter()) {
+            const baseCharacter = this.data as BaseCharacterType;
+            this.hpBox.setText(`${baseCharacter.hitpoints}/${baseCharacter.maxHitpoints}`);
+        }
+
+        // Update cost box if it exists
+        if (this.costBox && this.data.isPlayableCard()) {
+            const playableCard = this.data as PlayableCardType;
+            this.costBox.setText(`${playableCard.energyCost}`);
+        }
 
         // Update card image
         if (this.scene.textures.exists(this.data.portraitName)) {
@@ -508,24 +517,12 @@ export class PhysicalCard implements IPhysicalCardInterface {
         }
 
         // Position nameBox just below the portraitBox
-        const nameBoxY = this.cardImage.y + this.cardImage.displayHeight / 2 + this.nameBox.background!!.displayHeight / 2 + 10;
+        const nameBoxY = this.cardImage.y + this.cardImage.displayHeight / 2 + this.nameBox.height / 2 + 10;
         this.nameBox.setPosition(0, nameBoxY);
 
         // Position descBox just below the nameBox
-        const descBoxY = nameBoxY + this.nameBox.background!!.displayHeight / 2 + this.descBox.background!!.displayHeight / 2 + 10;
+        const descBoxY = nameBoxY + this.nameBox.height / 2 + this.descBox.height / 2 + 10;
         this.descBox.setPosition(0, descBoxY);
-
-        // Update HP box if it exists
-        if (this.hpBox && this.data.isBaseCharacter()) {
-            const baseCharacter = this.data as BaseCharacterType;
-            this.hpBox.setText(`${baseCharacter.hitpoints}/${baseCharacter.maxHitpoints}`);
-        }
-
-        // Update cost box if it exists
-        if (this.costBox && this.data.isPlayableCard()) {
-            const playableCard = this.data as PlayableCardType;
-            this.costBox.setText(`${playableCard.energyCost}`);
-        }
 
         // Update block text
         this.blockText.setText(`${this.data.block}`);
@@ -536,17 +533,10 @@ export class PhysicalCard implements IPhysicalCardInterface {
         if (!this.buffsContainer.scene?.sys) {
             console.warn('Scene is undefined in updateVisuals (FOR THE CARD BUFF SPECIFICALLY): ' + this.data.name);
             this.buffsContainer.scene = this.scene;
-        }else{
+        } else {
             // Sync buffs each tick
             this.syncBuffs();
         }
-
-        // Update the size of the rectangle background
-        this.cardBackgroundAsRectangle?.setDisplaySize(
-            this.cardBackground.displayWidth + 4,
-            this.cardBackground.displayHeight + 4
-        );
-
 
         if (this.data.isBaseCharacter()) {
             const baseCharacter = this.data as BaseCharacterType;

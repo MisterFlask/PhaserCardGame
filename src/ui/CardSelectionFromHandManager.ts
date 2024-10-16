@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { GameState } from '../rules/GameState';
 import { PlayableCardType } from '../Types';
+import { TextBoxButton } from './Button';
 import { TextBox } from './TextBox';
 
 interface CardSelectionParams {
@@ -22,10 +23,10 @@ class CardSelectionFromHandManager {
     private max: number;
     private selectedCards: Set<PlayableCardType> = new Set();
     private instructionsBox!: TextBox;
-    private submitButton!: TextBox;
+    private submitButton!: TextBoxButton;
     private overlay!: Phaser.GameObjects.Rectangle;
     private cancellable: boolean;
-    private cancelButton!: TextBox;
+    private cancelButton!: TextBoxButton;
 
     constructor(params: CardSelectionParams) {
         this.scene = params.scene;
@@ -49,9 +50,9 @@ class CardSelectionFromHandManager {
     }
 
     private createCancelButton(): void {
-        this.cancelButton = new TextBox({
+        this.cancelButton = new TextBoxButton({
             scene: this.scene,
-            x: (this.scene.scale.width / 4) * 3, // Positioning the cancel button on the right
+            x: (this.scene.scale.width / 4) * 3,
             y: this.scene.scale.height - 100,
             width: 200,
             height: 50,
@@ -61,19 +62,11 @@ class CardSelectionFromHandManager {
             textBoxName: 'CardSelectionCancelButton'
         });
 
-        this.cancelButton.background!!.setInteractive({ useHandCursor: true })
-            .on('pointerdown', this.onCancel, this)
-            .on('pointerover', () => {
-                this.cancelButton.background?.setFillStyle(0x777777);
-            })
-            .on('pointerout', () => {
-                this.cancelButton.background?.setFillStyle(0x555555);
-            });
+        this.cancelButton
+            .onClick(this.onCancel.bind(this))
+            .setDepth(2);
 
-        this.cancelButton.setDepth(2);
-
-        this.scene.add.existing(this.cancelButton.background!!);
-        this.scene.add.existing(this.cancelButton.text);
+        this.scene.add.existing(this.cancelButton);
     }
 
     private createOverlay(): void {
@@ -101,16 +94,15 @@ class CardSelectionFromHandManager {
             fillColor: 0x000000,
             textBoxName: 'CardSelectionInstructions'
         });
-        this.scene.add.existing(this.instructionsBox.background!!);
-        this.scene.add.existing(this.instructionsBox.text);
+        this.scene.add.existing(this.instructionsBox);
     }
 
     private createSubmitButton(): void {
-        this.submitButton = new TextBox({
+        this.submitButton = new TextBoxButton({
             scene: this.scene,
-            x: this.scene.scale.width / 4, // Positioning the submit button on the left
+            x: this.scene.scale.width / 4,
             y: this.scene.scale.height - 100,
-            width: 300, // Increased width to accommodate longer text
+            width: 300,
             height: 50,
             text: `Select ${this.min} more card${this.min > 1 ? 's' : ''}`,
             style: { fontSize: '24px', color: '#ffffff', wordWrap: { width: 280 } },
@@ -118,23 +110,11 @@ class CardSelectionFromHandManager {
             textBoxName: 'CardSelectionSubmitButton'
         });
 
-        this.submitButton.setDepth(2);
+        this.submitButton
+            .onClick(this.onSubmit.bind(this))
+            .setDepth(2);
 
-        this.submitButton.background!!.setInteractive({ useHandCursor: true })
-            .on('pointerdown', this.onSubmit, this)
-            .on('pointerover', () => {
-                if (this.selectedCards.size >= this.min && this.selectedCards.size <= this.max) {
-                    this.submitButton.background?.setFillStyle(0x777777);
-                }
-            })
-            .on('pointerout', () => {
-                if (this.selectedCards.size >= this.min && this.selectedCards.size <= this.max) {
-                    this.submitButton.background?.setFillStyle(0x555555);
-                }
-            });
-
-        this.scene.add.existing(this.submitButton.background!!);
-        this.scene.add.existing(this.submitButton.text);
+        this.scene.add.existing(this.submitButton);
 
         this.updateSubmitButton();
     }
@@ -144,16 +124,14 @@ class CardSelectionFromHandManager {
         const remainingCount = Math.max(this.min - selectedCount, 0);
 
         if (selectedCount >= this.min && selectedCount <= this.max) {
-            this.submitButton.text.setText('Submit');
-            this.submitButton.background?.setFillStyle(0x555555);
-            this.submitButton.background?.setInteractive({ useHandCursor: true });
+            this.submitButton.setText('Submit');
+            this.submitButton.setButtonEnabled(true);
         } else {
             const buttonText = remainingCount > 0 
                 ? `Select ${remainingCount} more card${remainingCount > 1 ? 's' : ''}`
                 : `Too many cards selected`;
-            this.submitButton.text.setText(buttonText);
-            this.submitButton.background?.setFillStyle(0x888888);
-            this.submitButton.background?.removeInteractive();
+            this.submitButton.setText(buttonText);
+            this.submitButton.setButtonEnabled(false);
         }
     }
 

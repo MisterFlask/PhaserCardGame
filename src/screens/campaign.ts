@@ -6,6 +6,7 @@ import { PlayableCard } from '../gamecharacters/PlayableCard';
 import { CardType } from '../gamecharacters/Primitives';
 import { CampaignRules } from '../rules/CampaignRules';
 import { GameState } from '../rules/GameState';
+import { TextBoxButton } from '../ui/Button';
 import InventoryPanel from '../ui/InventoryPanel';
 import { PhysicalCard, } from '../ui/PhysicalCard';
 import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
@@ -27,7 +28,7 @@ export default class CampaignScene extends Phaser.Scene {
     private shopY: number = 0;
     private rosterY: number = 0;
     private selectedY: number = 0;
-    private embarkButton!: Phaser.GameObjects.Text;
+    private embarkButton!: TextBoxButton;
     private debugGraphics!: Phaser.GameObjects.Graphics;
     private menuButton!: Phaser.GameObjects.Text;
     private menuPanel!: Phaser.GameObjects.Container;
@@ -155,7 +156,9 @@ export default class CampaignScene extends Phaser.Scene {
         });
 
         // Reposition embark button
-        this.embarkButton.setPosition(width * 0.95, height * 0.5);
+        if (this.embarkButton) {
+            this.embarkButton.setPosition(width * 0.95, height * 0.5);
+        }
 
         // Update deck display
         this.updateDeckDisplay(this.deckDisplayCards.map(card => card.data as AbstractCard));
@@ -310,19 +313,27 @@ export default class CampaignScene extends Phaser.Scene {
     }
 
     createEmbarkButton = () => {
-        this.embarkButton = this.add.text(this.scale.width * 0.95, this.scale.height * 0.5, 'Embark!', {
-            fontSize: '24px',
-            color: '#ffffff',
-            backgroundColor: '#4a4a4a',
-            padding: { x: 10, y: 5 }
+        this.embarkButton = new TextBoxButton({
+            scene: this,
+            x: this.scale.width * 0.95,
+            y: this.scale.height * 0.5,
+            width: 120,
+            height: 40,
+            text: 'Embark!',
+            style: {
+                fontSize: '24px',
+                color: '#ffffff',
+            },
+            fillColor: 0x4a4a4a,
         })
         .setOrigin(0.5)
-        .setAngle(-90)
-        .setInteractive()
-        .on('pointerdown', this.onEmbarkClicked, this);
+        .onClick(this.onEmbarkClicked);
+
+        this.add.existing(this.embarkButton);
     }
 
     onEmbarkClicked = () => {
+        console.log('Embark button clicked');
         const selectedCards = this.getSelectedCards();
         const selectedShopCards = this.shopCards.filter(card => card.container.getData('isSelected'));
         if (selectedCards.length === 3) {
@@ -354,6 +365,8 @@ export default class CampaignScene extends Phaser.Scene {
 
             GameState.getInstance().eliminatePhysicalCardsBetweenScenes();
             // Switch to the "map" scene
+            console.log('switching to combat scene:', gameState);
+
             SceneChanger.switchToCombatScene({ encounter: EncounterManager.getInstance().getShopEncounter().data });
         } else {
             console.log('Please select 3 characters before embarking:', selectedCards.map(card => card.data.name));
@@ -540,6 +553,10 @@ export default class CampaignScene extends Phaser.Scene {
                 border.setVisible(false);
             }
         }
+    }
+
+    pulseEmbarkButton = () => {
+        this.embarkButton.pulseGreenBriefly();
     }
 }
 class CargoCard extends PlayableCard {

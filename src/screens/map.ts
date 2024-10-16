@@ -6,8 +6,8 @@ import { LocationCard } from '../maplogic/LocationCard';
 import { LocationManager } from '../maplogic/LocationManager';
 import { SpatialManager } from '../maplogic/SpatialManager';
 import { GameState } from '../rules/GameState';
+import { TextBoxButton } from '../ui/Button';
 import { PhysicalCard } from '../ui/PhysicalCard';
-import { TextBox } from '../ui/TextBox';
 import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 import { SceneChanger } from './SceneChanger';
@@ -15,10 +15,10 @@ export default class MapScene extends Phaser.Scene {
     private locationCards: PhysicalCard[] = [];
     private characterCards: PhysicalCard[] = [];
     private background: Phaser.GameObjects.Image | null = null;
-    private abortButton: TextBox | null = null;
+    private abortButton: TextBoxButton | null = null;
     private campaignStatusText: Phaser.GameObjects.Text | null = null;
-    private moveUpButton: TextBox | null = null;
-    private moveDownButton: TextBox | null = null;
+    private moveUpButton: TextBoxButton | null = null;
+    private moveDownButton: TextBoxButton | null = null;
 
     // Managers
     private locationManager: LocationManager;
@@ -204,7 +204,7 @@ export default class MapScene extends Phaser.Scene {
         const buttonX = width / 2;
         const buttonY = height - 60;
 
-        this.abortButton = new TextBox({
+        this.abortButton = new TextBoxButton({
             scene: this,
             x: buttonX,
             y: buttonY,
@@ -215,18 +215,8 @@ export default class MapScene extends Phaser.Scene {
             fillColor: 0xff0000,
             textBoxName: 'abortButton'
         });
-        this.abortButton.background?.setInteractive({ useHandCursor: true })
-            .on('pointerover', () => {
-                if (this.abortButton?.background instanceof Phaser.GameObjects.Rectangle) {
-                    this.abortButton.background.setFillStyle(0xff3333);
-                }
-            })
-            .on('pointerout', () => {
-                if (this.abortButton?.background instanceof Phaser.GameObjects.Rectangle) {
-                    this.abortButton.background.setFillStyle(0xff0000);
-                }
-            })
-            .on('pointerdown', () => this.onAbortMission());
+        this.abortButton
+            .onClick(() => this.onAbortMission());
         this.abortButton.setScrollFactor(0);
     }
 
@@ -372,7 +362,7 @@ export default class MapScene extends Phaser.Scene {
         const padding = 20;
 
         // Move Up Button
-        this.moveUpButton = new TextBox({
+        this.moveUpButton = new TextBoxButton({
             scene: this,
             x: padding + buttonWidth / 2,
             y: padding + buttonHeight / 2,
@@ -383,12 +373,12 @@ export default class MapScene extends Phaser.Scene {
             fillColor: 0x00ff00,
             textBoxName: 'moveUpButton'
         });
-        this.moveUpButton.background?.setInteractive({ useHandCursor: true })
-            .on('pointerdown', () => this.panCameraUp());
+        this.moveUpButton
+            .onClick(() => this.panCameraUp());
         this.moveUpButton.setScrollFactor(0);
 
         // Move Down Button
-        this.moveDownButton = new TextBox({
+        this.moveDownButton = new TextBoxButton({
             scene: this,
             x: padding + buttonWidth / 2,
             y: padding + buttonHeight * 1.5 + 10,
@@ -399,8 +389,8 @@ export default class MapScene extends Phaser.Scene {
             fillColor: 0x00ff00,
             textBoxName: 'moveDownButton'
         });
-        this.moveDownButton.background?.setInteractive({ useHandCursor: true })
-            .on('pointerdown', () => this.panCameraDown());
+        this.moveDownButton
+            .onClick(() => this.panCameraDown());
         this.moveDownButton.setScrollFactor(0);
 
         // Add scroll wheel functionality for camera panning

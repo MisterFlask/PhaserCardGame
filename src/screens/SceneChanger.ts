@@ -8,6 +8,7 @@ export class SceneChanger {
     private static switchScene(sceneName: string, params?: object): void {
         if (SceneChanger.currentScene) {
             GameState.getInstance().eliminatePhysicalCardsBetweenScenes();
+            console.log('switching to scene:', sceneName);
             SceneChanger.currentScene.scene.start(sceneName, params);
         }else {
             console.warn(`No current scene to switch from.`);

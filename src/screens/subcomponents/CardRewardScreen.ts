@@ -1,12 +1,10 @@
 import Phaser from 'phaser';
 import { AbstractCard } from '../../gamecharacters/AbstractCard';
-import { TextBox } from '../../ui/TextBox';
-import { ActionManager } from '../../utils/ActionManager';
-import { SceneChanger } from '../SceneChanger';
-import { CardGuiUtils } from '../../utils/CardGuiUtils';
-import { PhysicalCard } from '../../ui/PhysicalCard';
 import { PlayerCharacter } from '../../gamecharacters/CharacterClasses';
 import { PlayableCard } from '../../gamecharacters/PlayableCard';
+import { TextBoxButton } from '../../ui/Button';
+import { PhysicalCard } from '../../ui/PhysicalCard';
+import { CardGuiUtils } from '../../utils/CardGuiUtils';
 
 /**
  * Interface for initializing CardRewardScreen with necessary data.
@@ -24,7 +22,7 @@ class CardRewardScreen {
     public rewards: CardReward[];
     private onSelect: (selectedCard: CardReward) => void;
     private onSkip: () => void;
-    private selectButton!: TextBox;
+    private selectButton!: TextBoxButton;
     private isCardSelected: boolean = false;
 
     constructor(params: CardRewardScreenData) {
@@ -93,7 +91,7 @@ class CardRewardScreen {
 
     private createActionButton(): void {
         const buttonText = "Go to Map";
-        this.selectButton = new TextBox({
+        this.selectButton = new TextBoxButton({
             scene: this.scene,
             x: 0,
             y: 250,
@@ -101,11 +99,12 @@ class CardRewardScreen {
             height: 50,
             text: buttonText,
             style: { fontSize: '24px', color: '#ffffff', fontFamily: 'Arial', align: 'center' },
-            fillColor: 0x007700
+            fillColor: 0x007700,
+            textBoxName: 'goToMapButton'
         });
 
-        this.selectButton.background!!.setInteractive({ useHandCursor: true })
-            .on('pointerdown', () => {
+        this.selectButton
+            .onClick(() => {
                 console.log("Go to Map button clicked.");
                 if (this.rewards.length > 0 && !this.isCardSelected) {
                     console.log("Please select a card before proceeding.");
@@ -113,20 +112,9 @@ class CardRewardScreen {
                 }
                 this.onSkip();
                 this.hide();
-            })
-            .on('pointerover', () => {
-                if (this.selectButton.background instanceof Phaser.GameObjects.Rectangle) {
-                    this.selectButton.background.setFillStyle(0x00aa00);
-                }
-            })
-            .on('pointerout', () => {
-                if (this.selectButton.background instanceof Phaser.GameObjects.Rectangle) {
-                    this.selectButton.background.setFillStyle(0x007700);
-                }
             });
 
-        this.container.add(this.selectButton.background!!);
-        this.container.add(this.selectButton.text);
+        this.container.add(this.selectButton);
     }
 
     public show(): void {

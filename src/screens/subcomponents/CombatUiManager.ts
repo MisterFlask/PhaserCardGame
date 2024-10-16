@@ -4,6 +4,7 @@ import Phaser from 'phaser';
 import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
 import { Defend } from '../../gamecharacters/playerclasses/cards/basic/Defend';
 import { GameState } from '../../rules/GameState';
+import { TextBoxButton } from '../../ui/Button';
 import { default as CombatSceneLayoutUtils, default as LayoutUtils } from '../../ui/LayoutUtils';
 import Menu from '../../ui/Menu';
 import { SubtitleManager } from '../../ui/SubtitleManager';
@@ -22,7 +23,7 @@ class CombatUIManager {
     public scene: Phaser.Scene;
     public menu!: Menu;
     public combatStatusText!: TextBox;
-    public endTurnButton!: TextBox;
+    public endTurnButton!: TextBoxButton;
     public battlefieldArea!: Phaser.GameObjects.Rectangle;
     public handArea!: Phaser.GameObjects.Rectangle;
     public energyDisplay!: TextBox;
@@ -35,13 +36,11 @@ class CombatUIManager {
         this.scene = scene;
         SubtitleManager.setInstance(scene);
         this.createUI();
-        this.createCardRewardScreen(); // Initialize CardRewardScreen
+        this.createCardRewardScreen();
 
-        // Subscribe to interaction events
         this.scene.events.on('disableInteractions', this.disableInteractions, this);
         this.scene.events.on('enableInteractions', this.enableInteractions, this);
 
-        // Add listener for scene shutdown to clean up event listeners and resources
         this.scene.events.once('shutdown', this.obliterate, this);
         this.scene.events.once('destroy', this.obliterate, this);
     }
@@ -64,18 +63,16 @@ class CombatUIManager {
         this.createEndTurnButton();
         this.createGameAreas();
         this.createEnergyDisplay();
-        this.createResourceIndicators(); // Add this line
+        this.createResourceIndicators();
     }
 
     private createEnergyDisplay(): void {
-        const gameWidth = this.scene.scale.width;
-        const gameHeight = this.scene.scale.height;
         const pileY = CombatSceneLayoutUtils.getPileY(this.scene);
 
         this.energyDisplay = new TextBox({
             scene: this.scene,
-            x: 100,  // Positioned toward the left
-            y: pileY,  // Same Y as the draw pile
+            x: 100,
+            y: pileY,
             width: 100,
             height: 40,
             text: this.getEnergyText(),
@@ -84,11 +81,11 @@ class CombatUIManager {
                 color: '#ffffff',
                 fontFamily: 'Arial'
             },
-            fillColor: 0x0000ff,  // Blue background
+            fillColor: 0x0000ff,
             textBoxName: 'EnergyDisplay'
         });
 
-        // Update the energy display whenever the game state changes
+        this.scene.add.existing(this.energyDisplay);
         this.scene.events.on('update', this.updateEnergyDisplay, this);
     }
 
@@ -98,7 +95,7 @@ class CombatUIManager {
     }
 
     private updateEnergyDisplay(): void {
-        if (this.energyDisplay.text.text !== this.getEnergyText()){
+        if (this.energyDisplay.getText() !== this.getEnergyText()){
             this.energyDisplay.pulseGreenBriefly();
             this.energyDisplay.setText(this.getEnergyText());
         }
@@ -118,7 +115,6 @@ class CombatUIManager {
             },
             {
                 text: 'New Campaign',
-                
                 callback: () => {
                     this.scene.scene.start('Campaign');
                     GameState.getInstance().eliminatePhysicalCardsBetweenScenes();
@@ -143,7 +139,6 @@ class CombatUIManager {
                         enemy.hitpoints = 0;
                     });
                     console.log("All enemies defeated for debugging purposes.");
-                    // Manually trigger combat end
                     this.onCombatEnd();
                 }
             }
@@ -160,35 +155,43 @@ class CombatUIManager {
             options: menuOptions
         });
 
-        const menuButton = this.scene.add.text(gameWidth - 350, 50, '☰ Menu', {
-            fontSize: '28px',
-            color: '#ffffff',
-            backgroundColor: '#000000',
-            padding: { x: 15, y: 10 },
-            align: 'center',
-        })
-            .setOrigin(0.5)
-            .setInteractive({ useHandCursor: true })
-            .on('pointerdown', () => this.menu.toggle())
-            .on('pointerover', () => {
-                this.scene.tweens.add({
-                    targets: menuButton,
-                    scale: 1.1,
-                    duration: 200,
-                    ease: 'Power2'
-                });
-                menuButton.setStyle({ backgroundColor: '#555555' });
-            })
-            .on('pointerout', () => {
-                this.scene.tweens.add({
-                    targets: menuButton,
-                    scale: 1.0,
-                    duration: 200,
-                    ease: 'Power2'
-                });
-                menuButton.setStyle({ backgroundColor: '#000000' });
-            })
-            .setName('MenuButton');
+        const menuButton = new TextBoxButton({
+            scene: this.scene,
+            x: gameWidth - 350,
+            y: 50,
+            width: 120,
+            height: 40,
+            text: '☰ Menu',
+            style: {
+                fontSize: '28px',
+                color: '#ffffff',
+            },
+            fillColor: 0x000000,
+            textBoxName: 'MenuButton'
+        });
+
+        menuButton.setOrigin(0.5)
+            .onClick(() => this.menu.toggle());
+
+        menuButton.on('pointerover', () => {
+            this.scene.tweens.add({
+                targets: menuButton,
+                scale: 1.1,
+                duration: 200,
+                ease: 'Power2'
+            });
+            menuButton.setFillColor(0x555555);
+        });
+
+        menuButton.on('pointerout', () => {
+            this.scene.tweens.add({
+                targets: menuButton,
+                scale: 1.0,
+                duration: 200,
+                ease: 'Power2'
+            });
+            menuButton.setFillColor(0x000000);
+        });
 
         this.scene.add.existing(menuButton);
     }
@@ -211,13 +214,15 @@ class CombatUIManager {
             text: 'CURRENT COMBAT STATUS',
             style: { fontSize: '24px', color: '#000', align: 'center' }
         });
+
+        this.scene.add.existing(this.combatStatusText);
     }
 
     private createEndTurnButton(): void {
         const gameWidth = this.scene.scale.width;
         const pileY = CombatSceneLayoutUtils.getPileY(this.scene);
 
-        this.endTurnButton = new TextBox({
+        this.endTurnButton = new TextBoxButton({
             scene: this.scene,
             x: gameWidth * 0.7,
             y: pileY,
@@ -228,33 +233,29 @@ class CombatUIManager {
                 fontSize: '24px',
                 color: '#ffffff'
             },
-            backgroundImage: 'button_background'
+            backgroundImage: 'button_background',
+            textBoxName: 'EndTurnButton'
         });
 
-        this.endTurnButton.backgroundImage!!.setInteractive({ useHandCursor: true })
-            .on('pointerdown', () => {
-                ActionManager.getInstance().endTurn();
-            });
+        this.endTurnButton.onClick(() => {
+            ActionManager.getInstance().endTurn();
+        });
 
-        this.scene.add.existing(this.endTurnButton.backgroundImage!!);
-        this.scene.add.existing(this.endTurnButton.text);
+        this.scene.add.existing(this.endTurnButton);
     }
 
     public updateLayout(width: number, height: number): void {
-        // Update positions based on new width and height
         this.menu.updatePosition(width * 0.25, height / 2);
         this.combatStatusText.setPosition(width * 0.5, CombatSceneLayoutUtils.getPileY(this.scene));
         this.endTurnButton.setPosition(width * 0.7, CombatSceneLayoutUtils.getPileY(this.scene));
 
-        const menuButton = this.scene.children.getByName('MenuButton') as Phaser.GameObjects.Text;
+        const menuButton = this.scene.children.getByName('MenuButton') as TextBoxButton;
         if (menuButton) {
             menuButton.setPosition(width * 0.25, 50);
         }
 
-        // Update game areas
         this.updateGameAreas();
 
-        // Update energy display position
         const pileY = CombatSceneLayoutUtils.getPileY(this.scene);
         this.energyDisplay.setPosition(100, pileY);
     }
@@ -264,25 +265,19 @@ class CombatUIManager {
         const handY = LayoutUtils.getHandY(this.scene);
         const battlefieldY = LayoutUtils.getBattlefieldY(this.scene);
 
-        // Battlefield Area
         this.battlefieldArea = this.scene.add.rectangle(gameWidth / 2, battlefieldY, gameWidth - 100, 300)
             .setStrokeStyle(4, 0xffff00)
-            .setFillStyle(0xffff00, 0.2) // Added fill for visibility
-            // .setInteractive() // Removed to prevent blocking underlying events
-            .setVisible(false); // Ensure visible during testing
+            .setFillStyle(0xffff00, 0.2)
+            .setVisible(false);
 
-        // Hand Area
         this.handArea = this.scene.add.rectangle(gameWidth / 2, handY, gameWidth - 100, 300)
             .setStrokeStyle(4, 0x00ff00)
-            .setFillStyle(0x00ff00, 0.2) // Added fill for visibility
-            // .setInteractive() // Removed to prevent blocking underlying events
-            .setVisible(false); // Ensure visible during testing
+            .setFillStyle(0x00ff00, 0.2)
+            .setVisible(false);
 
-        // Ensure these areas are on top of other game objects
         this.battlefieldArea.setDepth(1000);
         this.handArea.setDepth(1000);
 
-        // Setup global pointer events
         this.setupGlobalPointerEvents();
     }
 
@@ -291,20 +286,14 @@ class CombatUIManager {
     }
 
     private handlePointerMove(pointer: Phaser.Input.Pointer): void {
-        // Check if pointer is over the battlefield area
         const isOverBattlefield = this.battlefieldArea.getBounds().contains(pointer.x, pointer.y);
         if (isOverBattlefield) {
-            // Trigger desired action when hovering over battlefield
             console.log('Pointer is over the Battlefield Area');
-            // Example: Highlight battlefield or show specific UI elements
         }
 
-        // Check if pointer is over the hand area
         const isOverHand = this.handArea.getBounds().contains(pointer.x, pointer.y);
         if (isOverHand) {
-            // Trigger desired action when hovering over hand
             console.log('Pointer is over the Hand Area');
-            // Example: Highlight hand area or show specific UI elements
         }
     }
 
@@ -318,19 +307,11 @@ class CombatUIManager {
     }
 
     private obliterate(): void {
-        // Remove global pointer events
         this.scene.input.off('pointermove', this.handlePointerMove, this);
-
-        // Remove event listeners for interaction events
         this.scene.events.off('disableInteractions', this.disableInteractions, this);
         this.scene.events.off('enableInteractions', this.enableInteractions, this);
-
-        // Cleanup resource indicators to prevent memory leaks and undefined references
         this.resourceIndicators.forEach(container => container.destroy());
         this.resourceIndicators = [];
-
-        // Additional cleanup if necessary
-        // e.g., remove update event listeners
         this.scene.events.off('update', this.updateResourceIndicators, this);
     }
 
@@ -351,7 +332,7 @@ class CombatUIManager {
                 color: '#ffffff',
                 fontFamily: 'Arial'
             });
-            text.setShadow(2, 2, '#000000', 2, true, true); // Add drop shadow
+            text.setShadow(2, 2, '#000000', 2, true, true);
 
             const container = this.scene.add.container(0, 0, [icon, text]);
             this.resourceIndicators.push(container);
@@ -389,7 +370,8 @@ class CombatUIManager {
                 style: { fontSize: '24px', color: '#ffffff' },
                 expandDirection: 'down'
             });
-            this.subtitleTextBox.setDepth(100); // Ensure it's on top
+            this.subtitleTextBox.setDepth(100);
+            this.scene.add.existing(this.subtitleTextBox);
         } else {
             this.subtitleTextBox.setText(text);
             this.subtitleTextBox.setVisible(true);
@@ -405,36 +387,27 @@ class CombatUIManager {
     private createCardRewardScreen(): void {
         this.cardRewardScreen = new CardRewardScreen({
             scene: this.scene,
-            rewards: [], // Initially empty
+            rewards: [],
             onSelect: this.handleCardSelect.bind(this),
             onSkip: this.handleSkip.bind(this)
         });
-        this.cardRewardScreen.container.setDepth(1001); // Ensure it's on top of other UI
-        this.cardRewardScreen.container.setScrollFactor(0);  // Make it stay in place when scrolling
+        this.cardRewardScreen.container.setDepth(1001);
+        this.cardRewardScreen.container.setScrollFactor(0);
         this.cardRewardScreen.hide();
     }
 
-    /**
-     * Call this method when combat ends to show the card reward screen.
-     */
     public onCombatEnd(): void {
         if (this.combatEnded) return;
         this.combatEnded = true;
 
         const rewardCards = this.determineCardRewards();
-        this.cardRewardScreen.rewards = rewardCards; // Update rewards
+        this.cardRewardScreen.rewards = rewardCards;
         this.cardRewardScreen.displayRewardCards();
         this.cardRewardScreen.show();
         UIContextManager.getInstance().setContext(UIContext.CARD_REWARD);
     }
 
-    /**
-     * Stubbed method to determine which card rewards to provide.
-     */
     private determineCardRewards(): CardReward[] {
-        // TODO: Implement logic to decide which cards to reward
-        // For now, returning three dummy cards
-
         const characters = GameState.getInstance().getCurrentRunCharacters()
         const rewards= []
         for (const character of characters){
@@ -443,48 +416,24 @@ class CombatUIManager {
         return rewards
     }
 
-    /**
-     * Handle when a card is selected from the reward screen.
-     * @param selectedCard The card selected by the player.
-     */
     private handleCardSelect(selectedCard: CardReward): void {
         console.log("Card selected:", selectedCard.card.name);
-        // Add the selected card to the player's deck
-        // GameState.getInstance().playerDeck.addCard(selectedCard);
     }
 
-    /**
-     * Handle when the player decides to skip taking a card reward.
-     */
     private handleSkip(): void {
         console.log("Skip selected.");
     }
 
-    // ... existing methods ...
-
-    // Optionally, listen to combat state changes to trigger onCombatEnd
-    // This might involve emitting events from CombatScene when enemies are defeated
-
     public disableInteractions(): void {
-        // Disable end turn button
-        this.endTurnButton.setInteractive(false);
-        // Disable menu
+        this.endTurnButton.setButtonEnabled(false);
     }
 
     public enableInteractions(): void {
-        // Enable end turn button
-        this.endTurnButton.setInteractive(true);
-        // Enable menu
+        this.endTurnButton.setButtonEnabled(true);
     }
 
     public getPlayerHandCards(): IAbstractCard[] {
-        // Return the list of PlayableCard instances in the player's hand
         return GameState.getInstance().combatState.currentHand;
-    }
-
-    // Add this new method
-    public toggleInteraction(enable: boolean): void {
-        // Remove this method as it's no longer needed
     }
 }
 

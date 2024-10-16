@@ -4,8 +4,8 @@ import { LocationCard } from '../../maplogic/LocationCard';
 import { LocationManager } from '../../maplogic/LocationManager';
 import { SpatialManager } from '../../maplogic/SpatialManager';
 import { GameState } from '../../rules/GameState';
+import { TextBoxButton } from '../../ui/Button';
 import { PhysicalCard } from '../../ui/PhysicalCard';
-import { TextBox } from '../../ui/TextBox';
 import { UIContext, UIContextManager } from '../../ui/UIContextManager';
 import { ActionManagerFetcher } from '../../utils/ActionManagerFetcher';
 import { CardGuiUtils } from '../../utils/CardGuiUtils';
@@ -24,10 +24,11 @@ export class MapOverlay {
     private adjacencyManager: AdjacencyManager;
 
     private background: Phaser.GameObjects.Image | null = null;
-    private abortButton: TextBox | null = null;
+    private abortButton: TextBoxButton | null = null;
     private campaignStatusText: Phaser.GameObjects.Text | null = null;
-    private moveUpButton: TextBox | null = null;
-    private moveDownButton: TextBox | null = null;
+    private moveUpButton: TextBoxButton | null = null;
+    private moveDownButton: TextBoxButton | null = null;
+    private closeButton: TextBoxButton | null = null;
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -66,7 +67,7 @@ export class MapOverlay {
         this.updateHighlights();
 
         // Add close button
-        const closeButton = new TextBox({
+        this.closeButton = new TextBoxButton({
             scene: this.scene,
             x: width - 50,
             y: 50,
@@ -76,9 +77,8 @@ export class MapOverlay {
             style: { fontSize: '24px', color: '#ffffff' },
             textBoxName: 'closeButton'
         });
-        closeButton.setInteractive(true);
-        closeButton.background?.on('pointerdown', this.hide.bind(this));
-        this.overlay.add([closeButton.background!, closeButton.text]);
+        this.closeButton.onClick(this.hide.bind(this));
+        this.overlay.add(this.closeButton);
     }
 
     // Background creation
@@ -201,7 +201,7 @@ export class MapOverlay {
         const buttonX = width / 2;
         const buttonY = height - 60;
 
-        this.abortButton = new TextBox({
+        this.abortButton = new TextBoxButton({
             scene: this.scene,
             x: buttonX,
             y: buttonY,
@@ -212,20 +212,10 @@ export class MapOverlay {
             fillColor: 0xff0000,
             textBoxName: 'abortButton'
         });
-        this.abortButton.background?.setInteractive({ useHandCursor: true })
-            .on('pointerover', () => {
-                if (this.abortButton?.background instanceof Phaser.GameObjects.Rectangle) {
-                    this.abortButton.background.setFillStyle(0xff3333);
-                }
-            })
-            .on('pointerout', () => {
-                if (this.abortButton?.background instanceof Phaser.GameObjects.Rectangle) {
-                    this.abortButton.background.setFillStyle(0xff0000);
-                }
-            })
-            .on('pointerdown', () => this.onAbortMission());
-        this.abortButton.setScrollFactor(0);
-        this.overlay.add([this.abortButton.background!, this.abortButton.text]);
+        this.abortButton
+            .onClick(() => this.onAbortMission())
+            .setScrollFactor(0);
+        this.overlay.add(this.abortButton);
     }
 
     // Create Campaign Status Text
@@ -274,7 +264,7 @@ export class MapOverlay {
         const padding = 20;
 
         // Move Up Button
-        this.moveUpButton = new TextBox({
+        this.moveUpButton = new TextBoxButton({
             scene: this.scene,
             x: padding + buttonWidth / 2,
             y: padding + buttonHeight / 2,
@@ -285,13 +275,13 @@ export class MapOverlay {
             fillColor: 0x00ff00,
             textBoxName: 'moveUpButton'
         });
-        this.moveUpButton.background?.setInteractive({ useHandCursor: true })
-            .on('pointerdown', () => this.panCameraUp());
-        this.moveUpButton.setScrollFactor(0);
-        this.overlay.add([this.moveUpButton.background!, this.moveUpButton.text]);
+        this.moveUpButton
+            .onClick(() => this.panCameraUp())
+            .setScrollFactor(0);
+        this.overlay.add(this.moveUpButton);
 
         // Move Down Button
-        this.moveDownButton = new TextBox({
+        this.moveDownButton = new TextBoxButton({
             scene: this.scene,
             x: padding + buttonWidth / 2,
             y: padding + buttonHeight * 1.5 + 10,
@@ -302,10 +292,10 @@ export class MapOverlay {
             fillColor: 0x00ff00,
             textBoxName: 'moveDownButton'
         });
-        this.moveDownButton.background?.setInteractive({ useHandCursor: true })
-            .on('pointerdown', () => this.panCameraDown());
-        this.moveDownButton.setScrollFactor(0);
-        this.overlay.add([this.moveDownButton.background!, this.moveDownButton.text]);
+        this.moveDownButton
+            .onClick(() => this.panCameraDown())
+            .setScrollFactor(0);
+        this.overlay.add(this.moveDownButton);
 
         // Add scroll wheel functionality for camera panning
         this.scene.input.on('wheel', (pointer: Phaser.Input.Pointer, gameObjects: Phaser.GameObjects.GameObject[], deltaX: number, deltaY: number, deltaZ: number) => {
@@ -415,10 +405,10 @@ export class MapOverlay {
 
     private positionCameraButtons(width: number, height: number) {
         if (this.moveUpButton) {
-            this.moveUpButton.setPosition(20 + this.moveUpButton.background!.width / 2, 20 + this.moveUpButton.background!.height / 2);
+            this.moveUpButton.setPosition(20 + this.moveUpButton.width / 2, 20 + this.moveUpButton.height / 2);
         }
         if (this.moveDownButton) {
-            this.moveDownButton.setPosition(20 + this.moveDownButton.background!.width / 2, 20 + this.moveDownButton.background!.height * 1.5 + 10);
+            this.moveDownButton.setPosition(20 + this.moveDownButton.width / 2, 20 + this.moveDownButton.height * 1.5 + 10);
         }
     }
 

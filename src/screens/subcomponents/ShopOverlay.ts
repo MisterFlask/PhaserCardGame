@@ -5,40 +5,35 @@ import { BaseCharacter } from '../../gamecharacters/BaseCharacter';
 import { PlayableCard } from '../../gamecharacters/PlayableCard';
 import { Rummage } from '../../gamecharacters/playerclasses/cards/basic/Rummage';
 import { GameState } from '../../rules/GameState';
-import { PhysicalCard } from '../../ui/PhysicalCard';
+import { ShopItemPanel } from '../../ui/ShopItemPanel';
 import { TextBox } from '../../ui/TextBox';
 import { UIContext, UIContextManager } from '../../ui/UIContextManager';
-import { CardGuiUtils } from '../../utils/CardGuiUtils';
 
 export class ShopOverlay {
     private scene: Phaser.Scene;
     private overlay: Phaser.GameObjects.Container;
     private isVisible: boolean = false;
-    private cardGuiUtils: CardGuiUtils;
+    private shopItemsContainer!: Phaser.GameObjects.Container;
+    private inventoryContainer!: Phaser.GameObjects.Container;
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
         this.overlay = this.scene.add.container(0, 0).setVisible(false).setDepth(2000);
-        this.cardGuiUtils = CardGuiUtils.getInstance();
         this.createOverlay();
     }
 
     private createOverlay(): void {
         const { width, height } = this.scene.scale;
 
-        // Create a semi-transparent background
         const background = this.scene.add.rectangle(0, 0, width, height, 0x000000, 0.7);
         background.setOrigin(0);
 
-        // Create a title
         const title = this.scene.add.text(width / 2, 50, 'Shop', { fontSize: '32px', color: '#ffffff' });
         title.setOrigin(0.5);
 
-        // Create containers for shop items and inventory
-        const shopItemsContainer = this.scene.add.container(50, 100);
-        const inventoryContainer = this.scene.add.container(width - 300, 100);
+        this.shopItemsContainer = this.scene.add.container(50, 100);
+        this.inventoryContainer = this.scene.add.container(width - 300, 100);
 
-        // Add close button
         const closeButton = new TextBox({
             scene: this.scene,
             x: width - 50,
@@ -49,82 +44,60 @@ export class ShopOverlay {
             style: { fontSize: '24px', color: '#ffffff' },
             textBoxName: 'closeButton'
         });
-        closeButton.setInteractive(true);
-        closeButton.background?.on('pointerdown', this.hide.bind(this));
 
-        this.overlay.add([background, title, shopItemsContainer, inventoryContainer, closeButton.background!, closeButton.text]);
+        // Use the new makeInteractive method
+        closeButton.makeInteractive(this.hide.bind(this));
 
-        // Populate shop items and inventory
-        this.populateShopItems(shopItemsContainer);
-        this.populateInventory(inventoryContainer);
+        this.overlay.add([background, title, this.shopItemsContainer, this.inventoryContainer, closeButton]);
+
+        this.populateShopItems();
+        this.populateInventory();
     }
 
-    private populateShopItems(container: Phaser.GameObjects.Container): void {
+    private populateShopItems(): void {
         const shopItems = this.getShopItems();
         shopItems.forEach((item, index) => {
-            const physicalCard = this.cardGuiUtils.createCard({
-                scene: this.scene,
-                x: 0,
-                y: index * 180,
-                data: item,
-                eventCallback: (card: PhysicalCard) => this.buyItem(item)
-            });
-            
-            const priceText = new TextBox({
-                scene: this.scene,
-                x: physicalCard.container.x + 60,
-                y: physicalCard.container.y + 100,
-                width: 100,
-                height: 30,
-                text: `${item.surfaceValue} gold`,
-                style: { fontSize: '16px', color: '#ffffff' },
-                textBoxName: `priceTag_${item.name}`
-            });
-            
-            container.add([physicalCard.container, priceText.background!, priceText.text]);
+            const panel = new ShopItemPanel(this.scene, 0, index * 180, item, true, this.buyItem.bind(this));
+            this.shopItemsContainer.add(panel.container);
         });
     }
 
-    private populateInventory(container: Phaser.GameObjects.Container): void {
+    private populateInventory(): void {
         const inventory = GameState.getInstance().inventory;
         inventory.forEach((item, index) => {
-            const physicalCard = this.cardGuiUtils.createCard({
-                scene: this.scene,
-                x: 0,
-                y: index * 180,
-                data: item,
-                eventCallback: (card: PhysicalCard) => this.sellItem(item)
-            });
-            
-            const sellPriceText = new TextBox({
-                scene: this.scene,
-                x: physicalCard.container.x + 60,
-                y: physicalCard.container.y + 100,
-                width: 100,
-                height: 30,
-                text: `Sell: ${item.hellValue} gold`,
-                style: { fontSize: '16px', color: '#ffffff' },
-                textBoxName: `sellPriceTag_${item.name}`
-            });
-            
-            container.add([physicalCard.container, sellPriceText.background!, sellPriceText.text]);
+            const panel = new ShopItemPanel(this.scene, 0, index * 180, item, false, this.sellItem.bind(this));
+            this.inventoryContainer.add(panel.container);
         });
     }
 
     private getShopItems(): PlayableCard[] {
         // This method should be implemented to return the list of items for sale
-        // For now, we'll return an empty array
+        // For now, we'll return an array with three Rummage cards
         return [new Rummage(), new Rummage(), new Rummage()];
     }
 
     private buyItem(item: PlayableCard): void {
         // Implement buying logic here
         console.log(`Buying ${item.name}`);
+        // After buying, refresh the shop and inventory
+        this.refreshShop();
     }
 
     private sellItem(item: PlayableCard): void {
         // Implement selling logic here
         console.log(`Selling ${item.name}`);
+        // After selling, refresh the shop and inventory
+        this.refreshShop();
+    }
+
+    private refreshShop(): void {
+        // Clear existing items
+        this.shopItemsContainer.removeAll(true);
+        this.inventoryContainer.removeAll(true);
+
+        // Repopulate with updated items
+        this.populateShopItems();
+        this.populateInventory();
     }
 
     public show(): void {

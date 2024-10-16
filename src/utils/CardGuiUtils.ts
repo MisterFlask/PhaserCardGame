@@ -49,6 +49,7 @@ export class CardGuiUtils {
             textBoxName: "nameBox:" + data.id,
             style: { fontSize: '16px', color: '#000', wordWrap: { width: cardWidth - 10 } }
         });
+        
         const descBox = new TextBox({
             scene: scene,
             x: -20,
@@ -80,21 +81,6 @@ export class CardGuiUtils {
             }
         });
 
-        // Function to update background sizes
-        const updateBackgrounds = () => {
-            descBox.setSize(cardWidth - 10, descBox.text.height + 20);
-            descBox.setPosition(0, cardHeight / 2 + descBox.text.height / 4);
-            nameBox.setSize(cardWidth - 10, nameBox.text.height + 10);
-            nameBox.setPosition(0, cardHeight / 4);
-            tooltipBox.setSize(cardWidth - 10, tooltipBox.text.height + 20);
-            tooltipBox.setPosition(cardWidth + cardWidth / 2, tooltipBox.text.height / 2);
-        };
-
-        // Call updateBackgrounds initially
-        updateBackgrounds();
-        descBox.text.on('changedata', updateBackgrounds);
-        tooltipBox.text.on('changedata', updateBackgrounds);
-
         // Create hidden highlight border
         const highlightBorder = scene.add.rectangle(0, 0, cardWidth + 10, cardHeight + 10, 0xffff00)
             .setStrokeStyle(4, 0xffff00)
@@ -105,7 +91,7 @@ export class CardGuiUtils {
         descBox.setVisible(false);
         tooltipBox.setVisible(false);
         
-        cardContainer.add([cardBackground, cardImage, nameBox.background!!, nameBox.text, tooltipBox.background!!, tooltipBox.text, descBox.background!!, descBox.text, highlightBorder]);
+        cardContainer.add([cardBackground, cardImage, nameBox, tooltipBox, descBox, highlightBorder]);
         cardContainer.setSize(cardWidth, cardHeight);
         cardContainer.setInteractive(new Phaser.Geom.Rectangle(0, 0, cardWidth, cardHeight), Phaser.Geom.Rectangle.Contains);
 

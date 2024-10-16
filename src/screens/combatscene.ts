@@ -4,9 +4,9 @@ import Phaser from 'phaser';
 import { EncounterData } from '../encounters/Encounters';
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
 import { GameState } from '../rules/GameState';
+import { TextBoxButton } from '../ui/Button';
 import InventoryPanel from '../ui/InventoryPanel';
 import CombatSceneLayoutUtils from '../ui/LayoutUtils';
-import { TextBox } from '../ui/TextBox';
 import { UIContext, UIContextManager } from '../ui/UIContextManager';
 import { ActionManager } from '../utils/ActionManager';
 import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
@@ -39,7 +39,7 @@ class CombatScene extends Phaser.Scene {
     private detailsScreenManager!: DetailsScreenManager;
     private shopOverlay!: ShopOverlay;
     private mapOverlay!: MapOverlay;
-    private mapButton!: TextBox;
+    private mapButton!: TextBoxButton;
 
     constructor() {
         super('CombatScene');
@@ -47,7 +47,7 @@ class CombatScene extends Phaser.Scene {
 
     preload(): void {
         this.load.setBaseURL('https://raw.githubusercontent.com/');
-        new GameImageLoader().loadAllImages(this.load);2
+        new GameImageLoader().loadAllImages(this.load);
     }
 
     init(data: CombatSceneData): void {
@@ -92,21 +92,22 @@ class CombatScene extends Phaser.Scene {
         this.events.once('destroy', this.obliterate, this);
 
         // Create the map button
-        this.mapButton = new TextBox({
+        this.mapButton = new TextBoxButton({
             scene: this,
             x: 10,
             y: 10,
+            width: 100,
+            height: 40,
             text: 'Map',
             style: { fontSize: '24px' },
-            expandDirection: 'down'
+            textBoxName: 'mapButton',
+            fillColor: 0x555555
         });
-        this.mapButton.setInteractive(true);
-        this.mapButton.text.setInteractive(true);
-        this.mapButton.text.on('pointerdown', () => {
-            this.toggleMapOverlay(true);
-        });
-        this.add.existing(this.mapButton.text);
-        this.add.existing(this.mapButton.background!);
+        this.mapButton
+            .onClick(() => {
+                this.toggleMapOverlay(true);
+            });
+        this.add.existing(this.mapButton);
     }
 
     private obliterate(): void {
