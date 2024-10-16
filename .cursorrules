@@ -1,4 +1,8 @@
-# Rules
+# rules for all logic
+do not remove interactions using disableInteractive() or removeInteractive() unless you're literally destroying the object and this is a necessary step.  Instead check the UiContextManager and contextually do an early-return.
+
+
+# Rules for card logic
 1. Always implement the PlayableCard class.  InvokeCardEffects is where the actual logic goes of playing the card.
 2. Avoid hardcoding specific numbers in the description() method.  Instead use getDisplayedDamage(), getDisplayedBlock(), and getDisplayedMagicNumber() to display the values.
 3. Use the forEachAlly and forEachEnemy methods to iterate over the characters in the combat state.

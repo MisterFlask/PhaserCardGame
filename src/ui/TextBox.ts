@@ -180,7 +180,7 @@ export class TextBox {
             this.background.setInteractive(interactive ? { useHandCursor: true } : undefined);
         }
         if (this.backgroundImage) {
-            this.backgroundImage.setInteractive(interactive ? { useHandCursor: true } : undefined);
+            //this.backgroundImage.setInteractive(interactive ? { useHandCursor: true } : undefined);
         }
         this.text.setInteractive(interactive ? { useHandCursor: true } : undefined);
     }

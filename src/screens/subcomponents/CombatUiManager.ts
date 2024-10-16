@@ -8,8 +8,8 @@ import { default as CombatSceneLayoutUtils, default as LayoutUtils } from '../..
 import Menu from '../../ui/Menu';
 import { SubtitleManager } from '../../ui/SubtitleManager';
 import { TextBox } from '../../ui/TextBox';
+import { UIContext, UIContextManager } from '../../ui/UIContextManager';
 import { ActionManager } from '../../utils/ActionManager';
-import { SceneChanger } from '../SceneChanger';
 import CardRewardScreen, { CardReward } from './CardRewardScreen';
 
 interface MenuOption {
@@ -410,6 +410,7 @@ class CombatUIManager {
             onSkip: this.handleSkip.bind(this)
         });
         this.cardRewardScreen.container.setDepth(1001); // Ensure it's on top of other UI
+        this.cardRewardScreen.container.setScrollFactor(0);  // Make it stay in place when scrolling
         this.cardRewardScreen.hide();
     }
 
@@ -424,6 +425,7 @@ class CombatUIManager {
         this.cardRewardScreen.rewards = rewardCards; // Update rewards
         this.cardRewardScreen.displayRewardCards();
         this.cardRewardScreen.show();
+        UIContextManager.getInstance().setContext(UIContext.CARD_REWARD);
     }
 
     /**
@@ -449,7 +451,6 @@ class CombatUIManager {
         console.log("Card selected:", selectedCard.card.name);
         // Add the selected card to the player's deck
         // GameState.getInstance().playerDeck.addCard(selectedCard);
-        this.goToMap();
     }
 
     /**
@@ -457,14 +458,6 @@ class CombatUIManager {
      */
     private handleSkip(): void {
         console.log("Skip selected.");
-        this.goToMap();
-    }
-
-    /**
-     * Transition to the Map scene.
-     */
-    private goToMap(): void {
-        SceneChanger.switchToMapScene();
     }
 
     // ... existing methods ...
@@ -487,6 +480,11 @@ class CombatUIManager {
     public getPlayerHandCards(): IAbstractCard[] {
         // Return the list of PlayableCard instances in the player's hand
         return GameState.getInstance().combatState.currentHand;
+    }
+
+    // Add this new method
+    public toggleInteraction(enable: boolean): void {
+        // Remove this method as it's no longer needed
     }
 }
 

@@ -6,17 +6,19 @@ import type { AbstractCard } from '../gamecharacters/AbstractCard';
 import { GameState } from '../rules/GameState';
 import InventoryPanel from '../ui/InventoryPanel';
 import CombatSceneLayoutUtils from '../ui/LayoutUtils';
+import { TextBox } from '../ui/TextBox';
+import { UIContext, UIContextManager } from '../ui/UIContextManager';
 import { ActionManager } from '../utils/ActionManager';
 import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
 import GameImageLoader from '../utils/ImageUtils';
 import CampaignScene from './Campaign';
-import MapScene from './Map';
 import { SceneChanger } from './SceneChanger';
 import CombatCardManager from './subcomponents/CombatCardManager';
 import CombatInputHandler from './subcomponents/CombatInputHandler';
 import CombatStateService from './subcomponents/CombatStateService';
 import CombatUIManager from './subcomponents/CombatUiManager';
 import { DetailsScreenManager } from './subcomponents/DetailsScreenManager';
+import { MapOverlay } from './subcomponents/MapOverlay';
 import PerformanceMonitor from './subcomponents/PerformanceMonitor';
 import { ShopOverlay } from './subcomponents/ShopOverlay';
 
@@ -36,6 +38,8 @@ class CombatScene extends Phaser.Scene {
     private inventoryPanel!: InventoryPanel;
     private detailsScreenManager!: DetailsScreenManager;
     private shopOverlay!: ShopOverlay;
+    private mapOverlay!: MapOverlay;
+    private mapButton!: TextBox;
 
     constructor() {
         super('CombatScene');
@@ -43,7 +47,7 @@ class CombatScene extends Phaser.Scene {
 
     preload(): void {
         this.load.setBaseURL('https://raw.githubusercontent.com/');
-        new GameImageLoader().loadAllImages(this.load);
+        new GameImageLoader().loadAllImages(this.load);2
     }
 
     init(data: CombatSceneData): void {
@@ -51,16 +55,18 @@ class CombatScene extends Phaser.Scene {
         ActionManager.init(this);
         const stateService = CombatStateService.getInstance();
         stateService.initializeCombat(data.encounter, GameState.getInstance().currentRunCharacters);
+        UIContextManager.getInstance().setContext(UIContext.COMBAT);
     }
 
     create(): void {
-
         ActionManagerFetcher.initActionManager();
         this.createBackground();
 
         // Initialize CombatUIManager as a singleton
         CombatUIManager.initialize(this);
         this.uiManager = CombatUIManager.getInstance();
+        this.mapOverlay = new MapOverlay(this);
+        this.mapOverlay.hide();
 
         this.cardManager = new CombatCardManager(this);
         this.inputHandler = new CombatInputHandler(this, this.cardManager);
@@ -74,6 +80,7 @@ class CombatScene extends Phaser.Scene {
 
         // Set up the onCardClick handler
         this.inputHandler.addCardClickListener((card: AbstractCard) => {
+            if (UIContextManager.getInstance().getContext() !== UIContext.COMBAT) return;
             this.shopOverlay.handleCardClick(card);
         });
 
@@ -83,6 +90,23 @@ class CombatScene extends Phaser.Scene {
         this.inventoryPanel = new InventoryPanel(this);
         this.events.once('shutdown', this.obliterate, this);
         this.events.once('destroy', this.obliterate, this);
+
+        // Create the map button
+        this.mapButton = new TextBox({
+            scene: this,
+            x: 10,
+            y: 10,
+            text: 'Map',
+            style: { fontSize: '24px' },
+            expandDirection: 'down'
+        });
+        this.mapButton.setInteractive(true);
+        this.mapButton.text.setInteractive(true);
+        this.mapButton.text.on('pointerdown', () => {
+            this.toggleMapOverlay(true);
+        });
+        this.add.existing(this.mapButton.text);
+        this.add.existing(this.mapButton.background!);
     }
 
     private obliterate(): void {
@@ -134,11 +158,18 @@ class CombatScene extends Phaser.Scene {
 
         // Reposition inventory button
         this.inventoryPanel.resize(width, height);
+
+        // Reposition map button
+        if (this.mapButton) {
+            this.mapButton.setPosition(10, 10);
+        }
     }
 
     update(time: number, delta: number): void {
+        if (UIContextManager.getInstance().getContext() !== UIContext.COMBAT) return;
+
         this.performanceMonitor.update(time, delta);
-        // Implement additional update logic if needed
+
         // Sync the hand with the game state
         if (this.cardManager) {
             this.cardManager.syncHandWithGameState();
@@ -150,7 +181,7 @@ class CombatScene extends Phaser.Scene {
         }
 
         // Update DetailsScreenManager
-        const hoveredCard =GameState.getInstance().combatState.cardHoveredOver_transient;
+        const hoveredCard = GameState.getInstance().combatState.cardHoveredOver_transient;
         this.detailsScreenManager.update(hoveredCard);
     }
 
@@ -160,6 +191,15 @@ class CombatScene extends Phaser.Scene {
     private isCombatFinished(): boolean {
         return GameState.getInstance().combatState.enemies.every(enemy => enemy.isDead());
     }
+
+    private toggleMapOverlay(show: boolean  ): void {
+        if (show) {
+            this.mapOverlay.show();
+        } else {
+            this.mapOverlay.hide();
+        }
+    }
+
 }
 
 /**
@@ -179,7 +219,7 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
         roundPixels: false,
         pixelArt: false
     },
-    scene: [CampaignScene, CombatScene, MapScene]
+    scene: [CampaignScene, CombatScene]
 };
 
 // Instantiate and start the Phaser game

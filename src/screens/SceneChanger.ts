@@ -14,9 +14,9 @@ export class SceneChanger {
         }
     }
 
-    public static switchToMapScene(): void {
-        SceneChanger.switchScene('MapScene');
-    }
+    // public static switchToMapScene(): void {
+    //     SceneChanger.switchScene('MapScene');
+    // }
 
     public static switchToCampaignScene(): void {
         SceneChanger.switchScene('Campaign');

@@ -10,6 +10,7 @@ import { GameState } from '../../rules/GameState';
 import CombatSceneLayoutUtils from '../../ui/LayoutUtils';
 import { PhysicalCard } from '../../ui/PhysicalCard';
 import { PhysicalIntent } from '../../ui/PhysicalIntent';
+import { UIContext, UIContextManager } from '../../ui/UIContextManager';
 import { ActionManager } from '../../utils/ActionManager';
 import { IntentEmitter } from '../../utils/IntentEmitter';
 import CombatCardManager from './CombatCardManager';
@@ -21,6 +22,7 @@ class CombatInputHandler {
     private originalCardPosition: { x: number; y: number } | null = null;
     private highlightedCard: PhysicalCard | null = null;
     private cardClickListeners: ((card: AbstractCard) => void)[] = [];
+    private isInteractionEnabled: boolean = true;
 
     constructor(scene: Phaser.Scene, cardManager: CombatCardManager) {
         this.scene = scene;
@@ -30,6 +32,7 @@ class CombatInputHandler {
 
         IntentEmitter.getInstance().on(IntentEmitter.EVENT_INCOMING_INTENT_HOVER, this.onIncomingIntentHover, this);
         IntentEmitter.getInstance().on(IntentEmitter.EVENT_INCOMING_INTENT_HOVER_END, this.onIncomingIntentHoverEnd, this);
+        this.scene.events.on('toggleInteraction', this.toggleInteraction, this);
     }
 
     private setupEventListeners(): void {
@@ -71,7 +74,8 @@ class CombatInputHandler {
         ];
 
         allCards.forEach(card => {
-            card.container.setInteractive();
+            const bounds = card.cardBackground.getBounds();
+            card.container.setInteractive(new Phaser.Geom.Rectangle(0, 0, bounds.width, bounds.height), Phaser.Geom.Rectangle.Contains);
             card.container.on('pointerdown', () => this.handleCardClick(card));
         });
     }
@@ -85,11 +89,12 @@ class CombatInputHandler {
 
         allCards.forEach(card => {
             card.container.off('pointerdown');
-            card.container.disableInteractive();
+            //card.container.removeInteractive();
         });
     }
 
     private handleDragStart = (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject): void => {
+        if (!UIContextManager.getInstance().isContext(UIContext.COMBAT)) return;
         if ('physicalCard' in gameObject) {
             CombatInputHandler.draggedCard = (gameObject as any).physicalCard as PhysicalCard;
             if (CombatInputHandler.draggedCard) {
@@ -106,6 +111,7 @@ class CombatInputHandler {
     }
 
     private handleDrag(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject, dragX: number, dragY: number): void {
+        if (!UIContextManager.getInstance().isContext(UIContext.COMBAT)) return;
         if (CombatInputHandler.draggedCard) {
             CombatInputHandler.draggedCard.container.x = dragX;
             CombatInputHandler.draggedCard.container.y = dragY;
@@ -117,16 +123,21 @@ class CombatInputHandler {
     
 
     private handleDragEnd(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject): void {
-        if (!CombatInputHandler.draggedCard) return;
+        if (!UIContextManager.getInstance().isContext(UIContext.COMBAT)) return;
 
         console.log('handleDragEnd triggered on CombatInputHandler');
 
-        const isPlayable = CombatInputHandler.draggedCard.data instanceof PlayableCard;
+        if (!CombatInputHandler.draggedCard) {
+            console.log('error: no card being dragged');
+            return;
+        }
+
+        const isPlayable = CombatInputHandler.draggedCard!.data instanceof PlayableCard;
 
         let wasPlayed = false;
 
         if (isPlayable) {
-            const playableCard = CombatInputHandler.draggedCard.data as PlayableCard;
+            const playableCard = CombatInputHandler.draggedCard!.data as PlayableCard;
             const targetingType = this.getTargetingType(playableCard);
 
             if (targetingType === TargetingType.NO_TARGETING) {
@@ -146,14 +157,15 @@ class CombatInputHandler {
         if (!wasPlayed) {
             this.animateCardBack();
         } else {
-            this.removeCardFromHand(CombatInputHandler.draggedCard);
-            this.addCardToDiscardPile(CombatInputHandler.draggedCard);
+            this.removeCardFromHand(CombatInputHandler.draggedCard || undefined);
+            this.addCardToDiscardPile(CombatInputHandler.draggedCard!);
         }
 
         this.resetDragState();
     }
 
     private handleGameObjectOver = (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject): void => {
+        if (!UIContextManager.getInstance().isContext(UIContext.COMBAT)) return;
         if (gameObject instanceof Phaser.GameObjects.Container && (gameObject as any).physicalCard instanceof PhysicalCard) {
             const physicalCard = (gameObject as any).physicalCard as PhysicalCard;
             this.bringCardToFront(gameObject);
@@ -162,6 +174,7 @@ class CombatInputHandler {
     }
 
     private handleGameObjectOut = (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject): void => {
+        if (!UIContextManager.getInstance().isContext(UIContext.COMBAT)) return;
         if (gameObject instanceof Phaser.GameObjects.Container && (gameObject as any).physicalCard instanceof PhysicalCard) {
             const physicalCard = (gameObject as any).physicalCard as PhysicalCard;
             this.resetCardDepth(gameObject);
@@ -224,6 +237,8 @@ class CombatInputHandler {
     }
 
     private addCardToDiscardPile(card: PhysicalCard): void {
+        if (!card) return;
+
         this.scene.tweens.add({
             targets: card.container,
             x: this.cardManager.discardPile.container.x,
@@ -341,7 +356,34 @@ class CombatInputHandler {
     }
 
     private handleCardClick(card: PhysicalCard): void {
+        if (!UIContextManager.getInstance().isContext(UIContext.COMBAT)) return;
         this.cardClickListeners.forEach(listener => listener(card.data as AbstractCard));
+    }
+
+    private toggleInteraction = (enable: boolean): void => {
+        this.isInteractionEnabled = enable;
+        if (!enable) {
+            // Reset any ongoing interactions
+            if (CombatInputHandler.draggedCard) {
+                this.handleDragEnd(null as any, null as any);
+            }
+        }
+        
+        // Disable/enable interactions for all cards
+        const allCards = [
+            ...this.cardManager.playerHand,
+            ...this.cardManager.enemyUnits,
+            ...this.cardManager.playerUnits
+        ];
+
+        allCards.forEach(card => {
+            if (enable) {
+                const bounds = card.cardBackground.getBounds();
+                card.container.setInteractive(new Phaser.Geom.Rectangle(0, 0, bounds.width, bounds.height), Phaser.Geom.Rectangle.Contains);
+            } else {
+                card.container.removeInteractive();
+            }
+        });
     }
 }
 

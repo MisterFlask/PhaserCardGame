@@ -153,7 +153,7 @@ class CardSelectionFromHandManager {
                 : `Too many cards selected`;
             this.submitButton.text.setText(buttonText);
             this.submitButton.background?.setFillStyle(0x888888);
-            this.submitButton.background?.disableInteractive();
+            this.submitButton.background?.removeInteractive();
         }
     }
 

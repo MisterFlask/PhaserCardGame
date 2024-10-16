@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { BaconBeast, BloodManipulationSlime, ClockworkAbomination } from '../encounters/Encounters';
+import { BaconBeast, BloodManipulationSlime, ClockworkAbomination, EncounterManager } from '../encounters/Encounters';
 import { AbstractCard } from '../gamecharacters/AbstractCard';
 import { PlayerCharacter } from '../gamecharacters/CharacterClasses';
 import { PlayableCard } from '../gamecharacters/PlayableCard';
@@ -354,7 +354,7 @@ export default class CampaignScene extends Phaser.Scene {
 
             GameState.getInstance().eliminatePhysicalCardsBetweenScenes();
             // Switch to the "map" scene
-            this.scene.start('MapScene');
+            SceneChanger.switchToCombatScene({ encounter: EncounterManager.getInstance().getShopEncounter().data });
         } else {
             console.log('Please select 3 characters before embarking:', selectedCards.map(card => card.data.name));
         }

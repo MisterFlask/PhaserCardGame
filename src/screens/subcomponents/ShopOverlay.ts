@@ -7,6 +7,7 @@ import { Rummage } from '../../gamecharacters/playerclasses/cards/basic/Rummage'
 import { GameState } from '../../rules/GameState';
 import { PhysicalCard } from '../../ui/PhysicalCard';
 import { TextBox } from '../../ui/TextBox';
+import { UIContext, UIContextManager } from '../../ui/UIContextManager';
 import { CardGuiUtils } from '../../utils/CardGuiUtils';
 
 export class ShopOverlay {
@@ -129,11 +130,13 @@ export class ShopOverlay {
     public show(): void {
         this.overlay.setVisible(true);
         this.isVisible = true;
+        UIContextManager.getInstance().setContext(UIContext.SHOP);
     }
 
     public hide(): void {
         this.overlay.setVisible(false);
         this.isVisible = false;
+        UIContextManager.getInstance().setContext(UIContext.COMBAT);
     }
 
     public toggle(): void {
