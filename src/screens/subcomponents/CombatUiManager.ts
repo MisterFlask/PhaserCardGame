@@ -168,30 +168,10 @@ class CombatUIManager {
             },
             fillColor: 0x000000,
             textBoxName: 'MenuButton'
-        });
+        }).setZoomScales(1.0, 1.1);
 
-        menuButton.setOrigin(0.5)
+        menuButton
             .onClick(() => this.menu.toggle());
-
-        menuButton.on('pointerover', () => {
-            this.scene.tweens.add({
-                targets: menuButton,
-                scale: 1.1,
-                duration: 200,
-                ease: 'Power2'
-            });
-            menuButton.setFillColor(0x555555);
-        });
-
-        menuButton.on('pointerout', () => {
-            this.scene.tweens.add({
-                targets: menuButton,
-                scale: 1.0,
-                duration: 200,
-                ease: 'Power2'
-            });
-            menuButton.setFillColor(0x000000);
-        });
 
         this.scene.add.existing(menuButton);
     }

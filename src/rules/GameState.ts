@@ -1,6 +1,5 @@
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
 import type { PlayerCharacter } from '../gamecharacters/CharacterClasses';
-import type { IAbstractCard } from '../gamecharacters/IAbstractCard';
 import type { PlayableCard } from '../gamecharacters/PlayableCard';
 import type { LocationCard } from '../maplogic/LocationCard';
 import type { AutomatedCharacterType, BaseCharacterType } from '../Types';
@@ -12,7 +11,8 @@ export class GameState {
     public currentRunCharacters: PlayerCharacter[] = [];
     public shopItems: PlayableCard[] = [];
     public inventory: PlayableCard[] = [];
-    public currencyOnHand: number = 0
+    public surfaceCurrency: number = 0
+    public hellCurrency: number = 0
     public combatState: CombatState = new CombatState()
 
     // Add tracking for player's current location
@@ -30,7 +30,7 @@ export class GameState {
         return GameState.instance;
     }
 
-    private obliteratePhysicalCard(item: IAbstractCard): void {
+    private obliteratePhysicalCard(item: AbstractCard): void {
         if (item.physicalCard) {
             const card = item.physicalCard as PhysicalCard;
             card.obliterate();
@@ -38,7 +38,7 @@ export class GameState {
         }
     }
 
-    private obliteratePhysicalCardsForArray(items: (IAbstractCard | PlayableCard)[]): void {
+    private obliteratePhysicalCardsForArray(items: (AbstractCard | PlayableCard)[]): void {
         items.forEach(item => this.obliteratePhysicalCard(item));
     }
 
@@ -154,10 +154,10 @@ export class CombatState{
 
     cardHoveredOver_transient?: AbstractCard
 
-    currentDrawPile: IAbstractCard[] = []
-    currentDiscardPile: IAbstractCard[] = []
-    currentHand: IAbstractCard[] = []
-    currentExhaustPile: IAbstractCard[] = []
+    currentDrawPile: AbstractCard[] = []
+    currentDiscardPile: AbstractCard[] = []
+    currentHand: AbstractCard[] = []
+    currentExhaustPile: AbstractCard[] = []
 
     enemies: AutomatedCharacterType[] = []
     playerCharacters: BaseCharacterType[] = []
@@ -168,7 +168,7 @@ export class CombatState{
         return [...this.playerCharacters, ...this.enemies];
     }
 
-    get allCardsInAllPilesExceptExhaust(): IAbstractCard[] {
+    get allCardsInAllPilesExceptExhaust(): AbstractCard[] {
         return [...this.currentDrawPile, ...this.currentDiscardPile, ...this.currentHand];
     }
 

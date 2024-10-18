@@ -31,7 +31,7 @@ export class ShopItemPanel {
             x: 0,
             y: 0,
             data: this.card,
-            eventCallback: () => {} // We'll handle events in setupInteractivity
+            onCardCreatedEventCallback: () => {} // We'll handle events in setupInteractivity
         });
         this.container.add(this.physicalCard.container);
     }
@@ -54,8 +54,33 @@ export class ShopItemPanel {
         this.container.add([this.priceText]);
     }
 
+    public destroy(): void {
+        // Destroy the physical card
+        if (this.physicalCard) {
+            this.physicalCard.obliterate();
+            this.physicalCard.destroy();
+        }
+
+        // Destroy the price text
+        if (this.priceText) {
+            this.priceText.destroy();
+        }
+
+        // Remove all children from the container
+        this.container.removeAll(true);
+
+        // Destroy the container itself
+        this.container.destroy();
+
+        // Clear any references
+        this.scene = null!;
+        this.card = null!;
+        this.physicalCard = null!;
+        this.priceText = null!;
+    }
+
     private setupInteractivity(onPurchase: (card: PlayableCard) => void): void {
-        this.container.setInteractive()
+        this.physicalCard.container.setInteractive()
             .on('pointerdown', () => {
                 onPurchase(this.card);
             });

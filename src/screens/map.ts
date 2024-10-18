@@ -126,7 +126,7 @@ export default class MapScene extends Phaser.Scene {
                 x: location.xPos,
                 y: location.yPos,
                 data: location,
-                eventCallback: this.setupLocationCardEvents
+                onCardCreatedEventCallback: this.setupLocationCardEvents
             });
             card.container.setDepth(10); // Increased depth to ensure visibility
             this.locationCards.push(card);
@@ -191,7 +191,7 @@ export default class MapScene extends Phaser.Scene {
                 x: 0,
                 y: 0,
                 data: character,
-                eventCallback: this.setupCharacterCardEvents
+                onCardCreatedEventCallback: this.setupCharacterCardEvents
             });
             this.characterCards.push(card);
         });

@@ -33,7 +33,6 @@ export class PhysicalIntent implements JsonRepresentable {
             text: intent.displayText(),
             style: { fontSize: '30px', color: '#ffffff' }
         });
-        this.textBox.setOrigin(0.5);
         
         this.container.add([this.image, this.textBox]);
         

@@ -91,7 +91,7 @@ export default class InventoryPanel {
                 data: item,
                 x: 0, // Set to 0 relative to cardsContainer
                 y: 0,
-                eventCallback: (card: PhysicalCard) => {}
+                onCardCreatedEventCallback: (card: PhysicalCard) => {}
             });
 
             // Position the PhysicalCard within the grid

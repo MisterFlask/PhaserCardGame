@@ -120,7 +120,7 @@ export class MapOverlay {
                 x: location.xPos,
                 y: location.yPos,
                 data: location,
-                eventCallback: this.setupLocationCardEvents
+                onCardCreatedEventCallback: this.setupLocationCardEvents
             });
             card.container.setDepth(10);
             this.locationCards.push(card);
@@ -163,7 +163,7 @@ export class MapOverlay {
                 x: 0,
                 y: 0,
                 data: character,
-                eventCallback: this.setupCharacterCardEvents
+                onCardCreatedEventCallback: this.setupCharacterCardEvents
             });
             this.characterCards.push(card);
             this.overlay.add(card.container);

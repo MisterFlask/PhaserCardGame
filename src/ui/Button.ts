@@ -6,8 +6,11 @@ export class TextBoxButton extends TextBox {
     private hoverColor: number;
     private disabledColor: number;
     private clickCallback: (() => void) | null = null;
+    private normalScale: number = 1.0;
+    private hoverScale: number = 1.1;
 
     private initialized = false;
+
     constructor(params: {
         scene: Phaser.Scene,
         x?: number,
@@ -29,32 +32,16 @@ export class TextBoxButton extends TextBox {
 
     private addButtonBehavior(): this {
         console.log("addButtonBehavior called on ", this.textBoxName);
-        // Get the dimensions of the background
-        const bounds = this.background?.getBounds();
-        
-        let width: number;
-        let height: number;
-
-        if (bounds) {
-            width = bounds.width;
-            height = bounds.height;
-        } else if (this.backgroundImage) {
-            // Use the backgroundImage's dimensions if available
-            width = this.backgroundImage.width;
-            height = this.backgroundImage.height;
-        } else {
-            // Fallback to the text's dimensions if no background or image
-            const textBounds = this.text?.getBounds();
-            width = textBounds?.width ?? 100;  // Default width if all else fails
-            height = textBounds?.height ?? 50; // Default height if all else fails
+        if (this.initialized) {
+            return this;
         }
 
-        // Set the interactive area
-        this.setInteractive(new Phaser.Geom.Rectangle(0, 0, width, height), Phaser.Geom.Rectangle.Contains)
+
+        this.setInteractive(this.background, Phaser.Geom.Rectangle.Contains)
             .on('pointerover', this.onPointerOver, this)
             .on('pointerout', this.onPointerOut, this)
             .on('pointerdown', this.onPointerDown, this);
-        
+
         this.initialized = true;
 
         return this;
@@ -83,12 +70,14 @@ export class TextBoxButton extends TextBox {
     private onPointerOver(): void {
         if (this.isEnabled) {
             this.setFillColor(this.hoverColor);
+            this.zoomIn();
         }
     }
 
     private onPointerOut(): void {
         if (this.isEnabled) {
             this.setFillColor(this.normalColor);
+            this.zoomOut();
         }
     }
 
@@ -96,6 +85,24 @@ export class TextBoxButton extends TextBox {
         if (this.isEnabled && this.clickCallback) {
             this.clickCallback();
         }
+    }
+
+    private zoomIn(): void {
+        this.scene.tweens.add({
+            targets: this,
+            scale: this.hoverScale,
+            duration: 200,
+            ease: 'Power2'
+        });
+    }
+
+    private zoomOut(): void {
+        this.scene.tweens.add({
+            targets: this,
+            scale: this.normalScale,
+            duration: 200,
+            ease: 'Power2'
+        });
     }
 
     public setFillColor(color: number): void {
@@ -126,5 +133,12 @@ export class TextBoxButton extends TextBox {
 
     public pulseRedBriefly(): void {
         this.pulseColor(0xff0000);
+    }
+
+    public setZoomScales(normalScale: number, hoverScale: number): this {
+        this.normalScale = normalScale;
+        this.hoverScale = hoverScale;
+        this.setScale(this.normalScale);
+        return this;
     }
 }

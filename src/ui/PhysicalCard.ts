@@ -9,8 +9,11 @@ import { IncomingIntent } from "./IncomingIntent"; // Import the new class
 import { PhysicalBuff } from './PhysicalBuff';
 import { PhysicalIntent } from "./PhysicalIntent";
 import { TextBox } from "./TextBox"; // Ensure correct relative path
+import { UIContext } from './UIContextManager';
 
 export class PhysicalCard implements IPhysicalCardInterface {
+    contextRelevant?: UIContext;
+
     cardConfig: CardConfig;
 
     container: Phaser.GameObjects.Container;

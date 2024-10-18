@@ -3,12 +3,13 @@ import Phaser from 'phaser';
 
 // Modify the class to extend Phaser.GameObjects.Container
 export class TextBox extends Phaser.GameObjects.Container {
-    protected background: Phaser.GameObjects.Rectangle | null = null;
+    protected background: Phaser.GameObjects.Rectangle ;
     protected backgroundImage: Phaser.GameObjects.Image | null = null;
     protected text: Phaser.GameObjects.Text;
     protected outline: Phaser.GameObjects.Rectangle | null = null;
     textBoxName?: string;
     expandDirection: 'up' | 'down';
+    private debugGraphics: Phaser.GameObjects.Graphics;
 
     constructor(params: {
         scene: Phaser.Scene,
@@ -38,17 +39,18 @@ export class TextBox extends Phaser.GameObjects.Container {
 
         super(scene, x, y);
 
+        // **Set the origin of the container to the center**
+        this.setOrigin(0.5, 0.5);
+
         this.textBoxName = textBoxName ?? "anonymousTextBox";
         this.expandDirection = params.expandDirection ?? 'down';
         
-        if (backgroundImage) {
-            this.backgroundImage = scene.add.image(0, 0, backgroundImage).setDisplaySize(width, height);
-            this.add(this.backgroundImage);
-        } else {
-            this.background = scene.add.rectangle(0, 0, width, height, fillColor);
-            this.background.setStrokeStyle(2, 0xffffff);
-            this.add(this.background);
-        }
+        this.background = scene.add.rectangle(0, 0, width, height, fillColor)
+            .setStrokeStyle(2, 0xffffff)
+            // **Center the background rectangle**
+            .setOrigin(0.5, 0.5);
+        this.add(this.background);
+        
 
         this.text = scene.add.text(0, 0, text, {
             ...style,
@@ -56,22 +58,29 @@ export class TextBox extends Phaser.GameObjects.Container {
             stroke: '#000000',
             strokeThickness: 2,
             resolution: 1,
-        });
-        this.text.setOrigin(0.5);
-        this.text.setWordWrapWidth(width - 20);
-        this.text.setAlign('center');
-        this.text.setShadow(2, 2, '#000000', 2, false, true);
+        })
+        .setOrigin(0.5, 0.5) // **Center the text**
+        .setWordWrapWidth(width - 20)
+        .setAlign('center')
+        .setShadow(2, 2, '#000000', 2, false, true);
         this.add(this.text);
 
         this.adjustTextBoxSize();
 
         // Add the container to the scene
         scene.add.existing(this);
+
+        // Initialize debug graphics
+        this.debugGraphics = this.scene.add.graphics();
+        this.debugGraphics.setVisible(true); // Set to false to hide debug hitboxes
+        this.add(this.debugGraphics);
     }
 
     setOrigin(x: number, y?: number): this {
         y = y ?? x;
-        this.text.setOrigin(x, y);
+        if (this.text) {
+            this.text.setOrigin(x, y);
+        }
         if (this.background) {
             this.background.setOrigin(x, y);
         }
@@ -114,20 +123,8 @@ export class TextBox extends Phaser.GameObjects.Container {
 
     // Override setInteractive
     override setInteractive(hitArea?: any, callback?: any, dropZone?: boolean): this {
-        const target = this.backgroundImage || this.background;
-        if (!target) {
-            throw new Error(`TextBox "${this.textBoxName}" has no background to define hit area.`);
-        }
-
-        const { displayWidth: width, displayHeight: height } = target;
-
-        if (width <= 0 || height <= 0) {
-            throw new Error(`TextBox "${this.textBoxName}" has invalid dimensions: ${width}x${height}`);
-        }
-
-        const customHitArea = new Phaser.Geom.Rectangle(-width / 2, -height / 2, width, height);
-
-        return super.setInteractive(customHitArea, Phaser.Geom.Rectangle.Contains, dropZone);
+        const { width, height } = this.calculateBoundingBox();
+        return super.setInteractive(this.background, Phaser.Geom.Rectangle.Contains, dropZone);
     }
 
     setText(text: string): void {
@@ -179,30 +176,45 @@ export class TextBox extends Phaser.GameObjects.Container {
             this.backgroundImage.destroy();
         }
         this.text.destroy();
-        this.background = null;
         this.backgroundImage = null;
         super.destroy();
     }
+
 
     /**
      * Makes the TextBox interactive with a predefined hit area based on its size.
      * @param callback The function to call when the TextBox is interacted with.
      */
     public makeInteractive(callback: () => void): void {
-        // Determine width and height from background or backgroundImage
-        const target = this.backgroundImage || this.background;
-        if (!target) {
-            console.warn(`TextBox "${this.textBoxName}" has no background to define hit area.`);
-            return;
-        }
-
-        const { displayWidth: width, displayHeight: height } = target;
-
-        // Define hit area as a rectangle centered on the TextBox
+        const { width, height } = this.calculateBoundingBox();
         const hitArea = new Phaser.Geom.Rectangle(-width / 2, -height / 2, width, height);
-
-        // Set the container as interactive with the defined hit area and callback
         this.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains)
             .on('pointerdown', callback);
+    }
+
+    // Add the update method to refresh the hitbox each frame
+    update(): void {
+        const { width, height } = this.calculateBoundingBox();
+        const hitArea = new Phaser.Geom.Rectangle(-width / 2, -height / 2, width, height);
+        this.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains, true);
+
+        // Draw debug hitbox if enabled
+        if (this.debugGraphics.visible) {
+            this.debugGraphics.clear();
+            this.debugGraphics.lineStyle(2, 0xff0000, 1); // Red color for visibility
+            this.debugGraphics.strokeRect(hitArea.x, hitArea.y, hitArea.width, hitArea.height);
+            // Ensure debug graphics are drawn on top
+            this.debugGraphics.setDepth(1000);
+        }
+    }
+
+    // Consolidate bounding box calculation into its own method
+    protected calculateBoundingBox(): { width: number; height: number } {
+        const target = this.background;
+        if (!target) {
+            throw new Error(`TextBox "${this.textBoxName}" has no background to calculate bounding box.`);
+        }
+        const { displayWidth: width, displayHeight: height } = target;
+        return { width, height };
     }
 }

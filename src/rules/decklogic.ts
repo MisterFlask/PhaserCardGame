@@ -1,3 +1,4 @@
+import { AbstractCard } from '../gamecharacters/AbstractCard';
 import { IAbstractCard } from '../gamecharacters/IAbstractCard';
 import { GameState } from './GameState';
 
@@ -20,7 +21,7 @@ export class DeckLogic {
     return DeckLogic.instance;
   }
 
-  public generateInitialCombatDeck(): IAbstractCard[] {
+  public generateInitialCombatDeck(): AbstractCard[] {
     const gameState = GameState.getInstance();
     const selectedCharacters = gameState.getCurrentRunCharacters();
     let initialDeck: IAbstractCard[] = [];
@@ -29,7 +30,7 @@ export class DeckLogic {
       initialDeck = initialDeck.concat(character.cardsInMasterDeck);
     }
 
-    return initialDeck;
+    return initialDeck as AbstractCard[];
   }
 
   public shuffleArray<T>(array: T[]): T[] {
@@ -72,7 +73,7 @@ export class DeckLogic {
     return drawnCards;
   }
 
-  public static moveCardToPile(card: IAbstractCard, pile: PileName): void {
+  public static moveCardToPile(card: AbstractCard, pile: PileName): void {
       const gameState = GameState.getInstance();
       const combatState = gameState.combatState;
 

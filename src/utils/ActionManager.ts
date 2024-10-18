@@ -1,9 +1,10 @@
 import { GameState } from "../rules/GameState";
 
 import Phaser, { Scene } from 'phaser';
-import { IPhysicalCardInterface } from '../gamecharacters/AbstractCard';
-import { BaseCharacter } from "../gamecharacters/BaseCharacter";
+import { AbstractCard, IPhysicalCardInterface } from '../gamecharacters/AbstractCard';
+import type { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { AbstractBuff } from "../gamecharacters/buffs/AbstractBuff";
+import { Stress } from "../gamecharacters/buffs/standard/Stress";
 import { IAbstractCard } from "../gamecharacters/IAbstractCard";
 import { IBaseCharacter } from "../gamecharacters/IBaseCharacter";
 import { PlayableCard } from "../gamecharacters/PlayableCard";
@@ -112,7 +113,7 @@ export class ActionManager {
         }));
     }
 
-    public applyBuffToCharacter(character: IBaseCharacter, buff: AbstractBuff, sourceCharacter?: IBaseCharacter): void {
+    public applyBuffToCharacter(character: BaseCharacter, buff: AbstractBuff, sourceCharacter?: IBaseCharacter): void {
         if (character == null || buff == null) {
             return;
         }
@@ -250,7 +251,7 @@ export class ActionManager {
         });
     }
 
-    public basicDiscardCard = (card: IAbstractCard): void => {
+    public basicDiscardCard = (card: AbstractCard): void => {
         this.actionQueue.addAction(new GenericAction(async () => {
             DeckLogic.moveCardToPile(card, PileName.Discard);
             await this.animateDiscardCard(card.physicalCard!);
@@ -541,7 +542,7 @@ export class ActionManager {
     public async resolveActions(): Promise<void> {
         await this.actionQueue.resolveActions();
     }
-    public basicDiscardCards(cards: IAbstractCard[]): void {
+    public basicDiscardCards(cards: AbstractCard[]): void {
         // Queue discarding multiple cards
         this.actionQueue.addAction(new GenericAction(async () => {
             cards.forEach(card => {
@@ -678,6 +679,24 @@ export class ActionManager {
 
             ProcBroadcaster.getInstance().broadcastCombatEvent(new ExhaustEvent(card));
 
+            return [];
+        }));
+    }
+
+    public addStressToCharacter(character: BaseCharacter, amount: number): void {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            const stressBuff = new Stress(amount);
+            this.applyBuffToCharacter(character, stressBuff);
+            console.log(`Added ${amount} Stress to ${character.name}`);
+            return [];
+        }));
+    }
+
+    public relieveStressFromCharacter(character: BaseCharacter, amount: number): void {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            const reliefBuff = new Stress(amount);
+            this.removeBuffFromCharacter(character, reliefBuff.getName(), amount);
+            console.log(`Relieved ${amount} Stress from ${character.name}`);
             return [];
         }));
     }

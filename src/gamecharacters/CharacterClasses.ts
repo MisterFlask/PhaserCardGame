@@ -1,5 +1,5 @@
-import { AbstractCard } from "./AbstractCard";
 import { BaseCharacter, Gender } from "./BaseCharacter";
+import { PlayableCard } from "./PlayableCard";
 
 
 
@@ -13,12 +13,12 @@ export abstract class BaseCharacterClass {
 
     name: string
     iconName: string
-    availableCards: AbstractCard[]
+    availableCards: PlayableCard[]
     startingMaxHp: number
 
     abstract getPortraitNameAtRandom(gender: Gender): string;
 
-    addCard(card: AbstractCard) {
+    addCard(card: PlayableCard) {
         this.availableCards.push(card);
     }
 
@@ -28,7 +28,7 @@ export abstract class BaseCharacterClass {
 }
 
 export class PlayerCharacter extends BaseCharacter {
-    cardsInMasterDeck: AbstractCard[];
+    cardsInMasterDeck: PlayableCard[];
     characterClass: BaseCharacterClass;
     
     constructor({ name, portraitName, characterClass, description }

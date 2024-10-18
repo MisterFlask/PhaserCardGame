@@ -58,7 +58,7 @@ class CardRewardScreen {
                 x: startX + index * cardSpacing,
                 y: yPosition,
                 data: cardReward.card,
-                eventCallback: (cardInstance: PhysicalCard) => {
+                onCardCreatedEventCallback: (cardInstance: PhysicalCard) => {
                     cardInstance.container.setInteractive({ useHandCursor: true });
                     cardInstance.container.on('pointerdown', () => {
                         console.log("Card clicked:", cardReward.card.name);

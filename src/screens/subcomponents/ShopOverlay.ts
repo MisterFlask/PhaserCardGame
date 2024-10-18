@@ -15,6 +15,8 @@ export class ShopOverlay {
     private isVisible: boolean = false;
     private shopItemsContainer!: Phaser.GameObjects.Container;
     private inventoryContainer!: Phaser.GameObjects.Container;
+    private shopItemPanels: ShopItemPanel[] = [];
+    private inventoryItemPanels: ShopItemPanel[] = [];
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -57,16 +59,18 @@ export class ShopOverlay {
     private populateShopItems(): void {
         const shopItems = this.getShopItems();
         shopItems.forEach((item, index) => {
-            const panel = new ShopItemPanel(this.scene, 0, index * 180, item, true, this.buyItem.bind(this));
+            const panel = new ShopItemPanel(this.scene, 100, index * 200 + 100, item, true, this.buyItem.bind(this));
             this.shopItemsContainer.add(panel.container);
+            this.shopItemPanels.push(panel); // Track panel
         });
     }
 
     private populateInventory(): void {
         const inventory = GameState.getInstance().inventory;
         inventory.forEach((item, index) => {
-            const panel = new ShopItemPanel(this.scene, 0, index * 180, item, false, this.sellItem.bind(this));
+            const panel = new ShopItemPanel(this.scene, 0, index * 200 + 100, item, false, this.sellItem.bind(this));
             this.inventoryContainer.add(panel.container);
+            this.inventoryItemPanels.push(panel); // Track panel
         });
     }
 
@@ -79,6 +83,9 @@ export class ShopOverlay {
     private buyItem(item: PlayableCard): void {
         // Implement buying logic here
         console.log(`Buying ${item.name}`);
+        // remove from shop
+
+        
         // After buying, refresh the shop and inventory
         this.refreshShop();
     }
@@ -91,7 +98,14 @@ export class ShopOverlay {
     }
 
     private refreshShop(): void {
-        // Clear existing items
+        // Destroy all tracked shop item panels
+        this.shopItemPanels.forEach(panel => panel.destroy());
+        this.shopItemPanels = [];
+
+        // Destroy all tracked inventory item panels
+        this.inventoryItemPanels.forEach(panel => panel.destroy());
+        this.inventoryItemPanels = [];
+
         this.shopItemsContainer.removeAll(true);
         this.inventoryContainer.removeAll(true);
 

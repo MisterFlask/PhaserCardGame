@@ -1,9 +1,9 @@
 import { JsonRepresentable } from '../interfaces/JsonRepresentable';
-import { AbstractIntent } from './AbstractIntent';
+import type { PhysicalCard } from '../ui/PhysicalCard';
+import { Team } from './AbstractCard';
 import { AbstractBuff } from './buffs/AbstractBuff';
-import { CardSize, CardType } from './Primitives';
-import { IPhysicalCardInterface, Team } from './AbstractCard';
 import { IBaseCharacter } from './IBaseCharacter';
+import { CardSize, CardType } from './Primitives';
 
 export interface IAbstractCard extends JsonRepresentable {
     typeTag: string;
@@ -18,13 +18,12 @@ export interface IAbstractCard extends JsonRepresentable {
     team: Team;
     block: number;
     buffs: AbstractBuff[];
-    energyCost: number;
-    physicalCard?: IPhysicalCardInterface | undefined;
+    physicalCard?: PhysicalCard | undefined;
 
     isBaseCharacter(): boolean;
     isAutomatedCharacter(): boolean;
     isPlayableCard(): boolean;
 
     OnCombatStart(): void;
-    Copy(): IAbstractCard;
+    Copy(): this;
 }

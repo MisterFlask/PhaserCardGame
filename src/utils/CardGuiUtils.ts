@@ -2,6 +2,7 @@ import type { AbstractCard } from "../gamecharacters/AbstractCard";
 import { CardType } from "../gamecharacters/Primitives";
 import { PhysicalCard } from "../ui/PhysicalCard";
 import { TextBox } from "../ui/TextBox";
+import { UIContext } from "../ui/UIContextManager";
 
 export interface CardConfig {
     cardWidth: number;
@@ -29,9 +30,10 @@ export class CardGuiUtils {
         x: number,
         y: number,
         data: AbstractCard,
-        eventCallback: (card: PhysicalCard) => void
+        contextRelevant?: UIContext,
+        onCardCreatedEventCallback: (card: PhysicalCard) => void
     }): PhysicalCard {
-        const { scene, x, y, data, eventCallback } = params;
+        const { scene, x, y, data, contextRelevant, onCardCreatedEventCallback: eventCallback } = params;
         const cardContainer = scene.add.container(x, y);
         const { cardWidth, cardHeight } = this.cardConfig;
         const cardBackground = scene.add.image(0, 0, 'greyscale').setDisplaySize(cardWidth, cardHeight);
@@ -49,7 +51,7 @@ export class CardGuiUtils {
             textBoxName: "nameBox:" + data.id,
             style: { fontSize: '16px', color: '#000', wordWrap: { width: cardWidth - 10 } }
         });
-        
+
         const descBox = new TextBox({
             scene: scene,
             x: -20,
@@ -113,6 +115,7 @@ export class CardGuiUtils {
         (cardContainer as any).physicalCard = physicalCard;
 
         eventCallback(physicalCard);
+        physicalCard.contextRelevant = contextRelevant;
         return physicalCard;
     }
 

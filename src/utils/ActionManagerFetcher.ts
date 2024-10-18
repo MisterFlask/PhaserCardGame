@@ -14,6 +14,7 @@ export class ActionManagerFetcher {
         if (!this._actionManager) {
             const { ActionManager } = await import('./ActionManager');
             this._actionManager = ActionManager.getInstance();
+            
         }
     }
 }

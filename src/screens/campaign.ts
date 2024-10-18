@@ -208,7 +208,7 @@ export default class CampaignScene extends Phaser.Scene {
                 x: 0,
                 y: 0,
                 data: character,
-                eventCallback: () => {}
+                onCardCreatedEventCallback: () => {}
             });
             this.addCardToSlot(card, rosterSlots[index]);
             this.setupCardHover(card);
@@ -420,7 +420,7 @@ export default class CampaignScene extends Phaser.Scene {
                 x: x,
                 y: 0,
                 data: card,
-                eventCallback: this.setupCardEvents
+                onCardCreatedEventCallback: this.setupCardEvents
             });
             this.deckDisplayCards.push(physicalCard);
             this.deckDisplayContainer.add(physicalCard.container);
@@ -502,7 +502,7 @@ export default class CampaignScene extends Phaser.Scene {
                 x: x,
                 y: this.shopY,
                 data: item,
-                eventCallback: (card) => this.setupShopCardEvents(card)
+                onCardCreatedEventCallback: (card) => this.setupShopCardEvents(card)
             });
             this.shopCards.push(physicalCard);
             // Create a new slot for this shop card

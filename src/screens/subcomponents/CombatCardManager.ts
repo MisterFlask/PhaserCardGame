@@ -33,7 +33,7 @@ export class CombatCardManager {
                 x: 0,
                 y: CombatSceneLayoutUtils.getHandY(this.scene),
                 data: cardData as AbstractCard,
-                eventCallback: () => { }
+                onCardCreatedEventCallback: () => { }
             });
             this.playerHand.push(card);
         });
@@ -70,7 +70,7 @@ export class CombatCardManager {
                 x: x,
                 y: y,
                 data: characterData,
-                eventCallback: () => { }
+                onCardCreatedEventCallback: () => { }
             });
             (unit as any).isPlayerUnit = true;
             this.playerUnits.push(unit);
@@ -86,7 +86,7 @@ export class CombatCardManager {
                 x: 400 + index * (cardWidth * 2), // Ensure separation of one card's width
                 y: CombatSceneLayoutUtils.getBattlefieldY(this.scene),
                 data: enemy,
-                eventCallback: () => { }
+                onCardCreatedEventCallback: () => { }
             });
             if (enemy instanceof AutomatedCharacter) {
                 enemy.setNewIntents();
@@ -105,7 +105,7 @@ export class CombatCardManager {
             x: gameWidth * 0.1,
             y: pileY,
             data: new UiCard({ name: 'Draw Pile (0)', description: 'Cards to draw', portraitName: "drawpile" }),
-            eventCallback: () => { }
+            onCardCreatedEventCallback: () => { }
         });
 
         this.discardPile = CardGuiUtils.getInstance().createCard({
@@ -113,7 +113,7 @@ export class CombatCardManager {
             x: gameWidth * 0.2,
             y: pileY,
             data: new UiCard({ name: 'Discard Pile (0)', description: 'Discarded cards', portraitName: "discardpile" }),
-            eventCallback: () => { }
+            onCardCreatedEventCallback: () => { }
         });
     }
 
@@ -153,7 +153,7 @@ export class CombatCardManager {
             x: this.drawPile.container.x,
             y: this.drawPile.container.y,
             data: data as AbstractCard,
-            eventCallback: () => { }
+            onCardCreatedEventCallback: () => { }
         });
         card.container.setScale(0.5);
         card.container.setAlpha(0);

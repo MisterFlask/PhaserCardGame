@@ -6,10 +6,13 @@ import { AbstractCard } from '../gamecharacters/AbstractCard';
 import { CardSize, CardType } from '../gamecharacters/Primitives';
 import { GameState } from '../rules/GameState';
 import { SceneChanger } from '../screens/SceneChanger';
+import { Faction } from './Faction';
+
 
 export class LocationCard extends AbstractCard {
     override typeTag = "LocationCard";
     encounter: EncounterData;
+    controllingFaction: Faction = Faction.NEUTRAL;
     public adjacentLocations: LocationCard[] = []; // New property for adjacency
     public xPos: number = 0;
     public yPos: number = 0;

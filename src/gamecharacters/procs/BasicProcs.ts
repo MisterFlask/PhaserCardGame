@@ -18,7 +18,7 @@ export class BasicProcs {
         return BasicProcs.instance;
     }
 
-    public Sacrifice(triggeringCard?: PlayableCard): void {
+    public SacrificeACardOtherThan(triggeringCard?: PlayableCard): void {
         const gameState = GameState.getInstance();
         const combat = gameState.combatState;
         // step one is get the hand minus the triggering card

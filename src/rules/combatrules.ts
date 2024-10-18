@@ -3,7 +3,7 @@ import { GameState } from "./GameState";
 
 
 import { AutomatedCharacterType, BaseCharacterType, PlayableCardType } from "../Types";
-import { IAbstractCard } from "../gamecharacters/IAbstractCard";
+import type { AbstractCard } from "../gamecharacters/AbstractCard";
 
 export class DamageCalculationResult {
     totalDamage: number;
@@ -47,7 +47,7 @@ export class CombatRules {
         const gameState = GameState.getInstance();
         const combatState = gameState.combatState;
 
-        const removeDeadCharacterCards = (pile: IAbstractCard[]) => {
+        const removeDeadCharacterCards = (pile: AbstractCard[]) => {
             return pile.filter(card => card.owner !== character);
         };
 

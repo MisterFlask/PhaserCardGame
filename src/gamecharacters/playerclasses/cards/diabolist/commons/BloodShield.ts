@@ -23,7 +23,7 @@ export class BloodShield extends PlayableCard {
 
     override InvokeCardEffects(targetCard?: BaseCharacter): void {
         this.applyBlockToTarget(this.owner);
-        BasicProcs.getInstance().Sacrifice(this);
+        BasicProcs.getInstance().SacrificeACardOtherThan(this);
     }
 }
 

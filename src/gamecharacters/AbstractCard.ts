@@ -1,3 +1,4 @@
+import type { PhysicalCard } from '../ui/PhysicalCard';
 import { TextBox } from '../ui/TextBox';
 import type { ActionManager } from '../utils/ActionManager';
 import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
@@ -10,7 +11,7 @@ export interface IPhysicalCardInterface {
     container: Phaser.GameObjects.Container;
     cardBackground: Phaser.GameObjects.Image | Phaser.GameObjects.Rectangle;
     cardImage: Phaser.GameObjects.Image;
-    data: IAbstractCard;
+    data: AbstractCard;
     blockText: TextBox;
     highlight(): void;
     unhighlight(): void;
@@ -118,6 +119,7 @@ export abstract class AbstractCard implements IAbstractCard {
         return ActionManagerFetcher.getActionManager();
     }
 
+    public energyCost: number = 0;
     protected _name: string;
     protected _description: string;
     public portraitName: string
@@ -126,11 +128,10 @@ export abstract class AbstractCard implements IAbstractCard {
     owner?: IBaseCharacter
     size: CardSize
     id: string
-    physicalCard?: IPhysicalCardInterface // this is a hack, it's just always PhysicalCard
+    physicalCard?: PhysicalCard // this is a hack, it's just always PhysicalCard
     team: Team
     block: number = 0
     buffs: AbstractBuff[] = [];
-    energyCost: number = 1
 
     constructor({ name, description, portraitName, cardType, tooltip, characterData, size, team }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: AbstractCard, size?: CardSize, team?: Team }) {
         this._name = name
@@ -153,7 +154,7 @@ export abstract class AbstractCard implements IAbstractCard {
         console.log('Combat started');
     }
     
-    Copy(): AbstractCard {
+    Copy(): this {
         const copy = Object.create(Object.getPrototypeOf(this));
          
         Object.assign(copy, this);
