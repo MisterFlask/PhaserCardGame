@@ -1,4 +1,5 @@
 import { AbstractCard, TargetingType } from './AbstractCard';
+import { BaseCharacter } from './BaseCharacter';
 import { AbstractBuff } from './buffs/AbstractBuff';
 import { IBaseCharacter } from './IBaseCharacter';
 import { CardRarity, PlayableCard, } from './PlayableCard';
@@ -9,7 +10,7 @@ export abstract class PlayableCardWithHelpers extends PlayableCard {
         super({ name, description, portraitName, cardType, tooltip, characterData, size, targetingType, owner, price, rarity });
     }
 
-    addBuff(target: IBaseCharacter, buff: AbstractBuff): void {
+    addBuff(target: BaseCharacter, buff: AbstractBuff): void {
         this.actionManager.applyBuffToCharacter(target, buff, this.owner);
     }
 }

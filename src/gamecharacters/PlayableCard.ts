@@ -38,7 +38,7 @@ export abstract class PlayableCard extends AbstractCard {
     /**
      * DO NOT OVERRIDE.
      */
-    forEachAlly(callback: (ally: IBaseCharacter) => void): void {
+    forEachAlly(callback: (ally: BaseCharacter) => void): void {
         this.combatState.playerCharacters
             .filter(char => char.team === Team.ALLY)
             .forEach(callback);

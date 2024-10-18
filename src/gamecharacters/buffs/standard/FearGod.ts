@@ -1,4 +1,5 @@
-import { IBaseCharacter } from "../../IBaseCharacter";
+import type { BaseCharacter } from "../../BaseCharacter";
+import type { IBaseCharacter } from "../../IBaseCharacter";
 import { PlayableCard } from "../../PlayableCard";
 import { AbstractBuff } from "../AbstractBuff";
 import { Stress } from "./Stress";
@@ -49,7 +50,7 @@ class PhobiaBuff extends AbstractBuff {
     override onThisCardInvoked(target?: IBaseCharacter): void {
         const owner = this.getOwnerAsPlayableCard();
         if (owner && owner.owner) {
-            this.actionManager.applyBuffToCharacter(owner.owner, new Stress(1));
+            this.actionManager.applyBuffToCharacter(owner.owner as BaseCharacter, new Stress(1));
         }
     }
 }
