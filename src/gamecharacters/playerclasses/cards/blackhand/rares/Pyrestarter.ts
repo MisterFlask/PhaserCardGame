@@ -14,9 +14,9 @@ export class Pyrestarter extends PlayableCard {
             portraitName: "fire-starter",
             targetingType: TargetingType.NO_TARGETING,
         });
-        this.baseBlock = 5;
-        this.baseMagicNumber = 2;
-        this.energyCost = 1;
+        this.baseBlock = 6;
+        this.baseMagicNumber = 3;
+        this.energyCost = 2;
     }
 
     override get description(): string {

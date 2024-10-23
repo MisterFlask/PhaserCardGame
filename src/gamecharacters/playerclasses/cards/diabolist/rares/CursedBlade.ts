@@ -60,7 +60,7 @@ export class CursedBlade extends PlayableCard {
             resource: this.iron,
             attackScaling: 1,
         });
-        this.buffs.push(new WeThirstBuff(6));
+        this.buffs.push(new WeThirstBuff(4));
     }
 
     override get description(): string {

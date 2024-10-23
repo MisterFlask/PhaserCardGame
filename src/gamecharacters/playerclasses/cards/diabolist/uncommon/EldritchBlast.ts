@@ -11,12 +11,12 @@ import { EldritchSmoke } from "../tokens/EldritchSmoke";
 export class EldritchBlast extends PlayableCard {
     constructor() {
         super({
-            name: "Pocket Vial",
+            name: "Eldritch Blast",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
-            rarity: CardRarity.COMMON,
+            rarity: CardRarity.UNCOMMON,
         });
-        this.baseDamage = 15;
+        this.baseDamage = 12;
         this.baseBlock = 0; // Assuming no block is needed
         this.baseMagicNumber = 3; // Bloodprice value
         this.buffs.push(new BloodPriceBuff(3));

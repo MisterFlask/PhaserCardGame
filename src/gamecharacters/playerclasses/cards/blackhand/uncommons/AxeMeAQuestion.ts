@@ -13,7 +13,7 @@ export class AxeMeAQuestion extends PlayableCard {
       portraitName: 'axe-question',
       targetingType: TargetingType.ENEMY,
     });
-    this.baseDamage = 13;
+    this.baseDamage = 11;
     this.energyCost = 2;
     this.buffs.push(new AxeCritBuff());
   }

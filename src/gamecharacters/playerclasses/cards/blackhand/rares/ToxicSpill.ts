@@ -12,7 +12,7 @@ export class ToxicSpill extends PlayableCard {
         super({
             name: "Toxic Spill",
             cardType: CardType.SKILL,
-            rarity: CardRarity.COMMON,
+            rarity: CardRarity.RARE,
             targetingType: TargetingType.ENEMY,
         }); 
         this.baseMagicNumber = 6;

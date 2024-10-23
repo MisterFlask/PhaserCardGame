@@ -17,9 +17,9 @@ export class Balefire extends PlayableCard {
             targetingType: TargetingType.ENEMY,
             rarity: CardRarity.RARE,
         });
-        this.energyCost = 4;
-        this.baseDamage = 10;
-        this.baseMagicNumber = 3; // Number of times damage is dealt
+        this.energyCost = 3;
+        this.baseDamage = 12;
+        this.baseMagicNumber = 2; // Number of times damage is dealt
         this.buffs.push(new BloodPriceBuff(3));
         this.buffs.push(new GiantKiller(1));
         this.buffs.push(new ExhaustBuff())

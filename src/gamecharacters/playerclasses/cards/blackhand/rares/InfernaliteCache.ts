@@ -5,7 +5,7 @@ import { PlayableCard } from "../../../../PlayableCard";
 export class InfernaliteCache extends PlayableCard {
     constructor() {
         super({
-            name: "Fired Up",
+            name: "Infernalite Cache",
             description: `_`,
             portraitName: "enrage",
             targetingType: TargetingType.NO_TARGETING,

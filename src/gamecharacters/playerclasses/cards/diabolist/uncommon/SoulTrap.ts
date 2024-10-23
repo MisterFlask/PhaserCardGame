@@ -11,7 +11,7 @@ export class SoulTrap extends PlayableCard {
             targetingType: TargetingType.ENEMY,
             rarity: CardRarity.UNCOMMON,
         });
-        this.baseDamage = 7;
+        this.baseDamage = 9;
         this.energyCost = 2;
     }
 

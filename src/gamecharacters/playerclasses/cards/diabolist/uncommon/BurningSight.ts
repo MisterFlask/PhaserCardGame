@@ -12,8 +12,8 @@ export class BurningSight extends PlayableCard {
             targetingType: TargetingType.NO_TARGETING,
             rarity: CardRarity.UNCOMMON,
         });
-        this.energyCost = 4;
-        this.baseMagicNumber = 2; // Bloodprice value
+        this.energyCost = 2;
+        this.baseMagicNumber = 1; // Bloodprice value
         this.buffs.push(new BloodPriceBuff(2));
     }
 

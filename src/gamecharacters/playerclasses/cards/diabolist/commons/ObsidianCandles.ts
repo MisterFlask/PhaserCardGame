@@ -17,7 +17,8 @@ export class ObsidianCandles extends PlayableCard {
             targetingType: TargetingType.NO_TARGETING,
             rarity: CardRarity.COMMON,
         });
-        this.energyCost = 2;
+        this.energyCost = 1;
+        this.baseMagicNumber = 1; // Draw 1 card instead of 2
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

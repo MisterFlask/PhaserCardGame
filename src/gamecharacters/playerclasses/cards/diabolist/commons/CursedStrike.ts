@@ -14,8 +14,9 @@ export class CursedStrike extends PlayableCard {
             targetingType: TargetingType.ENEMY,
             rarity: CardRarity.COMMON,
         });
-        this.baseDamage = 8;
+        this.baseDamage = 7;
         this.energyCost = 1;
+        this.baseMagicNumber = 2; // Apply 2 Cursed instead of 1
     }
 
     override get description(): string {

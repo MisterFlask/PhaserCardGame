@@ -15,7 +15,7 @@ export class StrengthOfInsanity extends PlayableCard {
             rarity: CardRarity.RARE,
         });
         this.energyCost = 1;
-        this.baseMagicNumber = 3; // Amount of Strength to apply
+        this.baseMagicNumber = 2; // Amount of Strength to apply
     }
 
     override get description(): string {

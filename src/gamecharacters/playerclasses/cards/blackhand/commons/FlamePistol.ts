@@ -14,7 +14,7 @@ export class FlamePistol extends PlayableCard {
             targetingType: TargetingType.ENEMY,
             cardType: CardType.ATTACK,
         });
-        this.baseDamage = 3;
+        this.baseDamage = 4;
         this.baseMagicNumber = 2;
         this.energyCost = 1;
 

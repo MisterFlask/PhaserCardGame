@@ -13,7 +13,7 @@ export class Smokescreen extends PlayableCard {
 			targetingType: TargetingType.NO_TARGETING,
 		});
 		this.baseMagicNumber = 2;
-		this.baseBlock = 4;
+		this.baseBlock = 6;
 		this.energyCost = 1;
 		this.buffs.push(new ExhaustBuff());
 	}
