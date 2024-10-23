@@ -32,6 +32,15 @@ export abstract class AbstractBuff implements IAbstractBuff {
         this.isDebuff = false;
         this.canGoNegative = false;
     }
+
+    protected forEachAlly(callback: (ally: BaseCharacter) => void): void {
+        const gameState = GameState.getInstance();
+        const playerCharacters = gameState.combatState.playerCharacters;
+        playerCharacters.forEach(callback);
+    }
+
+    
+
     public getOwnerAsPlayableCard(): PlayableCard | null {
         // Import GameState if not already imported at the top of the file
 
@@ -48,8 +57,6 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
         return owner as PlayableCard;
     }
-
-
 
     public getOwnerAsCharacter(): BaseCharacter | null {
         // Import GameState if not already imported at the top of the file
@@ -113,6 +120,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
     secondaryStacks: number = -1;
     showSecondaryStacks: boolean = false;
     isDebuff: boolean = false;
+    valueMod: number = 0;
 
     private _stacks: number = 1;
 
@@ -226,6 +234,13 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
     }
 
+    hellValueModifier(): number {
+        return 0;
+    }
+
+    surfaceValueModifier(): number {
+        return 0;
+    }
 
     ////////////////// PLAYABLE CARD METHODS //////////////////
 
@@ -261,6 +276,10 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
 
     public shouldRetainAfterTurnEnds(): boolean {
+        return false;
+    }
+
+    public shouldPurgeAsStateBasedEffect(): boolean {
         return false;
     }
 

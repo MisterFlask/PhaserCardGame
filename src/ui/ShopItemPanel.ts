@@ -37,7 +37,7 @@ export class ShopItemPanel {
     }
 
     private createPriceText(): void {
-        const price = this.isBuyable ? this.card.surfaceValue : this.card.hellValue;
+        const price = this.isBuyable ? this.card.surfacePurchaseValue : this.card.hellPurchaseValue;
         const text = this.isBuyable ? `${price} gold` : `Sell: ${price} gold`;
         
         this.priceText = new TextBox({

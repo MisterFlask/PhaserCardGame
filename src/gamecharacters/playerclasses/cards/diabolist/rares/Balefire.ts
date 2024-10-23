@@ -2,7 +2,9 @@
 
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
+import { ExhaustBuff } from "../../../../buffs/playable_card/ExhaustBuff";
 import { BloodPriceBuff } from "../../../../buffs/standard/Bloodprice";
+import { DamageIncreaseOnKill } from "../../../../buffs/standard/DamageIncreaseOnKill";
 import { GiantKiller } from "../../../../buffs/standard/GiantKiller";
 import { CardRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
@@ -20,6 +22,8 @@ export class Balefire extends PlayableCard {
         this.baseMagicNumber = 3; // Number of times damage is dealt
         this.buffs.push(new BloodPriceBuff(3));
         this.buffs.push(new GiantKiller(1));
+        this.buffs.push(new ExhaustBuff())
+        this.buffs.push(new DamageIncreaseOnKill(5));
         this.resourceScalings.push({
             resource: this.powder,
             attackScaling: 1,
@@ -27,7 +31,7 @@ export class Balefire extends PlayableCard {
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage ${this.getDisplayedMagicNumber()} times. Giant Killer. Bloodprice 3. Decrease your max HP by 3. If this kills an enemy, return this card to your hand. Exhaust.`;
+        return `Deal ${this.getDisplayedDamage()} damage ${this.getDisplayedMagicNumber()} times. Giant Killer. Bloodprice 3. Decrease your max HP by 3. Exhaust.`;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
@@ -43,8 +47,9 @@ export class Balefire extends PlayableCard {
             owner.maxHitpoints -= 3;
             owner.hitpoints = Math.min(owner.hitpoints, owner.maxHitpoints);
         }
-        this.actionManager.exhaustCard(this);
-
     }
 
 }
+
+
+

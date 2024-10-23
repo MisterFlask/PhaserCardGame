@@ -44,6 +44,7 @@ export abstract class AbstractRelic {
 
     public onLocationEntered(location: LocationCard): void {}
 
+    public onRelicClicked(): void {}
     
     
     // helpers

@@ -60,11 +60,11 @@ export class CursedBlade extends PlayableCard {
             resource: this.iron,
             attackScaling: 1,
         });
-        this.buffs.push(new WeThirstBuff(this.getBaseDamageAfterResourceScaling()));
+        this.buffs.push(new WeThirstBuff(10));
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage. On combat start, gain "WE THIRST".`;
+        return `Deal ${this.getDisplayedDamage()} damage. On combat start, gain 10 "WE THIRST".`;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

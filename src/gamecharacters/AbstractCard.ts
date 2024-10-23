@@ -1,8 +1,10 @@
+import { GameState } from '../rules/GameState';
 import type { PhysicalCard } from '../ui/PhysicalCard';
 import { TextBox } from '../ui/TextBox';
 import type { ActionManager } from '../utils/ActionManager';
 import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
 import { AbstractBuff } from './buffs/AbstractBuff';
+import { PlayerCharacter } from './CharacterClasses';
 import { IAbstractCard } from './IAbstractCard';
 import { IBaseCharacter } from './IBaseCharacter';
 import { CardSize, CardType } from './Primitives'; // Ensure enums are imported from Primitives
@@ -143,6 +145,35 @@ export abstract class AbstractCard implements IAbstractCard {
         this.owner = characterData as unknown as IBaseCharacter || undefined
         this.size = size || CardSize.SMALL
         this.team = team || Team.ENEMY
+    }
+
+    mirrorChangeToCanonicalCard(changeFunction: (card: this) => void): void {
+        const canonicalCard = this.getCanonicalCard();
+        if (canonicalCard) {
+            changeFunction(canonicalCard);
+            console.log(`Changed canonical card ${canonicalCard.id} to match ${this.id}`);
+        }else{
+            console.warn(`No canonical card found for ${this.id}`);
+        }
+        changeFunction(this)
+    }
+    
+    getCanonicalCard(): this | null{
+        // check for card in character deck
+        const character = this.owner as PlayerCharacter;
+        const deck = character.cardsInMasterDeck;
+        const canonicalCard = deck.find((card: AbstractCard) => card.id === this.id);
+        if (canonicalCard) {
+            return canonicalCard as any as this;
+        }
+        // check for card in inventory
+        const inventory = GameState.getInstance().inventory;
+        const canonicalCardInInventory = inventory.find((card: AbstractCard) => card.id === this.id);
+        if (canonicalCardInInventory) {
+            return canonicalCardInInventory as any as this;
+        }
+
+        return null;
     }
 
     getBuffStacks(buffName: string): number {

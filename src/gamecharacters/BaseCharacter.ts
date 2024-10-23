@@ -1,8 +1,7 @@
-import { IBaseCharacter } from './IBaseCharacter';
-import { AbstractCard } from './AbstractCard';
-import { JsonRepresentable } from '../interfaces/JsonRepresentable';
 import { GameState } from '../rules/GameState';
+import { AbstractCard } from './AbstractCard';
 import { AbstractIntent } from './AbstractIntent';
+import { IBaseCharacter } from './IBaseCharacter';
 
 
 export enum Gender{
