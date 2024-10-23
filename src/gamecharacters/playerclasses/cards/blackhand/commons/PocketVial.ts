@@ -15,8 +15,9 @@ export class PocketVial extends PlayableCardWithHelpers {
             targetingType: TargetingType.ENEMY,
             rarity: CardRarity.COMMON,
         });
-        this.baseDamage = 3;
+        this.baseDamage = 4;
         this.baseMagicNumber = 1;
+        this.energyCost = 1;
         this.buffs.push(new VolatileBuff());
     }
 

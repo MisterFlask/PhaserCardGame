@@ -13,7 +13,7 @@ export class UnnaturalVigor extends PlayableCard {
             rarity: CardRarity.UNCOMMON,
         });
         this.energyCost = 2;
-        this.baseMagicNumber = 4; // Iron
+        this.baseMagicNumber = 3; // Iron
     }
 
     override get description(): string {

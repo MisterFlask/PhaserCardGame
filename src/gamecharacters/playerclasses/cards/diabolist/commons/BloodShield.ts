@@ -13,7 +13,7 @@ export class BloodShield extends PlayableCard {
             portraitName: "blood-shield",
             targetingType: TargetingType.NO_TARGETING,
         });
-        this.baseBlock = 9;
+        this.baseBlock = 13;
         this.energyCost = 2;
     }
 

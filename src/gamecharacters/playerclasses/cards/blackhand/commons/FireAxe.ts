@@ -11,7 +11,7 @@ export class FireAxe extends PlayableCard {
             portraitName: "fire-axe",
             targetingType: TargetingType.ENEMY,
         });
-        this.baseDamage = 6;
+        this.baseDamage = 7;
         this.baseMagicNumber = 3;
         this.energyCost = 1;
     }

@@ -11,7 +11,7 @@ export class ReIgnition extends PlayableCard {
             portraitName: "fire-silhouette",
             targetingType: TargetingType.ALLY,
         });
-        this.baseBlock = 10;
+        this.baseBlock = 6;
         this.baseMagicNumber = 2;
         this.energyCost = 1;
     }

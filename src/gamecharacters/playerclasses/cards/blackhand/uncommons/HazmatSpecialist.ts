@@ -13,9 +13,9 @@ export class HazmatSpecialist extends PlayableCard {
 			portraitName: "hazmat-suit",
 			targetingType: TargetingType.NO_TARGETING,
 		});
-		this.baseBlock = 10;
+		this.baseBlock = 7;
 		this.baseMagicNumber = 2;
-		this.energyCost = 2;
+		this.energyCost = 1;
 	}
 
 	override get description(): string {

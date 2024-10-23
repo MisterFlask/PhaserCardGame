@@ -12,8 +12,8 @@ export class Smokescreen extends PlayableCard {
 			portraitName: "smoke-bomb",
 			targetingType: TargetingType.NO_TARGETING,
 		});
-		this.baseMagicNumber = 3;
-		this.baseBlock = 5;
+		this.baseMagicNumber = 2;
+		this.baseBlock = 4;
 		this.energyCost = 1;
 		this.buffs.push(new ExhaustBuff());
 	}
