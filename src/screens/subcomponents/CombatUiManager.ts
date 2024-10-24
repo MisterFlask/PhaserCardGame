@@ -327,9 +327,9 @@ class CombatUIManager {
             resources.powder,
             resources.iron,
             resources.pages,
-            resources.ice,
+            resources.pluck,
             resources.venture,
-            resources.fog
+            resources.smog
         ];
         this.resourceIndicators.forEach((container, index) => {
             const resource = resourceArray[index];

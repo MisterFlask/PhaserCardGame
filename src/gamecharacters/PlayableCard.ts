@@ -29,10 +29,15 @@ export abstract class PlayableCard extends AbstractCard {
     constructor({ name, description, portraitName, cardType, tooltip, characterData, size, targetingType, owner, price: surfaceValue, rarity }: { name: string; description?: string; portraitName?: string; cardType?: CardType; tooltip?: string; characterData?: AbstractCard; size?: CardSize; targetingType?: TargetingType; owner?: IBaseCharacter; price?: number; rarity?: CardRarity }) {
         super({ name, description: description ?? "_", portraitName, cardType, tooltip, characterData, size });
         this.targetingType = targetingType ?? TargetingType.ENEMY;
-        this.owner = owner;
+        this.owner = owner as BaseCharacter;
         this.surfacePurchaseValue = surfaceValue ?? 100;
         this.hellPurchaseValue = 100;
         this.rarity = rarity ?? CardRarity.COMMON; // Default to COMMON if not provided
+    }
+
+    withOwner(owner: BaseCharacter): this {
+        this.owner = owner;
+        return this;
     }
 
     /**
@@ -72,10 +77,21 @@ export abstract class PlayableCard extends AbstractCard {
         return false;
     }
 
+    //// HELPER METHODS////
+    allPartyMembers(): BaseCharacter[] {
+        return [...this.combatState.playerCharacters];
+    }
+    
+    allEnemies(): BaseCharacter[] {
+        return [...this.combatState.enemies];
+    }
+
+    
+
     /**
      * DO NOT OVERRIDE.
      */
-    public ownedBy(owner: IBaseCharacter): this {
+    public ownedBy(owner: BaseCharacter): this {
         this.owner = owner;
         return this;
     }
@@ -111,8 +127,8 @@ export abstract class PlayableCard extends AbstractCard {
         return ActionManagerFetcher.getActionManager();
     }
 
-    get ice(): CombatResource {
-        return this.combatResources.ice;
+    get pluck(): CombatResource {
+        return this.combatResources.pluck;
     }
 
     get pages(): CombatResource {
@@ -123,12 +139,12 @@ export abstract class PlayableCard extends AbstractCard {
         return this.combatResources.iron;
     }
 
-    get gold(): CombatResource {
+    get venture(): CombatResource {
         return this.combatResources.venture;
     }
 
-    get fog(): CombatResource {
-        return this.combatResources.fog;
+    get smog(): CombatResource {
+        return this.combatResources.smog;
     }
 
     get powder(): CombatResource {

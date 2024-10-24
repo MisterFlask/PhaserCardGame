@@ -155,10 +155,10 @@ export class CombatState{
 
     cardHoveredOver_transient?: AbstractCard
 
-    currentDrawPile: AbstractCard[] = []
-    currentDiscardPile: AbstractCard[] = []
-    currentHand: AbstractCard[] = []
-    currentExhaustPile: AbstractCard[] = []
+    currentDrawPile: PlayableCard[] = []
+    currentDiscardPile: PlayableCard[] = []
+    currentHand: PlayableCard[] = []
+    currentExhaustPile: PlayableCard[] = []
 
     enemies: AutomatedCharacterType[] = []
     playerCharacters: BaseCharacterType[] = []
@@ -200,13 +200,13 @@ export class MissionDetails{
 
 export class CombatResources{
 
-    modifyIce(byAmount: number){
-        this.ice.value += byAmount;
-        console.log(`Modified Ice by ${byAmount}. New value: ${this.ice.value}`);
+    modifyPluck(byAmount: number){
+        this.pluck.value += byAmount;
+        console.log(`Modified Pluck by ${byAmount}. New value: ${this.pluck.value}`);
     }
     modifyPages(byAmount: number){
         this.pages.value += byAmount;
-        console.log(`Modified Mind by ${byAmount}. New value: ${this.pages.value}`);
+        console.log(`Modified Pages by ${byAmount}. New value: ${this.pages.value}`);
     }
     modifyIron(byAmount: number){
         this.iron.value += byAmount;
@@ -214,15 +214,15 @@ export class CombatResources{
     }
     modifyVenture(byAmount: number){
         this.venture.value += byAmount;
-        console.log(`Modified Gold by ${byAmount}. New value: ${this.venture.value}`);
+        console.log(`Modified Venture by ${byAmount}. New value: ${this.venture.value}`);
     }
-    modifyFog(byAmount: number){
-        this.fog.value += byAmount;
-        console.log(`Modified Fog by ${byAmount}. New value: ${this.fog.value}`);
+    modifySmog(byAmount: number){
+        this.smog.value += byAmount;
+        console.log(`Modified Smog by ${byAmount}. New value: ${this.smog.value}`);
     }
     modifyPowder(byAmount: number){
         this.powder.value += byAmount;
-        console.log(`Modified Thunder by ${byAmount}. New value: ${this.powder.value}`);
+        console.log(`Modified Powder by ${byAmount}. New value: ${this.powder.value}`);
     }
 
     getCombatResource(resource: CombatResource): CombatResource{
@@ -230,7 +230,7 @@ export class CombatResources{
     }
 
     resources(): CombatResource[]{
-        return [this.powder, this.ice, this.pages, this.iron, this.venture, this.fog]
+        return [this.powder, this.pluck, this.pages, this.iron, this.venture, this.smog]
     }
 
     powder: CombatResource = new CombatResource(
@@ -245,17 +245,17 @@ export class CombatResources{
 
     pages: CombatResource = new CombatResource(
         "Pages",
-        "If you obtain 4 Pages in a combat, gain an additional card reward option.  If you gain 10, get 2 instead."
+        "If you end combat with 4 Pages, gain an additional card reward option.  If you gain 10, get 2 instead."
     );
 
-    ice: CombatResource = new CombatResource(
-        "Ice",
-        "Grant 1 Stress Block at beginning of turn for each 1 Ice value."
+    pluck: CombatResource = new CombatResource(
+        "Pluck",
+        "Grant 1 Stress Block at beginning of turn for each 1 Pluck value."
     );
 
-    fog: CombatResource = new CombatResource(
-        "Fog",
-        "If you have >4 Fog at beginning of turn, gain Sneak Attack to your hand and decrease Fog by 4. [Replays next card played by a character.]"
+    smog: CombatResource = new CombatResource(
+        "Smog",
+        "If you have >4 Smog at beginning of turn, manufacture a Sidearm to hand."
     );
 
     venture: CombatResource = new CombatResource(

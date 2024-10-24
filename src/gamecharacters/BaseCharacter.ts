@@ -1,6 +1,7 @@
 import { GameState } from '../rules/GameState';
 import { AbstractCard } from './AbstractCard';
 import { AbstractIntent } from './AbstractIntent';
+import { Stress } from './buffs/standard/Stress';
 import { IBaseCharacter } from './IBaseCharacter';
 
 
@@ -35,6 +36,21 @@ export class BaseCharacter extends AbstractCard implements IBaseCharacter {
         }
 
         return targetingIntents;
+    }
+
+    get stress(): number {
+        const stressBuff = this.buffs.find(buff => buff instanceof Stress);
+        return stressBuff ? stressBuff.stacks : 0;
+    }
+
+    set stress(value: number) {
+        const stressBuff = this.buffs.find(buff => buff instanceof Stress);
+        if (stressBuff) {
+            stressBuff.stacks = value;
+        } else {
+            const newStressBuff = new Stress(value);
+            this.buffs.push(newStressBuff);
+        }
     }
 
     constructor({ name, portraitName, maxHitpoints, description }

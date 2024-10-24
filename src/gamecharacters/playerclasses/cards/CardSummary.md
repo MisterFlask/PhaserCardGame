@@ -51,17 +51,28 @@
 
 ## Archon Cards
 
-### Common
-- **Resource Surge**: Gain 2 energy. Draw 1 card.
-- **Bolster**: Apply 5 Block to all allies.
-- **Inspire**: All allies gain 1 Strength.
+### commons
+- **lead by example**: deal 6 damage. if the target is vulnerable, all allies gain 1 strength.  Startup: apply 1 command aura to self.
+- **suppressing fire**: deal 4 damage to all enemies. gain 2 block for each enemy hit.
+- **inspirational banner**: all allies gain 2 block. if any ally has more than 2 stress, gain 1 energy.  Startup: apply 1 command aura to self.
+- **tactical withdrawal**: exhaust a card in hand. all allies gain 5 block. you gain 1 ice.
+- **take cover**: apply 3 block to all allies. if you have more than 2 ice, gain 1 extra block per ally.
 
-### Uncommon
-- **Strategic Reserves**: Gain 3 energy.
-- **Fortify**: Apply 10 Block to all allies.
-- **Battle Orders**: All allies gain 2 Strength.
+### uncommons
+- **iron discipline**: exhaust a card in hand. all allies gain 1 strength and 1 iron.
+- **war hymn**: all allies gain 1 strength, 3 block, and 1 fearless.
+- **victory at any cost**: deal 12 damage. Sacrifice. if this kills an enemy, all allies gain 1 strength.
+- **ruthless inspiration**: draw 1 card. if an ally has stress >4, draw an additional card. gain 1 iron.
+- **exemplary courage**: gain 8 block. if any ally has more than 4 stress, gain 1 ice and 2 strength.
 
-### Rare
-- **Commanding Presence**: All allies gain 3 Strength and 3 Dexterity.
-- **Energy Overload**: Gain 5 energy.
-- **Ultimate Defense**: Apply 20 Block to all allies.
+### rares
+- **unbreakable resolve**: all allies gain 2 fearless. if you have more than 3 stress, draw 2 cards and gain 1 iron.
+- **blood and iron**: all allies gain 2 strength. at the end of your turn, lose 2 hp for each ally with more than 2 strength.
+- **shattered morale**: deal 10 damage to all enemies. enemies lose 1 strength for every 3 stress on your team.
+- **no retreat, no surrender**: all allies gain 2 iron and 2 strength. gain 5 stress.
+- **final command**: deal 20 damage to one enemy. sacrifice 3 health. all allies gain 3 strength and 1 fearless.
+
+## new buffs/debuffs
+
+- **command aura** (buff): all cards gain [stacks] extra block when targeting other party members.
+- **heroism** (buff): the first [stacks] cards played by this character each turn refunds 1 energy. applies only if this character’s stress is >5.

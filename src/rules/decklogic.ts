@@ -1,5 +1,6 @@
-import { AbstractCard } from '../gamecharacters/AbstractCard';
-import { IAbstractCard } from '../gamecharacters/IAbstractCard';
+import type { AbstractCard } from '../gamecharacters/AbstractCard';
+import type { IAbstractCard } from '../gamecharacters/IAbstractCard';
+import type { PlayableCard } from '../gamecharacters/PlayableCard';
 import { GameState } from './GameState';
 
 
@@ -41,10 +42,10 @@ export class DeckLogic {
     return array;
   }
 
-  public drawCards(count: number): IAbstractCard[] {
+  public drawCards(count: number): PlayableCard[] {
     const gameState = GameState.getInstance();
     const combatState = gameState.combatState;
-    const drawnCards: IAbstractCard[] = [];
+    const drawnCards: PlayableCard[] = [];
 
     for (let i = 0; i < count; i++) {
       if (combatState.currentDrawPile.length === 0) {
@@ -73,7 +74,7 @@ export class DeckLogic {
     return drawnCards;
   }
 
-  public static moveCardToPile(card: AbstractCard, pile: PileName): void {
+  public static moveCardToPile(card: PlayableCard, pile: PileName): void {
       const gameState = GameState.getInstance();
       const combatState = gameState.combatState;
 

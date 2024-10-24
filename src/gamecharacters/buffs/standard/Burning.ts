@@ -11,7 +11,7 @@ export class Burning extends AbstractBuff {
 
     override getDescription(): string {
         const totalDamage = this.baseDamage + GameState.getInstance().combatState.combatResources.powder.value;
-        return `At the end of turn, take ${totalDamage} damage for ${this.getStacksDisplayText()} turns.`;
+        return `At the end of turn, take ${totalDamage} damage for ${this.getStacksDisplayText()} turns. [damage increases with powder]`;
     }
 
     constructor(stacks: number = 1) {

@@ -18,7 +18,7 @@ export class StormCloak extends PlayableCard {
         this.energyCost = 1;
 
         this.resourceScalings.push({
-            resource: GameState.getInstance().combatState.combatResources.ice,
+            resource: GameState.getInstance().combatState.combatResources.pluck,
             blockScaling: 2
         })
     }

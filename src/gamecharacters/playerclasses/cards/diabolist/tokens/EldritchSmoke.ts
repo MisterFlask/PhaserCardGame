@@ -16,7 +16,7 @@ export class EldritchSmoke extends PlayableCard {
         this.baseMagicNumber = 0; // No magic number
         this.energyCost = 0;
         this.resourceScalings.push({
-            resource: this.fog,
+            resource: this.smog,
             blockScaling: 1,
         });
     }

@@ -5,7 +5,6 @@ import { AbstractCard, IPhysicalCardInterface } from '../gamecharacters/Abstract
 import type { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { AbstractBuff } from "../gamecharacters/buffs/AbstractBuff";
 import { Stress } from "../gamecharacters/buffs/standard/Stress";
-import { IAbstractCard } from "../gamecharacters/IAbstractCard";
 import { IBaseCharacter } from "../gamecharacters/IBaseCharacter";
 import { PlayableCard } from "../gamecharacters/PlayableCard";
 import { ProcBroadcaster } from "../gamecharacters/procs/ProcBroadcaster";
@@ -214,7 +213,7 @@ export class ActionManager {
                 buff.provideMissingEnergy_returnsAmountProvided(missingEnergy);
             });
 
-            DeckLogic.moveCardToPile(card.data, PileName.Discard);
+            DeckLogic.moveCardToPile(card.data as PlayableCard, PileName.Discard);
             await this.animateDiscardCard(card);
             return [];
         }));
@@ -233,7 +232,7 @@ export class ActionManager {
         });
     }
 
-    private animateDrawCard(card: IAbstractCard): Promise<void> {
+    private animateDrawCard(card: PlayableCard): Promise<void> {
         return new Promise<void>((resolve) => {
             // Implement draw animation logic here
             console.log(`Animating draw for card: ${card.name}`);
@@ -251,7 +250,7 @@ export class ActionManager {
         });
     }
 
-    public basicDiscardCard = (card: AbstractCard): void => {
+    public basicDiscardCard = (card: PlayableCard): void => {
         this.actionQueue.addAction(new GenericAction(async () => {
             DeckLogic.moveCardToPile(card, PileName.Discard);
             await this.animateDiscardCard(card.physicalCard!);
@@ -274,10 +273,10 @@ export class ActionManager {
         console.log('Hand:', combatState.currentHand.map(card => card.name));
     }
 
-    public drawCards(count: number): void {
+    public drawCards(count: number, callback?: (cards: PlayableCard[]) => void): void {
         this.actionQueue.addAction(new GenericAction(async () => {
             const deckLogic = DeckLogic.getInstance();
-            const drawnCards: IAbstractCard[] = [];
+            const drawnCards: PlayableCard[] = [];
             // Add a small delay after drawing each card
             for (let i = 0; i < count; i++) {
                 const drawnCard = deckLogic.drawCards(1)[0];
@@ -292,6 +291,8 @@ export class ActionManager {
 
             console.log('Cards drawn:', drawnCards.map(card => card.name));
             console.log('Updated hand:', combatState.currentHand.map(card => card.name));
+
+            callback?.(drawnCards);
 
             return [];
         }));
@@ -546,7 +547,7 @@ export class ActionManager {
         // Queue discarding multiple cards
         this.actionQueue.addAction(new GenericAction(async () => {
             cards.forEach(card => {
-                this.basicDiscardCard(card);
+                this.basicDiscardCard(card as PlayableCard);
             });
             return [];
         }));
@@ -554,13 +555,13 @@ export class ActionManager {
 
     public modifyFog(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
         this.actionQueue.addAction(new GenericAction(async () => {
-            GameState.getInstance().combatState.combatResources.modifyFog(amount);
+            GameState.getInstance().combatState.combatResources.modifySmog(amount);
             return [];
         }));
     }
-    public modifyIce(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
+    public modifyPluck(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
         this.actionQueue.addAction(new GenericAction(async () => {
-            GameState.getInstance().combatState.combatResources.modifyIce(amount);
+            GameState.getInstance().combatState.combatResources.modifyPluck(amount);
             return [];
         }));
     }
@@ -701,6 +702,14 @@ export class ActionManager {
         }));
     }
 
+    public DoAThing(debugName: string, action: () => void): void {
+        console.log(`Doing a thing: ${debugName}`);
+        this.actionQueue.addAction(new GenericAction(async () => {
+            action();
+            return [];
+        }));
+    }
+
     public static beginTurn(): void {
         const gameState = GameState.getInstance();
         const combatState = gameState.combatState;
@@ -746,6 +755,21 @@ export class ActionManager {
             return [];
         }));
     }
+
+public chooseCardToDiscard(): void {
+    this.requireCardSelection({
+        name: "Discard",
+        instructions: "Choose a card to discard",
+        min: 1,
+        max: 1,
+        cancellable: false,
+        action: (selectedCards: PlayableCardType[]) => {
+            if (selectedCards.length > 0) {
+                this.basicDiscardCard(selectedCards[0]);
+            }
+        }
+    });
+}
     public requireCardSelection(params: {
         name: string;
         instructions: string;
