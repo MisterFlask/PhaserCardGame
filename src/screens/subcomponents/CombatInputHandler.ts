@@ -186,16 +186,6 @@ class CombatInputHandler {
         }
     }
 
-    private bringCardToFront(container: Phaser.GameObjects.Container): void {
-        this.scene.children.bringToTop(container);
-    }
-
-    private resetCardDepth(container: Phaser.GameObjects.Container): void {
-        // Reset depth based on original logic or other criteria
-        const originalDepth = (container as any).originalDepth || 4;
-        container.setDepth(originalDepth);
-    }
-
     private getTargetingType(card: PlayableCard): TargetingType {
         return card.targetingType;
     }

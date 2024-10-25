@@ -67,17 +67,6 @@ export class ShopOverlay {
             this.shopItemsContainer.add(panel.container);
             panel.container.setDepth(this.BASE_PANEL_DEPTH);
             
-            // Add hover handlers
-            panel.onHoverStart(() => {
-                panel.container.setToTop();
-                
-                panel.container.setDepth(DepthManager.getInstance().SHOP_CARD_HOVER);
-            });
-            
-            panel.onHoverEnd(() => {
-                panel.container.setDepth(this.BASE_PANEL_DEPTH);
-            });
-            
             this.shopItemPanels.push(panel);
         });
     }
