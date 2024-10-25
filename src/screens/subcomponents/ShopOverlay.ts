@@ -5,6 +5,7 @@ import { BaseCharacter } from '../../gamecharacters/BaseCharacter';
 import { PlayableCard } from '../../gamecharacters/PlayableCard';
 import { Rummage } from '../../gamecharacters/playerclasses/cards/basic/Rummage';
 import { GameState } from '../../rules/GameState';
+import { DepthManager } from '../../ui/DepthManager';
 import { ShopItemPanel } from '../../ui/ShopItemPanel';
 import { TextBox } from '../../ui/TextBox';
 import { UIContext, UIContextManager } from '../../ui/UIContextManager';
@@ -17,10 +18,13 @@ export class ShopOverlay {
     private inventoryContainer!: Phaser.GameObjects.Container;
     private shopItemPanels: ShopItemPanel[] = [];
     private inventoryItemPanels: ShopItemPanel[] = [];
+    private readonly BASE_PANEL_DEPTH = DepthManager.getInstance().SHOP_OVERLAY;
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
-        this.overlay = this.scene.add.container(0, 0).setVisible(false).setDepth(2000);
+        this.overlay = this.scene.add.container(0, 0)
+            .setVisible(false)
+            .setDepth(DepthManager.getInstance().SHOP_OVERLAY);
         this.createOverlay();
     }
 
@@ -61,7 +65,20 @@ export class ShopOverlay {
         shopItems.forEach((item, index) => {
             const panel = new ShopItemPanel(this.scene, 100, index * 200 + 100, item, true, this.buyItem.bind(this));
             this.shopItemsContainer.add(panel.container);
-            this.shopItemPanels.push(panel); // Track panel
+            panel.container.setDepth(this.BASE_PANEL_DEPTH);
+            
+            // Add hover handlers
+            panel.onHoverStart(() => {
+                panel.container.setToTop();
+                
+                panel.container.setDepth(DepthManager.getInstance().SHOP_CARD_HOVER);
+            });
+            
+            panel.onHoverEnd(() => {
+                panel.container.setDepth(this.BASE_PANEL_DEPTH);
+            });
+            
+            this.shopItemPanels.push(panel);
         });
     }
 
@@ -70,7 +87,20 @@ export class ShopOverlay {
         inventory.forEach((item, index) => {
             const panel = new ShopItemPanel(this.scene, 0, index * 200 + 100, item, false, this.sellItem.bind(this));
             this.inventoryContainer.add(panel.container);
-            this.inventoryItemPanels.push(panel); // Track panel
+
+            panel.container.setDepth(this.BASE_PANEL_DEPTH);
+            
+            // Add hover handlers
+            panel.onHoverStart(() => {
+                panel.container.setToTop();
+                panel.container.setDepth(DepthManager.getInstance().SHOP_CARD_HOVER);
+            });
+            
+            panel.onHoverEnd(() => {
+                panel.container.setDepth(this.BASE_PANEL_DEPTH);
+            });
+            
+            this.inventoryItemPanels.push(panel);
         });
     }
 

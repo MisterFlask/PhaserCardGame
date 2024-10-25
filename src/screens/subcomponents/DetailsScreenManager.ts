@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import type { AbstractCard } from '../../gamecharacters/AbstractCard';
 import { IAbstractBuff } from '../../gamecharacters/IAbstractBuff';
 import { GameState } from '../../rules/GameState';
+import { DepthManager } from '../../ui/DepthManager';
 
 export class DetailsScreenManager {
     private scene: Phaser.Scene;
@@ -12,7 +13,7 @@ export class DetailsScreenManager {
         this.scene = scene;
         this.detailsContainer = this.scene.add.container(0, 0)
             .setVisible(false)
-            .setDepth(3000); // Ensure the container is rendered above other game objects
+            .setDepth(DepthManager.getInstance().DETAILS_OVERLAY);
         this.setupKeyboardListener();
     }
 

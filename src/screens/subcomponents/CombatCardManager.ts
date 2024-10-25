@@ -6,6 +6,7 @@ import { AutomatedCharacter } from '../../gamecharacters/AutomatedCharacter';
 import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
 import type { PlayableCard } from '../../gamecharacters/PlayableCard';
 import { GameState } from '../../rules/GameState';
+import { DepthManager } from '../../ui/DepthManager';
 import CombatSceneLayoutUtils from '../../ui/LayoutUtils';
 import { PhysicalCard } from '../../ui/PhysicalCard';
 import { CardGuiUtils } from '../../utils/CardGuiUtils';
@@ -59,7 +60,6 @@ export class CombatCardManager {
             }
         });
     }
-
     
     private createPlayerUnits(): void {
         const playerCharacters = GameState.getInstance().combatState.playerCharacters;
@@ -80,7 +80,9 @@ export class CombatCardManager {
 
     private createEnemyCards(): void {
         const enemies = GameState.getInstance().combatState.enemies;
-        const cardWidth = 150; // Define card width
+        const cardWidth = 150;
+        const depthManager = DepthManager.getInstance();
+        
         enemies.forEach((enemy, index) => {
             const enemyCard = CardGuiUtils.getInstance().createCard({
                 scene: this.scene,
@@ -92,7 +94,7 @@ export class CombatCardManager {
             if (enemy instanceof AutomatedCharacter) {
                 enemy.setNewIntents();
             }
-            enemyCard.container.setDepth(1);
+            enemyCard.container.setDepth(depthManager.CARD_BASE);
             this.enemyUnits.push(enemyCard);
         });
     }

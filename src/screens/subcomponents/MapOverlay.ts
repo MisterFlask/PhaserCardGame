@@ -5,6 +5,7 @@ import { LocationManager } from '../../maplogic/LocationManager';
 import { SpatialManager } from '../../maplogic/SpatialManager';
 import { GameState } from '../../rules/GameState';
 import { TextBoxButton } from '../../ui/Button';
+import { DepthManager } from '../../ui/DepthManager';
 import { PhysicalCard } from '../../ui/PhysicalCard';
 import { UIContext, UIContextManager } from '../../ui/UIContextManager';
 import { ActionManagerFetcher } from '../../utils/ActionManagerFetcher';
@@ -32,7 +33,9 @@ export class MapOverlay {
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
-        this.overlay = this.scene.add.container(0, 0).setVisible(false).setDepth(1000); // Higher depth to overlay above combat UI
+        this.overlay = this.scene.add.container(0, 0)
+            .setVisible(false)
+            .setDepth(DepthManager.getInstance().MAP_OVERLAY);
 
         // Initialize Managers
         this.locationManager = new LocationManager();
@@ -113,6 +116,7 @@ export class MapOverlay {
     // Create Physical Location Cards
     private createPhysicalLocationCards() {
         const locations = GameState.getInstance().getLocations();
+        const depthManager = DepthManager.getInstance();
 
         locations.forEach(location => {
             const card = CardGuiUtils.getInstance().createCard({
@@ -122,7 +126,7 @@ export class MapOverlay {
                 data: location,
                 onCardCreatedEventCallback: this.setupLocationCardEvents
             });
-            card.container.setDepth(10);
+            card.container.setDepth(depthManager.CARD_BASE);
             this.locationCards.push(card);
             this.overlay.add(card.container);
         });

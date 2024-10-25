@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { GameState } from '../rules/GameState';
 import { PlayableCardType } from '../Types';
 import { TextBoxButton } from './Button';
+import { DepthManager } from './DepthManager';
 import { TextBox } from './TextBox';
 
 interface CardSelectionParams {
@@ -70,6 +71,8 @@ class CardSelectionFromHandManager {
     }
 
     private createOverlay(): void {
+        const depthManager = DepthManager.getInstance();
+        
         this.overlay = this.scene.add.rectangle(
             this.scene.scale.width / 2,
             this.scene.scale.height / 2,
@@ -78,7 +81,7 @@ class CardSelectionFromHandManager {
             0x000000,
             0.5
         );
-        this.overlay.setDepth(1);
+        this.overlay.setDepth(depthManager.OVERLAY_BASE);
         this.overlay.setInteractive();
     }
 
@@ -136,10 +139,11 @@ class CardSelectionFromHandManager {
     }
 
     private setupCardInteractions(): void {
-        const handCards = GameState.getInstance().combatState.currentHand; // Assumes a method to get player's hand cards
+        const depthManager = DepthManager.getInstance();
+        const handCards = GameState.getInstance().combatState.currentHand;
 
         handCards.forEach((card, i) => {
-            card.physicalCard?.container.setDepth(4 + i);
+            card.physicalCard?.container.setDepth(depthManager.CARD_BASE + i);
             card.physicalCard?.container.setInteractive()
                 .on('pointerdown', () => this.toggleCardSelection(card as PlayableCardType));
         });

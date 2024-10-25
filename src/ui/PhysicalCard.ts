@@ -49,6 +49,9 @@ export class PhysicalCard implements IPhysicalCardInterface {
     glowColor: number = 0xffff00; //yellow
     private costBox: TextBox | null = null; // Add costBox property
 
+    // This should be false in production; used for debugging depth-related issues in cards
+    depthDebug: boolean = true;
+
     constructor({
         scene,
         container,
@@ -318,7 +321,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
         this.descBox.setVisible(true);
         this.tooltipBox.setVisible(true);
-        this.container.setDepth(1000);
+        // this.container.setDepth(1000);
 
         // Determine tooltip position based on card's position
         const cardWidth = this.cardBackground.displayWidth * this.data.size.sizeModifier * 1.1; // Adjust for scaling
@@ -380,7 +383,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
         this.descBox.setVisible(false);
         this.tooltipBox.setVisible(false);
-        this.container.setDepth(4);
+        //this.container.setDepth(4);
 
         // Stop wiggle animation
         if (this.wiggleTween) {
@@ -473,7 +476,13 @@ export class PhysicalCard implements IPhysicalCardInterface {
             return;
         }
 
-        this.nameBox.setText(this.data.name);
+        // Update the name text to include depth information if debug is enabled
+        if (this.depthDebug) {
+            this.nameBox.setText(`${this.data.name} depth=[${this.container.depth}]`);
+        } else {
+            this.nameBox.setText(this.data.name);
+        }
+
         this.descBox.setText(this.data.description);
 
         // Update HP box if it exists
@@ -808,5 +817,70 @@ export class PhysicalCard implements IPhysicalCardInterface {
             -this.cardBackground.displayWidth / 2 - 60 + totalWidth,
             -this.cardBackground.displayHeight / 2
         );
+    }
+
+    /**
+     * Sets the depth of all card components
+     * @param depth The depth value to set
+     */
+    public setDepth(depth: number): void {
+        console.log("Card component depth before setting:", {
+            container: this.container.depth,
+            descBox: this.descBox.depth,
+            nameBox: this.nameBox.depth,
+            tooltip: this.tooltipBox.depth,
+            backgroundRect: this.cardBackgroundAsRectangle?.depth,
+            background: this.cardBackground.depth,
+            border: this.cardBorder.depth
+        });
+        
+        // Set depth for main containers
+        this.container.setDepth(depth);
+        this.cardContent.setDepth(depth);
+        
+        // Set depth for all major components
+        if (this.cardBackgroundAsRectangle) {
+            this.cardBackgroundAsRectangle.setDepth(depth - 2);
+        }
+        this.cardBackground.setDepth(depth - 2);
+        this.cardImage.setDepth(depth - 1 );
+        this.nameBox.setDepth(depth);
+        this.descBox.setDepth(depth);
+        this.tooltipBox.setDepth(depth + 1); // Tooltip should be above other elements
+        
+        // Set depth for optional components
+        if (this.hpBox) {
+            this.hpBox.setDepth(depth);
+        }
+        if (this.costBox) {
+            this.costBox.setDepth(depth);
+        }
+        
+        // Set depth for containers and their contents
+        this.intentsContainer.setDepth(depth);
+        this.physicalIntents.forEach(intent => intent.getContainer().setDepth(depth));
+        
+        this.blocksContainer.setDepth(depth);
+        this.blockText.setDepth(depth);
+        
+        this.buffsContainer.setDepth(depth);
+        this.currentBuffs.forEach(buff => buff.container.setDepth(depth));
+        
+        this.incomingIntentsContainer.setDepth(depth);
+        this.incomingIntents.forEach(intent => intent.getContainer().setDepth(depth));
+        
+        if (this.cardBorder) {
+            this.cardBorder.setDepth(depth - 1); // Border should be behind the card
+        }
+
+        console.log("Card component depth after setting:", {
+            container: this.container.depth,
+            descBox: this.descBox.depth,
+            nameBox: this.nameBox.depth,
+            tooltip: this.tooltipBox.depth,
+            backgroundRect: this.cardBackgroundAsRectangle?.depth,
+            background: this.cardBackground.depth,
+            border: this.cardBorder.depth
+        });
     }
 }

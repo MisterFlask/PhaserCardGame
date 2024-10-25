@@ -1,5 +1,6 @@
 // src/ui/TextBox.ts
 import Phaser from 'phaser';
+import { DepthManager } from './DepthManager';
 
 // Modify the class to extend Phaser.GameObjects.Container
 export class TextBox extends Phaser.GameObjects.Container {
@@ -198,13 +199,11 @@ export class TextBox extends Phaser.GameObjects.Container {
         const hitArea = new Phaser.Geom.Rectangle(-width / 2, -height / 2, width, height);
         this.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains, true);
 
-        // Draw debug hitbox if enabled
         if (this.debugGraphics.visible) {
             this.debugGraphics.clear();
-            this.debugGraphics.lineStyle(2, 0xff0000, 1); // Red color for visibility
+            this.debugGraphics.lineStyle(2, 0xff0000, 1);
             this.debugGraphics.strokeRect(hitArea.x, hitArea.y, hitArea.width, hitArea.height);
-            // Ensure debug graphics are drawn on top
-            this.debugGraphics.setDepth(1000);
+            this.debugGraphics.setDepth(DepthManager.getInstance().TOOLTIP);
         }
     }
 

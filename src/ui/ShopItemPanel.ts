@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { PlayableCard } from '../gamecharacters/PlayableCard';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
+import { DepthManager } from './DepthManager';
 import { PhysicalCard } from './PhysicalCard';
 import { TextBox } from './TextBox';
 
@@ -79,10 +80,29 @@ export class ShopItemPanel {
         this.priceText = null!;
     }
 
+    // Update the setCardHoverDepth method to use the new setDepth function
+    public setCardHoverDepth(depth: number): void {
+        this.container.setDepth(depth);
+        if (this.physicalCard) {
+            //this.physicalCard.setDepth(depth);
+        }
+        // Also set depth for the price text to ensure it stays with the card
+        if (this.priceText) {
+            this.priceText.setDepth(depth);
+        }
+    }
+
     private setupInteractivity(onPurchase: (card: PlayableCard) => void): void {
         this.physicalCard.container.setInteractive()
             .on('pointerdown', () => {
                 onPurchase(this.card);
+            })
+            .on('pointerover', () => {                
+                this.container.setToTop(); //todo: why does this work and depth doesn't?
+                this.setCardHoverDepth(DepthManager.getInstance().SHOP_CARD_HOVER);
+            })
+            .on('pointerout', () => {
+                this.setCardHoverDepth(DepthManager.getInstance().SHOP_OVERLAY);
             });
     }
 
@@ -111,5 +131,15 @@ export class ShopItemPanel {
 
         // Update the interactive area
         this.container.input?.hitArea?.setTo(0, 0, grid.width, grid.height);
+    }
+
+    // Add these methods to the ShopItemPanel class
+
+    public onHoverStart(callback: () => void): void {
+        this.container.on('pointerover', callback);
+    }
+
+    public onHoverEnd(callback: () => void): void {
+        this.container.on('pointerout', callback);
     }
 }

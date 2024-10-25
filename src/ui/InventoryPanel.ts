@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { GameState } from '../rules/GameState';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 import { TextBoxButton } from './Button';
+import { DepthManager } from './DepthManager';
 import { PhysicalCard } from './PhysicalCard';
 import { TextBox } from './TextBox';
 
@@ -69,7 +70,7 @@ export default class InventoryPanel {
     private toggleInventory = (): void => {
         this.inventoryPanel.setVisible(!this.inventoryPanel.visible);
         if (this.inventoryPanel.visible) {
-            this.inventoryPanel.setDepth(Number.MAX_SAFE_INTEGER);
+            this.inventoryPanel.setDepth(DepthManager.getInstance().INVENTORY_OVERLAY);
             this.updateInventoryPanel();
         }
     }

@@ -1,5 +1,6 @@
 import { AbstractBuff } from '../gamecharacters/buffs/AbstractBuff';
 import ImageUtils from '../utils/ImageUtils';
+import { DepthManager } from './DepthManager';
 import { TextBox } from './TextBox';
 
 export class PhysicalBuff {
@@ -102,7 +103,7 @@ export class PhysicalBuff {
 
         this.tooltipBox.setPosition(descX, descY);
         this.tooltipBox.setVisible(true);
-        this.tooltipBox.setDepth(1000); // Ensure the tooltip is above all other elements
+        this.tooltipBox.setDepth(DepthManager.getInstance().TOOLTIP);
         this.updateText();
     }
 

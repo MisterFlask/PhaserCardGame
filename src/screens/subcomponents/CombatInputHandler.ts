@@ -7,6 +7,7 @@ import { BaseCharacter } from '../../gamecharacters/BaseCharacter';
 import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
 import { PlayableCard } from '../../gamecharacters/PlayableCard';
 import { GameState } from '../../rules/GameState';
+import { DepthManager } from '../../ui/DepthManager';
 import CombatSceneLayoutUtils from '../../ui/LayoutUtils';
 import { PhysicalCard } from '../../ui/PhysicalCard';
 import { PhysicalIntent } from '../../ui/PhysicalIntent';
@@ -98,10 +99,11 @@ class CombatInputHandler {
         if ('physicalCard' in gameObject) {
             CombatInputHandler.draggedCard = (gameObject as any).physicalCard as PhysicalCard;
             if (CombatInputHandler.draggedCard) {
-                this.originalCardPosition = { x: CombatInputHandler.draggedCard.container.x, y: CombatInputHandler.draggedCard.container.y };
-                if (gameObject.parentContainer) {
-                    this.bringCardToFront(gameObject.parentContainer);
-                }
+                this.originalCardPosition = { 
+                    x: CombatInputHandler.draggedCard.container.x, 
+                    y: CombatInputHandler.draggedCard.container.y 
+                };
+                CombatInputHandler.draggedCard.container.setDepth(DepthManager.getInstance().CARD_DRAGGING);
             }
         } else {
             console.warn('Dragged object is not a PhysicalCard');
@@ -168,7 +170,7 @@ class CombatInputHandler {
         if (!UIContextManager.getInstance().isContext(UIContext.COMBAT)) return;
         if (gameObject instanceof Phaser.GameObjects.Container && (gameObject as any).physicalCard instanceof PhysicalCard) {
             const physicalCard = (gameObject as any).physicalCard as PhysicalCard;
-            this.bringCardToFront(gameObject);
+            physicalCard.container.setDepth(DepthManager.getInstance().CARD_HOVER);
             this.highlightedCard = physicalCard;
         }
     }
@@ -177,7 +179,7 @@ class CombatInputHandler {
         if (!UIContextManager.getInstance().isContext(UIContext.COMBAT)) return;
         if (gameObject instanceof Phaser.GameObjects.Container && (gameObject as any).physicalCard instanceof PhysicalCard) {
             const physicalCard = (gameObject as any).physicalCard as PhysicalCard;
-            this.resetCardDepth(gameObject);
+            physicalCard.container.setDepth(DepthManager.getInstance().CARD_BASE);
             if (this.highlightedCard === physicalCard) {
                 this.highlightedCard = null;
             }
