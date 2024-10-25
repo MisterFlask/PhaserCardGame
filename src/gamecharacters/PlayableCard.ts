@@ -5,6 +5,7 @@ import type { ActionManager } from "../utils/ActionManager";
 import { ActionManagerFetcher } from "../utils/ActionManagerFetcher";
 import { AbstractCard, TargetingType, Team } from "./AbstractCard";
 import { BaseCharacter } from "./BaseCharacter";
+import { PlayerCharacter } from "./CharacterClasses";
 import { IBaseCharacter } from "./IBaseCharacter";
 import { CardSize, CardType } from "./Primitives";
 
@@ -29,13 +30,13 @@ export abstract class PlayableCard extends AbstractCard {
     constructor({ name, description, portraitName, cardType, tooltip, characterData, size, targetingType, owner, price: surfaceValue, rarity }: { name: string; description?: string; portraitName?: string; cardType?: CardType; tooltip?: string; characterData?: AbstractCard; size?: CardSize; targetingType?: TargetingType; owner?: IBaseCharacter; price?: number; rarity?: CardRarity }) {
         super({ name, description: description ?? "_", portraitName, cardType, tooltip, characterData, size });
         this.targetingType = targetingType ?? TargetingType.ENEMY;
-        this.owner = owner as BaseCharacter;
+        this.owner = owner as PlayerCharacter;
         this.surfacePurchaseValue = surfaceValue ?? 100;
         this.hellPurchaseValue = 100;
         this.rarity = rarity ?? CardRarity.COMMON; // Default to COMMON if not provided
     }
 
-    withOwner(owner: BaseCharacter): this {
+    withOwner(owner: PlayerCharacter): this {
         this.owner = owner;
         return this;
     }
@@ -91,7 +92,7 @@ export abstract class PlayableCard extends AbstractCard {
     /**
      * DO NOT OVERRIDE.
      */
-    public ownedBy(owner: BaseCharacter): this {
+    public ownedBy(owner: PlayerCharacter): this {
         this.owner = owner;
         return this;
     }

@@ -13,6 +13,7 @@ import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
 import GameImageLoader from '../utils/ImageUtils';
 import CampaignScene from './Campaign';
 import { SceneChanger } from './SceneChanger';
+import { CampaignBriefStatus } from './subcomponents/CampaignBriefStatus';
 import CombatCardManager from './subcomponents/CombatCardManager';
 import CombatInputHandler from './subcomponents/CombatInputHandler';
 import CombatStateService from './subcomponents/CombatStateService';
@@ -40,6 +41,7 @@ class CombatScene extends Phaser.Scene {
     private shopOverlay!: ShopOverlay;
     private mapOverlay!: MapOverlay;
     private mapButton!: TextBoxButton;
+    private campaignBriefStatus!: CampaignBriefStatus;
 
     constructor() {
         super('CombatScene');
@@ -94,8 +96,8 @@ class CombatScene extends Phaser.Scene {
         // Create the map button
         this.mapButton = new TextBoxButton({
             scene: this,
-            x: 10,
-            y: 10,
+            x: 300,
+            y: 100,
             width: 100,
             height: 40,
             text: 'Map',
@@ -108,6 +110,10 @@ class CombatScene extends Phaser.Scene {
                 this.toggleMapOverlay(true);
             });
         this.add.existing(this.mapButton);
+
+        this.campaignBriefStatus = new CampaignBriefStatus(this);
+        this.add.existing(this.campaignBriefStatus);
+        this.campaignBriefStatus.depth = 100;
     }
 
     private obliterate(): void {
@@ -115,6 +121,9 @@ class CombatScene extends Phaser.Scene {
         this.events.off('destroy', this.obliterate, this);
         // Remove resize event listener
         this.scale.off('resize', this.resize, this);
+        if (this.campaignBriefStatus) {
+            this.campaignBriefStatus.destroy();
+        }
     }
 
     private createBackground(): void {
@@ -162,7 +171,11 @@ class CombatScene extends Phaser.Scene {
 
         // Reposition map button
         if (this.mapButton) {
-            this.mapButton.setPosition(10, 10);
+            this.mapButton.setPosition(100, 200);
+        }
+
+        if (this.campaignBriefStatus) {
+            this.campaignBriefStatus.setPosition(700, 11);
         }
     }
 

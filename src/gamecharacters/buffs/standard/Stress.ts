@@ -1,6 +1,6 @@
-import { DamageInfo } from "../../../rules/DamageInfo";
-import { BaseCharacter } from "../../BaseCharacter";
-import { PlayableCard } from "../../PlayableCard";
+import type { DamageInfo } from "../../../rules/DamageInfo";
+import type { BaseCharacter } from "../../BaseCharacter";
+import type { PlayableCard } from "../../PlayableCard";
 import { AbstractBuff } from "../AbstractBuff";
 
 export class Stress extends AbstractBuff {

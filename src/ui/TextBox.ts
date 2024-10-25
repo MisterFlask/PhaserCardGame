@@ -106,8 +106,8 @@ export class TextBox extends Phaser.GameObjects.Container {
 
     pulseColor(color: number): void {
         if (this.background) {
-            const originalColor = this.background.fillColor;
-            this.scene.tweens.add({
+            const originalColor = this.background?.fillColor;
+            this.scene?.tweens?.add({
                 targets: this.background,
                 fillColor: { from: originalColor, to: color },
                 duration: 100,

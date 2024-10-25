@@ -5,6 +5,7 @@ import { ActionManager } from "../../utils/ActionManager";
 import { ActionManagerFetcher } from "../../utils/ActionManagerFetcher";
 import { generateWordGuid } from "../AbstractCard";
 import type { BaseCharacter } from "../BaseCharacter";
+import { PlayerCharacter } from "../CharacterClasses";
 import type { IAbstractBuff } from '../IAbstractBuff';
 import { IBaseCharacter } from '../IBaseCharacter';
 import type { PlayableCard } from "../PlayableCard";
@@ -58,7 +59,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
         return owner as PlayableCard;
     }
 
-    public getOwnerAsCharacter(): BaseCharacter | null {
+    public getOwnerAsCharacter(): PlayerCharacter | null {
         // Import GameState if not already imported at the top of the file
 
         // Find the owner of this buff by searching through all characters in the combat state
@@ -73,7 +74,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
             return null;
         }
 
-        return owner;
+        return owner as PlayerCharacter;
     }
 
     /*

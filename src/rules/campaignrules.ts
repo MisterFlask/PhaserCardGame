@@ -38,10 +38,10 @@ export class CampaignRules {
             
             randomClass.availableCards.forEach(card => {
                 character.cardsInMasterDeck.push(card.Copy());
-                character.cardsInMasterDeck.forEach(card=> {
-                    card.owner = character;
-                })
             });
+            character.cardsInMasterDeck.forEach(card=> {
+                card.owner = character;
+            })
             characters.push(character);
         }
 

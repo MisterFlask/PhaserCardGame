@@ -11,7 +11,7 @@ export class GameState {
     public currentRunCharacters: PlayerCharacter[] = [];
     public shopItems: PlayableCard[] = [];
     public inventory: PlayableCard[] = [];
-    
+
     public surfaceCurrency: number = 0
     public hellCurrency: number = 0
     public combatState: CombatState = new CombatState()
@@ -150,7 +150,6 @@ export class GameState {
     // Ensure that AbstractCard can be treated as StoreCard or adjust types accordingly
 }
 
-
 export class CombatState{
 
     cardHoveredOver_transient?: AbstractCard
@@ -161,7 +160,7 @@ export class CombatState{
     currentExhaustPile: PlayableCard[] = []
 
     enemies: AutomatedCharacterType[] = []
-    playerCharacters: BaseCharacterType[] = []
+    playerCharacters: PlayerCharacter[] = []
 
     currentTurn: number = 0
 

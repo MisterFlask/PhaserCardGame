@@ -25,12 +25,10 @@ export class Idol extends AbstractBuff {
 
         // Iterate through all enemies
         combatState.enemies.forEach(enemy => {
-            if (enemy !== this.getOwnerAsCharacter()) {
-                // Change all intents to target the striking unit
-                enemy.intents.forEach(intent => {
-                    intent.target = strikingUnit;
-                });
-            }
+            // Change all intents to target the striking unit
+            enemy.intents.forEach(intent => {
+                intent.target = strikingUnit;
+            });
         });
     }
 }

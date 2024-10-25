@@ -36,7 +36,8 @@ export class CardGuiUtils {
         const { scene, x, y, data, contextRelevant, onCardCreatedEventCallback: eventCallback } = params;
         const cardContainer = scene.add.container(x, y);
         const { cardWidth, cardHeight } = this.cardConfig;
-        const cardBackground = scene.add.image(0, 0, 'greyscale').setDisplaySize(cardWidth, cardHeight);
+        const cardBackground = scene.add.image(0, 0, data.getCardBackgroundImageName())
+            .setDisplaySize(cardWidth, cardHeight);
         let cardTexture = data.portraitName;
         
         const cardImage = scene.add.image(0, -cardHeight / 4, cardTexture)
@@ -118,6 +119,4 @@ export class CardGuiUtils {
         physicalCard.contextRelevant = contextRelevant;
         return physicalCard;
     }
-
-    
 }

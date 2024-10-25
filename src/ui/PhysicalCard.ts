@@ -188,11 +188,11 @@ export class PhysicalCard implements IPhysicalCardInterface {
         this.cardBorder = this.scene.add.rectangle(
             0,
             0,
-            this.cardBackground.displayWidth + 4, // Slightly larger than the background
+            this.cardBackground.displayWidth + 4,
             this.cardBackground.displayHeight + 4,
-            0x000000 // Black color
+            0x000000
         );
-        this.cardBorder.setStrokeStyle(2, 0x000000); // 2px thick black border
+        this.cardBorder.setStrokeStyle(2, 0x000000);
 
         // Add the border to the cardContent container, behind other elements
         this.cardContent.addAt(this.cardBorder, 0);
@@ -522,6 +522,10 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
         if (this.data.getPortraitTint()) {
             this.cardImage.setTint(this.data.getPortraitTint());
+        }
+
+        if (this.cardBackground.scene?.sys){
+            this.cardBackground.setTexture(this.data.getCardBackgroundImageName());
         }
 
         // Position nameBox just below the portraitBox

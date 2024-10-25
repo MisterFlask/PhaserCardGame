@@ -5,10 +5,10 @@ import { TextBox } from '../ui/TextBox';
 import type { ActionManager } from '../utils/ActionManager';
 import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
 import ImageUtils from '../utils/ImageUtils';
-import { BaseCharacter } from './BaseCharacter';
-import { AbstractBuff } from './buffs/AbstractBuff';
-import { PlayerCharacter } from './CharacterClasses';
+import type { AbstractBuff } from './buffs/AbstractBuff';
+import type { PlayerCharacter } from './CharacterClasses';
 import { IAbstractCard } from './IAbstractCard';
+import type { PlayableCard } from './PlayableCard';
 import { CardSize, CardType } from './Primitives'; // Ensure enums are imported from Primitives
 
 export interface IPhysicalCardInterface {
@@ -129,7 +129,7 @@ export abstract class AbstractCard implements IAbstractCard {
     public portraitName: string
     cardType: CardType
     public tooltip: string
-    owner?: BaseCharacter
+    owner?: PlayerCharacter
     size: CardSize
     id: string
     physicalCard?: PhysicalCard // this is a hack, it's just always PhysicalCard
@@ -145,7 +145,7 @@ export abstract class AbstractCard implements IAbstractCard {
         this.portraitName = portraitName || "placeholder"
         this.cardType = cardType || CardType.SKILL
         this.tooltip = tooltip || "Lorem ipsum dolor sit amet"
-        this.owner = characterData as unknown as BaseCharacter || undefined
+        this.owner = characterData as unknown as PlayerCharacter || undefined
         this.size = size || CardSize.SMALL
         this.team = team || Team.ENEMY
     }
@@ -193,6 +193,7 @@ export abstract class AbstractCard implements IAbstractCard {
          
         Object.assign(copy, this);
         copy.id = generateWordGuid();
+        copy.owner = this.owner
         return copy;
     }
 
@@ -249,6 +250,16 @@ export abstract class AbstractCard implements IAbstractCard {
 
     private static imageExists(scene: Scene, key: string): boolean {
         return scene.textures.exists(key);
+    }
+
+    public getCardBackgroundImageName(): string {
+        // if card is a BaseCharacter, check if it has a class.  If it does use the class's cardBackgroundImageName.  Otherwise, if the card has an owner, use the owner's class's cardBackgroundImageName.  Otherwise, use the default "greyscale"
+        if ((this as unknown as PlayerCharacter)?.characterClass) {
+            return (this as unknown as PlayerCharacter)!.characterClass.cardBackgroundImageName;
+        } else if ((this as unknown as PlayableCard)?.owner) {
+            return (this as unknown as PlayableCard)!.owner!.characterClass!.cardBackgroundImageName;
+        }
+        return "greyscale";
     }
 }
 

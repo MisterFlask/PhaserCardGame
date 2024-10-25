@@ -1,14 +1,16 @@
 import Phaser from 'phaser';
 import { GameState } from '../rules/GameState';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
+import { TextBoxButton } from './Button';
 import { PhysicalCard } from './PhysicalCard';
+import { TextBox } from './TextBox';
 
 export default class InventoryPanel {
     private scene: Phaser.Scene;
-    private inventoryButton!: Phaser.GameObjects.Text;
+    private inventoryButton!: TextBox;
     private inventoryPanel!: Phaser.GameObjects.Container;
     private cardsContainer!: Phaser.GameObjects.Container;
-    private closeButton!: Phaser.GameObjects.Text;
+    private closeButton!: TextBox;
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -16,9 +18,18 @@ export default class InventoryPanel {
     }
 
     private createInventoryButton(): void {
-        this.inventoryButton = this.scene.add.text(10, 50, 'INVENTORY', { fontSize: '24px', color: '#fff', backgroundColor: '#000000', padding: { x: 10, y: 5 } })
-            .setInteractive({ useHandCursor: true })
-            .on('pointerdown', this.toggleInventory, this);
+        // Create inventory button using TextBox
+        this.inventoryButton = new TextBoxButton({
+            scene: this.scene,
+            x: 85, // Adjusted for the button width
+            y: 50,
+            width: 150,
+            height: 40,
+            text: 'INVENTORY',
+            textBoxName: 'inventoryButton',
+            style: { fontSize: '24px' },
+            fillColor: 0x000000
+        }).onClick(() => this.toggleInventory());
 
         // Initialize the inventory panel but keep it hidden
         this.inventoryPanel = this.scene.add.container(this.scene.scale.width / 2, this.scene.scale.height / 2).setVisible(false);
@@ -29,11 +40,19 @@ export default class InventoryPanel {
         const panelBg = this.scene.add.rectangle(0, 0, panelWidth, panelHeight, 0x000000, 0.9).setOrigin(0.5);
         panelBg.setStrokeStyle(4, 0xffffff);
 
-        // Close button
-        this.closeButton = this.scene.add.text(panelWidth / 2 - 20, -panelHeight / 2 + 20, 'CLOSE', { fontSize: '20px', color: '#fff', backgroundColor: '#ff0000', padding: { x: 10, y: 5 } })
-            .setOrigin(1, 0)
-            .setInteractive({ useHandCursor: true })
-            .on('pointerdown', this.toggleInventory, this);
+        // Create close button using TextBox
+        this.closeButton = new TextBox({
+            scene: this.scene,
+            x: panelWidth / 2 - 60,
+            y: -panelHeight / 2 + 20,
+            width: 100,
+            height: 40,
+            text: 'CLOSE',
+            textBoxName: 'inventoryCloseButton',
+            style: { fontSize: '20px' },
+            fillColor: 0xff0000
+        });
+        this.closeButton.makeInteractive(() => this.toggleInventory());
 
         // Container for cards with scrolling capability
         this.cardsContainer = this.scene.add.container(0, 0);
@@ -112,7 +131,7 @@ export default class InventoryPanel {
         panelBg.setSize(panelWidth, panelHeight);
 
         // Update close button position
-        this.closeButton.setPosition(panelWidth / 2 - 20, -panelHeight / 2 + 20);
+        this.closeButton.setPosition(panelWidth / 2 - 60, -panelHeight / 2 + 20);
 
         // Update mask for cardsContainer
         const maskShape = this.scene.make.graphics({});
