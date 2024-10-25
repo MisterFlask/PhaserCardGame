@@ -4,6 +4,7 @@ import type { PhysicalCard } from '../ui/PhysicalCard';
 import { TextBox } from '../ui/TextBox';
 import type { ActionManager } from '../utils/ActionManager';
 import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
+import ImageUtils from '../utils/ImageUtils';
 import { BaseCharacter } from './BaseCharacter';
 import { AbstractBuff } from './buffs/AbstractBuff';
 import { PlayerCharacter } from './CharacterClasses';
@@ -135,6 +136,7 @@ export abstract class AbstractCard implements IAbstractCard {
     team: Team
     block: number = 0
     buffs: AbstractBuff[] = [];
+    portraitTint?: number
 
     constructor({ name, description, portraitName, cardType, tooltip, characterData, size, team }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: AbstractCard, size?: CardSize, team?: Team }) {
         this._name = name
@@ -215,11 +217,34 @@ export abstract class AbstractCard implements IAbstractCard {
     }
 
     // Add this method to set the portraitName after the card is created
-    public setPortrait(scene: Scene): void {
+    public setPortraitIfNotAvailable(scene: Scene): void {
         if (!AbstractCard.imageExists(scene, this.portraitName)) {
             console.warn(`Image "${this.portraitName}" not found. Using placeholder.`);
-            this.portraitName = "placeholder";
+            this.portraitName = ImageUtils.getDeterministicAbstractPlaceholder(this.constructor.name);
+            // Set portrait coloration to a random RGB value seeded with the constructor name
+            const seed = this.constructor.name;
+            const randomColor = this.generateSeededRandomColor(seed);
+            this.portraitTint = randomColor;
         }
+    }
+
+    private generateSeededRandomColor(seed: string): number {
+        let hash = 0;
+        for (let i = 0; i < seed.length; i++) {
+            const char = seed.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // Convert to 32bit integer
+        }
+
+        const r = (hash & 255);
+        const g = ((hash >> 8) & 255);
+        const b = ((hash >> 16) & 255);
+
+        return (r << 16) | (g << 8) | b;
+    }
+
+    public getPortraitTint(): number | undefined {
+        return this.portraitTint;
     }
 
     private static imageExists(scene: Scene, key: string): boolean {

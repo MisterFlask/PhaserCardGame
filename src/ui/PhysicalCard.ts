@@ -517,7 +517,11 @@ export class PhysicalCard implements IPhysicalCardInterface {
         } else {
             // console.warn(`Texture '${this.data.portraitName}' not found. Using fallback texture.`);
             // this.cardImage.setTexture('placeholder');
-            this.data.setPortrait(this.scene);
+            this.data.setPortraitIfNotAvailable(this.scene);
+        }
+
+        if (this.data.getPortraitTint()) {
+            this.cardImage.setTint(this.data.getPortraitTint());
         }
 
         // Position nameBox just below the portraitBox

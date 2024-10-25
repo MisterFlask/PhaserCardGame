@@ -57,8 +57,6 @@ export default class CampaignScene extends Phaser.Scene {
         this.createMenu();
         this.inventoryPanel = new InventoryPanel(this);
 
-        // Listen for resize events
-        this.scale.on('resize', this.resize, this);
         this.createDebugGraphics();
         this.updateDebugGraphics();
         this.resize();
@@ -121,7 +119,7 @@ export default class CampaignScene extends Phaser.Scene {
     }
 
     resize = () => {
-
+        console.log('Resizing campaign scene');
         // Bail if we're not in this scene right now
         if (!this.scene.isActive('Campaign')) {
             return;

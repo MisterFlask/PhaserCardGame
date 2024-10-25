@@ -294,6 +294,33 @@ export default class GameImageLoader {
         }
     }
 
+    /**
+     * Gets a deterministic image name from the abstract_placeholders category based on a provided key.
+     * @param key - The string key to use for deterministic selection.
+     * @returns The name of the selected image without the file extension.
+     */
+    public static getDeterministicAbstractPlaceholder(key: string): string {
+        const placeholders = this.images.abstract_placeholders.files;
+        const hash = this.hashString(key);
+        const index = hash % placeholders.length;
+        return placeholders[index].replace(/\.(png|svg)$/, '');
+    }
+
+    /**
+     * Simple hash function to convert a string to a number.
+     * @param str - The string to hash.
+     * @returns A number hash of the input string.
+     */
+    private static hashString(str: string): number {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // Convert to 32-bit integer
+        }
+        return Math.abs(hash);
+    }
+
     public static getRandomImageNameFromCategory(category: keyof typeof this.images): string {
         const categoryData = this.images[category];
         const randomIndex = Math.floor(Math.random() * categoryData.files.length);

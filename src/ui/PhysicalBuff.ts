@@ -1,11 +1,12 @@
 import { AbstractBuff } from '../gamecharacters/buffs/AbstractBuff';
+import ImageUtils from '../utils/ImageUtils';
 import { TextBox } from './TextBox';
 
 export class PhysicalBuff {
     abstractBuff: AbstractBuff;
     container: Phaser.GameObjects.Container;
     image: Phaser.GameObjects.Image;
-    textBox: TextBox;
+    stacksText: Phaser.GameObjects.Text;
     tooltipBox: TextBox;
     scene: Phaser.Scene;
 
@@ -14,22 +15,22 @@ export class PhysicalBuff {
         this.abstractBuff = abstractBuff;
         this.container = scene.add.container(x, y);
         // Create the image
-        const imageName = scene.textures.exists(abstractBuff.imageName) ? abstractBuff.imageName : 'placeholder';
+        const imageName = scene.textures.exists(abstractBuff.imageName) ? abstractBuff.imageName : this.useAbstractIcon(abstractBuff);
         this.image = scene.add.image(0, 0, imageName);
         
         this.image.setScale(0.5); // Adjust scale as needed
 
-        // Create the text using TextBox
-        this.textBox = new TextBox({
-            scene: this.scene,
-            x: 0,
-            y: 0,
-            width: 30,
-            height: 30,
-            text: `${abstractBuff.stacks}`,
-            style: { fontSize: '14px', color: '#ffffff', fontFamily: 'Arial' }
+        // Update the text creation with new styling and position
+        this.stacksText = scene.add.text(0, 0, `${abstractBuff.stacks}`, {
+            fontSize: '19px',
+            color: '#ffffff',
+            fontFamily: 'Arial',
+            align: 'left',
+            stroke: '#000000',
+            strokeThickness: 3
         });
-        this.textBox.setPosition(this.textBox.x, this.textBox.y - this.textBox.height / 2); // Center the text vertically
+        // Change origin to bottom-left instead of center
+        this.stacksText.setOrigin(0, 1);
 
         // Create the description box (initially hidden)
         this.tooltipBox = new TextBox({
@@ -45,13 +46,12 @@ export class PhysicalBuff {
         const containerSize = 40; // Adjust this value as needed
         this.container.setSize(containerSize, containerSize);
 
-        // Resize the image to fit the container
+        // Update text position to bottom-left of the container
+        const halfContainerSize = containerSize / 2;
         this.image.setDisplaySize(containerSize, containerSize);
-        
-        // Center the image and text in the container
         this.image.setPosition(0, 0);
-        this.textBox.setPosition(0, 0);
-        this.container.add([this.image, this.textBox]);
+        this.stacksText.setPosition(-halfContainerSize + 6, halfContainerSize - 6); // Added small offset (2px) for padding
+        this.container.add([this.image, this.stacksText]);
 
         // Adjust the interactive area to match the container's size
         this.container.setInteractive(new Phaser.Geom.Rectangle(-containerSize / 2, -containerSize / 2, containerSize, containerSize), Phaser.Geom.Rectangle.Contains);
@@ -71,6 +71,10 @@ export class PhysicalBuff {
                 this.container.setScale(1); // Ensure scale resets to original
             }
         });
+    }
+
+    private useAbstractIcon(abstractBuff: AbstractBuff) {
+        return ImageUtils.getDeterministicAbstractPlaceholder(abstractBuff.getName());
     }
 
     showDescription() {
@@ -108,7 +112,7 @@ export class PhysicalBuff {
 
     updateText() {
         // Update the text to reflect current stack count
-        this.textBox.setText(`${this.abstractBuff.stacks}`);
+        this.stacksText.setText(`${this.abstractBuff.stacks}`);
         // Update the description text in case it has changed
         this.tooltipBox.setText(`${this.abstractBuff.getName()}: ${this.abstractBuff.getDescription()}`);
     }
