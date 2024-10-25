@@ -10,6 +10,7 @@ export class DiabolistClass extends BaseCharacterClass {
     }
     constructor() {
         super({ name: "Diabolist", iconName: "diabolist_icon", startingMaxHp: 20 })
+        this.cardBackgroundImageName = "diabolist_background"
         // Add Diabolist-specific cards here
         this.addCard(new ArcaneRitualCard())
         this.addCard(new SummonDemonCard())

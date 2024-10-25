@@ -39,6 +39,10 @@ export default class GameImageLoader {
             prefix: 'UI/',
             files: ['drawpile.svg', 'discardpile.svg', 'placeholder.png', 'oops_image.webp']
         },
+        card_backgrounds: {
+            prefix: 'Sprites/CardBackgrounds/',
+            files: ['archon_background.png', 'blackhand_background.png', 'diabolist_background.png', 'cog_background.png', 'scavenger_background.png', 'hammer_background.png']
+        },
         cards_blackhand: {
             prefix: 'Sprites/Cards/Blackhand/',
             files: [

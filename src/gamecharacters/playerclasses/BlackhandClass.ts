@@ -22,6 +22,8 @@ export class BlackhandClass extends BaseCharacterClass {
     constructor() {
         super({ name: "Blackhand", iconName: "blackhand_icon", startingMaxHp: 30 })
         // Add Blackhand-specific cards here
+        this.cardBackgroundImageName = "blackhand_background"
+
         this.addCard(new FireAxe())
         this.addCard(new FlamePistol())
         this.addCard(new StormCloak())
