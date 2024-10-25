@@ -13,9 +13,10 @@ export class PhysicalBuff {
         this.scene = scene;
         this.abstractBuff = abstractBuff;
         this.container = scene.add.container(x, y);
-
         // Create the image
-        this.image = scene.add.image(0, 0, abstractBuff.imageName);
+        const imageName = scene.textures.exists(abstractBuff.imageName) ? abstractBuff.imageName : 'placeholder';
+        this.image = scene.add.image(0, 0, imageName);
+        
         this.image.setScale(0.5); // Adjust scale as needed
 
         // Create the text using TextBox

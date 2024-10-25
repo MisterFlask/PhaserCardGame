@@ -1,3 +1,4 @@
+import { Scene } from 'phaser';
 import { GameState } from '../rules/GameState';
 import type { PhysicalCard } from '../ui/PhysicalCard';
 import { TextBox } from '../ui/TextBox';
@@ -212,6 +213,18 @@ export abstract class AbstractCard implements IAbstractCard {
             block: this.block,
         }, null, 2);
     }
+
+    // Add this method to set the portraitName after the card is created
+    public setPortrait(scene: Scene): void {
+        if (!AbstractCard.imageExists(scene, this.portraitName)) {
+            console.warn(`Image "${this.portraitName}" not found. Using placeholder.`);
+            this.portraitName = "placeholder";
+        }
+    }
+
+    private static imageExists(scene: Scene, key: string): boolean {
+        return scene.textures.exists(key);
+    }
 }
 
 // dummy card implementation for ui elements that look like cards but are not playable
@@ -233,4 +246,3 @@ export enum PlayableCardType {
     Skill = "Skill",
     Power = "Power",
 }
-

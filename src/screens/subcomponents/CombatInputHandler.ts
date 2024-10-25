@@ -251,7 +251,7 @@ class CombatInputHandler {
             onComplete: () => {
                 this.cardManager.discardPile.data.name = `Discard Pile (${GameState.getInstance().combatState.currentDiscardPile.length + 1})`;
                 this.cardManager.discardPile.nameBox.setText(this.cardManager.discardPile.data.name);
-                GameState.getInstance().combatState.currentDiscardPile.push(card.data);
+                GameState.getInstance().combatState.currentDiscardPile.push(card.data as PlayableCard);
                 card.obliterate(); // Remove the card after animation
             }
         });

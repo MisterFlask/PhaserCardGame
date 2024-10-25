@@ -27,7 +27,7 @@ export class Pyronox extends PlayableCard {
     }
 }
 
-class FlamesAmplifierBuff extends AbstractBuff {
+export class FlamesAmplifierBuff extends AbstractBuff {
     constructor(stacks: number) {
         super();
         this.imageName = "flames-amplifier";

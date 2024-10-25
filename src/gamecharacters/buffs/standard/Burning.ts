@@ -1,5 +1,6 @@
 import { GameState } from "../../../rules/GameState";
 import { ActionManager } from "../../../utils/ActionManager";
+import { FlamesAmplifierBuff } from "../../playerclasses/cards/blackhand/rares/Pyronox";
 import { AbstractBuff } from "../AbstractBuff";
 
 export class Burning extends AbstractBuff {
@@ -25,7 +26,15 @@ export class Burning extends AbstractBuff {
         const owner = this.getOwnerAsCharacter();
         if (owner) {
             const powderAmount = GameState.getInstance().combatState.combatResources.powder.value;
-            const totalDamage = this.baseDamage + powderAmount;
+            var totalDamage = this.baseDamage + powderAmount;
+
+            // Check for FlamesAmplifier buff and increase damage
+            const flamesAmplifierBuff = owner.buffs.find(buff => buff instanceof FlamesAmplifierBuff);
+            if (flamesAmplifierBuff) {
+                const amplifierAmount = flamesAmplifierBuff.stacks;
+                totalDamage += amplifierAmount;
+                console.log(`Burning damage increased by ${amplifierAmount} due to Flames Amplifier`);
+            }
 
             // Apply burning damage
             ActionManager.getInstance().dealDamage({ baseDamageAmount: totalDamage, target: owner, fromAttack: false });
@@ -33,6 +42,8 @@ export class Burning extends AbstractBuff {
 
             // Reduce stacks by 1
             this.stacks--;
+
+
         }
     }
 }

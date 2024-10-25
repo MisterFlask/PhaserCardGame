@@ -4,6 +4,7 @@ import Phaser from 'phaser';
 import { AbstractCard, UiCard } from '../../gamecharacters/AbstractCard';
 import { AutomatedCharacter } from '../../gamecharacters/AutomatedCharacter';
 import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
+import type { PlayableCard } from '../../gamecharacters/PlayableCard';
 import { GameState } from '../../rules/GameState';
 import CombatSceneLayoutUtils from '../../ui/LayoutUtils';
 import { PhysicalCard } from '../../ui/PhysicalCard';
@@ -53,7 +54,7 @@ export class CombatCardManager {
             onComplete: () => {
                 this.discardPile.data.name = `Discard Pile (${GameState.getInstance().combatState.currentDiscardPile.length + 1})`;
                 this.discardPile.nameBox.setText(this.discardPile.data.name);
-                GameState.getInstance().combatState.currentDiscardPile.push(card.data);
+                GameState.getInstance().combatState.currentDiscardPile.push(card.data as PlayableCard);
                 card.obliterate(); // Remove the card after animation
             }
         });

@@ -12,6 +12,7 @@ export class CourageUnderFire extends PlayableCard {
             targetingType: TargetingType.NO_TARGETING,
             rarity: CardRarity.UNCOMMON,
         });
+        this.portraitName = "CourageUnderFire";
         this.energyCost = 2;
         this.baseBlock = 5;
         this.baseMagicNumber = 1; // Amount of Strength to apply
