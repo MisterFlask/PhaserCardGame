@@ -5,24 +5,23 @@ import { DepthManager } from './DepthManager';
 import { PhysicalCard } from './PhysicalCard';
 import { TextBox } from './TextBox';
 
-export class ShopItemPanel {
-    public container: Phaser.GameObjects.Container;
-    private scene: Phaser.Scene;
+export class ShopItemPanel extends Phaser.GameObjects.Container {
     private card: PlayableCard;
     private physicalCard!: PhysicalCard;
     private priceText!: TextBox;
     private isBuyable: boolean;
 
     constructor(scene: Phaser.Scene, x: number, y: number, card: PlayableCard, isBuyable: boolean, onPurchase: (card: PlayableCard) => void) {
-        this.scene = scene;
+        super(scene, x, y); // Initialize the container
         this.card = card;
         this.isBuyable = isBuyable;
-        this.container = this.scene.add.container(x, y);
 
         this.createPhysicalCard();
         this.createPriceText();
         this.setupInteractivity(onPurchase);
         this.arrangeComponents();
+
+        this.scene.add.existing(this); // Add this container to the scene
     }
 
     private createPhysicalCard(): void {
@@ -34,7 +33,11 @@ export class ShopItemPanel {
             data: this.card,
             onCardCreatedEventCallback: () => {} // We'll handle events in setupInteractivity
         });
-        this.container.add(this.physicalCard.container);
+        this.physicalCard.container
+            .on('pointerdown', () => this.emit('pointerdown'))
+            .on('pointerover', () => this.emit('pointerover'))
+            .on('pointerout', () => this.emit('pointerout'));
+        this.add(this.physicalCard.container);
     }
 
     private createPriceText(): void {
@@ -52,7 +55,7 @@ export class ShopItemPanel {
             textBoxName: `priceTag_${this.card.name}`
         });
         
-        this.container.add([this.priceText]);
+        this.add(this.priceText);
     }
 
     public destroy(): void {
@@ -68,23 +71,17 @@ export class ShopItemPanel {
         }
 
         // Remove all children from the container
-        this.container.removeAll(true);
+        this.removeAll(true);
 
         // Destroy the container itself
-        this.container.destroy();
-
-        // Clear any references
-        this.scene = null!;
-        this.card = null!;
-        this.physicalCard = null!;
-        this.priceText = null!;
+        super.destroy();
     }
 
     // Update the setCardHoverDepth method to use the new setDepth function
     public setCardHoverDepth(depth: number): void {
-        this.container.setDepth(depth);
+        this.setDepth(depth);
         if (this.physicalCard) {
-            //this.physicalCard.setDepth(depth);
+            this.physicalCard.setDepth(depth);
         }
         // Also set depth for the price text to ensure it stays with the card
         if (this.priceText) {
@@ -93,12 +90,15 @@ export class ShopItemPanel {
     }
 
     private setupInteractivity(onPurchase: (card: PlayableCard) => void): void {
-        this.physicalCard.container.setInteractive()
+        console.log(`setting up interactivity for ${this.card.name}'s shop item panel`);
+        this.setInteractive()
             .on('pointerdown', () => {
+                console.log(`pointerdown on ${this.card.name}'s shop item panel`);
                 onPurchase(this.card);
             })
             .on('pointerover', () => {                
-                this.container.setToTop(); //todo: why does this work and depth doesn't?
+                console.log(`pointerover on ${this.card.name}'s shop item panel`);
+                this.setToTop(); //todo: why does this work and depth doesn't?
                 this.setCardHoverDepth(DepthManager.getInstance().SHOP_CARD_HOVER);
             })
             .on('pointerout', () => {
@@ -124,22 +124,22 @@ export class ShopItemPanel {
         Phaser.Display.Align.In.BottomCenter(this.priceText, alignmentContainer);
 
         // Add the alignment container to our main container
-        this.container.add(alignmentContainer);
+        this.add(alignmentContainer);
 
         // Set the container size to match the grid
-        this.container.setSize(grid.width, grid.height);
+        this.setSize(grid.width, grid.height);
 
         // Update the interactive area
-        this.container.input?.hitArea?.setTo(0, 0, grid.width, grid.height);
+        this.input?.hitArea?.setTo(0, 0, grid.width, grid.height);
     }
 
     // Add these methods to the ShopItemPanel class
 
     public onHoverStart(callback: () => void): void {
-        this.container.on('pointerover', callback);
+        this.on('pointerover', callback);
     }
 
     public onHoverEnd(callback: () => void): void {
-        this.container.on('pointerout', callback);
+        this.on('pointerout', callback);
     }
 }

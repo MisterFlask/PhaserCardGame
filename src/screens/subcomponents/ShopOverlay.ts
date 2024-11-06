@@ -64,8 +64,8 @@ export class ShopOverlay {
         const shopItems = this.getShopItems();
         shopItems.forEach((item, index) => {
             const panel = new ShopItemPanel(this.scene, 100, index * 200 + 100, item, true, this.buyItem.bind(this));
-            this.shopItemsContainer.add(panel.container);
-            panel.container.setDepth(this.BASE_PANEL_DEPTH);
+            this.shopItemsContainer.add(panel); // Changed from panel.container to panel
+            panel.setDepth(this.BASE_PANEL_DEPTH);
             
             this.shopItemPanels.push(panel);
         });
@@ -75,18 +75,17 @@ export class ShopOverlay {
         const inventory = GameState.getInstance().inventory;
         inventory.forEach((item, index) => {
             const panel = new ShopItemPanel(this.scene, 0, index * 200 + 100, item, false, this.sellItem.bind(this));
-            this.inventoryContainer.add(panel.container);
+            this.inventoryContainer.add(panel); // Changed from panel.container to panel
 
-            panel.container.setDepth(this.BASE_PANEL_DEPTH);
+            panel.setDepth(this.BASE_PANEL_DEPTH);
             
             // Add hover handlers
-            panel.onHoverStart(() => {
-                panel.container.setToTop();
-                panel.container.setDepth(DepthManager.getInstance().SHOP_CARD_HOVER);
+            panel.on('pointerover', () => { // Updated to use container's event
+                panel.setDepth(DepthManager.getInstance().SHOP_CARD_HOVER);
             });
             
-            panel.onHoverEnd(() => {
-                panel.container.setDepth(this.BASE_PANEL_DEPTH);
+            panel.on('pointerout', () => { // Updated to use container's event
+                panel.setDepth(this.BASE_PANEL_DEPTH);
             });
             
             this.inventoryItemPanels.push(panel);

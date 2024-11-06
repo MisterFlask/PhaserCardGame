@@ -1,4 +1,5 @@
 import { CardRarity, PlayableCard } from "../../gamecharacters/PlayableCard";
+import { Shoot } from "../../gamecharacters/playerclasses/cards/basic/Shoot";
 import { AbstractRelic, DamageModifier } from "../AbstractRelic";
 
 export class Catspaw extends AbstractRelic {
@@ -10,7 +11,7 @@ export class Catspaw extends AbstractRelic {
     }
 
     public damageModifierOnCardPlayed(card: PlayableCard): DamageModifier {
-        if (card.name === "Shoot") {
+        if (card instanceof Shoot) {
             return new DamageModifier({flatDamageMod: 2});
         }
         return new DamageModifier();
