@@ -17,6 +17,30 @@ import CardSelectionFromHandManager from '../ui/CardSelectionFromHandManager';
 import { SubtitleManager } from "../ui/SubtitleManager";
 
 export class ActionManager {
+
+
+    sellItemForHellCurrency(item: PlayableCard) {
+        const inventory = GameState.getInstance().inventory;
+        const index = inventory.findIndex(card => card.id === item.id);
+        if (index !== -1) {
+            inventory.splice(index, 1);
+        }
+
+        GameState.getInstance().hellCurrency += item.hellPurchaseValue;
+    }
+
+    buyItemForHellCurrency(item: PlayableCard) : boolean {
+        const inventory = GameState.getInstance().inventory;
+        if (GameState.getInstance().hellCurrency < item.hellPurchaseValue) {
+            return false;
+        }
+        
+        inventory.push(item);
+        GameState.getInstance().hellCurrency -= item.hellPurchaseValue;
+        return true;
+    }
+
+
     heal(character: BaseCharacter, amount: number) {
         this.actionQueue.addAction(new GenericAction(async () => {
             character.hitpoints += amount;

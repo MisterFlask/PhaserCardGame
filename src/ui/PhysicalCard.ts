@@ -48,6 +48,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
     glowEffect?: Phaser.FX.Glow;
     glowColor: number = 0xffff00; //yellow
     private costBox: TextBox | null = null; // Add costBox property
+    private priceBox: TextBox | null = null; // Add this property
 
     // This should be false in production; used for debugging depth-related issues in cards
     depthDebug: boolean = true;
@@ -209,6 +210,37 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
         // Initialize the targeting intents grid
         this.initTargetingIntentsGrid();
+
+        // Add price box if the card has pricing information
+        if (this.data.pricingInformation) {
+            const cardWidth = this.cardBackground.displayWidth;
+            const cardHeight = this.cardBackground.displayHeight;
+            
+            // Position it below the energy cost
+            const priceText = this.data.pricingInformation.buyable 
+                ? `Buy: $${this.data.pricingInformation.price}`
+                : this.data.pricingInformation.sellable 
+                    ? `Sell: $${this.data.pricingInformation.price}`
+                    : '';
+
+            if (priceText) {
+                this.priceBox = new TextBox({
+                    scene: this.scene,
+                    x: -cardWidth / 2 + 40, // Align with energy cost
+                    y: -cardHeight / 2 + 40, // Move down by the height of the energy cost box
+                    width: 80,
+                    height: 30,
+                    text: priceText,
+                    style: { 
+                        fontSize: '16px', 
+                        color: this.data.pricingInformation.buyable ? '#00ff00' : '#ffff00',
+                        fontFamily: 'Arial',
+                        align: 'left'
+                    }
+                });
+                this.cardContent.add(this.priceBox);
+            }
+        }
 
         this.updateVisuals();
         this.scene.events.on('update', this.updateVisuals, this);
@@ -570,6 +602,18 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
         // Sync incoming intents
         this.syncIncomingIntents();
+
+        // Update price box if it exists
+        if (this.priceBox && this.data.pricingInformation) {
+            const priceText = this.data.pricingInformation.buyable 
+                ? `Buy: $${this.data.pricingInformation.price}`
+                : this.data.pricingInformation.sellable 
+                    ? `Sell: $${this.data.pricingInformation.price}`
+                    : '';
+                    
+            this.priceBox.setText(priceText);
+            this.priceBox.setFillColor(this.data.pricingInformation.buyable ? 0x00ff00 : 0xffff00);
+        }
     }
 
     private updateHighlightVisual(): void {

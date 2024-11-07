@@ -100,6 +100,35 @@ export class CardGuiUtils {
 
         if (data.cardType == CardType.SKILL) scene.input.setDraggable(cardContainer);
 
+        // Add price box if the card has pricing information
+        let priceBox = null;
+        if (data.pricingInformation) {
+            const priceText = data.pricingInformation.buyable 
+                ? `Buy: $${data.pricingInformation.price}`
+                : data.pricingInformation.sellable 
+                    ? `Sell: $${data.pricingInformation.price}`
+                    : '';
+
+            if (priceText) {
+                priceBox = new TextBox({
+                    scene: scene,
+                    x: -cardWidth / 2 + 80,
+                    y: -cardHeight / 2 + 40,
+                    width: 80,
+                    height: 30,
+                    text: priceText,
+                    textBoxName: "priceBox:" + data.id,
+                    style: { 
+                        fontSize: '16px', 
+                        color: data.pricingInformation.buyable ? '#00ff00' : '#ffff00',
+                        fontFamily: 'Arial',
+                        align: 'left'
+                    }
+                });
+                cardContainer.add(priceBox);
+            }
+        }
+
         const physicalCard = new PhysicalCard({
             scene: scene,
             container: cardContainer,

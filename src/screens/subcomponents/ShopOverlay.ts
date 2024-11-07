@@ -9,6 +9,8 @@ import { DepthManager } from '../../ui/DepthManager';
 import { ShopItemPanel } from '../../ui/ShopItemPanel';
 import { TextBox } from '../../ui/TextBox';
 import { UIContext, UIContextManager } from '../../ui/UIContextManager';
+import { ActionManagerFetcher } from '../../utils/ActionManagerFetcher';
+import { CampaignBriefStatus } from './CampaignBriefStatus';
 
 export class ShopOverlay {
     private scene: Phaser.Scene;
@@ -19,12 +21,18 @@ export class ShopOverlay {
     private shopItemPanels: ShopItemPanel[] = [];
     private inventoryItemPanels: ShopItemPanel[] = [];
     private readonly BASE_PANEL_DEPTH = DepthManager.getInstance().SHOP_OVERLAY;
+    private campaignBriefStatus: CampaignBriefStatus;
+    private shopItems: PlayableCard[] = [new Rummage(), new Rummage(), new Rummage()];
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
         this.overlay = this.scene.add.container(0, 0)
             .setVisible(false)
             .setDepth(DepthManager.getInstance().SHOP_OVERLAY);
+        
+        // Create the campaign brief status
+        this.campaignBriefStatus = new CampaignBriefStatus(scene);
+        
         this.createOverlay();
     }
 
@@ -35,6 +43,7 @@ export class ShopOverlay {
         background.setOrigin(0);
 
         const title = this.scene.add.text(width / 2, 50, 'Shop', { fontSize: '32px', color: '#ffffff' });
+        this.campaignBriefStatus.setPosition(width / 2, title.y + title.height + 30);
         title.setOrigin(0.5);
 
         this.shopItemsContainer = this.scene.add.container(50, 100);
@@ -54,7 +63,7 @@ export class ShopOverlay {
         // Use the new makeInteractive method
         closeButton.makeInteractive(this.hide.bind(this));
 
-        this.overlay.add([background, title, this.shopItemsContainer, this.inventoryContainer, closeButton]);
+        this.overlay.add([background, title, this.shopItemsContainer, this.inventoryContainer, closeButton, this.campaignBriefStatus]);
 
         this.populateShopItems();
         this.populateInventory();
@@ -95,22 +104,39 @@ export class ShopOverlay {
     private getShopItems(): PlayableCard[] {
         // This method should be implemented to return the list of items for sale
         // For now, we'll return an array with three Rummage cards
-        return [new Rummage(), new Rummage(), new Rummage()];
+        return this.shopItems;
     }
 
     private buyItem(item: PlayableCard): void {
         // Implement buying logic here
         console.log(`Buying ${item.name}`);
         // remove from shop
-
-        
-        // After buying, refresh the shop and inventory
-        this.refreshShop();
+        if (ActionManagerFetcher.getActionManager().buyItemForHellCurrency(item)) { 
+            this.shopItems.splice(this.shopItems.indexOf(item), 1); // removes item from the shop
+            this.populateShopItems()
+            // After buying, refresh the shop and inventory
+            this.refreshShop();
+        } else{
+            // Get the campaign brief status and shake it to indicate insufficient funds
+            const campaignBriefStatus = this.campaignBriefStatus;
+            if (campaignBriefStatus) {
+                this.scene.tweens.add({
+                    targets: campaignBriefStatus,
+                    x: '+=10',
+                    duration: 50,
+                    yoyo: true,
+                    repeat: 9, // 10 shakes total (1 second at 50ms per shake)
+                    ease: 'Sine.easeInOut'
+                });
+            }
+        }
     }
 
     private sellItem(item: PlayableCard): void {
         // Implement selling logic here
         console.log(`Selling ${item.name}`);
+        ActionManagerFetcher.getActionManager().sellItemForHellCurrency(item);
+        
         // After selling, refresh the shop and inventory
         this.refreshShop();
     }

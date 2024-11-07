@@ -87,8 +87,16 @@ export enum Team{
     ENEMY
 }
 
+// kept here for the sake of the UI.  Calculated on the fly.
+export class TransientPricingInformation{
+    public sellable: boolean = false; 
+    public buyable: boolean = false; 
+    public price: number = 0; 
+}
+
 export abstract class AbstractCard implements IAbstractCard {
 
+    public pricingInformation: TransientPricingInformation = new TransientPricingInformation();
     public typeTag: string = "AbstractCard"
     public get name(): string {
         return this._name;

@@ -128,6 +128,12 @@ export class TextBox extends Phaser.GameObjects.Container {
         return super.setInteractive(this.background, Phaser.Geom.Rectangle.Contains, dropZone);
     }
 
+    setFillColor(color: number): void {
+        if (this.background) {
+            this.background.setFillStyle(color);
+        }
+    }
+
     setText(text: string): void {
         if (this.text.scene === null) {
             return;
