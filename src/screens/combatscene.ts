@@ -14,6 +14,7 @@ import GameImageLoader from '../utils/ImageUtils';
 import CampaignScene from './Campaign';
 import { SceneChanger } from './SceneChanger';
 import { CampaignBriefStatus } from './subcomponents/CampaignBriefStatus';
+import { CharacterDeckOverlay } from './subcomponents/CharacterDeckOverlay';
 import CombatCardManager from './subcomponents/CombatCardManager';
 import CombatInputHandler from './subcomponents/CombatInputHandler';
 import CombatStateService from './subcomponents/CombatStateService';
@@ -42,6 +43,7 @@ class CombatScene extends Phaser.Scene {
     private mapOverlay!: MapOverlay;
     private mapButton!: TextBoxButton;
     private campaignBriefStatus!: CampaignBriefStatus;
+    private characterDeckOverlay!: CharacterDeckOverlay;
 
     constructor() {
         super('CombatScene');
@@ -114,6 +116,10 @@ class CombatScene extends Phaser.Scene {
         this.campaignBriefStatus = new CampaignBriefStatus(this);
         this.add.existing(this.campaignBriefStatus);
         this.campaignBriefStatus.depth = 100;
+
+        this.characterDeckOverlay = new CharacterDeckOverlay(this);
+        this.characterDeckOverlay.hide();
+        this.setupCharacterClickHandlers();
     }
 
     private obliterate(): void {
@@ -177,6 +183,10 @@ class CombatScene extends Phaser.Scene {
         if (this.campaignBriefStatus) {
             this.campaignBriefStatus.setPosition(700, 11);
         }
+
+        if (this.characterDeckOverlay) {
+            this.characterDeckOverlay.resize();
+        }
     }
 
     update(time: number, delta: number): void {
@@ -212,6 +222,19 @@ class CombatScene extends Phaser.Scene {
         } else {
             this.mapOverlay.hide();
         }
+    }
+
+    private setupCharacterClickHandlers(): void {
+        GameState.getInstance().combatState.playerCharacters.forEach(character => {
+            if (character.physicalCard) {
+                character.physicalCard.container.setInteractive();
+                character.physicalCard.container.on('pointerdown', () => {
+                    if (UIContextManager.getInstance().getContext() === UIContext.COMBAT) {
+                        this.characterDeckOverlay.show(character);
+                    }
+                });
+            }
+        });
     }
 
 }

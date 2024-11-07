@@ -112,7 +112,13 @@ export class ShopOverlay {
         console.log(`Buying ${item.name}`);
         // remove from shop
         if (ActionManagerFetcher.getActionManager().buyItemForHellCurrency(item)) { 
-            this.shopItems.splice(this.shopItems.indexOf(item), 1); // removes item from the shop
+            
+            // Remove the purchased item from the shop items array
+            const itemIndex = this.shopItems.findIndex(shopItem => shopItem.id === item.id);
+            if (itemIndex !== -1) {
+                this.shopItems.splice(itemIndex, 1);
+            }
+
             this.populateShopItems()
             // After buying, refresh the shop and inventory
             this.refreshShop();

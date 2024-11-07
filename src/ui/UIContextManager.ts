@@ -2,7 +2,8 @@ export enum UIContext {
     COMBAT,
     MAP,
     SHOP,
-    CARD_REWARD
+    CARD_REWARD,
+    CHARACTER_DECK_SHOWN
 }
 
 export class UIContextManager {
