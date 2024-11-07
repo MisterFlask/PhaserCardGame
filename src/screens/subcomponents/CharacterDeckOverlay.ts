@@ -64,8 +64,14 @@ export class CharacterDeckOverlay extends Phaser.GameObjects.Container {
         this.hide();
         
         // Add scroll wheel listener
-        this.scene.input.on('wheel', (pointer: any, gameObjects: any, deltaX: number, deltaY: number) => {
+        this.scene.input.on('wheel', (pointer: Phaser.Input.Pointer, gameObjects: any, deltaX: number, deltaY: number) => {
             if (this.visible) {
+                // Prevent default scrolling
+                pointer.event.preventDefault();
+                
+                // Stop event propagation
+                pointer.event.stopPropagation();
+
                 this.scrollableArea.y -= deltaY;
                 this.clampScroll();
             }
@@ -107,7 +113,7 @@ export class CharacterDeckOverlay extends Phaser.GameObjects.Container {
         
         // Define margins to start grid near the upper-left
         const marginX = -this.background.width / 2 + 50;
-        const marginY = -this.background.height / 2 + 50;
+        const marginY = -this.background.height / 2 + 150;
         
         // Create physical cards and arrange them in a grid
         characterCards.forEach((card: PlayableCard, index: number) => {
