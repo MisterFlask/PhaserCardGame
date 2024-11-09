@@ -30,4 +30,5 @@ export class UIContextManager {
     public isContext(context: UIContext): boolean {
         return this.currentContext === context;
     }
+
 }

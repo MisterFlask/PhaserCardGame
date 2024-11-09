@@ -1,7 +1,7 @@
 // src/gamecharacters/PhysicalCard.ts
 import Phaser from 'phaser';
 import { AutomatedCharacterType, BaseCharacterType, PlayableCardType } from '../Types';
-import type { AbstractCard, IPhysicalCardInterface } from '../gamecharacters/AbstractCard';
+import { AbstractCard, IPhysicalCardInterface, PriceContext } from '../gamecharacters/AbstractCard';
 import { AbstractIntent } from '../gamecharacters/AbstractIntent';
 import { GameState } from '../rules/GameState';
 import type { CardConfig } from '../utils/CardGuiUtils';
@@ -48,11 +48,11 @@ export class PhysicalCard implements IPhysicalCardInterface {
     glowEffect?: Phaser.FX.Glow;
     glowColor: number = 0xffff00; //yellow
     private costBox: TextBox | null = null; // Add costBox property
-    private priceBox: TextBox | null = null; // Add this property
+    private priceBox!: TextBox; // Add this property
 
     // This should be false in production; used for debugging depth-related issues in cards
-    depthDebug: boolean = true;
-
+    depthDebug: boolean = false;
+    priceContext: PriceContext = PriceContext.NONE;
     constructor({
         scene,
         container,
@@ -211,36 +211,23 @@ export class PhysicalCard implements IPhysicalCardInterface {
         // Initialize the targeting intents grid
         this.initTargetingIntentsGrid();
 
-        // Add price box if the card has pricing information
-        if (this.data.pricingInformation) {
-            const cardWidth = this.cardBackground.displayWidth;
-            const cardHeight = this.cardBackground.displayHeight;
-            
-            // Position it below the energy cost
-            const priceText = this.data.pricingInformation.buyable 
-                ? `Buy: $${this.data.pricingInformation.price}`
-                : this.data.pricingInformation.sellable 
-                    ? `Sell: $${this.data.pricingInformation.price}`
-                    : '';
-
-            if (priceText) {
-                this.priceBox = new TextBox({
-                    scene: this.scene,
-                    x: -cardWidth / 2 + 40, // Align with energy cost
-                    y: -cardHeight / 2 + 40, // Move down by the height of the energy cost box
-                    width: 80,
-                    height: 30,
-                    text: priceText,
-                    style: { 
-                        fontSize: '16px', 
-                        color: this.data.pricingInformation.buyable ? '#00ff00' : '#ffff00',
-                        fontFamily: 'Arial',
-                        align: 'left'
-                    }
-                });
-                this.cardContent.add(this.priceBox);
-            }
-        }
+        this.priceBox = new TextBox({
+            scene: this.scene,
+            x: -this.cardBackground.displayWidth / 2 + 40,
+            y: -this.cardBackground.displayHeight / 2 + 40,
+            width: 80,
+            height: 30,
+            text: '',
+            style: { 
+                fontSize: '16px', 
+                color: '#ffffff',
+                fontFamily: 'Arial',
+                align: 'left'
+            },
+            fillColor: 0x0000ff
+        });
+        this.priceBox.setVisible(false);
+        this.cardContent.add(this.priceBox);
 
         this.updateVisuals();
         this.scene.events.on('update', this.updateVisuals, this);
@@ -603,16 +590,15 @@ export class PhysicalCard implements IPhysicalCardInterface {
         // Sync incoming intents
         this.syncIncomingIntents();
 
-        // Update price box if it exists
-        if (this.priceBox && this.data.pricingInformation) {
-            const priceText = this.data.pricingInformation.buyable 
-                ? `Buy: $${this.data.pricingInformation.price}`
-                : this.data.pricingInformation.sellable 
-                    ? `Sell: $${this.data.pricingInformation.price}`
-                    : '';
-                    
+         // Simplified price box logic
+        if (this.priceContext !== PriceContext.NONE) {
+            const priceText = this.data.getPriceDisplayText(this.priceContext);
+            const priceColor = this.data.getPriceDisplayColor(this.priceContext);
             this.priceBox.setText(priceText);
-            this.priceBox.setFillColor(this.data.pricingInformation.buyable ? 0x00ff00 : 0xffff00);
+            this.priceBox.setFillColor(priceColor);
+            this.priceBox.setVisible(true);
+        }else{
+            this.priceBox.setVisible(false);
         }
     }
 

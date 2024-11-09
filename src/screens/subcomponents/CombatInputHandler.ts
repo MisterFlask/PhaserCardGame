@@ -75,9 +75,28 @@ class CombatInputHandler {
         ];
 
         allCards.forEach(card => {
-            const bounds = card.cardBackground.getBounds();
-            card.container.setInteractive(new Phaser.Geom.Rectangle(0, 0, bounds.width, bounds.height), Phaser.Geom.Rectangle.Contains);
-            card.container.on('pointerdown', () => this.handleCardClick(card));
+            // Ensure the container is interactive
+            card.container.setInteractive({
+                hitArea: card.cardBackground,
+                hitAreaCallback: Phaser.Geom.Rectangle.Contains,
+                useHandCursor: true  // Add cursor hint
+            });
+
+            // Remove any existing listeners first to prevent duplicate bindings
+            card.container.off('pointerdown');
+            card.container.on('pointerdown', () => {
+                console.log(`Attempting to handle click for card: ${card.data.name}`);
+                this.handleCardClick(card);
+            });
+
+            // Additional debug logging
+            card.container.on('pointerover', () => {
+                console.log(`Pointer over card: ${card.data.name}`);
+            });
+
+            card.container.on('pointerout', () => {
+                console.log(`Pointer out card: ${card.data.name}`);
+            });
         });
     }
 
@@ -370,8 +389,16 @@ class CombatInputHandler {
 
         allCards.forEach(card => {
             if (enable) {
-                const bounds = card.cardBackground.getBounds();
-                card.container.setInteractive(new Phaser.Geom.Rectangle(0, 0, bounds.width, bounds.height), Phaser.Geom.Rectangle.Contains);
+                // More comprehensive interactive setup
+                card.container.setInteractive({
+                    hitArea: card.cardBackground,
+                    hitAreaCallback: Phaser.Geom.Rectangle.Contains,
+                    useHandCursor: true
+                });
+                
+                // Re-add event listeners
+                card.container.off('pointerdown');
+                card.container.on('pointerdown', () => this.handleCardClick(card));
             } else {
                 card.container.removeInteractive();
             }

@@ -10,7 +10,7 @@ export class SurfaceSellValue extends AbstractBuff {
     }
 
     override getName(): string {
-        return "Valuable on Surface";
+        return "Surface Sell Value";
     }
 
     override getDescription(): string {

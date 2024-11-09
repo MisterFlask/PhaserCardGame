@@ -3,6 +3,10 @@ import { BaconBeast, BloodManipulationSlime, ClockworkAbomination, EncounterMana
 import { AbstractCard } from '../gamecharacters/AbstractCard';
 import { PlayerCharacter } from '../gamecharacters/CharacterClasses';
 import { PlayableCard } from '../gamecharacters/PlayableCard';
+import { AlcoholCargo } from '../gamecharacters/playerclasses/cards/cargo/AlcoholCargo';
+import { CoffeeCargo } from '../gamecharacters/playerclasses/cards/cargo/CoffeeCargo';
+import { SacredRelicsCargo } from '../gamecharacters/playerclasses/cards/cargo/SacredRelicsCargo';
+import { SpicyLiteratureCargo } from '../gamecharacters/playerclasses/cards/cargo/SpicyLiteratureCargo';
 import { CardType } from '../gamecharacters/Primitives';
 import { CampaignRules } from '../rules/CampaignRules';
 import { GameState } from '../rules/GameState';
@@ -471,9 +475,11 @@ export default class CampaignScene extends Phaser.Scene {
 
     createShop = () => {
         const shopItems = [
-            new CargoCard(),
-            new MedkitCard(),
-            new AmmoPackCard()
+            new CoffeeCargo(),
+            new AlcoholCargo(),
+            new SacredRelicsCargo(),
+            new CoffeeCargo(),
+            new SpicyLiteratureCargo()
         ];
 
         this.positionShopCards(shopItems);

@@ -10,7 +10,7 @@ export class HellSellValue extends AbstractBuff {
     }
 
     override getName(): string {
-        return "Valuable in Hell";
+        return "Hell Sell Value";
     }
 
     override getDescription(): string {

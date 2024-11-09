@@ -19,7 +19,7 @@ export class CoffeeCargo extends PlayableCard {
     }
 
     override get description(): string {
-        return `Draw 2 cards.  Decrease the ValuableInHell buff on this card by 10.`;
+        return `Draw 2 cards.  Decrease the HellSellValue of this card by 10.`;
     }
 
     override InvokeCardEffects(): void {

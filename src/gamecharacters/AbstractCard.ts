@@ -86,18 +86,19 @@ export enum Team{
     ALLY,
     ENEMY
 }
-
-// kept here for the sake of the UI.  Calculated on the fly.
-export class TransientPricingInformation{
-    public sellable: boolean = false; 
-    public buyable: boolean = false; 
-    public price: number = 0; 
+    // Enum to represent pricing context
+export enum PriceContext {
+    SURFACE_BUY,
+    SURFACE_SELL,
+    HELL_BUY,
+    HELL_SELL,
+    NONE
 }
 
 export abstract class AbstractCard implements IAbstractCard {
 
-    public pricingInformation: TransientPricingInformation = new TransientPricingInformation();
     public typeTag: string = "AbstractCard"
+    
     public get name(): string {
         return this._name;
     }
@@ -145,6 +146,61 @@ export abstract class AbstractCard implements IAbstractCard {
     block: number = 0
     buffs: AbstractBuff[] = [];
     portraitTint?: number
+
+
+    public surfacePurchaseValue: number = -1;
+    public hellPurchaseValue: number = -1;
+    public get hellSellValue(): number {
+        return this.getBuffStacks("Hell Sell Value")
+    }
+    public get surfaceSellValue(): number {
+        return this.getBuffStacks("Surface Sell Value")
+    }
+    // Method to get the appropriate price based on context
+    public getPriceForContext(context: PriceContext): number {
+        switch (context) {
+            case PriceContext.SURFACE_BUY: 
+                return this.surfacePurchaseValue;
+            case PriceContext.SURFACE_SELL: 
+                // Calculate sell value dynamically
+                return this.surfaceSellValue;
+            case PriceContext.HELL_BUY: 
+                return this.hellPurchaseValue;
+            case PriceContext.HELL_SELL: 
+                // Calculate sell value dynamically
+                return this.hellSellValue;
+            default: 
+                return -1;
+        }
+    }
+
+    // Generates a price display text
+    public getPriceDisplayText(context: PriceContext): string {
+        const price = this.getPriceForContext(context);
+        if (price <= 0) return '';
+
+        switch (context) {
+            case PriceContext.SURFACE_BUY: return `Buy: $${price}`;
+            case PriceContext.SURFACE_SELL: return `Sell: $${price}`;
+            case PriceContext.HELL_BUY: return `Buy: $${price}`;
+            case PriceContext.HELL_SELL: return `Sell: $${price}`;
+            default: return '';
+        }
+    }
+
+    // Color for price display based on context
+    public getPriceDisplayColor(context: PriceContext): number {
+        switch (context) {
+            case PriceContext.SURFACE_BUY:
+            case PriceContext.HELL_BUY:
+                return 0x00ff00; // Green for buying
+            case PriceContext.SURFACE_SELL:
+            case PriceContext.HELL_SELL:
+                return 0xffff00; // Yellow for selling
+            default:
+                return 0xffffff; // White as default
+        }
+    }
 
     constructor({ name, description, portraitName, cardType, tooltip, characterData, size, team }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: AbstractCard, size?: CardSize, team?: Team }) {
         this._name = name

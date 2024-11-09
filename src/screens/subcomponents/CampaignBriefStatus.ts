@@ -61,7 +61,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
 
     public destroy(fromScene?: boolean): void {
         console.log('Destroying CampaignBriefStatus');
-        this.scene.events.off('update', this.updateCurrencyDisplay, this);
+        this.scene?.events?.off('update', this.updateCurrencyDisplay, this);
         super.destroy(fromScene);
     }
 }

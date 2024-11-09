@@ -22,8 +22,7 @@ export enum CardRarity {
 export abstract class PlayableCard extends AbstractCard {
     targetingType: TargetingType;
     override typeTag = "PlayableCard";
-    public surfacePurchaseValue: number;
-    public hellPurchaseValue: number;
+
     rarity: CardRarity; // Added card rarity
 
     resourceScalings: CardResourceScaling[] = [];
@@ -358,6 +357,7 @@ export abstract class PlayableCard extends AbstractCard {
     public unhighlight(): void {
         this.physicalCard?.unhighlight();
     }
+
 }
 
 export interface CardResourceScaling {

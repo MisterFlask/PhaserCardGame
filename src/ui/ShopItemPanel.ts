@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { PriceContext } from '../gamecharacters/AbstractCard';
 import { PlayableCard } from '../gamecharacters/PlayableCard';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
 import { DepthManager } from './DepthManager';
@@ -9,24 +10,19 @@ export class ShopItemPanel extends Phaser.GameObjects.Container {
     private physicalCard!: PhysicalCard;
     private isBuyable: boolean;
 
-    constructor(scene: Phaser.Scene, x: number, y: number, card: PlayableCard, isBuyable: boolean, onPurchase: (card: PlayableCard) => void) {
+    constructor(scene: Phaser.Scene, x: number, y: number, card: PlayableCard, isBuyable: boolean, onPurchase: (card: PlayableCard) => void, priceContext: PriceContext) {
         super(scene, x, y);
         this.card = card;
         this.isBuyable = isBuyable;
 
-        // Set up the pricing information on the card
-        this.card.pricingInformation.buyable = isBuyable;
-        this.card.pricingInformation.sellable = !isBuyable;
-        this.card.pricingInformation.price = card.hellPurchaseValue;
-
-        this.createPhysicalCard();
+        this.createPhysicalCard(priceContext);
         this.setupInteractivity(onPurchase);
         this.arrangeComponents();
 
         this.scene.add.existing(this);
     }
 
-    private createPhysicalCard(): void {
+    private createPhysicalCard(priceContext: PriceContext): void {
         const cardGuiUtils = CardGuiUtils.getInstance();
         this.physicalCard = cardGuiUtils.createCard({
             scene: this.scene,
@@ -35,6 +31,7 @@ export class ShopItemPanel extends Phaser.GameObjects.Container {
             data: this.card,
             onCardCreatedEventCallback: () => {}
         });
+        this.physicalCard.priceContext = priceContext;
         this.physicalCard.container
             .on('pointerdown', () => this.emit('pointerdown'))
             .on('pointerover', () => this.emit('pointerover'))
@@ -43,13 +40,6 @@ export class ShopItemPanel extends Phaser.GameObjects.Container {
     }
 
     public destroy(): void {
-        // Clear pricing information when destroying
-        if (this.card.pricingInformation) {
-            this.card.pricingInformation.buyable = false;
-            this.card.pricingInformation.sellable = false;
-            this.card.pricingInformation.price = 0;
-        }
-
         if (this.physicalCard) {
             this.physicalCard.obliterate();
             this.physicalCard.destroy();

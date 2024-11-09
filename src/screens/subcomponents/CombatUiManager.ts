@@ -306,7 +306,10 @@ class CombatUIManager {
         const spacingY = 50;
 
         resourceArray.forEach((resource, index) => {
-            const icon = this.scene.add.image(startX, startY + index * spacingY, resource.icon).setDisplaySize(32, 32);
+            const icon = this.scene.add.image(startX, startY + index * spacingY, resource.icon)
+                .setDisplaySize(32, 32)
+                .setInteractive();
+
             const text = this.scene.add.text(startX + 40, startY + index * spacingY, `${resource.name}: ${resource.value}`, {
                 fontSize: '20px',
                 color: '#ffffff',
@@ -316,6 +319,33 @@ class CombatUIManager {
 
             const container = this.scene.add.container(0, 0, [icon, text]);
             this.resourceIndicators.push(container);
+
+            // Create tooltip using the resource's description
+            const tooltip = new TextBox({
+                scene: this.scene,
+                x: startX - 250,  // Wider tooltip to accommodate longer descriptions
+                y: startY + index * spacingY,
+                width: 230,
+                height: 100,
+                text: resource.description,
+                style: { 
+                    fontSize: '16px', 
+                    color: '#ffffff', 
+                    wordWrap: { width: 220 } 
+                },
+                fillColor: 0x000000
+            });
+            tooltip.setVisible(false);
+
+            icon.on('pointerover', () => {
+                tooltip.setVisible(true);
+            });
+
+            icon.on('pointerout', () => {
+                tooltip.setVisible(false);
+            });
+
+            this.scene.add.existing(tooltip);
         });
 
         this.scene.events.on('update', this.updateResourceIndicators, this);

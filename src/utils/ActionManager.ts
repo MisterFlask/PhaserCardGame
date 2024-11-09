@@ -26,7 +26,7 @@ export class ActionManager {
             inventory.splice(index, 1);
         }
 
-        GameState.getInstance().hellCurrency += item.hellPurchaseValue;
+        GameState.getInstance().hellCurrency += item.hellSellValue;
     }
 
     buyItemForHellCurrency(item: PlayableCard) : boolean {
