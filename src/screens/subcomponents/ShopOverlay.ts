@@ -4,6 +4,10 @@ import { AbstractCard, PriceContext } from '../../gamecharacters/AbstractCard';
 import { BaseCharacter } from '../../gamecharacters/BaseCharacter';
 import { PlayableCard } from '../../gamecharacters/PlayableCard';
 import { Rummage } from '../../gamecharacters/playerclasses/cards/basic/Rummage';
+import { AbstractRelic } from '../../relics/AbstractRelic';
+import { CaskOfErrantSouls } from '../../relics/common/CaskOfErrantSouls';
+import { FrozenDew } from '../../relics/common/FrozenDew';
+import { IronFilings } from '../../relics/common/IronFilings';
 import { GameState } from '../../rules/GameState';
 import { DepthManager } from '../../ui/DepthManager';
 import { ShopItemPanel } from '../../ui/ShopItemPanel';
@@ -22,7 +26,8 @@ export class ShopOverlay {
     private inventoryItemPanels: ShopItemPanel[] = [];
     private readonly BASE_PANEL_DEPTH = DepthManager.getInstance().SHOP_OVERLAY;
     private campaignBriefStatus: CampaignBriefStatus;
-    private shopItems: PlayableCard[] = [new Rummage(), new Rummage(), new Rummage()];
+    private shopCards: PlayableCard[] = [new Rummage(), new Rummage(), new Rummage()];
+    private shopRelics: AbstractRelic[] = [new CaskOfErrantSouls(), new FrozenDew(), new IronFilings()];
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -65,19 +70,97 @@ export class ShopOverlay {
 
         this.overlay.add([background, title, this.shopItemsContainer, this.inventoryContainer, closeButton, this.campaignBriefStatus]);
 
-        this.populatePurchasableShopItems();
+        this.populatePurchasableShopCards();
+        this.populatePurchasableShopRelics();
         this.populateSellableInventory();
     }
 
-    private populatePurchasableShopItems(): void {
-        const shopItems = this.getShopItems();
-        shopItems.forEach((item, index) => {
-            const panel = new ShopItemPanel(this.scene, 100, index * 200 + 100, item, true, this.buyItem.bind(this), PriceContext.HELL_BUY);
-            this.shopItemsContainer.add(panel); // Changed from panel.container to panel
-            panel.setDepth(this.BASE_PANEL_DEPTH);
+    private populatePurchasableShopRelics(): void {
+        const gridColumns = 3;
+        const verticalSpacing = 250;
+        const horizontalSpacing = 200;
+        const startX = 50;
+        // Position relics below the cards
+        const startY = 850; // Adjust this value based on your layout needs
+
+        this.shopRelics.forEach((relic, index) => {
+            const row = Math.floor(index / gridColumns);
+            const col = index % gridColumns;
             
+            const panel = new ShopItemPanel(
+                this.scene,
+                startX + col * horizontalSpacing,
+                startY + row * verticalSpacing,
+                relic,
+                true,
+                this.buyRelic.bind(this),
+                PriceContext.HELL_BUY
+            );
+            
+            this.shopItemsContainer.add(panel);
+            panel.setDepth(this.BASE_PANEL_DEPTH);
             this.shopItemPanels.push(panel);
         });
+    }
+
+    private buyRelic(relic: AbstractRelic): void {
+        console.log(`Buying relic ${relic.name}`);
+        if (ActionManagerFetcher.getActionManager().buyItemForHellCurrency(relic)) {
+            // Remove the purchased relic from the shop relics array
+            const relicIndex = this.shopRelics.findIndex(shopRelic => shopRelic.id === relic.id);
+            if (relicIndex !== -1) {
+                this.shopRelics.splice(relicIndex, 1);
+            }
+            
+            this.refreshShop();
+        } else {
+            // Shake animation for insufficient funds
+            const campaignBriefStatus = this.campaignBriefStatus;
+            if (campaignBriefStatus) {
+                this.scene.tweens.add({
+                    targets: campaignBriefStatus,
+                    x: '+=10',
+                    duration: 50,
+                    yoyo: true,
+                    repeat: 9,
+                    ease: 'Sine.easeInOut'
+                });
+            }
+        }
+    }
+
+    private populatePurchasableShopCards(): void {
+        const shopItems = this.getShopItems();
+        const gridColumns = 3;
+        const gridRows = 3;
+        const horizontalSpacing = 200;
+        const verticalSpacing = 250;
+        const startX = 50;
+        const startY = 100;
+
+        for (let row = 0; row < gridRows; row++) {
+            for (let col = 0; col < gridColumns; col++) {
+                const index = row * gridColumns + col;
+                
+                // Only create a panel if there's an item available
+                if (index < shopItems.length) {
+                    const item = shopItems[index];
+                    const panel = new ShopItemPanel(
+                        this.scene, 
+                        startX + col * horizontalSpacing, 
+                        startY + row * verticalSpacing, 
+                        item, 
+                        true, 
+                        this.buyItem.bind(this), 
+                        PriceContext.HELL_BUY
+                    );
+                    this.shopItemsContainer.add(panel);
+                    panel.setDepth(this.BASE_PANEL_DEPTH);
+                    
+                    this.shopItemPanels.push(panel);
+                }
+            }
+        }
     }
 
     private populateSellableInventory(): void {
@@ -107,7 +190,7 @@ export class ShopOverlay {
     private getShopItems(): PlayableCard[] {
         // This method should be implemented to return the list of items for sale
         // For now, we'll return an array with three Rummage cards
-        return this.shopItems;
+        return this.shopCards;
     }
 
     private buyItem(item: PlayableCard): void {
@@ -116,12 +199,12 @@ export class ShopOverlay {
         // remove from shop
         if (ActionManagerFetcher.getActionManager().buyItemForHellCurrency(item)) { 
             // Remove the purchased item from the shop items array
-            const itemIndex = this.shopItems.findIndex(shopItem => shopItem.id === item.id);
+            const itemIndex = this.shopCards.findIndex(shopItem => shopItem.id === item.id);
             if (itemIndex !== -1) {
-                this.shopItems.splice(itemIndex, 1);
+                this.shopCards.splice(itemIndex, 1);
             }
 
-            this.populatePurchasableShopItems()
+            this.populatePurchasableShopCards()
             // After buying, refresh the shop and inventory
             this.refreshShop();
         } else{
@@ -162,7 +245,8 @@ export class ShopOverlay {
         this.inventoryContainer.removeAll(true);
 
         // Repopulate with updated items
-        this.populatePurchasableShopItems();
+        this.populatePurchasableShopCards();
+        this.populatePurchasableShopRelics();
         this.populateSellableInventory();
     }
 
