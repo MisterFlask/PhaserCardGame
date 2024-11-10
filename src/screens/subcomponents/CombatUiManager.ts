@@ -5,6 +5,7 @@ import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
 import { Defend } from '../../gamecharacters/playerclasses/cards/basic/Defend';
 import { GameState } from '../../rules/GameState';
 import { TextBoxButton } from '../../ui/Button';
+import { CombatResourceDisplay } from '../../ui/CombatResourceDisplay';
 import { default as CombatSceneLayoutUtils, default as LayoutUtils } from '../../ui/LayoutUtils';
 import Menu from '../../ui/Menu';
 import { SubtitleManager } from '../../ui/SubtitleManager';
@@ -27,7 +28,7 @@ class CombatUIManager {
     public battlefieldArea!: Phaser.GameObjects.Rectangle;
     public handArea!: Phaser.GameObjects.Rectangle;
     public energyDisplay!: TextBox;
-    public resourceIndicators: Phaser.GameObjects.Container[] = [];
+    public resourceIndicators: CombatResourceDisplay[] = [];
     private subtitleTextBox?: TextBox;
     private cardRewardScreen!: CardRewardScreen;
     private combatEnded: boolean = false;
@@ -290,7 +291,7 @@ class CombatUIManager {
         this.scene.input.off('pointermove', this.handlePointerMove, this);
         this.scene.events.off('disableInteractions', this.disableInteractions, this);
         this.scene.events.off('enableInteractions', this.enableInteractions, this);
-        this.resourceIndicators.forEach(container => container.destroy());
+        this.resourceIndicators.forEach(display => display.destroy());
         this.resourceIndicators = [];
         this.scene.events.off('update', this.updateResourceIndicators, this);
     }
@@ -306,74 +307,21 @@ class CombatUIManager {
         const spacingY = 50;
 
         resourceArray.forEach((resource, index) => {
-            const icon = this.scene.add.image(startX, startY + index * spacingY, resource.icon)
-                .setDisplaySize(64, 64)
-                .setInteractive();
-
-            const text = this.scene.add.text(startX + 40, startY + index * spacingY, `${resource.name}: ${resource.value}`, {
-                fontSize: '20px',
-                color: '#ffffff',
-                fontFamily: 'Arial'
-            });
-            text.setShadow(2, 2, '#000000', 2, true, true);
-
-            const container = this.scene.add.container(0, 0, [icon, text]);
-            this.resourceIndicators.push(container);
-
-            // Create tooltip using the resource's description
-            const tooltip = new TextBox({
-                scene: this.scene,
-                x: startX - 250,
-                y: startY + index * spacingY,
-                width: 230,
-                height: 100,
-                text: resource.description,
-                style: { 
-                    fontSize: '16px', 
-                    color: '#ffffff', 
-                    wordWrap: { width: 220 } 
-                },
-                fillColor: 0x000000
-            });
-            tooltip.setVisible(false);
-
-            // Add click handler
-            icon.on('pointerdown', () => {
-                if (UIContextManager.getInstance().getContext() === UIContext.COMBAT) {
-                    resource.onClick();
-                }
-            });
-
-            icon.on('pointerover', () => {
-                tooltip.setVisible(true);
-                icon.setTint(0xcccccc); // Slight darkening to indicate hover
-            });
-
-            icon.on('pointerout', () => {
-                tooltip.setVisible(false);
-                icon.clearTint();
-            });
-
-            this.scene.add.existing(tooltip);
+            const resourceDisplay = new CombatResourceDisplay(
+                this.scene,
+                startX,
+                startY + index * spacingY,
+                resource
+            );
+            this.resourceIndicators.push(resourceDisplay);
         });
 
         this.scene.events.on('update', this.updateResourceIndicators, this);
     }
 
     private updateResourceIndicators(): void {
-        const resources = GameState.getInstance().combatState.combatResources;
-        const resourceArray = [
-            resources.powder,
-            resources.iron,
-            resources.pages,
-            resources.pluck,
-            resources.venture,
-            resources.smog
-        ];
-        this.resourceIndicators.forEach((container, index) => {
-            const resource = resourceArray[index];
-            const text = container.getAt(1) as Phaser.GameObjects.Text;
-            text.setText(`${resource.name}: ${resource.value}`);
+        this.resourceIndicators.forEach((display) => {
+            (display as CombatResourceDisplay).updateValue();
         });
     }
 
