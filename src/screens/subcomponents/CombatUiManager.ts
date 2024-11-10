@@ -323,7 +323,7 @@ class CombatUIManager {
             // Create tooltip using the resource's description
             const tooltip = new TextBox({
                 scene: this.scene,
-                x: startX - 250,  // Wider tooltip to accommodate longer descriptions
+                x: startX - 250,
                 y: startY + index * spacingY,
                 width: 230,
                 height: 100,
@@ -337,12 +337,21 @@ class CombatUIManager {
             });
             tooltip.setVisible(false);
 
+            // Add click handler
+            icon.on('pointerdown', () => {
+                if (UIContextManager.getInstance().getContext() === UIContext.COMBAT) {
+                    resource.onClick();
+                }
+            });
+
             icon.on('pointerover', () => {
                 tooltip.setVisible(true);
+                icon.setTint(0xcccccc); // Slight darkening to indicate hover
             });
 
             icon.on('pointerout', () => {
                 tooltip.setVisible(false);
+                icon.clearTint();
             });
 
             this.scene.add.existing(tooltip);

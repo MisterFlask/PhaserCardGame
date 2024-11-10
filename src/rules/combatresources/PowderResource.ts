@@ -8,7 +8,6 @@ export class PowderResource extends AbstractCombatResource {
         super(
             "Powder",
             "Spend 1 Powder: all characters gain 2 Temporary Strength",
-            0,
             'powder_icon'
         );
     }

@@ -7,7 +7,6 @@ export class IronResource extends AbstractCombatResource {
         super(
             "Iron",
             "Spend 1 Iron: all characters gain 3 Block.",
-            0,
             'iron_icon'
         );
     }

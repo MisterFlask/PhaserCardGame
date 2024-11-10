@@ -6,7 +6,6 @@ export class VentureResource extends AbstractCombatResource {
         super(
             "Venture",
             "Spend 1 Venture: Draw a card",
-            0,
             'venture_icon'
         );
     }

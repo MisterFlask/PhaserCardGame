@@ -8,7 +8,6 @@ export class SmogResource extends AbstractCombatResource {
         super(
             "Smog",
             "Spend 2 Smog: Return a card from your discard pile to your hand",
-            0,
             'smog_icon'
         );
     }

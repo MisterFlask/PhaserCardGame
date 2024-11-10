@@ -7,7 +7,6 @@ export class PluckResource extends AbstractCombatResource {
         super(
             "Pluck",
             "Spend 1 Pluck: Gain 1 Stress Block",
-            0,
             'pluck_icon'
         );
     }

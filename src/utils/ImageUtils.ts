@@ -242,6 +242,10 @@ export default class GameImageLoader {
                 'boss-icon.png', 'elite-icon.svg', 'entrance-icon.png', 'event-icon.svg', 'rest-icon.svg', 'shop-icon.svg', 'room-fight-icon.svg', 'treasure-icon.svg'
             ]
         },
+        combat_resources: {
+            prefix: 'Sprites/CombatResources/',
+            files: ['powder_icon.svg', 'iron_icon.svg', 'pages_icon.svg', 'pluck_icon.svg', 'venture_icon.svg', 'smog_icon.svg']
+        },
         mission_icons: {
             prefix: 'Sprites/MissionIcons/',
             files: ['cash.png', 'fairy.png', 'gate.png', 'key.png', 'relic.png', 'strategic.png']
