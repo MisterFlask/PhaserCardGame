@@ -307,7 +307,7 @@ class CombatUIManager {
 
         resourceArray.forEach((resource, index) => {
             const icon = this.scene.add.image(startX, startY + index * spacingY, resource.icon)
-                .setDisplaySize(32, 32)
+                .setDisplaySize(64, 64)
                 .setInteractive();
 
             const text = this.scene.add.text(startX + 40, startY + index * spacingY, `${resource.name}: ${resource.value}`, {
