@@ -253,7 +253,7 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
     },
     render: {
         antialias: true,
-        roundPixels: false,
+        roundPixels: true,
         pixelArt: false
     },
     scene: [CampaignScene, CombatScene]

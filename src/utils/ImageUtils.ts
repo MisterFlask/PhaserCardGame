@@ -244,7 +244,7 @@ export default class GameImageLoader {
         },
         combat_resources: {
             prefix: 'Sprites/CombatResources/',
-            files: ['powder_icon.svg', 'iron_icon.svg', 'pages_icon.svg', 'pluck_icon.svg', 'venture_icon.svg', 'smog_icon.svg']
+            files: ['powder_icon.png', 'iron_icon.png', 'pages_icon.png', 'pluck_icon.png', 'venture_icon.png', 'smog_icon.png']
         },
         mission_icons: {
             prefix: 'Sprites/MissionIcons/',
