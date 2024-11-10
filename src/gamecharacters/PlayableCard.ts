@@ -1,5 +1,12 @@
+import { AbstractCombatResource } from "../rules/combatresources/AbstractCombatResource";
+import { IronResource } from "../rules/combatresources/IronResource";
+import { PagesResource } from "../rules/combatresources/PagesResource";
+import { PluckResource } from "../rules/combatresources/PluckResource";
+import { PowderResource } from "../rules/combatresources/PowderResource";
+import { SmogResource } from "../rules/combatresources/SmogResource";
+import { VentureResource } from "../rules/combatresources/VentureResource";
 import { CombatRules, DamageCalculationResult } from "../rules/CombatRules";
-import { CombatResource, CombatResources, CombatState, GameState } from "../rules/GameState";
+import { CombatResources, CombatState, GameState } from "../rules/GameState";
 import { BaseCharacterType } from "../Types";
 import type { ActionManager } from "../utils/ActionManager";
 import { ActionManagerFetcher } from "../utils/ActionManagerFetcher";
@@ -127,27 +134,27 @@ export abstract class PlayableCard extends AbstractCard {
         return ActionManagerFetcher.getActionManager();
     }
 
-    get pluck(): CombatResource {
+    get pluck(): PluckResource {
         return this.combatResources.pluck;
     }
 
-    get pages(): CombatResource {
+    get pages(): PagesResource {
         return this.combatResources.pages;
     }
 
-    get iron(): CombatResource {
+    get iron(): IronResource {
         return this.combatResources.iron;
     }
 
-    get venture(): CombatResource {
+    get venture(): VentureResource {
         return this.combatResources.venture;
     }
 
-    get smog(): CombatResource {
+    get smog(): SmogResource {
         return this.combatResources.smog;
     }
 
-    get powder(): CombatResource {
+    get powder(): PowderResource {
         return this.combatResources.powder;
     }
 
@@ -361,7 +368,7 @@ export abstract class PlayableCard extends AbstractCard {
 }
 
 export interface CardResourceScaling {
-    resource: CombatResource;
+    resource: AbstractCombatResource;
     attackScaling?: number;
     blockScaling?: number;
     magicNumberScaling?: number;

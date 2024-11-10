@@ -2,15 +2,25 @@ import type { AbstractCard } from '../gamecharacters/AbstractCard';
 import type { PlayerCharacter } from '../gamecharacters/CharacterClasses';
 import type { PlayableCard } from '../gamecharacters/PlayableCard';
 import type { LocationCard } from '../maplogic/LocationCard';
+import { AbstractRelic } from '../relics/AbstractRelic';
 import type { AutomatedCharacterType, BaseCharacterType } from '../Types';
 import type { PhysicalCard } from '../ui/PhysicalCard';
+import { AbstractCombatResource } from './combatresources/AbstractCombatResource';
+import { IronResource } from './combatresources/IronResource';
+import { PagesResource } from './combatresources/PagesResource';
+import { PluckResource } from './combatresources/PluckResource';
+import { PowderResource } from './combatresources/PowderResource';
+import { SmogResource } from './combatresources/SmogResource';
+import { VentureResource } from './combatresources/VentureResource';
+
 export class GameState {
     private static instance: GameState;
 
     public roster: PlayerCharacter[] = [];
     public currentRunCharacters: PlayerCharacter[] = [];
     public shopItems: PlayableCard[] = [];
-    public inventory: PlayableCard[] = [];
+    public cardsInventory: PlayableCard[] = [];
+    public relicsInventory: AbstractRelic[] = [];
 
     public surfaceCurrency: number = 0
     public hellCurrency: number = 0
@@ -32,7 +42,7 @@ export class GameState {
     }
 
     public getCardsOwnedByCharacter(character: PlayerCharacter): PlayableCard[]{
-        const inventoryCards = this.inventory.filter(card => card.owner?.id === character.id)
+        const inventoryCards = this.cardsInventory.filter(card => card.owner?.id === character.id)
         const currentCharacter = this.currentRunCharacters.filter(card => card.id === character.id)
         const currentCharacterCards = currentCharacter.flatMap(c => c.cardsInMasterDeck)
         return [...inventoryCards, ...currentCharacterCards]
@@ -60,7 +70,7 @@ export class GameState {
         // If you need to handle enemy characters, ensure CombatState has this property
         // this.obliteratePhysicalCardsForArray(this.combatState.enemyCharacters);
 
-        this.obliteratePhysicalCardsForArray(this.inventory);
+        this.obliteratePhysicalCardsForArray(this.cardsInventory);
     }
 
     // Roster methods
@@ -100,16 +110,16 @@ export class GameState {
 
     // Inventory methods
     public addToInventory(item: PlayableCard): void {
-        this.inventory.push(item);
+        this.cardsInventory.push(item);
         // Optionally, update UI or perform additional actions
     }
 
     public removeFromInventory(item: PlayableCard): void {
-        this.inventory = this.inventory.filter(i => i !== item);
+        this.cardsInventory = this.cardsInventory.filter(i => i !== item);
     }
 
     public getInventory(): PlayableCard[] {
-        return [...this.inventory];
+        return [...this.cardsInventory];
     }
 
     // Reset method
@@ -117,7 +127,7 @@ export class GameState {
         this.roster = [];
         this.currentRunCharacters = [];
         this.shopItems = [];
-        this.inventory = [];
+        this.cardsInventory = [];
     }
 
     // Serializer function
@@ -132,7 +142,7 @@ export class GameState {
                 ...char
             })),
             shopItems: this.shopItems,
-            inventory: this.inventory
+            inventory: this.cardsInventory
         };
         return JSON.stringify(serializableState);
     }
@@ -204,82 +214,44 @@ export class MissionDetails{
     public reward: number = 10
 }
 
-export class CombatResources{
+export class CombatResources {
+    powder: PowderResource = new PowderResource();
+    iron: IronResource = new IronResource();
+    pages: PagesResource = new PagesResource();
+    pluck: PluckResource = new PluckResource();
+    smog: SmogResource = new SmogResource();
+    venture: VentureResource = new VentureResource();
 
-    modifyPluck(byAmount: number){
+    modifyPluck(byAmount: number) {
         this.pluck.value += byAmount;
         console.log(`Modified Pluck by ${byAmount}. New value: ${this.pluck.value}`);
     }
-    modifyPages(byAmount: number){
+    modifyPages(byAmount: number) {
         this.pages.value += byAmount;
         console.log(`Modified Pages by ${byAmount}. New value: ${this.pages.value}`);
     }
-    modifyIron(byAmount: number){
+    modifyIron(byAmount: number) {
         this.iron.value += byAmount;
         console.log(`Modified Iron by ${byAmount}. New value: ${this.iron.value}`);
     }
-    modifyVenture(byAmount: number){
+    modifyVenture(byAmount: number) {
         this.venture.value += byAmount;
         console.log(`Modified Venture by ${byAmount}. New value: ${this.venture.value}`);
     }
-    modifySmog(byAmount: number){
+    modifySmog(byAmount: number) {
         this.smog.value += byAmount;
         console.log(`Modified Smog by ${byAmount}. New value: ${this.smog.value}`);
     }
-    modifyPowder(byAmount: number){
+    modifyPowder(byAmount: number) {
         this.powder.value += byAmount;
         console.log(`Modified Powder by ${byAmount}. New value: ${this.powder.value}`);
     }
 
-    getCombatResource(resource: CombatResource): CombatResource{
-        return this.resources().find(r => r.name === resource.name)!
+    getCombatResource(resource: AbstractCombatResource): AbstractCombatResource {
+        return this.resources().find(r => r.name === resource.name)!;
     }
 
-    resources(): CombatResource[]{
-        return [this.powder, this.pluck, this.pages, this.iron, this.venture, this.smog]
-    }
-
-    powder: CombatResource = new CombatResource(
-        "Powder",
-        "At the start of turn, if you have 2 Powder, decrease it by 2 and a random ally gains 2 Strength."
-    );
-
-    iron: CombatResource = new CombatResource(
-        "Iron",
-        "At beginning of turn, gain 1 Block for each Iron value.  Decreases by 1 at end of turn."
-    );
-
-    pages: CombatResource = new CombatResource(
-        "Pages",
-        "If you end combat with 4 Pages, gain an additional card reward option.  If you gain 10, get 2 instead."
-    );
-
-    pluck: CombatResource = new CombatResource(
-        "Pluck",
-        "Grant 1 Stress Block at beginning of turn for each 1 Pluck value."
-    );
-
-    smog: CombatResource = new CombatResource(
-        "Smog",
-        "If you have >4 Smog at beginning of turn, manufacture a Sidearm to hand."
-    );
-
-    venture: CombatResource = new CombatResource(
-        "Venture",
-        "At end of combat, gain a Loot reward option for each 2 Venture value. [this is distinct from ordinary card rewards]"
-    );
-}
-
-export class CombatResource{
-    name: string;
-    description: string;
-    value: number;
-    icon: string; // Add icon property
-
-    constructor(name: string, description: string, initialValue: number = 0, icon: string = 'placeholder') {
-        this.name = name;
-        this.description = description;
-        this.value = initialValue;
-        this.icon = icon; // Initialize icon
+    resources(): AbstractCombatResource[] {
+        return [this.powder, this.pluck, this.pages, this.iron, this.venture, this.smog];
     }
 }

@@ -8,6 +8,7 @@ import { Stress } from "../gamecharacters/buffs/standard/Stress";
 import { IBaseCharacter } from "../gamecharacters/IBaseCharacter";
 import { PlayableCard } from "../gamecharacters/PlayableCard";
 import { ProcBroadcaster } from "../gamecharacters/procs/ProcBroadcaster";
+import { AbstractRelic } from "../relics/AbstractRelic";
 import { AbstractCombatEvent } from "../rules/AbstractCombatEvent";
 import { CombatRules, DamageCalculationResult } from "../rules/CombatRules";
 import { DeckLogic, PileName } from "../rules/DeckLogic";
@@ -20,7 +21,7 @@ export class ActionManager {
 
 
     sellItemForHellCurrency(item: PlayableCard) {
-        const inventory = GameState.getInstance().inventory;
+        const inventory = GameState.getInstance().cardsInventory;
         const index = inventory.findIndex(card => card.id === item.id);
         if (index !== -1) {
             inventory.splice(index, 1);
@@ -28,9 +29,20 @@ export class ActionManager {
 
         GameState.getInstance().hellCurrency += item.hellSellValue;
     }
+    buyRelicForHellCurrency(relic: AbstractRelic, price: number) : boolean {
+        if (GameState.getInstance().hellCurrency < price) {
+            return false;
+        }
+        const inventory = GameState.getInstance().relicsInventory;
+        inventory.push(relic);
+        
+        GameState.getInstance().hellCurrency -= price;
+        return true;
+    }
+
 
     buyItemForHellCurrency(item: PlayableCard) : boolean {
-        const inventory = GameState.getInstance().inventory;
+        const inventory = GameState.getInstance().cardsInventory;
         if (GameState.getInstance().hellCurrency < item.hellPurchaseValue) {
             return false;
         }

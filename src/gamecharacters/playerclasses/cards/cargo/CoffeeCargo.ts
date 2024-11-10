@@ -2,7 +2,6 @@ import { TargetingType } from "../../../AbstractCard";
 import { CardRarity, PlayableCard } from "../../../PlayableCard";
 import { CardType } from "../../../Primitives";
 import { HellSellValue } from "../../../buffs/standard/HellSellValue";
-import { ValuableCargo } from "../../../buffs/standard/ValuableCargo";
 export class CoffeeCargo extends PlayableCard {
     constructor() {
         super({
@@ -13,7 +12,6 @@ export class CoffeeCargo extends PlayableCard {
         });
         this.energyCost = 0;
         this.buffs.push(new HellSellValue(50));
-        this.buffs.push(new ValuableCargo());
         this.surfacePurchaseValue = 50;
         this.hellPurchaseValue = 0;
     }

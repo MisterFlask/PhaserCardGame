@@ -10,7 +10,8 @@ import { FrozenDew } from '../../relics/common/FrozenDew';
 import { IronFilings } from '../../relics/common/IronFilings';
 import { GameState } from '../../rules/GameState';
 import { DepthManager } from '../../ui/DepthManager';
-import { ShopItemPanel } from '../../ui/ShopItemPanel';
+import { ShopCardPanel } from '../../ui/ShopCardPanel';
+import { ShopRelicPanel } from '../../ui/ShopRelicPanel';
 import { TextBox } from '../../ui/TextBox';
 import { UIContext, UIContextManager } from '../../ui/UIContextManager';
 import { ActionManagerFetcher } from '../../utils/ActionManagerFetcher';
@@ -22,8 +23,9 @@ export class ShopOverlay {
     private isVisible: boolean = false;
     private shopItemsContainer!: Phaser.GameObjects.Container;
     private inventoryContainer!: Phaser.GameObjects.Container;
-    private shopItemPanels: ShopItemPanel[] = [];
-    private inventoryItemPanels: ShopItemPanel[] = [];
+    private shopItemPanels: ShopCardPanel[] = [];
+    private inventoryItemPanels: ShopCardPanel[] = [];
+    private shopRelicPanels: ShopRelicPanel[] = [];
     private readonly BASE_PANEL_DEPTH = DepthManager.getInstance().SHOP_OVERLAY;
     private campaignBriefStatus: CampaignBriefStatus;
     private shopCards: PlayableCard[] = [new Rummage(), new Rummage(), new Rummage()];
@@ -76,43 +78,44 @@ export class ShopOverlay {
     }
 
     private populatePurchasableShopRelics(): void {
-        const gridColumns = 3;
-        const verticalSpacing = 250;
-        const horizontalSpacing = 200;
-        const startX = 50;
-        // Position relics below the cards
-        const startY = 850; // Adjust this value based on your layout needs
+        const gridColumns = 4;
+        const verticalSpacing = 122;
+        const horizontalSpacing = 122;
+        const startX = 450;
+        const startY = 300;
 
         this.shopRelics.forEach((relic, index) => {
             const row = Math.floor(index / gridColumns);
             const col = index % gridColumns;
             
-            const panel = new ShopItemPanel(
+            const panel = new ShopRelicPanel(
                 this.scene,
                 startX + col * horizontalSpacing,
                 startY + row * verticalSpacing,
                 relic,
-                true,
-                this.buyRelic.bind(this),
-                PriceContext.HELL_BUY
+                PriceContext.HELL_BUY,
+                this.buyRelic.bind(this)
             );
             
             this.shopItemsContainer.add(panel);
             panel.setDepth(this.BASE_PANEL_DEPTH);
-            this.shopItemPanels.push(panel);
+            this.shopRelicPanels.push(panel);
         });
     }
 
     private buyRelic(relic: AbstractRelic): void {
         console.log(`Buying relic ${relic.name}`);
-        if (ActionManagerFetcher.getActionManager().buyItemForHellCurrency(relic)) {
+        if (ActionManagerFetcher.getActionManager().buyRelicForHellCurrency(relic, relic.price)) {
             // Remove the purchased relic from the shop relics array
-            const relicIndex = this.shopRelics.findIndex(shopRelic => shopRelic.id === relic.id);
+            const relicIndex = this.shopRelics.findIndex(shopRelic => shopRelic.name === relic.name);
             if (relicIndex !== -1) {
                 this.shopRelics.splice(relicIndex, 1);
             }
             
             this.refreshShop();
+            
+            // Emit game state changes event
+            this.scene.events.emit('propagateGameStateChangesToUi');
         } else {
             // Shake animation for insufficient funds
             const campaignBriefStatus = this.campaignBriefStatus;
@@ -145,7 +148,7 @@ export class ShopOverlay {
                 // Only create a panel if there's an item available
                 if (index < shopItems.length) {
                     const item = shopItems[index];
-                    const panel = new ShopItemPanel(
+                    const panel = new ShopCardPanel(
                         this.scene, 
                         startX + col * horizontalSpacing, 
                         startY + row * verticalSpacing, 
@@ -164,11 +167,11 @@ export class ShopOverlay {
     }
 
     private populateSellableInventory(): void {
-        const inventory = GameState.getInstance().inventory;
+        const inventory = GameState.getInstance().cardsInventory;
         inventory.forEach((item, index) => {
 
             if (item.hellSellValue > 0) {
-                const panel = new ShopItemPanel(this.scene, 0, index * 200 + 100, item, false, this.sellItem.bind(this), PriceContext.HELL_SELL);
+                const panel = new ShopCardPanel(this.scene, 0, index * 200 + 100, item, false, this.sellItem.bind(this), PriceContext.HELL_SELL);
                 this.inventoryContainer.add(panel); // Changed from panel.container to panel
 
                 panel.setDepth(this.BASE_PANEL_DEPTH);
@@ -207,6 +210,9 @@ export class ShopOverlay {
             this.populatePurchasableShopCards()
             // After buying, refresh the shop and inventory
             this.refreshShop();
+            
+            // Emit game state changes event
+            this.scene.events.emit('propagateGameStateChangesToUi');
         } else{
             // Get the campaign brief status and shake it to indicate insufficient funds
             const campaignBriefStatus = this.campaignBriefStatus;
@@ -230,6 +236,9 @@ export class ShopOverlay {
         
         // After selling, refresh the shop and inventory
         this.refreshShop();
+        
+        // Emit game state changes event
+        this.scene.events.emit('propagateGameStateChangesToUi');
     }
 
     private refreshShop(): void {
@@ -243,6 +252,10 @@ export class ShopOverlay {
 
         this.shopItemsContainer.removeAll(true);
         this.inventoryContainer.removeAll(true);
+
+        // Destroy all tracked relic panels
+        this.shopRelicPanels.forEach(panel => panel.destroy());
+        this.shopRelicPanels = [];
 
         // Repopulate with updated items
         this.populatePurchasableShopCards();

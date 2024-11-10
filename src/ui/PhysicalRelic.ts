@@ -11,56 +11,64 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
     abstractRelic: AbstractRelic;
     private _isHighlighted: boolean = false;
     private obliterated: boolean = false;
+    private baseSize: number;
 
     constructor({
         scene,
         x = 0,
         y = 0,
-        relicImage,
         abstractRelic,
         price,
     }: {
         scene: Phaser.Scene;
         x?: number;
         y?: number;
-        relicImage: Phaser.GameObjects.Image;
         abstractRelic: AbstractRelic;
         price?: number;
     }) {
         super(scene, x, y);
-        scene.add.existing(this);
+
+        console.log(`Initializing PhysicalRelic for: ${abstractRelic.getName()} at (${x}, ${y})`);
 
         this.abstractRelic = abstractRelic;
-        this.relicImage = relicImage;
+        
+        // Create relic image using portraitName from AbstractRelic
+        if (!scene.textures.exists(abstractRelic.portraitName)) {
+            console.error(`Texture not found for key: ${abstractRelic.portraitName}`);
+        }
+        this.relicImage = scene.add.image(0, 0, abstractRelic.portraitName ?? "placeholder");
+        const baseSize = 64;
+        this.relicImage.setDisplaySize(baseSize, baseSize);
+        this.baseSize = baseSize;
         this.add(this.relicImage);
 
-        // Create tooltip
+        // Create tooltip without specifying y position yet
         this.tooltipBox = new TextBox({
             scene,
             text: `${abstractRelic.getName()}\n${abstractRelic.getDescription()}`,
-            width: 200,
-            expandDirection: 'up'
+            width: 200
         });
         this.tooltipBox.setVisible(false);
         this.add(this.tooltipBox);
 
-        // Optional price display
-        if (price !== undefined) {
-            this.priceBox = new TextBox({
-                scene,
-                text: `${price}g`,
-                width: 50,
-                height: 25,
-                y: this.relicImage.height / 2 + 15
-            });
-            this.add(this.priceBox);
-        }
+        this.priceBox = new TextBox({
+            scene,
+            text: `${price ?? 0}$`,
+            width: 50,
+            height: 25,
+            y: this.baseSize / 2 + 15
+        });
+        this.add(this.priceBox);
+
+        this.priceBox.setDepth(1)
 
         this.setupInteractivity();
     }
 
     setupInteractivity(): void {
-        this.relicImage.setInteractive()
+        // Set the container as interactive with a specific hit area rectangle
+        this.setInteractive(new Phaser.Geom.Rectangle(0, 0, this.baseSize, this.baseSize), 
+            Phaser.Geom.Rectangle.Contains)
             .on('pointerover', this.onPointerOver, this)
             .on('pointerout', this.onPointerOut, this)
             .on('pointerdown', this.onPointerDown, this);
@@ -68,42 +76,63 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
 
     private onPointerOver = (): void => {
         if (this.obliterated) return;
+        console.log('PhysicalRelic: onPointerOver');
 
-        // Scale up slightly
+        // Show tooltip first so its dimensions are calculated
+        this.tooltipBox.setVisible(true);
+
+        // Determine tooltip position based on screen position
+        const globalY = this.y + (this.parentContainer?.y ?? 0);
+        const screenHeight = this.scene.scale.height;
+        const isCloserToTop = globalY < screenHeight / 2;
+
+        // Get the actual tooltip height after text is set and rendered
+        const tooltipBounds = this.tooltipBox.getBounds();
+        const tooltipHeight = tooltipBounds.height;
+
+        // Position tooltip above or below the relic
+        this.tooltipBox.y = isCloserToTop ? 
+            (this.baseSize + 10) + 100 :  // Below the relic
+            -(tooltipHeight + 10);  // Above the relic, accounting for actual tooltip height
+
+        // Scale up using displaySize instead of scale
         this.scene.tweens.add({
             targets: this.relicImage,
-            scale: 1.1,
+            displayWidth: this.baseSize * 1.1,
+            displayHeight: this.baseSize * 1.1,
             duration: 200,
             ease: 'Power2'
         });
-
-        // Show tooltip
-        this.tooltipBox.setVisible(true);
+        
+        // Emit the event to parent
+        this.parentContainer?.emit('pointerover');
     }
 
     private onPointerOut = (): void => {
         if (this.obliterated) return;
 
-        // Scale back to normal
+        // Scale back using displaySize
         this.scene.tweens.add({
             targets: this.relicImage,
-            scale: 1,
+            displayWidth: this.baseSize,
+            displayHeight: this.baseSize,
             duration: 200,
             ease: 'Power2'
         });
 
         // Hide tooltip
         this.tooltipBox.setVisible(false);
+        
+        // Emit the event to parent
+        this.parentContainer?.emit('pointerout');
     }
 
     private onPointerDown = (): void => {
         if (this.obliterated) return;
         this.abstractRelic.onRelicClicked();
-    }
-
-    setInteractive(isInteractive: boolean): this {
-        this.relicImage.setInteractive(isInteractive);
-        return this;
+        
+        // Emit the event to parent
+        this.parentContainer?.emit('pointerdown');
     }
 
     highlight(): void {
@@ -120,5 +149,19 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
         if (this.obliterated) return;
         this.obliterated = true;
         this.destroy();
+    }
+
+    // Add lifecycle logging for debugging
+    destroy(): void {
+        console.log(`Destroying PhysicalRelic for: ${this.abstractRelic.getName()}`);
+        super.destroy();
+    }
+
+    setVisible(isVisible: boolean): this {
+        return super.setVisible(isVisible);
+    }
+
+    setAlpha(alpha: number): this {
+        return super.setAlpha(alpha);
     }
 }

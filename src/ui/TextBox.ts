@@ -4,6 +4,14 @@ import { DepthManager } from './DepthManager';
 
 // Modify the class to extend Phaser.GameObjects.Container
 export class TextBox extends Phaser.GameObjects.Container {
+
+    public static readonly YELLOW = 0xFFFF00;
+    public static readonly GREEN = 0x00FF00;
+    public static readonly RED = 0xFF0000;
+    public static readonly ORANGE = 0xFFA500;
+    public static readonly MAGENTA = 0xFF00FF;
+
+    private isVisible: boolean = true;
     protected background: Phaser.GameObjects.Rectangle ;
     protected backgroundImage: Phaser.GameObjects.Image | null = null;
     protected text: Phaser.GameObjects.Text;
@@ -98,6 +106,12 @@ export class TextBox extends Phaser.GameObjects.Container {
 
     pulseRedBriefly(): void {
         this.pulseColor(0xff0000);
+    }
+
+    setBackgroundColor(color: number): void {
+        if (this.background) {
+            this.background.setFillStyle(color);
+        }
     }
 
 

@@ -8,6 +8,8 @@ export abstract class AbstractRelic {
     name!: string;
     description!: string;
     tier!: CardRarity;
+    price: number = -1;
+    portraitName: string = "placeholder";
 
     constructor() {
     }

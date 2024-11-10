@@ -5,7 +5,7 @@ import { CardGuiUtils } from '../utils/CardGuiUtils';
 import { DepthManager } from './DepthManager';
 import { PhysicalCard } from './PhysicalCard';
 
-export class ShopItemPanel extends Phaser.GameObjects.Container {
+export class ShopCardPanel extends Phaser.GameObjects.Container {
     private card: PlayableCard;
     private physicalCard!: PhysicalCard;
     private isBuyable: boolean;

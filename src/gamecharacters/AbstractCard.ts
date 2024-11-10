@@ -228,13 +228,14 @@ export abstract class AbstractCard implements IAbstractCard {
     getCanonicalCard(): this | null{
         // check for card in character deck
         const character = this.owner as PlayerCharacter;
+        if (character == null) return null;
         const deck = character.cardsInMasterDeck;
         const canonicalCard = deck.find((card: AbstractCard) => card.id === this.id);
         if (canonicalCard) {
             return canonicalCard as any as this;
         }
         // check for card in inventory
-        const inventory = GameState.getInstance().inventory;
+        const inventory = GameState.getInstance().cardsInventory;
         const canonicalCardInInventory = inventory.find((card: AbstractCard) => card.id === this.id);
         if (canonicalCardInInventory) {
             return canonicalCardInInventory as any as this;

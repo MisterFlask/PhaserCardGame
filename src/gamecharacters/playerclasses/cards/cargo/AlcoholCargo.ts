@@ -3,7 +3,6 @@ import { BaseCharacter } from "../../../BaseCharacter";
 import { CardRarity, PlayableCard } from "../../../PlayableCard";
 import { CardType } from "../../../Primitives";
 import { HellSellValue } from "../../../buffs/standard/HellSellValue";
-import { ValuableCargo } from "../../../buffs/standard/ValuableCargo";
 
 export class AlcoholCargo extends PlayableCard {
     constructor() {
@@ -15,12 +14,11 @@ export class AlcoholCargo extends PlayableCard {
         });
         this.energyCost = 1;
         this.buffs.push(new HellSellValue(40));
-        this.buffs.push(new ValuableCargo());
         this.surfacePurchaseValue = 30;
     }
 
     override get description(): string {
-        return `Decrease stress of all allies by 1. Decrease the ValuableInHell buff on this card by 5.`;
+        return `Decrease stress of all allies by 2. Decrease the HellSellValue buff on this card by 5.`;
     }
 
     override InvokeCardEffects(): void {

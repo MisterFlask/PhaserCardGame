@@ -169,6 +169,10 @@ export abstract class AbstractBuff implements IAbstractBuff {
         return 0;
     }
 
+    getCardsDrawnAtStartOfTurnModifier(): number {
+        return 0;
+    }
+
     // this is a percentage modifier on top of damage sent by the owner.  If this is "100" that means 100% more damage is sent.  If this is -100 then this means the character does no damage.  Standard is 0, which means no modifier.
     // Note this does not take into account blocking in any way.
     getAdditionalPercentCombatDamageDealtModifier(target?: IBaseCharacter): number {
@@ -246,6 +250,10 @@ export abstract class AbstractBuff implements IAbstractBuff {
     ////////////////// PLAYABLE CARD METHODS //////////////////
 
     public onActiveDiscard(){
+
+    }
+
+    public onCardDrawn(): void {
 
     }
 

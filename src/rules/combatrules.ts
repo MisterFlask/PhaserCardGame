@@ -10,9 +10,9 @@ export class DamageCalculationResult {
     unblockedDamage: number;
 
     constructor(totalDamage: number, blockedDamage: number, unblockedDamage: number) {
-        this.totalDamage = totalDamage;
-        this.blockedDamage = blockedDamage;
-        this.unblockedDamage = unblockedDamage;
+        this.totalDamage = Math.round(totalDamage);
+        this.blockedDamage = Math.round(blockedDamage);
+        this.unblockedDamage = Math.round(unblockedDamage);
     }
 }
 

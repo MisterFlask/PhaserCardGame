@@ -16,10 +16,13 @@ export class Blind extends AbstractBuff {
     }
 
     override getDescription(): string {
-        return `The next ${this.getStacksDisplayText()} card[s] played discard[s] a card at random from your hand.`;
+        return `The next ${this.getStacksDisplayText()} card[s] played by this character discard[s] a card at random from your hand.`;
     }
 
     override onAnyCardPlayed(playedCard: PlayableCard, target?: BaseCharacter): void {
+        if (playedCard.owner != this.getOwnerAsCharacter()) {
+            return;
+        }
         if (this.stacks > 0) {
             const gameState = GameState.getInstance();
             const hand = gameState.combatState.currentHand;

@@ -1,7 +1,6 @@
 import { TargetingType } from "../../../AbstractCard";
 import { Devil } from "../../../buffs/standard/Devil";
 import { HellSellValue } from "../../../buffs/standard/HellSellValue";
-import { ValuableCargo } from "../../../buffs/standard/ValuableCargo";
 import { CardRarity, PlayableCard } from "../../../PlayableCard";
 import { CardType } from "../../../Primitives";
 
@@ -20,7 +19,6 @@ export class SacredRelicsCargo extends PlayableCard {
         this.surfacePurchaseValue = 20;
         this.baseDamage = 15;
         this.buffs.push(new HellSellValue(50));
-        this.buffs.push(new ValuableCargo());
     }
 
     override get description(): string {
