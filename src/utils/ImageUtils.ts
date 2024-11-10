@@ -268,6 +268,10 @@ export default class GameImageLoader {
                 'knife-thrust.png', 'magick-trick.png', 'poison-bottle-2.png', 'round-shield.png',
                 'star-swirl.png', 'uncertainty.png', 'unstable-orb.png'
             ]
+        },
+        effects: {
+            prefix: 'Sprites/Effects/',
+            files: ['particle.png']
         }
     };
 

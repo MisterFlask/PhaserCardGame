@@ -7,7 +7,6 @@ import { AlcoholCargo } from '../gamecharacters/playerclasses/cards/cargo/Alcoho
 import { CoffeeCargo } from '../gamecharacters/playerclasses/cards/cargo/CoffeeCargo';
 import { SacredRelicsCargo } from '../gamecharacters/playerclasses/cards/cargo/SacredRelicsCargo';
 import { SpicyLiteratureCargo } from '../gamecharacters/playerclasses/cards/cargo/SpicyLiteratureCargo';
-import { CardType } from '../gamecharacters/Primitives';
 import { CampaignRules } from '../rules/CampaignRules';
 import { GameState } from '../rules/GameState';
 import { TextBoxButton } from '../ui/Button';
@@ -474,15 +473,19 @@ export default class CampaignScene extends Phaser.Scene {
     }
 
     createShop = () => {
-        const shopItems = [
-            new CoffeeCargo(),
-            new AlcoholCargo(),
-            new SacredRelicsCargo(),
-            new CoffeeCargo(),
-            new SpicyLiteratureCargo()
-        ];
-
-        this.positionShopCards(shopItems);
+        // Get shop items from GameState instead of creating new ones directly
+        const shopItems = GameState.getInstance().getShopItems();
+        if (shopItems.length === 0) {
+            // Initialize shop items only if empty
+            GameState.getInstance().setShopItems([
+                new CoffeeCargo(),
+                new AlcoholCargo(),
+                new SacredRelicsCargo(),
+                new CoffeeCargo(),
+                new SpicyLiteratureCargo()
+            ]);
+        }
+        this.positionShopCards(GameState.getInstance().getShopItems());
     }
 
     positionShopCards = (shopItems: PlayableCard[]) => {
@@ -517,110 +520,89 @@ export default class CampaignScene extends Phaser.Scene {
     }
     
     setupShopCardEvents = (card: PhysicalCard): void => {
-        console.log('Setting up shop card events'); // Add this line for debugging
-        card.container.setInteractive()
-            .on('pointerover', () => {
+        card.container.removeAllListeners();
+        
+        // Track original position for returning the card if needed
+        const originalX = card.container.x;
+        const originalY = card.container.y;
+        
+        card.container.setInteractive({ draggable: true })
+            .on('dragstart', () => {
                 card.container.setScale(1.1);
+                this.children.bringToTop(card.container);
             })
-            .on('pointerout', () => {
+            .on('drag', (pointer: Phaser.Input.Pointer) => {
+                // Convert pointer position to local coordinates
+                const localPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
+                card.container.x = localPoint.x;
+                card.container.y = localPoint.y;
+            })
+            .on('dragend', (pointer: Phaser.Input.Pointer) => {
                 card.container.setScale(1);
-            })
-            .on('pointerdown', () => {
-                console.log('Shop card clicked'); // Add this line for debugging
-
-                this.toggleCardSelection(card);
+                this.handleShopCardDrop(card, pointer);
             });
     }
 
-    toggleCardSelection = (card: PhysicalCard): void => {
-        const isAlreadySelected = card.container.getData('isSelected');
-        card.container.setData('isSelected', !isAlreadySelected);
+    handleShopCardDrop = (card: PhysicalCard, pointer: Phaser.Input.Pointer) => {
+        const selectedSlots = this.cardSlots.filter((slot: CardSlot) => 
+            slot.type === 'selected' && slot.card !== null
+        );
         
-        console.log('Toggling selection:', !isAlreadySelected); // Add this line for debugging
+        let targetSlot: CardSlot | null = null;
         
-        if (!isAlreadySelected) {
-            // Create a selection border if it doesn't exist
-            if (!card.container.getData('selectionBorder')) {
-                const border = this.add.graphics();
-                border.lineStyle(4, 0xffff00); // Increase line width for visibility
-                border.strokeRect(-50, -70, 100, 140); // Use fixed dimensions
-                card.container.add(border);
-                card.container.setData('selectionBorder', border);
-            } else {
-                // Show existing border
-                card.container.getData('selectionBorder').setVisible(true);
-            }
-        } else {
-            // Hide the selection border
-            const border = card.container.getData('selectionBorder');
-            if (border) {
-                border.setVisible(false);
+        for (const slot of selectedSlots) {
+            if (!slot.card) continue;
+            
+            // Get the bounds of the character card in world coordinates
+            const characterBounds = slot.card.container.getBounds();
+            
+            // Use pointer position directly
+            if (Phaser.Geom.Rectangle.Contains(
+                characterBounds,
+                pointer.x,
+                pointer.y
+            )) {
+                targetSlot = slot;
+                break;
             }
         }
+
+        if (targetSlot && targetSlot.card) {
+            const targetCharacter = targetSlot.card.data;
+            if (targetCharacter instanceof PlayerCharacter && card.data instanceof PlayableCard) {
+                targetCharacter.cardsInMasterDeck.push(card.data);
+                
+                const gameState = GameState.getInstance();
+                const updatedShopItems = gameState.getShopItems().filter(item => item !== card.data);
+                gameState.setShopItems(updatedShopItems);
+                
+                this.positionShopCards(updatedShopItems);
+                this.showPurchaseEffect(pointer.x, pointer.y);
+            }
+        } else {
+            // If not dropped on a character card, return to original position
+            this.positionShopCards(GameState.getInstance().getShopItems());
+        }
+    }
+
+    showPurchaseEffect = (x: number, y: number) => {
+        const particles = this.add.particles(x, y, 'particle', {
+            speed: { min: -100, max: 100 },
+            angle: { min: 0, max: 360 },
+            scale: { start: 0.5, end: 0 },
+            blendMode: 'ADD',
+            lifespan: 500,
+            quantity: 1,
+            frequency: 25,
+            duration: 500
+        });
+
+        this.time.delayedCall(500, () => {
+            particles.destroy();
+        });
     }
 
     pulseEmbarkButton = () => {
         this.embarkButton.pulseGreenBriefly();
-    }
-}
-class CargoCard extends PlayableCard {
-    constructor() {
-        super({ 
-            name: 'Cargo', 
-            description: 'Increases carrying capacity', 
-            portraitName: '', 
-            tooltip: 'Carry more items', 
-            price: 100, 
-            cardType: CardType.POWER 
-        });
-    }
-
-    OnPurchase = (): void => {
-        console.log('Cargo item purchased');
-        // Additional logic for CargoCard purchase
-    }
-    InvokeCardEffects(targetCard?: AbstractCard): void {
-    }
-}
-
-class MedkitCard extends PlayableCard {
-    constructor() {
-        super({ 
-            name: 'Medkit', 
-            description: 'Restores health', 
-            portraitName: '', 
-            tooltip: 'Heal your character', 
-            price: 50, 
-            cardType: CardType.POWER 
-        });
-    }
-
-    OnPurchase = (): void => {
-        console.log('Medkit item purchased');
-        // Additional logic for MedkitCard purchase
-    }
-
-    InvokeCardEffects(targetCard?: AbstractCard): void {
-    }
-}
-
-class AmmoPackCard extends PlayableCard {
-    constructor() {
-        super({ 
-            name: 'Ammo Pack', 
-            description: 'Replenishes ammunition', 
-            portraitName: '', 
-            tooltip: 'Refill your ammo', 
-            price: 75, 
-            cardType: CardType.POWER 
-        });
-    }
-
-    OnPurchase = (): void => {
-        console.log('Ammo Pack item purchased');
-        // Additional logic for AmmoPackCard purchase
-    }
-    
-    InvokeCardEffects(targetCard?: AbstractCard): void {
     }
 }
