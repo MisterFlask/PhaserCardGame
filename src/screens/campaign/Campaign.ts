@@ -1,21 +1,23 @@
 import Phaser from 'phaser';
-import { BaconBeast, BloodManipulationSlime, ClockworkAbomination, EncounterManager } from '../encounters/Encounters';
-import { AbstractCard } from '../gamecharacters/AbstractCard';
-import { PlayerCharacter } from '../gamecharacters/CharacterClasses';
-import { PlayableCard } from '../gamecharacters/PlayableCard';
-import { AlcoholCargo } from '../gamecharacters/playerclasses/cards/cargo/AlcoholCargo';
-import { CoffeeCargo } from '../gamecharacters/playerclasses/cards/cargo/CoffeeCargo';
-import { SacredRelicsCargo } from '../gamecharacters/playerclasses/cards/cargo/SacredRelicsCargo';
-import { SpicyLiteratureCargo } from '../gamecharacters/playerclasses/cards/cargo/SpicyLiteratureCargo';
-import { CampaignRules } from '../rules/CampaignRules';
-import { GameState } from '../rules/GameState';
-import { TextBoxButton } from '../ui/Button';
-import InventoryPanel from '../ui/InventoryPanel';
-import { PhysicalCard, } from '../ui/PhysicalCard';
-import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
-import { CardGuiUtils } from '../utils/CardGuiUtils';
-import GameImageLoader from '../utils/ImageUtils';
-import { SceneChanger } from './SceneChanger';
+import { BaconBeast, BloodManipulationSlime, ClockworkAbomination, EncounterManager } from '../../encounters/Encounters';
+import { AbstractCard } from '../../gamecharacters/AbstractCard';
+import { PlayerCharacter } from '../../gamecharacters/CharacterClasses';
+import { PlayableCard } from '../../gamecharacters/PlayableCard';
+import { AlcoholCargo } from '../../gamecharacters/playerclasses/cards/cargo/AlcoholCargo';
+import { CoffeeCargo } from '../../gamecharacters/playerclasses/cards/cargo/CoffeeCargo';
+import { SacredRelicsCargo } from '../../gamecharacters/playerclasses/cards/cargo/SacredRelicsCargo';
+import { SpicyLiteratureCargo } from '../../gamecharacters/playerclasses/cards/cargo/SpicyLiteratureCargo';
+import { CampaignRules } from '../../rules/CampaignRules';
+import { GameState } from '../../rules/GameState';
+import { TextBoxButton } from '../../ui/Button';
+import InventoryPanel from '../../ui/InventoryPanel';
+import { PhysicalCard, } from '../../ui/PhysicalCard';
+import { ActionManagerFetcher } from '../../utils/ActionManagerFetcher';
+import { CardGuiUtils } from '../../utils/CardGuiUtils';
+import GameImageLoader from '../../utils/ImageUtils';
+import { SceneChanger } from '../SceneChanger';
+import { CharacterSelectScreen } from './CharacterSelectScreen';
+import { InventoryScreen } from './InventoryScreen';
 
 interface CardSlot {
     container: Phaser.GameObjects.Container;
@@ -39,6 +41,9 @@ export default class CampaignScene extends Phaser.Scene {
     private deckDisplayContainer!: Phaser.GameObjects.Container;
     private deckScrollPosition: number = 0;
     private readonly SCROLL_SPEED: number = 4;
+    private characterSelectScreen!: CharacterSelectScreen;
+    private inventoryScreen!: InventoryScreen;
+    private currentScreen: 'character' | 'inventory' = 'character';
 
     constructor() {
         super('Campaign');
@@ -50,20 +55,12 @@ export default class CampaignScene extends Phaser.Scene {
 
     create =  () => {
         ActionManagerFetcher.initActionManager();
-        this.createLayout();
-        this.createDeckDisplayContainer(); // Add this line here
-        this.createCardSlots();
-        this.createCharacterRoster();
-        this.createEmbarkButton();
-        this.createDeckDisplay();
-        this.createShop();
-        this.createMenu();
-        this.inventoryPanel = new InventoryPanel(this);
-
-        this.createDebugGraphics();
-        this.updateDebugGraphics();
-        this.resize();
-        this.input.on('wheel', this.handleMouseWheel, this);
+        
+        this.characterSelectScreen = new CharacterSelectScreen(this);
+        this.inventoryScreen = new InventoryScreen(this);
+        
+        // Start with character select screen
+        this.showCharacterSelect();
     }
 
     createMenu() {
@@ -121,60 +118,6 @@ export default class CampaignScene extends Phaser.Scene {
         this.selectedY = height * 0.85;
     }
 
-    resize = () => {
-        console.log('Resizing campaign scene');
-        // Bail if we're not in this scene right now
-        if (!this.scene.isActive('Campaign')) {
-            return;
-        }
-        const { width, height } = this.scale;
-
-        // Update layout
-        this.rosterY = height * 0.1;
-        this.deckDisplayY = height * 0.3;
-        this.shopY = height * 0.5;
-        this.selectedY = height * 0.85;
-
-        // Reposition card slots
-        this.cardSlots.forEach((slot, index) => {
-            if (slot.type === 'roster') {
-                slot.container.setPosition(width * (0.1 + index * 0.18), this.rosterY);
-            } else if (slot.type === 'selected') {
-                slot.container.setPosition(width * (0.1 + index * 0.1), this.selectedY);
-            } else if (slot.type === 'deck') {
-                const cardWidth = width * 0.1;
-                const cardSpacing = width * 0.01;
-                const startX = (width - (this.deckDisplayCards.length * (cardWidth + cardSpacing))) / 2;
-                slot.container.setPosition(startX + index * (cardWidth + cardSpacing), this.deckDisplayY);
-            } else if (slot.type === 'shop') {
-                const cardWidth = width * 0.1;
-                const cardSpacing = width * 0.01;
-                const startX = (width - (this.shopCards.length * (cardWidth + cardSpacing))) / 2;
-                slot.container.setPosition(startX + index * (cardWidth + cardSpacing), this.shopY);
-            }
-
-            console.log(`Slot ${index} (${slot.type}): x=${slot.container.x}, y=${slot.container.y}`);
-        });
-
-        // Reposition embark button
-        if (this.embarkButton) {
-            this.embarkButton.setPosition(width * 0.95, height * 0.5);
-        }
-
-        // Update deck display
-        this.updateDeckDisplay(this.deckDisplayCards.map(card => card.data as AbstractCard));
-
-        // Update shop cards
-        this.positionShopCards(this.shopCards.map(card => card.data as PlayableCard));
-
-        // Reposition menu button
-        this.menuButton.setPosition(10, 10);
-
-        // Reposition inventory button
-        this.inventoryPanel.resize(width, height);
-
-        this.updateDebugGraphics();
-    }
 
     createCardSlots = () => {
         const { width } = this.scale;
@@ -281,6 +224,28 @@ export default class CampaignScene extends Phaser.Scene {
             targetSlot = this.cardSlots.find(slot => slot.type === 'selected' && !slot.card);
         } else if (sourceSlot.type === 'selected') {
             targetSlot = this.cardSlots.find(slot => slot.type === 'roster' && !slot.card);
+            
+            // If we're unselecting a character, return their purchased cards to the shop
+            if (card.data instanceof PlayerCharacter) {
+                const gameState = GameState.getInstance();
+                const purchasedCards = card.data.cardsInMasterDeck.filter(deckCard => 
+                    // Only return cards that were available in the shop (cargo cards)
+                    deckCard instanceof PlayableCard && 
+                    deckCard.name.includes('Cargo')
+                );
+                
+                // Remove the cards from the character's deck
+                card.data.cardsInMasterDeck = card.data.cardsInMasterDeck.filter(deckCard => 
+                    !purchasedCards.includes(deckCard)
+                );
+                
+                // Add the cards back to the shop
+                const currentShopItems = gameState.getShopItems();
+                gameState.setShopItems([...currentShopItems, ...purchasedCards]);
+                
+                // Update the shop display
+                this.positionShopCards(gameState.getShopItems());
+            }
         }
     
         if (targetSlot && this.canMoveCardToSlot(sourceSlot, targetSlot)) {
@@ -604,5 +569,17 @@ export default class CampaignScene extends Phaser.Scene {
 
     pulseEmbarkButton = () => {
         this.embarkButton.pulseGreenBriefly();
+    }
+
+    switchToInventoryScreen() {
+        this.currentScreen = 'inventory';
+        this.characterSelectScreen.hide();
+        this.inventoryScreen.show();
+    }
+
+    showCharacterSelect() {
+        this.currentScreen = 'character';
+        this.characterSelectScreen.show();
+        this.inventoryScreen.hide();
     }
 }

@@ -11,7 +11,7 @@ import { UIContext, UIContextManager } from '../ui/UIContextManager';
 import { ActionManager } from '../utils/ActionManager';
 import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
 import GameImageLoader from '../utils/ImageUtils';
-import CampaignScene from './Campaign';
+import CampaignScene from './campaign/Campaign';
 import { SceneChanger } from './SceneChanger';
 import { CampaignBriefStatus } from './subcomponents/CampaignBriefStatus';
 import { CharacterDeckOverlay } from './subcomponents/CharacterDeckOverlay';
