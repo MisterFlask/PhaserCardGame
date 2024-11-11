@@ -279,7 +279,7 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
         scene.add.existing(this);
 
         this.createTitle();
-        this.createEquipmentGrid();
+        this.createAssignableCardsGrid();
     }
 
     private createTitle(): void {
@@ -295,16 +295,121 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
         this.add(title);
     }
 
-    private createEquipmentGrid(): void {
-        // Create grid for equipment slots
+    private createAssignableCardsGrid(): void {
+        const campaignState = CampaignState.getInstance();
+        const GRID_COLS = 3;
+        const CARD_WIDTH = 100;
+        const CARD_HEIGHT = 140;
+        const PADDING = 20;
+
+        campaignState.ownedTradeGoods.forEach((good, index) => {
+            const col = index % GRID_COLS;
+            const row = Math.floor(index / GRID_COLS);
+            
+            const x = col * (CARD_WIDTH + PADDING);
+            const y = 60 + row * (CARD_HEIGHT + PADDING);
+
+            const card = CardGuiUtils.getInstance().createCard({
+                scene: this.scene,
+                x,
+                y,
+                data: good,
+                onCardCreatedEventCallback: (card) => this.setupTradeGoodCard(card)
+            });
+
+            this.add(card.container);
+            this.equipmentSlots.push(card);
+        });
+    }
+
+    private setupTradeGoodCard(card: PhysicalCard): void {
+        card.container.setInteractive({ draggable: true });
+
+        const originalX = card.container.x;
+        const originalY = card.container.y;
+        const originalScale = card.container.scale;
+
+        card.container
+            .on('dragstart', () => {
+                card.container.setScale(0.8);
+                this.scene.children.bringToTop(card.container);
+            })
+            .on('drag', (pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
+                card.container.x = dragX;
+                card.container.y = dragY;
+            })
+            .on('dragend', () => {
+                const droppedOnCharacter = this.checkDropOnCharacter(card);
+                
+                if (!droppedOnCharacter) {
+                    // Return to original position if not dropped on a character
+                    card.container.x = originalX;
+                    card.container.y = originalY;
+                    card.container.setScale(originalScale);
+                }
+            })
+            .on('pointerover', () => {
+                if (!card.container.input.dragging) {
+                    card.container.setScale(1.1);
+                }
+            })
+            .on('pointerout', () => {
+                if (!card.container.input.dragging) {
+                    card.container.setScale(1.0);
+                }
+            });
+    }
+
+    private checkDropOnCharacter(card: PhysicalCard): boolean {
+        if (!this.activeCharacter) return false;
+
+        // Get the character card from the CaravanPartyPanel
+        const characterCard = this.scene.children.list
+            .find(child => child instanceof CaravanPartyPanel)
+            ?.characterCards?.get(this.activeCharacter);
+
+        if (!characterCard) return false;
+
+        const bounds = characterCard.container.getBounds();
+        const cardBounds = card.container.getBounds();
+
+        if (Phaser.Geom.Rectangle.Overlaps(bounds, cardBounds)) {
+            this.equipTradeGood(card, this.activeCharacter);
+            return true;
+        }
+
+        return false;
+    }
+
+    private equipTradeGood(tradeGood: PhysicalCard, character: PhysicalCard): void {
+        const characterCard = character
+
+        if (!characterCard) return;
+
+        // Position the trade good card next to the character card
+        const targetX = characterCard.container.x + characterCard.container.width + 10;
+        const targetY = characterCard.container.y;
+
+        // Animate the card to its new position
+        this.scene.tweens.add({
+            targets: tradeGood.container,
+            x: targetX,
+            y: targetY,
+            scale: 0.6,
+            duration: 200,
+            ease: 'Power2'
+        });
+
+        tradeGood.data.owner = character.data as PlayerCharacter; 
+        // when we launch expedition we'll need to actually add the trade good to the character's master deck.
     }
 
     setActiveCharacter(character: PlayerCharacter): void {
         this.activeCharacter = character;
-        this.refreshEquipmentDisplay();
+        this.refreshAssignableCardsDisplay();
     }
 
-    private refreshEquipmentDisplay(): void {
+    private refreshAssignableCardsDisplay(): void {
         // Update equipment display for active character
     }
 

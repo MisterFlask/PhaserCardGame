@@ -21,6 +21,7 @@ export class CampaignState {
     public roster: PlayerCharacter[] = CampaignRules.getInstance().generateLogicalCharacterRoster();
     public availableTradeGoods: PlayableCard[] = [new CoffeeCargo(), new CoalCargo(), new SpicyLiteratureCargo()];
     public ownedTradeGoods: PlayableCard[] = [];
+    
     private constructor() {}
 
     public static getInstance(): CampaignState {
