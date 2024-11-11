@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import { EncounterManager } from '../../../../encounters/Encounters';
 import { PlayerCharacter } from '../../../../gamecharacters/CharacterClasses';
+import { GameState } from '../../../../rules/GameState';
 import { TextBoxButton } from '../../../../ui/Button';
 import { PhysicalCard } from '../../../../ui/PhysicalCard';
 import { TextBox } from '../../../../ui/TextBox';
@@ -16,6 +17,7 @@ export class LoadoutPanel extends AbstractHqPanel {
     public summaryPanel: ExpeditionSummaryPanel;
     private launchButton: TextBoxButton;
     private statusText: TextBox;
+    private tradeRouteCard: PhysicalCard | null = null;
 
     constructor(scene: Scene) {
         super(scene, 'Expedition Loadout');
@@ -91,11 +93,24 @@ export class LoadoutPanel extends AbstractHqPanel {
             this.equipmentPanel.setActiveCharacter(character);
             this.updateSummary();
         });
+
+        this.updateTradeRouteCard();
     }
 
     private handleLaunch(): void {
         if (this.isReadyToLaunch()) {
             this.scene.events.emit('launchExpedition');
+            GameState.getInstance().currentRunCharacters = CampaignState.getInstance().selectedParty;
+            
+            // Add cargo cards to characters' master decks
+            const campaignState = CampaignState.getInstance();
+            campaignState.selectedParty.forEach(character => {
+                const assignedTradeGoods = campaignState.ownedTradeGoods.filter(
+                    good => good.owner === character
+                );
+                character.cardsInMasterDeck.push(...assignedTradeGoods);
+            });
+
             SceneChanger.switchToCombatScene({ encounter: EncounterManager.getInstance().getShopEncounter().data });
         }
     }
@@ -163,11 +178,37 @@ export class LoadoutPanel extends AbstractHqPanel {
         this.updateLaunchButton();
     }
 
+    private updateTradeRouteCard(): void {
+        const campaignState = CampaignState.getInstance();
+        
+        if (!this.tradeRouteCard && campaignState.selectedTradeRoute) {
+            // Create the card if it doesn't exist and we have a route
+            this.tradeRouteCard = CardGuiUtils.getInstance().createCard({
+                scene: this.scene,
+                x: this.scene.scale.width * 0.2,
+                y: this.scene.scale.height * 0.8,
+                data: campaignState.selectedTradeRoute,
+                onCardCreatedEventCallback: (card) => {
+                    card.container.setScale(0.8);
+                    this.add(card.container);
+                }
+            });
+        } else if (this.tradeRouteCard && !campaignState.selectedTradeRoute) {
+            // Remove the card if we have no route
+            this.tradeRouteCard.container.destroy();
+            this.tradeRouteCard = null;
+        } else if (this.tradeRouteCard && campaignState.selectedTradeRoute) {
+            // Update existing card's data
+            this.tradeRouteCard.data = campaignState.selectedTradeRoute;
+        }
+    }
+
     update(): void {
         this.rosterPanel.update();
         this.partyPanel.update();
         this.equipmentPanel.update();
         this.summaryPanel.update();
+        this.updateTradeRouteCard();
         this.updateSummary();
     }
 }
@@ -537,7 +578,7 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
 class ExpeditionSummaryPanel extends Phaser.GameObjects.Container {
     private loadoutPanel: LoadoutPanel;
     private cargoValueText!: TextBox;
-    private deckCompositionText!: TextBox;
+    private partyInfoText!: TextBox;
     private tradeRouteText!: TextBox;
     private warningsText!: TextBox;
 
@@ -546,62 +587,92 @@ class ExpeditionSummaryPanel extends Phaser.GameObjects.Container {
         this.loadoutPanel = loadoutPanel;
         scene.add.existing(this);
 
-        this.createTitle();
         this.createSummaryTexts();
     }
 
-    private createTitle(): void {
-        const title = new TextBox({
-            scene: this.scene,
-            x: 0,
-            y: -30,
-            width: 200,
-            height: 40,
-            text: 'Expedition Summary',
-            style: { fontSize: '18px', color: '#ffffff' }
-        });
-        this.add(title);
-    }
-
     private createSummaryTexts(): void {
-        // Create and position summary text elements
+        const textStyle = { 
+            fontSize: '16px', 
+            color: '#ffffff',
+            align: 'left',
+            wordWrap: { width: 290 }
+        };
+
+        // Cargo value text
         this.cargoValueText = new TextBox({
             scene: this.scene,
             x: 0,
             y: 30,
             width: 300,
-            height: 40,
-            text: 'Total Cargo Value: £0',
-            style: { fontSize: '16px', color: '#ffffff' }
+            height: 60,
+            text: '',
+            style: textStyle
         });
 
-        // Add other summary texts...
+        // Party info text
+        this.partyInfoText = new TextBox({
+            scene: this.scene,
+            x: 0,
+            y: 100,
+            width: 300,
+            height: 100,
+            text: '',
+            style: textStyle
+        });
 
-        this.add([this.cargoValueText]);
+        // Trade route text
+        this.tradeRouteText = new TextBox({
+            scene: this.scene,
+            x: 0,
+            y: 210,
+            width: 300,
+            height: 60,
+            text: '',
+            style: textStyle
+        });
+
+        // Warnings text
+        this.warningsText = new TextBox({
+            scene: this.scene,
+            x: 0,
+            y: 280,
+            width: 300,
+            height: 100,
+            text: '',
+            style: { ...textStyle, color: '#ff6b6b' }
+        });
+
+        this.add([
+            this.cargoValueText,
+            this.partyInfoText,
+            this.tradeRouteText,
+            this.warningsText
+        ]);
     }
 
     update(): void {
         const campaignState = CampaignState.getInstance();
-        // Update all summary information
-        this.updateCargoValue();
-        this.updateDeckComposition();
-        this.updateTradeRouteInfo();
-        this.updateWarnings();
-    }
+        
+        // Update cargo value
+        const totalValue = campaignState.ownedTradeGoods.reduce((total, good) => 
+            total + (good.owner ? good.hellSellValue : 0), 0);
+        this.cargoValueText.setText(
+            `Total Cargo Value: ${totalValue} Hell\n` +
+            `Assigned Cards: ${campaignState.ownedTradeGoods.filter(g => g.owner).length}/${campaignState.ownedTradeGoods.length}`
+        );
 
-    private updateCargoValue(): void {
-        // Calculate and update total cargo value
-    }
+        // Update party info
+        const partySize = campaignState.selectedParty.length;
+        this.partyInfoText.setText(
+            `Party Members: ${partySize}/3\n` +
+            `${campaignState.selectedParty.map(char => `• ${char.name}`).join('\n')}`
+        );
 
-    private updateDeckComposition(): void {
-        // Update deck composition summary
-    }
+        // Update trade route info
+        this.tradeRouteText.setText(
+            `Trade Route: ${campaignState.selectedTradeRoute ? 
+                campaignState.selectedTradeRoute.name : 'None selected'}`
+        );
 
-    private updateTradeRouteInfo(): void {
-        // Update trade route information
-    }
-
-    private updateWarnings(): void {
-        // Update any warnings about the expedition setup
     }
 } 

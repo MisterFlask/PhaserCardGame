@@ -2,11 +2,13 @@ import { Scene } from 'phaser';
 import { GameState } from '../../../rules/GameState';
 import { ActionManagerFetcher } from '../../../utils/ActionManagerFetcher';
 import GameImageLoader from '../../../utils/ImageUtils';
+import { SceneChanger } from '../../SceneChanger';
 import { CampaignState } from './CampaignState';
 import { InvestmentPanel } from './panels/InvestmentPanel';
 import { LoadoutPanel } from './panels/LoadoutPanel';
 import { MainHubPanel } from './panels/MainHubPanel';
 import { PersonnelPanel } from './panels/PersonnelPanel';
+import { TradeGoodsPanel } from './panels/TradeGoodsPanel';
 import { TradePanel } from './panels/TradePanel';
 
 export class HqScene extends Scene {
@@ -16,6 +18,7 @@ export class HqScene extends Scene {
     private tradePanel!: TradePanel;
     private personnelPanel!: PersonnelPanel;
     private loadoutPanel!: LoadoutPanel;
+    private tradeGoodsPanel!: TradeGoodsPanel;
 
     constructor() {
         super({ key: 'HqScene' });
@@ -24,6 +27,7 @@ export class HqScene extends Scene {
     preload(): void {
         ActionManagerFetcher.initActionManager();
         new GameImageLoader().loadAllImages(this.load);
+        SceneChanger.setCurrentScene(this);
         // Load any required assets
     }
 
@@ -36,13 +40,15 @@ export class HqScene extends Scene {
         this.tradePanel = new TradePanel(this);
         this.personnelPanel = new PersonnelPanel(this);
         this.loadoutPanel = new LoadoutPanel(this);
+        this.tradeGoodsPanel = new TradeGoodsPanel(this);
 
         // Hide all panels initially
         [
             this.investmentPanel,
             this.tradePanel,
             this.personnelPanel,
-            this.loadoutPanel
+            this.loadoutPanel,
+            this.tradeGoodsPanel
         ].forEach(panel => panel.hide());
 
         // Show main hub initially
@@ -61,7 +67,7 @@ export class HqScene extends Scene {
         });
     }
 
-    private showPanel(panelKey: 'main' | 'investment' | 'trade' | 'personnel' | 'loadout'): void {
+    private showPanel(panelKey: 'main' | 'investment' | 'trade' | 'personnel' | 'loadout' | 'tradegoods'): void {
         // Hide current panel
         if (this.currentPanel) {
             this.currentPanel.setVisible(false);
@@ -84,6 +90,9 @@ export class HqScene extends Scene {
             case 'loadout':
                 this.currentPanel = this.loadoutPanel;
                 break;
+            case 'tradegoods':
+                this.currentPanel = this.tradeGoodsPanel;
+                break;
         }
 
         this.currentPanel?.setVisible(true);
@@ -102,6 +111,9 @@ export class HqScene extends Scene {
                 break;
             case 'expedition loadout':
                 this.showPanel('loadout');
+                break;
+            case 'trade goods':
+                this.showPanel('tradegoods');
                 break;
             default:
                 console.warn(`Unknown destination: ${destination}`);
