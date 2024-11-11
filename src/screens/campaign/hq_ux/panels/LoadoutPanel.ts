@@ -336,11 +336,27 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
         const PADDING = 20;
 
         campaignState.ownedTradeGoods.forEach((good, index) => {
-            const col = index % GRID_COLS;
-            const row = Math.floor(index / GRID_COLS);
-            
-            const x = col * (CARD_WIDTH + PADDING);
-            const y = 60 + row * (CARD_HEIGHT + PADDING);
+            // Check if the good has an owner and if they're in the party
+            const ownerInParty = good.owner && this.loadoutPanel.partyPanel.getCharacterCards().has(good.owner);
+
+            let x, y;
+            if (ownerInParty && good.owner) {
+                // Get the owner's card and position the trade good next to it
+                const ownerCard = this.loadoutPanel.partyPanel.getCharacterCards().get(good.owner);
+                if (ownerCard) {
+                    x = ownerCard.container.x + ownerCard.container.width + 10;
+                    y = ownerCard.container.y;
+                } else {
+                    // Fallback to grid position if something went wrong
+                    x = (index % GRID_COLS) * (CARD_WIDTH + PADDING);
+                    y = 60 + Math.floor(index / GRID_COLS) * (CARD_HEIGHT + PADDING);
+                }
+            } else {
+                // If owner isn't in party, clear owner and use grid position
+                good.owner = undefined;
+                x = (index % GRID_COLS) * (CARD_WIDTH + PADDING);
+                y = 60 + Math.floor(index / GRID_COLS) * (CARD_HEIGHT + PADDING);
+            }
 
             const card = CardGuiUtils.getInstance().createCard({
                 scene: this.scene,
@@ -349,6 +365,11 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
                 data: good,
                 onCardCreatedEventCallback: (card) => this.setupTradeGoodCard(card)
             });
+
+            // Set scale if the card is assigned to a character
+            if (ownerInParty) {
+                card.container.setScale(0.6);
+            }
 
             this.gridContainer.add(card.container);
             this.equipmentSlots.push(card);
