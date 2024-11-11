@@ -11,7 +11,7 @@ import { UIContext, UIContextManager } from '../ui/UIContextManager';
 import { ActionManager } from '../utils/ActionManager';
 import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
 import GameImageLoader from '../utils/ImageUtils';
-import CampaignScene from './campaign/Campaign';
+import { HqScene } from './campaign/hq_ux/HqScene';
 import { SceneChanger } from './SceneChanger';
 import { CampaignBriefStatus } from './subcomponents/CampaignBriefStatus';
 import { CharacterDeckOverlay } from './subcomponents/CharacterDeckOverlay';
@@ -256,7 +256,7 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
         roundPixels: true,
         pixelArt: false
     },
-    scene: [CampaignScene, CombatScene]
+    scene: [HqScene, CombatScene]
 };
 
 // Instantiate and start the Phaser game

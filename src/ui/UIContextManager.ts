@@ -3,7 +3,8 @@ export enum UIContext {
     MAP,
     SHOP,
     CARD_REWARD,
-    CHARACTER_DECK_SHOWN
+    CHARACTER_DECK_SHOWN,
+    CAMPAIGN_HQ
 }
 
 export class UIContextManager {

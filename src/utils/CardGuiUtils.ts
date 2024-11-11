@@ -31,9 +31,13 @@ export class CardGuiUtils {
         y: number,
         data: AbstractCard,
         contextRelevant?: UIContext,
-        onCardCreatedEventCallback: (card: PhysicalCard) => void
+        onCardCreatedEventCallback?: (card: PhysicalCard) => void
     }): PhysicalCard {
-        const { scene, x, y, data, contextRelevant, onCardCreatedEventCallback: eventCallback } = params;
+        var { scene, x, y, data, contextRelevant, onCardCreatedEventCallback: eventCallback } = params;
+        if (!eventCallback) {
+            eventCallback = (card: PhysicalCard) => {};
+        }
+
         const cardContainer = scene.add.container(x, y);
         const { cardWidth, cardHeight } = this.cardConfig;
         const cardBackground = scene.add.image(0, 0, data.getCardBackgroundImageName())
@@ -109,7 +113,6 @@ export class CardGuiUtils {
             descBox: descBox,
             tooltipBox: tooltipBox,
             data: data,
-            visualTags: [],
             cardConfig: this.cardConfig
         });
 

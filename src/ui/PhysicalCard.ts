@@ -63,7 +63,6 @@ export class PhysicalCard implements IPhysicalCardInterface {
         descBox,
         tooltipBox,
         data,
-        visualTags,
         cardConfig
     }: {
         scene: Phaser.Scene;
@@ -75,7 +74,6 @@ export class PhysicalCard implements IPhysicalCardInterface {
         descBox: TextBox;
         tooltipBox: TextBox;
         data: AbstractCard;
-        visualTags: PhysicalBuff[];
         cardConfig: CardConfig;
     }) {
         this.scene = scene;

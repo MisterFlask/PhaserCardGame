@@ -163,31 +163,9 @@ export default class CampaignScene extends Phaser.Scene {
         slot.card = card;
         slot.container.add(card.container);
         card.container.setPosition(0, 0);
-        this.setupCardEvents(card);
+        //this.setupCardEvents(card);
     }
 
-    setupCardEvents = (card: PhysicalCard): void => {
-        // Remove existing listeners set up by this function
-        const pointerDownCallback = (pointer: Phaser.Input.Pointer) => {
-            this.onPointerDown(pointer, card);
-        };
-        const pointerOverCallback = () => {
-            this.bringToFront(card);
-        };
-        const pointerOutCallback = () => {
-            this.sendToBack(card);
-        };
-
-        card.container.off('pointerdown', pointerDownCallback, this)
-            .off('pointerover', pointerOverCallback, this)
-            .off('pointerout', pointerOutCallback, this);
-    
-        card.container.setInteractive()
-            .on('pointerdown', pointerDownCallback, this)
-            .on('pointerover', pointerOverCallback, this)
-            .on('pointerout', pointerOutCallback, this);
-    }
-    
     private onPointerDown = (pointer: Phaser.Input.Pointer, card: PhysicalCard) => {
         const lastClickTime = card.container.getData('lastClickTime') || 0;
         const currentTime = pointer.downTime;
@@ -386,7 +364,7 @@ export default class CampaignScene extends Phaser.Scene {
                 x: x,
                 y: 0,
                 data: card,
-                onCardCreatedEventCallback: this.setupCardEvents
+                //onCardCreatedEventCallback: this.setupCardEvents TODO
             });
             this.deckDisplayCards.push(physicalCard);
             this.deckDisplayContainer.add(physicalCard.container);

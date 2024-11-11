@@ -22,7 +22,7 @@ export class GameState {
     public cardsInventory: PlayableCard[] = [];
     public relicsInventory: AbstractRelic[] = [];
 
-    public surfaceCurrency: number = 0
+    public surfaceCurrency: number = 200
     public hellCurrency: number = 0
     public combatState: CombatState = new CombatState()
 
