@@ -178,6 +178,7 @@ class RosterPanel extends Phaser.GameObjects.Container {
             })
             .on('pointerover', () => {
                 card.container.setScale(1.1);
+                
             })
             .on('pointerout', () => {
                 card.container.setScale(1.0);
@@ -268,17 +269,43 @@ class CaravanPartyPanel extends Phaser.GameObjects.Container {
             yOffset += 120;
         });
     }
+
+    getCharacterCards(): Map<PlayerCharacter, PhysicalCard> {
+        return this.characterCards;
+    }
 }
 
 class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
     private activeCharacter: PlayerCharacter | null = null;
     private equipmentSlots: PhysicalCard[] = [];
+    private gridContainer: Phaser.GameObjects.Container;
 
     constructor(scene: Scene) {
         super(scene, 0, 0);
         scene.add.existing(this);
 
+        // Create a container for the grid
+        this.gridContainer = new Phaser.GameObjects.Container(scene, 0, 0);
+        this.add(this.gridContainer);
+
         this.createTitle();
+        this.createAssignableCardsGrid();
+
+        // Subscribe to trade goods changes
+        this.scene.events.on('tradeGoodsChanged', () => {
+            this.refreshGrid();
+        });
+    }
+
+    private refreshGrid(): void {
+        // Clear existing grid
+        this.equipmentSlots.forEach(card => {
+            card.container.destroy();
+        });
+        this.equipmentSlots = [];
+        this.gridContainer.removeAll();
+
+        // Recreate the grid
         this.createAssignableCardsGrid();
     }
 
@@ -317,7 +344,7 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
                 onCardCreatedEventCallback: (card) => this.setupTradeGoodCard(card)
             });
 
-            this.add(card.container);
+            this.gridContainer.add(card.container);
             this.equipmentSlots.push(card);
         });
     }
@@ -349,41 +376,44 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
                 }
             })
             .on('pointerover', () => {
-                if (!card.container.input.dragging) {
+                if (card.container.input?.dragState != 2) {
                     card.container.setScale(1.1);
                 }
             })
             .on('pointerout', () => {
-                if (!card.container.input.dragging) {
+                if (card.container.input?.dragState != 2) {
                     card.container.setScale(1.0);
                 }
             });
     }
 
     private checkDropOnCharacter(card: PhysicalCard): boolean {
-        if (!this.activeCharacter) return false;
+        // Get the CaravanPartyPanel instance
+        const partyPanel = this.scene.children.list
+            .find(child => child instanceof CaravanPartyPanel) as CaravanPartyPanel | undefined;
+        
+        if (!partyPanel) return false;
 
-        // Get the character card from the CaravanPartyPanel
-        const characterCard = this.scene.children.list
-            .find(child => child instanceof CaravanPartyPanel)
-            ?.characterCards?.get(this.activeCharacter);
+        // Check overlap with each character card
+        for (const [character, characterCard] of partyPanel.getCharacterCards()) {
+            const bounds = characterCard.container.getBounds();
+            const cardBounds = card.container.getBounds();
 
-        if (!characterCard) return false;
-
-        const bounds = characterCard.container.getBounds();
-        const cardBounds = card.container.getBounds();
-
-        if (Phaser.Geom.Rectangle.Overlaps(bounds, cardBounds)) {
-            this.equipTradeGood(card, this.activeCharacter);
-            return true;
+            if (Phaser.Geom.Rectangle.Overlaps(bounds, cardBounds)) {
+                this.equipTradeGood(card, character);
+                return true;
+            }
         }
 
         return false;
     }
 
-    private equipTradeGood(tradeGood: PhysicalCard, character: PhysicalCard): void {
-        const characterCard = character
-
+    private equipTradeGood(tradeGood: PhysicalCard, character: PlayerCharacter): void {
+        // Get the character's card from the party panel
+        const partyPanel = this.scene.children.list
+            .find(child => child instanceof CaravanPartyPanel) as CaravanPartyPanel;
+        
+        const characterCard = partyPanel?.getCharacterCards().get(character);
         if (!characterCard) return;
 
         // Position the trade good card next to the character card
@@ -400,8 +430,7 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
             ease: 'Power2'
         });
 
-        tradeGood.data.owner = character.data as PlayerCharacter; 
-        // when we launch expedition we'll need to actually add the trade good to the character's master deck.
+        tradeGood.data.owner = character;
     }
 
     setActiveCharacter(character: PlayerCharacter): void {

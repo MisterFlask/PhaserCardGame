@@ -264,8 +264,9 @@ export class InvestmentPanel extends AbstractHqPanel {
         // Purchase the trade good
         campaignState.availableTradeGoods = campaignState.availableTradeGoods
             .filter(g => g !== good);
-        campaignState.ownedTradeGoods.push(good);
-        this.showGoodsTab(); // Refresh display
+            campaignState.ownedTradeGoods.push(good);
+            this.scene.events.emit("tradeGoodsChanged");
+            this.showGoodsTab(); // Refresh display
         }
     }
 

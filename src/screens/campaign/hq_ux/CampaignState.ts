@@ -1,3 +1,4 @@
+import { Scene } from 'phaser';
 import { PlayerCharacter } from '../../../gamecharacters/CharacterClasses';
 import { PlayableCard } from '../../../gamecharacters/PlayableCard';
 import { CoalCargo } from '../../../gamecharacters/playerclasses/cards/cargo/CoalCargo';
@@ -37,5 +38,18 @@ export class CampaignState {
 
     public getShareholderSatisfaction(): number {
         return this.getCurrentFunds() / this.shareholderExpectation;
+    }
+
+    public addTradeGood(good: PlayableCard, scene: Scene): void {
+        this.ownedTradeGoods.push(good);
+        scene.events.emit('tradeGoodsChanged');
+    }
+
+    public removeTradeGood(good: PlayableCard, scene: Scene): void {
+        const index = this.ownedTradeGoods.indexOf(good);
+        if (index > -1) {
+            this.ownedTradeGoods.splice(index, 1);
+            scene.events.emit('tradeGoodsChanged');
+        }
     }
 } 
