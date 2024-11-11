@@ -1,9 +1,11 @@
 import { Scene } from 'phaser';
+import { EncounterManager } from '../../../../encounters/Encounters';
 import { PlayerCharacter } from '../../../../gamecharacters/CharacterClasses';
 import { TextBoxButton } from '../../../../ui/Button';
 import { PhysicalCard } from '../../../../ui/PhysicalCard';
 import { TextBox } from '../../../../ui/TextBox';
 import { CardGuiUtils } from '../../../../utils/CardGuiUtils';
+import { SceneChanger } from '../../../SceneChanger';
 import { CampaignState } from '../CampaignState';
 import { AbstractHqPanel } from './AbstractHqPanel';
 
@@ -94,6 +96,7 @@ export class LoadoutPanel extends AbstractHqPanel {
     private handleLaunch(): void {
         if (this.isReadyToLaunch()) {
             this.scene.events.emit('launchExpedition');
+            SceneChanger.switchToCombatScene({ encounter: EncounterManager.getInstance().getShopEncounter().data });
         }
     }
 
@@ -147,11 +150,11 @@ export class LoadoutPanel extends AbstractHqPanel {
         // Update status text
         if (status.ready) {
             this.statusText.setText("Ready to launch!");
-            this.statusText.setFillColor(0x90EE90); // Light green
+            this.statusText.setFillColor(0x006400); // Dark green
         } else {
             const reasonsText = status.reasons.join('\n• ');
             this.statusText.setText(`Cannot launch:\n• ${reasonsText}`);
-            this.statusText.setFillColor(0xFFB6C1); // Light red
+            this.statusText.setFillColor(0x8B0000); // Dark red
         }
     }
 
@@ -332,6 +335,7 @@ class CaravanPartyPanel extends Phaser.GameObjects.Container {
     getCharacterCards(): Map<PlayerCharacter, PhysicalCard> {
         return this.characterCards;
     }
+
 }
 
 class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
@@ -434,7 +438,6 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
     private setupTradeGoodCard(card: PhysicalCard): void {
         card.container.setInteractive({ draggable: true });
 
-        // Store original position and scale
         const originalX = card.container.x;
         const originalY = card.container.y;
         const originalScale = card.container.scale;
@@ -443,6 +446,10 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
             .on('dragstart', () => {
                 card.container.setScale(0.8);
                 this.scene.children.bringToTop(card.container);
+                // Highlight character cards when starting drag
+                this.loadoutPanel.partyPanel.getCharacterCards().forEach((characterCard) => {
+                    characterCard.highlight();
+                });
             })
             .on('drag', (pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
                 card.container.x = dragX;
@@ -451,7 +458,12 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
             .on('dragend', () => {
                 const droppedOnCharacter = this.checkDropOnCharacter(card);
                 
-                // Always return to original position, even if successfully dropped
+                // Remove highlighting when drag ends
+                this.loadoutPanel.partyPanel.getCharacterCards().forEach((characterCard) => {
+                    characterCard.unhighlight();
+                });
+                
+                // Return to original position
                 card.container.x = originalX;
                 card.container.y = originalY;
                 card.container.setScale(originalScale);
