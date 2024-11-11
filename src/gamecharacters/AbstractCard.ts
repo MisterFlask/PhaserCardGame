@@ -285,7 +285,7 @@ export abstract class AbstractCard implements IAbstractCard {
     // Add this method to set the portraitName after the card is created
     public setPortraitIfNotAvailable(scene: Scene): void {
         if (!AbstractCard.imageExists(scene, this.portraitName)) {
-            console.warn(`Image "${this.portraitName}" not found. Using placeholder.`);
+            // console.warn(`Image "${this.portraitName}" not found. Using placeholder.`);
             this.portraitName = ImageUtils.getDeterministicAbstractPlaceholder(this.constructor.name);
             // Set portrait coloration to a random RGB value seeded with the constructor name
             const seed = this.constructor.name;

@@ -8,20 +8,20 @@ import { CampaignState } from '../CampaignState';
 import { AbstractHqPanel } from './AbstractHqPanel';
 
 export class LoadoutPanel extends AbstractHqPanel {
-    private rosterPanel: RosterPanel;
-    private partyPanel: CaravanPartyPanel;
-    private equipmentPanel: EquipmentAssignmentPanel;
-    private summaryPanel: ExpeditionSummaryPanel;
+    public rosterPanel: RosterPanel;
+    public partyPanel: CaravanPartyPanel;
+    public equipmentPanel: EquipmentAssignmentPanel;
+    public summaryPanel: ExpeditionSummaryPanel;
     private launchButton: TextBoxButton;
 
     constructor(scene: Scene) {
         super(scene, 'Expedition Loadout');
 
-        // Create sub-panels
-        this.rosterPanel = new RosterPanel(scene);
-        this.partyPanel = new CaravanPartyPanel(scene);
-        this.equipmentPanel = new EquipmentAssignmentPanel(scene);
-        this.summaryPanel = new ExpeditionSummaryPanel(scene);
+        // Create sub-panels, passing 'this' as a reference
+        this.rosterPanel = new RosterPanel(scene, this);
+        this.partyPanel = new CaravanPartyPanel(scene, this);
+        this.equipmentPanel = new EquipmentAssignmentPanel(scene, this);
+        this.summaryPanel = new ExpeditionSummaryPanel(scene, this);
 
         // Position panels
         this.rosterPanel.setPosition(scene.scale.width * 0.2, scene.scale.height * 0.2);
@@ -117,11 +117,13 @@ export class LoadoutPanel extends AbstractHqPanel {
 }
 
 class RosterPanel extends Phaser.GameObjects.Container {
+    private loadoutPanel: LoadoutPanel;
     private characterCards: Map<PlayerCharacter, PhysicalCard> = new Map();
     private title: TextBox;
 
-    constructor(scene: Scene) {
+    constructor(scene: Scene, loadoutPanel: LoadoutPanel) {
         super(scene, 0, 0);
+        this.loadoutPanel = loadoutPanel;
         scene.add.existing(this);
 
         this.title = new TextBox({
@@ -174,7 +176,7 @@ class RosterPanel extends Phaser.GameObjects.Container {
     private setupCharacterCard(card: PhysicalCard): void {
         card.container.setInteractive()
             .on('pointerdown', () => {
-                this.emit('characterSelected', card.data);
+                this.loadoutPanel.rosterPanel.emit('characterSelected', card.data);
             })
             .on('pointerover', () => {
                 card.container.setScale(1.1);
@@ -195,12 +197,14 @@ class RosterPanel extends Phaser.GameObjects.Container {
 }
 
 class CaravanPartyPanel extends Phaser.GameObjects.Container {
+    private loadoutPanel: LoadoutPanel;
     private characterCards: Map<PlayerCharacter, PhysicalCard> = new Map();
     private readonly MAX_PARTY_SIZE = 3;
     private title: TextBox;
 
-    constructor(scene: Scene) {
+    constructor(scene: Scene, loadoutPanel: LoadoutPanel) {
         super(scene, 0, 0);
+        this.loadoutPanel = loadoutPanel;
         scene.add.existing(this);
 
         this.title = new TextBox({
@@ -239,11 +243,11 @@ class CaravanPartyPanel extends Phaser.GameObjects.Container {
     private setupCharacterCard(card: PhysicalCard): void {
         card.container.setInteractive()
             .on('pointerdown', () => {
-                this.emit('characterSelected', card.data);
+                this.loadoutPanel.partyPanel.emit('characterSelected', card.data);
             })
             .on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-                this.removeCharacter(card.data as PlayerCharacter);
-                this.emit('characterRemoved', card.data);
+                this.loadoutPanel.partyPanel.removeCharacter(card.data as PlayerCharacter);
+                this.loadoutPanel.partyPanel.emit('characterRemoved', card.data);
             })
             .on('pointerover', () => {
                 card.container.setScale(1.1);
@@ -276,12 +280,14 @@ class CaravanPartyPanel extends Phaser.GameObjects.Container {
 }
 
 class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
+    private loadoutPanel: LoadoutPanel;
     private activeCharacter: PlayerCharacter | null = null;
     private equipmentSlots: PhysicalCard[] = [];
     private gridContainer: Phaser.GameObjects.Container;
 
-    constructor(scene: Scene) {
+    constructor(scene: Scene, loadoutPanel: LoadoutPanel) {
         super(scene, 0, 0);
+        this.loadoutPanel = loadoutPanel;
         scene.add.existing(this);
 
         // Create a container for the grid
@@ -358,14 +364,17 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
 
         card.container
             .on('dragstart', () => {
+                console.log("dragstart");
                 card.container.setScale(0.8);
                 this.scene.children.bringToTop(card.container);
             })
             .on('drag', (pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
                 card.container.x = dragX;
                 card.container.y = dragY;
+                console.log("dragging");
             })
             .on('dragend', () => {
+                console.log("dragend");
                 const droppedOnCharacter = this.checkDropOnCharacter(card);
                 
                 if (!droppedOnCharacter) {
@@ -387,31 +396,35 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
             });
     }
 
-    private checkDropOnCharacter(card: PhysicalCard): boolean {
+    private checkDropOnCharacter(cargoCard: PhysicalCard): boolean {
         // Get the CaravanPartyPanel instance
-        const partyPanel = this.scene.children.list
-            .find(child => child instanceof CaravanPartyPanel) as CaravanPartyPanel | undefined;
+        console.log("checking drop on character");
+        const partyPanel = this.loadoutPanel.partyPanel;
         
-        if (!partyPanel) return false;
+        if (!partyPanel) {
+            console.error("party panel not found");
+            return false;
+        }
 
-        // Check overlap with each character card
+        // Check overlap with each character card using mouse cursor
         for (const [character, characterCard] of partyPanel.getCharacterCards()) {
             const bounds = characterCard.container.getBounds();
-            const cardBounds = card.container.getBounds();
+            const pointer = this.scene.input.activePointer;
 
-            if (Phaser.Geom.Rectangle.Overlaps(bounds, cardBounds)) {
-                this.equipTradeGood(card, character);
+            if (Phaser.Geom.Rectangle.Contains(bounds, pointer.x, pointer.y)) {
+                this.equipTradeGood(cargoCard, character);
+                console.log("dropped on character ", character.name);
                 return true;
             }
         }
 
+        console.log("not dropped on character");
         return false;
     }
 
     private equipTradeGood(tradeGood: PhysicalCard, character: PlayerCharacter): void {
         // Get the character's card from the party panel
-        const partyPanel = this.scene.children.list
-            .find(child => child instanceof CaravanPartyPanel) as CaravanPartyPanel;
+        const partyPanel = this.loadoutPanel.partyPanel;
         
         const characterCard = partyPanel?.getCharacterCards().get(character);
         if (!characterCard) return;
@@ -431,6 +444,7 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
         });
 
         tradeGood.data.owner = character;
+        console.log("assigned trade good to character ", character.name, " with trade good ", tradeGood.data.name);
     }
 
     setActiveCharacter(character: PlayerCharacter): void {
@@ -448,13 +462,15 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
 }
 
 class ExpeditionSummaryPanel extends Phaser.GameObjects.Container {
+    private loadoutPanel: LoadoutPanel;
     private cargoValueText!: TextBox;
     private deckCompositionText!: TextBox;
     private tradeRouteText!: TextBox;
     private warningsText!: TextBox;
 
-    constructor(scene: Scene) {
+    constructor(scene: Scene, loadoutPanel: LoadoutPanel) {
         super(scene, 0, 0);
+        this.loadoutPanel = loadoutPanel;
         scene.add.existing(this);
 
         this.createTitle();

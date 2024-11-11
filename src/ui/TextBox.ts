@@ -159,7 +159,7 @@ export class TextBox extends Phaser.GameObjects.Container {
             this.text.setText(text);
             this.adjustTextBoxSize();
         } else{
-            console.log("text frame data is null for " + this.textBoxName);
+            // console.log("text frame data is null for " + this.textBoxName);
         }
     }
 

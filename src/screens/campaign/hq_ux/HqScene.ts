@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import { GameState } from '../../../rules/GameState';
 import { ActionManagerFetcher } from '../../../utils/ActionManagerFetcher';
+import GameImageLoader from '../../../utils/ImageUtils';
 import { CampaignState } from './CampaignState';
 import { InvestmentPanel } from './panels/InvestmentPanel';
 import { LoadoutPanel } from './panels/LoadoutPanel';
@@ -22,6 +23,7 @@ export class HqScene extends Scene {
 
     preload(): void {
         ActionManagerFetcher.initActionManager();
+        new GameImageLoader().loadAllImages(this.load);
         // Load any required assets
     }
 
