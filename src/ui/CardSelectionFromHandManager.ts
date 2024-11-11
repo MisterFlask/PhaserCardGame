@@ -65,7 +65,7 @@ class CardSelectionFromHandManager {
 
         this.cancelButton
             .onClick(this.onCancel.bind(this))
-            .setDepth(2);
+            .setDepth(DepthManager.getInstance().OVERLAY_BASE + 100);
 
         this.scene.add.existing(this.cancelButton);
     }
@@ -97,6 +97,7 @@ class CardSelectionFromHandManager {
             fillColor: 0x000000,
             textBoxName: 'CardSelectionInstructions'
         });
+        this.instructionsBox.setDepth(DepthManager.getInstance().OVERLAY_BASE + 100);
         this.scene.add.existing(this.instructionsBox);
     }
 
@@ -115,7 +116,7 @@ class CardSelectionFromHandManager {
 
         this.submitButton
             .onClick(this.onSubmit.bind(this))
-            .setDepth(2);
+            .setDepth(DepthManager.getInstance().OVERLAY_BASE + 100);
 
         this.scene.add.existing(this.submitButton);
 
@@ -143,9 +144,11 @@ class CardSelectionFromHandManager {
         const handCards = GameState.getInstance().combatState.currentHand;
 
         handCards.forEach((card, i) => {
-            card.physicalCard?.container.setDepth(depthManager.CARD_BASE + i);
-            card.physicalCard?.container.setInteractive()
-                .on('pointerdown', () => this.toggleCardSelection(card as PlayableCardType));
+            if (card.physicalCard?.container) {
+                card.physicalCard.container.setDepth(depthManager.OVERLAY_BASE + 100 + i);
+                card.physicalCard.container.setInteractive()
+                    .on('pointerdown', () => this.toggleCardSelection(card as PlayableCardType));
+            }
         });
     }
 
@@ -190,10 +193,21 @@ class CardSelectionFromHandManager {
         this.overlay.destroy();
         this.instructionsBox.destroy();
         this.submitButton.destroy();
-        this.cancelButton.destroy();
+        if (this.cancellable) {
+            this.cancelButton.destroy();
+        }
         this.unhighlightAllSelectedCards();
         this.enableOtherInteractions();
         this.cleanupCardInteractions();
+
+        // Restore original card depths
+        const depthManager = DepthManager.getInstance();
+        const handCards = GameState.getInstance().combatState.currentHand;
+        handCards.forEach((card, i) => {
+            if (card.physicalCard?.container) {
+                card.physicalCard.container.setDepth(depthManager.CARD_BASE + i);
+            }
+        });
     }
 
     private unhighlightAllSelectedCards(): void {
