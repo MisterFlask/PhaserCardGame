@@ -336,40 +336,42 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
         const PADDING = 20;
 
         campaignState.ownedTradeGoods.forEach((good, index) => {
-            // Check if the good has an owner and if they're in the party
-            const ownerInParty = good.owner && this.loadoutPanel.partyPanel.getCharacterCards().has(good.owner);
-
-            let x, y;
-            if (ownerInParty && good.owner) {
-                // Get the owner's card and position the trade good next to it
-                const ownerCard = this.loadoutPanel.partyPanel.getCharacterCards().get(good.owner);
-                if (ownerCard) {
-                    x = ownerCard.container.x + ownerCard.container.width + 10;
-                    y = ownerCard.container.y;
-                } else {
-                    // Fallback to grid position if something went wrong
-                    x = (index % GRID_COLS) * (CARD_WIDTH + PADDING);
-                    y = 60 + Math.floor(index / GRID_COLS) * (CARD_HEIGHT + PADDING);
-                }
-            } else {
-                // If owner isn't in party, clear owner and use grid position
-                good.owner = undefined;
-                x = (index % GRID_COLS) * (CARD_WIDTH + PADDING);
-                y = 60 + Math.floor(index / GRID_COLS) * (CARD_HEIGHT + PADDING);
-            }
+            const col = index % GRID_COLS;
+            const row = Math.floor(index / GRID_COLS);
+            
+            const x = col * (CARD_WIDTH + PADDING);
+            const y = 60 + row * (CARD_HEIGHT + PADDING);
 
             const card = CardGuiUtils.getInstance().createCard({
                 scene: this.scene,
                 x,
                 y,
                 data: good,
-                onCardCreatedEventCallback: (card) => this.setupTradeGoodCard(card)
-            });
+                onCardCreatedEventCallback: (card) => {
+                    this.setupTradeGoodCard(card);
+                    
+                    // Create assignment status text box as child of card container
+                    const assignmentText = new TextBox({
+                        scene: this.scene,
+                        x: CARD_WIDTH + 5,  // Local position relative to card
+                        y: CARD_HEIGHT / 2,  // Vertically center relative to card
+                        width: 120,
+                        height: 30,
+                        text: good.owner ? `Assigned to:\n${good.owner.name}` : 'Unassigned',
+                        style: { 
+                            fontSize: '14px', 
+                            color: good.owner ? '#90EE90' : '#FFB6C1',
+                            align: 'left',
+                            wordWrap: { width: 110 }
+                        }
+                    });
 
-            // Set scale if the card is assigned to a character
-            if (ownerInParty) {
-                card.container.setScale(0.6);
-            }
+                    // Add the text box to the card's container
+                    card.container.add(assignmentText);
+                    // Store reference to the text box on the card for later updates
+                    (card as any).assignmentText = assignmentText;
+                }
+            });
 
             this.gridContainer.add(card.container);
             this.equipmentSlots.push(card);
@@ -444,27 +446,16 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
     }
 
     private equipTradeGood(tradeGood: PhysicalCard, character: PlayerCharacter): void {
-        // Get the character's card from the party panel
-        const partyPanel = this.loadoutPanel.partyPanel;
-        
-        const characterCard = partyPanel?.getCharacterCards().get(character);
-        if (!characterCard) return;
-
-        // Position the trade good card next to the character card
-        const targetX = characterCard.container.x + characterCard.container.width + 10;
-        const targetY = characterCard.container.y;
-
-        // Animate the card to its new position
-        this.scene.tweens.add({
-            targets: tradeGood.container,
-            x: targetX,
-            y: targetY,
-            scale: 0.6,
-            duration: 200,
-            ease: 'Power2'
-        });
-
+        // Update the trade good's owner
         tradeGood.data.owner = character;
+
+        // Update the assignment text box directly through the stored reference
+        const assignmentText = (tradeGood as any).assignmentText as TextBox;
+        if (assignmentText) {
+            assignmentText.setText(`Assigned to:\n${character.name}`);
+            assignmentText.setFillColor(0x90EE90);
+        }
+
         console.log("assigned trade good to character ", character.name, " with trade good ", tradeGood.data.name);
     }
 
