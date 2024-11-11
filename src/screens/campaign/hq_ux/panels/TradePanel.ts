@@ -79,6 +79,7 @@ export class TradePanel extends AbstractHqPanel {
             .on('pointerover', () => {
                 card.highlight();
                 this.showRouteDetails(card);
+                CampaignState.getInstance().selectedTradeRoute = card.data as AbstractTradeRoute;
             })
             .on('pointerout', () => {
                 if (this.selectedRoute !== card) {

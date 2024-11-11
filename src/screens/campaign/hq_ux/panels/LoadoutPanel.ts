@@ -13,6 +13,7 @@ export class LoadoutPanel extends AbstractHqPanel {
     public equipmentPanel: EquipmentAssignmentPanel;
     public summaryPanel: ExpeditionSummaryPanel;
     private launchButton: TextBoxButton;
+    private statusText: TextBox;
 
     constructor(scene: Scene) {
         super(scene, 'Expedition Loadout');
@@ -41,6 +42,22 @@ export class LoadoutPanel extends AbstractHqPanel {
             fillColor: 0x444444
         });
 
+        // Create status text box below launch button
+        this.statusText = new TextBox({
+            scene,
+            x: scene.scale.width * 0.8,
+            y: scene.scale.height * 0.85 + 70, // Position below launch button
+            width: 300,
+            height: 100,
+            text: '',
+            style: { 
+                fontSize: '16px', 
+                color: '#ffffff',
+                align: 'center',
+                wordWrap: { width: 290 }
+            }
+        });
+
         this.launchButton.onClick(() => this.handleLaunch());
         this.updateLaunchButton();
 
@@ -50,7 +67,8 @@ export class LoadoutPanel extends AbstractHqPanel {
             this.partyPanel,
             this.equipmentPanel,
             this.summaryPanel,
-            this.launchButton
+            this.launchButton,
+            this.statusText
         ]);
 
         // Set up event listeners between panels
@@ -97,9 +115,44 @@ export class LoadoutPanel extends AbstractHqPanel {
         });
     }
 
+    private getReadinessStatus(): { ready: boolean; reasons: string[] } {
+        const campaignState = CampaignState.getInstance();
+        const reasons: string[] = [];
+
+        // Check party size
+        if (campaignState.selectedParty.length < 3) {
+            reasons.push(`Need ${3 - campaignState.selectedParty.length} more party members`);
+        }
+
+        // Check trade route
+        if (!campaignState.selectedTradeRoute) {
+            reasons.push("No trade route selected");
+        }
+
+        // Check equipment
+        if (!this.hasValidEquipment()) {
+            reasons.push("Missing required equipment");
+        }
+
+        return {
+            ready: reasons.length === 0,
+            reasons
+        };
+    }
+
     private updateLaunchButton(): void {
-        const isReady = this.isReadyToLaunch();
-        this.launchButton.setButtonEnabled(isReady);
+        const status = this.getReadinessStatus();
+        this.launchButton.setButtonEnabled(status.ready);
+
+        // Update status text
+        if (status.ready) {
+            this.statusText.setText("Ready to launch!");
+            this.statusText.setFillColor(0x90EE90); // Light green
+        } else {
+            const reasonsText = status.reasons.join('\n• ');
+            this.statusText.setText(`Cannot launch:\n• ${reasonsText}`);
+            this.statusText.setFillColor(0xFFB6C1); // Light red
+        }
     }
 
     private updateSummary(): void {
@@ -112,7 +165,7 @@ export class LoadoutPanel extends AbstractHqPanel {
         this.partyPanel.update();
         this.equipmentPanel.update();
         this.summaryPanel.update();
-        this.updateLaunchButton();
+        this.updateSummary();
     }
 }
 
@@ -237,6 +290,7 @@ class CaravanPartyPanel extends Phaser.GameObjects.Container {
         
         this.characterCards.set(character, card);
         this.add(card.container);
+        CampaignState.getInstance().selectedParty.push(character);
         this.repositionCards();
     }
 
@@ -263,6 +317,7 @@ class CaravanPartyPanel extends Phaser.GameObjects.Container {
             card.container.destroy();
             this.characterCards.delete(character);
             this.repositionCards();
+            CampaignState.getInstance().selectedParty = CampaignState.getInstance().selectedParty.filter(c => c !== character);
         }
     }
 
@@ -330,14 +385,14 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
 
     private createAssignableCardsGrid(): void {
         const campaignState = CampaignState.getInstance();
-        const GRID_COLS = 3;
+        const GRID_ROWS = 3;
         const CARD_WIDTH = 100;
         const CARD_HEIGHT = 140;
         const PADDING = 20;
 
         campaignState.ownedTradeGoods.forEach((good, index) => {
-            const col = index % GRID_COLS;
-            const row = Math.floor(index / GRID_COLS);
+            const row = index % GRID_ROWS;
+            const col = Math.floor(index / GRID_ROWS);
             
             const x = col * (CARD_WIDTH + PADDING);
             const y = 60 + row * (CARD_HEIGHT + PADDING);
@@ -353,11 +408,11 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
                     // Create assignment status text box as child of card container
                     const assignmentText = new TextBox({
                         scene: this.scene,
-                        x: CARD_WIDTH + 5,  // Local position relative to card
-                        y: CARD_HEIGHT / 2,  // Vertically center relative to card
+                        x: CARD_WIDTH + 5,
+                        y: CARD_HEIGHT / 2,
                         width: 120,
                         height: 30,
-                        text: good.owner ? `Assigned to:\n${good.owner.name}` : 'Unassigned',
+                        text: good.owner ? `Assigned to:\n${good.owner.name}` : 'Unassigned (will not be taken)',
                         style: { 
                             fontSize: '14px', 
                             color: good.owner ? '#90EE90' : '#FFB6C1',
@@ -366,9 +421,7 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
                         }
                     });
 
-                    // Add the text box to the card's container
                     card.container.add(assignmentText);
-                    // Store reference to the text box on the card for later updates
                     (card as any).assignmentText = assignmentText;
                 }
             });
@@ -381,31 +434,27 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
     private setupTradeGoodCard(card: PhysicalCard): void {
         card.container.setInteractive({ draggable: true });
 
+        // Store original position and scale
         const originalX = card.container.x;
         const originalY = card.container.y;
         const originalScale = card.container.scale;
 
         card.container
             .on('dragstart', () => {
-                console.log("dragstart");
                 card.container.setScale(0.8);
                 this.scene.children.bringToTop(card.container);
             })
             .on('drag', (pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
                 card.container.x = dragX;
                 card.container.y = dragY;
-                console.log("dragging");
             })
             .on('dragend', () => {
-                console.log("dragend");
                 const droppedOnCharacter = this.checkDropOnCharacter(card);
                 
-                if (!droppedOnCharacter) {
-                    // Return to original position if not dropped on a character
-                    card.container.x = originalX;
-                    card.container.y = originalY;
-                    card.container.setScale(originalScale);
-                }
+                // Always return to original position, even if successfully dropped
+                card.container.x = originalX;
+                card.container.y = originalY;
+                card.container.setScale(originalScale);
             })
             .on('pointerover', () => {
                 if (card.container.input?.dragState != 2) {
