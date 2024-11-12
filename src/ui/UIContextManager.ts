@@ -4,7 +4,8 @@ export enum UIContext {
     SHOP,
     CARD_REWARD,
     CHARACTER_DECK_SHOWN,
-    CAMPAIGN_HQ
+    CAMPAIGN_HQ,
+    CARD_SELECTION_FROM_HAND
 }
 
 export class UIContextManager {

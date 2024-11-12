@@ -4,6 +4,7 @@ import { PlayableCardType } from '../Types';
 import { TextBoxButton } from './Button';
 import { DepthManager } from './DepthManager';
 import { TextBox } from './TextBox';
+import { UIContext, UIContextManager } from './UIContextManager';
 
 interface CardSelectionParams {
     scene: Phaser.Scene;
@@ -48,6 +49,7 @@ class CardSelectionFromHandManager {
         if (this.cancellable) {
             this.createCancelButton();
         }
+        UIContextManager.getInstance().setContext(UIContext.CARD_SELECTION_FROM_HAND);
     }
 
     private createCancelButton(): void {
@@ -208,6 +210,7 @@ class CardSelectionFromHandManager {
                 card.physicalCard.container.setDepth(depthManager.CARD_BASE + i);
             }
         });
+        UIContextManager.getInstance().setContext(UIContext.COMBAT);
     }
 
     private unhighlightAllSelectedCards(): void {
