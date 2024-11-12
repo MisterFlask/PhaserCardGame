@@ -81,6 +81,7 @@ export class CombatCardManager {
                 data: characterData,
                 onCardCreatedEventCallback: () => { }
             });
+            unit.data.physicalCard = unit;
             (unit as any).isPlayerUnit = true;
             this.playerUnits.push(unit);
         });

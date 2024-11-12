@@ -105,12 +105,12 @@ export class PersonnelPanel extends AbstractHqPanel {
     private setupCharacterCardEvents(card: PhysicalCard): void {
         card.container.setInteractive()
             .on('pointerover', () => {
-                card.highlight();
+                card.setGlow(true);
                 this.showCharacterDetails(card);
             })
             .on('pointerout', () => {
                 if (this.selectedCharacter !== card) {
-                    card.unhighlight();
+                    card.setGlow(false);
                 }
             })
             .on('pointerdown', () => {
@@ -121,11 +121,11 @@ export class PersonnelPanel extends AbstractHqPanel {
     private selectCharacter(card: PhysicalCard): void {
         // Unhighlight previously selected character
         if (this.selectedCharacter && this.selectedCharacter !== card) {
-            this.selectedCharacter.unhighlight();
+            this.selectedCharacter.setGlow(false);
         }
 
         this.selectedCharacter = card;
-        card.highlight();
+        card.setGlow(true);
         this.showCharacterDetails(card);
         this.displayCharacterDeck(card);
     }

@@ -61,10 +61,10 @@ export class InvestmentPanel extends AbstractHqPanel {
     private setupFactoryCardEvents(card: PhysicalCard): void {
         card.container.setInteractive()
             .on('pointerover', () => {
-                card.highlight();
+                card.setGlow(true);
             })
             .on('pointerout', () => {
-                card.unhighlight();
+                card.setGlow(false);
             })
             .on('pointerdown', () => {
                 this.handleFactoryCardClick(card);

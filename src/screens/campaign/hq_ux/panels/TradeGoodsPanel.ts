@@ -53,13 +53,7 @@ export class TradeGoodsPanel extends AbstractHqPanel {
     }
 
     private setupTradeGoodCardEvents(card: PhysicalCard): void {
-        card.container.setInteractive()
-            .on('pointerover', () => {
-                card.highlight();
-            })
-            .on('pointerout', () => {
-                card.unhighlight();
-            })
+        card.setInteractive(true)
             .on('pointerdown', () => {
                 this.handleTradeGoodCardClick(card);
             });

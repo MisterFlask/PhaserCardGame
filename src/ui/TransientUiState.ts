@@ -24,6 +24,8 @@ export class TransientUiState {
         // only applies to playable card instances
         if (card?.data?.isPlayableCard()) {
             this.draggedCard = card ?? undefined;
+        }else{
+            this.draggedCard = undefined;
         }
     }
 
@@ -40,11 +42,10 @@ export class TransientUiState {
     }
 
     public getDebugDisplayString(): string {
-        return `
+        return `UI State:
 Dragged Card: ${this.draggedCard ? this.draggedCard.data.name : 'None'}
 Hovered Card: ${this.hoveredCard ? this.hoveredCard.data.name : 'None'}
 Hovered Intent: ${this.hoveredIntent ? this.hoveredIntent.intent.id : 'None'}
-Hovered Incoming Intent: ${this.hoveredIncomingIntent ? this.hoveredIncomingIntent.intent.id : 'None'}
-        `.trim();
+Hovered Incoming Intent: ${this.hoveredIncomingIntent ? this.hoveredIncomingIntent.intent.id : 'None'}`.trim();
     }
 } 

@@ -489,7 +489,7 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
                 this.scene.children.bringToTop(card.container);
                 // Highlight character cards when starting drag
                 this.loadoutPanel.partyPanel.getCharacterCards().forEach((characterCard) => {
-                    characterCard.highlight();
+                    characterCard.setGlow(true);
                 });
             })
             .on('drag', (pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
@@ -501,7 +501,7 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
                 
                 // Remove highlighting when drag ends
                 this.loadoutPanel.partyPanel.getCharacterCards().forEach((characterCard) => {
-                    characterCard.unhighlight();
+                    characterCard.setGlow(false);
                 });
                 
                 // Return to original position

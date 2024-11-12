@@ -6,6 +6,7 @@ import { Defend } from '../../gamecharacters/playerclasses/cards/basic/Defend';
 import { GameState } from '../../rules/GameState';
 import { TextBoxButton } from '../../ui/Button';
 import { CombatResourceDisplay } from '../../ui/CombatResourceDisplay';
+import { DepthManager } from '../../ui/DepthManager';
 import { default as CombatSceneLayoutUtils, default as LayoutUtils } from '../../ui/LayoutUtils';
 import Menu from '../../ui/Menu';
 import { SubtitleManager } from '../../ui/SubtitleManager';
@@ -413,17 +414,28 @@ class CombatUIManager {
     }
 
     private createDebugOverlay(): void {
+        const gameWidth = this.scene.scale.width;
+        const gameHeight = this.scene.scale.height;
+        
         this.debugOverlay = new TextBox({
             scene: this.scene,
-            x: this.scene.scale.width - 200, // Positioning at bottom-right
-            y: this.scene.scale.height - 50,
-            width: 200,
-            height: 100,
+            x: gameWidth - 200,  // Position on right side
+            y: gameHeight * 0.3, // Position in middle-right
+            width: 300,          // Increased width for more info
+            height: 200,         // Increased height for more info
             text: 'Debug Info',
-            style: { fontSize: '14px', color: '#00ff00' },
+            style: { 
+                fontSize: '14px', 
+                color: '#00ff00',
+                align: 'left',
+                wordWrap: { width: 280 } // Enable word wrap
+            },
             fillColor: 0x000000,
             textBoxName: 'DebugOverlay'
         });
+        
+        // Set depth using DepthManager
+        this.debugOverlay.setDepth(DepthManager.getInstance().OVERLAY_BASE + 500);
         this.debugOverlay.setVisible(false);
         this.scene.add.existing(this.debugOverlay);
     }
@@ -449,7 +461,33 @@ class CombatUIManager {
     }
 
     private updateDebugOverlay(): void {
-        const debugText = TransientUiState.getInstance().getDebugDisplayString();
+        const gameState = GameState.getInstance();
+        const transientState = TransientUiState.getInstance();
+        
+        // Get base debug info
+        let debugText = transientState.getDebugDisplayString();
+        
+        // Add character highlight status
+        debugText += '\n\nCharacter Highlights:';
+        
+        // Add player characters
+        gameState.getCurrentRunCharacters().forEach(character => {
+            if (character.physicalCard) {
+                debugText += `\n${character.name}: ${character.physicalCard.isHighlighted ? '🌟 Glowing' : '⚪ Normal'}`;
+            }
+        });
+        
+        // Add enemies
+        gameState.combatState.enemies.forEach(enemy => {
+            if (enemy.physicalCard) {
+                debugText += `\n${enemy.name}: ${enemy.physicalCard.isHighlighted ? '🌟 Glowing' : '⚪ Normal'}`;
+            }
+        });
+
+        GameState.getInstance().combatState.currentHand.forEach(card => {
+            debugText += `\n${card.name}: ${card.physicalCard?.isHighlighted ? '🌟 Glowing' : '⚪ Normal'}`;
+        });
+        
         this.debugOverlay.setText(debugText);
     }
 }

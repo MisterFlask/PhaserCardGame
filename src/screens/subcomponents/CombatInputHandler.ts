@@ -10,11 +10,9 @@ import { GameState } from '../../rules/GameState';
 import { DepthManager } from '../../ui/DepthManager';
 import CombatSceneLayoutUtils from '../../ui/LayoutUtils';
 import { PhysicalCard } from '../../ui/PhysicalCard';
-import { PhysicalIntent } from '../../ui/PhysicalIntent';
 import { TransientUiState } from '../../ui/TransientUiState';
 import { UIContext, UIContextManager } from '../../ui/UIContextManager';
 import { ActionManager } from '../../utils/ActionManager';
-import { IntentEmitter } from '../../utils/IntentEmitter';
 import CombatCardManager from './CombatCardManager';
 
 class CombatInputHandler {
@@ -31,8 +29,6 @@ class CombatInputHandler {
         this.setupEventListeners();
         this.setupCardClickListeners();
 
-        IntentEmitter.getInstance().on(IntentEmitter.EVENT_INCOMING_INTENT_HOVER, this.onIncomingIntentHover, this);
-        IntentEmitter.getInstance().on(IntentEmitter.EVENT_INCOMING_INTENT_HOVER_END, this.onIncomingIntentHoverEnd, this);
         this.scene.events.on('toggleInteraction', this.toggleInteraction, this);
     }
 
@@ -45,9 +41,6 @@ class CombatInputHandler {
 
         this.scene.events.on('shutdown', this.removeEventListeners, this);
 
-        // Changed to listen on IntentEmitter instance
-        IntentEmitter.getInstance().on(IntentEmitter.EVENT_INTENT_HOVER, this.handleIntentHoverOver, this);
-        IntentEmitter.getInstance().on(IntentEmitter.EVENT_INTENT_HOVER_END, this.handleIntentHoverOut, this);
     }
 
     private removeEventListeners(): void {
@@ -59,9 +52,6 @@ class CombatInputHandler {
 
         this.scene.events.off('shutdown', this.removeEventListeners, this);
 
-        // Changed to remove listeners from IntentEmitter instance
-        IntentEmitter.getInstance().off(IntentEmitter.EVENT_INTENT_HOVER, this.handleIntentHoverOver, this);
-        IntentEmitter.getInstance().off(IntentEmitter.EVENT_INTENT_HOVER_END, this.handleIntentHoverOut, this);
 
         this.removeCardClickListeners();
         this.cardClickListeners = []; // Clear all listeners
@@ -299,14 +289,9 @@ class CombatInputHandler {
 
         if (cardUnderPointer && cardUnderPointer !== this.transientUiState.draggedCard) {
             if (this.transientUiState.hoveredCard !== cardUnderPointer) {
-                if (this.transientUiState.hoveredCard) {
-                    this.unhighlightCard(this.transientUiState.hoveredCard);
-                }
                 this.transientUiState.setHoveredCard(cardUnderPointer);
-                this.highlightCard(cardUnderPointer);
             }
         } else if (this.transientUiState.hoveredCard) {
-            this.unhighlightCard(this.transientUiState.hoveredCard);
             this.transientUiState.setHoveredCard(null);
         }
     }
@@ -322,44 +307,7 @@ class CombatInputHandler {
         return null;
     }
 
-    private highlightCard(card: PhysicalCard): void {
-        card.highlight();
-    }
 
-    private unhighlightCard(card: PhysicalCard): void {
-        card.unhighlight();
-    }
-
-
-    private handleIntentHoverOver(intent: PhysicalIntent): void {
-        console.log('intent hover over');
-        const targetCard = intent.intent.target;
-        if (targetCard && targetCard.physicalCard) {
-            this.highlightCard(targetCard.physicalCard as PhysicalCard);
-        }
-    }
-
-    private handleIntentHoverOut(intent: PhysicalIntent): void {
-        console.log('intent hover out');
-        const targetCard = intent.intent.target;
-        if (targetCard && targetCard.physicalCard) {
-            this.unhighlightCard(targetCard.physicalCard as PhysicalCard);
-        }
-    }
-
-    private onIncomingIntentHover(owner: BaseCharacter): void {
-        const enemyPhysicalCard = owner.physicalCard as PhysicalCard;
-        if (enemyPhysicalCard) {
-            enemyPhysicalCard.highlight();
-        }
-    }
-
-    private onIncomingIntentHoverEnd(owner: BaseCharacter): void {
-        const enemyPhysicalCard = owner.physicalCard as PhysicalCard;
-        if (enemyPhysicalCard) {
-            enemyPhysicalCard.unhighlight();
-        }
-    }
 
     public addCardClickListener(listener: (card: AbstractCard) => void): void {
         this.cardClickListeners.push(listener);

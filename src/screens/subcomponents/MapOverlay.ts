@@ -327,13 +327,13 @@ export class MapOverlay {
         const currentLocationCard = this.locationCards.find(card => (card.data as LocationCard).id === currentLocation?.id);
         if (currentLocationCard) {
             currentLocationCard.glowColor = 0x00ff00;
-            currentLocationCard.isHighlighted = true;
+            currentLocationCard.setGlow(true);
         }
         const nextLocations = currentLocation?.adjacentLocations;
         nextLocations?.forEach(loc => {
             const nextLocationCard = this.locationCards.find(card => (card.data as LocationCard).id === loc.id);
             if (nextLocationCard) {
-                nextLocationCard.isHighlighted = true;
+                nextLocationCard.setGlow(true);
             }
         });
     }

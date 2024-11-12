@@ -1,4 +1,5 @@
 import { AbstractCard } from "../gamecharacters/AbstractCard";
+import { GameState } from "../rules/GameState";
 import { BaseCharacterType } from "../Types";
 import { PhysicalCard } from "./PhysicalCard";
 import { TransientUiState } from "./TransientUiState";
@@ -45,6 +46,12 @@ export class CombatHighlightsManager {
             if (character.physicalCard) {
                 character.physicalCard.setGlow(false);
             }
+        });
+
+
+        // now, cards in hand
+        GameState.getInstance().combatState.currentHand.forEach(card => {
+            card.physicalCard?.setGlow(false);
         });
     }
 

@@ -359,11 +359,11 @@ export abstract class PlayableCard extends AbstractCard {
     }
 
     public highlight(): void {
-        this.physicalCard?.highlight(); // Example: Green tint for selection
+        this.physicalCard?.setGlow(true); // Example: Green tint for selection
     }
 
     public unhighlight(): void {
-        this.physicalCard?.unhighlight();
+        this.physicalCard?.setGlow(false);
     }
 
 }

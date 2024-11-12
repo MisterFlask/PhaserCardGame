@@ -77,13 +77,13 @@ export class TradePanel extends AbstractHqPanel {
     private setupTradeRouteCardEvents(card: PhysicalCard): void {
         card.container.setInteractive()
             .on('pointerover', () => {
-                card.highlight();
+                card.setGlow(true);
                 this.showRouteDetails(card);
                 CampaignState.getInstance().selectedTradeRoute = card.data as AbstractTradeRoute;
             })
             .on('pointerout', () => {
                 if (this.selectedRoute !== card) {
-                    card.unhighlight();
+                    card.setGlow(false);
                 }
                 if (!this.selectedRoute) {
                     this.hideRouteDetails();
@@ -96,11 +96,11 @@ export class TradePanel extends AbstractHqPanel {
 
     private selectRoute(card: PhysicalCard): void {
         if (this.selectedRoute && this.selectedRoute !== card) {
-            this.selectedRoute.unhighlight();
+            this.selectedRoute.setGlow(false);
         }
 
         this.selectedRoute = card;
-        card.highlight();
+        card.setGlow(true);
         this.selectButton.setVisible(true);
         this.showRouteDetails(card);
     }

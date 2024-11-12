@@ -17,8 +17,6 @@ export interface IPhysicalCardInterface {
     cardImage: Phaser.GameObjects.Image;
     data: AbstractCard;
     blockText: TextBox;
-    highlight(): void;
-    unhighlight(): void;
 
     setInteractive(isInteractive: boolean): void;
 }

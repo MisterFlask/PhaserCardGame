@@ -37,7 +37,10 @@ export class PhysicalCard implements IPhysicalCardInterface {
     private physicalIntents: Map<string, PhysicalIntent> = new Map();
     private intentsContainer: Phaser.GameObjects.Container;
     private jsonModal: Phaser.GameObjects.Container | null = null;
-    private _isHighlighted: boolean = false;
+    public get isHighlighted(): boolean {
+        return this.glowEffect?.visible ?? false;
+    }
+
     private blocksContainer: Phaser.GameObjects.Container;
     private blockIcon: Phaser.GameObjects.Image;
     public blockText: TextBox;
@@ -255,8 +258,9 @@ export class PhysicalCard implements IPhysicalCardInterface {
         // Add glow effect first so it appears behind the card
         this.cardContent.addAt(this.glowEffect, 0);
     }
-    setInteractive(isInteractive: boolean): void {
+    setInteractive(isInteractive: boolean): Phaser.GameObjects.Container {
         this.container.setInteractive(isInteractive);
+        return this.container;
     }
 
     obliterate(): void {
@@ -693,30 +697,6 @@ export class PhysicalCard implements IPhysicalCardInterface {
         this.container.destroy();
     }
 
-    get isHighlighted(): boolean {
-        return this._isHighlighted;
-    }
-
-    set isHighlighted(value: boolean) {
-        this._isHighlighted = value;
-        this.setGlow(value)
-    }
-
-    /**
-     * Highlights the card by changing its appearance.
-     */
-    highlight(): void {
-        this.isHighlighted = true
-        console.log("highlightBorder: " + this._isHighlighted);
-    }
-
-    /**
-     * Removes the highlight from the card.
-     */
-    unhighlight(): void {
-        this.isHighlighted = false
-        console.log("highlightBorder: " + this._isHighlighted);
-    }
 
     // Initialize buffs grid layout
     private initBuffsGrid(): void {
@@ -833,7 +813,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
      */
     public setGlow(isGlowing: boolean): void {
         if (!this.glowEffect) return;
-
+        
         if (isGlowing) {
             this.glowEffect.turnOn();
             
