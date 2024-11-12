@@ -10,6 +10,7 @@ import { default as CombatSceneLayoutUtils, default as LayoutUtils } from '../..
 import Menu from '../../ui/Menu';
 import { SubtitleManager } from '../../ui/SubtitleManager';
 import { TextBox } from '../../ui/TextBox';
+import { TransientUiState } from '../../ui/TransientUiState';
 import { UIContext, UIContextManager } from '../../ui/UIContextManager';
 import { ActionManager } from '../../utils/ActionManager';
 import CardRewardScreen, { CardReward } from './CardRewardScreen';
@@ -32,6 +33,7 @@ class CombatUIManager {
     private subtitleTextBox?: TextBox;
     private cardRewardScreen!: CardRewardScreen;
     private combatEnded: boolean = false;
+    private debugOverlay!: TextBox;
 
     private constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -65,6 +67,8 @@ class CombatUIManager {
         this.createGameAreas();
         this.createEnergyDisplay();
         this.createResourceIndicators();
+        this.createDebugOverlay();
+        this.setupDebugOverlayToggle();
     }
 
     private createEnergyDisplay(): void {
@@ -294,6 +298,11 @@ class CombatUIManager {
         this.resourceIndicators.forEach(display => display.destroy());
         this.resourceIndicators = [];
         this.scene.events.off('update', this.updateResourceIndicators, this);
+        this.scene.events.off('update', () => {
+            if (this.debugOverlay.visible) {
+                this.updateDebugOverlay();
+            }
+        });
     }
 
     private createResourceIndicators(): void {
@@ -401,6 +410,47 @@ class CombatUIManager {
 
     public getPlayerHandCards(): IAbstractCard[] {
         return GameState.getInstance().combatState.currentHand;
+    }
+
+    private createDebugOverlay(): void {
+        this.debugOverlay = new TextBox({
+            scene: this.scene,
+            x: this.scene.scale.width - 200, // Positioning at bottom-right
+            y: this.scene.scale.height - 50,
+            width: 200,
+            height: 100,
+            text: 'Debug Info',
+            style: { fontSize: '14px', color: '#00ff00' },
+            fillColor: 0x000000,
+            textBoxName: 'DebugOverlay'
+        });
+        this.debugOverlay.setVisible(false);
+        this.scene.add.existing(this.debugOverlay);
+    }
+
+    private setupDebugOverlayToggle(): void {
+        const ctrlKey = this.scene.input?.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.CTRL);
+        ctrlKey?.on('down', () => {
+            this.toggleDebugOverlay();
+        });
+
+        this.scene.events.on('update', () => {
+            if (this.debugOverlay.visible) {
+                this.updateDebugOverlay();
+            }
+        });
+    }
+
+    private toggleDebugOverlay(): void {
+        this.debugOverlay.setVisible(!this.debugOverlay.visible);
+        if (this.debugOverlay.visible) {
+            this.updateDebugOverlay();
+        }
+    }
+
+    private updateDebugOverlay(): void {
+        const debugText = TransientUiState.getInstance().getDebugDisplayString();
+        this.debugOverlay.setText(debugText);
     }
 }
 

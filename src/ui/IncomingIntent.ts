@@ -33,12 +33,13 @@ export class IncomingIntent {
             .on('pointerover', this.onPointerOver, this)
             .on('pointerout', this.onPointerOut, this);
         
+        var incomingIntent = this;
         this.container.on('pointerover', () => {
-            IntentEmitter.getInstance().emitIncomingIntentHover(this.intent.owner);
+            IntentEmitter.getInstance().emitIncomingIntentHover(incomingIntent, this.intent.owner);
         });
 
         this.container.on('pointerout', () => {
-            IntentEmitter.getInstance().emitIncomingIntentHoverEnd(this.intent.owner);
+            IntentEmitter.getInstance().emitIncomingIntentHoverEnd(incomingIntent, this.intent.owner);
         });
         
         this.update();

@@ -48,7 +48,6 @@ export class PhysicalCard implements IPhysicalCardInterface {
     private incomingIntentsContainer: Phaser.GameObjects.Container;
     private incomingIntents: Map<string, IncomingIntent> = new Map();
     public glowEffect?: CheapGlowEffect;
-    glowColor: number = 0xffff00; //yellow
     private costBox: TextBox | null = null; // Add costBox property
     private priceBox!: TextBox; // Add this property
 
@@ -932,5 +931,11 @@ export class PhysicalCard implements IPhysicalCardInterface {
             background: this.cardBackground.depth,
             border: this.cardBorder.depth
         });
+    }
+
+    public set glowColor(color: number){
+        if (this.glowEffect) {
+            this.glowEffect.setTint(color);
+        }
     }
 }

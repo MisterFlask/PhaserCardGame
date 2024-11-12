@@ -147,7 +147,6 @@ export abstract class AbstractCard implements IAbstractCard {
     buffs: AbstractBuff[] = [];
     portraitTint?: number
 
-
     public surfacePurchaseValue: number = -1;
     public hellPurchaseValue: number = -1;
     public get hellSellValue(): number {

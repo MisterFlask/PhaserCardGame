@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { BaseCharacter } from '../gamecharacters/BaseCharacter';
+import { IncomingIntent } from '../ui/IncomingIntent';
 import { PhysicalIntent } from '../ui/PhysicalIntent';
+import { TransientUiState } from '../ui/TransientUiState';
 
 export class IntentEmitter extends Phaser.Events.EventEmitter {
     private static instance: IntentEmitter;
@@ -29,11 +31,13 @@ export class IntentEmitter extends Phaser.Events.EventEmitter {
         this.emit(IntentEmitter.EVENT_INTENT_HOVER_END, intent);
     }
 
-    public emitIncomingIntentHover(owner: BaseCharacter): void {
+    public emitIncomingIntentHover(incomingPhysicalIntent: IncomingIntent, owner: BaseCharacter): void {
+        TransientUiState.getInstance().setHoveredIncomingIntent(incomingPhysicalIntent);
         this.emit(IntentEmitter.EVENT_INCOMING_INTENT_HOVER, owner);
     }
 
-    public emitIncomingIntentHoverEnd(owner: BaseCharacter): void {
+    public emitIncomingIntentHoverEnd(incomingPhysicalIntent: IncomingIntent, owner: BaseCharacter): void {
+        TransientUiState.getInstance().setHoveredIncomingIntent(null);
         this.emit(IntentEmitter.EVENT_INCOMING_INTENT_HOVER_END, owner);
     }
 }

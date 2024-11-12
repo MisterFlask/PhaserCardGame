@@ -152,6 +152,7 @@ class CombatInputHandler {
         const draggedCard = this.transientUiState.draggedCard;
         if (!draggedCard) {
             console.log('error: no card being dragged');
+            this.resetDragState()
             return;
         }
 

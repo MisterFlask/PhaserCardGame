@@ -1,3 +1,4 @@
+import { IncomingIntent } from "./IncomingIntent";
 import type { PhysicalCard } from "./PhysicalCard";
 import type { PhysicalIntent } from "./PhysicalIntent";
 
@@ -8,6 +9,7 @@ export class TransientUiState {
     public draggedCard: PhysicalCard | undefined = undefined;
     public hoveredCard: PhysicalCard | undefined = undefined;
     public hoveredIntent: PhysicalIntent | undefined = undefined;
+    public hoveredIncomingIntent: IncomingIntent | undefined = undefined;
 
     private constructor() {}
 
@@ -19,7 +21,10 @@ export class TransientUiState {
     }
 
     public setDraggedCard(card: PhysicalCard | undefined | null): void {
-        this.draggedCard = card ?? undefined;
+        // only applies to playable card instances
+        if (card?.data?.isPlayableCard()) {
+            this.draggedCard = card ?? undefined;
+        }
     }
 
     public setHoveredCard(card: PhysicalCard | undefined | null): void {
@@ -28,5 +33,18 @@ export class TransientUiState {
 
     public setHoveredIntent(intent: PhysicalIntent | undefined | null): void {
         this.hoveredIntent = intent ?? undefined;
+    }
+
+    public setHoveredIncomingIntent(incomingIntent: IncomingIntent   | undefined | null): void {
+        this.hoveredIncomingIntent = incomingIntent ?? undefined;
+    }
+
+    public getDebugDisplayString(): string {
+        return `
+Dragged Card: ${this.draggedCard ? this.draggedCard.data.name : 'None'}
+Hovered Card: ${this.hoveredCard ? this.hoveredCard.data.name : 'None'}
+Hovered Intent: ${this.hoveredIntent ? this.hoveredIntent.intent.id : 'None'}
+Hovered Incoming Intent: ${this.hoveredIncomingIntent ? this.hoveredIncomingIntent.intent.id : 'None'}
+        `.trim();
     }
 } 

@@ -333,7 +333,6 @@ export class MapOverlay {
         nextLocations?.forEach(loc => {
             const nextLocationCard = this.locationCards.find(card => (card.data as LocationCard).id === loc.id);
             if (nextLocationCard) {
-                nextLocationCard.glowColor = 0xffff00;
                 nextLocationCard.isHighlighted = true;
             }
         });

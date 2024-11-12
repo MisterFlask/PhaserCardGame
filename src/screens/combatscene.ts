@@ -5,8 +5,10 @@ import { EncounterData } from '../encounters/Encounters';
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
 import { GameState } from '../rules/GameState';
 import { TextBoxButton } from '../ui/Button';
+import { CombatHighlightsManager } from '../ui/CombatHighlightsManager';
 import InventoryPanel from '../ui/InventoryPanel';
 import CombatSceneLayoutUtils from '../ui/LayoutUtils';
+import { TransientUiState } from '../ui/TransientUiState';
 import { UIContext, UIContextManager } from '../ui/UIContextManager';
 import { ActionManager } from '../utils/ActionManager';
 import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
@@ -23,7 +25,6 @@ import { DetailsScreenManager } from './subcomponents/DetailsScreenManager';
 import { MapOverlay } from './subcomponents/MapOverlay';
 import PerformanceMonitor from './subcomponents/PerformanceMonitor';
 import { ShopOverlay } from './subcomponents/ShopOverlay';
-import { TransientUiState } from '../ui/TransientUiState';
 
 /**
  * Interface for initializing CombatScene with necessmorniary data.
@@ -208,6 +209,12 @@ class CombatScene extends Phaser.Scene {
         // Update DetailsScreenManager
         const hoveredCard = TransientUiState.getInstance().hoveredCard;
         this.detailsScreenManager.update(hoveredCard);
+
+        // Get all characters (both allies and enemies)
+        const allCharacters = [...GameState.getInstance().combatState.playerCharacters, ...     GameState.getInstance().combatState.enemies];
+        
+        // Update highlights
+        CombatHighlightsManager.getInstance().update(allCharacters);
     }
 
     /**
