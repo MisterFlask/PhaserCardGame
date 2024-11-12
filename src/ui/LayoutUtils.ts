@@ -1,9 +1,9 @@
 // src/utils/LayoutUtils.ts
 
 import Phaser from 'phaser';
-import CombatInputHandler from '../screens/subcomponents/CombatInputHandler';
 import { PhysicalCard } from '../ui/PhysicalCard';
 import { CardGuiUtils } from '../utils/CardGuiUtils';
+import { TransientUiState } from './TransientUiState';
 
 class CombatSceneLayoutUtils {
     static getBattlefieldY(scene: Phaser.Scene): number {
@@ -31,7 +31,7 @@ class CombatSceneLayoutUtils {
 
         cardArray.forEach((card, index) => {
             // Don't move the card that is being dragged
-            if (CombatInputHandler.draggedCard !== card) {
+            if (TransientUiState.getInstance().draggedCard !== card) {
                 card.container.x = startX + index * cardSpacing;
                 card.container.y = yPosition;
                 (card.container as any).originalDepth = index;

@@ -1,8 +1,8 @@
 import Phaser from 'phaser';
-import type { AbstractCard } from '../../gamecharacters/AbstractCard';
 import { IAbstractBuff } from '../../gamecharacters/IAbstractBuff';
-import { GameState } from '../../rules/GameState';
 import { DepthManager } from '../../ui/DepthManager';
+import { PhysicalCard } from '../../ui/PhysicalCard';
+import { TransientUiState } from '../../ui/TransientUiState';
 
 export class DetailsScreenManager {
     private scene: Phaser.Scene;
@@ -24,7 +24,7 @@ export class DetailsScreenManager {
 
     private showDetails(): void {
         this.isVisible = true;
-        console.log('Details screen is now visible; hovered card:', GameState.getInstance().combatState.cardHoveredOver_transient);
+        console.log('Details screen is now visible; hovered card:', TransientUiState.getInstance().hoveredCard);
         this.detailsContainer.setVisible(true);
     }
 
@@ -34,7 +34,7 @@ export class DetailsScreenManager {
         this.detailsContainer.setVisible(false);
     }
 
-    public update(hoveredCard?: AbstractCard): void {
+    public update(hoveredCard?: PhysicalCard): void {
         if (!this.isVisible) {
             return;
         }
@@ -54,11 +54,11 @@ export class DetailsScreenManager {
         this.detailsContainer.add(background);
 
         // Add card name
-        const nameText = this.scene.add.text(10, 10, card.name, { fontSize: '24px', color: '#ffffff' });
+        const nameText = this.scene.add.text(10, 10, card.data.name, { fontSize: '24px', color: '#ffffff' });
         this.detailsContainer.add(nameText);
 
         // Add card description
-        const descriptionText = this.scene.add.text(10, 50, card.description, {
+        const descriptionText = this.scene.add.text(10, 50, card.data.description, {
             fontSize: '18px',
             color: '#ffffff',
             wordWrap: { width: width * 0.28 }
@@ -67,7 +67,7 @@ export class DetailsScreenManager {
 
         // Add buffs
         let buffY = descriptionText.y + descriptionText.height + 20;
-        hoveredCard.buffs.forEach((buff: IAbstractBuff, index: number) => {
+        hoveredCard.data.buffs.forEach((buff: IAbstractBuff, index: number) => {
             
             // Add buff icon
             const iconSize = 32; // Adjust this value to scale the icon as needed

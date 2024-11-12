@@ -4,6 +4,7 @@ import { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { JsonRepresentable } from "../interfaces/JsonRepresentable";
 import { IntentEmitter } from "../utils/IntentEmitter";
 import { TextBox } from './TextBox';
+import { TransientUiState } from './TransientUiState';
 
 export class PhysicalIntent implements JsonRepresentable {
     static readonly WIDTH: number = 40;
@@ -14,6 +15,7 @@ export class PhysicalIntent implements JsonRepresentable {
     private container: Phaser.GameObjects.Container;
     private image: Phaser.GameObjects.Image;
     private textBox: TextBox;
+    private transientUiState = TransientUiState.getInstance();
 
     constructor(scene: Scene, intent: AbstractIntent, x: number, y: number) {
         this.scene = scene;
@@ -47,11 +49,15 @@ export class PhysicalIntent implements JsonRepresentable {
 
     private onPointerOver(): void {
         console.log(`Pointer over intent: ${this.intent.displayText}`);
+        this.transientUiState.setHoveredIntent(this);
         IntentEmitter.getInstance().emitIntentHover(this);
     }
 
     private onPointerOut(): void {
         console.log(`Pointer out intent: ${this.intent.displayText}`);
+        if (this.transientUiState.hoveredIntent === this) {
+            this.transientUiState.setHoveredIntent(undefined);
+        }
         IntentEmitter.getInstance().emitIntentHoverEnd(this);
     }
 

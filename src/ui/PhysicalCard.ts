@@ -3,13 +3,13 @@ import Phaser from 'phaser';
 import { AutomatedCharacterType, BaseCharacterType, PlayableCardType } from '../Types';
 import { AbstractCard, IPhysicalCardInterface, PriceContext } from '../gamecharacters/AbstractCard';
 import { AbstractIntent } from '../gamecharacters/AbstractIntent';
-import { GameState } from '../rules/GameState';
 import type { CardConfig } from '../utils/CardGuiUtils';
 import { CheapGlowEffect } from './CheapGlowEffect';
 import { IncomingIntent } from "./IncomingIntent"; // Import the new class
 import { PhysicalBuff } from './PhysicalBuff';
 import { PhysicalIntent } from "./PhysicalIntent";
 import { TextBox } from "./TextBox"; // Ensure correct relative path
+import { TransientUiState } from './TransientUiState'; // Added import
 import { UIContext } from './UIContextManager';
 
 export class PhysicalCard implements IPhysicalCardInterface {
@@ -47,7 +47,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
     private cardBorder: Phaser.GameObjects.Rectangle;
     private incomingIntentsContainer: Phaser.GameObjects.Container;
     private incomingIntents: Map<string, IncomingIntent> = new Map();
-    private glowEffect?: CheapGlowEffect;
+    public glowEffect?: CheapGlowEffect;
     glowColor: number = 0xffff00; //yellow
     private costBox: TextBox | null = null; // Add costBox property
     private priceBox!: TextBox; // Add this property
@@ -55,6 +55,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
     // This should be false in production; used for debugging depth-related issues in cards
     depthDebug: boolean = false;
     priceContext: PriceContext = PriceContext.NONE;
+    private transientUiState = TransientUiState.getInstance(); // Added
+
     constructor({
         scene,
         container,
@@ -344,7 +346,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
             this.container.parentContainer.bringToTop(this.container);
         }
 
-        GameState.getInstance().combatState.cardHoveredOver_transient = this.data as AbstractCard;
+        TransientUiState.getInstance().setHoveredCard(this);
 
         if (this.obliterated) return;
         console.log(`Pointer over card: ${this.data.name}`);
@@ -403,6 +405,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
                 yoyo: true
             });
         }
+
+        TransientUiState.getInstance().setHoveredCard(this); // Updated
     }
 
     onPointerOut_PhysicalCard = (): void => {
@@ -433,6 +437,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
             this.wiggleTween = null;
             this.cardContent.setAngle(0);
         }
+
+        this.transientUiState.setHoveredCard(null); // Updated
     }
 
     onPointerDown_PhysicalCard = (): void => {

@@ -169,8 +169,7 @@ export class GameState {
 
 export class CombatState{
 
-    cardHoveredOver_transient?: AbstractCard
-
+    // Removed direct property, now using TransientUiState
     currentDrawPile: PlayableCard[] = []
     currentDiscardPile: PlayableCard[] = []
     currentHand: PlayableCard[] = []

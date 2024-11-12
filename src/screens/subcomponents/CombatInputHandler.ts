@@ -11,6 +11,7 @@ import { DepthManager } from '../../ui/DepthManager';
 import CombatSceneLayoutUtils from '../../ui/LayoutUtils';
 import { PhysicalCard } from '../../ui/PhysicalCard';
 import { PhysicalIntent } from '../../ui/PhysicalIntent';
+import { TransientUiState } from '../../ui/TransientUiState';
 import { UIContext, UIContextManager } from '../../ui/UIContextManager';
 import { ActionManager } from '../../utils/ActionManager';
 import { IntentEmitter } from '../../utils/IntentEmitter';
@@ -19,11 +20,10 @@ import CombatCardManager from './CombatCardManager';
 class CombatInputHandler {
     private scene: Phaser.Scene;
     private cardManager: CombatCardManager;
-    public static draggedCard: PhysicalCard | null = null;
     private originalCardPosition: { x: number; y: number } | null = null;
-    private highlightedCard: PhysicalCard | null = null;
     private cardClickListeners: ((card: AbstractCard) => void)[] = [];
     private isInteractionEnabled: boolean = true;
+    private transientUiState = TransientUiState.getInstance();
 
     constructor(scene: Phaser.Scene, cardManager: CombatCardManager) {
         this.scene = scene;
@@ -116,26 +116,27 @@ class CombatInputHandler {
     private handleDragStart = (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject): void => {
         if (!UIContextManager.getInstance().isContext(UIContext.COMBAT)) return;
         if ('physicalCard' in gameObject) {
-            CombatInputHandler.draggedCard = (gameObject as any).physicalCard as PhysicalCard;
-            if (CombatInputHandler.draggedCard) {
+            const draggedCard = (gameObject as any).physicalCard as PhysicalCard;
+            if (draggedCard) {
                 this.originalCardPosition = { 
-                    x: CombatInputHandler.draggedCard.container.x, 
-                    y: CombatInputHandler.draggedCard.container.y 
+                    x: draggedCard.container.x, 
+                    y: draggedCard.container.y 
                 };
-                CombatInputHandler.draggedCard.container.setDepth(DepthManager.getInstance().CARD_DRAGGING);
+                draggedCard.container.setDepth(DepthManager.getInstance().CARD_DRAGGING);
+                this.transientUiState.setDraggedCard(draggedCard);
             }
         } else {
             console.warn('Dragged object is not a PhysicalCard');
-            CombatInputHandler.draggedCard = null;
+            this.transientUiState.setDraggedCard(null);
             this.originalCardPosition = null;
         }
     }
 
     private handleDrag(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject, dragX: number, dragY: number): void {
         if (!UIContextManager.getInstance().isContext(UIContext.COMBAT)) return;
-        if (CombatInputHandler.draggedCard) {
-            CombatInputHandler.draggedCard.container.x = dragX;
-            CombatInputHandler.draggedCard.container.y = dragY;
+        if (this.transientUiState.draggedCard) {
+            this.transientUiState.draggedCard.container.x = dragX;
+            this.transientUiState.draggedCard.container.y = dragY;
 
             this.checkCardUnderPointer(pointer);
         }
@@ -148,29 +149,30 @@ class CombatInputHandler {
 
         console.log('handleDragEnd triggered on CombatInputHandler');
 
-        if (!CombatInputHandler.draggedCard) {
+        const draggedCard = this.transientUiState.draggedCard;
+        if (!draggedCard) {
             console.log('error: no card being dragged');
             return;
         }
 
-        const isPlayable = CombatInputHandler.draggedCard!.data instanceof PlayableCard;
+        const isPlayable = draggedCard.data instanceof PlayableCard;
 
         let wasPlayed = false;
 
         if (isPlayable) {
-            const playableCard = CombatInputHandler.draggedCard!.data as PlayableCard;
+            const playableCard = draggedCard.data as PlayableCard;
             const targetingType = this.getTargetingType(playableCard);
 
             if (targetingType === TargetingType.NO_TARGETING) {
                 const droppedOnBattlefield = CombatSceneLayoutUtils.isDroppedOnBattlefield(this.scene, pointer);
                 if (droppedOnBattlefield) {
                     wasPlayed = true;
-                    this.playCardOnBattlefield(CombatInputHandler.draggedCard);
+                    this.playCardOnBattlefield(draggedCard);
                 }
             } else {
-                if (this.highlightedCard && this.isValidTarget(playableCard, this.highlightedCard.data)) {
+                if (this.transientUiState.hoveredCard && this.isValidTarget(playableCard, this.transientUiState.hoveredCard.data)) {
                     wasPlayed = true;
-                    this.playCardOnTarget(playableCard, this.highlightedCard.data as BaseCharacter);
+                    this.playCardOnTarget(playableCard, this.transientUiState.hoveredCard.data as BaseCharacter);
                 }
             }
         }
@@ -178,8 +180,8 @@ class CombatInputHandler {
         if (!wasPlayed) {
             this.animateCardBack();
         } else {
-            this.removeCardFromHand(CombatInputHandler.draggedCard || undefined);
-            this.addCardToDiscardPile(CombatInputHandler.draggedCard!);
+            this.removeCardFromHand(draggedCard || undefined);
+            this.addCardToDiscardPile(draggedCard!);
         }
 
         this.resetDragState();
@@ -190,7 +192,7 @@ class CombatInputHandler {
         if (gameObject instanceof Phaser.GameObjects.Container && (gameObject as any).physicalCard instanceof PhysicalCard) {
             const physicalCard = (gameObject as any).physicalCard as PhysicalCard;
             physicalCard.container.setDepth(DepthManager.getInstance().CARD_HOVER);
-            this.highlightedCard = physicalCard;
+            this.transientUiState.setHoveredCard(physicalCard);
         }
     }
 
@@ -199,8 +201,8 @@ class CombatInputHandler {
         if (gameObject instanceof Phaser.GameObjects.Container && (gameObject as any).physicalCard instanceof PhysicalCard) {
             const physicalCard = (gameObject as any).physicalCard as PhysicalCard;
             physicalCard.container.setDepth(DepthManager.getInstance().CARD_BASE);
-            if (this.highlightedCard === physicalCard) {
-                this.highlightedCard = null;
+            if (this.transientUiState.hoveredCard === physicalCard) {
+                this.transientUiState.setHoveredCard(null);
             }
         }
     }
@@ -269,9 +271,9 @@ class CombatInputHandler {
     }
 
     private animateCardBack(): void {
-        if (CombatInputHandler.draggedCard && this.originalCardPosition) {
+        if (this.transientUiState.draggedCard && this.originalCardPosition) {
             this.scene.tweens.add({
-                targets: CombatInputHandler.draggedCard.container,
+                targets: this.transientUiState.draggedCard.container,
                 x: this.originalCardPosition.x,
                 y: this.originalCardPosition.y,
                 scaleX: 1,
@@ -286,25 +288,25 @@ class CombatInputHandler {
     }
 
     private resetDragState(): void {
-        CombatInputHandler.draggedCard = null;
-        this.originalCardPosition = null;
-        this.highlightedCard = null;
+        this.transientUiState.setDraggedCard(null);
+        this.transientUiState.setHoveredCard(null);
+        this.transientUiState.setHoveredIntent(null);
     }
 
     private checkCardUnderPointer(pointer: Phaser.Input.Pointer): void {
         const cardUnderPointer = this.getCardUnderPointer(pointer);
 
-        if (cardUnderPointer && cardUnderPointer !== CombatInputHandler.draggedCard) {
-            if (this.highlightedCard !== cardUnderPointer) {
-                if (this.highlightedCard) {
-                    this.unhighlightCard(this.highlightedCard);
+        if (cardUnderPointer && cardUnderPointer !== this.transientUiState.draggedCard) {
+            if (this.transientUiState.hoveredCard !== cardUnderPointer) {
+                if (this.transientUiState.hoveredCard) {
+                    this.unhighlightCard(this.transientUiState.hoveredCard);
                 }
-                this.highlightedCard = cardUnderPointer;
+                this.transientUiState.setHoveredCard(cardUnderPointer);
                 this.highlightCard(cardUnderPointer);
             }
-        } else if (this.highlightedCard) {
-            this.unhighlightCard(this.highlightedCard);
-            this.highlightedCard = null;
+        } else if (this.transientUiState.hoveredCard) {
+            this.unhighlightCard(this.transientUiState.hoveredCard);
+            this.transientUiState.setHoveredCard(null);
         }
     }
 
@@ -312,7 +314,7 @@ class CombatInputHandler {
         const allCards = [...this.cardManager.playerHand, ...this.cardManager.enemyUnits, ...this.cardManager.playerUnits];
         for (let i = allCards.length - 1; i >= 0; i--) {
             const card = allCards[i];
-            if (card !== CombatInputHandler.draggedCard && card.cardBackground.getBounds().contains(pointer.x, pointer.y)) {
+            if (card !== this.transientUiState.draggedCard && card.cardBackground.getBounds().contains(pointer.x, pointer.y)) {
                 return card;
             }
         }
@@ -375,7 +377,7 @@ class CombatInputHandler {
         this.isInteractionEnabled = enable;
         if (!enable) {
             // Reset any ongoing interactions
-            if (CombatInputHandler.draggedCard) {
+            if (this.transientUiState.draggedCard) {
                 this.handleDragEnd(null as any, null as any);
             }
         }

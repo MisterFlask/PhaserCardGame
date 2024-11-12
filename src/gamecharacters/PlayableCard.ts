@@ -8,6 +8,7 @@ import { VentureResource } from "../rules/combatresources/VentureResource";
 import { CombatRules, DamageCalculationResult } from "../rules/CombatRules";
 import { CombatResources, CombatState, GameState } from "../rules/GameState";
 import { BaseCharacterType } from "../Types";
+import { TransientUiState } from "../ui/TransientUiState";
 import type { ActionManager } from "../utils/ActionManager";
 import { ActionManagerFetcher } from "../utils/ActionManagerFetcher";
 import { AbstractCard, TargetingType, Team } from "./AbstractCard";
@@ -111,12 +112,12 @@ export abstract class PlayableCard extends AbstractCard {
      * DO NOT OVERRIDE.
      */
     get hoveredCharacter(): IBaseCharacter | undefined {
-        var card = GameState.getInstance().combatState.cardHoveredOver_transient;
+        var card = TransientUiState.getInstance().hoveredCard
         if (!card) {
             return undefined;
         }
-        if (card.isBaseCharacter()){
-            return card as BaseCharacterType;            
+        if (card.data.isBaseCharacter()){
+            return card.data as BaseCharacterType;            
         }
         return undefined;
     }

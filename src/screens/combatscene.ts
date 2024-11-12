@@ -23,6 +23,7 @@ import { DetailsScreenManager } from './subcomponents/DetailsScreenManager';
 import { MapOverlay } from './subcomponents/MapOverlay';
 import PerformanceMonitor from './subcomponents/PerformanceMonitor';
 import { ShopOverlay } from './subcomponents/ShopOverlay';
+import { TransientUiState } from '../ui/TransientUiState';
 
 /**
  * Interface for initializing CombatScene with necessmorniary data.
@@ -205,7 +206,7 @@ class CombatScene extends Phaser.Scene {
         }
 
         // Update DetailsScreenManager
-        const hoveredCard = GameState.getInstance().combatState.cardHoveredOver_transient;
+        const hoveredCard = TransientUiState.getInstance().hoveredCard;
         this.detailsScreenManager.update(hoveredCard);
     }
 
