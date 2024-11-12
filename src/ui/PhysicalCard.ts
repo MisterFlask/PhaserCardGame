@@ -5,6 +5,7 @@ import { AbstractCard, IPhysicalCardInterface, PriceContext } from '../gamechara
 import { AbstractIntent } from '../gamecharacters/AbstractIntent';
 import { GameState } from '../rules/GameState';
 import type { CardConfig } from '../utils/CardGuiUtils';
+import { CheapGlowEffect } from './CheapGlowEffect';
 import { IncomingIntent } from "./IncomingIntent"; // Import the new class
 import { PhysicalBuff } from './PhysicalBuff';
 import { PhysicalIntent } from "./PhysicalIntent";
@@ -45,7 +46,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
     private cardBorder: Phaser.GameObjects.Rectangle;
     private incomingIntentsContainer: Phaser.GameObjects.Container;
     private incomingIntents: Map<string, IncomingIntent> = new Map();
-    glowEffect?: Phaser.FX.Glow;
+    private glowEffect?: CheapGlowEffect;
     glowColor: number = 0xffff00; //yellow
     private costBox: TextBox | null = null; // Add costBox property
     private priceBox!: TextBox; // Add this property
@@ -242,6 +243,15 @@ export class PhysicalCard implements IPhysicalCardInterface {
         }
         this.scene.events.once('shutdown', this.obliterate, this);
         this.scene.events.once('destroy', this.obliterate, this);
+
+        // Create glow effect (initially invisible)
+        this.glowEffect = new CheapGlowEffect(scene);
+        const scaledWidth = this.cardBackground.displayWidth * 1.5;
+        const scaledHeight = this.cardBackground.displayHeight * 1.5;
+        this.glowEffect.setDisplaySize(scaledWidth, scaledHeight);
+        
+        // Add glow effect first so it appears behind the card
+        this.cardContent.addAt(this.glowEffect, 0);
     }
     setInteractive(isInteractive: boolean): void {
         this.container.setInteractive(isInteractive);
@@ -302,6 +312,11 @@ export class PhysicalCard implements IPhysicalCardInterface {
             this.intentsContainer.destroy();
         }
 
+        if (this.glowEffect) {
+            this.glowEffect.destroy();
+            this.glowEffect = undefined;
+        }
+
         this.obliterated = true;
     }
 
@@ -338,7 +353,9 @@ export class PhysicalCard implements IPhysicalCardInterface {
             targets: this.cardContent,
             scale: this.data.size.sizeModifier * 1.1,
             duration: 200,
-            ease: 'Power2'
+            ease: 'Power2',
+            onUpdate: () => {
+            }
         });
 
         this.descBox.setVisible(true);
@@ -400,7 +417,9 @@ export class PhysicalCard implements IPhysicalCardInterface {
             targets: this.cardContent,
             scale: this.data.size.sizeModifier,
             duration: 200,
-            ease: 'Power2'
+            ease: 'Power2',
+            onUpdate: () => {
+            }
         });
 
         this.descBox.setVisible(false);
@@ -602,6 +621,14 @@ export class PhysicalCard implements IPhysicalCardInterface {
             this.priceBox.setVisible(true);
         }else{
             this.priceBox.setVisible(false);
+        }
+
+        // Update glow effect size if it exists and is visible
+        if (this.glowEffect?.visible) {
+            const currentScale = this.cardContent.scale;
+            const scaledWidth = this.cardBackground.displayWidth * 1.5 * currentScale;
+            const scaledHeight = this.cardBackground.displayHeight * 1.5 * currentScale;
+            this.glowEffect.setDisplaySize(scaledWidth, scaledHeight);
         }
     }
 
@@ -808,26 +835,18 @@ export class PhysicalCard implements IPhysicalCardInterface {
      * @param isGlowing - True to make the card glow, false to stop glowing.
      */
     public setGlow(isGlowing: boolean): void {
-        if (isGlowing && !this.glowEffect) {
-            // Create a more intense glow effect
-            this.glowEffect = this.cardContent.postFX.addGlow(this.glowColor, 4, 0, false, 0.8, 4);
+        if (!this.glowEffect) return;
+
+        if (isGlowing) {
+            this.glowEffect.turnOn();
             
-            // Add a pulsating animation to make it more noticeable
-            this.scene.tweens.add({
-                targets: this.glowEffect,
-                outerStrength: 8,
-                yoyo: true,
-                repeat: -1,
-                duration: 1000,
-                ease: 'Sine.easeInOut'
-            });
-        } else if (this.glowEffect) {
-            // Stop the pulsating animation
-            this.scene.tweens.killTweensOf(this.glowEffect);
-            
-            // Remove the glow effect
-            this.cardContent.postFX.remove(this.glowEffect);
-            this.glowEffect = undefined;
+            // Update glow size when card scales
+            const currentScale = this.cardContent.scale;
+            const scaledWidth = this.cardBackground.displayWidth * 1.5 * currentScale;
+            const scaledHeight = this.cardBackground.displayHeight * 1.5 * currentScale;
+            this.glowEffect.setDisplaySize(scaledWidth, scaledHeight);
+        } else {
+            this.glowEffect.turnOff();
         }
     }
     /**
