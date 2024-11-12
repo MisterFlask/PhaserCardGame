@@ -149,7 +149,7 @@ export class TextBox extends Phaser.GameObjects.Container {
     }
 
     setText(text: string): void {
-        if (this.text.scene === null) {
+        if (this.text.scene?.sys === null) {
             return;
         }
         if (this.background == null && this.backgroundImage == null){
