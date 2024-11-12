@@ -35,7 +35,15 @@ export class CombatCardManager {
                 x: 0,
                 y: CombatSceneLayoutUtils.getHandY(this.scene),
                 data: cardData as AbstractCard,
-                onCardCreatedEventCallback: () => { }
+                onCardCreatedEventCallback: (card: PhysicalCard) => {
+                    // Make player hand cards interactive and draggable
+                    card.container.setInteractive({
+                        hitArea: card.cardBackground,
+                        hitAreaCallback: Phaser.Geom.Rectangle.Contains,
+                        useHandCursor: true
+                    });
+                    this.scene.input.setDraggable(card.container);
+                }
             });
             this.playerHand.push(card);
         });
@@ -86,10 +94,19 @@ export class CombatCardManager {
         enemies.forEach((enemy, index) => {
             const enemyCard = CardGuiUtils.getInstance().createCard({
                 scene: this.scene,
-                x: 400 + index * (cardWidth * 2), // Ensure separation of one card's width
+                x: 400 + index * (cardWidth * 2),
                 y: CombatSceneLayoutUtils.getBattlefieldY(this.scene),
                 data: enemy,
-                onCardCreatedEventCallback: () => { }
+                onCardCreatedEventCallback: (card: PhysicalCard) => {
+                    // Make enemy cards interactive if needed
+                    card.container.setInteractive({
+                        hitArea: card.cardBackground,
+                        hitAreaCallback: Phaser.Geom.Rectangle.Contains,
+                        useHandCursor: true
+                    });
+                    // If enemy cards should be draggable
+                    this.scene.input.setDraggable(card.container);
+                }
             });
             if (enemy instanceof AutomatedCharacter) {
                 enemy.setNewIntents();
@@ -156,8 +173,17 @@ export class CombatCardManager {
             x: this.drawPile.container.x,
             y: this.drawPile.container.y,
             data: data as AbstractCard,
-            onCardCreatedEventCallback: () => { }
+            onCardCreatedEventCallback: (card: PhysicalCard) => {
+                // Make drawn cards interactive and draggable
+                card.container.setInteractive({
+                    hitArea: card.cardBackground,
+                    hitAreaCallback: Phaser.Geom.Rectangle.Contains,
+                    useHandCursor: true
+                });
+                this.scene.input.setDraggable(card.container);
+            }
         });
+        data.physicalCard = card;
         card.container.setScale(0.5);
         card.container.setAlpha(0);
 
@@ -190,6 +216,7 @@ export class CombatCardManager {
             duration: 500,
             ease: 'Power2',
             onComplete: () => {
+                card.data.physicalCard = undefined;
                 card.obliterate(); // Remove the card after animation
             }
         });

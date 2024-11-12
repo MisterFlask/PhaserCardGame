@@ -85,7 +85,11 @@ export class PhysicalCard implements IPhysicalCardInterface {
         this.descBox = descBox;
         this.tooltipBox = tooltipBox;
         this.data = data;
-        (this.data as any).physicalCard = this;
+        if (!this.data.physicalCard){
+            this.data.physicalCard = this;
+        }else{
+            console.warn("AbstractCard already has a physicalCard property set.");
+        }
         this.physicalBuffs = [];
         this.cardConfig = cardConfig;
         // Create a new container for card content (excluding tooltip)
@@ -246,7 +250,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
     obliterate(): void {
         // Remove event listener
         this.scene.events.off('update', this.updateVisuals, this);
-
+        this.data.physicalCard = undefined;
+        
         // Stop and remove the wiggle tween if it exists
         if (this.wiggleTween) {
             this.wiggleTween.stop();

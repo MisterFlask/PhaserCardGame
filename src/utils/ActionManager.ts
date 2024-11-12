@@ -279,6 +279,11 @@ export class ActionManager {
 
     private animateDiscardCard(card: IPhysicalCardInterface): Promise<void> {
         return new Promise<void>((resolve) => {
+            if (!card?.data){
+                console.info("No physical card found for " + card);
+                resolve();
+                return;
+            }
             // Implement discard animation logic here
             console.log(`Animating discard for card: ${card.data.name}`);
             // Example animation delay
