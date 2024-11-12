@@ -13,6 +13,7 @@ import { TextBox } from "./TextBox"; // Ensure correct relative path
 import { UIContext } from './UIContextManager';
 
 export class PhysicalCard implements IPhysicalCardInterface {
+    private static readonly GLOW_SCALE_MULTIPLIER = 1.7;
     contextRelevant?: UIContext;
 
     cardConfig: CardConfig;
@@ -246,8 +247,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
         // Create glow effect (initially invisible)
         this.glowEffect = new CheapGlowEffect(scene);
-        const scaledWidth = this.cardBackground.displayWidth * 1.5;
-        const scaledHeight = this.cardBackground.displayHeight * 1.5;
+        const scaledWidth = this.cardBackground.displayWidth * PhysicalCard.GLOW_SCALE_MULTIPLIER;
+        const scaledHeight = this.cardBackground.displayHeight * PhysicalCard.GLOW_SCALE_MULTIPLIER;
         this.glowEffect.setDisplaySize(scaledWidth, scaledHeight);
         
         // Add glow effect first so it appears behind the card
@@ -590,7 +591,6 @@ export class PhysicalCard implements IPhysicalCardInterface {
         this.blockText.setText(`${this.data.block}`);
 
         this.updateIntents();
-        this.updateHighlightVisual();
 
         if (!this.buffsContainer.scene?.sys) {
             console.warn('Scene is undefined in updateVisuals (FOR THE CARD BUFF SPECIFICALLY): ' + this.data.name);
@@ -626,16 +626,9 @@ export class PhysicalCard implements IPhysicalCardInterface {
         // Update glow effect size if it exists and is visible
         if (this.glowEffect?.visible) {
             const currentScale = this.cardContent.scale;
-            const scaledWidth = this.cardBackground.displayWidth * 1.5 * currentScale;
-            const scaledHeight = this.cardBackground.displayHeight * 1.5 * currentScale;
+            const scaledWidth = this.cardBackground.displayWidth * PhysicalCard.GLOW_SCALE_MULTIPLIER * currentScale;
+            const scaledHeight = this.cardBackground.displayHeight * PhysicalCard.GLOW_SCALE_MULTIPLIER * currentScale;
             this.glowEffect.setDisplaySize(scaledWidth, scaledHeight);
-        }
-    }
-
-    private updateHighlightVisual(): void {
-        const highlightBorder = this.container.getByName('highlightBorder') as Phaser.GameObjects.Rectangle;
-        if (highlightBorder) {
-            highlightBorder.setVisible(this._isHighlighted);
         }
     }
 
@@ -701,7 +694,6 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
     set isHighlighted(value: boolean) {
         this._isHighlighted = value;
-        this.updateHighlightVisual();
         this.setGlow(value)
     }
 
@@ -842,8 +834,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
             
             // Update glow size when card scales
             const currentScale = this.cardContent.scale;
-            const scaledWidth = this.cardBackground.displayWidth * 1.5 * currentScale;
-            const scaledHeight = this.cardBackground.displayHeight * 1.5 * currentScale;
+            const scaledWidth = this.cardBackground.displayWidth * PhysicalCard.GLOW_SCALE_MULTIPLIER * currentScale;
+            const scaledHeight = this.cardBackground.displayHeight * PhysicalCard.GLOW_SCALE_MULTIPLIER * currentScale;
             this.glowEffect.setDisplaySize(scaledWidth, scaledHeight);
         } else {
             this.glowEffect.turnOff();

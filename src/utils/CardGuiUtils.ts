@@ -88,17 +88,10 @@ export class CardGuiUtils {
             }
         });
 
-        // Create hidden highlight border
-        const highlightBorder = scene.add.rectangle(0, 0, cardWidth + 10, cardHeight + 10, 0xffff00)
-            .setStrokeStyle(4, 0xffff00)
-            .setFillStyle(0x000000, 0)
-            .setVisible(false)
-            .setName('highlightBorder');
-
         descBox.setVisible(false);
         tooltipBox.setVisible(false);
         
-        cardContainer.add([cardBackground, cardImage, nameBox, tooltipBox, descBox, highlightBorder]);
+        cardContainer.add([cardBackground, cardImage, nameBox, tooltipBox, descBox, ]);
         cardContainer.setSize(cardWidth, cardHeight);
         cardContainer.setInteractive(new Phaser.Geom.Rectangle(0, 0, cardWidth, cardHeight), Phaser.Geom.Rectangle.Contains);
 

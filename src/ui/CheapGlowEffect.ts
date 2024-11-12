@@ -65,6 +65,8 @@ export class CheapGlowEffect extends Phaser.GameObjects.Image {
         this.stopPulsing();
         super.destroy();
     }
+
+    
 }
 
 
