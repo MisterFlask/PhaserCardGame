@@ -11,7 +11,7 @@ export class AbstractTradeRoute extends AbstractCard {
     }: { 
         name: string; 
         description: string; 
-        portraitName: string;
+        portraitName?: string;
     }) {
         super({ 
             name,
@@ -28,7 +28,6 @@ export class StandardTradeRoute extends AbstractTradeRoute {
         super({
             name: "Silk Road Connection",
             description: "A lucrative trade route connecting distant markets",
-            portraitName: "placeholder",
         });
         this.buffs = [new EnemyUpgradeTradeRouteModifier()];
     }

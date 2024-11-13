@@ -57,7 +57,8 @@ export class ShopRelicPanel extends Phaser.GameObjects.Container {
             x: 0,
             y: 0,
             abstractRelic: this.relic,
-            price: this.relic.price
+            price: this.relic.price,
+            baseSize: 64
         });
 
         this.physicalRelic

@@ -134,7 +134,7 @@ export abstract class AbstractCard implements IAbstractCard {
     public energyCost: number = 0;
     protected _name: string;
     protected _description: string;
-    public portraitName: string
+    public portraitName?: string
     cardType: CardType
     public tooltip: string
     owner?: PlayerCharacter
@@ -204,7 +204,7 @@ export abstract class AbstractCard implements IAbstractCard {
         this._name = name
         this.id = generateWordGuid(name)
         this._description = description
-        this.portraitName = portraitName || "placeholder"
+        this.portraitName = portraitName
         this.cardType = cardType || CardType.SKILL
         this.tooltip = tooltip || "Lorem ipsum dolor sit amet"
         this.owner = characterData as unknown as PlayerCharacter || undefined
@@ -281,14 +281,14 @@ export abstract class AbstractCard implements IAbstractCard {
     }
 
     public getEffectivePortraitName(scene: Scene): string {
-        if (scene.textures.exists(this.portraitName)) {
+        if (this.portraitName && scene.textures.exists(this.portraitName)) {
             return this.portraitName;
         }
         return ImageUtils.getDeterministicAbstractPlaceholder(this.constructor.name);
     }
 
     public getEffectivePortraitTint(scene: Scene): number {
-        if (scene.textures.exists(this.portraitName)) {
+        if (this.portraitName && scene.textures.exists(this.portraitName)) {
             return this.portraitTint ?? 0xFFFFFF;
         }
         

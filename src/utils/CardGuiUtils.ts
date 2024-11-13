@@ -42,9 +42,8 @@ export class CardGuiUtils {
         const { cardWidth, cardHeight } = this.cardConfig;
         const cardBackground = scene.add.image(0, 0, data.getCardBackgroundImageName())
             .setDisplaySize(cardWidth, cardHeight);
-        let cardTexture = data.portraitName;
         
-        const cardImage = scene.add.image(0, -cardHeight / 4, cardTexture)
+        const cardImage = scene.add.image(0, -cardHeight / 4, data.getEffectivePortraitName(scene))
             .setDisplaySize(cardWidth / 2, cardHeight / 2);
         const nameBox = new TextBox({
             scene: scene,

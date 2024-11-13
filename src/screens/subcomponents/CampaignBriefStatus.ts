@@ -9,7 +9,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
     private readonly CURRENCY_WIDTH = 180;
     private readonly RELIC_GRID_WIDTH = 900; // 5x currency width
     private readonly RELIC_GRID_HEIGHT = 60; // 2x currency height
-    private readonly RELIC_SIZE = 43; 
+    private readonly RELIC_SIZE = 44; 
     private readonly RELIC_PADDING = 6;
 
     constructor(scene: Phaser.Scene) {
@@ -76,6 +76,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
                 x,
                 y,
                 abstractRelic: relic,
+                baseSize: this.RELIC_SIZE
             });
 
             // Hide the price box since we're just displaying owned relics

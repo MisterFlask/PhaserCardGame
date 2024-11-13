@@ -21,12 +21,14 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
         y = 0,
         abstractRelic,
         price,
+        baseSize = 64
     }: {
         scene: Phaser.Scene;
         x?: number;
         y?: number;
         abstractRelic: AbstractRelic;
         price?: number;
+        baseSize: number;
     }) {
         super(scene, x, y);
 
@@ -34,7 +36,6 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
 
         this.abstractRelic = abstractRelic;
         
-        const baseSize = 64;
         this.baseSize = baseSize;
 
         const textureName = abstractRelic.portraitName ?? "placeholder";
