@@ -103,7 +103,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
         this.cardImage = new ShadowedImage({
             scene: this.scene,
             texture: this.data.getEffectivePortraitName(this.scene),
-            displaySize: this.cardConfig.cardWidth * 0.8, // Adjust size as needed
+            displaySize: this.cardConfig.cardWidth, // Adjust size as needed
             shadowOffset: 3 // Adjust shadow offset as needed
         });
         this.cardContent.add([
@@ -565,8 +565,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
         const frame = texture.get();
         const aspectRatio = frame.width / frame.height;
 
-        const availableWidth = this.cardBackground.displayWidth * 0.8;
-        const availableHeight = this.cardBackground.displayHeight * 0.5;
+        const availableWidth = this.cardBackground.displayWidth * 0.9;
+        const availableHeight = this.cardBackground.displayHeight * 0.7;
 
         let newWidth = availableWidth;
         let newHeight = availableWidth / aspectRatio;
