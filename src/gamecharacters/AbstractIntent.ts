@@ -141,7 +141,7 @@ export class AttackIntent extends AbstractIntent {
     }
 
     tooltipText(): string {
-        return 'Attacking for ' + this.displayedDamage() + ' damage';
+        return 'Attacking for ' + this.displayedDamage() + ' damage.  (base damage before modifiers was ' + this.baseDamage + ")";
     }
 
     displayText(): string {

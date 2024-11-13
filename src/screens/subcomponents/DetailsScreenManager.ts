@@ -102,6 +102,15 @@ export class DetailsScreenManager {
 
             buffY += Math.max(buffIcon.displayHeight, buffText.height) + 10;
         });
+
+        // Add card type at the bottom
+        const cardTypeText = this.scene.add.text(10, buffY + 10, `Type: ${hoveredCard.data.cardType} , Targeting:  ${hoveredCard.data.asPlayableCard()?.targetingType ?? "No targeting type found"}`, {
+            fontSize: '16px',
+            color: '#aaaaaa',
+            wordWrap: { width: width * 0.28 }
+        });
+        this.detailsContainer.add(cardTypeText);
+
     }
 
     private isUsingRandomizedImage(buff: AbstractBuff): boolean {

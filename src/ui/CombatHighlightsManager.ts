@@ -1,4 +1,4 @@
-import { AbstractCard } from "../gamecharacters/AbstractCard";
+import { AbstractCard, TargetingType } from "../gamecharacters/AbstractCard";
 import { GameState } from "../rules/GameState";
 import CombatUIManager from "../screens/subcomponents/CombatUiManager";
 import { BaseCharacterType } from "../Types";
@@ -34,11 +34,14 @@ export class CombatHighlightsManager {
 
         if (draggedCard) {
             this.handleDraggedCardHighlights(draggedCard, allCharacters);
-            CombatUIManager.getInstance().dropZoneHighlight.setAlpha(0.5)
-            if (TransientUiState.getInstance().mouseOverCardDropZone) {
-                CombatUIManager.getInstance().dropZoneHighlight.setTint(CombatHighlightsManager.HOVERED_TARGET_COLOR)
-            }else{
-                CombatUIManager.getInstance().dropZoneHighlight.setTint(CombatHighlightsManager.ELIGIBLE_TARGET_COLOR)
+
+            if (draggedCard.data.asPlayableCard().targetingType === TargetingType.NO_TARGETING) {
+                CombatUIManager.getInstance().dropZoneHighlight.setAlpha(0.5)
+                if (TransientUiState.getInstance().mouseOverCardDropZone) {
+                    CombatUIManager.getInstance().dropZoneHighlight.setTint(CombatHighlightsManager.HOVERED_TARGET_COLOR)
+                } else {
+                    CombatUIManager.getInstance().dropZoneHighlight.setTint(CombatHighlightsManager.ELIGIBLE_TARGET_COLOR)
+                }
             }
         }
 
@@ -70,7 +73,7 @@ export class CombatHighlightsManager {
         characters.forEach(character => {
             if (!character.physicalCard) return;
 
-            if (this.isEligibleTarget(draggedCard.data, character)) {
+            if (this.isEligibleTargetForPurposeOfHighlighting(draggedCard.data, character)) {
                 // If this is the hovered character and it's eligible, highlight in green
                 if (character === hoveredCharacter) {
                     character.physicalCard.glowColor = CombatHighlightsManager.HOVERED_TARGET_COLOR;
@@ -97,7 +100,9 @@ export class CombatHighlightsManager {
         );
     }
 
-    private isEligibleTarget(draggedPlayableCard: AbstractCard, character: BaseCharacterType): boolean {
-        return true;
+    private isEligibleTargetForPurposeOfHighlighting(draggedCard: AbstractCard, character: BaseCharacterType): boolean {
+        if (draggedCard.asPlayableCard().targetingType === TargetingType.NO_TARGETING) return false;
+        
+        return draggedCard.isValidTarget(character);
     }
 } 

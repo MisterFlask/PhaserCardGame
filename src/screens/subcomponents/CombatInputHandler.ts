@@ -203,16 +203,7 @@ class CombatInputHandler {
     }
 
     private isValidTarget(card: PlayableCard, target: IAbstractCard): boolean {
-        if (card.targetingType === TargetingType.NO_TARGETING) return true;
-
-        if (target instanceof BaseCharacter) {
-            if (card.targetingType === TargetingType.ENEMY) {
-                return this.isEnemy(target);
-            } else if (card.targetingType === TargetingType.ALLY) {
-                return this.isAlly(target);
-            }
-        }
-        return false;
+        return card.isValidTarget(target);
     }
 
     private isAlly(target: BaseCharacter): boolean {

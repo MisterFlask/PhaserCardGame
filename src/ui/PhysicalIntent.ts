@@ -15,6 +15,7 @@ export class PhysicalIntent implements JsonRepresentable {
     private image: Phaser.GameObjects.Image;
     private alwaysDisplayedIntentText: Phaser.GameObjects.Text;
     private transientUiState = TransientUiState.getInstance();
+    private tooltipText: Phaser.GameObjects.Text;
 
     constructor(scene: Scene, intent: AbstractIntent, x: number, y: number) {
         this.scene = scene;
@@ -31,7 +32,19 @@ export class PhysicalIntent implements JsonRepresentable {
         );
         this.alwaysDisplayedIntentText.setOrigin(0.5);
         
-        this.container.add([this.image, this.alwaysDisplayedIntentText]);
+        this.tooltipText = this.scene.add.text(0, -PhysicalIntent.HEIGHT, '', 
+            { 
+                fontSize: '16px', 
+                color: '#ffffff',
+                backgroundColor: '#000000',
+                padding: { x: 5, y: 5 },
+                wordWrap: { width: 200 }
+            }
+        );
+        this.tooltipText.setOrigin(0.5, 1);
+        this.tooltipText.setVisible(false);
+        
+        this.container.add([this.image, this.alwaysDisplayedIntentText, this.tooltipText]);
         
         // Set interactive for the container to detect pointer events
         this.container.setSize(PhysicalIntent.WIDTH, PhysicalIntent.HEIGHT)
@@ -43,40 +56,43 @@ export class PhysicalIntent implements JsonRepresentable {
     }
 
     private onPointerOver(): void {
-        console.log(`Pointer over intent: ${this.intent.displayText}`);
+        console.log(`Pointer over intent: ${this.intent.displayText()}`);
         this.transientUiState.setHoveredIntent(this);
         IntentEmitter.getInstance().emitIntentHover(this);
+        
+        // Show and update tooltip
+        this.tooltipText.setText(this.intent.tooltipText());
+        this.tooltipText.setVisible(true);
     }
 
     private onPointerOut(): void {
-        console.log(`Pointer out intent: ${this.intent.displayText}`);
+        console.log(`Pointer out intent: ${this.intent.displayText()}`);
         if (this.transientUiState.hoveredIntent === this) {
             this.transientUiState.setHoveredIntent(undefined);
         }
         IntentEmitter.getInstance().emitIntentHoverEnd(this);
-    }
-
-    private setupTooltip(): void {
-        this.container.setInteractive({ useHandCursor: true })
-            .on('pointerover', () => {
-                // Show tooltip
-                // You might want to implement a proper tooltip system
-                console.log(this.intent.tooltipText);
-            })
-            .on('pointerout', () => {
-                // Hide tooltip
-            });
+        
+        // Hide tooltip
+        this.tooltipText.setVisible(false);
     }
 
     update(): void {
         this.image.setTexture(this.intent.imageName);
         this.alwaysDisplayedIntentText.setText(this.intent.displayText());
+        // Update tooltip text if it's visible
+        if (this.tooltipText.visible) {
+            this.tooltipText.setText(this.intent.tooltipText());
+        }
     }
 
     updateIntent(newIntent: AbstractIntent): void {
         this.intent = newIntent;
         this.image.setTexture(this.intent.imageName);
         this.alwaysDisplayedIntentText.setText(this.intent.displayText());
+        // Update tooltip text if it's visible
+        if (this.tooltipText.visible) {
+            this.tooltipText.setText(this.intent.tooltipText());
+        }
     }
 
     setPosition(x: number, y: number): void {
