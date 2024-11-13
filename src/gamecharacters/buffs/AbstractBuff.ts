@@ -40,7 +40,20 @@ export abstract class AbstractBuff implements IAbstractBuff {
         playerCharacters.forEach(callback);
     }
 
-    
+    public generateSeededRandomBuffColor(): number {
+        let hash = 0;
+        for (let i = 0; i < this.getName().length; i++) {
+            const char = this.getName().charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // Convert to 32bit integer
+        }
+
+        const r = (hash & 255);
+        const g = ((hash >> 8) & 255);
+        const b = ((hash >> 16) & 255);
+
+        return (r << 16) | (g << 8) | b;
+    }
 
     public getOwnerAsPlayableCard(): PlayableCard | null {
         // Import GameState if not already imported at the top of the file

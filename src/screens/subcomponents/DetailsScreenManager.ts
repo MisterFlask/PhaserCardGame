@@ -1,8 +1,9 @@
 import Phaser from 'phaser';
-import { IAbstractBuff } from '../../gamecharacters/IAbstractBuff';
+import type { AbstractBuff } from '../../gamecharacters/buffs/AbstractBuff';
 import { DepthManager } from '../../ui/DepthManager';
 import { PhysicalCard } from '../../ui/PhysicalCard';
 import { TransientUiState } from '../../ui/TransientUiState';
+import ImageUtils from '../../utils/ImageUtils';
 
 export class DetailsScreenManager {
     private scene: Phaser.Scene;
@@ -67,17 +68,20 @@ export class DetailsScreenManager {
 
         // Add buffs
         let buffY = descriptionText.y + descriptionText.height + 20;
-        hoveredCard.data.buffs.forEach((buff: IAbstractBuff, index: number) => {
+        hoveredCard.data.buffs.forEach((buff: AbstractBuff, index: number) => {
             
             // Add buff icon
             const iconSize = 32; // Adjust this value to scale the icon as needed
-            const buffIcon = this.scene.add.image(10, buffY, buff.imageName)
+            const buffIcon = this.scene.add.image(10, buffY, this.getEffectiveImage(buff))
                 .setOrigin(0, 0)
                 .setDisplaySize(iconSize, iconSize);
+            if (this.isUsingRandomizedImage(buff)){
+                buffIcon.setTint(this.getEffectiveRandomizedColor(buff));
+            }
             this.detailsContainer.add(buffIcon);
 
             // Add buff name and description
-            const buffText = this.scene.add.text(50, buffY, `${buff.getName()}: ${buff.getDescription()}`, {
+            const buffText = this.scene.add.text(50, buffY, `${buff.getName()} [${buff.stacks}]: ${buff.getDescription()}`, {
                 fontSize: '16px',
                 color: '#ffffff',
                 wordWrap: { width: width * 0.25 }
@@ -86,5 +90,19 @@ export class DetailsScreenManager {
 
             buffY += Math.max(buffIcon.displayHeight, buffText.height) + 10;
         });
+    }
+
+    private isUsingRandomizedImage(buff: AbstractBuff): boolean {
+        return !this.scene.textures.exists(buff.imageName);
+    }
+
+    private getEffectiveImage(buff: AbstractBuff): string {
+        return this.scene.textures.exists(buff.imageName) 
+            ? buff.imageName 
+            : ImageUtils.getDeterministicAbstractPlaceholder(buff.getName());
+    }
+
+    private getEffectiveRandomizedColor(buff: AbstractBuff): number {
+        return buff.generateSeededRandomBuffColor();
     }
 }

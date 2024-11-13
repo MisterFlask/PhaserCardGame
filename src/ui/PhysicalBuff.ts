@@ -6,7 +6,7 @@ import { TextBox } from './TextBox';
 export class PhysicalBuff {
     abstractBuff: AbstractBuff;
     container: Phaser.GameObjects.Container;
-    image: Phaser.GameObjects.Image;
+    image!: Phaser.GameObjects.Image;
     stacksText: Phaser.GameObjects.Text;
     tooltipBox: TextBox;
     scene: Phaser.Scene;
@@ -16,8 +16,7 @@ export class PhysicalBuff {
         this.abstractBuff = abstractBuff;
         this.container = scene.add.container(x, y);
         // Create the image
-        const imageName = scene.textures.exists(abstractBuff.imageName) ? abstractBuff.imageName : this.useAbstractIcon(abstractBuff);
-        this.image = scene.add.image(0, 0, imageName);
+        this.setBuffImage(scene, abstractBuff);
         
         this.image.setScale(0.5); // Adjust scale as needed
 
@@ -74,7 +73,17 @@ export class PhysicalBuff {
         });
     }
 
-    private useAbstractIcon(abstractBuff: AbstractBuff) {
+    private setBuffImage(scene: Phaser.Scene, abstractBuff: AbstractBuff) {
+        if (!scene.textures.exists(abstractBuff.imageName)) {
+            const imageName = this.getAbstractIcon(abstractBuff);
+            this.image = scene.add.image(0, 0, imageName);
+            this.image.setTint(abstractBuff.generateSeededRandomBuffColor());
+        } else {
+            this.image = scene.add.image(0, 0, abstractBuff.imageName);
+        }
+    }
+
+    private getAbstractIcon(abstractBuff: AbstractBuff) {
         return ImageUtils.getDeterministicAbstractPlaceholder(abstractBuff.getName());
     }
 

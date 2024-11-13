@@ -374,7 +374,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
         const cardCenterX = this.container.x;
 
         // Set tooltip text
-        this.tooltipBox.setText(this.data.id);
+        this.tooltipBox.setText(this.data.id + "[shift for details]");
 
         // Calculate tooltip dimensions
         const padding = 20;
