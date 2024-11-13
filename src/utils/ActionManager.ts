@@ -192,48 +192,66 @@ export class ActionManager {
             return [];
         }));
     }
+    
 
-    public playCard(card: IPhysicalCardInterface, target?: BaseCharacterType) {
+    public getCanPlayCardResult(card: IPhysicalCardInterface, target?: BaseCharacterType): {canPlay: boolean, reason?: string} {
+        const playableCard = card.data as PlayableCardType;
+        const gameState = GameState.getInstance();
+        const combatState = gameState.combatState;
+
+        // Check if card can be performed on target
+        if (!playableCard.IsPerformableOn(target)) {
+            return {canPlay: false, reason: "This card cannot be played on that target"};
+        }
+
+        // Calculate missing energy
+        let missingEnergy = playableCard.energyCost - combatState.energyAvailable;
+        if (missingEnergy <= 0) {
+            return {canPlay: true};
+        }
+
+        // Check if buffs can cover the missing energy
+        for (const buff of card.data.buffs) {
+            const maxProvidedIfWePayAltCost = buff.canPayThisMuchMissingEnergy(missingEnergy);
+            if (maxProvidedIfWePayAltCost > 0) {
+                missingEnergy -= Math.min(missingEnergy, maxProvidedIfWePayAltCost);
+                if (missingEnergy <= 0) {
+                    return {canPlay: true};
+                }
+            }
+        }
+
+        return {canPlay: false, reason: "Not enough energy to play this card"};
+    }
+
+    public playCard(card: IPhysicalCardInterface, target?: BaseCharacterType): boolean {
+        const playResult = this.getCanPlayCardResult(card, target);
+        if (!playResult.canPlay) {
+            if (playResult.reason) {
+                this.displaySubtitle(playResult.reason);
+            }
+            return false;
+        }
+
         this.actionQueue.addAction(new GenericAction(async () => {
             const playableCard = card.data as PlayableCardType;
-
-            let canBePlayed = playableCard.IsPerformableOn(target);
-            if (!canBePlayed) {
-                return [];
-            }
-
-            // Handle missing energy using buffs
             const gameState = GameState.getInstance();
             const combatState = gameState.combatState;
+            
+            // Handle missing energy using buffs
             let missingEnergy = playableCard.energyCost - combatState.energyAvailable;
+            let missingEnergyBuffs: AbstractBuff[] = [];
 
-            let missingEnergyBuffs: AbstractBuff[] = []; // Iterate over all card buffs to handle missing energy
-            for (const buff of card.data.buffs) { 
-
-                if (missingEnergy <= 0) {
-                    break;
-                }
+            // Collect buffs that will pay for missing energy
+            for (const buff of card.data.buffs) {
+                if (missingEnergy <= 0) break;
 
                 const maxProvidedIfWePayAltCost = buff.canPayThisMuchMissingEnergy(missingEnergy);
-
-                if (maxProvidedIfWePayAltCost <= 0){
-                    continue;
-                }
-
-                const energyToCover = Math.min(missingEnergy, maxProvidedIfWePayAltCost);
-                if (maxProvidedIfWePayAltCost > 0){
-                    console.log("can pay " + energyToCover + " from " + buff.getName());
+                if (maxProvidedIfWePayAltCost > 0) {
+                    const energyToCover = Math.min(missingEnergy, maxProvidedIfWePayAltCost);
                     missingEnergy -= energyToCover;
                     missingEnergyBuffs.push(buff);
                 }
-
-            }
-
-            // After processing all buffs, check if missing energy is still greater than 0
-            if (missingEnergy > 0) {
-                // Not all missing energy could be covered
-                this.displaySubtitle("Not enough energy to play this card.");
-                return [];
             }
 
             if (target) {
@@ -243,9 +261,8 @@ export class ActionManager {
                 playableCard.InvokeCardEffects();
             }
 
-            // now we pay the missing energy
+            // Pay the missing energy through buffs
             missingEnergyBuffs.forEach(buff => {
-                console.log("paying missing energy for " + buff.getName());
                 buff.provideMissingEnergy_returnsAmountProvided(missingEnergy);
             });
 
@@ -253,6 +270,8 @@ export class ActionManager {
             await this.animateDiscardCard(card);
             return [];
         }));
+
+        return true;
     }
 
     public stateBasedEffects(){
@@ -664,7 +683,7 @@ export class ActionManager {
         }));
     }
 
-    public displaySubtitle(text: string, durationMs: number = 4000): void {
+    public displaySubtitle(text: string, durationMs: number = 1000): void {
         this.actionQueue.addAction(new GenericAction(async () => {
             await SubtitleManager.getInstance().showSubtitle(text);
             // Wait for the specified duration
@@ -672,6 +691,13 @@ export class ActionManager {
             await SubtitleManager.getInstance().hideSubtitle();
             return [];
         }));
+    }
+
+    public async displaySubtitle_NoQueue(text: string, durationMs: number = 1000): Promise<void> {
+        SubtitleManager.getInstance().showSubtitle(text);
+        // Wait for the specified duration
+        await new WaitAction(durationMs).playAction();
+        SubtitleManager.getInstance().hideSubtitle();
     }
 
     public PlayCard = (card: PlayableCardType, target: BaseCharacterType): void => {

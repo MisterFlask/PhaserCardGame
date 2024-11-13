@@ -138,39 +138,61 @@ class CombatInputHandler {
     
 
     private handleDragEnd(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject): void {
-        if (!UIContextManager.getInstance().isContext(UIContext.COMBAT)) return;
+        if (!UIContextManager.getInstance().isContext(UIContext.COMBAT)) {
+            console.log('handleDragEnd: Not in combat context, returning');
+            return;
+        }
 
-        console.log('handleDragEnd triggered on CombatInputHandler');
+        console.log('handleDragEnd: Starting drag end handling');
 
         const draggedCard = this.transientUiState.draggedCard;
         if (!draggedCard) {
-            console.log('error: no card being dragged');
+            console.log('handleDragEnd: No card being dragged, resetting state');
             this.resetDragState()
             return;
         }
 
         const isPlayable = draggedCard.data instanceof PlayableCard;
+        console.log(`handleDragEnd: Card ${draggedCard.data.name} isPlayable: ${isPlayable}`);
 
         let wasPlayed = false;
-
+        var target = this.transientUiState.hoveredCard?.data as BaseCharacter;
         if (isPlayable) {
             const playableCard = draggedCard.data as PlayableCard;
             const targetingType = this.getTargetingType(playableCard);
-
-            if (targetingType === TargetingType.NO_TARGETING) {
+            console.log(`handleDragEnd: Card targeting type: ${targetingType}`);
+            var canPlayResult = ActionManager.getInstance().getCanPlayCardResult(draggedCard, target)
+            if (targetingType === TargetingType.NO_TARGETING && !canPlayResult.canPlay) {
+                console.log('handleDragEnd: Cannot play no-target card');
+                ActionManager.getInstance().displaySubtitle_NoQueue(canPlayResult.reason || "Unknown reason", 2000);
+                wasPlayed = false;
+            }
+            else if (!canPlayResult.canPlay) {
+                console.log('handleDragEnd: Cannot play card on target');
+                ActionManager.getInstance().displaySubtitle_NoQueue(canPlayResult.reason || "Unknown reason", 2000);
+                wasPlayed = false;
+            }
+            else if (targetingType === TargetingType.NO_TARGETING) {
                 const droppedOnBattlefield = CombatSceneLayoutUtils.isDroppedOnBattlefield(this.scene, pointer);
+                console.log(`handleDragEnd: No-target card dropped on battlefield: ${droppedOnBattlefield}`);
                 if (droppedOnBattlefield) {
                     wasPlayed = true;
                     this.playCardOnBattlefield(draggedCard);
                 }
-            } else {
+            } else if (target) {
+                console.log(`handleDragEnd: Checking if can play on target: ${target.name}`);
                 if (this.transientUiState.hoveredCard && this.isValidTarget(playableCard, this.transientUiState.hoveredCard.data)) {
+                    console.log('handleDragEnd: Valid target found, playing card');
                     wasPlayed = true;
-                    this.playCardOnTarget(playableCard, this.transientUiState.hoveredCard.data as BaseCharacter);
+                    this.playCardOnTarget(playableCard, target);
                 }
+            }else{
+                console.log('handleDragEnd: No valid target found');
+                wasPlayed = false;
             }
         }
 
+        console.log(`handleDragEnd: Card was${wasPlayed ? '' : ' not'} played`);
         if (!wasPlayed) {
             this.animateCardBack();
         } else {
@@ -178,6 +200,7 @@ class CombatInputHandler {
             this.addCardToDiscardPile(draggedCard!);
         }
 
+        console.log('handleDragEnd: Resetting drag state');
         this.resetDragState();
     }
 
