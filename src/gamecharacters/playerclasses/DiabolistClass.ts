@@ -1,8 +1,17 @@
 import ImageUtils from "../../utils/ImageUtils";
 import { Gender } from "../BaseCharacter";
 import { BaseCharacterClass } from "../CharacterClasses";
-import { Rummage } from "./cards/basic/Rummage";
-import { ArcaneRitualCard, SummonDemonCard } from "./DiabolistCards";
+import { CursedStrike } from "./cards/diabolist/commons/CursedStrike";
+import { DarkWhisper } from "./cards/diabolist/commons/DarkWhisper";
+import { ObsidianCandles } from "./cards/diabolist/commons/ObsidianCandles";
+import { Balefire } from "./cards/diabolist/rares/Balefire";
+import { CursedBlade } from "./cards/diabolist/rares/CursedBlade";
+import { HorrificRegeneration } from "./cards/diabolist/rares/HorrificRegeneration";
+import { StrengthOfInsanity } from "./cards/diabolist/rares/StrengthOfInsanity";
+import { BurningSight } from "./cards/diabolist/uncommon/BurningSight";
+import { EldritchBlast } from "./cards/diabolist/uncommon/EldritchBlast";
+import { SoulTrap } from "./cards/diabolist/uncommon/SoulTrap";
+import { UnnaturalVigor } from "./cards/diabolist/uncommon/UnnaturalVigor";
 
 export class DiabolistClass extends BaseCharacterClass {
     getPortraitNameAtRandom(gender: Gender): string {
@@ -11,9 +20,24 @@ export class DiabolistClass extends BaseCharacterClass {
     constructor() {
         super({ name: "Diabolist", iconName: "diabolist_icon", startingMaxHp: 20 })
         this.cardBackgroundImageName = "diabolist_background"
-        // Add Diabolist-specific cards here
-        this.addCard(new ArcaneRitualCard())
-        this.addCard(new SummonDemonCard())
-        this.addCard(new Rummage())
+        // common
+        new Balefire(),
+        new CursedStrike(),
+        new DarkWhisper(),
+        new ObsidianCandles(),
+        
+        // rare
+        new Balefire(),
+        new CursedBlade(),
+        new HorrificRegeneration(),
+        new StrengthOfInsanity(),
+
+        //uncommon
+        new BurningSight(),
+        new EldritchBlast(),
+        new SoulTrap(),
+        new UnnaturalVigor()
+
+        
     }
 }

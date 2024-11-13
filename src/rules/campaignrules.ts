@@ -3,6 +3,7 @@ import { BlackhandClass } from '../gamecharacters/playerclasses/BlackhandClass';
 import { DiabolistClass } from '../gamecharacters/playerclasses/DiabolistClass';
 
 import { Gender } from '../gamecharacters/BaseCharacter';
+import { ArchonClass } from '../gamecharacters/playerclasses/ArchonClass';
 export class CampaignRules {
     private static instance: CampaignRules;
 
@@ -16,7 +17,7 @@ export class CampaignRules {
     }
 
     public generateLogicalCharacterRoster(): PlayerCharacter[] {
-        const classes: BaseCharacterClass[] = [new DiabolistClass(), new BlackhandClass()];
+        const classes: BaseCharacterClass[] = [new DiabolistClass(), new BlackhandClass(), new ArchonClass()];
         const characters: PlayerCharacter[] = [];
 
         for (let i = 0; i < 5; i++) {

@@ -35,6 +35,16 @@ export default class GameImageLoader {
                 "diabolist_female_4.png"
               ]
         },
+        portraits_archon_female: {
+            prefix: 'Portraits/ArchonPortraits/female/',
+            files: [
+                "archon_female_1.png",
+                "archon_female_2.png",
+                "archon_female_3.png",
+                "archon_female_4.png",
+                "archon_female_5.png"
+              ]
+        },
         ui: {
             prefix: 'UI/',
             files: ['drawpile.svg', 'discardpile.svg', 'placeholder.png', 'oops_image.webp']
