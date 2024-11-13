@@ -1,10 +1,11 @@
 import { Scene } from 'phaser';
 import { AbstractCombatResource } from '../rules/combatresources/AbstractCombatResource';
+import { ShadowedImage } from './ShadowedImage';
 import { TextBox } from './TextBox';
 import { UIContext, UIContextManager } from './UIContextManager';
 
 export class CombatResourceDisplay extends Phaser.GameObjects.Container {
-    private icon: Phaser.GameObjects.Image;
+    private icon: ShadowedImage;
     private valueText: Phaser.GameObjects.Text;
     private tooltip: TextBox;
     private resource: AbstractCombatResource;
@@ -13,10 +14,16 @@ export class CombatResourceDisplay extends Phaser.GameObjects.Container {
         super(scene, x, y);
         this.resource = resource;
 
-        // Create icon
-        this.icon = scene.add.image(0, 0, resource.icon)
-            .setDisplaySize(64, 64)
-            .setInteractive();
+        // Create icon using ShadowedImage
+        this.icon = new ShadowedImage({
+            scene,
+            texture: resource.icon,
+            displaySize: 64,
+            shadowOffset: 2
+        });
+        
+        // Make the icon interactive
+        this.icon.mainImage.setInteractive();
         
         // Create value text
         this.valueText = scene.add.text(40, 0, `${resource.name}: ${resource.value}`, {
@@ -44,9 +51,9 @@ export class CombatResourceDisplay extends Phaser.GameObjects.Container {
         this.tooltip.setVisible(false);
 
         // Add event handlers
-        this.icon.on('pointerdown', this.handleClick, this);
-        this.icon.on('pointerover', this.handlePointerOver, this);
-        this.icon.on('pointerout', this.handlePointerOut, this);
+        this.icon.mainImage.on('pointerdown', this.handleClick, this);
+        this.icon.mainImage.on('pointerover', this.handlePointerOver, this);
+        this.icon.mainImage.on('pointerout', this.handlePointerOut, this);
 
         // Add components to container
         this.add([this.icon, this.valueText, this.tooltip]);
@@ -76,9 +83,9 @@ export class CombatResourceDisplay extends Phaser.GameObjects.Container {
     }
 
     public destroy(): void {
-        this.icon.off('pointerdown', this.handleClick, this);
-        this.icon.off('pointerover', this.handlePointerOver, this);
-        this.icon.off('pointerout', this.handlePointerOut, this);
+        this.icon.mainImage.off('pointerdown', this.handleClick, this);
+        this.icon.mainImage.off('pointerover', this.handlePointerOver, this);
+        this.icon.mainImage.off('pointerout', this.handlePointerOut, this);
         super.destroy();
     }
 } 

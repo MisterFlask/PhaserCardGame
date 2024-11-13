@@ -58,15 +58,27 @@ export class DetailsScreenManager {
         const nameText = this.scene.add.text(10, 10, card.data.name, { fontSize: '24px', color: '#ffffff' });
         this.detailsContainer.add(nameText);
 
-        // Add card description
-        const descriptionText = this.scene.add.text(10, 50, card.data.description, {
+        // Add portrait
+        const portraitWidth = width * 0.15; // Make portrait width 25% of screen width
+        const portraitTexture = this.scene.textures.get(card.data.getEffectivePortraitName(this.scene));
+        const originalRatio = portraitTexture.source[0].height / portraitTexture.source[0].width;
+        const portraitHeight = portraitWidth * originalRatio;
+        
+        const portrait = this.scene.add.image(100, nameText.y + nameText.height + 10, card.data.getEffectivePortraitName(this.scene))
+            .setOrigin(0, 0)
+            .setDisplaySize(portraitWidth, portraitHeight)
+            .setTint(card.data.getEffectivePortraitTint(this.scene));
+        this.detailsContainer.add(portrait);
+
+        // Add card description (now below portrait)
+        const descriptionText = this.scene.add.text(10, portrait.y + portraitHeight + 10, card.data.description, {
             fontSize: '18px',
             color: '#ffffff',
             wordWrap: { width: width * 0.28 }
         });
         this.detailsContainer.add(descriptionText);
 
-        // Add buffs
+        // Add buffs (adjusted Y position to account for portrait)
         let buffY = descriptionText.y + descriptionText.height + 20;
         hoveredCard.data.buffs.forEach((buff: AbstractBuff, index: number) => {
             

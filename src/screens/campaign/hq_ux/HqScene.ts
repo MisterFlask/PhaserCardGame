@@ -9,13 +9,13 @@ import { LoadoutPanel } from './panels/LoadoutPanel';
 import { MainHubPanel } from './panels/MainHubPanel';
 import { PersonnelPanel } from './panels/PersonnelPanel';
 import { TradeGoodsPanel } from './panels/TradeGoodsPanel';
-import { TradePanel } from './panels/TradePanel';
+import { TradeRouteSelectionPanel } from './panels/TradePanel';
 
 export class HqScene extends Scene {
     private currentPanel?: Phaser.GameObjects.Container;
     private mainHubPanel!: MainHubPanel;
     private investmentPanel!: InvestmentPanel;
-    private tradePanel!: TradePanel;
+    private tradePanel!: TradeRouteSelectionPanel;
     private personnelPanel!: PersonnelPanel;
     private loadoutPanel!: LoadoutPanel;
     private tradeGoodsPanel!: TradeGoodsPanel;
@@ -37,7 +37,7 @@ export class HqScene extends Scene {
         // Initialize all panels
         this.mainHubPanel = new MainHubPanel(this);
         this.investmentPanel = new InvestmentPanel(this);
-        this.tradePanel = new TradePanel(this);
+        this.tradePanel = new TradeRouteSelectionPanel(this);
         this.personnelPanel = new PersonnelPanel(this);
         this.loadoutPanel = new LoadoutPanel(this);
         this.tradeGoodsPanel = new TradeGoodsPanel(this);

@@ -7,10 +7,8 @@ import { AbstractTradeRoute } from '../AbstractTradeRoute';
 import { CampaignState } from '../CampaignState';
 import { AbstractHqPanel } from './AbstractHqPanel';
 
-export class TradePanel extends AbstractHqPanel {
+export class TradeRouteSelectionPanel extends AbstractHqPanel {
     private tradeRouteCards: PhysicalCard[] = [];
-    private selectButton: TextBoxButton;
-    private selectedRoute: PhysicalCard | null = null;
     private detailsContainer: Phaser.GameObjects.Container;
 
     constructor(scene: Scene) {
@@ -19,21 +17,6 @@ export class TradePanel extends AbstractHqPanel {
         this.detailsContainer = this.scene.add.container(0, 0);
         this.detailsContainer.setVisible(false);
         this.add(this.detailsContainer);
-
-        // Create select button (initially hidden)
-        this.selectButton = new TextBoxButton({
-            scene: this.scene,
-            x: this.scene.scale.width * 0.5,
-            y: this.scene.scale.height * 0.85,
-            width: 200,
-            height: 50,
-            text: 'Select Route',
-            style: { fontSize: '20px', color: '#ffffff' },
-            fillColor: 0x444444
-        });
-        this.selectButton.setVisible(false);
-        this.selectButton.onClick(() => this.onRouteSelected());
-        this.add(this.selectButton);
 
         this.displayTradeRoutes();
     }
@@ -82,27 +65,14 @@ export class TradePanel extends AbstractHqPanel {
                 CampaignState.getInstance().selectedTradeRoute = card.data as AbstractTradeRoute;
             })
             .on('pointerout', () => {
-                if (this.selectedRoute !== card) {
-                    card.setGlow(false);
-                }
-                if (!this.selectedRoute) {
-                    this.hideRouteDetails();
-                }
+                card.setGlow(false);
+                this.hideRouteDetails();
             })
             .on('pointerdown', () => {
-                this.selectRoute(card);
+                const campaignState = CampaignState.getInstance();
+                this.scene.events.emit('routeSelected', card.data);
+                this.returnToHub();
             });
-    }
-
-    private selectRoute(card: PhysicalCard): void {
-        if (this.selectedRoute && this.selectedRoute !== card) {
-            this.selectedRoute.setGlow(false);
-        }
-
-        this.selectedRoute = card;
-        card.setGlow(true);
-        this.selectButton.setVisible(true);
-        this.showRouteDetails(card);
     }
 
     private showRouteDetails(card: PhysicalCard): void {
@@ -129,13 +99,6 @@ export class TradePanel extends AbstractHqPanel {
 
     private hideRouteDetails(): void {
         this.detailsContainer.setVisible(false);
-    }
-
-    private onRouteSelected(): void {
-        if (this.selectedRoute) {
-            const campaignState = CampaignState.getInstance();
-            this.scene.events.emit('routeSelected', this.selectedRoute.data);
-        }
     }
 
     update(): void {

@@ -85,13 +85,13 @@ export class MainHubPanel extends AbstractHqPanel {
 
         const buttons = [
             { text: 'Investment', x: 0.2, y: 0.6 },
-            { text: 'Trade Routes', x: 0.4, y: 0.6 },
+            { text: 'Trade Routes', x: 0.4, y: 0.6, special: true },
             { text: 'Trade Goods', x: 0.6, y: 0.6 },
             { text: 'Personnel', x: 0.8, y: 0.6 },
             { text: 'Expedition Loadout', x: 0.5, y: 0.75 }
         ];
 
-        buttons.forEach(({ text, x, y }) => {
+        buttons.forEach(({ text, x, y, special }) => {
             const button = new TextBoxButton({
                 scene: this.scene,
                 x: this.scene.scale.width * x,
@@ -103,6 +103,9 @@ export class MainHubPanel extends AbstractHqPanel {
             button.onClick(() => this.navigateTo(text));
             this.navigationButtons.set(text, button);
         });
+
+        // Initialize trade route button state
+        this.updateTradeRouteButton();
     }
 
     private navigateTo(destination: string): void {
@@ -125,11 +128,27 @@ export class MainHubPanel extends AbstractHqPanel {
         this.warningDisplay.setText(warnings.join('\n'));
     }
 
+    private updateTradeRouteButton(): void {
+        const campaignState = CampaignState.getInstance();
+        const tradeButton = this.navigationButtons.get('Trade Routes');
+        
+        if (!tradeButton) return;
+
+        if (campaignState.selectedTradeRoute) {
+            tradeButton.setText('Trade Route (finished)');
+            tradeButton.setFillColor(0x00aa00); // Green
+        } else {
+            tradeButton.setText('Select Trade Route (required)');
+            tradeButton.setFillColor(0xffff00); // Yellow
+        }
+    }
+
     update(): void {
         const campaignState = CampaignState.getInstance();
         this.fundsDisplay.setText(`Funds: £${campaignState.getCurrentFunds()}`);
         this.yearDisplay.setText(`Year: ${campaignState.currentYear}`);
         this.expectationsDisplay.setText(`Expected Profit: £${campaignState.shareholderExpectation}`);
         this.updateWarnings();
+        this.updateTradeRouteButton();
     }
 } 
