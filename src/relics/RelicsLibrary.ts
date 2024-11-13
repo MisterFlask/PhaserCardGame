@@ -37,4 +37,10 @@ export class RelicsLibrary {
     public getAllRelics(): AbstractRelic[] {
         return this.relics;
     }
+
+    public getRandomRelics(count: number): AbstractRelic[] {
+        var relics = this.relics.sort(() => Math.random() - 0.5).slice(0, count);
+        relics.forEach(relic => relic.init());
+        return relics;
+    }
 }

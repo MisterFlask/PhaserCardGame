@@ -6,6 +6,7 @@ import { UIContext } from './UIContextManager';
 export class PhysicalRelic extends Phaser.GameObjects.Container {
     contextRelevant?: UIContext;
     relicImage: Phaser.GameObjects.Image;
+    shadowImage: Phaser.GameObjects.Image;
     tooltipBox: TextBox;
     priceBox?: TextBox;
     abstractRelic: AbstractRelic;
@@ -32,14 +33,18 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
 
         this.abstractRelic = abstractRelic;
         
-        // Create relic image using portraitName from AbstractRelic
-        if (!scene.textures.exists(abstractRelic.portraitName)) {
-            console.error(`Texture not found for key: ${abstractRelic.portraitName}`);
-        }
-        this.relicImage = scene.add.image(0, 0, abstractRelic.portraitName ?? "placeholder");
         const baseSize = 64;
-        this.relicImage.setDisplaySize(baseSize, baseSize);
         this.baseSize = baseSize;
+
+        // Create shadow image first (so it appears behind)
+        this.shadowImage = scene.add.image(2, 2, abstractRelic.portraitName ?? "placeholder");
+        this.shadowImage.setDisplaySize(baseSize, baseSize);
+        this.shadowImage.setTint(0x000000);
+        this.add(this.shadowImage);
+
+        // Create main relic image
+        this.relicImage = scene.add.image(0, 0, abstractRelic.portraitName ?? "placeholder");
+        this.relicImage.setDisplaySize(baseSize, baseSize);
         this.add(this.relicImage);
 
         // Create tooltip without specifying y position yet
@@ -78,52 +83,45 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
         if (this.obliterated) return;
         console.log('PhysicalRelic: onPointerOver');
 
-        // Show tooltip first so its dimensions are calculated
         this.tooltipBox.setVisible(true);
 
-        // Determine tooltip position based on screen position
         const globalY = this.y + (this.parentContainer?.y ?? 0);
         const screenHeight = this.scene.scale.height;
         const isCloserToTop = globalY < screenHeight / 2;
 
-        // Get the actual tooltip height after text is set and rendered
         const tooltipBounds = this.tooltipBox.getBounds();
         const tooltipHeight = tooltipBounds.height;
 
-        // Position tooltip above or below the relic
         this.tooltipBox.y = isCloserToTop ? 
-            (this.baseSize + 10) + 100 :  // Below the relic
-            -(tooltipHeight + 10);  // Above the relic, accounting for actual tooltip height
+            (this.baseSize + 10) + 100 :
+            -(tooltipHeight + 10);
 
-        // Scale up using displaySize instead of scale
+        // Scale up both the main image and shadow
         this.scene.tweens.add({
-            targets: this.relicImage,
+            targets: [this.relicImage, this.shadowImage],
             displayWidth: this.baseSize * 1.1,
             displayHeight: this.baseSize * 1.1,
             duration: 200,
             ease: 'Power2'
         });
         
-        // Emit the event to parent
         this.parentContainer?.emit('pointerover');
     }
 
     private onPointerOut = (): void => {
         if (this.obliterated) return;
 
-        // Scale back using displaySize
+        // Scale back both the main image and shadow
         this.scene.tweens.add({
-            targets: this.relicImage,
+            targets: [this.relicImage, this.shadowImage],
             displayWidth: this.baseSize,
             displayHeight: this.baseSize,
             duration: 200,
             ease: 'Power2'
         });
 
-        // Hide tooltip
         this.tooltipBox.setVisible(false);
         
-        // Emit the event to parent
         this.parentContainer?.emit('pointerout');
     }
 

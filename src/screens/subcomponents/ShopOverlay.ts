@@ -5,9 +5,7 @@ import { BaseCharacter } from '../../gamecharacters/BaseCharacter';
 import { PlayableCard } from '../../gamecharacters/PlayableCard';
 import { Rummage } from '../../gamecharacters/playerclasses/cards/basic/Rummage';
 import { AbstractRelic } from '../../relics/AbstractRelic';
-import { CaskOfErrantSouls } from '../../relics/common/CaskOfErrantSouls';
-import { FrozenDew } from '../../relics/common/FrozenDew';
-import { IronFilings } from '../../relics/common/IronFilings';
+import { RelicsLibrary } from '../../relics/RelicsLibrary';
 import { GameState } from '../../rules/GameState';
 import { DepthManager } from '../../ui/DepthManager';
 import { ShopCardPanel } from '../../ui/ShopCardPanel';
@@ -29,7 +27,7 @@ export class ShopOverlay {
     private readonly BASE_PANEL_DEPTH = DepthManager.getInstance().SHOP_OVERLAY;
     private campaignBriefStatus: CampaignBriefStatus;
     private shopCards: PlayableCard[] = [new Rummage(), new Rummage(), new Rummage()];
-    private shopRelics: AbstractRelic[] = [new CaskOfErrantSouls(), new FrozenDew(), new IronFilings()];
+    private shopRelics: AbstractRelic[] = RelicsLibrary.getInstance().getRandomRelics(3);
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
