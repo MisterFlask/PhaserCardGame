@@ -10,16 +10,17 @@ export class PhysicalBuff {
     stacksText: Phaser.GameObjects.Text;
     tooltipBox: TextBox;
     scene: Phaser.Scene;
+    shadowImage!: Phaser.GameObjects.Image;
 
     constructor(scene: Phaser.Scene, x: number, y: number, abstractBuff: AbstractBuff) {
         this.scene = scene;
         this.abstractBuff = abstractBuff;
         this.container = scene.add.container(x, y);
         // Create the image
-        this.setBuffImage(scene, abstractBuff);
-        
-        this.image.setScale(0.5); // Adjust scale as needed
+        const containerSize = 40; // Adjust this value as needed
 
+        this.setBuffImage(scene, abstractBuff,containerSize);
+        
         // Update the text creation with new styling and position
         this.stacksText = scene.add.text(0, 0, `${abstractBuff.stacks}`, {
             fontSize: '19px',
@@ -43,15 +44,12 @@ export class PhysicalBuff {
         this.tooltipBox.setVisible(false);
 
         // Set the size of the container
-        const containerSize = 40; // Adjust this value as needed
         this.container.setSize(containerSize, containerSize);
 
         // Update text position to bottom-left of the container
         const halfContainerSize = containerSize / 2;
-        this.image.setDisplaySize(containerSize, containerSize);
-        this.image.setPosition(0, 0);
         this.stacksText.setPosition(-halfContainerSize + 6, halfContainerSize - 6); // Added small offset (2px) for padding
-        this.container.add([this.image, this.stacksText]);
+        this.container.add([this.stacksText]);
 
         // Adjust the interactive area to match the container's size
         this.container.setInteractive(new Phaser.Geom.Rectangle(-containerSize / 2, -containerSize / 2, containerSize, containerSize), Phaser.Geom.Rectangle.Contains);
@@ -73,14 +71,41 @@ export class PhysicalBuff {
         });
     }
 
-    private setBuffImage(scene: Phaser.Scene, abstractBuff: AbstractBuff) {
+    private setBuffImage(scene: Phaser.Scene, abstractBuff: AbstractBuff, containerSize: number) {
+        let imageFileName: string;
         if (!scene.textures.exists(abstractBuff.imageName)) {
-            const imageName = this.getAbstractIcon(abstractBuff);
-            this.image = scene.add.image(0, 0, imageName);
+            imageFileName = this.getAbstractIcon(abstractBuff);
+            // Create shadow image
+            const shadowImage = scene.add.image(2, 2, imageFileName);
+            shadowImage.setTint(0x000000);
+            this.shadowImage = shadowImage;
+            
+            // Create main image
+            this.image = scene.add.image(0, 0, imageFileName);
             this.image.setTint(abstractBuff.generateSeededRandomBuffColor());
         } else {
+            // Create shadow image
+            const shadowImage = scene.add.image(2, 2, abstractBuff.imageName);
+            shadowImage.setTint(0x000000);
+            this.shadowImage = shadowImage;
+            
+            // Create main image
             this.image = scene.add.image(0, 0, abstractBuff.imageName);
         }
+        
+        this.image.setScale(0.5); // Adjust scale as needed
+        this.shadowImage.setScale(0.5);
+
+        
+        this.image.setDisplaySize(containerSize, containerSize);
+        this.image.setPosition(0, 0);
+        
+        this.shadowImage.setDisplaySize(containerSize, containerSize);
+        this.shadowImage.setPosition(2, 2);
+
+        this.container.add([this.shadowImage, this.image, ]);
+
+        this.shadowImage.setDepth(this.image.depth - 1);
     }
 
     private getAbstractIcon(abstractBuff: AbstractBuff) {
