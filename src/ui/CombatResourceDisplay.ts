@@ -50,6 +50,8 @@ export class CombatResourceDisplay extends Phaser.GameObjects.Container {
         });
         this.tooltip.setVisible(false);
 
+        this.icon.mainImage.setTint(resource.tint);
+
         // Add event handlers
         this.icon.mainImage.on('pointerdown', this.handleClick, this);
         this.icon.mainImage.on('pointerover', this.handlePointerOver, this);
@@ -70,12 +72,12 @@ export class CombatResourceDisplay extends Phaser.GameObjects.Container {
 
     private handlePointerOver(): void {
         this.tooltip.setVisible(true);
-        this.icon.setTint(0xcccccc);
+        this.icon.setTint(0x888888 * this.resource.tint);
     }
 
     private handlePointerOut(): void {
         this.tooltip.setVisible(false);
-        this.icon.clearTint();
+        this.icon.setTint(this.resource.tint);
     }
 
     public updateValue(): void {

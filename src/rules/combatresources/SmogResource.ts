@@ -10,6 +10,7 @@ export class SmogResource extends AbstractCombatResource {
             "Spend 2 Smog: Return a card from your discard pile to your hand",
             'smog_icon'
         );
+        this.tint = 0x808080;
     }
 
     public onClick(): void {

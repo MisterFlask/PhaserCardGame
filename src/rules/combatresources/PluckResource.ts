@@ -9,6 +9,7 @@ export class PluckResource extends AbstractCombatResource {
             "Spend 1 Pluck: Gain 1 Stress Block",
             'feather_icon'
         );
+        this.tint = 0x00ff00;
     }
 
     public onClick(): void {

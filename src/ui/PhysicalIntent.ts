@@ -3,7 +3,6 @@ import { AbstractIntent } from "../gamecharacters/AbstractIntent";
 import { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { JsonRepresentable } from "../interfaces/JsonRepresentable";
 import { IntentEmitter } from "../utils/IntentEmitter";
-import { TextBox } from './TextBox';
 import { TransientUiState } from './TransientUiState';
 
 export class PhysicalIntent implements JsonRepresentable {
@@ -14,7 +13,7 @@ export class PhysicalIntent implements JsonRepresentable {
     public intent: AbstractIntent;
     private container: Phaser.GameObjects.Container;
     private image: Phaser.GameObjects.Image;
-    private textBox: TextBox;
+    private alwaysDisplayedIntentText: Phaser.GameObjects.Text;
     private transientUiState = TransientUiState.getInstance();
 
     constructor(scene: Scene, intent: AbstractIntent, x: number, y: number) {
@@ -26,17 +25,13 @@ export class PhysicalIntent implements JsonRepresentable {
         this.image = this.scene.add.image(0, 0, intent.imageName);
         this.image.setDisplaySize(PhysicalIntent.WIDTH, PhysicalIntent.HEIGHT);
         
-        this.textBox = new TextBox({
-            scene: this.scene,
-            x: 0,
-            y: PhysicalIntent.HEIGHT / 2,
-            width: PhysicalIntent.WIDTH,
-            height: 30,
-            text: intent.displayText(),
-            style: { fontSize: '30px', color: '#ffffff' }
-        });
+        this.alwaysDisplayedIntentText = this.scene.add.text(0, PhysicalIntent.HEIGHT / 2, 
+            intent.displayText(), 
+            { fontSize: '30px', color: '#ffffff' }
+        );
+        this.alwaysDisplayedIntentText.setOrigin(0.5);
         
-        this.container.add([this.image, this.textBox]);
+        this.container.add([this.image, this.alwaysDisplayedIntentText]);
         
         // Set interactive for the container to detect pointer events
         this.container.setSize(PhysicalIntent.WIDTH, PhysicalIntent.HEIGHT)
@@ -75,13 +70,13 @@ export class PhysicalIntent implements JsonRepresentable {
 
     update(): void {
         this.image.setTexture(this.intent.imageName);
-        this.textBox.setText(this.intent.displayText());
+        this.alwaysDisplayedIntentText.setText(this.intent.displayText());
     }
 
     updateIntent(newIntent: AbstractIntent): void {
         this.intent = newIntent;
         this.image.setTexture(this.intent.imageName);
-        this.textBox.setText(this.intent.displayText());
+        this.alwaysDisplayedIntentText.setText(this.intent.displayText());
     }
 
     setPosition(x: number, y: number): void {

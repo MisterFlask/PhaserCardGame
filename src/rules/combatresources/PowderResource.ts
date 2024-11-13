@@ -10,6 +10,7 @@ export class PowderResource extends AbstractCombatResource {
             "Spend 1 Powder: all characters gain 2 Temporary Strength",
             'powder_icon'
         );
+        this.tint = 0xff0000;
     }
 
     public onClick(): void {

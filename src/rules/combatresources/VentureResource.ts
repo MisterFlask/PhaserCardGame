@@ -8,6 +8,7 @@ export class VentureResource extends AbstractCombatResource {
             "Spend 1 Venture: Draw a card",
             'venture_icon'
         );
+        this.tint = 0x0000ff;
     }
 
     public onClick(): void {

@@ -9,6 +9,7 @@ export class IronResource extends AbstractCombatResource {
             "Spend 1 Iron: all characters gain 3 Block.",
             'iron_icon'
         );
+        this.tint = 0x808080;
     }
 
     public onClick(): void {
