@@ -35,6 +35,7 @@ class CombatUIManager {
     private cardRewardScreen!: CardRewardScreen;
     private combatEnded: boolean = false;
     private debugOverlay!: TextBox;
+    public dropZoneHighlight!: Phaser.GameObjects.Image;
 
     private constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -251,6 +252,24 @@ class CombatUIManager {
         const handY = LayoutUtils.getHandY(this.scene);
         const battlefieldY = LayoutUtils.getBattlefieldY(this.scene);
 
+        // Create battlefield highlight
+        const dropArea = CombatSceneLayoutUtils.getBattlefieldDropArea(this.scene);
+        this.dropZoneHighlight = this.scene.add.image(
+            dropArea.x + dropArea.width / 2,
+            dropArea.y + dropArea.height / 2,
+            'cheap_glow_effect'
+        );
+        this.dropZoneHighlight.setDisplaySize(dropArea.width, dropArea.height);
+
+        this.dropZoneHighlight.setInteractive()
+        .on('pointerover', () => {
+            TransientUiState.getInstance().mouseOverCardDropZone = true;
+        }).on('pointerout', () => {
+            TransientUiState.getInstance().mouseOverCardDropZone = false;
+        });
+        this.dropZoneHighlight.setAlpha(0.4);
+        this.dropZoneHighlight.setDepth(DepthManager.getInstance().BATTLEFIELD_HIGHLIGHT);
+
         this.battlefieldArea = this.scene.add.rectangle(gameWidth / 2, battlefieldY, gameWidth - 100, 300)
             .setStrokeStyle(4, 0xffff00)
             .setFillStyle(0xffff00, 0.2)
@@ -304,6 +323,9 @@ class CombatUIManager {
                 this.updateDebugOverlay();
             }
         });
+        if (this.dropZoneHighlight) {
+            this.dropZoneHighlight.destroy();
+        }
     }
 
     private createResourceIndicators(): void {
@@ -438,6 +460,7 @@ class CombatUIManager {
         this.debugOverlay.setDepth(DepthManager.getInstance().OVERLAY_BASE + 500);
         this.debugOverlay.setVisible(false);
         this.scene.add.existing(this.debugOverlay);
+
     }
 
     private setupDebugOverlayToggle(): void {

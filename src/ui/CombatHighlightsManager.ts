@@ -1,5 +1,6 @@
 import { AbstractCard } from "../gamecharacters/AbstractCard";
 import { GameState } from "../rules/GameState";
+import CombatUIManager from "../screens/subcomponents/CombatUiManager";
 import { BaseCharacterType } from "../Types";
 import { PhysicalCard } from "./PhysicalCard";
 import { TransientUiState } from "./TransientUiState";
@@ -33,11 +34,18 @@ export class CombatHighlightsManager {
 
         if (draggedCard) {
             this.handleDraggedCardHighlights(draggedCard, allCharacters);
+            CombatUIManager.getInstance().dropZoneHighlight.setAlpha(0.5)
+            if (TransientUiState.getInstance().mouseOverCardDropZone) {
+                CombatUIManager.getInstance().dropZoneHighlight.setTint(CombatHighlightsManager.HOVERED_TARGET_COLOR)
+            }else{
+                CombatUIManager.getInstance().dropZoneHighlight.setTint(CombatHighlightsManager.ELIGIBLE_TARGET_COLOR)
+            }
         }
 
         if (hoveredCard) {
             this.handleHoveredCardHighlight(hoveredCard);
         }
+
     }
 
     private clearAllHighlights(characters: BaseCharacterType[]): void {
@@ -49,6 +57,7 @@ export class CombatHighlightsManager {
         });
 
 
+        CombatUIManager.getInstance().dropZoneHighlight.setAlpha(0.0)
         // now, cards in hand
         GameState.getInstance().combatState.currentHand.forEach(card => {
             card.physicalCard?.setGlow(false);

@@ -402,8 +402,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
         if (!this.wiggleTween) {
             this.wiggleTween = this.scene.tweens.add({
                 targets: this.cardContent,
-                angle: { from: -2, to: 2 },
-                duration: 100,
+                angle: { from: -1, to: 1 },
+                duration: 88,
                 repeat: 2,
                 yoyo: true
             });

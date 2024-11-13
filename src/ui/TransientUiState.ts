@@ -10,6 +10,7 @@ export class TransientUiState {
     public hoveredCard: PhysicalCard | undefined = undefined;
     public hoveredIntent: PhysicalIntent | undefined = undefined;
     public hoveredIncomingIntent: IncomingIntent | undefined = undefined;
+    public mouseOverCardDropZone: boolean = false;
 
     private constructor() {}
 
@@ -46,6 +47,7 @@ export class TransientUiState {
 Dragged Card: ${this.draggedCard ? this.draggedCard.data.name : 'None'}
 Hovered Card: ${this.hoveredCard ? this.hoveredCard.data.name : 'None'}
 Hovered Intent: ${this.hoveredIntent ? this.hoveredIntent.intent.id : 'None'}
-Hovered Incoming Intent: ${this.hoveredIncomingIntent ? this.hoveredIncomingIntent.intent.id : 'None'}`.trim();
+Hovered Incoming Intent: ${this.hoveredIncomingIntent ? this.hoveredIncomingIntent.intent.id : 'None'}
+Mouse Over Card Drop Zone: ${this.mouseOverCardDropZone ? 'Yes' : 'No'}`.trim();
     }
 } 

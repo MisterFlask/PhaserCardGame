@@ -28,6 +28,7 @@ export class DepthManager {
     public readonly DETAILS_OVERLAY = this.OVERLAY_BASE + 400;
     
     // Top-level UI elements
+    public readonly BATTLEFIELD_HIGHLIGHT = this.UI_BASE + 1000;
     public readonly TOOLTIP = this.UI_BASE + 2000;
     public readonly MODAL = this.UI_BASE + 3000;
 

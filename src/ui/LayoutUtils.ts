@@ -39,10 +39,20 @@ class CombatSceneLayoutUtils {
         });
     }
 
-    static isDroppedOnBattlefield(scene: Phaser.Scene, pointer: Phaser.Input.Pointer): boolean {
-        const battlefieldY = this.getBattlefieldY(scene);
-        return pointer.y < battlefieldY;
+    static getBattlefieldDropArea(scene: Phaser.Scene): Phaser.Geom.Rectangle {
+        const width = scene.scale.width * 0.8; // Using 80% of screen width
+        const height = scene.scale.height * 0.25; // Area above battlefield
+        const x = (scene.scale.width - width) / 2; // Centered horizontally
+        const y = this.getBattlefieldY(scene) - height; // Above battlefield
+        
+        return new Phaser.Geom.Rectangle(x, y, width, height);
     }
+
+    static isDroppedOnBattlefield(scene: Phaser.Scene, pointer: Phaser.Input.Pointer): boolean {
+        const dropArea = this.getBattlefieldDropArea(scene);
+        return dropArea.contains(pointer.x, pointer.y);
+    }
+    
 }
 
 export default CombatSceneLayoutUtils;
