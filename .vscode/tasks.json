@@ -12,6 +12,7 @@
 			"label": "npm: build",
 			"detail": "webpack --mode development"
 		},
+		
 		{
 			"label": "Start Game Server",
 			"type": "shell",
@@ -21,14 +22,31 @@
 			  "cwd": "${workspaceFolder}"
 			},
 			"group": {
-			  "kind": "build",
-			  "isDefault": true
+				"kind": "build",
+				"isDefault": true
 			},
 			"presentation": {
-			  "reveal": "always",
-			  "panel": "dedicated"
+				"reveal": "always",
+				"panel": "dedicated"
 			},
 			"problemMatcher": []
-		  }
+		},
+		{
+			"label": "Deploy to GitHub Pages",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-ExecutionPolicy",
+				"Bypass",
+				"-File",
+				"${workspaceFolder}/deploy-gh-pages.ps1"
+			],
+			"group": "build",
+			"presentation": {
+				"reveal": "always",
+				"panel": "new"
+			},
+			"problemMatcher": []
+		}
 	]
 }
