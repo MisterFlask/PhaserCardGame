@@ -29,26 +29,30 @@ export class ArchonClass extends BaseCharacterClass {
         super({ name: "Archon", iconName: "archon_icon", startingMaxHp: 30 })
         // Add Archon-specific cards here
         this.cardBackgroundImageName = "archon_background"
+        this.availableCards = [
+            // common
+            new Bolster(),
+            new Buzzsword(),
+            new HandCannon(),
+            new Incoming(),
+            new InspiringPresence(),
+            new TacticalManual(),
+            new TheLash(),
 
-        new Bolster(),
-        new Buzzsword(),
-        new HandCannon(),
-        new Incoming(),
-        new InspiringPresence(),
-        new TacticalManual(),
-        new TheLash(),
+            // uncommon
+            new CourageUnderFire(),
+            new InspireFear(),
+            new Orders(),
+            new TheLaw(),
+            new ToughItOut(),
 
-        new CourageUnderFire(),
-        new InspireFear(),
-        new Orders(),
-        new TheLaw(),
-        new ToughItOut(),
-
-        new ChainOfCommand(),
-        new GloriousSacrifice(),
-        new LastBastion(),
-        new IronWill(),
-        new Quartermaster(),
-        new QueensMandate()
+            // rare
+            new ChainOfCommand(),
+            new GloriousSacrifice(),
+            new LastBastion(),
+            new IronWill(),
+            new Quartermaster(),
+            new QueensMandate()
+        ]
     }
 }

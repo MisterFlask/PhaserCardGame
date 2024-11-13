@@ -20,23 +20,25 @@ export class DiabolistClass extends BaseCharacterClass {
     constructor() {
         super({ name: "Diabolist", iconName: "diabolist_icon", startingMaxHp: 20 })
         this.cardBackgroundImageName = "diabolist_background"
-        // common
-        new Balefire(),
-        new CursedStrike(),
-        new DarkWhisper(),
-        new ObsidianCandles(),
         
-        // rare
-        new Balefire(),
-        new CursedBlade(),
-        new HorrificRegeneration(),
-        new StrengthOfInsanity(),
+        this.availableCards = [
+            // common
+            new Balefire(),
+            new CursedStrike(),
+            new DarkWhisper(),
+            new ObsidianCandles(),
+            
+            // rare
+            new Balefire(),
+            new CursedBlade(),
+            new HorrificRegeneration(),
+            new StrengthOfInsanity(),
 
-        //uncommon
-        new BurningSight(),
-        new EldritchBlast(),
-        new SoulTrap(),
-        new UnnaturalVigor()
+            //uncommon
+            new BurningSight(),
+            new EldritchBlast(),
+            new SoulTrap(),
+            new UnnaturalVigor()]
 
         
     }
