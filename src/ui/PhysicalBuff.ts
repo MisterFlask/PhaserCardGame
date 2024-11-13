@@ -1,6 +1,7 @@
 import { AbstractBuff } from '../gamecharacters/buffs/AbstractBuff';
 import ImageUtils from '../utils/ImageUtils';
 import { DepthManager } from './DepthManager';
+import { ShadowedImage } from './ShadowedImage';
 import { TextBox } from './TextBox';
 
 export class PhysicalBuff {
@@ -72,40 +73,20 @@ export class PhysicalBuff {
     }
 
     private setBuffImage(scene: Phaser.Scene, abstractBuff: AbstractBuff, containerSize: number) {
-        let imageFileName: string;
-        if (!scene.textures.exists(abstractBuff.imageName)) {
-            imageFileName = this.getAbstractIcon(abstractBuff);
-            // Create shadow image
-            const shadowImage = scene.add.image(2, 2, imageFileName);
-            shadowImage.setTint(0x000000);
-            this.shadowImage = shadowImage;
-            
-            // Create main image
-            this.image = scene.add.image(0, 0, imageFileName);
-            this.image.setTint(abstractBuff.generateSeededRandomBuffColor());
-        } else {
-            // Create shadow image
-            const shadowImage = scene.add.image(2, 2, abstractBuff.imageName);
-            shadowImage.setTint(0x000000);
-            this.shadowImage = shadowImage;
-            
-            // Create main image
-            this.image = scene.add.image(0, 0, abstractBuff.imageName);
-        }
-        
-        this.image.setScale(0.5); // Adjust scale as needed
-        this.shadowImage.setScale(0.5);
+        const imageFileName = !scene.textures.exists(abstractBuff.imageName) 
+            ? this.getAbstractIcon(abstractBuff)
+            : abstractBuff.imageName;
 
-        
-        this.image.setDisplaySize(containerSize, containerSize);
-        this.image.setPosition(0, 0);
-        
-        this.shadowImage.setDisplaySize(containerSize, containerSize);
-        this.shadowImage.setPosition(2, 2);
+        const shadowedImage = new ShadowedImage({
+            scene,
+            texture: imageFileName,
+            displaySize: containerSize,
+            tint: scene.textures.exists(abstractBuff.imageName) ? undefined : abstractBuff.generateSeededRandomBuffColor()
+        });
 
-        this.container.add([this.shadowImage, this.image, ]);
-
-        this.shadowImage.setDepth(this.image.depth - 1);
+        this.container.add(shadowedImage);
+        this.image = shadowedImage.mainImage;
+        this.shadowImage = shadowedImage.shadowImage;
     }
 
     private getAbstractIcon(abstractBuff: AbstractBuff) {

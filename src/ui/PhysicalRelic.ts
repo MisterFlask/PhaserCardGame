@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { AbstractRelic } from '../relics/AbstractRelic';
+import { ShadowedImage } from './ShadowedImage';
 import { TextBox } from './TextBox';
 import { UIContext } from './UIContextManager';
 
@@ -36,16 +37,22 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
         const baseSize = 64;
         this.baseSize = baseSize;
 
-        // Create shadow image first (so it appears behind)
-        this.shadowImage = scene.add.image(2, 2, abstractRelic.portraitName ?? "placeholder");
-        this.shadowImage.setDisplaySize(baseSize, baseSize);
-        this.shadowImage.setTint(0x000000);
-        this.add(this.shadowImage);
+        const textureName = abstractRelic.portraitName ?? "placeholder";
+        if (!scene.textures.exists(textureName)) {
+            console.error(`Texture not found for key: ${textureName}`);
+        }
 
-        // Create main relic image
-        this.relicImage = scene.add.image(0, 0, abstractRelic.portraitName ?? "placeholder");
-        this.relicImage.setDisplaySize(baseSize, baseSize);
-        this.add(this.relicImage);
+        const shadowedImage = new ShadowedImage({
+            scene,
+            texture: textureName,
+            displaySize: baseSize,
+            shadowOffset: 2,
+            tint: abstractRelic.tint
+        });
+        this.add(shadowedImage);
+        
+        this.relicImage = shadowedImage.mainImage;
+        this.shadowImage = shadowedImage.shadowImage;
 
         // Create tooltip without specifying y position yet
         this.tooltipBox = new TextBox({
