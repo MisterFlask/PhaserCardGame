@@ -108,6 +108,9 @@ class CombatInputHandler {
         if ('physicalCard' in gameObject) {
             const draggedCard = (gameObject as any).physicalCard as PhysicalCard;
             if (draggedCard) {
+                // Kill any existing tweens on the card container
+                this.scene.tweens.killTweensOf(draggedCard.container);
+                
                 this.originalCardPosition = { 
                     x: draggedCard.container.x, 
                     y: draggedCard.container.y 
@@ -262,10 +265,19 @@ class CombatInputHandler {
                 scaleY: 1,
                 alpha: 1,
                 duration: 300,
-                ease: 'Power2'
+                ease: 'Power2',
+                onComplete: () => {
+                    this.cardManager.arrangeCards(
+                        this.cardManager.playerHand, 
+                        CombatSceneLayoutUtils.getHandY(this.scene)
+                    );
+                }
             });
         } else {
-            this.cardManager.arrangeCards(this.cardManager.playerHand, CombatSceneLayoutUtils.getHandY(this.scene));
+            this.cardManager.arrangeCards(
+                this.cardManager.playerHand, 
+                CombatSceneLayoutUtils.getHandY(this.scene)
+            );
         }
     }
 

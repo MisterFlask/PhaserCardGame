@@ -32,9 +32,19 @@ class CombatSceneLayoutUtils {
         cardArray.forEach((card, index) => {
             // Don't move the card that is being dragged
             if (TransientUiState.getInstance().draggedCard !== card) {
-                card.container.x = startX + index * cardSpacing;
-                card.container.y = yPosition;
-                (card.container as any).originalDepth = index;
+                const targetX = startX + index * cardSpacing;
+                
+                // Use tweens instead of direct position setting
+                scene.tweens.add({
+                    targets: card.container,
+                    x: targetX,
+                    y: yPosition,
+                    duration: 200,
+                    ease: 'Power2',
+                    onComplete: () => {
+                        (card.container as any).originalDepth = index;
+                    }
+                });
             }
         });
     }

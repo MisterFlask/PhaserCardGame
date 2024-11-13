@@ -243,31 +243,6 @@ export class CombatCardManager {
         }
     }
 
-    public update(): void {
-        const state = GameState.getInstance().combatState.currentHand;
-        const stateIds = new Set(state.map(card => card.id));
-        const handIds = new Set(this.playerHand.map(card => card.data.id));
-
-        // Identify cards to add
-        const cardsToAdd = state.filter(card => !handIds.has(card.id));
-        cardsToAdd.forEach(cardData => {
-            const newCard = this.animateCardDraw(cardData);
-            this.playerHand.push(newCard);
-        });
-
-        // Identify cards to remove
-        const cardsToRemove = this.playerHand.filter(card => !stateIds.has(card.data.id));
-        cardsToRemove.forEach(card => {
-            this.discardCardAnimation(card);
-        });
-
-        // Arrange the hand after updates
-        this.arrangeCards(this.playerHand, CombatSceneLayoutUtils.getHandY(this.scene));
-
-        this.updateDiscardPileCount();
-        this.updateDrawPileCount();
-    }
-
 }
 
 export default CombatCardManager;
