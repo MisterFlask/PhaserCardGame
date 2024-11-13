@@ -8,6 +8,7 @@ import { CheapGlowEffect } from './CheapGlowEffect';
 import { IncomingIntent } from "./IncomingIntent"; // Import the new class
 import { PhysicalBuff } from './PhysicalBuff';
 import { PhysicalIntent } from "./PhysicalIntent";
+import { ShadowedImage } from './ShadowedImage'; // Add this import
 import { TextBox } from "./TextBox"; // Ensure correct relative path
 import { TransientUiState } from './TransientUiState'; // Added import
 import { UIContext } from './UIContextManager';
@@ -21,7 +22,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
     container: Phaser.GameObjects.Container;
     cardBackgroundAsRectangle?: Phaser.GameObjects.Rectangle;
     cardBackground: Phaser.GameObjects.Image;
-    cardImage: Phaser.GameObjects.Image;
+    cardImage: ShadowedImage;
     nameBox: TextBox;
     descBox: TextBox;
     tooltipBox: TextBox;
@@ -86,7 +87,6 @@ export class PhysicalCard implements IPhysicalCardInterface {
         this.container = container;
         this.cardBackgroundAsRectangle = cardBackgroundAsRectangle;
         this.cardBackground = cardBackground;
-        this.cardImage = cardImage;
         this.nameBox = nameBox;
         this.descBox = descBox;
         this.tooltipBox = tooltipBox;
@@ -100,6 +100,12 @@ export class PhysicalCard implements IPhysicalCardInterface {
         this.cardConfig = cardConfig;
         // Create a new container for card content (excluding tooltip)
         this.cardContent = this.scene.add.container(0, 0);
+        this.cardImage = new ShadowedImage({
+            scene: this.scene,
+            texture: this.data.getEffectivePortraitName(this.scene),
+            displaySize: this.cardConfig.cardWidth * 0.8, // Adjust size as needed
+            shadowOffset: 3 // Adjust shadow offset as needed
+        });
         this.cardContent.add([
             this.cardBackground,
             this.cardImage,
@@ -548,41 +554,31 @@ export class PhysicalCard implements IPhysicalCardInterface {
             this.costBox.setText(`${playableCard.energyCost}`);
         }
 
-        // Update card image
-        if (this.scene.textures.exists(this.data.portraitName)) {
-            // Maintain aspect ratio
-            const texture = this.scene.textures.get(this.data.portraitName);
-            texture.setFilter(Phaser.Textures.LINEAR);
-            this.cardImage.setTexture(this.data.portraitName);
-            this.cardImage.texture.setFilter(Phaser.Textures.LINEAR);
-            const frame = texture.get();
-            const aspectRatio = frame.width / frame.height;
+        // Update card image and tint
+        const effectivePortraitName = this.data.getEffectivePortraitName(this.scene);
+        const effectivePortraitTint = this.data.getEffectivePortraitTint(this.scene);
+        
+        const texture = this.scene.textures.get(effectivePortraitName);
+        texture.setFilter(Phaser.Textures.LINEAR);
+        
+        // Update the ShadowedImage
+        const frame = texture.get();
+        const aspectRatio = frame.width / frame.height;
 
-            // Assuming the card background defines the available space
-            const availableWidth = this.cardBackground.displayWidth * 0.8; // 80% of card width
-            const availableHeight = this.cardBackground.displayHeight * 0.5; // 50% of card height
+        const availableWidth = this.cardBackground.displayWidth * 0.8;
+        const availableHeight = this.cardBackground.displayHeight * 0.5;
 
-            let newWidth = availableWidth;
-            let newHeight = availableWidth / aspectRatio;
+        let newWidth = availableWidth;
+        let newHeight = availableWidth / aspectRatio;
 
-            if (newHeight > availableHeight) {
-                newHeight = availableHeight;
-                newWidth = availableHeight * aspectRatio;
-            }
-
-            this.cardImage.setDisplaySize(newWidth, newHeight);
-
-            // Center the image on the card
-            this.cardImage.setPosition(0, -this.cardBackground.displayHeight * 0.2); // Move image slightly upwards
-        } else {
-            // console.warn(`Texture '${this.data.portraitName}' not found. Using fallback texture.`);
-            // this.cardImage.setTexture('placeholder');
-            this.data.setPortraitIfNotAvailable(this.scene);
+        if (newHeight > availableHeight) {
+            newHeight = availableHeight;
+            newWidth = availableHeight * aspectRatio;
         }
 
-        if (this.data.getPortraitTint()) {
-            this.cardImage.setTint(this.data.getPortraitTint());
-        }
+        this.cardImage.setDisplaySize(newWidth, newHeight);
+        this.cardImage.setPosition(0, -this.cardBackground.displayHeight * 0.2);
+        this.cardImage.setTint(effectivePortraitTint);
 
         if (this.cardBackground.scene?.sys){
             this.cardBackground.setTexture(this.data.getCardBackgroundImageName());
@@ -612,9 +608,9 @@ export class PhysicalCard implements IPhysicalCardInterface {
         if (this.data.isBaseCharacter()) {
             const baseCharacter = this.data as BaseCharacterType;
             if (baseCharacter.hitpoints <= 0) {
-                this.cardImage.setTint(0x808080); // Apply greyscale tint
+                this.cardImage.setTint(0x808080);
             } else {
-                this.cardImage.clearTint(); // Remove tint if HP is above 0
+                this.cardImage.clearTint();
             }
         }
 
@@ -694,6 +690,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
             this.wiggleTween.stop();
             this.wiggleTween = null;
         }
+        this.cardImage.destroy(); // ShadowedImage has its own destroy method
         this.container.destroy();
     }
 

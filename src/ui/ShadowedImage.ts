@@ -40,6 +40,9 @@ export class ShadowedImage extends Phaser.GameObjects.Container {
             this.mainImage.setTint(tint);
         }
         this.add(this.mainImage);
+
+        // Set the container's size to match the display size
+        this.setSize(displaySize, displaySize);
     }
 
     setScale(scale: number): this {
@@ -51,6 +54,8 @@ export class ShadowedImage extends Phaser.GameObjects.Container {
     setDisplaySize(width: number, height: number): this {
         this.mainImage.setDisplaySize(width, height);
         this.shadowImage.setDisplaySize(width, height);
+        // Update container size when display size changes
+        this.setSize(width, height);
         return this;
     }
 

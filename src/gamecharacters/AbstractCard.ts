@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import { GameState } from '../rules/GameState';
 import type { PhysicalCard } from '../ui/PhysicalCard';
+import { ShadowedImage } from '../ui/ShadowedImage';
 import { TextBox } from '../ui/TextBox';
 import type { ActionManager } from '../utils/ActionManager';
 import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
@@ -14,7 +15,7 @@ import { CardSize, CardType } from './Primitives'; // Ensure enums are imported 
 export interface IPhysicalCardInterface {
     container: Phaser.GameObjects.Container;
     cardBackground: Phaser.GameObjects.Image | Phaser.GameObjects.Rectangle;
-    cardImage: Phaser.GameObjects.Image;
+    cardImage: ShadowedImage;
     data: AbstractCard;
     blockText: TextBox;
 
@@ -279,16 +280,21 @@ export abstract class AbstractCard implements IAbstractCard {
         }, null, 2);
     }
 
-    // Add this method to set the portraitName after the card is created
-    public setPortraitIfNotAvailable(scene: Scene): void {
-        if (!AbstractCard.imageExists(scene, this.portraitName)) {
-            // console.warn(`Image "${this.portraitName}" not found. Using placeholder.`);
-            this.portraitName = ImageUtils.getDeterministicAbstractPlaceholder(this.constructor.name);
-            // Set portrait coloration to a random RGB value seeded with the constructor name
-            const seed = this.constructor.name;
-            const randomColor = this.generateSeededRandomColor(seed);
-            this.portraitTint = randomColor;
+    public getEffectivePortraitName(scene: Scene): string {
+        if (scene.textures.exists(this.portraitName)) {
+            return this.portraitName;
         }
+        return ImageUtils.getDeterministicAbstractPlaceholder(this.constructor.name);
+    }
+
+    public getEffectivePortraitTint(scene: Scene): number {
+        if (scene.textures.exists(this.portraitName)) {
+            return this.portraitTint ?? 0xFFFFFF;
+        }
+        
+        // Generate deterministic tint based on constructor name
+        const seed = this.constructor.name;
+        return this.generateSeededRandomColor(seed);
     }
 
     private generateSeededRandomColor(seed: string): number {
@@ -296,7 +302,7 @@ export abstract class AbstractCard implements IAbstractCard {
         for (let i = 0; i < seed.length; i++) {
             const char = seed.charCodeAt(i);
             hash = ((hash << 5) - hash) + char;
-            hash = hash & hash; // Convert to 32bit integer
+            hash = hash & hash;
         }
 
         const r = (hash & 255);
@@ -304,14 +310,6 @@ export abstract class AbstractCard implements IAbstractCard {
         const b = ((hash >> 16) & 255);
 
         return (r << 16) | (g << 8) | b;
-    }
-
-    public getPortraitTint(): number | undefined {
-        return this.portraitTint;
-    }
-
-    private static imageExists(scene: Scene, key: string): boolean {
-        return scene.textures.exists(key);
     }
 
     public getCardBackgroundImageName(): string {
