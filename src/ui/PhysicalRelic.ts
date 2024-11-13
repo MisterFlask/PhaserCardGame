@@ -78,9 +78,8 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
     }
 
     setupInteractivity(): void {
-        // Set the container as interactive with a specific hit area rectangle
-        this.setInteractive(new Phaser.Geom.Rectangle(0, 0, this.baseSize, this.baseSize), 
-            Phaser.Geom.Rectangle.Contains)
+        // Remove the container's interactivity and set it on the shadowed image's main image instead
+        this.relicImage.setInteractive()
             .on('pointerover', this.onPointerOver, this)
             .on('pointerout', this.onPointerOut, this)
             .on('pointerdown', this.onPointerDown, this);

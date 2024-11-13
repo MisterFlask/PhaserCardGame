@@ -32,7 +32,7 @@ export class ShadowedImage extends Phaser.GameObjects.Container {
         this.shadowImage.setDepth(0);
         this.add(this.shadowImage);
 
-        // Create main image
+        // Create main image with input enabled
         this.mainImage = scene.add.image(0, 0, texture);
         this.mainImage.setDisplaySize(displaySize, displaySize);
         this.mainImage.setDepth(1);
