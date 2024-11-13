@@ -9,7 +9,7 @@ export class CoalCargo extends PlayableCard {
     constructor() {
         super({
             name: "Coal Cargo",
-            cardType: CardType.SKILL,
+            cardType: CardType.ITEM,
             targetingType: TargetingType.NO_TARGETING,
             rarity: CardRarity.COMMON,
         });

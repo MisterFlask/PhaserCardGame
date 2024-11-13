@@ -8,7 +8,7 @@ export class AlcoholCargo extends PlayableCard {
     constructor() {
         super({
             name: "Alcohol Cargo",
-            cardType: CardType.SKILL,
+            cardType: CardType.ITEM,
             targetingType: TargetingType.NO_TARGETING,
             rarity: CardRarity.COMMON,
         });

@@ -266,6 +266,39 @@ export class ActionManager {
                 }
             });
         });
+
+
+        
+        // Consolidate stacks of buffs of the same type
+        combatState.allPlayerAndEnemyCharacters.forEach(character => {
+            // Create a map to track buffs by their constructor name
+            const buffsByType = new Map<string, AbstractBuff[]>();
+            
+            character.buffs.forEach(buff => {
+                const buffType = buff.constructor.name;
+                if (!buffsByType.has(buffType)) {
+                    buffsByType.set(buffType, []);
+                }
+                buffsByType.get(buffType)!.push(buff);
+            });
+
+            // For each buff type that has multiple instances
+            buffsByType.forEach((buffs, buffType) => {
+                if (buffs.length > 1) {
+                    // Sum up all stacks
+                    const totalStacks = buffs.reduce((sum, buff) => sum + buff.stacks, 0);
+                    
+                    // Keep the first buff and update its stacks
+                    const firstBuff = buffs[0];
+                    firstBuff.stacks = totalStacks;
+
+                    // Remove other buffs of the same type
+                    character.buffs = character.buffs.filter(buff => 
+                        buff === firstBuff || buff.constructor.name !== buffType
+                    );
+                }
+            });
+        });
     }
 
     private animateDrawCard(card: PlayableCard): Promise<void> {

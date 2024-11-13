@@ -6,7 +6,7 @@ export class CoffeeCargo extends PlayableCard {
     constructor() {
         super({
             name: "Coffee Cargo",
-            cardType: CardType.SKILL,
+            cardType: CardType.ITEM,
             targetingType: TargetingType.NO_TARGETING,
             rarity: CardRarity.COMMON,
         });

@@ -60,6 +60,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
     priceContext: PriceContext = PriceContext.NONE;
     private transientUiState = TransientUiState.getInstance(); // Added
 
+    private cardTypeBox: TextBox | null = null;
+
     constructor({
         scene,
         container,
@@ -263,6 +265,29 @@ export class PhysicalCard implements IPhysicalCardInterface {
         
         // Add glow effect first so it appears behind the card
         this.cardContent.addAt(this.glowEffect, 0);
+
+        if (this.data.isPlayableCard()) {
+            const playableCard = this.data as PlayableCardType;
+            const cardWidth = this.cardBackground.displayWidth;
+            const cardHeight = this.cardBackground.displayHeight;
+            this.cardTypeBox = new TextBox({
+                scene: this.scene,
+                x: -cardWidth / 2,
+                y: -cardHeight / 2,
+                width: 22,
+                height: 11,
+                text: playableCard.cardType.displayName,
+                style: { 
+                    fontSize: '12px',
+                    color: '#ffffff',
+                    fontFamily: 'Arial',
+                    align: 'center'
+                }
+            });
+            this.cardContent.add(this.cardTypeBox);
+        } else {
+            this.cardTypeBox = null;
+        }
     }
     setInteractive(isInteractive: boolean): Phaser.GameObjects.Container {
         this.container.setInteractive(isInteractive);
@@ -327,6 +352,10 @@ export class PhysicalCard implements IPhysicalCardInterface {
         if (this.glowEffect) {
             this.glowEffect.destroy();
             this.glowEffect = undefined;
+        }
+
+        if (this.cardTypeBox) {
+            this.cardTypeBox.destroy();
         }
 
         this.obliterated = true;
@@ -635,6 +664,11 @@ export class PhysicalCard implements IPhysicalCardInterface {
             const scaledHeight = this.cardBackground.displayHeight * PhysicalCard.GLOW_SCALE_MULTIPLIER * currentScale;
             this.glowEffect.setDisplaySize(scaledWidth, scaledHeight);
         }
+
+        if (this.cardTypeBox && this.data.isPlayableCard()) {
+            const playableCard = this.data as PlayableCardType;
+            this.cardTypeBox.setText(playableCard.cardType.displayName);
+        }
     }
 
     updateIntents(): void {
@@ -897,6 +931,10 @@ export class PhysicalCard implements IPhysicalCardInterface {
         
         if (this.cardBorder) {
             this.cardBorder.setDepth(depth - 1); // Border should be behind the card
+        }
+
+        if (this.cardTypeBox) {
+            this.cardTypeBox.setDepth(depth);
         }
 
         console.log("Card component depth after setting:", {

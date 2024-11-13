@@ -7,7 +7,7 @@ export class SpicyLiteratureCargo extends PlayableCard {
     constructor() {
         super({
             name: "Spicy Literature Cargo",
-            cardType: CardType.SKILL,
+            cardType: CardType.ITEM,
             targetingType: TargetingType.NO_TARGETING,
             rarity: CardRarity.COMMON,
         });
