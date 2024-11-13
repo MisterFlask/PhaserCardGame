@@ -1,7 +1,7 @@
 // src/managers/CombatCardManager.ts
 
 import Phaser from 'phaser';
-import { AbstractCard, UiCard } from '../../gamecharacters/AbstractCard';
+import { AbstractCard, Team, UiCard } from '../../gamecharacters/AbstractCard';
 import { AutomatedCharacter } from '../../gamecharacters/AutomatedCharacter';
 import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
 import type { PlayableCard } from '../../gamecharacters/PlayableCard';
@@ -82,6 +82,7 @@ export class CombatCardManager {
                 onCardCreatedEventCallback: () => { }
             });
             unit.data.physicalCard = unit;
+            unit.data.team = Team.ALLY;
             (unit as any).isPlayerUnit = true;
             this.playerUnits.push(unit);
         });
@@ -93,6 +94,7 @@ export class CombatCardManager {
         const depthManager = DepthManager.getInstance();
         
         enemies.forEach((enemy, index) => {
+            enemy.team = Team.ENEMY;
             const enemyCard = CardGuiUtils.getInstance().createCard({
                 scene: this.scene,
                 x: 400 + index * (cardWidth * 2),
