@@ -256,11 +256,11 @@ class CombatInputHandler {
     }
 
     private animateCardBack(): void {
-        if (this.transientUiState.draggedCard && this.originalCardPosition) {
+        if (this.transientUiState.draggedCard) {
             this.scene.tweens.add({
                 targets: this.transientUiState.draggedCard.container,
-                x: this.originalCardPosition.x,
-                y: this.originalCardPosition.y,
+                x: CombatSceneLayoutUtils.getCardPositionInHand(this.scene, this.cardManager.playerHand.indexOf(this.transientUiState.draggedCard), this.cardManager.playerHand).x,
+                y: CombatSceneLayoutUtils.getHandY(this.scene),
                 scaleX: 1,
                 scaleY: 1,
                 alpha: 1,

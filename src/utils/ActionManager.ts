@@ -268,7 +268,7 @@ export class ActionManager {
         });
 
 
-        
+
         // Consolidate stacks of buffs of the same type
         combatState.allPlayerAndEnemyCharacters.forEach(character => {
             // Create a map to track buffs by their constructor name
@@ -664,14 +664,16 @@ export class ActionManager {
         }));
     }
 
-    public displaySubtitle(text: string): void {
+    public displaySubtitle(text: string, durationMs: number = 4000): void {
         this.actionQueue.addAction(new GenericAction(async () => {
             await SubtitleManager.getInstance().showSubtitle(text);
-            // Small delay to ensure the subtitle appears before the next action
-            await new WaitAction(50).playAction();
+            // Wait for the specified duration
+            await new WaitAction(durationMs).playAction();
+            await SubtitleManager.getInstance().hideSubtitle();
             return [];
         }));
     }
+
     public PlayCard = (card: PlayableCardType, target: BaseCharacterType): void => {
         // Invoke the effect of the card
         if (card.IsPerformableOn(target)) {

@@ -25,7 +25,6 @@ class CombatUIManager {
     private static instance: CombatUIManager;
     public scene: Phaser.Scene;
     public menu!: Menu;
-    public combatStatusText!: TextBox;
     public endTurnButton!: TextBoxButton;
     public battlefieldArea!: Phaser.GameObjects.Rectangle;
     public handArea!: Phaser.GameObjects.Rectangle;
@@ -64,7 +63,6 @@ class CombatUIManager {
 
     private createUI(): void {
         this.createMenu();
-        this.createCombatStatusText();
         this.createEndTurnButton();
         this.createGameAreas();
         this.createEnergyDisplay();
@@ -188,22 +186,6 @@ class CombatUIManager {
         this.handArea.setVisible(!this.handArea.visible);
     }
 
-    private createCombatStatusText(): void {
-        const gameWidth = this.scene.scale.width;
-        const pileY = CombatSceneLayoutUtils.getPileY(this.scene);
-
-        this.combatStatusText = new TextBox({
-            scene: this.scene,
-            x: gameWidth * 0.5,
-            y: pileY,
-            width: 300,
-            height: 50,
-            text: 'CURRENT COMBAT STATUS',
-            style: { fontSize: '24px', color: '#000', align: 'center' }
-        });
-
-        this.scene.add.existing(this.combatStatusText);
-    }
 
     private createEndTurnButton(): void {
         const gameWidth = this.scene.scale.width;
@@ -233,7 +215,6 @@ class CombatUIManager {
 
     public updateLayout(width: number, height: number): void {
         this.menu.updatePosition(width * 0.25, height / 2);
-        this.combatStatusText.setPosition(width * 0.5, CombatSceneLayoutUtils.getPileY(this.scene));
         this.endTurnButton.setPosition(width * 0.7, CombatSceneLayoutUtils.getPileY(this.scene));
 
         const menuButton = this.scene.children.getByName('MenuButton') as TextBoxButton;

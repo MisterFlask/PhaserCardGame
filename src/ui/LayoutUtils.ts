@@ -62,7 +62,19 @@ class CombatSceneLayoutUtils {
         const dropArea = this.getBattlefieldDropArea(scene);
         return dropArea.contains(pointer.x, pointer.y);
     }
-    
+
+    static getCardPositionInHand(scene: Phaser.Scene, index: number, cardArray: PhysicalCard[]): { x: number, y: number } {
+        const gameWidth = scene.scale.width;
+        const totalWidth = gameWidth;
+        const cardSpacing = Math.min(CardGuiUtils.getInstance().cardConfig.cardWidth, totalWidth / (cardArray.length + 1));
+        const totalCardsWidth = cardArray.length * cardSpacing;
+        const startX = (totalWidth - totalCardsWidth) / 2;
+        
+        return {
+            x: startX + index * cardSpacing,
+            y: this.getHandY(scene)
+        };
+    }
 }
 
 export default CombatSceneLayoutUtils;
