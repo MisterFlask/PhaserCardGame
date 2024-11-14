@@ -757,6 +757,7 @@ export class ActionManager {
         
         // Queue discard actions instead of direct discard
         ActionManager.getInstance().basicDiscardCards(combatState.currentHand);
+        combatState.currentTurn++;
         ActionManager.beginTurn();
     }
 

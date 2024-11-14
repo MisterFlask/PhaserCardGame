@@ -11,7 +11,11 @@ import { FrenchDeer } from './monsters/act1_segment1/FrenchDeer';
 import { FrenchTotem } from './monsters/act1_segment1/FrenchTotem';
 import { FrenchLumberjack } from './monsters/act1_segment2/FrenchLumberjack';
 import { FrenchMime } from './monsters/act1_segment2/FrenchMime';
+import { FrenchCaptain } from './monsters/act2_boss/FrenchCaptain';
+import { FrenchIntellectual } from './monsters/act2_segment1/FrenchIntellectual';
 import { FrenchPoliceman } from './monsters/act2_segment1/FrenchPoliceman';
+import { Artiste } from './monsters/act2_segment2/Artiste';
+import { FrenchRestauranteur } from './monsters/act2_segment2/FrenchRestauranteur';
 
 // Define new character classes
 export class ClockworkAbomination extends AutomatedCharacter {
@@ -84,24 +88,33 @@ export class ActSegment {
     static readonly Boss_Act1 = new ActSegmentData("Boss Fight - Act 1", 1, 3, [
         {
             enemies: [new FrenchBlindProphetess(), new FrenchTotem(), new FrenchTotem()]
-        }
+        },
     ]);
 
     static readonly Act2_Segment1 = new ActSegmentData("Act 2 - Segment 1", 2, 1, [
         {
             enemies: [new FrenchPoliceman(), new FrenchPoliceman()]
+        },
+        {
+            enemies: [new FrenchIntellectual(), new FrenchIntellectual()]
         }
     ]);
 
-    static readonly Act2_Segment2 = new ActSegmentData("Act 2 - Segment 2", 2, 2, []);
+    static readonly Act2_Segment2 = new ActSegmentData("Act 2 - Segment 2", 2, 2, [
+        {
+            enemies: [new FrenchIntellectual(), new FrenchIntellectual(), new Artiste()]
+        },
+        {
+            enemies: [new FrenchChef(), new FrenchChef(), new FrenchRestauranteur()]
+        }
+    ]);
+    
     
     static readonly Boss_Act2 = new ActSegmentData("Boss Fight - Act 2", 2, 3, [
         {
-            enemies: [new BaconBeast(), new ClockworkAbomination(), new ClockworkAbomination()]
+            enemies: [new FrenchCaptain()]
         }
     ]);
-
-    static readonly Special = new ActSegmentData("Special", 0, 0, []);
 }
 
 export interface EncounterData {

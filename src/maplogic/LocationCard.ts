@@ -11,33 +11,38 @@ import { Faction } from './Faction';
 
 export class LocationCard extends AbstractCard {
     override typeTag = "LocationCard";
-    encounter: EncounterData;
+    encounter!: EncounterData;
     controllingFaction: Faction = Faction.NEUTRAL;
     public adjacentLocations: LocationCard[] = []; // New property for adjacency
     public xPos: number = 0;
     public yPos: number = 0;
     public floor: number = 0;
     public roomNumber: number = 0;
+    public segment: number = 0;
 
     constructor({ name, description, portraitName, tooltip, size, floor, index }: { name: string; description: string; portraitName?: string; tooltip?: string; size: CardSize; floor: number; index: number }) { 
         const fullName = `${name} ${floor}-${index + 1}`;
 
-        const encounter = EncounterManager.getInstance().getRandomEncounter();
-        const encounterDescription = `Encounter: ${encounter.enemies.map(e => e.name).join(', ')}`;
-        const fullDescription = `${description}\n\n${encounterDescription}`;
-
         super({
             name: fullName,
-            description: fullDescription,
+            description: "",
             portraitName,
-            cardType: CardType.ATTACK,
+            cardType: CardType.NON_PLAYABLE,
             tooltip,
             size // Pass the size parameter
         });
 
-        this.encounter = encounter;
+
         this.floor = floor;
-        this.roomNumber = index;
+        this.roomNumber = index;       
+    }
+
+    initEncounter() {
+        const encounter = EncounterManager.getInstance().getRandomEncounterFromActSegmentNumbers(1, this.segment);
+        const encounterDescription = `Encounter: ${encounter.enemies.map(e => e.name).join(', ')}`;
+        this.encounter = encounter;
+        const fullDescription = `${encounterDescription}`;
+        this.description = fullDescription;
     }
 
     setAdjacent(location: LocationCard) {

@@ -50,8 +50,14 @@ export class LocationManager {
                     }
                 }
 
+                if (location.floor < 5){
+                    location.segment = 1;
+                } else {
+                    location.segment = 2;
+                }
                 location.floor = floor;
                 location.roomNumber = i;
+                location.initEncounter();
                 floorLocationData.push(location);
             }
 

@@ -91,6 +91,7 @@ class CombatScene extends Phaser.Scene {
         });
 
         this.setupResizeHandler();
+        GameState.getInstance().combatState.currentTurn = 0;
         ActionManager.beginTurn()
 
         this.inventoryPanel = new InventoryPanel(this);
