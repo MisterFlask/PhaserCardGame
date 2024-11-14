@@ -52,7 +52,7 @@ export abstract class BaseCharacterClass {
         ]
     }
     generateStartingPersonaTraits(): AbstractBuff {
-        const buffs = [new Scholar(), new WellDrilled(), new StrongBack(), new Undersider(), new Merchant()]
+        const buffs = [new Scholar(), new WellDrilled(), new StrongBack(2), new Undersider(20), new Merchant(35)]
         return buffs[Math.floor(Math.random() * buffs.length)]
     }
 
