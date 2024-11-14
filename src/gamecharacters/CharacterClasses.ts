@@ -40,7 +40,11 @@ export abstract class BaseCharacterClass {
     createCharacterFromClass(){
         var character = new PlayerCharacter({ name: this.name, portraitName: this.iconName, characterClass: this })
         character.cardsInMasterDeck = this.generateStartingDeck()
+        for (const card of character.cardsInMasterDeck) {
+            card.owner = character;
+        }
         character.buffs = [this.generateStartingPersonaTraits()]
+
         return character
     }
 
@@ -53,7 +57,7 @@ export abstract class BaseCharacterClass {
     }
     generateStartingPersonaTraits(): AbstractBuff {
         const buffs = [new Scholar(), new WellDrilled(), new StrongBack(2), new Undersider(20), new Merchant(35)]
-        return buffs[Math.floor(Math.random() * buffs.length)]
+        return buffs[Math.floor(Math.random() * buffs.length)].clone()
     }
 
     private getRandomResourceIncreaseBuff(): AbstractBuff {
