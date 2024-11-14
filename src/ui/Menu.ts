@@ -227,4 +227,21 @@ export default class Menu {
                 closeButton.destroy();
             });
     }
+
+    public updateOptions(newOptions: MenuOption[]): void {
+        this.options = newOptions;
+        // Clear existing options
+        this.optionContainers.forEach(container => container.destroy());
+        this.optionContainers = [];
+        // Create new options
+        this.createOptions();
+    }
+
+    public isVisible(): boolean {
+        return this.container.visible;
+    }
+
+    public destroy(): void {
+        this.container.destroy();
+    }
 }

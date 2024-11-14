@@ -165,6 +165,11 @@ export class GameState {
     }
 
     // Ensure that AbstractCard can be treated as StoreCard or adjust types accordingly
+
+    // Add the addRelic method to GameState class
+    public addRelic(relic: AbstractRelic): void {
+        this.relicsInventory.push(relic);
+    }
 }
 
 export class CombatState{

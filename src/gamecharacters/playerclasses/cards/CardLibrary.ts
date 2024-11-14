@@ -1,4 +1,5 @@
 import { PlayableCard } from '../../PlayableCard';
+import { ArchonClass } from '../ArchonClass';
 import { BlackhandClass } from '../BlackhandClass';
 import { DiabolistClass } from '../DiabolistClass';
 
@@ -20,6 +21,7 @@ export class CardLibrary {
         return [
             ... new BlackhandClass().availableCards,
             ... new DiabolistClass().availableCards,
+            ... new ArchonClass().availableCards,
         ];
     }
 }

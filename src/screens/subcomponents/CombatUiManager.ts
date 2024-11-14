@@ -6,6 +6,7 @@ import { Defend } from '../../gamecharacters/playerclasses/cards/basic/Defend';
 import { GameState } from '../../rules/GameState';
 import { TextBoxButton } from '../../ui/Button';
 import { CombatResourceDisplay } from '../../ui/CombatResourceDisplay';
+import { DebugMenu } from '../../ui/DebugMenu';
 import { DepthManager } from '../../ui/DepthManager';
 import { default as CombatSceneLayoutUtils, default as LayoutUtils } from '../../ui/LayoutUtils';
 import Menu from '../../ui/Menu';
@@ -35,6 +36,7 @@ class CombatUIManager {
     private combatEnded: boolean = false;
     private debugOverlay!: TextBox;
     public dropZoneHighlight!: Phaser.GameObjects.Image;
+    private debugMenu!: DebugMenu;
 
     private constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -69,6 +71,7 @@ class CombatUIManager {
         this.createResourceIndicators();
         this.createDebugOverlay();
         this.setupDebugOverlayToggle();
+        this.createDebugMenu();
     }
 
     private createEnergyDisplay(): void {
@@ -307,6 +310,9 @@ class CombatUIManager {
         if (this.dropZoneHighlight) {
             this.dropZoneHighlight.destroy();
         }
+        if (this.debugMenu) {
+            this.debugMenu.destroy();
+        }
     }
 
     private createResourceIndicators(): void {
@@ -493,6 +499,10 @@ class CombatUIManager {
         });
         
         this.debugOverlay.setText(debugText);
+    }
+
+    private createDebugMenu(): void {
+        this.debugMenu = new DebugMenu(this.scene);
     }
 }
 
