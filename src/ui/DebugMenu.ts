@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import { CardLibrary } from '../gamecharacters/playerclasses/cards/CardLibrary';
 import { RelicsLibrary } from '../relics/RelicsLibrary';
+import { GameState } from '../rules/GameState';
 import { ActionManager } from '../utils/ActionManager';
 import { DepthManager } from './DepthManager';
 import Menu from './Menu';
@@ -75,6 +76,18 @@ export class DebugMenu {
             {
                 text: 'Add Relics',
                 callback: () => this.showRelicsMenu()
+            },
+            {
+                text: 'Add Resources (+4 each)',
+                callback: () => {
+                    const combatResources = GameState.getInstance().combatState.combatResources;
+                    combatResources.modifyPluck(4);
+                    combatResources.modifyPages(4);
+                    combatResources.modifyIron(4);
+                    combatResources.modifyVenture(4);
+                    combatResources.modifySmog(4);
+                    combatResources.modifyPowder(4);
+                }
             },
             {
                 text: 'Close',

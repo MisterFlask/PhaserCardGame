@@ -650,7 +650,7 @@ export class ActionManager {
         }));
     }
 
-    public modifyFog(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
+    public modifySmog(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
         this.actionQueue.addAction(new GenericAction(async () => {
             GameState.getInstance().combatState.combatResources.modifySmog(amount);
             return [];
@@ -674,7 +674,7 @@ export class ActionManager {
             return [];
         }));
     }
-    public modifyGold(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
+    public modifyVenture(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
         this.actionQueue.addAction(new GenericAction(async () => {
             GameState.getInstance().combatState.combatResources.modifyVenture(amount);
             return [];

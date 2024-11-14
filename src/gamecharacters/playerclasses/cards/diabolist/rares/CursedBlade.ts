@@ -10,7 +10,6 @@ class WeThirstBuff extends AbstractBuff {
         super();
         this.stacks = stacks;
         this.isDebuff = true;
-        
     }
 
     override getName(): string {

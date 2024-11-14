@@ -194,7 +194,7 @@ export class CombatState{
     combatResources: CombatResources = new CombatResources()
 
     public energyAvailable: number = 0
-    public maxEnergy: number = 5
+    public maxEnergy: number = 3
         
     getBattleCardLocation = (cardId: string): BattleCardLocation => {
         if (this.currentDrawPile.some(c => c.id === cardId)) return BattleCardLocation.DrawPile

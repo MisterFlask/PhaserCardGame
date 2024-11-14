@@ -13,12 +13,14 @@ import type { ActionManager } from "../utils/ActionManager";
 import { ActionManagerFetcher } from "../utils/ActionManagerFetcher";
 import { AbstractCard, TargetingType, Team } from "./AbstractCard";
 import { BaseCharacter } from "./BaseCharacter";
+import type { AbstractBuff } from "./buffs/AbstractBuff";
 import { PlayerCharacter } from "./CharacterClasses";
 import { IBaseCharacter } from "./IBaseCharacter";
 import { CardSize, CardType } from "./Primitives";
 
 export enum CardRarity {
     TOKEN,
+    BASIC,
     COMMON,
     UNCOMMON,
     RARE,
@@ -56,6 +58,11 @@ export abstract class PlayableCard extends AbstractCard {
         this.combatState.playerCharacters
             .filter(char => char.team === Team.ALLY)
             .forEach(callback);
+    }
+
+    withBuffs(buffs: AbstractBuff[]): this {
+        this.buffs = buffs;
+        return this;
     }
 
     /**
