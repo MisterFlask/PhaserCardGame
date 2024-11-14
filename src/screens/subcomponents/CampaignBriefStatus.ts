@@ -11,6 +11,8 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
     private readonly RELIC_GRID_HEIGHT = 60; // 2x currency height
     private readonly RELIC_SIZE = 44; 
     private readonly RELIC_PADDING = 6;
+    private readonly BASE_RELIC_DEPTH = 100;
+    private readonly HOVER_RELIC_DEPTH = 1000;
 
     constructor(scene: Phaser.Scene) {
         super(scene, 10, 10);
@@ -58,7 +60,6 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
 
     private updateRelicDisplay(): void {
         console.log('Updating relic display because propagateGameStateChangesToUi was emitted');
-        // Clear existing relics
         this.relicContainer.removeAll(true);
 
         const relics = GameState.getInstance().relicsInventory;
@@ -79,8 +80,16 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
                 baseSize: this.RELIC_SIZE
             });
 
-            // Hide the price box since we're just displaying owned relics
+            physicalRelic.setDepth(this.BASE_RELIC_DEPTH);
             physicalRelic.priceBox?.setVisible(false);
+            
+            physicalRelic.on('pointerover', () => {
+                physicalRelic.setDepth(this.HOVER_RELIC_DEPTH);
+            });
+
+            physicalRelic.on('pointerout', () => {
+                physicalRelic.setDepth(this.BASE_RELIC_DEPTH);
+            });
             
             this.relicContainer.add(physicalRelic);
         });

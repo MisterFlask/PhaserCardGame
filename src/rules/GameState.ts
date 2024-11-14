@@ -164,11 +164,9 @@ export class GameState {
         return [...this.locations];
     }
 
-    // Ensure that AbstractCard can be treated as StoreCard or adjust types accordingly
-
-    // Add the addRelic method to GameState class
-    public addRelic(relic: AbstractRelic): void {
+    public addRelic(relic: AbstractRelic, scene: Phaser.Scene): void {
         this.relicsInventory.push(relic);
+        scene.events.emit('propagateGameStateChangesToUi');
     }
 }
 

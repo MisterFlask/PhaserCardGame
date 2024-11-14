@@ -40,6 +40,10 @@ export class ActionManager {
         return true;
     }
 
+    addRelicToInventory(relic: AbstractRelic, scene: Phaser.Scene) {
+        GameState.getInstance().addRelic(relic, scene);
+    }
+
 
     buyItemForHellCurrency(item: PlayableCard) : boolean {
         const inventory = GameState.getInstance().cardsInventory;

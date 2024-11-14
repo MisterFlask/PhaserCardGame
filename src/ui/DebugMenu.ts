@@ -1,7 +1,6 @@
 import { Scene } from 'phaser';
 import { CardLibrary } from '../gamecharacters/playerclasses/cards/CardLibrary';
 import { RelicsLibrary } from '../relics/RelicsLibrary';
-import { GameState } from '../rules/GameState';
 import { ActionManager } from '../utils/ActionManager';
 import { DepthManager } from './DepthManager';
 import Menu from './Menu';
@@ -153,7 +152,7 @@ export class DebugMenu {
                 text: relic.name,
                 callback: () => {
                     const newRelic = new (relic.constructor as any)();
-                    GameState.getInstance().addRelic(newRelic);
+                    ActionManager.getInstance().addRelicToInventory(newRelic, this.scene);
                 }
             }));
 
