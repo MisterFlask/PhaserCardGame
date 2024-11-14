@@ -6,6 +6,7 @@ import { TextBox } from '../ui/TextBox';
 import type { ActionManager } from '../utils/ActionManager';
 import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
 import ImageUtils from '../utils/ImageUtils';
+import type { BaseCharacter } from './BaseCharacter';
 import type { AbstractBuff } from './buffs/AbstractBuff';
 import type { PlayerCharacter } from './CharacterClasses';
 import { IAbstractCard } from './IAbstractCard';
@@ -125,6 +126,15 @@ export abstract class AbstractCard implements IAbstractCard {
     public isPlayableCard(): boolean{
         return this.hasOwnProperty('targetingType');
     }
+
+    public asPlayableCard(): PlayableCard{
+        return this as unknown as PlayableCard;
+    }
+
+    public asBaseCharacter(): BaseCharacter{
+        return this as unknown as BaseCharacter;
+    }
+
     public _actionManager!: ActionManager;
 
     public get actionManager(): ActionManager{
@@ -321,6 +331,25 @@ export abstract class AbstractCard implements IAbstractCard {
         }
         return "greyscale";
     }
+
+    public isValidTarget(target: IAbstractCard): boolean {
+        // Base cards aren't playable on targets
+        if (!(this as unknown as PlayableCard)?.targetingType) return false;
+
+        const targetingType = (this as unknown as PlayableCard).targetingType;
+        
+        if (targetingType === TargetingType.NO_TARGETING) return true;
+
+        // If target is a character
+        if ((target as any).isBaseCharacter?.()) {
+            if (targetingType === TargetingType.ENEMY) {
+                return target.team === Team.ENEMY;
+            } else if (targetingType === TargetingType.ALLY) {
+                return target.team === Team.ALLY;
+            }
+        }
+        return false;
+    }
 }
 
 // dummy card implementation for ui elements that look like cards but are not playable
@@ -332,13 +361,7 @@ export class UiCard extends AbstractCard{
 }
 
 export enum TargetingType{
-    ALLY,
-    ENEMY,
-    NO_TARGETING
-}
-
-export enum PlayableCardType {
-    Attack = "Attack",
-    Skill = "Skill",
-    Power = "Power",
+    ALLY = "ALLY",
+    ENEMY = "ENEMY",
+    NO_TARGETING = "NO_TARGETING"
 }

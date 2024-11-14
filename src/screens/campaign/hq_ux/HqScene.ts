@@ -25,6 +25,31 @@ export class HqScene extends Scene {
     }
 
     preload(): void {
+        // background and border of the loading bar
+        const barWidth = 300;
+        const barHeight = 30;
+        const barX = (this.cameras.main.width - barWidth) / 2;
+        const barY = (this.cameras.main.height - barHeight) / 2;
+
+        // border and fill graphics
+        const loadBar = this.add.graphics();
+        const loadFill = this.add.graphics();
+
+        loadBar.fillStyle(0x222222, 1); // dark background for the bar
+        loadBar.fillRect(barX, barY, barWidth, barHeight);
+
+        // update the bar as assets load
+        this.load.on('progress', (progress: number) => {
+            loadFill.clear();
+            loadFill.fillStyle(0xffffff, 1); // white fill for progress
+            loadFill.fillRect(barX, barY, barWidth * progress, barHeight);
+        });
+
+        this.load.on('complete', () => {
+            loadFill.destroy();
+            loadBar.destroy();
+        });
+
         ActionManagerFetcher.initActionManager();
         new GameImageLoader().loadAllImages(this.load);
         SceneChanger.setCurrentScene(this);

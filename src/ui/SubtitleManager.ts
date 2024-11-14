@@ -40,6 +40,19 @@ export class SubtitleManager {
             this.subtitleTextBox.setText(text);
             this.subtitleTextBox.setVisible(true);
         }
+
+        // Reset scale before playing new pulse animation
+        this.subtitleTextBox.setScale(1);
+        
+        // Play pulse animation
+        this.scene.tweens.add({
+            targets: this.subtitleTextBox,
+            scaleX: 1.1,
+            scaleY: 1.1,
+            duration: 100,
+            yoyo: true,
+            ease: 'Quad.easeInOut'
+        });
     }
 
     public async hideSubtitle(): Promise<void> {
