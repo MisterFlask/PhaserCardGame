@@ -11,6 +11,18 @@ try {
         throw "Failed to switch to gh-pages branch"
     }
 
+    # Merge from master
+    git merge master
+    if ($LASTEXITCODE -ne 0) {
+        throw "Failed to merge from master"
+    }
+
+    # Run build
+    npm run build
+    if ($LASTEXITCODE -ne 0) {
+        throw "Build failed"
+    }
+
     # 2. Copy dist folder contents to root
     Copy-Item -Path "dist/*" -Destination "." -Recurse -Force
 
