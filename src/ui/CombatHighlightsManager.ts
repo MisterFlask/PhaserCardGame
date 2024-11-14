@@ -2,7 +2,9 @@ import { AbstractCard, TargetingType } from "../gamecharacters/AbstractCard";
 import { GameState } from "../rules/GameState";
 import CombatUIManager from "../screens/subcomponents/CombatUiManager";
 import { BaseCharacterType } from "../Types";
+import { IncomingIntent } from "./IncomingIntent";
 import { PhysicalCard } from "./PhysicalCard";
+import { PhysicalIntent } from "./PhysicalIntent";
 import { TransientUiState } from "./TransientUiState";
 
 export class CombatHighlightsManager {
@@ -26,8 +28,18 @@ export class CombatHighlightsManager {
     }
 
     public update(allCharacters: BaseCharacterType[]): void {
+
+
         // Clear all highlights first
         this.clearAllHighlights(allCharacters);
+
+        if (this.transientUiState.hoveredIntent) {
+            this.highlightDefender(this.transientUiState.hoveredIntent);
+        }
+        
+        if (this.transientUiState.hoveredIncomingIntent) {
+            this.highlightAttacker(this.transientUiState.hoveredIncomingIntent);
+        }
 
         const draggedCard = this.transientUiState.draggedCard;
         const hoveredCard = this.transientUiState.hoveredCard;
@@ -49,6 +61,15 @@ export class CombatHighlightsManager {
             this.handleHoveredCardHighlight(hoveredCard);
         }
 
+    }
+
+    highlightAttacker(hoveredIncomingIntent: IncomingIntent) {
+        var attacker = hoveredIncomingIntent.intent.owner;
+        attacker?.physicalCard?.setGlow(true)
+    }
+
+    highlightDefender(hoveredIntent: PhysicalIntent) {
+        hoveredIntent.getTargetedCharacter()?.physicalCard?.setGlow(true)
     }
 
     private clearAllHighlights(characters: BaseCharacterType[]): void {
