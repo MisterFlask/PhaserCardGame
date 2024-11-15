@@ -72,11 +72,14 @@ export class ShopOverlay {
     }
 
     private populatePurchasableShopRelics(): void {
-        const gridColumns = 4;
+        const { width, height } = this.scene.scale;
+
+        const gridColumns = 3;
         const verticalSpacing = 122;
         const horizontalSpacing = 122;
-        const startX = 450;
-        const startY = 300;
+        
+        const startX = width - 400;
+        const startY = height / 2 - (verticalSpacing * (gridColumns - 1) / 2);
 
         GameState.getInstance().shopRelicsForSale.forEach((relic, index) => {
             const row = Math.floor(index / gridColumns);
