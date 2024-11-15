@@ -1,7 +1,6 @@
 import type { AbstractCard } from "../gamecharacters/AbstractCard";
 import { CardType } from "../gamecharacters/Primitives";
 import { PhysicalCard } from "../ui/PhysicalCard";
-import { TextBox } from "../ui/TextBox";
 import { UIContext } from "../ui/UIContextManager";
 
 export interface CardConfig {
@@ -40,23 +39,7 @@ export class CardGuiUtils {
 
         const cardContainer = scene.add.container(x, y);
         const { cardWidth, cardHeight } = this.cardConfig;
-        const cardBackground = scene.add.image(0, 0, data.getCardBackgroundImageName())
-            .setDisplaySize(cardWidth, cardHeight);
         
-        const cardImage = scene.add.image(0, -cardHeight / 4, data.getEffectivePortraitName(scene))
-            .setDisplaySize(cardWidth / 2, cardHeight / 2);
-        const nameBox = new TextBox({
-            scene: scene,
-            x: 0,
-            y: cardHeight / 4,
-            width: cardWidth - 10,
-            height: 60,
-            text: data.name,
-            textBoxName: "nameBox:" + data.id,
-            style: { fontSize: '16px', color: '#000', wordWrap: { width: cardWidth - 10 } }
-        });
-        
-        cardContainer.add([cardBackground, cardImage, nameBox]);
         cardContainer.setSize(cardWidth, cardHeight);
         cardContainer.setInteractive(new Phaser.Geom.Rectangle(0, 0, cardWidth, cardHeight), Phaser.Geom.Rectangle.Contains);
 
@@ -65,9 +48,6 @@ export class CardGuiUtils {
         const physicalCard = new PhysicalCard({
             scene: scene,
             container: cardContainer,
-            cardBackground: cardBackground,
-            cardImage: cardImage,
-            nameBox: nameBox,
             data: data,
             cardConfig: this.cardConfig
         });

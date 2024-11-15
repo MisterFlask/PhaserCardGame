@@ -65,28 +65,17 @@ export class PhysicalCard implements IPhysicalCardInterface {
     constructor({
         scene,
         container,
-        cardBackgroundAsRectangle,
-        cardBackground,
-        cardImage,
-        nameBox,
         data,
         cardConfig
     }: {
         scene: Phaser.Scene;
         container: Phaser.GameObjects.Container;
-        cardBackgroundAsRectangle?: Phaser.GameObjects.Rectangle;
-        cardBackground: Phaser.GameObjects.Image;
-        cardImage: Phaser.GameObjects.Image;
-        nameBox: TextBox;
         data: AbstractCard;
         cardConfig: CardConfig;
     }) {
         var {cardWidth, cardHeight} = cardConfig;
         this.scene = scene;
         this.container = container;
-        this.cardBackgroundAsRectangle = cardBackgroundAsRectangle;
-        this.cardBackground = cardBackground;
-        this.nameBox = nameBox;
         this.data = data;
         if (!this.data.physicalCard){
             this.data.physicalCard = this;
@@ -98,6 +87,12 @@ export class PhysicalCard implements IPhysicalCardInterface {
         
         // Create a new container for card content (excluding tooltip)
         this.cardContent = this.scene.add.container(0, 0);
+
+        // Create cardBackground
+        this.cardBackground = this.scene.add.image(0, 0, data.getCardBackgroundImageName())
+            .setDisplaySize(cardWidth, cardHeight);
+
+        // Create cardImage
         this.cardImage = new ShadowedImage({
             scene: this.scene,
             texture: this.data.getEffectivePortraitName(this.scene),
@@ -105,7 +100,19 @@ export class PhysicalCard implements IPhysicalCardInterface {
             shadowOffset: 3
         });
 
-        // Create descBox here
+        // Create nameBox
+        this.nameBox = new TextBox({
+            scene: this.scene,
+            x: 0,
+            y: cardHeight / 4,
+            width: cardWidth - 10,
+            height: 60,
+            text: data.name,
+            textBoxName: "nameBox:" + data.id,
+            style: { fontSize: '16px', color: '#000', wordWrap: { width: cardWidth - 10 } }
+        });
+
+        // Create descBox
         this.descBox = new TextBox({
             scene: this.scene,
             x: -20,
