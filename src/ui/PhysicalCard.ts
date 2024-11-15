@@ -64,18 +64,19 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
     constructor({
         scene,
-        container,
+        x,
+        y,
         data,
         cardConfig
     }: {
         scene: Phaser.Scene;
-        container: Phaser.GameObjects.Container;
+        x: number;
+        y: number;
         data: AbstractCard;
         cardConfig: CardConfig;
     }) {
         var {cardWidth, cardHeight} = cardConfig;
         this.scene = scene;
-        this.container = container;
         this.data = data;
         if (!this.data.physicalCard){
             this.data.physicalCard = this;
@@ -84,6 +85,13 @@ export class PhysicalCard implements IPhysicalCardInterface {
         }
         this.physicalBuffs = [];
         this.cardConfig = cardConfig;
+        
+        // Create the main container
+        this.container = scene.add.container(x, y);
+        this.container.setSize(cardWidth, cardHeight);
+        this.container.setInteractive(new Phaser.Geom.Rectangle(0, 0, cardWidth, cardHeight), Phaser.Geom.Rectangle.Contains);
+        
+        (this.container as any).physicalCard = this;
         
         // Create a new container for card content (excluding tooltip)
         this.cardContent = this.scene.add.container(0, 0);

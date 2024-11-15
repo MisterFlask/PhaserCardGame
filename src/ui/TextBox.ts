@@ -31,7 +31,8 @@ export class TextBox extends Phaser.GameObjects.Container {
         backgroundImage?: string,
         textBoxName?: string,
         fillColor?: number,
-        expandDirection?: 'up' | 'down'
+        expandDirection?: 'up' | 'down',
+        bigTextOverVariableColors?: boolean
     }) {
         const {
             scene,
@@ -43,7 +44,8 @@ export class TextBox extends Phaser.GameObjects.Container {
             style = { fontSize: '18px', color: '#ffffff', fontFamily: 'Verdana' },
             backgroundImage,
             textBoxName,
-            fillColor = 0x2e2e2e
+            fillColor = 0x2e2e2e,
+            bigTextOverVariableColors = false
         } = params;
 
         super(scene, x, y);

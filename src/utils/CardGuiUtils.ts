@@ -1,5 +1,4 @@
 import type { AbstractCard } from "../gamecharacters/AbstractCard";
-import { CardType } from "../gamecharacters/Primitives";
 import { PhysicalCard } from "../ui/PhysicalCard";
 import { UIContext } from "../ui/UIContextManager";
 
@@ -37,22 +36,13 @@ export class CardGuiUtils {
             eventCallback = (card: PhysicalCard) => {};
         }
 
-        const cardContainer = scene.add.container(x, y);
-        const { cardWidth, cardHeight } = this.cardConfig;
-        
-        cardContainer.setSize(cardWidth, cardHeight);
-        cardContainer.setInteractive(new Phaser.Geom.Rectangle(0, 0, cardWidth, cardHeight), Phaser.Geom.Rectangle.Contains);
-
-        if (data.cardType == CardType.SKILL) scene.input.setDraggable(cardContainer);
-
         const physicalCard = new PhysicalCard({
             scene: scene,
-            container: cardContainer,
+            x: x,
+            y: y,
             data: data,
             cardConfig: this.cardConfig
         });
-
-        (cardContainer as any).physicalCard = physicalCard;
 
         eventCallback(physicalCard);
         physicalCard.contextRelevant = contextRelevant;
