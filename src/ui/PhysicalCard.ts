@@ -69,7 +69,6 @@ export class PhysicalCard implements IPhysicalCardInterface {
         cardBackground,
         cardImage,
         nameBox,
-        descBox,
         data,
         cardConfig
     }: {
@@ -79,18 +78,15 @@ export class PhysicalCard implements IPhysicalCardInterface {
         cardBackground: Phaser.GameObjects.Image;
         cardImage: Phaser.GameObjects.Image;
         nameBox: TextBox;
-        descBox: TextBox;
         data: AbstractCard;
         cardConfig: CardConfig;
     }) {
-
         var {cardWidth, cardHeight} = cardConfig;
         this.scene = scene;
         this.container = container;
         this.cardBackgroundAsRectangle = cardBackgroundAsRectangle;
         this.cardBackground = cardBackground;
         this.nameBox = nameBox;
-        this.descBox = descBox;
         this.data = data;
         if (!this.data.physicalCard){
             this.data.physicalCard = this;
@@ -99,20 +95,41 @@ export class PhysicalCard implements IPhysicalCardInterface {
         }
         this.physicalBuffs = [];
         this.cardConfig = cardConfig;
+        
         // Create a new container for card content (excluding tooltip)
         this.cardContent = this.scene.add.container(0, 0);
         this.cardImage = new ShadowedImage({
             scene: this.scene,
             texture: this.data.getEffectivePortraitName(this.scene),
-            displaySize: this.cardConfig.cardWidth, // Adjust size as needed
-            shadowOffset: 3 // Adjust shadow offset as needed
+            displaySize: this.cardConfig.cardWidth,
+            shadowOffset: 3
         });
+
+        // Create descBox here
+        this.descBox = new TextBox({
+            scene: this.scene,
+            x: -20,
+            y: cardHeight / 2,
+            width: cardWidth + 40,
+            height: 60,
+            text: data.description,
+            textBoxName: "descBox:" + data.id,
+            style: {
+                fontSize: '12px',
+                color: '#000',
+                wordWrap: { width: cardWidth - 20 },
+                align: 'center'
+            }
+        });
+        this.descBox.setVisible(false);
+
         this.cardContent.add([
             this.cardBackground,
             this.cardImage,
             this.nameBox,
             this.descBox
         ]);
+
         if (this.cardBackgroundAsRectangle){
             this.cardContent.add(this.cardBackgroundAsRectangle);
         }

@@ -55,26 +55,8 @@ export class CardGuiUtils {
             textBoxName: "nameBox:" + data.id,
             style: { fontSize: '16px', color: '#000', wordWrap: { width: cardWidth - 10 } }
         });
-
-        const descBox = new TextBox({
-            scene: scene,
-            x: -20,
-            y: cardHeight / 2,
-            width: cardWidth + 40,
-            height: 60,
-            text: data.description,
-            textBoxName: "descBox:" + data.id,
-            style: {
-                fontSize: '12px',
-                color: '#000',
-                wordWrap: { width: cardWidth - 20 },
-                align: 'center'
-            }
-        });
-
-        descBox.setVisible(false);
         
-        cardContainer.add([cardBackground, cardImage, nameBox, descBox]);
+        cardContainer.add([cardBackground, cardImage, nameBox]);
         cardContainer.setSize(cardWidth, cardHeight);
         cardContainer.setInteractive(new Phaser.Geom.Rectangle(0, 0, cardWidth, cardHeight), Phaser.Geom.Rectangle.Contains);
 
@@ -86,7 +68,6 @@ export class CardGuiUtils {
             cardBackground: cardBackground,
             cardImage: cardImage,
             nameBox: nameBox,
-            descBox: descBox,
             data: data,
             cardConfig: this.cardConfig
         });
