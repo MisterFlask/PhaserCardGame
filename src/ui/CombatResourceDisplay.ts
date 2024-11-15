@@ -90,10 +90,10 @@ export class CombatResourceDisplay extends Phaser.GameObjects.Container {
     }
 
     public destroy(): void {
-        this.scene.events.off('update', this.update, this);
-        this.icon.mainImage.off('pointerdown', this.handleClick, this);
-        this.icon.mainImage.off('pointerover', this.handlePointerOver, this);
-        this.icon.mainImage.off('pointerout', this.handlePointerOut, this);
+        this.scene?.events?.off('update', this.update, this);
+        this.icon?.mainImage?.off('pointerdown', this.handleClick, this);
+        this.icon?.mainImage?.off('pointerover', this.handlePointerOver, this);
+        this.icon?.mainImage?.off('pointerout', this.handlePointerOut, this);
         super.destroy();
     }
 } 
