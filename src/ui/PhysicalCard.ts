@@ -117,7 +117,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
             height: 60,
             text: data.name,
             textBoxName: "nameBox:" + data.id,
-            style: { fontSize: '16px', color: '#000', wordWrap: { width: cardWidth - 10 } }
+            style: { fontSize: '16px', color: '#000', wordWrap: { width: cardWidth - 10 } },
+            bigTextOverVariableColors: true
         });
 
         // Create descBox
@@ -624,6 +625,11 @@ export class PhysicalCard implements IPhysicalCardInterface {
         if (this.hpBox && this.data.isBaseCharacter()) {
             const baseCharacter = this.data as BaseCharacterType;
             this.hpBox.setText(`${baseCharacter.hitpoints}/${baseCharacter.maxHitpoints}`);
+        }
+
+        if (this.data.isPlayableCard()) {
+            const playableCard = this.data as PlayableCardType;
+            this.nameBox.setBackgroundColor(playableCard.rarity.color);
         }
 
         // Update cost box if it exists

@@ -27,7 +27,7 @@ export class CardRarity {
     }: {
         id: string;
         weight: number;
-        color: string;
+        color: number;
         basePrice: number;
     }) {
         this.id = id;
@@ -38,17 +38,17 @@ export class CardRarity {
 
     public readonly id: string;
     public readonly weight: number;
-    public readonly color: string;
+    public readonly color: number;
     public readonly basePrice: number;
 
-    static readonly TOKEN = new CardRarity({ id: "TOKEN", weight: 0, color: "#A0A0A0", basePrice: 0 });
-    static readonly BASIC = new CardRarity({ id: "BASIC", weight: 1, color: "#FFFFFF", basePrice: 50 });
-    static readonly COMMON = new CardRarity({ id: "COMMON", weight: 2, color: "#90EE90", basePrice: 100 });
-    static readonly UNCOMMON = new CardRarity({ id: "UNCOMMON", weight: 3, color: "#87CEEB", basePrice: 175 });
-    static readonly RARE = new CardRarity({ id: "RARE", weight: 4, color: "#DDA0DD", basePrice: 250 });
-    static readonly EPIC = new CardRarity({ id: "EPIC", weight: 5, color: "#FF69B4", basePrice: 350 });
-    static readonly LEGENDARY = new CardRarity({ id: "LEGENDARY", weight: 6, color: "#FFD700", basePrice: 500 });
-    static readonly SPECIAL = new CardRarity({ id: "SPECIAL", weight: 7, color: "#FF4500", basePrice: 400 });
+    static readonly TOKEN = new CardRarity({ id: "TOKEN", weight: 0, color: 0xA0A0A0, basePrice: 0 });
+    static readonly BASIC = new CardRarity({ id: "BASIC", weight: 1, color: 0xA0A0A0, basePrice: 50 });
+    static readonly COMMON = new CardRarity({ id: "COMMON", weight: 2, color: 0xA0A0A0, basePrice: 100 });
+    static readonly UNCOMMON = new CardRarity({ id: "UNCOMMON", weight: 3, color: 0x87CEEB, basePrice: 175 });
+    static readonly RARE = new CardRarity({ id: "RARE", weight: 4, color: 0xDDA0DD, basePrice: 250 });
+    static readonly EPIC = new CardRarity({ id: "EPIC", weight: 5, color: 0xFF69B4, basePrice: 350 });
+    static readonly LEGENDARY = new CardRarity({ id: "LEGENDARY", weight: 6, color: 0xFFD700, basePrice: 500 });
+    static readonly SPECIAL = new CardRarity({ id: "SPECIAL", weight: 7, color: 0xFF4500, basePrice: 400 });
 
     toString(): string {
         return this.id;
