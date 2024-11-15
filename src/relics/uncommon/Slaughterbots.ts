@@ -33,7 +33,7 @@ export class Slaughterbots extends AbstractRelic {
         super();
         this.name = "Slaughterbots";
         this.description = "At the start of combat, add two Slaughterbots to your hand.";
-        this.tier = CardRarity.UNCOMMON;
+        this.rarity = CardRarity.UNCOMMON;
     }
 
     override onCombatStart(): void {

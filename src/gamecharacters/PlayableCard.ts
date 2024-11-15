@@ -13,18 +13,71 @@ import type { ActionManager } from "../utils/ActionManager";
 import { ActionManagerFetcher } from "../utils/ActionManagerFetcher";
 import { AbstractCard, TargetingType, Team } from "./AbstractCard";
 import { BaseCharacter } from "./BaseCharacter";
-import { PlayerCharacter } from "./CharacterClasses";
+import { BaseCharacterClass, PlayerCharacter } from "./BaseCharacterClass";
+import type { AbstractBuff } from "./buffs/AbstractBuff";
 import { IBaseCharacter } from "./IBaseCharacter";
 import { CardSize, CardType } from "./Primitives";
 
-export enum CardRarity {
-    TOKEN,
-    COMMON,
-    UNCOMMON,
-    RARE,
-    EPIC,
-    LEGENDARY,
-    SPECIAL
+export class CardRarity {
+    private constructor({
+        id,
+        weight,
+        color,
+        basePrice
+    }: {
+        id: string;
+        weight: number;
+        color: number;
+        basePrice: number;
+    }) {
+        this.id = id;
+        this.weight = weight;
+        this.color = color;
+        this.basePrice = basePrice;
+    }
+
+    public readonly id: string;
+    public readonly weight: number;
+    public readonly color: number;
+    public readonly basePrice: number;
+
+    static readonly TOKEN = new CardRarity({ id: "TOKEN", weight: 0, color: 0xA0A0A0, basePrice: 0 });
+    static readonly BASIC = new CardRarity({ id: "BASIC", weight: 1, color: 0xA0A0A0, basePrice: 50 });
+    static readonly COMMON = new CardRarity({ id: "COMMON", weight: 2, color: 0xA0A0A0, basePrice: 100 });
+    static readonly UNCOMMON = new CardRarity({ id: "UNCOMMON", weight: 3, color: 0x87CEEB, basePrice: 175 });
+    static readonly RARE = new CardRarity({ id: "RARE", weight: 4, color: 0xDDA0DD, basePrice: 250 });
+    static readonly EPIC = new CardRarity({ id: "EPIC", weight: 5, color: 0xFF69B4, basePrice: 350 });
+    static readonly LEGENDARY = new CardRarity({ id: "LEGENDARY", weight: 6, color: 0xFFD700, basePrice: 500 });
+    static readonly SPECIAL = new CardRarity({ id: "SPECIAL", weight: 7, color: 0xFF4500, basePrice: 400 });
+
+    toString(): string {
+        return this.id;
+    }
+
+    static fromString(str: string): CardRarity {
+        const value = (CardRarity as any)[str];
+        if (!value) {
+            throw new Error(`Invalid CardRarity: ${str}`);
+        }
+        return value;
+    }
+
+    static getAllRarities(): CardRarity[] {
+        return [
+            CardRarity.TOKEN,
+            CardRarity.BASIC,
+            CardRarity.COMMON,
+            CardRarity.UNCOMMON,
+            CardRarity.RARE,
+            CardRarity.EPIC,
+            CardRarity.LEGENDARY,
+            CardRarity.SPECIAL
+        ];
+    }
+
+    isAtLeastAsRareAs(other: CardRarity): boolean {
+        return this.weight >= other.weight;
+    }
 }
 
 export abstract class PlayableCard extends AbstractCard {
@@ -32,16 +85,16 @@ export abstract class PlayableCard extends AbstractCard {
     override typeTag = "PlayableCard";
 
     rarity: CardRarity; // Added card rarity
-
+    nativeToCharacterClass?: BaseCharacterClass;
     resourceScalings: CardResourceScaling[] = [];
     constructor({ name, description, portraitName, cardType, tooltip, characterData, size, targetingType, owner, price: surfaceValue, rarity }: { name: string; description?: string; portraitName?: string; cardType?: CardType; tooltip?: string; characterData?: AbstractCard; size?: CardSize; targetingType?: TargetingType; owner?: IBaseCharacter; price?: number; rarity?: CardRarity }) {
         super({ name, description: description ?? "_", portraitName, cardType, tooltip, characterData, size });
         this.targetingType = targetingType ?? TargetingType.ENEMY;
         this.owner = owner as PlayerCharacter;
-        this.surfacePurchaseValue = surfaceValue ?? 100;
-        this.hellPurchaseValue = 100;
+        this.rarity = rarity ?? CardRarity.COMMON;
+        this.surfacePurchaseValue = surfaceValue ?? this.rarity.basePrice;
+        this.hellPurchaseValue = this.rarity.basePrice;
         this.cardType = cardType ?? CardType.NON_PLAYABLE;
-        this.rarity = rarity ?? CardRarity.COMMON; // Default to COMMON if not provided
     }
 
     withOwner(owner: PlayerCharacter): this {
@@ -56,6 +109,11 @@ export abstract class PlayableCard extends AbstractCard {
         this.combatState.playerCharacters
             .filter(char => char.team === Team.ALLY)
             .forEach(callback);
+    }
+
+    withBuffs(buffs: AbstractBuff[]): this {
+        this.buffs = buffs;
+        return this;
     }
 
     /**

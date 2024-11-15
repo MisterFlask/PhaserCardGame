@@ -1,9 +1,6 @@
-import { BaseCharacterClass, PlayerCharacter } from '../gamecharacters/CharacterClasses';
-import { BlackhandClass } from '../gamecharacters/playerclasses/BlackhandClass';
-import { DiabolistClass } from '../gamecharacters/playerclasses/DiabolistClass';
+import { PlayerCharacter } from '../gamecharacters/BaseCharacterClass';
+import { CharacterGenerator } from '../gamecharacters/CharacterGenerator';
 
-import { Gender } from '../gamecharacters/BaseCharacter';
-import { ArchonClass } from '../gamecharacters/playerclasses/ArchonClass';
 export class CampaignRules {
     private static instance: CampaignRules;
 
@@ -17,32 +14,18 @@ export class CampaignRules {
     }
 
     public generateLogicalCharacterRoster(): PlayerCharacter[] {
-        const classes: BaseCharacterClass[] = [new DiabolistClass(), new BlackhandClass(), new ArchonClass()];
         const characters: PlayerCharacter[] = [];
 
         for (let i = 0; i < 5; i++) {
-            const randomClass = classes[Math.floor(Math.random() * classes.length)];
-            const character = new PlayerCharacter({ 
-                name: `Character ${i + 1} (${randomClass.name})`, 
-                portraitName: randomClass.getPortraitNameAtRandom(Gender.Female), //todo: make this random
-                characterClass: randomClass 
-            });
-
+            const character = CharacterGenerator.generateRandomCharacter();
+            
             // Reroll portrait up to 5 times to avoid duplicates
-            let portraitName = randomClass.getPortraitNameAtRandom(Gender.Female);
             let attempts = 0;
-            while (attempts < 5 && characters.some(c => c.portraitName === portraitName)) {
-                portraitName = randomClass.getPortraitNameAtRandom(Gender.Female);
+            while (attempts < 5 && characters.some(c => c.portraitName === character.portraitName)) {
+                character.portraitName = character.characterClass.getPortraitNameAtRandom(character.gender);
                 attempts++;
             }
-            character.portraitName = portraitName;
             
-            randomClass.availableCards.forEach(card => {
-                character.cardsInMasterDeck.push(card.Copy());
-            });
-            character.cardsInMasterDeck.forEach(card=> {
-                card.owner = character;
-            })
             characters.push(character);
         }
 

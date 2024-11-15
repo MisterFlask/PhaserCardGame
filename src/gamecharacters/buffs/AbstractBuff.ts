@@ -5,7 +5,7 @@ import { ActionManager } from "../../utils/ActionManager";
 import { ActionManagerFetcher } from "../../utils/ActionManagerFetcher";
 import { generateWordGuid } from "../AbstractCard";
 import type { BaseCharacter } from "../BaseCharacter";
-import { PlayerCharacter } from "../CharacterClasses";
+import { PlayerCharacter } from "../BaseCharacterClass";
 import type { IAbstractBuff } from '../IAbstractBuff';
 import { IBaseCharacter } from '../IBaseCharacter';
 import type { PlayableCard } from "../PlayableCard";
@@ -172,9 +172,13 @@ export abstract class AbstractBuff implements IAbstractBuff {
     abstract getDescription(): string;
 
 
+    onRunStart(): void {
+
+    }
+
     // this is a FLAT modifier on top of damage taken, not percentage-based.
     //  this refers to pre-block damage.
-    getCombatDamageDealtModifier(target?: BaseCharacter): number {
+    getCombatDamageDealtModifier(target?: BaseCharacter, cardPlayed?: PlayableCard): number {
         return 0;
     }
 
@@ -322,7 +326,12 @@ export abstract class AbstractBuff implements IAbstractBuff {
         return 0;
     }
 
-    
+    public clone(): this {
+        const clonedBuff = Object.create(Object.getPrototypeOf(this));
+        Object.assign(clonedBuff, this);
+        clonedBuff.id = generateWordGuid(); // Generate new unique ID for clone
+        return clonedBuff;
+    }
     
 }
 

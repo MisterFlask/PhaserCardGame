@@ -1,8 +1,10 @@
 import { Scene } from 'phaser';
+import { PriceContext } from '../../../../gamecharacters/AbstractCard';
 import { PlayableCard } from '../../../../gamecharacters/PlayableCard';
+import { GameState } from '../../../../rules/GameState';
 import { PhysicalCard } from '../../../../ui/PhysicalCard';
 import { CardGuiUtils } from '../../../../utils/CardGuiUtils';
-import { CampaignState } from '../CampaignState';
+import { CampaignState as CampaignUiState } from '../CampaignState';
 import { AbstractHqPanel } from './AbstractHqPanel';
 
 export class TradeGoodsPanel extends AbstractHqPanel {
@@ -10,15 +12,36 @@ export class TradeGoodsPanel extends AbstractHqPanel {
     private ownedTradeGoods: PhysicalCard[] = [];
     private tradeGoodsContainer: Phaser.GameObjects.Container;
     private ownedGoodsContainer: Phaser.GameObjects.Container;
+    private fundsText: Phaser.GameObjects.Text;
 
     constructor(scene: Scene) {
         super(scene, 'Trade Goods');
 
         this.tradeGoodsContainer = this.scene.add.container(0, 0);
         this.ownedGoodsContainer = this.scene.add.container(0, 0);
-        this.add([this.tradeGoodsContainer, this.ownedGoodsContainer]);
+
+        // Add funds display below the title
+        this.fundsText = this.scene.add.text(10, 40, '', {
+            fontSize: '24px',
+            color: '#ffff00',
+            backgroundColor: '#333333',
+            padding: { x: 10, y: 5 }
+        });
+        this.updateFundsDisplay();
+
+        this.add([this.fundsText, this.tradeGoodsContainer, this.ownedGoodsContainer]);
 
         this.displayTradeGoods();
+
+        // Listen for funds changes
+        this.scene.events.on('fundsChanged', () => {
+            this.updateFundsDisplay();
+        });
+    }
+
+    private updateFundsDisplay(): void {
+        const currentFunds = CampaignUiState.getInstance().getCurrentFunds();
+        this.fundsText.setText(`Available Funds: ${currentFunds}`);
     }
 
     private createSection(title: string, x: number, y: number, width: number, height: number): Phaser.GameObjects.Container {
@@ -49,6 +72,7 @@ export class TradeGoodsPanel extends AbstractHqPanel {
             data: good,
             onCardCreatedEventCallback: (card) => this.setupTradeGoodCardEvents(card)
         });
+        card.priceContext = PriceContext.SURFACE_BUY;
         return card;
     }
 
@@ -61,20 +85,22 @@ export class TradeGoodsPanel extends AbstractHqPanel {
 
     private handleTradeGoodCardClick(card: PhysicalCard): void {
         const good = card.data as PlayableCard;
-        const campaignState = CampaignState.getInstance();
+        const campaignState = CampaignUiState.getInstance();
 
         if (!campaignState.ownedTradeGoods.includes(good) && 
             campaignState.getCurrentFunds() >= good.surfacePurchaseValue) {
             campaignState.availableTradeGoods = campaignState.availableTradeGoods
                 .filter(g => g !== good);
             campaignState.ownedTradeGoods.push(good);
+            GameState.getInstance().surfaceCurrency -= (good.surfacePurchaseValue);
             this.scene.events.emit("tradeGoodsChanged");
+            this.scene.events.emit("fundsChanged");
             this.displayTradeGoods();
         }
     }
 
     private displayTradeGoods(): void {
-        const gameState = CampaignState.getInstance();
+        const gameState = CampaignUiState.getInstance();
         const cardSpacing = 20;
         const startY = 150;
         const cardsPerRow = 4;
@@ -128,6 +154,6 @@ export class TradeGoodsPanel extends AbstractHqPanel {
     }
 
     update(): void {
-        // Update any dynamic content if needed
+        this.updateFundsDisplay();
     }
 } 

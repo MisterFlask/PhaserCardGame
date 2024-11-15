@@ -3,7 +3,7 @@
 
 import { TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
-import { PlayableCard } from "../../../../PlayableCard";
+import { CardRarity, PlayableCard } from "../../../../PlayableCard";
 import { BasicProcs } from "../../../../procs/BasicProcs";
 
 export class BloodShield extends PlayableCard {
@@ -15,6 +15,7 @@ export class BloodShield extends PlayableCard {
         });
         this.baseBlock = 13;
         this.energyCost = 2;
+        this.rarity = CardRarity.COMMON;
     }
 
     override get description(): string {

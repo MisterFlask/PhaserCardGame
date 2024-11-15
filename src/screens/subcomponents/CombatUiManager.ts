@@ -1,11 +1,14 @@
 // src/subcomponents/CombatUIManager.ts
 
 import Phaser from 'phaser';
+import { PlayerCharacter } from '../../gamecharacters/BaseCharacterClass';
 import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
-import { Defend } from '../../gamecharacters/playerclasses/cards/basic/Defend';
+import { PlayableCard } from '../../gamecharacters/PlayableCard';
+import { CardLibrary } from '../../gamecharacters/playerclasses/cards/CardLibrary';
 import { GameState } from '../../rules/GameState';
 import { TextBoxButton } from '../../ui/Button';
 import { CombatResourceDisplay } from '../../ui/CombatResourceDisplay';
+import { DebugMenu } from '../../ui/DebugMenu';
 import { DepthManager } from '../../ui/DepthManager';
 import { default as CombatSceneLayoutUtils, default as LayoutUtils } from '../../ui/LayoutUtils';
 import Menu from '../../ui/Menu';
@@ -35,6 +38,7 @@ class CombatUIManager {
     private combatEnded: boolean = false;
     private debugOverlay!: TextBox;
     public dropZoneHighlight!: Phaser.GameObjects.Image;
+    private debugMenu!: DebugMenu;
 
     private constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -69,6 +73,7 @@ class CombatUIManager {
         this.createResourceIndicators();
         this.createDebugOverlay();
         this.setupDebugOverlayToggle();
+        this.createDebugMenu();
     }
 
     private createEnergyDisplay(): void {
@@ -307,6 +312,9 @@ class CombatUIManager {
         if (this.dropZoneHighlight) {
             this.dropZoneHighlight.destroy();
         }
+        if (this.debugMenu) {
+            this.debugMenu.destroy();
+        }
     }
 
     private createResourceIndicators(): void {
@@ -388,12 +396,8 @@ class CombatUIManager {
     }
 
     private determineCardRewards(): CardReward[] {
-        const characters = GameState.getInstance().getCurrentRunCharacters()
-        const rewards= []
-        for (const character of characters){
-            rewards.push(new CardReward(new Defend(), character))
-        }
-        return rewards
+        var cards = CardLibrary.getInstance().getRandomSelectionOfRelevantClassCards(3);
+        return cards.map(card => new CardReward(card, this.deriveOwnerFromCardNativeClass(card)));
     }
 
     private handleCardSelect(selectedCard: CardReward): void {
@@ -494,6 +498,23 @@ class CombatUIManager {
         
         this.debugOverlay.setText(debugText);
     }
+
+    private createDebugMenu(): void {
+        this.debugMenu = new DebugMenu(this.scene);
+    }
+    private deriveOwnerFromCardNativeClass(card: PlayableCard): PlayerCharacter { 
+        var clazz = card.nativeToCharacterClass;
+        if (!clazz) {
+            console.warn(`Card ${card.name} has no associated character class`);
+        }
+        var playerCharacter = GameState.getInstance().getCurrentRunCharacters().find(c => c.characterClass.id === clazz?.id);
+        if (!playerCharacter) {
+            // If no matching class found, randomly assign to a current run character
+            playerCharacter = GameState.getInstance().getCurrentRunCharacters()[Math.floor(Math.random() * GameState.getInstance().getCurrentRunCharacters().length)];
+        }
+        return playerCharacter;
+    }
 }
 
 export default CombatUIManager;
+

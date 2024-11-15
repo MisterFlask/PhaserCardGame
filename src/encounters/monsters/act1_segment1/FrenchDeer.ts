@@ -15,7 +15,7 @@ export class FrenchDeer extends AutomatedCharacter {
     override generateNewIntents(): AbstractIntent[] {
         const intents: AbstractIntent[][] = [
             [
-                new ApplyDebuffToRandomCharacterIntent({ debuff: new Burning(8), owner: this }).withTitle("Ignite")
+                new ApplyDebuffToRandomCharacterIntent({ debuff: new Burning(2), owner: this }).withTitle("Ignite")
             ],
             [
                 new AttackAllPlayerCharactersIntent({ baseDamage: 4, owner: this }).withTitle("Inferno Charge")

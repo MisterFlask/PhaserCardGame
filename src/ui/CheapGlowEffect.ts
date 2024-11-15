@@ -6,7 +6,7 @@ export class CheapGlowEffect extends Phaser.GameObjects.Image {
         
         this.setBlendMode(Phaser.BlendModes.ADD);
         this.setVisible(false);
-        this.setAlpha(0.4);
+        this.setAlpha(0.8);
         
         // Required for Image subclasses
         scene.add.existing(this);
@@ -40,8 +40,8 @@ export class CheapGlowEffect extends Phaser.GameObjects.Image {
 
         this.pulseTween = this.scene.tweens.add({
             targets: this,
-            alpha: { from: 0.4, to: 0.7 },
-            scale: { from: 1, to: 1.1 },
+            alpha: { from: 0.7, to: 0.9 },
+            scale: { from: 1, to: 1.2 },
             duration: 1500,
             yoyo: true,
             repeat: -1,
@@ -57,7 +57,7 @@ export class CheapGlowEffect extends Phaser.GameObjects.Image {
             this.pulseTween.stop();
             this.pulseTween = undefined;
         }
-        this.setAlpha(0.4);
+        this.setAlpha(0.8);
         this.setScale(1);
     }
 

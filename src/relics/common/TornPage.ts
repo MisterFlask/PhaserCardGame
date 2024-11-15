@@ -6,7 +6,7 @@ export class TornPage extends AbstractRelic {
         super();
         this.name = "Torn Page";
         this.description = "At the start of combat, increase your Pages by 2.";
-        this.tier = CardRarity.COMMON;
+        this.rarity = CardRarity.COMMON;
     }
 
     onCombatStart(): void {

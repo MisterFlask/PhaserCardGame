@@ -9,7 +9,7 @@ import { LoadoutPanel } from './panels/LoadoutPanel';
 import { MainHubPanel } from './panels/MainHubPanel';
 import { PersonnelPanel } from './panels/PersonnelPanel';
 import { TradeGoodsPanel } from './panels/TradeGoodsPanel';
-import { TradeRouteSelectionPanel } from './panels/TradePanel';
+import { TradeRouteSelectionPanel } from './panels/TradeRouteSelectionPanel';
 
 export class HqScene extends Scene {
     private currentPanel?: Phaser.GameObjects.Container;

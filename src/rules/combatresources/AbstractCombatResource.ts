@@ -1,7 +1,7 @@
 export abstract class AbstractCombatResource {
     name: string;
     description: string;
-    value: number = 5;
+    value: number = 0;
     icon: string;
     tint: number = 0xffffff;
 

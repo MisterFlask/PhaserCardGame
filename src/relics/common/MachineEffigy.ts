@@ -8,7 +8,7 @@ export class MachineEffigy extends AbstractRelic {
         super();
         this.name = "Machine Effigy";
         this.description = "If any enemies have the Robotic buff, your whole party gets 2 Strength.";
-        this.tier = CardRarity.COMMON;
+        this.rarity = CardRarity.COMMON;
     }
 
     onCombatStart(): void {

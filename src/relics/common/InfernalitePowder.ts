@@ -6,7 +6,7 @@ export class InfernalitePowder extends AbstractRelic {
         super();
         this.name = "Infernalite Powder";
         this.description = "At the start of combat, increase your Powder by 2.";
-        this.tier = CardRarity.COMMON;
+        this.rarity = CardRarity.COMMON;
     }
 
     onCombatStart(): void {

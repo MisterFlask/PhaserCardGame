@@ -2,6 +2,7 @@
 
 import { BaseCharacterType } from "../../../../Types";
 import { AbstractCard, TargetingType } from "../../../AbstractCard";
+import { CardRarity } from "../../../PlayableCard";
 import { PlayableCardWithHelpers } from "../../../PlayableCardWithHelpers";
 
 export class Defend extends PlayableCardWithHelpers {
@@ -10,10 +11,11 @@ export class Defend extends PlayableCardWithHelpers {
             name: "Defend",
             description: `_`,
             portraitName: "shield",
-            targetingType: TargetingType.ENEMY,
+            targetingType: TargetingType.ALLY,
         });
-        this.baseBlock = 5
-        this.energyCost = 2;
+        this.baseBlock = 5;
+        this.rarity = CardRarity.BASIC;
+        this.energyCost = 1;
     }
 
     override get description(): string {

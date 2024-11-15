@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { AbstractCard } from '../../gamecharacters/AbstractCard';
-import { PlayerCharacter } from '../../gamecharacters/CharacterClasses';
+import { PlayerCharacter } from '../../gamecharacters/BaseCharacterClass';
 import { PlayableCard } from '../../gamecharacters/PlayableCard';
 import { TextBoxButton } from '../../ui/Button';
 import { PhysicalCard } from '../../ui/PhysicalCard';
@@ -146,6 +146,7 @@ export class CardReward{
 
     constructor(card: PlayableCard, owner: PlayerCharacter){
         this.card = card
+        this.card.owner = owner
         this.owner = owner
     }
 }

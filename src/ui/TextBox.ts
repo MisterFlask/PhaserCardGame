@@ -31,7 +31,8 @@ export class TextBox extends Phaser.GameObjects.Container {
         backgroundImage?: string,
         textBoxName?: string,
         fillColor?: number,
-        expandDirection?: 'up' | 'down'
+        expandDirection?: 'up' | 'down',
+        bigTextOverVariableColors?: boolean
     }) {
         const {
             scene,
@@ -43,7 +44,8 @@ export class TextBox extends Phaser.GameObjects.Container {
             style = { fontSize: '18px', color: '#ffffff', fontFamily: 'Verdana' },
             backgroundImage,
             textBoxName,
-            fillColor = 0x2e2e2e
+            fillColor = 0x2e2e2e,
+            bigTextOverVariableColors = false
         } = params;
 
         super(scene, x, y);
@@ -61,17 +63,32 @@ export class TextBox extends Phaser.GameObjects.Container {
         this.add(this.background);
         
 
-        this.text = scene.add.text(0, 0, text, {
+        // Modify the text style based on bigTextOverVariableColors
+        const textStyle = {
             ...style,
             color: '#ffffff',
             stroke: '#000000',
-            strokeThickness: 2,
+            strokeThickness: bigTextOverVariableColors ? 3 : 2,
             resolution: 1,
-        })
-        .setOrigin(0.5, 0.5) // **Center the text**
-        .setWordWrapWidth(width - 20)
-        .setAlign('center')
-        .setShadow(2, 2, '#000000', 2, false, true);
+            fontSize: style.fontSize,
+            fontStyle: bigTextOverVariableColors ? 'bold' : style.fontStyle,
+        };
+
+        this.text = scene.add.text(0, 0, text, textStyle)
+            .setOrigin(0.5, 0.5)
+            .setWordWrapWidth(width - 20)
+            .setAlign('center');
+
+        // Add multiple shadow layers for better outline effect when bigTextOverVariableColors is true
+        if (bigTextOverVariableColors) {
+            this.text.setShadow(2, 2, '#000000', 2, true, true)
+                .setShadow(-2, -2, '#000000', 2, true, true)
+                .setShadow(2, -2, '#000000', 2, true, true)
+                .setShadow(-2, 2, '#000000', 2, true, true);
+        } else {
+            this.text.setShadow(2, 2, '#000000', 2, false, true);
+        }
+
         this.add(this.text);
 
         this.adjustTextBoxSize();

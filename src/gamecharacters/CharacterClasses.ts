@@ -1,44 +1,21 @@
-import { BaseCharacter, Gender } from "./BaseCharacter";
-import { PlayableCard } from "./PlayableCard";
+import { BaseCharacterClass } from "./BaseCharacterClass";
+import { CardLibrary } from "./playerclasses/cards/CardLibrary";
 
+export class CharacterClasses {
+    id: string;
 
-
-export abstract class BaseCharacterClass {
-    constructor({ name, iconName, startingMaxHp }: { name: string; iconName: string, startingMaxHp: number }) {
-        this.name = name
-        this.iconName = iconName
-        this.availableCards = []
-        this.startingMaxHp = startingMaxHp
+    constructor(id: string) {
+        this.id = id;
     }
-
-    name: string
-    iconName: string
-    availableCards: PlayableCard[]
-    cardBackgroundImageName: string = "greyscale"
-    startingMaxHp: number
-
-    abstract getPortraitNameAtRandom(gender: Gender): string;
-
-    addCard(card: PlayableCard) {
-        this.availableCards.push(card);
+    getCharacterClass(): BaseCharacterClass {
+        return CardLibrary.getInstance().getCharacterClasses().find(c => c.id === this.id) as BaseCharacterClass;
     }
+    static ARCHON = new CharacterClasses("ARCHON");
+    static BLACKHAND = new CharacterClasses("BLACKHAND");
+    static DIABOLIST = new CharacterClasses("DIABOLIST");
 
-    createCharacterFromClass(){
-        return new PlayerCharacter({ name: this.name, portraitName: this.iconName, characterClass: this })
-    }
+    static ARCHON_ID = this.ARCHON.id
+    static BLACKHAND_ID = this.BLACKHAND.id
+    static DIABOLIST_ID = this.DIABOLIST.id
+
 }
-
-export class PlayerCharacter extends BaseCharacter {
-    cardsInMasterDeck: PlayableCard[];
-    characterClass: BaseCharacterClass;
-    
-    constructor({ name, portraitName, characterClass, description }
-        : {name: string; portraitName: string; characterClass: BaseCharacterClass, description?: string}) {
-        super({ name, portraitName, maxHitpoints: characterClass.startingMaxHp, description })
-        this.cardsInMasterDeck = [];
-        this.hitpoints = characterClass.startingMaxHp;
-        this.maxHitpoints = characterClass.startingMaxHp;
-        this.characterClass = characterClass;
-    }
-}
-

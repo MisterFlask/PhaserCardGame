@@ -18,6 +18,7 @@ export class DarkWhisper extends PlayableCard {
         this.baseBlock = 4;
         this.baseMagicNumber = 2;
         this.energyCost = 1;
+        this.rarity = CardRarity.COMMON;
     }
 
     override get description(): string {

@@ -16,6 +16,7 @@ export abstract class AbstractIntent implements JsonRepresentable {
     target?: BaseCharacter;
     owner: BaseCharacter;
     title: string;
+    targetsAllPlayers: boolean = false;
 
     constructor({imageName, target, owner }: {imageName: string, target: BaseCharacter | undefined, owner: BaseCharacter }) {
         this.imageName = imageName;
@@ -232,10 +233,11 @@ export class AttackAllPlayerCharactersIntent extends AbstractIntent {
     constructor({ baseDamage, owner }: { baseDamage: number, owner: BaseCharacter }) {
         super({ imageName: 'area-damage', target: undefined, owner: owner });
         this.baseDamage = baseDamage;
+        this.targetsAllPlayers = true;
     }
 
     tooltipText(): string {
-        return `Attacking all players for ${this.displayedDamage()} damage`;
+        return `Attacking all allies for ${this.displayedDamage()} damage`;
     }
 
     displayText(): string {
@@ -248,7 +250,7 @@ export class AttackAllPlayerCharactersIntent extends AbstractIntent {
     }
 
     act(): void {
-        console.log('Attacking all player characters');
+        console.log('Attacking all allied characters');
         ActionManager.getInstance().tiltCharacter(this.owner);
 
         const playerCharacters = TargetingUtils.getInstance().selectAllPlayerCharacters();

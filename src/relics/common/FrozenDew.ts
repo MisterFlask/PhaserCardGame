@@ -6,7 +6,7 @@ export class FrozenDew extends AbstractRelic {
         super();
         this.name = "Frozen Dew";
         this.description = "At the start of combat, increase your Pluck by 2.";
-        this.tier = CardRarity.COMMON;
+        this.rarity = CardRarity.COMMON;
     }
 
     onCombatStart(): void {

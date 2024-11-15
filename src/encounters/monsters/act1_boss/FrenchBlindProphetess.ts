@@ -23,8 +23,8 @@ export class FrenchBlindProphetess extends AutomatedCharacter {
                 new ApplyDebuffToAllPlayerCharactersIntent({ debuff: new Weak(2), owner: this }).withTitle("Enfeebling Vision")
             ],
             [
-                new ApplyDebuffToAllPlayerCharactersIntent({ debuff: new Vulnerable(2), owner: this }).withTitle("Revealing Prophecy"),
-                new ApplyDebuffToAllPlayerCharactersIntent({ debuff: new Stress(1), owner: this }).withTitle("Terrible Knowledge")
+                new ApplyDebuffToAllPlayerCharactersIntent({ debuff: new Vulnerable(2), owner: this }).withTitle("Fascinating Prophecy"),
+                new ApplyDebuffToAllPlayerCharactersIntent({ debuff: new Stress(1), owner: this }).withTitle("Unnerving Knowledge")
             ],
             [
                 new AttackIntent({ baseDamage: 30, owner: this }).withTitle("KNOW THY FOLLY")

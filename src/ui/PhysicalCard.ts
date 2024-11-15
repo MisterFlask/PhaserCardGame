@@ -64,34 +64,19 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
     constructor({
         scene,
-        container,
-        cardBackgroundAsRectangle,
-        cardBackground,
-        cardImage,
-        nameBox,
-        descBox,
-        tooltipBox,
+        x,
+        y,
         data,
         cardConfig
     }: {
         scene: Phaser.Scene;
-        container: Phaser.GameObjects.Container;
-        cardBackgroundAsRectangle?: Phaser.GameObjects.Rectangle;
-        cardBackground: Phaser.GameObjects.Image;
-        cardImage: Phaser.GameObjects.Image;
-        nameBox: TextBox;
-        descBox: TextBox;
-        tooltipBox: TextBox;
+        x: number;
+        y: number;
         data: AbstractCard;
         cardConfig: CardConfig;
     }) {
+        var {cardWidth, cardHeight} = cardConfig;
         this.scene = scene;
-        this.container = container;
-        this.cardBackgroundAsRectangle = cardBackgroundAsRectangle;
-        this.cardBackground = cardBackground;
-        this.nameBox = nameBox;
-        this.descBox = descBox;
-        this.tooltipBox = tooltipBox;
         this.data = data;
         if (!this.data.physicalCard){
             this.data.physicalCard = this;
@@ -100,25 +85,90 @@ export class PhysicalCard implements IPhysicalCardInterface {
         }
         this.physicalBuffs = [];
         this.cardConfig = cardConfig;
+        
+        // Create the main container
+        this.container = scene.add.container(x, y);
+        this.container.setSize(cardWidth, cardHeight);
+        this.container.setInteractive(new Phaser.Geom.Rectangle(0, 0, cardWidth, cardHeight), Phaser.Geom.Rectangle.Contains);
+        
+        (this.container as any).physicalCard = this;
+        
         // Create a new container for card content (excluding tooltip)
         this.cardContent = this.scene.add.container(0, 0);
+
+        // Create cardBackground
+        this.cardBackground = this.scene.add.image(0, 0, data.getCardBackgroundImageName())
+            .setDisplaySize(cardWidth, cardHeight);
+
+        // Create cardImage
         this.cardImage = new ShadowedImage({
             scene: this.scene,
             texture: this.data.getEffectivePortraitName(this.scene),
-            displaySize: this.cardConfig.cardWidth, // Adjust size as needed
-            shadowOffset: 3 // Adjust shadow offset as needed
+            displaySize: this.cardConfig.cardWidth,
+            shadowOffset: 3
         });
+
+        // Create nameBox
+        this.nameBox = new TextBox({
+            scene: this.scene,
+            x: 0,
+            y: cardHeight / 4,
+            width: cardWidth - 10,
+            height: 60,
+            text: data.name,
+            textBoxName: "nameBox:" + data.id,
+            style: { fontSize: '16px', color: '#000', wordWrap: { width: cardWidth - 10 } },
+            bigTextOverVariableColors: true
+        });
+
+        // Create descBox
+        this.descBox = new TextBox({
+            scene: this.scene,
+            x: -20,
+            y: cardHeight / 2,
+            width: cardWidth + 40,
+            height: 60,
+            text: data.description,
+            textBoxName: "descBox:" + data.id,
+            style: {
+                fontSize: '12px',
+                color: '#000',
+                wordWrap: { width: cardWidth - 20 },
+                align: 'center'
+            }
+        });
+        this.descBox.setVisible(false);
+
         this.cardContent.add([
             this.cardBackground,
             this.cardImage,
             this.nameBox,
             this.descBox
         ]);
+
         if (this.cardBackgroundAsRectangle){
             this.cardContent.add(this.cardBackgroundAsRectangle);
         }
         this.container.add(this.cardContent);
 
+        // Create tooltipBox here instead
+        this.tooltipBox = new TextBox({
+            scene: this.scene,
+            x: cardWidth + cardWidth / 2,
+            y: 0,
+            width: cardWidth - 10,
+            height: cardHeight,
+            text: data.tooltip || '',
+            textBoxName: "tooltipBox:" + data.id,
+            style: {
+                fontSize: '12px',
+                color: '#000',
+                wordWrap: { width: cardWidth - 20 },
+                align: 'left'
+            }
+        });
+        this.tooltipBox.setVisible(false);
+        
         // Add tooltip directly to the main container
         this.container.add(this.tooltipBox);
 
@@ -575,6 +625,11 @@ export class PhysicalCard implements IPhysicalCardInterface {
         if (this.hpBox && this.data.isBaseCharacter()) {
             const baseCharacter = this.data as BaseCharacterType;
             this.hpBox.setText(`${baseCharacter.hitpoints}/${baseCharacter.maxHitpoints}`);
+        }
+
+        if (this.data.isPlayableCard()) {
+            const playableCard = this.data as PlayableCardType;
+            this.nameBox.setBackgroundColor(playableCard.rarity.color);
         }
 
         // Update cost box if it exists

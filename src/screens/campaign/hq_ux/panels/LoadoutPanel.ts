@@ -1,6 +1,6 @@
 import { Scene } from 'phaser';
 import { EncounterManager } from '../../../../encounters/Encounters';
-import { PlayerCharacter } from '../../../../gamecharacters/CharacterClasses';
+import { PlayerCharacter } from '../../../../gamecharacters/BaseCharacterClass';
 import { GameState } from '../../../../rules/GameState';
 import { TextBoxButton } from '../../../../ui/Button';
 import { PhysicalCard } from '../../../../ui/PhysicalCard';
@@ -111,6 +111,7 @@ export class LoadoutPanel extends AbstractHqPanel {
                 character.cardsInMasterDeck.push(...assignedTradeGoods);
             });
 
+            GameState.getInstance().initializeRun();
             SceneChanger.switchToCombatScene({ encounter: EncounterManager.getInstance().getShopEncounter().data });
         }
     }

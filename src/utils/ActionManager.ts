@@ -40,6 +40,10 @@ export class ActionManager {
         return true;
     }
 
+    addRelicToInventory(relic: AbstractRelic, scene: Phaser.Scene) {
+        GameState.getInstance().addRelic(relic, scene);
+    }
+
 
     buyItemForHellCurrency(item: PlayableCard) : boolean {
         const inventory = GameState.getInstance().cardsInventory;
@@ -630,7 +634,7 @@ export class ActionManager {
         item.OnPurchase();
         const inventory = GameState.getInstance().getInventory();
         inventory.push(item);
-        GameState.getInstance().setShopItems(GameState.getInstance().getShopItems().filter(i => i !== item));
+        GameState.getInstance().shopCardsForSale = GameState.getInstance().shopCardsForSale.filter(i => i !== item);
     }
 
     public async resolveActions(): Promise<void> {
@@ -646,7 +650,7 @@ export class ActionManager {
         }));
     }
 
-    public modifyFog(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
+    public modifySmog(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
         this.actionQueue.addAction(new GenericAction(async () => {
             GameState.getInstance().combatState.combatResources.modifySmog(amount);
             return [];
@@ -670,7 +674,7 @@ export class ActionManager {
             return [];
         }));
     }
-    public modifyGold(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
+    public modifyVenture(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
         this.actionQueue.addAction(new GenericAction(async () => {
             GameState.getInstance().combatState.combatResources.modifyVenture(amount);
             return [];
@@ -757,6 +761,7 @@ export class ActionManager {
         
         // Queue discard actions instead of direct discard
         ActionManager.getInstance().basicDiscardCards(combatState.currentHand);
+        combatState.currentTurn++;
         ActionManager.beginTurn();
     }
 

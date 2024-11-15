@@ -1,6 +1,7 @@
 import ImageUtils from "../../utils/ImageUtils";
 import { Gender } from "../BaseCharacter";
-import { BaseCharacterClass } from "../CharacterClasses";
+import { BaseCharacterClass } from "../BaseCharacterClass";
+import { CharacterClasses } from "../CharacterClasses";
 import { CursedStrike } from "./cards/diabolist/commons/CursedStrike";
 import { DarkWhisper } from "./cards/diabolist/commons/DarkWhisper";
 import { ObsidianCandles } from "./cards/diabolist/commons/ObsidianCandles";
@@ -15,10 +16,10 @@ import { UnnaturalVigor } from "./cards/diabolist/uncommon/UnnaturalVigor";
 
 export class DiabolistClass extends BaseCharacterClass {
     getPortraitNameAtRandom(gender: Gender): string {
-        return ImageUtils.getRandomImageNameFromCategory(`portraits_diabolist_${gender === Gender.Female ? "female" : "male"}` as "portraits_diabolist_female");
+        return ImageUtils.getRandomImageNameFromCategory(`portraits_diabolist_${gender === Gender.Female ? "female" : "male"}` as "portraits_diabolist_female");    
     }
     constructor() {
-        super({ name: "Diabolist", iconName: "diabolist_icon", startingMaxHp: 20 })
+        super({ name: "Diabolist", id: CharacterClasses.DIABOLIST_ID, iconName: "diabolist_icon", startingMaxHp: 20 })
         this.cardBackgroundImageName = "diabolist_background"
         
         this.availableCards = [

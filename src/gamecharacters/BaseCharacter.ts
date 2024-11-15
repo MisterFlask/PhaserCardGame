@@ -29,7 +29,7 @@ export class BaseCharacter extends AbstractCard implements IBaseCharacter {
 
         for (const enemy of livingEnemies) {
             for (const intent of enemy.intents) {
-                if (intent.target === this) {
+                if (intent.target === this || intent.targetsAllPlayers) {
                     targetingIntents.push(intent);
                 }
             }

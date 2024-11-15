@@ -5,7 +5,8 @@ export enum UIContext {
     CARD_REWARD,
     CHARACTER_DECK_SHOWN,
     CAMPAIGN_HQ,
-    CARD_SELECTION_FROM_HAND
+    CARD_SELECTION_FROM_HAND,
+    DEBUG_MENU
 }
 
 export class UIContextManager {

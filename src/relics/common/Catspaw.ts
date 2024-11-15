@@ -7,7 +7,7 @@ export class Catspaw extends AbstractRelic {
         super();
         this.name = "Catspaw";
         this.description = "Shoot cards deal 2 more damage.";
-        this.tier = CardRarity.COMMON;
+        this.rarity = CardRarity.COMMON;
     }
 
     public damageModifierOnCardPlayed(card: PlayableCard): DamageModifier {

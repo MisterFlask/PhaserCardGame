@@ -1,5 +1,5 @@
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
-import type { PlayerCharacter } from '../gamecharacters/CharacterClasses';
+import type { PlayerCharacter } from '../gamecharacters/BaseCharacterClass';
 import type { PlayableCard } from '../gamecharacters/PlayableCard';
 import type { LocationCard } from '../maplogic/LocationCard';
 import { AbstractRelic } from '../relics/AbstractRelic';
@@ -12,13 +12,33 @@ import { PluckResource } from './combatresources/PluckResource';
 import { PowderResource } from './combatresources/PowderResource';
 import { SmogResource } from './combatresources/SmogResource';
 import { VentureResource } from './combatresources/VentureResource';
+import { ShopPopulator } from './ShopPopulator';
 
 export class GameState {
+
+    initializeRun() {
+        console.log('initializing run')
+        this.rerollShop();
+        this.combatState.playerCharacters = this.currentRunCharacters
+
+        // Run onRunStart for each buff on each character
+        this.currentRunCharacters.forEach(character => {
+            character.buffs.forEach(buff => {
+                buff.onRunStart();
+            });
+        });
+    }
+
     private static instance: GameState;
 
     public roster: PlayerCharacter[] = [];
     public currentRunCharacters: PlayerCharacter[] = [];
-    public shopItems: PlayableCard[] = [];
+
+    // shop stuff
+    public shopCardsForSale: PlayableCard[] = [];
+    public shopRelicsForSale: AbstractRelic[] = [];
+
+    // player's stuff
     public cardsInventory: PlayableCard[] = [];
     public relicsInventory: AbstractRelic[] = [];
 
@@ -99,15 +119,6 @@ export class GameState {
         return [...this.currentRunCharacters];
     }
 
-    // Shop items methods
-    public setShopItems(items: PlayableCard[]): void {
-        this.shopItems = items;
-    }
-
-    public getShopItems(): PlayableCard[] {
-        return [...this.shopItems];
-    }
-
     // Inventory methods
     public addToInventory(item: PlayableCard): void {
         this.cardsInventory.push(item);
@@ -122,11 +133,21 @@ export class GameState {
         return [...this.cardsInventory];
     }
 
+    public rerollShop(): void {
+        console.log('rerolling shop')
+        const shopCards = ShopPopulator.getInstance().getShopCards();
+        const shopRelics = ShopPopulator.getInstance().getShopRelics();
+        console.log('shop cards after reroll', shopCards)
+        console.log('shop relics after reroll', shopRelics)
+        this.shopCardsForSale = shopCards;
+        this.shopRelicsForSale = shopRelics;
+    }
+
     // Reset method
     public reset(): void {
         this.roster = [];
         this.currentRunCharacters = [];
-        this.shopItems = [];
+        this.shopCardsForSale = [];
         this.cardsInventory = [];
     }
 
@@ -141,7 +162,7 @@ export class GameState {
                 type: char.constructor.name,
                 ...char
             })),
-            shopItems: this.shopItems,
+            shopItems: this.shopCardsForSale,
             inventory: this.cardsInventory
         };
         return JSON.stringify(serializableState);
@@ -164,7 +185,10 @@ export class GameState {
         return [...this.locations];
     }
 
-    // Ensure that AbstractCard can be treated as StoreCard or adjust types accordingly
+    public addRelic(relic: AbstractRelic, scene: Phaser.Scene): void {
+        this.relicsInventory.push(relic);
+        scene.events.emit('propagateGameStateChangesToUi');
+    }
 }
 
 export class CombatState{
@@ -191,7 +215,7 @@ export class CombatState{
     combatResources: CombatResources = new CombatResources()
 
     public energyAvailable: number = 0
-    public maxEnergy: number = 5
+    public maxEnergy: number = 3
         
     getBattleCardLocation = (cardId: string): BattleCardLocation => {
         if (this.currentDrawPile.some(c => c.id === cardId)) return BattleCardLocation.DrawPile

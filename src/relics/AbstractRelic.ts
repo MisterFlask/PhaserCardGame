@@ -8,10 +8,11 @@ import ImageUtils from "../utils/ImageUtils";
 export abstract class AbstractRelic {
     name!: string;
     description!: string;
-    tier!: CardRarity;
+    rarity!: CardRarity;
     price: number = -1;
     portraitName!: string
     tint!: number
+    
 
     constructor() {
     }
@@ -32,7 +33,7 @@ export abstract class AbstractRelic {
     }
 
     public getTier(): CardRarity {
-        return this.tier;
+        return this.rarity;
     }
 
     public generateSeededRandomColor(): number {
@@ -84,6 +85,10 @@ export abstract class AbstractRelic {
 
     protected get actionManager(): ActionManager {
         return ActionManagerFetcher.getActionManager();
+    }
+
+    public getShopPriceMultiplier(): number {
+        return 1.0; // Override in specific relics to modify shop prices
     }
 }
 

@@ -9,7 +9,7 @@ export class EldritchSmoke extends PlayableCard {
             name: "Eldritch Smoke",
             cardType: CardType.SKILL,
             targetingType: TargetingType.ALLY,
-            rarity: CardRarity.COMMON,
+            rarity: CardRarity.SPECIAL,
         });
         this.baseBlock = 4; // Set the base block value
         this.baseDamage = 0; // No damage

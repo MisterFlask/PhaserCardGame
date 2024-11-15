@@ -1,6 +1,7 @@
 import ImageUtils from "../../utils/ImageUtils";
 import { Gender } from "../BaseCharacter";
-import { BaseCharacterClass } from "../CharacterClasses";
+import { BaseCharacterClass } from "../BaseCharacterClass";
+import { CharacterClasses } from "../CharacterClasses";
 import { Bolster } from "./cards/archon/commons/Bolster";
 import { Buzzsword } from "./cards/archon/commons/Buzzsword";
 import { HandCannon } from "./cards/archon/commons/HandCannon";
@@ -26,7 +27,7 @@ export class ArchonClass extends BaseCharacterClass {
     }
 
     constructor() {
-        super({ name: "Archon", iconName: "archon_icon", startingMaxHp: 30 })
+        super({ name: "Archon", id: CharacterClasses.ARCHON_ID, iconName: "archon_icon", startingMaxHp: 30 })
         // Add Archon-specific cards here
         this.cardBackgroundImageName = "archon_background"
         this.availableCards = [

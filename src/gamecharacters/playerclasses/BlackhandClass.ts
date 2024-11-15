@@ -1,6 +1,7 @@
 import ImageUtils from "../../utils/ImageUtils";
 import { Gender } from "../BaseCharacter";
-import { BaseCharacterClass } from "../CharacterClasses";
+import { BaseCharacterClass } from "../BaseCharacterClass";
+import { CharacterClasses } from "../CharacterClasses";
 import { Rummage } from "./cards/basic/Rummage";
 import { FireAxe } from "./cards/blackhand/commons/FireAxe";
 import { FlamePistol } from "./cards/blackhand/commons/FlamePistol";
@@ -20,7 +21,7 @@ export class BlackhandClass extends BaseCharacterClass {
         return ImageUtils.getRandomImageNameFromCategory(`portraits_blackhand_${gender === Gender.Female ? "female" : "male"}` as "portraits_blackhand_female");
     }
     constructor() {
-        super({ name: "Blackhand", iconName: "blackhand_icon", startingMaxHp: 30 })
+        super({ name: "Blackhand", id: CharacterClasses.BLACKHAND_ID, iconName: "blackhand_icon", startingMaxHp: 30 })
         // Add Blackhand-specific cards here
         this.cardBackgroundImageName = "blackhand_background"
 
