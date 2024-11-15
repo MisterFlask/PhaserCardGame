@@ -36,7 +36,7 @@ export class GlassCross extends AbstractRelic {
         super();
         this.name = "Glass Cross";
         this.description = "In Spanish areas, at the start of combat, manufacture a Holy Bombardment to your hand.";
-        this.tier = CardRarity.COMMON;
+        this.rarity = CardRarity.COMMON;
     }
 
     override onCombatStart(): void {

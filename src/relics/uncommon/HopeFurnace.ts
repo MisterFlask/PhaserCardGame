@@ -10,7 +10,7 @@ export class HopeFurnace extends AbstractRelic {
         super();
         this.name = "Hope Furnace";
         this.description = "The first five cards you exhaust in a combat, a random character is relieved of 1 stress.";
-        this.tier = CardRarity.UNCOMMON;
+        this.rarity = CardRarity.UNCOMMON;
     }
 
     override onCardExhausted(): void {

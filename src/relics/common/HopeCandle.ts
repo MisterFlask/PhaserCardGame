@@ -6,7 +6,7 @@ export class HopeCandle extends AbstractRelic {
         super();
         this.name = "Hope Candle";
         this.description = "At the end of combat, decrease your Stress by 1.";
-        this.tier = CardRarity.COMMON;
+        this.rarity = CardRarity.COMMON;
     }
 
     onCombatEnd(): void {

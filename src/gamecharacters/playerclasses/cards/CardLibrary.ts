@@ -1,3 +1,4 @@
+import { BaseCharacterClass } from '../../CharacterClasses';
 import { PlayableCard } from '../../PlayableCard';
 import { ArchonClass } from '../ArchonClass';
 import { BlackhandClass } from '../BlackhandClass';
@@ -17,11 +18,21 @@ export class CardLibrary {
         return CardLibrary.instance;
     }
 
+    public getCharacterClasses(): BaseCharacterClass[] {
+        return [
+            new BlackhandClass(),
+            new DiabolistClass(),
+            new ArchonClass(),
+        ];
+    }
+
+    public getCardsForClass(characterClass: BaseCharacterClass): PlayableCard[] {
+        return characterClass.availableCards;
+    }
+
     public getAllCards(): PlayableCard[] {
         return [
-            ... new BlackhandClass().availableCards,
-            ... new DiabolistClass().availableCards,
-            ... new ArchonClass().availableCards,
+            ... this.getCharacterClasses().flatMap(c => c.availableCards),
         ];
     }
 }

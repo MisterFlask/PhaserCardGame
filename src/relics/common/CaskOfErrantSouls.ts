@@ -6,7 +6,7 @@ export class CaskOfErrantSouls extends AbstractRelic {
         super();
         this.name = "Cask of Errant Souls";
         this.description = "Each time you enter a rest site, gain 10 Hell Currency.";
-        this.tier = CardRarity.COMMON;
+        this.rarity = CardRarity.COMMON;
     }
 
     override onLocationEntered(location: LocationCard): void {
