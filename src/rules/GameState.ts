@@ -1,5 +1,5 @@
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
-import type { PlayerCharacter } from '../gamecharacters/CharacterClasses';
+import type { PlayerCharacter } from '../gamecharacters/BaseCharacterClass';
 import type { PlayableCard } from '../gamecharacters/PlayableCard';
 import type { LocationCard } from '../maplogic/LocationCard';
 import { AbstractRelic } from '../relics/AbstractRelic';

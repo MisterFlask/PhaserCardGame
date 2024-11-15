@@ -1,5 +1,5 @@
 import { Gender } from "./BaseCharacter";
-import { PlayerCharacter } from "./CharacterClasses";
+import { PlayerCharacter } from "./BaseCharacterClass";
 import { ArchonClass } from "./playerclasses/ArchonClass";
 import { BlackhandClass } from "./playerclasses/BlackhandClass";
 import { DiabolistClass } from "./playerclasses/DiabolistClass";
@@ -12,7 +12,7 @@ export class CharacterGenerator {
             new BlackhandClass(), 
             new DiabolistClass()
         ];
-        
+
         const selectedClass = characterClasses[Math.floor(Math.random() * characterClasses.length)];
 
         // Randomly select gender

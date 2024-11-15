@@ -5,7 +5,7 @@ import { ActionManager } from "../../utils/ActionManager";
 import { ActionManagerFetcher } from "../../utils/ActionManagerFetcher";
 import { generateWordGuid } from "../AbstractCard";
 import type { BaseCharacter } from "../BaseCharacter";
-import { PlayerCharacter } from "../CharacterClasses";
+import { PlayerCharacter } from "../BaseCharacterClass";
 import type { IAbstractBuff } from '../IAbstractBuff';
 import { IBaseCharacter } from '../IBaseCharacter';
 import type { PlayableCard } from "../PlayableCard";

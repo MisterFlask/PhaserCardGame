@@ -7,8 +7,8 @@ import type { ActionManager } from '../utils/ActionManager';
 import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
 import ImageUtils from '../utils/ImageUtils';
 import type { BaseCharacter } from './BaseCharacter';
+import type { PlayerCharacter } from './BaseCharacterClass';
 import type { AbstractBuff } from './buffs/AbstractBuff';
-import type { PlayerCharacter } from './CharacterClasses';
 import { IAbstractCard } from './IAbstractCard';
 import type { PlayableCard } from './PlayableCard';
 import { CardSize, CardType } from './Primitives'; // Ensure enums are imported from Primitives

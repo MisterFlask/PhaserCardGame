@@ -13,8 +13,8 @@ import type { ActionManager } from "../utils/ActionManager";
 import { ActionManagerFetcher } from "../utils/ActionManagerFetcher";
 import { AbstractCard, TargetingType, Team } from "./AbstractCard";
 import { BaseCharacter } from "./BaseCharacter";
+import { BaseCharacterClass, PlayerCharacter } from "./BaseCharacterClass";
 import type { AbstractBuff } from "./buffs/AbstractBuff";
-import { PlayerCharacter } from "./CharacterClasses";
 import { IBaseCharacter } from "./IBaseCharacter";
 import { CardSize, CardType } from "./Primitives";
 
@@ -85,7 +85,7 @@ export abstract class PlayableCard extends AbstractCard {
     override typeTag = "PlayableCard";
 
     rarity: CardRarity; // Added card rarity
-
+    nativeToCharacterClass?: BaseCharacterClass;
     resourceScalings: CardResourceScaling[] = [];
     constructor({ name, description, portraitName, cardType, tooltip, characterData, size, targetingType, owner, price: surfaceValue, rarity }: { name: string; description?: string; portraitName?: string; cardType?: CardType; tooltip?: string; characterData?: AbstractCard; size?: CardSize; targetingType?: TargetingType; owner?: IBaseCharacter; price?: number; rarity?: CardRarity }) {
         super({ name, description: description ?? "_", portraitName, cardType, tooltip, characterData, size });

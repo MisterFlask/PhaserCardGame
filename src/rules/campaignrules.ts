@@ -1,4 +1,4 @@
-import { PlayerCharacter } from '../gamecharacters/CharacterClasses';
+import { PlayerCharacter } from '../gamecharacters/BaseCharacterClass';
 import { CharacterGenerator } from '../gamecharacters/CharacterGenerator';
 
 export class CampaignRules {

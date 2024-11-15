@@ -1,5 +1,5 @@
 import { Scene } from 'phaser';
-import { PlayerCharacter } from '../../gamecharacters/CharacterClasses';
+import { PlayerCharacter } from '../../gamecharacters/BaseCharacterClass';
 import { PlayableCard } from '../../gamecharacters/PlayableCard';
 import { GameState } from '../../rules/GameState';
 import { TextBoxButton } from '../../ui/Button';
