@@ -3,9 +3,7 @@ import { ShopGuy } from '../../encounters/Encounters';
 import { AbstractCard, PriceContext } from '../../gamecharacters/AbstractCard';
 import { BaseCharacter } from '../../gamecharacters/BaseCharacter';
 import { PlayableCard } from '../../gamecharacters/PlayableCard';
-import { Rummage } from '../../gamecharacters/playerclasses/cards/basic/Rummage';
 import { AbstractRelic } from '../../relics/AbstractRelic';
-import { RelicsLibrary } from '../../relics/RelicsLibrary';
 import { GameState } from '../../rules/GameState';
 import { DepthManager } from '../../ui/DepthManager';
 import { ShopCardPanel } from '../../ui/ShopCardPanel';
@@ -26,8 +24,6 @@ export class ShopOverlay {
     private shopRelicPanels: ShopRelicPanel[] = [];
     private readonly BASE_PANEL_DEPTH = DepthManager.getInstance().SHOP_OVERLAY;
     private campaignBriefStatus: CampaignBriefStatus;
-    private shopCards: PlayableCard[] = [new Rummage(), new Rummage(), new Rummage()];
-    private shopRelics: AbstractRelic[] = RelicsLibrary.getInstance().getRandomRelics(3);
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -82,7 +78,7 @@ export class ShopOverlay {
         const startX = 450;
         const startY = 300;
 
-        this.shopRelics.forEach((relic, index) => {
+        GameState.getInstance().shopRelicsForSale.forEach((relic, index) => {
             const row = Math.floor(index / gridColumns);
             const col = index % gridColumns;
             
@@ -105,9 +101,9 @@ export class ShopOverlay {
         console.log(`Buying relic ${relic.name}`);
         if (ActionManagerFetcher.getActionManager().buyRelicForHellCurrency(relic, relic.price)) {
             // Remove the purchased relic from the shop relics array
-            const relicIndex = this.shopRelics.findIndex(shopRelic => shopRelic.name === relic.name);
+            const relicIndex = GameState.getInstance().shopRelicsForSale.findIndex(shopRelic => shopRelic.name === relic.name);
             if (relicIndex !== -1) {
-                this.shopRelics.splice(relicIndex, 1);
+                GameState.getInstance().shopRelicsForSale.splice(relicIndex, 1);
             }
             
             this.refreshShop();
@@ -132,6 +128,9 @@ export class ShopOverlay {
 
     private populatePurchasableShopCards(): void {
         const shopItems = this.getShopItems();
+
+        console.log('Shop items:', shopItems);
+
         const gridColumns = 3;
         const gridRows = 3;
         const horizontalSpacing = 200;
@@ -191,7 +190,7 @@ export class ShopOverlay {
     private getShopItems(): PlayableCard[] {
         // This method should be implemented to return the list of items for sale
         // For now, we'll return an array with three Rummage cards
-        return this.shopCards;
+        return GameState.getInstance().shopCardsForSale;
     }
 
     private buyItem(item: PlayableCard): void {
@@ -200,9 +199,9 @@ export class ShopOverlay {
         // remove from shop
         if (ActionManagerFetcher.getActionManager().buyItemForHellCurrency(item)) { 
             // Remove the purchased item from the shop items array
-            const itemIndex = this.shopCards.findIndex(shopItem => shopItem.id === item.id);
+            const itemIndex = GameState.getInstance().shopCardsForSale.findIndex(shopItem => shopItem.id === item.id);
             if (itemIndex !== -1) {
-                this.shopCards.splice(itemIndex, 1);
+                GameState.getInstance().shopCardsForSale.splice(itemIndex, 1);
             }
 
             this.populatePurchasableShopCards()

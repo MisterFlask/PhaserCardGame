@@ -111,6 +111,7 @@ export class LoadoutPanel extends AbstractHqPanel {
                 character.cardsInMasterDeck.push(...assignedTradeGoods);
             });
 
+            GameState.getInstance().initializeRun();
             SceneChanger.switchToCombatScene({ encounter: EncounterManager.getInstance().getShopEncounter().data });
         }
     }

@@ -150,6 +150,7 @@ export class ShopCard extends LocationCard {
         console.log(`Location ${this.id} selected with encounter: ${this.encounter.enemies.map(e => e.name).join(', ')}`);
         
         GameState.getInstance().eliminatePhysicalCardsBetweenScenes();
+        GameState.getInstance().rerollShop();
         SceneChanger.switchToCombatScene({ encounter: EncounterManager.getInstance().getShopEncounter().data });
     }
 }

@@ -634,7 +634,7 @@ export class ActionManager {
         item.OnPurchase();
         const inventory = GameState.getInstance().getInventory();
         inventory.push(item);
-        GameState.getInstance().setShopItems(GameState.getInstance().getShopItems().filter(i => i !== item));
+        GameState.getInstance().shopCardsForSale = GameState.getInstance().shopCardsForSale.filter(i => i !== item);
     }
 
     public async resolveActions(): Promise<void> {
