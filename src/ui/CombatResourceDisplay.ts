@@ -62,6 +62,11 @@ export class CombatResourceDisplay extends Phaser.GameObjects.Container {
         
         // Add to scene
         scene.add.existing(this);
+        this.scene.events.on('update', this.update, this);
+    }
+
+    update(): void {
+        this.updateValue();
     }
 
     private handleClick(): void {
@@ -85,6 +90,7 @@ export class CombatResourceDisplay extends Phaser.GameObjects.Container {
     }
 
     public destroy(): void {
+        this.scene.events.off('update', this.update, this);
         this.icon.mainImage.off('pointerdown', this.handleClick, this);
         this.icon.mainImage.off('pointerover', this.handlePointerOver, this);
         this.icon.mainImage.off('pointerout', this.handlePointerOut, this);

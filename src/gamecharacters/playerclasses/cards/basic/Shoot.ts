@@ -5,7 +5,7 @@ import { CardRarity, PlayableCard } from "../../../PlayableCard";
 export class Shoot extends PlayableCard {
     constructor() {
         super({
-            name: "Fire Webley Revolver",
+            name: "Fire Revolver",
             description: `_`,
             portraitName: "gun",
             targetingType: TargetingType.ENEMY,
