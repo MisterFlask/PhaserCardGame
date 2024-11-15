@@ -70,7 +70,6 @@ export class PhysicalCard implements IPhysicalCardInterface {
         cardImage,
         nameBox,
         descBox,
-        tooltipBox,
         data,
         cardConfig
     }: {
@@ -81,17 +80,17 @@ export class PhysicalCard implements IPhysicalCardInterface {
         cardImage: Phaser.GameObjects.Image;
         nameBox: TextBox;
         descBox: TextBox;
-        tooltipBox: TextBox;
         data: AbstractCard;
         cardConfig: CardConfig;
     }) {
+
+        var {cardWidth, cardHeight} = cardConfig;
         this.scene = scene;
         this.container = container;
         this.cardBackgroundAsRectangle = cardBackgroundAsRectangle;
         this.cardBackground = cardBackground;
         this.nameBox = nameBox;
         this.descBox = descBox;
-        this.tooltipBox = tooltipBox;
         this.data = data;
         if (!this.data.physicalCard){
             this.data.physicalCard = this;
@@ -119,6 +118,24 @@ export class PhysicalCard implements IPhysicalCardInterface {
         }
         this.container.add(this.cardContent);
 
+        // Create tooltipBox here instead
+        this.tooltipBox = new TextBox({
+            scene: this.scene,
+            x: cardWidth + cardWidth / 2,
+            y: 0,
+            width: cardWidth - 10,
+            height: cardHeight,
+            text: data.tooltip || '',
+            textBoxName: "tooltipBox:" + data.id,
+            style: {
+                fontSize: '12px',
+                color: '#000',
+                wordWrap: { width: cardWidth - 20 },
+                align: 'left'
+            }
+        });
+        this.tooltipBox.setVisible(false);
+        
         // Add tooltip directly to the main container
         this.container.add(this.tooltipBox);
 

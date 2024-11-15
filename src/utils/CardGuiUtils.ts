@@ -71,26 +71,10 @@ export class CardGuiUtils {
                 align: 'center'
             }
         });
-        const tooltipBox = new TextBox({
-            scene: scene,
-            x: cardWidth + cardWidth / 2,
-            y: 0,
-            width: cardWidth - 10,
-            height: cardHeight,
-            text: data.tooltip || '',
-            textBoxName: "tooltipBox:" + data.id,
-            style: {
-                fontSize: '12px',
-                color: '#000',
-                wordWrap: { width: cardWidth - 20 },
-                align: 'left'
-            }
-        });
 
         descBox.setVisible(false);
-        tooltipBox.setVisible(false);
         
-        cardContainer.add([cardBackground, cardImage, nameBox, tooltipBox, descBox, ]);
+        cardContainer.add([cardBackground, cardImage, nameBox, descBox]);
         cardContainer.setSize(cardWidth, cardHeight);
         cardContainer.setInteractive(new Phaser.Geom.Rectangle(0, 0, cardWidth, cardHeight), Phaser.Geom.Rectangle.Contains);
 
@@ -103,7 +87,6 @@ export class CardGuiUtils {
             cardImage: cardImage,
             nameBox: nameBox,
             descBox: descBox,
-            tooltipBox: tooltipBox,
             data: data,
             cardConfig: this.cardConfig
         });
