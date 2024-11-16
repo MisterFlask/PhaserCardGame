@@ -64,6 +64,8 @@ class CombatScene extends Phaser.Scene {
         UIContextManager.getInstance().setContext(UIContext.COMBAT);
     }
 
+
+
     create(): void {
         ActionManagerFetcher.initActionManager();
         this.createBackground();
@@ -216,6 +218,9 @@ class CombatScene extends Phaser.Scene {
         
         // Update highlights
         CombatHighlightsManager.getInstance().update(allCharacters);
+
+        // Update card manager
+        this.cardManager.update();
     }
 
     /**

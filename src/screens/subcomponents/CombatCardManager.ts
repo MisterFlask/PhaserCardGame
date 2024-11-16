@@ -244,6 +244,23 @@ export class CombatCardManager {
         }
     }
 
+    public update(){
+        // Ensure physical cards match the game state
+        const state = GameState.getInstance().combatState;
+        state.currentHand.forEach(cardData => {
+            if (!cardData.physicalCard) {
+                // Find the matching physical card in our hand
+                const matchingPhysicalCard = this.playerHand.find(physicalCard => 
+                    physicalCard.data === cardData
+                );
+                
+                if (matchingPhysicalCard) {
+                    cardData.physicalCard = matchingPhysicalCard;
+                }
+            }
+        });
+    }
+
 }
 
 export default CombatCardManager;
