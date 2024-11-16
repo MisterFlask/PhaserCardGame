@@ -23,10 +23,29 @@ export class AbstractTradeRoute extends AbstractCard {
     }
 } 
 
+const tradeRouteNames = [
+    "the brimstone corridor",
+    "perdition’s pass",
+    "the charred vein",
+    "the ashen byway",
+    "gehenna crossroad",
+    "the infernal lattice",
+    "the sulphur strand",
+    "hellgate concourse",
+    "the abyssal exchange",
+    "diabolus circuit",
+    "the molten traverse",
+    "pandemonium pike",
+    "the obsidian spur",
+    "mephisto's thoroughfare",
+    "tartarus relay"
+]
+
+
 export class StandardTradeRoute extends AbstractTradeRoute {
     constructor() {
         super({
-            name: "Silk Road Connection",
+            name: tradeRouteNames[Math.floor(Math.random() * tradeRouteNames.length)],
             description: "A lucrative trade route connecting distant markets",
         });
         this.buffs = [new EnemyUpgradeTradeRouteModifier()];
