@@ -200,6 +200,10 @@ export class ActionManager {
 
     public getCanPlayCardResult(card: IPhysicalCardInterface, target?: BaseCharacterType): {canPlay: boolean, reason?: string} {
         const playableCard = card.data as PlayableCardType;
+        if (!card.data){
+            console.error("No data found for card " + card);
+            return {canPlay: false, reason: "No data found for card"};
+        }
         const gameState = GameState.getInstance();
         const combatState = gameState.combatState;
 
@@ -229,6 +233,11 @@ export class ActionManager {
     }
 
     public playCard(card: IPhysicalCardInterface, target?: BaseCharacterType): boolean {
+        if (!card?.data){
+            console.error("No data found for card " + card);
+            return false;
+        }
+        
         const playResult = this.getCanPlayCardResult(card, target);
         if (!playResult.canPlay) {
             if (playResult.reason) {

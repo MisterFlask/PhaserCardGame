@@ -402,6 +402,9 @@ class CombatUIManager {
 
     private handleCardSelect(selectedCard: CardReward): void {
         console.log("Card selected:", selectedCard.card.name);
+        selectedCard.owner.cardsInMasterDeck.push(selectedCard.card as PlayableCard);
+        this.cardRewardScreen.hide();
+        UIContextManager.getInstance().setContext(UIContext.COMBAT);
     }
 
     private handleSkip(): void {
