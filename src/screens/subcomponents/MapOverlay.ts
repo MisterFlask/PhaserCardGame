@@ -346,6 +346,10 @@ export class MapOverlay {
                 const gameState = GameState.getInstance();
                 gameState.setCurrentLocation(card.data);
                 
+                GameState.getInstance().relicsInventory.forEach(relic => {
+                    relic.onLocationEntered(card.data as LocationCard)
+                });
+                
                 card.data.OnLocationSelected(this.scene);
                 this.updatePlayerLocationIcon();
             }

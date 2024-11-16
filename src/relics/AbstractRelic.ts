@@ -70,7 +70,7 @@ export abstract class AbstractRelic {
 
     public onCardExhausted(card: PlayableCard): void {}
 
-    public onLocationEntered(location: LocationCard): void {} //todo
+    public onLocationEntered(location: LocationCard): void {}
 
     public onRelicClicked(): void {}
     
