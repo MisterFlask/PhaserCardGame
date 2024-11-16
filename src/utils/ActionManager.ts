@@ -20,6 +20,11 @@ import { SubtitleManager } from "../ui/SubtitleManager";
 export class ActionManager {
     endCombat() {
         this.actionQueue.addAction(new GenericAction(async () => {
+
+            GameState.getInstance().relicsInventory.forEach(relic => {
+                relic.onCombatEnd();
+            });
+
             GameState.getInstance().combatState.allPlayerAndEnemyCharacters.forEach(character => {
                 character.buffs.forEach(buff => {
                     buff.onCombatEnd();
@@ -31,6 +36,10 @@ export class ActionManager {
 
     startCombat() {
         this.actionQueue.addAction(new GenericAction(async () => {
+            GameState.getInstance().relicsInventory.forEach(relic => {
+                relic.onCombatStart();
+            });
+
             GameState.getInstance().combatState.allPlayerAndEnemyCharacters.forEach(character => {
                 character.buffs.forEach(buff => {
                     buff.onCombatStart();
@@ -316,6 +325,11 @@ export class ActionManager {
             });
         });
 
+        
+        GameState.getInstance().relicsInventory.forEach(relic => {
+            relic.onCardPlayed(playableCard, target);
+        });
+
     }
 
     public stateBasedEffects(){
@@ -420,6 +434,9 @@ export class ActionManager {
                 
                 drawnCard.buffs.forEach(buff => {
                     buff.onCardDrawn();
+                });
+                GameState.getInstance().relicsInventory.forEach(relic => {
+                    relic.onCardDrawn(drawnCard);
                 });
 
                 await this.animateDrawCard(drawnCard);
@@ -812,6 +829,9 @@ export class ActionManager {
             for (const buff of card.buffs) {
                 buff.onActiveDiscard();
             }
+            GameState.getInstance().relicsInventory.forEach(relic => {
+                relic.onCardDiscarded(card);
+            });
             return [];
         }));
     }
@@ -825,6 +845,9 @@ export class ActionManager {
                 buff.onExhaust();
             }
 
+            GameState.getInstance().relicsInventory.forEach(relic => {
+                relic.onCardExhausted(card);
+            });
             ProcBroadcaster.getInstance().broadcastCombatEvent(new ExhaustEvent(card));
 
             return [];

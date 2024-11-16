@@ -1,3 +1,4 @@
+import { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { CardRarity, PlayableCard } from "../gamecharacters/PlayableCard";
 import { LocationCard } from "../maplogic/LocationCard";
 import { CombatState, GameState } from "../rules/GameState";
@@ -57,7 +58,7 @@ export abstract class AbstractRelic {
 
     public onCombatEnd(): void {}
 
-    public onCardPlayed(card: PlayableCard): void {}
+    public onCardPlayed(card: PlayableCard, target: BaseCharacter | undefined): void {}
 
     public damageModifierOnCardPlayed(card: PlayableCard): DamageModifier {
         return new DamageModifier();
@@ -69,7 +70,7 @@ export abstract class AbstractRelic {
 
     public onCardExhausted(card: PlayableCard): void {}
 
-    public onLocationEntered(location: LocationCard): void {}
+    public onLocationEntered(location: LocationCard): void {} //todo
 
     public onRelicClicked(): void {}
     

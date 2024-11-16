@@ -345,6 +345,7 @@ export class MapOverlay {
             if (card.data instanceof LocationCard) {
                 const gameState = GameState.getInstance();
                 gameState.setCurrentLocation(card.data);
+                
                 card.data.OnLocationSelected(this.scene);
                 this.updatePlayerLocationIcon();
             }
