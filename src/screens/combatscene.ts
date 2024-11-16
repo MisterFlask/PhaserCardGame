@@ -94,6 +94,7 @@ class CombatScene extends Phaser.Scene {
 
         this.setupResizeHandler();
         GameState.getInstance().combatState.currentTurn = 0;
+        ActionManager.getInstance().startCombat();
         ActionManager.beginTurn()
 
         this.inventoryPanel = new InventoryPanel(this);
@@ -206,6 +207,7 @@ class CombatScene extends Phaser.Scene {
 
         // Check if combat is finished
         if (this.isCombatFinished()) {
+            ActionManager.getInstance().endCombat();
             this.uiManager.onCombatEnd();
         }
 

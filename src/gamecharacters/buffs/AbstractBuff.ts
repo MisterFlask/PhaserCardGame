@@ -100,6 +100,23 @@ export abstract class AbstractBuff implements IAbstractBuff {
         if (character.buffs == null) {
             character.buffs = [];
         }
+
+        // Check for buff interception from existing buffs
+        let changeInStacks = buff.stacks;
+        const previousStacks = character.buffs.find(b => b.constructor === buff.constructor)?.stacks || 0;
+
+        for (const existingBuff of character.buffs) {
+            const interceptionResult = existingBuff.interceptBuffApplication(character, buff, previousStacks, changeInStacks);
+            if (interceptionResult.logicTriggered) {
+                changeInStacks = interceptionResult.newChangeInStacks;
+                if (changeInStacks <= 0) {
+                    return; // Buff was fully intercepted
+                }
+            }
+        }
+        buff.stacks = changeInStacks;
+
+
         // Check if the character already has a buff of the same type
         let existingBuff = character.buffs.find(existingBuff => existingBuff.constructor === buff.constructor);
         if (existingBuff) {
@@ -312,7 +329,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
     // Applies to character buffs ONLY.  If true, buff is not removed at end of combat.
     public isPersistentBetweenCombats: boolean = false;
 
-    // Applies to character buffs ONLY.  If true, buff is not removed at end of the run (meaning it's basically forever on this character)
+    // Applies to character buffs ONLY.  If true, buff is not removed at end of the run OR at end of combat (meaning it's basically forever on this character)
     public isPersonaTrait: boolean = false;
 
     // done for bloodprice buffs.

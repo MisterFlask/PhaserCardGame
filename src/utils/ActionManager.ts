@@ -18,7 +18,27 @@ import CardSelectionFromHandManager from '../ui/CardSelectionFromHandManager';
 import { SubtitleManager } from "../ui/SubtitleManager";
 
 export class ActionManager {
+    endCombat() {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            GameState.getInstance().combatState.allPlayerAndEnemyCharacters.forEach(character => {
+                character.buffs.forEach(buff => {
+                    buff.onCombatEnd();
+                });
+            });
+            return [];
+        }));
+    }
 
+    startCombat() {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            GameState.getInstance().combatState.allPlayerAndEnemyCharacters.forEach(character => {
+                character.buffs.forEach(buff => {
+                    buff.onCombatStart();
+                });
+            });
+            return [];
+        }));
+    }
 
     sellItemForHellCurrency(item: PlayableCard) {
         const inventory = GameState.getInstance().cardsInventory;
@@ -397,6 +417,11 @@ export class ActionManager {
             // Add a small delay after drawing each card
             for (let i = 0; i < count; i++) {
                 const drawnCard = deckLogic.drawCards(1)[0];
+                
+                drawnCard.buffs.forEach(buff => {
+                    buff.onCardDrawn();
+                });
+
                 await this.animateDrawCard(drawnCard);
                 await new WaitAction(50).playAction();
                 drawnCards.push(drawnCard);
@@ -404,6 +429,7 @@ export class ActionManager {
 
             const gameState = GameState.getInstance();
             const combatState = gameState.combatState;
+
 
 
             console.log('Cards drawn:', drawnCards.map(card => card.name));
@@ -729,13 +755,32 @@ export class ActionManager {
         const gameState = GameState.getInstance();
         const combatState = gameState.combatState;
 
-        // {{ edit_1 }}
+
+
+
         // Remove intents from dead enemies
         combatState.enemies.forEach(enemy => {
             if (enemy.hitpoints <= 0) {
                 enemy.intents = [];
             }
         });
+
+        // end turn buffs
+        combatState.allPlayerAndEnemyCharacters.forEach(character => {
+            character.buffs.forEach(buff => {
+                buff.onTurnEnd_CharacterBuff();
+            });
+        });
+
+        // end turn buffs on cards in hand
+        combatState.currentHand.forEach(card => {
+            card.buffs.forEach(buff => {
+                buff.onInHandAtEndOfTurn();
+            });
+        });
+
+        // Queue discard actions instead of direct discard
+        this.basicDiscardCards(combatState.currentHand);
 
         combatState.enemies.forEach(enemy => {
             for (const intent of [...enemy.intents]) {
@@ -755,17 +800,7 @@ export class ActionManager {
                 });
             }
         });
-
-        // end turn buffs
-        combatState.allPlayerAndEnemyCharacters.forEach(character => {
-            character.buffs.forEach(buff => {
-                buff.onTurnEnd_CharacterBuff();
-            });
-        });
-
         
-        // Queue discard actions instead of direct discard
-        ActionManager.getInstance().basicDiscardCards(combatState.currentHand);
         combatState.currentTurn++;
         ActionManager.beginTurn();
     }
@@ -877,7 +912,7 @@ public chooseCardToDiscard(): void {
         cancellable: false,
         action: (selectedCards: PlayableCardType[]) => {
             if (selectedCards.length > 0) {
-                this.basicDiscardCard(selectedCards[0]);
+                this.activeDiscardCard(selectedCards[0]);
             }
         }
     });
