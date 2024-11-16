@@ -26,7 +26,6 @@ export class Flying extends AbstractBuff {
 
     override getCombatDamageTakenModifier(sourceCharacter?: IBaseCharacter, sourceCard?: PlayableCard): number {
         if (this.secondaryStacks > 0) {
-            this.secondaryStacks--;
             console.log(`Flying buff activated. Dodged attack. Remaining dodges this turn: ${this.secondaryStacks}`);
             return -1000;
         }

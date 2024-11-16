@@ -267,12 +267,10 @@ export class ActionManager {
                 }
             }
 
-            if (target) {
-                combatState.energyAvailable -= playableCard.energyCost;
-                playableCard.InvokeCardEffects(target);
-            } else {
-                playableCard.InvokeCardEffects();
-            }
+            combatState.energyAvailable -= playableCard.energyCost;
+            playableCard.InvokeCardEffects(target);
+
+            this.InvokeSecondaryEffectsOfPlayingCard(playableCard, target);
 
             // Pay the missing energy through buffs
             missingEnergyBuffs.forEach(buff => {
@@ -285,6 +283,19 @@ export class ActionManager {
         }));
 
         return true;
+    }
+    InvokeSecondaryEffectsOfPlayingCard(playableCard: PlayableCard, target: BaseCharacter | undefined) 
+    {
+        playableCard.buffs.forEach(buff => {
+            buff.onThisCardInvoked(target);
+        });    
+
+        GameState.getInstance().combatState.allPlayerAndEnemyCharacters.forEach(character => {
+            character.buffs.forEach(buff => {
+                buff.onAnyCardPlayedByAnyone(playableCard, target);
+            });
+        });
+
     }
 
     public stateBasedEffects(){
@@ -712,21 +723,6 @@ export class ActionManager {
         await new WaitAction(durationMs).playAction();
         SubtitleManager.getInstance().hideSubtitle();
     }
-
-    public PlayCard = (card: PlayableCardType, target: BaseCharacterType): void => {
-        // Invoke the effect of the card
-        if (card.IsPerformableOn(target)) {
-            card.InvokeCardEffects(target);
-            
-            // now for each buff on the card, invoke its onCardInvoked effect
-            card.buffs.forEach(buff => {
-                buff.onThisCardInvoked(target);
-            });
-        }
-
-        // Queue discard action instead of direct discard
-        ActionManager.getInstance().basicDiscardCard(card);
-    };
 
     public endTurn(): void {
         console.log('Ending turn');

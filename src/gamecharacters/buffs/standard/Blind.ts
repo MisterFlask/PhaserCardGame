@@ -19,7 +19,7 @@ export class Blind extends AbstractBuff {
         return `The next ${this.getStacksDisplayText()} card[s] played by this character discard[s] a card at random from your hand.`;
     }
 
-    override onAnyCardPlayed(playedCard: PlayableCard, target?: BaseCharacter): void {
+    override onAnyCardPlayedByAnyone(playedCard: PlayableCard, target?: BaseCharacter): void {
         if (playedCard.owner != this.getOwnerAsCharacter()) {
             return;
         }

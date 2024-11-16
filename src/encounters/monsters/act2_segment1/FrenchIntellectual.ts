@@ -24,7 +24,7 @@ class PhilosophicalShield extends AbstractBuff {
         this.skillPlayedThisTurn = false;
     }
 
-    override onAnyCardPlayed(playedCard: PlayableCard): void {
+    override onAnyCardPlayedByAnyone(playedCard: PlayableCard): void {
         if (playedCard.cardType === CardType.SKILL) {
             this.skillPlayedThisTurn = true;
         }

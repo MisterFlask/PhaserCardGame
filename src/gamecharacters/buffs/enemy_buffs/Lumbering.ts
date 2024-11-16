@@ -19,7 +19,7 @@ export class Lumbering extends AbstractBuff {
         return `Every time a card is played, takes ${this.getStacksDisplayText()} additional damage from attacks for the rest of the turn. Currently taking ${this.secondaryStacks} additional damage.`;
     }
 
-    override onAnyCardPlayed(playedCard: PlayableCard): void {
+    override onAnyCardPlayedByAnyone(playedCard: PlayableCard): void {
         this.secondaryStacks += this.stacks;
     }
 

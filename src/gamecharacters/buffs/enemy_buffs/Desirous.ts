@@ -22,7 +22,7 @@ export class Desirous extends AbstractBuff {
         this.secondaryStacks = 0;
     }
 
-    override onAnyCardPlayed(playedCard: PlayableCard, target?: BaseCharacter): void {
+    override onAnyCardPlayedByAnyone(playedCard: PlayableCard, target?: BaseCharacter): void {
         if (this.secondaryStacks < this.stacks) {
             this.actionManager.exhaustCard(playedCard);
             this.secondaryStacks++;

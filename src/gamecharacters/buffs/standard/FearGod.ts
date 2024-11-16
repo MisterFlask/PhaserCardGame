@@ -25,7 +25,7 @@ export class FearGod extends AbstractBuff {
         this.cardsPlayedThisTurn = 0;
     }
 
-    override onAnyCardPlayed(playedCard: PlayableCard, target?: IBaseCharacter): void {
+    override onAnyCardPlayedByAnyone(playedCard: PlayableCard, target?: IBaseCharacter): void {
         if (this.cardsPlayedThisTurn < this.stacks) {
             this.actionManager.applyBuffToCard(playedCard, new PhobiaBuff());
             this.cardsPlayedThisTurn++;

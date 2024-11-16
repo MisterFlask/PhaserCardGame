@@ -282,7 +282,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
     }
 
-    public onAnyCardPlayed(playedCard: PlayableCard, target?: BaseCharacter){
+    public onAnyCardPlayedByAnyone(playedCard: PlayableCard, target?: BaseCharacter){
 
     }
 

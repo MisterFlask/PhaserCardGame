@@ -18,7 +18,7 @@ export class Guilt extends AbstractBuff {
         return `Whenever a card with cost >2 is played, exhaust ${this.getStacksDisplayText()} card(s) from your discard pile.`;
     }
 
-    override onAnyCardPlayed(playedCard: PlayableCard, target?: BaseCharacter): void {
+    override onAnyCardPlayedByAnyone(playedCard: PlayableCard, target?: BaseCharacter): void {
         if (playedCard.energyCost > 2) {
             const gameState = GameState.getInstance();
             const discardPile = gameState.combatState.currentDiscardPile;

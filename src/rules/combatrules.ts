@@ -88,7 +88,7 @@ export class CombatRules {
         let totalDamage = baseDamageAmount;
         
         sourceCharacter?.buffs.forEach(buff => {
-            totalDamage += buff.getCombatDamageDealtModifier(target as BaseCharacterType);
+            totalDamage += buff.getCombatDamageDealtModifier(target as BaseCharacterType, sourceCard);
             totalDamage *= (1 + buff.getAdditionalPercentCombatDamageDealtModifier() / 100);
         });
         // Apply target character buffs
@@ -99,7 +99,7 @@ export class CombatRules {
 
         //apply playable card buffs
         sourceCard?.buffs.forEach(buff => {
-            totalDamage += buff.getCombatDamageDealtModifier(target as BaseCharacterType);
+            totalDamage += buff.getCombatDamageDealtModifier(target as BaseCharacterType, sourceCard);
             totalDamage *= (1 + buff.getAdditionalPercentCombatDamageDealtModifier() / 100);
         });
 

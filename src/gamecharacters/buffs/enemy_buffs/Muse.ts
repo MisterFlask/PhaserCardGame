@@ -17,7 +17,7 @@ export class Muse extends AbstractBuff {
         return `Whenever a cost 0 card is played, gain ${this.getStacksDisplayText()} Strength.`;
     }
 
-    override onAnyCardPlayed(playedCard: PlayableCard): void {
+    override onAnyCardPlayedByAnyone(playedCard: PlayableCard): void {
         if (playedCard.energyCost === 0) {
             const owner = this.getOwnerAsCharacter();
             if (owner) {

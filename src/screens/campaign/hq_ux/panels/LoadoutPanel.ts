@@ -493,7 +493,7 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
                         text: good.owner ? `Assigned to:\n${good.owner.name}` : 'Unassigned (will not be taken)',
                         style: { 
                             fontSize: '14px', 
-                            color: good.owner ? '#90EE90' : '#FFB6C1',
+                            color: good.owner ? '#006400' : '#8B0000', // Dark green and dark red
                             align: 'left',
                             wordWrap: { width: 110 }
                         }
@@ -554,19 +554,17 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
         const assignmentText = (tradeGood as any).assignmentText as TextBox;
         if (assignmentText) {
             assignmentText.setText('Unassigned (will not be taken)');
-            assignmentText.setFillColor(0xFFB6C1);
+            assignmentText.setFillColor(0x8B0000); // Dark red
         }
     }
 
     private equipTradeGood(tradeGood: PhysicalCard, character: PlayerCharacter): void {
-        // Update the trade good's owner
         tradeGood.data.owner = character;
 
-        // Update the assignment text box directly through the stored reference
         const assignmentText = (tradeGood as any).assignmentText as TextBox;
         if (assignmentText) {
             assignmentText.setText(`Assigned to:\n${character.name}`);
-            assignmentText.setFillColor(0x90EE90);
+            assignmentText.setFillColor(0x006400); // Dark green
         }
 
         console.log("assigned trade good to character ", character.name, " with trade good ", tradeGood.data.name);
