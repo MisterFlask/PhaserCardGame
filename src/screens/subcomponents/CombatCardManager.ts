@@ -43,6 +43,7 @@ export class CombatCardManager {
                         useHandCursor: true
                     });
                     this.scene.input.setDraggable(card.container);
+                    card.data.physicalCard = card;
                 }
             });
             this.playerHand.push(card);
