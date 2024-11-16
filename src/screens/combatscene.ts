@@ -8,7 +8,6 @@ import { TextBoxButton } from '../ui/Button';
 import { CombatHighlightsManager } from '../ui/CombatHighlightsManager';
 import InventoryPanel from '../ui/InventoryPanel';
 import CombatSceneLayoutUtils from '../ui/LayoutUtils';
-import { TransientUiState } from '../ui/TransientUiState';
 import { UIContext, UIContextManager } from '../ui/UIContextManager';
 import { ActionManager } from '../utils/ActionManager';
 import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
@@ -196,7 +195,6 @@ class CombatScene extends Phaser.Scene {
     }
 
     update(time: number, delta: number): void {
-        if (UIContextManager.getInstance().getContext() !== UIContext.COMBAT) return;
 
         this.performanceMonitor.update(time, delta);
 
@@ -212,8 +210,7 @@ class CombatScene extends Phaser.Scene {
         }
 
         // Update DetailsScreenManager
-        const hoveredCard = TransientUiState.getInstance().hoveredCard;
-        this.detailsScreenManager.update(hoveredCard);
+        this.detailsScreenManager.update();
 
         // Get all characters (both allies and enemies)
         const allCharacters = [...GameState.getInstance().combatState.playerCharacters, ...     GameState.getInstance().combatState.enemies];

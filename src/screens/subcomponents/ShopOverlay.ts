@@ -9,6 +9,7 @@ import { DepthManager } from '../../ui/DepthManager';
 import { ShopCardPanel } from '../../ui/ShopCardPanel';
 import { ShopRelicPanel } from '../../ui/ShopRelicPanel';
 import { TextBox } from '../../ui/TextBox';
+import { TransientUiState } from '../../ui/TransientUiState';
 import { UIContext, UIContextManager } from '../../ui/UIContextManager';
 import { ActionManagerFetcher } from '../../utils/ActionManagerFetcher';
 import { CampaignBriefStatus } from './CampaignBriefStatus';
@@ -179,6 +180,7 @@ export class ShopOverlay {
                 // Add hover handlers
                 panel.on('pointerover', () => { // Updated to use container's event
                     panel.setDepth(DepthManager.getInstance().SHOP_CARD_HOVER);
+                    TransientUiState.getInstance().hoveredCard = panel.physicalCard;
                 });
                 
                 panel.on('pointerout', () => { // Updated to use container's event

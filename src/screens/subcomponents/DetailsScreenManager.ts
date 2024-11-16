@@ -1,7 +1,6 @@
 import Phaser from 'phaser';
 import type { AbstractBuff } from '../../gamecharacters/buffs/AbstractBuff';
 import { DepthManager } from '../../ui/DepthManager';
-import { PhysicalCard } from '../../ui/PhysicalCard';
 import { TransientUiState } from '../../ui/TransientUiState';
 import ImageUtils from '../../utils/ImageUtils';
 
@@ -35,10 +34,11 @@ export class DetailsScreenManager {
         this.detailsContainer.setVisible(false);
     }
 
-    public update(hoveredCard?: PhysicalCard): void {
+    public update(): void {
         if (!this.isVisible) {
             return;
         }
+        var hoveredCard = TransientUiState.getInstance().hoveredCard;
 
         if (!hoveredCard) {
             this.detailsContainer.removeAll(true);
