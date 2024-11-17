@@ -51,6 +51,7 @@ export default class Menu {
         // Initially hide the menu
         this.container.setVisible(false);
         this.container.setAlpha(0);
+        this.container.setScrollFactor(0);
     }
 
     public updatePosition(x: number, y: number): void {

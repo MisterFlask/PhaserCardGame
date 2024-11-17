@@ -74,6 +74,29 @@ class CombatUIManager {
         this.createDebugOverlay();
         this.setupDebugOverlayToggle();
         this.createDebugMenu();
+        
+        this.setScrollFactorForAllElements();
+    }
+
+    private setScrollFactorForAllElements(): void {
+        this.menu.container.setScrollFactor(0);
+        this.endTurnButton.setScrollFactor(0);
+
+        this.battlefieldArea.setScrollFactor(0);
+        this.handArea.setScrollFactor(0);
+        this.dropZoneHighlight.setScrollFactor(0);
+
+        this.energyDisplay.setScrollFactor(0);
+
+        this.resourceIndicators.forEach(indicator => {
+            indicator.setScrollFactor(0);
+        });
+
+        this.debugOverlay.setScrollFactor(0);
+
+        if (this.subtitleTextBox) {
+            this.subtitleTextBox.setScrollFactor(0);
+        }
     }
 
     private createEnergyDisplay(): void {
@@ -183,6 +206,7 @@ class CombatUIManager {
         menuButton
             .onClick(() => this.menu.toggle());
 
+        menuButton.setScrollFactor(0);
         this.scene.add.existing(menuButton);
     }
 
@@ -360,6 +384,7 @@ class CombatUIManager {
                 expandDirection: 'down'
             });
             this.subtitleTextBox.setDepth(100);
+            this.subtitleTextBox.setScrollFactor(0);
             this.scene.add.existing(this.subtitleTextBox);
         } else {
             this.subtitleTextBox.setText(text);

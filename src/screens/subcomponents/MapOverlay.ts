@@ -81,6 +81,7 @@ export class MapOverlay {
             textBoxName: 'closeButton'
         });
         this.closeButton.onClick(this.hide.bind(this));
+        this.closeButton.setScrollFactor(0);
         this.overlay.add(this.closeButton);
     }
 
@@ -303,6 +304,8 @@ export class MapOverlay {
 
         // Add scroll wheel functionality for camera panning
         this.scene.input.on('wheel', (pointer: Phaser.Input.Pointer, gameObjects: Phaser.GameObjects.GameObject[], deltaX: number, deltaY: number, deltaZ: number) => {
+            if (!this.isVisible) return;
+
             if (deltaY > 0) {
                 this.panCameraDown();
             } else if (deltaY < 0) {

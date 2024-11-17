@@ -157,7 +157,7 @@ class CombatScene extends Phaser.Scene {
     private createBackground(): void {
         const backgroundName = GameState.getInstance().currentLocation?.backgroundName || "battleback1";
 
-        this.background = this.add.image(this.scale.width / 2, this.scale.height / 2, 'battleback1')
+        this.background = this.add.image(this.scale.width / 2, this.scale.height / 2, backgroundName)
             .setOrigin(0.5)
             .setDisplaySize(this.scale.width, this.scale.height)
             .setDepth(-10)
@@ -203,6 +203,10 @@ class CombatScene extends Phaser.Scene {
         if (this.mapButton) {
             this.mapButton.setPosition(100, 200);
         }
+
+        this.mapButton.setScrollFactor(0);
+        this.background.setScrollFactor(0);
+        this.campaignBriefStatus.setScrollFactor(0);
 
         if (this.campaignBriefStatus) {
             this.campaignBriefStatus.setPosition(700, 11);

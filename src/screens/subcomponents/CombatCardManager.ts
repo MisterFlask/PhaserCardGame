@@ -262,7 +262,7 @@ export class CombatCardManager {
         }
     }
 
-    public update(){
+    public update() {
         // Ensure physical cards match the game state
         const state = GameState.getInstance().combatState;
         state.currentHand.forEach(cardData => {
@@ -275,6 +275,13 @@ export class CombatCardManager {
                 if (matchingPhysicalCard) {
                     cardData.physicalCard = matchingPhysicalCard;
                 }
+            }
+        });
+
+        // Set scroll factor to 0 for all cards
+        [...this.playerHand, ...this.enemyUnits, ...this.playerUnits, this.drawPile, this.discardPile].forEach(card => {
+            if (card && card.container) {
+                card.container.setScrollFactor(0);
             }
         });
 
