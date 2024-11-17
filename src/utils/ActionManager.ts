@@ -16,6 +16,7 @@ import CombatUiManager from "../screens/subcomponents/CombatUiManager";
 import { AutomatedCharacterType, BaseCharacterType, PlayableCardType } from "../Types";
 import CardSelectionFromHandManager from '../ui/CardSelectionFromHandManager';
 import { SubtitleManager } from "../ui/SubtitleManager";
+import { UIContext, UIContextManager } from "../ui/UIContextManager";
 
 export class ActionManager {
     endCombat() {
@@ -432,9 +433,15 @@ export class ActionManager {
             for (let i = 0; i < count; i++) {
                 const drawnCard = deckLogic.drawCards(1)[0];
                 
+                if (!drawnCard) {
+                    console.warn("No card drawn");
+                    break;
+                }
+                
                 drawnCard.buffs.forEach(buff => {
                     buff.onCardDrawn();
                 });
+                
                 GameState.getInstance().relicsInventory.forEach(relic => {
                     relic.onCardDrawn(drawnCard);
                 });
@@ -768,6 +775,7 @@ export class ActionManager {
     }
 
     public endTurn(): void {
+        UIContextManager.getInstance().setContext(UIContext.COMBAT_BUT_NOT_YOUR_TURN);
         console.log('Ending turn');
         const gameState = GameState.getInstance();
         const combatState = gameState.combatState;
@@ -881,26 +889,30 @@ export class ActionManager {
     }
 
     public static beginTurn(): void {
-        const gameState = GameState.getInstance();
-        const combatState = gameState.combatState;
+        ActionManager.getInstance().actionQueue.addAction(new GenericAction(async () => {
+            const gameState = GameState.getInstance();
+            const combatState = gameState.combatState;
 
-        // Prevent dead enemies from gaining new intents
-        combatState.enemies.forEach(enemy => {
-            if (enemy.hitpoints > 0) {
-                enemy.setNewIntents();
-            }
-        });
-
-        // Queue draw action instead of direct draw
-        ActionManager.getInstance().drawHandForNewTurn();
-
-        combatState.allPlayerAndEnemyCharacters.forEach(character => {
-            character.buffs.forEach(buff => {
-                buff.onTurnStart();
+            // Prevent dead enemies from gaining new intents
+            combatState.enemies.forEach(enemy => {
+                if (enemy.hitpoints > 0) {
+                    enemy.setNewIntents();
+                }
             });
-        });
 
-        combatState.energyAvailable = combatState.maxEnergy
+            // Queue draw action instead of direct draw
+            ActionManager.getInstance().drawHandForNewTurn();
+
+            combatState.allPlayerAndEnemyCharacters.forEach(character => {
+                character.buffs.forEach(buff => {
+                    buff.onTurnStart();
+                });
+            });
+
+            combatState.energyAvailable = combatState.maxEnergy;
+            UIContextManager.getInstance().setContext(UIContext.COMBAT);
+            return [];
+        }));
     }
 
     public static ExecuteIntents(): void {

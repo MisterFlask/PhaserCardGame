@@ -212,6 +212,7 @@ class CombatUIManager {
         });
 
         this.endTurnButton.onClick(() => {
+            if (UIContextManager.getInstance().getContext() === UIContext.COMBAT_BUT_NOT_YOUR_TURN) return;
             ActionManager.getInstance().endTurn();
         });
 

@@ -6,7 +6,8 @@ export enum UIContext {
     CHARACTER_DECK_SHOWN,
     CAMPAIGN_HQ,
     CARD_SELECTION_FROM_HAND,
-    DEBUG_MENU
+    DEBUG_MENU,
+    COMBAT_BUT_NOT_YOUR_TURN
 }
 
 export class UIContextManager {
