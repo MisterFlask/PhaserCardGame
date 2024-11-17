@@ -259,6 +259,10 @@ export class CombatCardManager {
                 }
             }
         });
+
+        // Update draw and discard pile names to reflect current counts
+        this.updateDrawPileCount();
+        this.updateDiscardPileCount();
     }
 
 }

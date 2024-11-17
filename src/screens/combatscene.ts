@@ -196,6 +196,9 @@ class CombatScene extends Phaser.Scene {
 
     update(time: number, delta: number): void {
 
+        this.cardManager.drawPile.setGlow(false);
+        this.cardManager.discardPile.setGlow(false);
+
         this.performanceMonitor.update(time, delta);
 
         // Sync the hand with the game state

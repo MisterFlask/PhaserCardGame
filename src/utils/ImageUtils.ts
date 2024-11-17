@@ -249,6 +249,7 @@ export default class GameImageLoader {
         map_icons: {
             prefix: 'Sprites/MapIcons/',
             files: [
+                "old-wagon.svg",
                 'boss-icon.png', 'elite-icon.png', 'entrance-icon.png', 'event-icon.png', 'rest-icon.png', 'shop-icon.png', 'room-fight-icon.png', 'treasure-icon.png'
             ]
         },
@@ -270,7 +271,7 @@ export default class GameImageLoader {
         },
         ui_elements: {
             prefix: 'Sprites/UIElements/',
-            files: ['Circle.png', 'old-wagon.svg', 'cheap_glow_effect.png', 'play-button.png']
+            files: ['Circle.png', 'cheap_glow_effect.png', 'play-button.png']
         },
         intent_icons: {
             prefix: 'Sprites/IntentIcons/',

@@ -73,13 +73,14 @@ export class CombatHighlightsManager {
     }
 
     private clearAllHighlights(characters: BaseCharacterType[]): void {
+        
+
         // Clear character highlights
         characters.forEach(character => {
             if (character.physicalCard) {
                 character.physicalCard.setGlow(false);
             }
         });
-
 
         CombatUIManager.getInstance().dropZoneHighlight.setAlpha(0.0)
         // now, cards in hand

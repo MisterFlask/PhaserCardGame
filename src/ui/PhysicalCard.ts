@@ -714,13 +714,6 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
         this.glowEffect?.update();
 
-        // Update glow effect size if it exists and is visible
-        if (this.glowEffect) {
-            const currentScale = this.cardContent.scale;
-            const scaledWidth = this.cardBackground.displayWidth * PhysicalCard.GLOW_SCALE_MULTIPLIER * currentScale;
-            const scaledHeight = this.cardBackground.displayHeight * PhysicalCard.GLOW_SCALE_MULTIPLIER * currentScale;
-            this.glowEffect.setDisplaySize(scaledWidth, scaledHeight);
-        }
         if (this.cardTypeBox && this.data.isPlayableCard()) {
             const playableCard = this.data as PlayableCardType;
             this.cardTypeBox.setText(playableCard.cardType.displayName);

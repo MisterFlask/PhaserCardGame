@@ -1,4 +1,10 @@
 export class CheapGlowEffect extends Phaser.GameObjects.Image {
+    private static readonly STARTING_ALPHA: number = 0.3;
+    private static readonly ENDING_ALPHA: number = 0.6;
+
+    private static readonly STARTING_SCALE: number = 0.7;
+    private static readonly ENDING_SCALE: number = 0.8;
+
     private pulseTween?: Phaser.Tweens.Tween;
     private shouldBeVisible: boolean = false;
     private shouldPulse: boolean = false;
@@ -8,7 +14,6 @@ export class CheapGlowEffect extends Phaser.GameObjects.Image {
         
         this.setBlendMode(Phaser.BlendModes.ADD);
         this.setVisible(false);
-        this.setAlpha(0.8);
         
         // Required for Image subclasses
         scene.add.existing(this);
@@ -54,9 +59,15 @@ export class CheapGlowEffect extends Phaser.GameObjects.Image {
 
         this.pulseTween = this.scene.tweens.add({
             targets: this,
-            alpha: { from: 0.7, to: 0.9 },
-            scale: { from: 1, to: 1.3 },
-            duration: 1500,
+            alpha: { 
+                from: CheapGlowEffect.STARTING_ALPHA, 
+                to: CheapGlowEffect.ENDING_ALPHA 
+            },
+            scale: { 
+                from: CheapGlowEffect.STARTING_SCALE, 
+                to: CheapGlowEffect.ENDING_SCALE 
+            },
+            duration: 1000,
             yoyo: true,
             repeat: -1,
             ease: 'Sine.easeInOut'
@@ -71,8 +82,8 @@ export class CheapGlowEffect extends Phaser.GameObjects.Image {
             this.pulseTween.stop();
             this.pulseTween = undefined;
         }
-        this.setAlpha(0.8);
-        this.setScale(1);
+        this.setScale(CheapGlowEffect.STARTING_SCALE);
+        this.setAlpha(CheapGlowEffect.STARTING_ALPHA);
     }
 
     destroy(): void {
