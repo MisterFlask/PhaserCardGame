@@ -712,14 +712,15 @@ export class PhysicalCard implements IPhysicalCardInterface {
             this.priceBox.setVisible(false);
         }
 
+        this.glowEffect?.update();
+
         // Update glow effect size if it exists and is visible
-        if (this.glowEffect?.visible) {
+        if (this.glowEffect) {
             const currentScale = this.cardContent.scale;
             const scaledWidth = this.cardBackground.displayWidth * PhysicalCard.GLOW_SCALE_MULTIPLIER * currentScale;
             const scaledHeight = this.cardBackground.displayHeight * PhysicalCard.GLOW_SCALE_MULTIPLIER * currentScale;
             this.glowEffect.setDisplaySize(scaledWidth, scaledHeight);
         }
-
         if (this.cardTypeBox && this.data.isPlayableCard()) {
             const playableCard = this.data as PlayableCardType;
             this.cardTypeBox.setText(playableCard.cardType.displayName);
@@ -892,6 +893,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
         this.layoutTargetingIntents();
     }
+
     /**
      * Make the entire card glow or stop glowing with a dramatic and unmistakable effect.
      * @param isGlowing - True to make the card glow, false to stop glowing.
@@ -900,34 +902,9 @@ export class PhysicalCard implements IPhysicalCardInterface {
         if (!this.glowEffect) return;
         
         if (isGlowing) {
-            this.glowEffect.turnOn();
+            this.glowEffect.turnOn(true);
             
-            // Update glow size when card scales
-            const currentScale = this.cardContent.scale;
-            const baseWidth = this.cardBackground.displayWidth * PhysicalCard.GLOW_SCALE_MULTIPLIER * currentScale;
-            const baseHeight = this.cardBackground.displayHeight * PhysicalCard.GLOW_SCALE_MULTIPLIER * currentScale;
-            this.glowEffect.setDisplaySize(baseWidth, baseHeight);
-
-            // Add pulsing animation that expands and contracts the glowEffect
-            if (!this.scene.tweens.isTweening(this.glowEffect)) {
-                this.scene.tweens.add({
-                    targets: this.glowEffect,
-                    scaleX: { from: 1, to: 1.2 },
-                    scaleY: { from: 1, to: 1.2 },
-                    alpha: { from: 0.6, to: 1 },
-                    displayWidth: { from: baseWidth, to: baseWidth * 1.2 },
-                    displayHeight: { from: baseHeight, to: baseHeight * 1.2 },
-                    duration: 10000,
-                    yoyo: true,
-                    repeat: -1,
-                    ease: 'Sine.easeInOut'
-                });
-            }
         } else {
-            // Stop any existing tweens before turning off
-            this.scene.tweens.killTweensOf(this.glowEffect);
-            this.glowEffect.setScale(1);
-            this.glowEffect.setAlpha(1);
             this.glowEffect.turnOff();
         }
     }

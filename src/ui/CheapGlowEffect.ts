@@ -1,5 +1,7 @@
 export class CheapGlowEffect extends Phaser.GameObjects.Image {
     private pulseTween?: Phaser.Tweens.Tween;
+    private shouldBeVisible: boolean = false;
+    private shouldPulse: boolean = false;
 
     constructor(scene: Phaser.Scene, x: number = 0, y: number = 0) {
         super(scene, x, y, 'cheap_glow_effect');
@@ -17,19 +19,31 @@ export class CheapGlowEffect extends Phaser.GameObjects.Image {
      * @param pulse Whether to add a pulsing animation
      */
     turnOn(pulse: boolean = true): void {
-        this.setVisible(true);
-        
-        if (pulse) {
-            this.startPulsing();
-        }
+        this.shouldBeVisible = true;
+        this.shouldPulse = pulse;
     }
 
     /**
      * Turn off the glow effect and stop any pulsing
      */
     turnOff(): void {
-        this.setVisible(false);
-        this.stopPulsing();
+        this.shouldBeVisible = false;
+        this.shouldPulse = false;
+    }
+
+    /**
+     * Update the visual state based on shouldBeVisible and shouldPulse
+     */
+    update(): void {
+        if (this.shouldBeVisible !== this.visible) {
+            this.setVisible(this.shouldBeVisible);
+        }
+
+        if (this.shouldBeVisible && this.shouldPulse && !this.pulseTween) {
+            this.startPulsing();
+        } else if ((!this.shouldBeVisible || !this.shouldPulse) && this.pulseTween) {
+            this.stopPulsing();
+        }
     }
 
     /**
@@ -41,7 +55,7 @@ export class CheapGlowEffect extends Phaser.GameObjects.Image {
         this.pulseTween = this.scene.tweens.add({
             targets: this,
             alpha: { from: 0.7, to: 0.9 },
-            scale: { from: 1, to: 1.2 },
+            scale: { from: 1, to: 1.3 },
             duration: 1500,
             yoyo: true,
             repeat: -1,
@@ -65,8 +79,6 @@ export class CheapGlowEffect extends Phaser.GameObjects.Image {
         this.stopPulsing();
         super.destroy();
     }
-
-    
 }
 
 

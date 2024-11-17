@@ -80,6 +80,7 @@ export class EntranceCard extends LocationCard {
             index
         });
         this.portraitName = 'entrance-icon';
+        this.portraitTint = 0x00ffff;
     }
 }
 
@@ -93,6 +94,7 @@ export class BossCard extends LocationCard {
             index
         });
         this.portraitName = 'boss-icon';
+        this.portraitTint = 0x800080;
     }
 }
 
@@ -106,6 +108,7 @@ export class RestSiteCard extends LocationCard {
             index
         });
         this.portraitName = 'rest-icon';
+        this.portraitTint = 0xffa500;
     }
 }
 
@@ -119,6 +122,7 @@ export class NormalRoomCard extends LocationCard {
             index
         });
         this.portraitName = 'room-fight-icon';
+        this.portraitTint = 0xff0000;
     }
 }
 
@@ -132,6 +136,7 @@ export class EliteRoomCard extends LocationCard {
             index
         });
         this.portraitName = 'elite-icon';
+        this.portraitTint = 0x8B0000;
     }
 }
 
@@ -145,6 +150,7 @@ export class ShopCard extends LocationCard {
             index
         });
         this.portraitName = 'shop-icon';
+        this.portraitTint = 0x00ff00;
     }
 
     override OnLocationSelected(scene: Phaser.Scene): void {
@@ -166,6 +172,7 @@ export class TreasureRoomCard extends LocationCard {
             index
         });
         this.portraitName = 'treasure-icon';
+        this.portraitTint = 0xFFD700;
     }
 }
 

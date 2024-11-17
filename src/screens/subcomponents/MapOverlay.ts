@@ -323,6 +323,11 @@ export class MapOverlay {
 
     // Highlight Updates
     public updateHighlights() {
+        // Clear glow effects on all location cards
+        this.locationCards.forEach(card => {
+            card.setGlow(false);
+        });
+        
         const currentLocation = GameState.getInstance().getCurrentLocation();
         const currentLocationCard = this.locationCards.find(card => (card.data as LocationCard).id === currentLocation?.id);
         if (currentLocationCard) {
@@ -422,13 +427,9 @@ export class MapOverlay {
 
     // Update Method
     private update(time: number, delta: number): void {
-        // Any dynamic updates for the overlay can be handled here
+        this.updateHighlights();
     }
 
-    // Abolish/Destroy Method
-    private abolish(): void {
-        // Clean up overlay elements if necessary
-    }
 
     // Abort Mission Logic
     private onAbortMission(): void {
