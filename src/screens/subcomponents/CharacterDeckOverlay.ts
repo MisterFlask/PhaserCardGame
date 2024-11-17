@@ -1,6 +1,6 @@
 import { Scene } from 'phaser';
+import { AbstractCard } from '../../gamecharacters/AbstractCard';
 import { PlayerCharacter } from '../../gamecharacters/BaseCharacterClass';
-import { PlayableCard } from '../../gamecharacters/PlayableCard';
 import { GameState } from '../../rules/GameState';
 import { TextBoxButton } from '../../ui/Button';
 import { PhysicalCard } from '../../ui/PhysicalCard';
@@ -103,20 +103,30 @@ export class CharacterDeckOverlay extends Phaser.GameObjects.Container {
     }
 
     public show(character: PlayerCharacter): void {
+        const characterCards = GameState.getInstance().getCardsOwnedByCharacter(character);
+        this.showCards(characterCards);
+    }
+
+    public showCardInDrawPile(): void{
+        this.showCards(GameState.getInstance().combatState.currentDrawPile);
+    }
+
+    public showCardInDiscardPile(): void{
+        this.showCards(GameState.getInstance().combatState.currentDiscardPile);
+    }
+
+    public showCards(cards: AbstractCard[]): void {
         // Clear existing cards
         UIContextManager.getInstance().setContext(UIContext.CHARACTER_DECK_SHOWN);
         this.cards.forEach(card => card.obliterate());
         this.cards = [];
-        
-        // Get all cards owned by this character
-        const characterCards = GameState.getInstance().getCardsOwnedByCharacter(character)
         
         // Define margins to start grid near the upper-left
         const marginX = -this.background.width / 2 + 50;
         const marginY = -this.background.height / 2 + 150;
         
         // Create physical cards and arrange them in a grid
-        characterCards.forEach((card: PlayableCard, index: number) => {
+        cards.forEach((card: AbstractCard, index: number) => {
             const row = Math.floor(index / this.CARDS_PER_ROW);
             const col = index % this.CARDS_PER_ROW;
             

@@ -4,7 +4,6 @@ import Phaser from 'phaser';
 import { AbstractCard, Team, UiCard } from '../../gamecharacters/AbstractCard';
 import { AutomatedCharacter } from '../../gamecharacters/AutomatedCharacter';
 import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
-import type { PlayableCard } from '../../gamecharacters/PlayableCard';
 import { GameState } from '../../rules/GameState';
 import { DepthManager } from '../../ui/DepthManager';
 import CombatSceneLayoutUtils from '../../ui/LayoutUtils';
@@ -64,7 +63,6 @@ export class CombatCardManager {
             onComplete: () => {
                 this.discardPile.data.name = `Discard Pile (${GameState.getInstance().combatState.currentDiscardPile.length + 1})`;
                 this.discardPile.nameBox.setText(this.discardPile.data.name);
-                GameState.getInstance().combatState.currentDiscardPile.push(card.data as PlayableCard);
                 card.obliterate(); // Remove the card after animation
             }
         });
@@ -129,7 +127,17 @@ export class CombatCardManager {
             x: gameWidth * 0.1,
             y: pileY,
             data: new UiCard({ name: 'Draw Pile (0)', description: 'Cards to draw', portraitName: "drawpile" }),
-            onCardCreatedEventCallback: () => { }
+            onCardCreatedEventCallback: (card: PhysicalCard) => {
+                // Make draw pile interactive
+                card.container.setInteractive({
+                    hitArea: card.cardBackground,
+                    hitAreaCallback: Phaser.Geom.Rectangle.Contains,
+                    useHandCursor: true
+                });
+                card.container.on('pointerdown', () => {
+                    this.scene.events.emit('drawPileClicked');
+                });
+            }
         });
 
         this.discardPile = CardGuiUtils.getInstance().createCard({
@@ -137,7 +145,17 @@ export class CombatCardManager {
             x: gameWidth * 0.2,
             y: pileY,
             data: new UiCard({ name: 'Discard Pile (0)', description: 'Discarded cards', portraitName: "discardpile" }),
-            onCardCreatedEventCallback: () => { }
+            onCardCreatedEventCallback: (card: PhysicalCard) => {
+                // Make discard pile interactive
+                card.container.setInteractive({
+                    hitArea: card.cardBackground,
+                    hitAreaCallback: Phaser.Geom.Rectangle.Contains,
+                    useHandCursor: true
+                });
+                card.container.on('pointerdown', () => {
+                    this.scene.events.emit('discardPileClicked');
+                });
+            }
         });
     }
 

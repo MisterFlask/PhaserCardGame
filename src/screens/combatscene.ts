@@ -125,6 +125,19 @@ class CombatScene extends Phaser.Scene {
         this.characterDeckOverlay = new CharacterDeckOverlay(this);
         this.characterDeckOverlay.hide();
         this.setupCharacterClickHandlers();
+
+        // Add event listeners for draw and discard pile clicks
+        this.events.on('drawPileClicked', () => {
+            if (UIContextManager.getInstance().getContext() === UIContext.COMBAT) {
+                this.characterDeckOverlay.showCardInDrawPile();
+            }
+        });
+
+        this.events.on('discardPileClicked', () => {
+            if (UIContextManager.getInstance().getContext() === UIContext.COMBAT) {
+                this.characterDeckOverlay.showCardInDiscardPile();
+            }
+        });
     }
 
     private obliterate(): void {
@@ -135,6 +148,10 @@ class CombatScene extends Phaser.Scene {
         if (this.campaignBriefStatus) {
             this.campaignBriefStatus.destroy();
         }
+
+        // Remove the pile click event listeners
+        this.events.off('drawPileClicked');
+        this.events.off('discardPileClicked');
     }
 
     private createBackground(): void {
