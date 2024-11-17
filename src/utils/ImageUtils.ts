@@ -270,7 +270,7 @@ export default class GameImageLoader {
         },
         ui_elements: {
             prefix: 'Sprites/UIElements/',
-            files: ['Circle.png', 'cursed-star.png', 'cheap_glow_effect.png', 'play-button.png']
+            files: ['Circle.png', 'old-wagon.svg', 'cheap_glow_effect.png', 'play-button.png']
         },
         intent_icons: {
             prefix: 'Sprites/IntentIcons/',

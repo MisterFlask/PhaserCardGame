@@ -148,7 +148,7 @@ export class MapOverlay {
             const portraitWidth = currentLocationCard.cardImage.displayWidth;
             const portraitHeight = currentLocationCard.cardImage.displayHeight;
 
-            const currentLocationIcon = this.scene.add.image(0, -currentLocationCard.cardBackground.displayHeight / 4, 'cursed-star');
+            const currentLocationIcon = this.scene.add.image(0, -currentLocationCard.cardBackground.displayHeight / 4, 'old-wagon');
             currentLocationIcon.setDisplaySize(portraitWidth / 2, portraitHeight / 2);
             currentLocationIcon.setDepth(1);
             currentLocationIcon.setName("currentLocationIcon");
@@ -349,7 +349,7 @@ export class MapOverlay {
                 GameState.getInstance().relicsInventory.forEach(relic => {
                     relic.onLocationEntered(card.data as LocationCard)
                 });
-                
+
                 card.data.OnLocationSelected(this.scene);
                 this.updatePlayerLocationIcon();
             }
