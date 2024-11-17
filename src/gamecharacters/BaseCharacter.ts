@@ -1,5 +1,5 @@
 import { GameState } from '../rules/GameState';
-import { AbstractCard } from './AbstractCard';
+import { AbstractCard, Team } from './AbstractCard';
 import { AbstractIntent } from './AbstractIntent';
 import { Stress } from './buffs/standard/Stress';
 import { IBaseCharacter } from './IBaseCharacter';
@@ -29,7 +29,7 @@ export class BaseCharacter extends AbstractCard implements IBaseCharacter {
 
         for (const enemy of livingEnemies) {
             for (const intent of enemy.intents) {
-                if (intent.target === this || intent.targetsAllPlayers) {
+                if (intent.target === this || intent.targetsAllPlayers && this.team == Team.ALLY) {
                     targetingIntents.push(intent);
                 }
             }

@@ -1,5 +1,6 @@
 import { Gender } from "./BaseCharacter";
 import { PlayerCharacter } from "./BaseCharacterClass";
+import { CharacterNameGenerator } from "./CharacterNameGenerator";
 import { ArchonClass } from "./playerclasses/ArchonClass";
 import { BlackhandClass } from "./playerclasses/BlackhandClass";
 import { DiabolistClass } from "./playerclasses/DiabolistClass";
@@ -25,6 +26,7 @@ export class CharacterGenerator {
         const character = selectedClass.createCharacterFromClass();
         character.portraitName = portraitName;
         character.gender = gender;
+        character.name = CharacterNameGenerator.getRandomName(gender);
 
         return character;
     }
