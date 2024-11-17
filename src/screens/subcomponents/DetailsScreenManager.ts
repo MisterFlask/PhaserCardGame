@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import type { AbstractBuff } from '../../gamecharacters/buffs/AbstractBuff';
 import { DepthManager } from '../../ui/DepthManager';
+import { PhysicalCard } from '../../ui/PhysicalCard';
 import { TransientUiState } from '../../ui/TransientUiState';
 import ImageUtils from '../../utils/ImageUtils';
 
@@ -22,9 +23,14 @@ export class DetailsScreenManager {
         this.scene.input.keyboard?.on('keyup-SHIFT', this.hideDetails, this);
     }
 
+    // can be overridden for non-combat scenes
+    public findHoveredCard(): PhysicalCard | undefined {
+        return TransientUiState.getInstance().hoveredCard;
+    }
+
     private showDetails(): void {
         this.isVisible = true;
-        console.log('Details screen is now visible; hovered card:', TransientUiState.getInstance().hoveredCard);
+        console.log('Details screen is now visible; hovered card:', this.findHoveredCard());
         this.detailsContainer.setVisible(true);
     }
 
@@ -38,7 +44,7 @@ export class DetailsScreenManager {
         if (!this.isVisible) {
             return;
         }
-        var hoveredCard = TransientUiState.getInstance().hoveredCard;
+        var hoveredCard = this.findHoveredCard();
 
         if (!hoveredCard) {
             this.detailsContainer.removeAll(true);
