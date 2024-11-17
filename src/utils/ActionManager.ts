@@ -563,6 +563,7 @@ export class ActionManager {
                 sourceCard,
                 fromAttack
             });
+            console.log(`Damage Result from ${sourceCharacter?.name || 'Unknown'} to ${target.name}: `, damageResult);
 
             if (damageResult.unblockedDamage > 0) {
                 target.hitpoints = Math.max(0, target.hitpoints - damageResult.unblockedDamage);

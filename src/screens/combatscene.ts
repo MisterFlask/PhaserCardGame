@@ -155,6 +155,8 @@ class CombatScene extends Phaser.Scene {
     }
 
     private createBackground(): void {
+        const backgroundName = GameState.getInstance().currentLocation?.backgroundName || "battleback1";
+
         this.background = this.add.image(this.scale.width / 2, this.scale.height / 2, 'battleback1')
             .setOrigin(0.5)
             .setDisplaySize(this.scale.width, this.scale.height)

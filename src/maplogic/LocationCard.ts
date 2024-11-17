@@ -19,6 +19,7 @@ export class LocationCard extends AbstractCard {
     public floor: number = 0;
     public roomNumber: number = 0;
     public segment: number = 0;
+    public backgroundName?: string;
 
     constructor({ name, description, portraitName, tooltip, size, floor, index }: { name: string; description: string; portraitName?: string; tooltip?: string; size: CardSize; floor: number; index: number }) { 
         const fullName = `${name} ${floor}-${index + 1}`;
@@ -140,6 +141,8 @@ export class EliteRoomCard extends LocationCard {
     }
 }
 
+const shopBackgrounds = ["shop-background-1"];
+
 export class ShopCard extends LocationCard {
     constructor(floor: number, index: number) {
         super({
@@ -151,6 +154,7 @@ export class ShopCard extends LocationCard {
         });
         this.portraitName = 'shop-icon';
         this.portraitTint = 0x00ff00;
+        this.backgroundName = shopBackgrounds[Math.floor(Math.random() * shopBackgrounds.length)];
     }
 
     override OnLocationSelected(scene: Phaser.Scene): void {
