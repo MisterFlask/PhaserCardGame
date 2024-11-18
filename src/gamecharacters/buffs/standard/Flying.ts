@@ -33,6 +33,8 @@ export class Flying extends AbstractBuff {
     }
 
     override onOwnerStruck_CannotModifyDamage(strikingUnit: IBaseCharacter | null, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void {
-        this.secondaryStacks --;    
+        if (this.secondaryStacks > 0) {
+            this.secondaryStacks --;    
+        }
     }
 }

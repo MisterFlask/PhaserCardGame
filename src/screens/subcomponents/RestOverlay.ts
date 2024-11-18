@@ -11,6 +11,7 @@ export class RestOverlay {
         this.scene = scene;
         this.container = this.scene.add.container(0, 0);
         this.container.setDepth(DepthManager.getInstance().MAP_OVERLAY + 100); // Above map overlay
+        this.container.setScrollFactor(0);
         this.createOverlay();
         this.hide(); // Start hidden
     }
@@ -22,6 +23,7 @@ export class RestOverlay {
         // Semi-transparent background
         this.background = this.scene.add.rectangle(0, 0, gameWidth, gameHeight, 0x000000, 0.7);
         this.background.setOrigin(0);
+        this.background.setScrollFactor(0);
         this.container.add(this.background);
 
         // Title
@@ -29,6 +31,7 @@ export class RestOverlay {
             fontSize: '32px',
             color: '#ffffff'
         }).setOrigin(0.5);
+        title.setScrollFactor(0);
         this.container.add(title);
 
         // Rest Button
@@ -43,6 +46,7 @@ export class RestOverlay {
             fillColor: 0x4a4a4a,
             textBoxName: 'restButton'
         });
+        restButton.setScrollFactor(0);
         restButton.onClick(() => this.handleRest());
         this.container.add(restButton);
 
@@ -58,6 +62,7 @@ export class RestOverlay {
             fillColor: 0x4a4a4a,
             textBoxName: 'scavengeButton'
         });
+        scavengeButton.setScrollFactor(0);
         scavengeButton.onClick(() => this.handleScavenge());
         this.container.add(scavengeButton);
 

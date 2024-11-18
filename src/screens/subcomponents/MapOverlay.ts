@@ -444,16 +444,23 @@ export class MapOverlay {
     public show(): void {
         this.overlay.setVisible(true);
         this.isVisible = true;
+        this.resetCameraPosition();
         UIContextManager.getInstance().setContext(UIContext.MAP);
     }
 
     public hide(): void {
         this.overlay.setVisible(false);
         this.isVisible = false;
+        this.resetCameraPosition();
         UIContextManager.getInstance().setContext(UIContext.COMBAT);
     }
 
     public toggle(): void {
         this.isVisible ? this.hide() : this.show();
+    }
+
+    private resetCameraPosition(): void {
+        this.scene.cameras.main.scrollX = 0;
+        this.scene.cameras.main.scrollY = 0;
     }
 }
