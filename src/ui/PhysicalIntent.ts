@@ -25,6 +25,7 @@ export class PhysicalIntent implements JsonRepresentable {
         
         this.image = this.scene.add.image(0, 0, intent.imageName);
         this.image.setDisplaySize(PhysicalIntent.WIDTH, PhysicalIntent.HEIGHT);
+        this.image.setTint(intent.iconTint);
         
         this.alwaysDisplayedIntentText = this.scene.add.text(0, PhysicalIntent.HEIGHT / 2, 
             intent.displayText(), 
