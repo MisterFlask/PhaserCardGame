@@ -830,6 +830,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
                 col * (buffWidth + padding),
                 row * (buffHeight + padding)
             );
+
+            buffUI.updateText();
             index++;
         });
 

@@ -9,6 +9,7 @@ export class PhysicalBuff {
     container: Phaser.GameObjects.Container;
     image!: Phaser.GameObjects.Image;
     stacksText: Phaser.GameObjects.Text;
+    secondaryStacksText: Phaser.GameObjects.Text;
     tooltipBox: TextBox;
     scene: Phaser.Scene;
     shadowImage!: Phaser.GameObjects.Image;
@@ -34,6 +35,17 @@ export class PhysicalBuff {
         // Change origin to bottom-left instead of center
         this.stacksText.setOrigin(0, 1);
 
+        // Create the secondary stacks text
+        this.secondaryStacksText = scene.add.text(0, 0, '', {
+            fontSize: '19px',
+            color: '#ffff00', // Yellow color to distinguish from primary stacks
+            fontFamily: 'Arial',
+            align: 'left',
+            stroke: '#000000',
+            strokeThickness: 3
+        });
+        this.secondaryStacksText.setOrigin(0, 1);
+
         // Create the description box (initially hidden)
         this.tooltipBox = new TextBox({
             scene: this.scene,
@@ -49,8 +61,11 @@ export class PhysicalBuff {
 
         // Update text position to bottom-left of the container
         const halfContainerSize = containerSize / 2;
-        this.stacksText.setPosition(-halfContainerSize + 6, halfContainerSize - 6); // Added small offset (2px) for padding
-        this.container.add([this.stacksText]);
+        this.stacksText.setPosition(-halfContainerSize + 6, halfContainerSize - 20); // Moved up to make room for secondary
+        this.secondaryStacksText.setPosition(-halfContainerSize + 6, halfContainerSize - 6); // Positioned below stacksText
+        
+        // Update the container.add to include secondaryStacksText
+        this.container.add([this.stacksText, this.secondaryStacksText]);
 
         // Adjust the interactive area to match the container's size
         this.container.setInteractive(new Phaser.Geom.Rectangle(-containerSize / 2, -containerSize / 2, containerSize, containerSize), Phaser.Geom.Rectangle.Contains);
@@ -127,9 +142,18 @@ export class PhysicalBuff {
     }
 
     updateText() {
-        // Update the text to reflect current stack count
+        // Update the primary stacks text
         this.stacksText.setText(`${this.abstractBuff.stacks}`);
-        // Update the description text in case it has changed
+        
+        // Update the secondary stacks text
+        if (this.abstractBuff.showSecondaryStacks && this.abstractBuff.secondaryStacks >= 0) {
+            this.secondaryStacksText.setText(`/${this.abstractBuff.secondaryStacks}`);
+            this.secondaryStacksText.setVisible(true);
+        } else {
+            this.secondaryStacksText.setVisible(false);
+        }
+        
+        // Update the description text
         this.tooltipBox.setText(`${this.abstractBuff.getName()}: ${this.abstractBuff.getDescription()}`);
     }
 
