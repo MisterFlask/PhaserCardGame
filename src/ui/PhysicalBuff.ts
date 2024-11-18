@@ -85,6 +85,16 @@ export class PhysicalBuff {
                 this.container.setScale(1); // Ensure scale resets to original
             }
         });
+
+        // Add event listener for pulsing
+        this.scene.events.on('pulseBuff', this.handlePulseEvent, this);
+    }
+
+    private handlePulseEvent = (buffId: string) => {
+        // Only pulse if this buff matches the ID
+        if (this.abstractBuff.id === buffId) {
+            this.pulse();
+        }
     }
 
     private setBuffImage(scene: Phaser.Scene, abstractBuff: AbstractBuff, containerSize: number) {
@@ -158,8 +168,30 @@ export class PhysicalBuff {
     }
 
     destroy() {
+        // Remove the event listener when destroying
+        this.scene.events.off('pulseBuff', this.handlePulseEvent, this);
+        
         this.container.destroy();
         this.tooltipBox.destroy();
+    }
+
+    pulse() {
+        // Save original scale
+        const originalScale = this.container.scale;
+
+        // Create tween to scale up and back down
+        this.scene.tweens.add({
+            targets: this.container,
+            scaleX: originalScale * 1.5,
+            scaleY: originalScale * 1.5,
+            duration: 100,
+            yoyo: true,
+            ease: 'Quad.easeOut',
+            onComplete: () => {
+                // Ensure we return to exact original scale
+                this.container.setScale(originalScale);
+            }
+        });
     }
 }
 

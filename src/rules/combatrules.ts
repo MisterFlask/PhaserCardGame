@@ -116,20 +116,8 @@ export class CombatRules {
         // Ensure damage doesn't go below 0
         totalDamage = Math.max(0, totalDamage);
 
-        if (sourceCard){
-            totalDamage = totalDamage;
-        }
-
-        let blockedDamage = 0;
-        let unblockedDamage = totalDamage;
-
-        if (target?.block || 0 >= totalDamage) {
-            blockedDamage = totalDamage;
-            unblockedDamage = 0;
-        } else {
-            blockedDamage = target?.block || 0;
-            unblockedDamage = totalDamage - blockedDamage;
-        }
+        let blockedDamage = Math.min(target?.block || 0, totalDamage);
+        let unblockedDamage = totalDamage - blockedDamage;
 
         return new DamageCalculationResult(totalDamage, blockedDamage, unblockedDamage);
     };

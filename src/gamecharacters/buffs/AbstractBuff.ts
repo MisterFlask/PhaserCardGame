@@ -55,6 +55,11 @@ export abstract class AbstractBuff implements IAbstractBuff {
         return (r << 16) | (g << 8) | b;
     }
 
+    public pulseBuff(){
+        this.actionManager.pulseBuff(this);
+        this.actionManager.displaySubtitle(this.getName(), 500);
+    }
+
     public getOwnerAsPlayableCard(): PlayableCard | null {
         // Import GameState if not already imported at the top of the file
 

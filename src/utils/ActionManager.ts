@@ -19,6 +19,10 @@ import { SubtitleManager } from "../ui/SubtitleManager";
 import { UIContext, UIContextManager } from "../ui/UIContextManager";
 
 export class ActionManager {
+    pulseBuff(buff: AbstractBuff) {
+        this.scene.events.emit('pulseBuff', buff.id);
+
+    }
 
     addCardToMasterDeck(card: PlayableCard) {
         if (!card.owner){
@@ -379,6 +383,7 @@ export class ActionManager {
             // For each buff type that has multiple instances
             buffsByType.forEach((buffs, buffType) => {
                 if (buffs.length > 1) {
+                    console.log("consolidating " + buffType);
                     // Sum up all stacks
                     const totalStacks = buffs.reduce((sum, buff) => sum + buff.stacks, 0);
                     

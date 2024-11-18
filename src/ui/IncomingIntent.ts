@@ -11,6 +11,7 @@ export class IncomingIntent {
     private container: Phaser.GameObjects.Container;
     private image: Phaser.GameObjects.Image;
     private text: Phaser.GameObjects.Text;
+    private tooltip: Phaser.GameObjects.Text;
 
     constructor(scene: Scene, intent: AbstractIntent, x: number, y: number) {
         this.scene = scene;
@@ -19,6 +20,7 @@ export class IncomingIntent {
         this.container = this.scene.add.container(x, y);
         
         this.image = this.scene.add.image(0, 0, intent.imageName);
+        this.image.setTint(this.intent.iconTint);
         this.image.setDisplaySize(IncomingIntent.WIDTH, IncomingIntent.HEIGHT);
         
         this.text = this.scene.add.text(0, IncomingIntent.HEIGHT / 2, intent.displayText(), { fontSize: '30px', color: '#ffffff' });
@@ -26,6 +28,19 @@ export class IncomingIntent {
         this.text.setShadow(2, 2, '#000000', 3, true, true);
 
         this.container.add([this.image, this.text]);
+        
+        // Create tooltip (initially invisible)
+        this.tooltip = this.scene.add.text(-200, 0, '', { 
+            fontSize: '16px', 
+            color: '#ffffff',
+            backgroundColor: '#000000',
+            padding: { x: 8, y: 4 },
+            wordWrap: { width: 200 }
+        });
+        this.tooltip.setOrigin(1, 0.5);
+        this.tooltip.setVisible(false);
+        
+        this.container.add(this.tooltip);
         
         // Set interactive for the container to detect pointer events
         this.container.setSize(IncomingIntent.WIDTH, IncomingIntent.HEIGHT)
@@ -46,13 +61,13 @@ export class IncomingIntent {
     }
 
     private onPointerOver(): void {
-        console.log(`Pointer over targeting intent: ${this.intent.displayText}`);
-        // Implement tooltip or highlight if needed
+        const tooltipText = `Targeted by: ${this.intent.tooltipText()}`;
+        this.tooltip.setText(tooltipText);
+        this.tooltip.setVisible(true);
     }
 
     private onPointerOut(): void {
-        console.log(`Pointer out targeting intent: ${this.intent.displayText}`);
-        // Implement tooltip hide if needed
+        this.tooltip.setVisible(false);
     }
 
     update(): void {
@@ -64,6 +79,9 @@ export class IncomingIntent {
         this.intent = newIntent;
         this.image.setTexture(this.intent.imageName);
         this.text.setText(this.intent.displayText());
+        if (this.tooltip.visible) {
+            this.tooltip.setText(`Targeted by: ${this.intent.tooltipText()}`);
+        }
     }
 
     setPosition(x: number, y: number): void {

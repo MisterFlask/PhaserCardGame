@@ -1,5 +1,4 @@
 import { GameState } from "../../../rules/GameState";
-import { ActionManager } from "../../../utils/ActionManager";
 import { FlamesAmplifierBuff } from "../../playerclasses/cards/blackhand/rares/Pyronox";
 import { AbstractBuff } from "../AbstractBuff";
 
@@ -37,7 +36,8 @@ export class Burning extends AbstractBuff {
             }
 
             // Apply burning damage
-            ActionManager.getInstance().dealDamage({ baseDamageAmount: totalDamage, target: owner, fromAttack: false });
+            this.pulseBuff();
+            this.actionManager.dealDamage({ baseDamageAmount: totalDamage, target: owner, fromAttack: false });
             console.log(`${owner.name} took ${totalDamage} burning damage (${this.baseDamage} base + ${powderAmount} Powder)`);
 
             // Reduce stacks by 1
