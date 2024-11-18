@@ -415,9 +415,18 @@ export class ActionManager {
         console.log('Drawing hand for new turn');
         const gameState = GameState.getInstance();
         const combatState = gameState.combatState;
-        const handSize = 3; // Assuming a hand size of 3 cards
+        const handSize = 5;
 
-        this.drawCards(handSize);
+        // Check each character's buffs at start of turn
+        const allCharacters = [...combatState.playerCharacters, ...combatState.enemies];
+        var cardModifier = 0;
+        allCharacters.forEach(character => {
+            character.buffs.forEach(buff => {
+                cardModifier += buff.getCardsDrawnAtStartOfTurnModifier();
+            });
+        });
+
+        this.drawCards(handSize + cardModifier);
 
         console.log('State of all piles:');
         console.log('Draw Pile:', combatState.currentDrawPile.map(card => card.name));
@@ -585,7 +594,7 @@ export class ActionManager {
 
                 // now for every buff on the source character, invoke its onOwnerStriking method
                 sourceCharacter?.buffs.forEach(buff => {
-                    buff.onOwnerStriking(target as BaseCharacterType, sourceCard || null, {
+                    buff.onOwnerStriking_CannotModifyDamage(target as BaseCharacterType, sourceCard || null, {
                         damageDealt: damageResult.totalDamage,
                         unblockedDamageTaken: damageResult.unblockedDamage,
                         damageBlocked: damageResult.blockedDamage

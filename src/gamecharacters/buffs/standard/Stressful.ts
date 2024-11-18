@@ -21,7 +21,7 @@ export class Stressful extends AbstractBuff {
         this.stackable = true;
     }
 
-    override onOwnerStriking(struckUnit: BaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void {
+    override onOwnerStriking_CannotModifyDamage(struckUnit: BaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void {
         if (damageInfo.unblockedDamageTaken > 0) {
             const stressBuff = new Stress(this.stacks);
             ActionManager.getInstance().applyBuffToCharacter(struckUnit, stressBuff);

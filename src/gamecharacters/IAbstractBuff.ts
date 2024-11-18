@@ -25,7 +25,7 @@ export interface IAbstractBuff {
     getCombatDamageTakenModifier(): number;
     getBlockReceivedModifier(): number;
     onOwnerStruck_CannotModifyDamage(strikingUnit: BaseCharacter | null, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void;
-    onOwnerStriking(struckUnit: BaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void;
+    onOwnerStriking_CannotModifyDamage(struckUnit: BaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void;
     onTurnStart(): void;
     onTurnEnd_CharacterBuff(): void;
     onEvent(item: AbstractCombatEvent): void;

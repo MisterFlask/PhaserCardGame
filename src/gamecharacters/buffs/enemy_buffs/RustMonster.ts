@@ -19,7 +19,7 @@ export class RustMonster extends AbstractBuff {
         return `When the owner hits a character, if that character has at least one card in the non-exhaust piles, a random card with >0 defense gets -${this.getStacksDisplayText()} to defense.`;
     }
 
-    override onOwnerStriking(targetCharacter: BaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void {
+    override onOwnerStriking_CannotModifyDamage(targetCharacter: BaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void {
         const gameState = GameState.getInstance();
         const combatState = gameState.combatState;
 

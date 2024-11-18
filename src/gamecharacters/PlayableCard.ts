@@ -94,7 +94,7 @@ export abstract class PlayableCard extends AbstractCard {
         this.rarity = rarity ?? CardRarity.COMMON;
         this.surfacePurchaseValue = surfaceValue ?? this.rarity.basePrice;
         this.hellPurchaseValue = this.rarity.basePrice;
-        this.cardType = cardType ?? CardType.NON_PLAYABLE;
+        this.cardType = cardType ?? CardType.SKILL;
     }
 
     withOwner(owner: PlayerCharacter): this {

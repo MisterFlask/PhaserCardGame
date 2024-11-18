@@ -47,7 +47,7 @@ export class PyrestarterBuff extends AbstractBuff {
         return `Attacks apply ${this.getStacksDisplayText()} Burning. Removed at end of turn.`;
     }
 
-    override onOwnerStriking(struckUnit: IBaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: any): void {
+    override onOwnerStriking_CannotModifyDamage(struckUnit: IBaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: any): void {
         if (struckUnit.team !== this.getOwnerAsCharacter()?.team) {
             
                 ActionManager.getInstance().applyBuffToCharacter(
