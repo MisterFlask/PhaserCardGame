@@ -192,7 +192,7 @@ export abstract class AbstractCard implements IAbstractCard {
         switch (context) {
             case PriceContext.SURFACE_BUY: return `$${price}`;
             case PriceContext.SURFACE_SELL: return `$${price}`;
-            case PriceContext.HELL_BUY: return `Buy: $${price}`;
+            case PriceContext.HELL_BUY: return `$${price}`;
             case PriceContext.HELL_SELL: return `Sell: $${price}`;
             default: return '';
         }
