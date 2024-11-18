@@ -25,10 +25,10 @@ export class HazmatSpecialist extends PlayableCard {
 	override InvokeCardEffects(targetCard?: AbstractCardType): void {
 		this.forEachAlly(ally => {
 			this.applyBlockToTarget(ally);	
-			this.actionManager.applyBuffToCharacter(ally, new Blessed(1), ally);
+			this.actionManager.applyBuffToCharacterOrCard(ally, new Blessed(1), ally);
 		});
 		this.performActionOnRandomEnemy(enemy => {
-			this.actionManager.applyBuffToCharacter(enemy, new Burning(this.getBaseMagicNumberAfterResourceScaling()), this.owner as BaseCharacter);
+			this.actionManager.applyBuffToCharacterOrCard(enemy, new Burning(this.getBaseMagicNumberAfterResourceScaling()), this.owner as BaseCharacter);
 		});
 	}
 }

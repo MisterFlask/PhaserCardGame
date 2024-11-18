@@ -21,7 +21,7 @@ export class InspiringPresence extends PlayableCard {
 
         // Apply Strong to all allies
         this.forEachAlly(ally => {
-            this.actionManager.applyBuffToCharacter(ally, new Strong(1));
+            this.actionManager.applyBuffToCharacterOrCard(ally, new Strong(1));
         });
     }
 

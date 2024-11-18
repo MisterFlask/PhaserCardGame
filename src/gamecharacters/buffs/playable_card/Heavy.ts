@@ -16,6 +16,6 @@ export class Heavy extends AbstractBuff {
 
     override onCardDrawn(): void {
        // apply Draw One Fewer Card to the owner of the card
-       this.actionManager.applyBuffToCharacter(this.getOwnerAsPlayableCard()?.owner!, new DrawOneFewerCardNextNTurns(1));
+       this.actionManager.applyBuffToCharacterOrCard(this.getOwnerAsPlayableCard()?.owner!, new DrawOneFewerCardNextNTurns(1));
     }
 }

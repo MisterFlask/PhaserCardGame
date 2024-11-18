@@ -23,6 +23,6 @@ export class Delicious extends AbstractBuff {
 
     override onOwnerStruck_CannotModifyDamage(strikingUnit: BaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void {
         const strongBuff = new Strong(this.stacks);
-        ActionManager.getInstance().applyBuffToCharacter(strikingUnit, strongBuff);
+        ActionManager.getInstance().applyBuffToCharacterOrCard(strikingUnit, strongBuff);
     }
 }

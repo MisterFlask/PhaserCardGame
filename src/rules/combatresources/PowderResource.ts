@@ -18,7 +18,7 @@ export class PowderResource extends AbstractCombatResource {
         if (this.value >= 1) {
             ActionManager.getInstance().DoAThing("Powder Resource Click", () => {
                 gameState.combatState.allPlayerAndEnemyCharacters.forEach(character => {
-                    ActionManager.getInstance().applyBuffToCharacter(
+                    ActionManager.getInstance().applyBuffToCharacterOrCard(
                         character, 
                         new Strong(2)
                     );

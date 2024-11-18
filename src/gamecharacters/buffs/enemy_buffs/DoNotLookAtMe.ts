@@ -20,13 +20,11 @@ export class DoNotLookAtMe extends AbstractBuff {
     }
 
     public onAnyCardPlayedByAnyone(playedCard: PlayableCard, target?: BaseCharacter){
-        if (target && target === this.getOwnerAsCharacter()) {
-            const owner = this.getOwnerAsCharacter();
-            if (owner) {
-                const stressBuff = new Stress(this.stacks);
-                this.actionManager.applyBuffToCharacter(owner, stressBuff);
-                console.log(`${owner.name} received ${this.stacks} Stress from Do Not Look At Me effect`);
-            }
+        const ownerOfCard = playedCard?.owner
+        if (ownerOfCard) {
+            const stressBuff = new Stress(this.stacks);
+            this.actionManager.applyBuffToCharacter(ownerOfCard, stressBuff);
+            console.log(`${ownerOfCard.name} received ${this.stacks} Stress from Do Not Look At Me effect`);
         }
     }
 }

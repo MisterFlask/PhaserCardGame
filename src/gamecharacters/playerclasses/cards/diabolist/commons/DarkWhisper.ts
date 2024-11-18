@@ -27,7 +27,7 @@ export class DarkWhisper extends PlayableCard {
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         this.forEachEnemy(enemy => {
-            this.actionManager.applyBuffToCharacter(enemy as BaseCharacter, new Poisoned(this.getBaseMagicNumberAfterResourceScaling()));
+            this.actionManager.applyBuffToCharacterOrCard(enemy as BaseCharacter, new Poisoned(this.getBaseMagicNumberAfterResourceScaling()));
         });
         this.forEachAlly(ally => {
             this.applyBlockToTarget(ally);

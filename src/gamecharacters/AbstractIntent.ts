@@ -294,7 +294,7 @@ export class ApplyDebuffToAllPlayerCharactersIntent extends AbstractIntent {
         console.log(`Applying ${this.debuff.stacks} stack(s) of ${this.debuff.getName()} to ${this.target.name}`);
         for (const target of TargetingUtils.getInstance().selectAllPlayerCharacters()) {
             ActionManager.getInstance().tiltCharacter(this.owner);
-            ActionManager.getInstance().applyBuffToCharacter(target, this.debuff);
+            ActionManager.getInstance().applyBuffToCharacterOrCard(target, this.debuff);
         }
     }
 
@@ -333,7 +333,7 @@ export class ApplyDebuffToRandomCharacterIntent extends AbstractIntent {
         ActionManager.getInstance().tiltCharacter(this.owner);
 
         console.log(`Applying ${this.debuff.stacks} stack(s) of ${this.debuff.getName()} to ${this.target.name}`);
-        ActionManager.getInstance().applyBuffToCharacter(this.target, this.debuff);
+        ActionManager.getInstance().applyBuffToCharacterOrCard(this.target, this.debuff);
     }
 
     createJsonRepresentation(): string {
@@ -399,7 +399,7 @@ export class ApplyBuffToSelfIntent extends AbstractIntent {
     act(): void {
         ActionManager.getInstance().tiltCharacter(this.owner);
         console.log(`Applying ${this.buff.stacks} stack(s) of ${this.buff.getName()} to allies`);
-        ActionManager.getInstance().applyBuffToCharacter(this.owner, this.buff);
+        ActionManager.getInstance().applyBuffToCharacterOrCard(this.owner, this.buff);
     }
 
     createJsonRepresentation(): string {

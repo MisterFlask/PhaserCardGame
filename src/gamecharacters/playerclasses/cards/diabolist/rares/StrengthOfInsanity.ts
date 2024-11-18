@@ -49,7 +49,7 @@ export class StrengthOfInsanity extends PlayableCard {
 
     private applyStrengthToAllies(): void {
         this.forEachAlly(ally => {
-            this.actionManager.applyBuffToCharacter(ally as BaseCharacter, new Strong(this.getBaseMagicNumberAfterResourceScaling()));
+            this.actionManager.applyBuffToCharacterOrCard(ally as BaseCharacter, new Strong(this.getBaseMagicNumberAfterResourceScaling()));
         });
     }
 }

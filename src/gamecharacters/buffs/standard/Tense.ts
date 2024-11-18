@@ -23,7 +23,7 @@ export class Tense extends AbstractBuff {
         const currentStress = this.getOwnerAsCharacter()?.getBuffStacks(new Stress().getName());
         if (currentStress && currentStress < this.stacks) {
             const stressToAdd = this.stacks - currentStress;
-            ActionManager.getInstance().applyBuffToCharacter(this.getOwnerAsCharacter()!,       new Stress(stressToAdd));
+            ActionManager.getInstance().applyBuffToCharacterOrCard(this.getOwnerAsCharacter()!,       new Stress(stressToAdd));
         }
     }
 }

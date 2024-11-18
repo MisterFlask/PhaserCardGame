@@ -32,7 +32,7 @@ export class GloriousSacrifice extends PlayableCard {
                 BasicProcs.getInstance().Taunt(enemy, this.owner!);
             });
 
-            ActionManagerFetcher.getActionManager().applyBuffToCharacter(this.owner!,new Vulnerable(1));
+            ActionManagerFetcher.getActionManager().applyBuffToCharacterOrCard(this.owner!,new Vulnerable(1));
         }
     }
 

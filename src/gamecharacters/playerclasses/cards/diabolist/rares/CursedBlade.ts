@@ -28,7 +28,7 @@ class WeThirstBuff extends AbstractBuff {
     override onCombatStart(){
         const owner = this.getOwnerAsCharacter();
         if (owner){
-            this.actionManager.applyBuffToCharacter(owner, new WeThirstBuff(this.stacks));
+            this.actionManager.applyBuffToCharacterOrCard(owner, new WeThirstBuff(this.stacks));
         }
     }
 

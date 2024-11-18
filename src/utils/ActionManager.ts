@@ -194,10 +194,19 @@ export class ActionManager {
         this.animateAttackerTilt(character.physicalCard!);
     }
 
-    public applyBuffToCard(card: PlayableCard, buff: AbstractBuff) {
+    public applyBuffToCard(card: AbstractCard, buff: AbstractBuff, sourceCharacter?: IBaseCharacter): void {
+       this.applyBuffToCharacterOrCard(card, buff, sourceCharacter);
+    }
+    
+    public applyBuffToCharacterOrCard(card: AbstractCard, buff: AbstractBuff, sourceCharacter?: IBaseCharacter): void {
+        if (card == null || buff == null) {
+            return;
+        }
         this.actionQueue.addAction(new GenericAction(async () => {
-            card.buffs.push(buff);
-            console.log(`Applied buff ${buff.getName()} to card ${card.name}`);
+            AbstractBuff._applyBuffToCharacterOrCard(card, buff);
+            console.log(`Applied buff ${buff.getName()} to ${card.name}`);
+            // You might want to add some animation or visual feedback here
+            await new WaitAction(20).playAction(); // Short delay for visual feedback
             return [];
         }));
     }
@@ -207,7 +216,7 @@ export class ActionManager {
             return;
         }
         this.actionQueue.addAction(new GenericAction(async () => {
-            AbstractBuff._applyBuffToCharacter(character as BaseCharacterType, buff);
+            AbstractBuff._applyBuffToCharacterOrCard(character as BaseCharacterType, buff);
             console.log(`Applied buff ${buff.getName()} to ${character.name}`);
             // You might want to add some animation or visual feedback here
             await new WaitAction(20).playAction(); // Short delay for visual feedback

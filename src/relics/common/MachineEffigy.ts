@@ -18,7 +18,7 @@ export class MachineEffigy extends AbstractRelic {
 
         if (hasRoboticEnemy) {
             this.combatState.playerCharacters.forEach(character => {
-                this.actionManager.applyBuffToCharacter(character, new Strong(2));
+                this.actionManager.applyBuffToCharacterOrCard(character, new Strong(2));
             });
         }
     }

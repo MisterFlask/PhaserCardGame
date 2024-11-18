@@ -99,7 +99,7 @@ class ModernArtStrength extends PlayableCard {
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         this.combatState.playerCharacters.forEach(ally => {
-            this.actionManager.applyBuffToCharacter(ally, new Strong(this.getBaseMagicNumberAfterResourceScaling()) );
+            this.actionManager.applyBuffToCharacterOrCard(ally, new Strong(this.getBaseMagicNumberAfterResourceScaling()) );
         });
     }
 

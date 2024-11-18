@@ -26,7 +26,7 @@ export class Pyrestarter extends PlayableCard {
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         this.forEachAlly(ally => {
             this.applyBlockToTarget(ally);
-            this.actionManager.applyBuffToCharacter(ally, new PyrestarterBuff(this.getBaseMagicNumberAfterResourceScaling()));
+            this.actionManager.applyBuffToCharacterOrCard(ally, new PyrestarterBuff(this.getBaseMagicNumberAfterResourceScaling()));
         });
     }
 }
@@ -50,7 +50,7 @@ export class PyrestarterBuff extends AbstractBuff {
     override onOwnerStriking_CannotModifyDamage(struckUnit: IBaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: any): void {
         if (struckUnit.team !== this.getOwnerAsCharacter()?.team) {
             
-                ActionManager.getInstance().applyBuffToCharacter(
+                ActionManager.getInstance().applyBuffToCharacterOrCard(
                     struckUnit as BaseCharacter,
                     new Burning(this.stacks),
                     this.getOwnerAsCharacter()!

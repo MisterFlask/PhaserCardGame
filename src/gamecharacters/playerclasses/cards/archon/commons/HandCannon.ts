@@ -28,7 +28,7 @@ export class HandCannon extends PlayableCard {
             
             BasicProcs.getInstance().Exert(this, 1, (energyExerted) => {
                 if (energyExerted > 0) {
-                    this.actionManager.applyBuffToCharacter(targetCard, new Vulnerable(this.getBaseMagicNumberAfterResourceScaling()));
+                    this.actionManager.applyBuffToCharacterOrCard(targetCard, new Vulnerable(this.getBaseMagicNumberAfterResourceScaling()));
                 }
             });
         }

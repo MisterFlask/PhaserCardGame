@@ -33,7 +33,7 @@ export class SacredRelicsCargo extends PlayableCard {
             }
         });
         this.mirrorChangeToCanonicalCard((card) => {
-            this.actionManager.applyBuffToCard(card, new HellSellValue(-15));
+            this.actionManager.applyBuffToCharacterOrCard(card, new HellSellValue(-15));
         });
     }
 }

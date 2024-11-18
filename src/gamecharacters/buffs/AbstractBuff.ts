@@ -3,7 +3,7 @@ import type { DamageInfo } from "../../rules/DamageInfo";
 import { CombatResources, CombatState, GameState } from "../../rules/GameState";
 import { ActionManager } from "../../utils/ActionManager";
 import { ActionManagerFetcher } from "../../utils/ActionManagerFetcher";
-import { generateWordGuid } from "../AbstractCard";
+import { AbstractCard, generateWordGuid } from "../AbstractCard";
 import type { BaseCharacter } from "../BaseCharacter";
 import { PlayerCharacter } from "../BaseCharacterClass";
 import type { IAbstractBuff } from '../IAbstractBuff';
@@ -98,7 +98,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
     /*
     * Generally you'll want to use the ActionManager method for this since that allows game animations to play.
     */
-    public static _applyBuffToCharacter(character: BaseCharacter, buff: AbstractBuff) {
+    public static _applyBuffToCharacterOrCard(character: AbstractCard, buff: AbstractBuff) {
         if (character == null) {
             return;
         }
@@ -262,7 +262,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
     }
 
-    interceptBuffApplication(character: IBaseCharacter, buffApplied: AbstractBuff, previousStacks: number, changeInStacks: number) : BuffApplicationResult {
+    interceptBuffApplication(character: AbstractCard, buffApplied: AbstractBuff, previousStacks: number, changeInStacks: number) : BuffApplicationResult {
         return {logicTriggered: false, newChangeInStacks: changeInStacks};
     }
 

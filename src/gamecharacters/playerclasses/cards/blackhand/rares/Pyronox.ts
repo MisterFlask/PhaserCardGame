@@ -22,7 +22,7 @@ export class Pyronox extends PlayableCard {
 
     override InvokeCardEffects(targetCard?: BaseCharacter): void {
         this.forEachEnemy(enemy => {
-            this.actionManager.applyBuffToCharacter(enemy, new FlamesAmplifierBuff(this.getBaseMagicNumberAfterResourceScaling()), this.owner as BaseCharacter);
+            this.actionManager.applyBuffToCharacterOrCard(enemy, new FlamesAmplifierBuff(this.getBaseMagicNumberAfterResourceScaling()), this.owner as BaseCharacter);
         });
     }
 }

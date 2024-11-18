@@ -36,7 +36,7 @@ export class CourageUnderFire extends PlayableCard {
 
     private applyEffectsToCharacter(character: BaseCharacter): void {
         this.applyBlockToTarget(character);
-        this.actionManager.applyBuffToCharacter(character, new Strong(this.getBaseMagicNumberAfterResourceScaling()));
+        this.actionManager.applyBuffToCharacterOrCard(character, new Strong(this.getBaseMagicNumberAfterResourceScaling()));
     }
 
     override get description(): string {

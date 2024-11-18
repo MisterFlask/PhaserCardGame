@@ -21,7 +21,7 @@ class GrowingPowerBuff extends AbstractBuff {
     override onTurnStart(): void {
         const owner = this.getOwnerAsCharacter();
         if (owner) {
-            this.actionManager.applyBuffToCharacter(owner, new Strong(this.stacks));
+            this.actionManager.applyBuffToCharacterOrCard(owner, new Strong(this.stacks));
         }
     }   
 }

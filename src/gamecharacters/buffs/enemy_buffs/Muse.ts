@@ -21,7 +21,7 @@ export class Muse extends AbstractBuff {
         if (playedCard.energyCost === 0) {
             const owner = this.getOwnerAsCharacter();
             if (owner) {
-                this.actionManager.applyBuffToCharacter(owner, new Strong(this.stacks));
+                this.actionManager.applyBuffToCharacterOrCard(owner, new Strong(this.stacks));
             }
         }
     }

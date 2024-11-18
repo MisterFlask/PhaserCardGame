@@ -1,4 +1,4 @@
-import { IBaseCharacter } from "../../IBaseCharacter";
+import { AbstractCard } from "../../AbstractCard";
 import { AbstractBuff, BuffApplicationResult } from "../AbstractBuff";
 
 export class Blessed extends AbstractBuff {
@@ -17,7 +17,8 @@ export class Blessed extends AbstractBuff {
     override getDescription(): string {
         return `Negates the next ${this.getStacksDisplayText()} debuff${this.stacks > 1 ? 's' : ''} applied.`;
     }
-    override interceptBuffApplication(character: IBaseCharacter, buffApplied: AbstractBuff, previousStacks: number, changeInStacks: number): BuffApplicationResult {
+    
+    override interceptBuffApplication(character: AbstractCard, buffApplied: AbstractBuff, previousStacks: number, changeInStacks: number): BuffApplicationResult {
         if (changeInStacks > 0 && buffApplied.isDebuff) {
             this.stacks--;
             return { logicTriggered: true, newChangeInStacks: 0 };

@@ -20,12 +20,12 @@ export class InspireFear extends PlayableCard {
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         // Apply 2 Vulnerable to all enemies
         this.forEachEnemy(enemy => {
-            this.actionManager.applyBuffToCharacter(enemy, new Vulnerable(this.baseMagicNumber));
+            this.actionManager.applyBuffToCharacterOrCard(enemy, new Vulnerable(this.baseMagicNumber));
         });
 
         // Apply 1 Vulnerable to all allies
         this.forEachAlly(ally => {
-            this.actionManager.applyBuffToCharacter(ally, new Vulnerable(this.baseBlock));
+            this.actionManager.applyBuffToCharacterOrCard(ally, new Vulnerable(this.baseBlock));
         });
 
         // Deal 10 damage to all enemies

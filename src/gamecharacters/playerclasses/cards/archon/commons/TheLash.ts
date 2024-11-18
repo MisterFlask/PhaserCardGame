@@ -20,7 +20,7 @@ export class TheLash extends PlayableCard {
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         if (targetCard instanceof BaseCharacter) {
             this.dealDamageToTarget(targetCard);
-            this.actionManager.applyBuffToCharacter(targetCard, new Weak(this.getBaseMagicNumberAfterResourceScaling()));
+            this.actionManager.applyBuffToCharacterOrCard(targetCard, new Weak(this.getBaseMagicNumberAfterResourceScaling()));
         }
     }
 

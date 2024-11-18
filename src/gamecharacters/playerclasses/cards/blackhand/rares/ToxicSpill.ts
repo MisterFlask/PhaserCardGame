@@ -25,9 +25,9 @@ export class ToxicSpill extends PlayableCard {
 
     override InvokeCardEffects(targetCard?: BaseCharacter): void {
         if (targetCard) {
-            this.actionManager.applyBuffToCharacter(targetCard, new Burning(4));
-            this.actionManager.applyBuffToCharacter(targetCard, new Poison(this.getBaseMagicNumberAfterResourceScaling()));
-            this.actionManager.applyBuffToCharacter(targetCard, new Weak(1));
+            this.actionManager.applyBuffToCharacterOrCard(targetCard, new Burning(4));
+            this.actionManager.applyBuffToCharacterOrCard(targetCard, new Poison(this.getBaseMagicNumberAfterResourceScaling()));
+            this.actionManager.applyBuffToCharacterOrCard(targetCard, new Weak(1));
         }
     }
 }
