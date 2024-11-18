@@ -295,8 +295,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
         this.priceBox = new TextBox({
             scene: this.scene,
-            x: -this.cardBackground.displayWidth / 2 + 40,
-            y: -this.cardBackground.displayHeight / 2 + 40,
+            x: this.cardBackground.displayWidth / 2 + 20,
+            y: 0,
             width: 80,
             height: 30,
             text: '',

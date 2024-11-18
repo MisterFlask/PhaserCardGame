@@ -25,6 +25,10 @@ export class ShopOverlay {
     private shopRelicPanels: ShopRelicPanel[] = [];
     private readonly BASE_PANEL_DEPTH = DepthManager.getInstance().SHOP_OVERLAY;
     private campaignBriefStatus: CampaignBriefStatus;
+    private shopCardsOutline!: Phaser.GameObjects.Rectangle;
+    private inventoryOutline!: Phaser.GameObjects.Rectangle;
+    private relicsOutline!: Phaser.GameObjects.Rectangle;
+    private debugOutlinesVisible: boolean = false;
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -36,6 +40,9 @@ export class ShopOverlay {
         this.campaignBriefStatus = new CampaignBriefStatus(scene);
         
         this.createOverlay();
+        
+        // Add keyboard listener for Control key
+        this.scene.input?.keyboard?.on('keydown-CTRL', this.toggleDebugOutlines, this);
     }
 
     private createOverlay(): void {
@@ -48,21 +55,24 @@ export class ShopOverlay {
         this.campaignBriefStatus.setPosition(width / 2, title.y + title.height + 30);
         title.setOrigin(0.5);
 
-        // Create debug outlines for each section
-        const shopCardsOutline = this.scene.add.rectangle(50, 100, 600, height - 150, 0xff0000, 0.2);
-        shopCardsOutline.setStrokeStyle(2, 0xff0000);
-        shopCardsOutline.setOrigin(0, 0);
+        // Create debug outlines for each section - initially invisible
+        this.shopCardsOutline = this.scene.add.rectangle(50, 100, 600, height - 150, 0xff0000, 0.2);
+        this.shopCardsOutline.setStrokeStyle(2, 0xff0000);
+        this.shopCardsOutline.setOrigin(0, 0);
+        this.shopCardsOutline.setVisible(false);
 
-        const inventoryOutline = this.scene.add.rectangle(width / 2 - 100, 200, 600, height - 250, 0x00ff00, 0.2);
-        inventoryOutline.setStrokeStyle(2, 0x00ff00);
-        inventoryOutline.setOrigin(0, 0);
+        this.inventoryOutline = this.scene.add.rectangle(width / 2 - 200, 200, 600, height - 250, 0x00ff00, 0.2);
+        this.inventoryOutline.setStrokeStyle(2, 0x00ff00);
+        this.inventoryOutline.setOrigin(0, 0);
+        this.inventoryOutline.setVisible(false);
 
-        const relicsOutline = this.scene.add.rectangle(width - 300, 100, 250, height - 150, 0x0000ff, 0.2);
-        relicsOutline.setStrokeStyle(2, 0x0000ff);
-        relicsOutline.setOrigin(0, 0);
+        this.relicsOutline = this.scene.add.rectangle(width - 400, 100, 250, height - 150, 0x0000ff, 0.2);
+        this.relicsOutline.setStrokeStyle(2, 0x0000ff);
+        this.relicsOutline.setOrigin(0, 0);
+        this.relicsOutline.setVisible(false);
 
         this.shopItemsContainer = this.scene.add.container(50, 100);
-        this.inventoryContainer = this.scene.add.container(width / 2 - 100, 200); // Pushed down by 100px
+        this.inventoryContainer = this.scene.add.container(width / 2 - 200, 200);
 
         const closeButton = new TextBox({
             scene: this.scene,
@@ -79,9 +89,9 @@ export class ShopOverlay {
 
         this.overlay.add([
             background, 
-            shopCardsOutline,
-            inventoryOutline,
-            relicsOutline,
+            this.shopCardsOutline,
+            this.inventoryOutline,
+            this.relicsOutline,
             title, 
             this.shopItemsContainer, 
             this.inventoryContainer, 
@@ -101,7 +111,7 @@ export class ShopOverlay {
         const verticalSpacing = 122;
         const horizontalSpacing = 122;
         
-        const startX = width - 300;
+        const startX = width - 400;
         const startY = height / 2 - (verticalSpacing * (gridColumns - 1) / 2);
 
         GameState.getInstance().shopRelicsForSale.forEach((relic, index) => {
@@ -327,5 +337,17 @@ export class ShopOverlay {
             console.log('Shop clicked');
             this.toggle();
         }
+    }
+
+    private toggleDebugOutlines(): void {
+        this.debugOutlinesVisible = !this.debugOutlinesVisible;
+        this.shopCardsOutline.setVisible(this.debugOutlinesVisible);
+        this.inventoryOutline.setVisible(this.debugOutlinesVisible);
+        this.relicsOutline.setVisible(this.debugOutlinesVisible);
+    }
+
+    public destroy(): void {
+        // Clean up keyboard listener when overlay is destroyed
+        this.scene.input?.keyboard?.off('keydown-CTRL', this.toggleDebugOutlines, this);
     }
 }

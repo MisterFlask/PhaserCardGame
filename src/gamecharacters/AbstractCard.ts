@@ -190,8 +190,8 @@ export abstract class AbstractCard implements IAbstractCard {
         if (price <= 0) return '';
 
         switch (context) {
-            case PriceContext.SURFACE_BUY: return `Buy: $${price}`;
-            case PriceContext.SURFACE_SELL: return `Sell: $${price}`;
+            case PriceContext.SURFACE_BUY: return `$${price}`;
+            case PriceContext.SURFACE_SELL: return `$${price}`;
             case PriceContext.HELL_BUY: return `Buy: $${price}`;
             case PriceContext.HELL_SELL: return `Sell: $${price}`;
             default: return '';
@@ -203,7 +203,7 @@ export abstract class AbstractCard implements IAbstractCard {
         switch (context) {
             case PriceContext.SURFACE_BUY:
             case PriceContext.HELL_BUY:
-                return 0x00ff00; // Green for buying
+                return 0xF5F5DC; // Beige for buying
             case PriceContext.SURFACE_SELL:
             case PriceContext.HELL_SELL:
                 return 0xffff00; // Yellow for selling
