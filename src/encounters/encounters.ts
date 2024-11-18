@@ -143,6 +143,21 @@ export class ShopGuy extends AutomatedCharacter {
     }
 }
 
+export class TreasureChest extends AutomatedCharacter {
+    constructor() {
+        super({ 
+            name: 'Treasure Chest', 
+            portraitName: 'TreasureChest', 
+            maxHitpoints: 1, 
+            description: 'Contains valuable treasures' 
+        });
+    }
+
+    override generateNewIntents(): AbstractIntent[] {
+        return []; // Treasure chest doesn't attack or have intents
+    }
+}
+
 export class EncounterManager {
     private static instance: EncounterManager;
 
@@ -182,6 +197,17 @@ export class EncounterManager {
     public CopyEncounterData(encounterData: EncounterData): EncounterData {
         return {
             enemies: encounterData.enemies.map(e => e.Copy())
+        };
+    }
+
+    public getTreasureEncounter(): Encounter {
+        return {
+            data: {
+                enemies: [new TreasureChest()],
+            },
+            peaceful: true,
+            act: 0,
+            segment: 0
         };
     }
 }

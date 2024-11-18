@@ -44,6 +44,7 @@ export class LocationCard extends AbstractCard {
         const encounterDescription = `Encounter: ${encounter.enemies.map(e => e.name).join(', ')}`;
         const fullDescription = `${encounterDescription}`;
         this.description = fullDescription;
+        this.encounter = encounter;
     }
 
     setAdjacent(location: LocationCard) {
@@ -178,13 +179,22 @@ export class TreasureRoomCard extends LocationCard {
     constructor(floor: number, index: number) {
         super({
             name: 'Treasure Room',
-            description: `This is a treasure room on floor ${floor}.`,
+            description: `A mysterious chest awaits...`,
             size: CardSize.SMALL,
             floor,
             index
         });
         this.portraitName = 'treasure-icon';
         this.portraitTint = 0xFFD700;
+    }
+
+    override OnLocationSelected(scene: Phaser.Scene): void {
+        console.log(`Treasure room ${this.id} selected`);
+        
+        GameState.getInstance().eliminatePhysicalCardsBetweenScenes();
+        SceneChanger.switchToCombatScene({ 
+            encounter: EncounterManager.getInstance().getTreasureEncounter().data 
+        });
     }
 }
 

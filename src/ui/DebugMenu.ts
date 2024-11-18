@@ -165,7 +165,7 @@ export class DebugMenu {
                 text: relic.name,
                 callback: () => {
                     const newRelic = new (relic.constructor as any)();
-                    ActionManager.getInstance().addRelicToInventory(newRelic, this.scene);
+                    ActionManager.getInstance().addRelicToInventory(newRelic);
                 }
             }));
 

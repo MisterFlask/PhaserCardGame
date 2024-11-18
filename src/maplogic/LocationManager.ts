@@ -35,15 +35,15 @@ export class LocationManager {
                     if (!restSiteAssigned && i === numNodesOnThisFloor - 2) { // Ensure at least one Rest Site
                         location = new RestSiteCard(floor, i);
                         restSiteAssigned = true;
-                    } else if (rand < 0.6) {
+                    } else if (rand < 0.3) {
                         location = new NormalRoomCard(floor, i);
-                    } else if (rand < 0.7) {
+                    } else if (rand < 0.5) {
                         location = new RestSiteCard(floor, i);
-                    } else if (rand < 0.8) {
+                    } else if (rand < 0.6) {
                         location = new EliteRoomCard(floor, i);
-                    } else if (rand < 0.85) {
+                    } else if (rand < 0.8) {
                         location = new ShopCard(floor, i);
-                    } else if (rand < 0.9) {
+                    } else if (rand < 0.95) {
                         location = new TreasureRoomCard(floor, i);
                     } else {
                         location = new EventRoomCard(floor, i);

@@ -99,8 +99,8 @@ export class ActionManager {
         return true;
     }
 
-    addRelicToInventory(relic: AbstractRelic, scene: Phaser.Scene) {
-        GameState.getInstance().addRelic(relic, scene);
+    addRelicToInventory(relic: AbstractRelic) {
+        GameState.getInstance().addRelic(relic, this.scene);
     }
 
 
@@ -108,7 +108,7 @@ export class ActionManager {
         if (GameState.getInstance().hellCurrency < item.hellPurchaseValue) {
             return false;
         }
-        
+
         this.addCardToMasterDeck(item);
         
         GameState.getInstance().hellCurrency -= item.hellPurchaseValue;

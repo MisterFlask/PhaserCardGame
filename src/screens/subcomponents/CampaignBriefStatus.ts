@@ -17,6 +17,11 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
     constructor(scene: Phaser.Scene) {
         super(scene, 10, 10);
 
+        if (!this.scene){
+            console.error("No scene provided to CampaignBriefStatus");
+            throw new Error("No scene provided to CampaignBriefStatus");
+        }
+
         // Create currency displays
         this.surfaceCurrencyText = new TextBox({
             scene: this.scene,
@@ -64,6 +69,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
 
         const relics = GameState.getInstance().relicsInventory;
         const relicsPerRow = Math.floor(this.RELIC_GRID_WIDTH / (this.RELIC_SIZE + this.RELIC_PADDING));
+        var scene = this.scene;
 
         relics.forEach((relic, index) => {
             const row = Math.floor(index / relicsPerRow);
@@ -73,7 +79,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
             const y = row * (this.RELIC_SIZE + this.RELIC_PADDING);
 
             const physicalRelic = new PhysicalRelic({
-                scene: this.scene,
+                scene: scene,
                 x,
                 y,
                 abstractRelic: relic,
@@ -103,7 +109,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
 
     public destroy(fromScene?: boolean): void {
         this.scene?.events?.off('update', this.updateCurrencyDisplay, this);
-        this.scene?.events?.off('relicsChanged', this.updateRelicDisplay, this);
+        this.scene?.events?.off('propagateGameStateChangesToUi', this.updateRelicDisplay, this);
         super.destroy(fromScene);
     }
 

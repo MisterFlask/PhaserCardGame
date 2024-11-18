@@ -24,6 +24,7 @@ import { DetailsScreenManager } from './subcomponents/DetailsScreenManager';
 import { MapOverlay } from './subcomponents/MapOverlay';
 import PerformanceMonitor from './subcomponents/PerformanceMonitor';
 import { ShopOverlay } from './subcomponents/ShopOverlay';
+import { TreasureOverlay } from './subcomponents/TreasureOverlay';
 
 /**
  * Interface for initializing CombatScene with necessmorniary data.
@@ -45,6 +46,7 @@ class CombatScene extends Phaser.Scene {
     private mapButton!: TextBoxButton;
     private campaignBriefStatus!: CampaignBriefStatus;
     private characterDeckOverlay!: CharacterDeckOverlay;
+    private treasureOverlay!: TreasureOverlay;
 
     constructor() {
         super('CombatScene');
@@ -84,11 +86,13 @@ class CombatScene extends Phaser.Scene {
 
         // Initialize ShopOverlay
         this.shopOverlay = new ShopOverlay(this);
+        this.treasureOverlay = new TreasureOverlay(this);
 
         // Set up the onCardClick handler
         this.inputHandler.addCardClickListener((card: AbstractCard) => {
             if (UIContextManager.getInstance().getContext() !== UIContext.COMBAT) return;
             this.shopOverlay.handleCardClick(card);
+            this.treasureOverlay.handleCardClick(card);
         });
 
         this.setupResizeHandler();

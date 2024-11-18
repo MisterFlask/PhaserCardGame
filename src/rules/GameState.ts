@@ -179,6 +179,10 @@ export class GameState {
 
     public addRelic(relic: AbstractRelic, scene: Phaser.Scene): void {
         this.relicsInventory.push(relic);
+        if (!scene){
+            console.error("No scene provided to addRelic")
+            return;
+        }
         scene.events.emit('propagateGameStateChangesToUi');
     }
 }
