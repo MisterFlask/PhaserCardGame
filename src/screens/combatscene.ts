@@ -3,6 +3,7 @@
 import Phaser from 'phaser';
 import { EncounterData } from '../encounters/Encounters';
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
+import { LocationCard, RestSiteCard } from '../maplogic/LocationCard';
 import { GameState } from '../rules/GameState';
 import { TextBoxButton } from '../ui/Button';
 import { CombatHighlightsManager } from '../ui/CombatHighlightsManager';
@@ -23,6 +24,7 @@ import CombatUIManager from './subcomponents/CombatUiManager';
 import { DetailsScreenManager } from './subcomponents/DetailsScreenManager';
 import { MapOverlay } from './subcomponents/MapOverlay';
 import PerformanceMonitor from './subcomponents/PerformanceMonitor';
+import { RestOverlay } from './subcomponents/RestOverlay';
 import { ShopOverlay } from './subcomponents/ShopOverlay';
 import { TreasureOverlay } from './subcomponents/TreasureOverlay';
 
@@ -47,6 +49,7 @@ class CombatScene extends Phaser.Scene {
     private campaignBriefStatus!: CampaignBriefStatus;
     private characterDeckOverlay!: CharacterDeckOverlay;
     private treasureOverlay!: TreasureOverlay;
+    private restOverlay!: RestOverlay;
 
     constructor() {
         super('CombatScene');
@@ -87,6 +90,10 @@ class CombatScene extends Phaser.Scene {
         // Initialize ShopOverlay
         this.shopOverlay = new ShopOverlay(this);
         this.treasureOverlay = new TreasureOverlay(this);
+
+        // Initialize RestOverlay
+        this.restOverlay = new RestOverlay(this);
+        this.restOverlay.hide();
 
         // Set up the onCardClick handler
         this.inputHandler.addCardClickListener((card: AbstractCard) => {
@@ -142,6 +149,13 @@ class CombatScene extends Phaser.Scene {
                 this.characterDeckOverlay.showCardInDiscardPile();
             }
         });
+
+        // Add event listener for location selection
+        this.events.on('locationSelected', (location: LocationCard) => {
+            if (location instanceof RestSiteCard) {
+                this.restOverlay.show();
+            }
+        });
     }
 
     private obliterate(): void {
@@ -156,6 +170,7 @@ class CombatScene extends Phaser.Scene {
         // Remove the pile click event listeners
         this.events.off('drawPileClicked');
         this.events.off('discardPileClicked');
+        this.events.off('locationSelected');
     }
 
     private createBackground(): void {
