@@ -1,9 +1,9 @@
-import { PlayableCard } from '../../../../PlayableCard';
-import { BaseCharacter } from '../../../../BaseCharacter';
-import { Burning } from '../../../../buffs/standard/Burning';
 import { TargetingType } from '../../../../AbstractCard';
+import { BaseCharacter } from '../../../../BaseCharacter';
 import { AbstractBuff } from '../../../../buffs/AbstractBuff';
+import { Burning } from '../../../../buffs/standard/Burning';
 import { IBaseCharacter } from '../../../../IBaseCharacter';
+import { PlayableCard } from '../../../../PlayableCard';
 
 export class AxeMeAQuestion extends PlayableCard {
   constructor() {
@@ -14,7 +14,7 @@ export class AxeMeAQuestion extends PlayableCard {
       targetingType: TargetingType.ENEMY,
     });
     this.baseDamage = 11;
-    this.energyCost = 2;
+    this.baseEnergyCost = 2;
     this.buffs.push(new AxeCritBuff());
   }
 

@@ -19,7 +19,7 @@ export class Guilt extends AbstractBuff {
     }
 
     override onAnyCardPlayedByAnyone(playedCard: PlayableCard, target?: BaseCharacter): void {
-        if (playedCard.energyCost > 2) {
+        if (playedCard.baseEnergyCost > 2) {
             const gameState = GameState.getInstance();
             const discardPile = gameState.combatState.currentDiscardPile;
             

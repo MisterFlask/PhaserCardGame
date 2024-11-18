@@ -18,9 +18,9 @@ export class Penance extends AbstractBuff {
     }
 
     override onAnyCardPlayedByAnyone(playedCard: PlayableCard, target?: BaseCharacter): void {
-        if (playedCard.energyCost <= 2) {
-            playedCard.energyCost += this.stacks;
-            console.log(`Penance increased the cost of ${playedCard.name} by ${this.stacks}. New cost: ${playedCard.energyCost}`);
+        if (playedCard.baseEnergyCost <= 2) {
+            playedCard.baseEnergyCost += this.stacks;
+            console.log(`Penance increased the cost of ${playedCard.name} by ${this.stacks}. New cost: ${playedCard.baseEnergyCost}`);
         }
     }
 }

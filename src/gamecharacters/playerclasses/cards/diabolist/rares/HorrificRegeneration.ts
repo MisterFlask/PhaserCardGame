@@ -2,7 +2,7 @@ import { GameState } from "../../../../../rules/GameState";
 import { TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
 import { Stress } from "../../../../buffs/standard/Stress";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
 export class HorrificRegeneration extends PlayableCard {
@@ -11,9 +11,9 @@ export class HorrificRegeneration extends PlayableCard {
             name: "Horrific Regeneration",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.RARE,
+            rarity: EntityRarity.RARE,
         });
-        this.energyCost = 3; // Assuming a cost for the card
+        this.baseEnergyCost = 3; // Assuming a cost for the card
     }
     override get description(): string {
         return `All party members heal ${this.getDisplayedMagicNumber()} HP. They also gain 20 stress. Exhaust.`;

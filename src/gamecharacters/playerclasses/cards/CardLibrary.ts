@@ -36,7 +36,7 @@ export class CardLibrary {
         var characters = GameState.getInstance().currentRunCharacters;
         var cards = characters.flatMap(c => c.characterClass.availableCards);
         // dedupe
-        return [...new Map(cards.map(item => [item.name, item])).values()];
+        return [...new Map(cards.map(item => [item.name, item.Copy()])).values()];
     }
 
     public getRandomSelectionOfRelevantClassCards(count: number): PlayableCard[] {
@@ -45,12 +45,13 @@ export class CardLibrary {
     }
 
     public getCardsForClass(characterClass: BaseCharacterClass): PlayableCard[] {
-        return characterClass.availableCards;
+        return characterClass.availableCards.map(c => c.Copy());
     }
 
     public getAllCards(): PlayableCard[] {
         return [
-            ... this.getCharacterClasses().flatMap(c => c.availableCards),
+            ... this.getCharacterClasses().flatMap(c => c.availableCards)
+            .map(c => c.Copy()),
         ];
     }
 }

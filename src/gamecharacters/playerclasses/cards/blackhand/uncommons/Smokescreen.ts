@@ -14,7 +14,7 @@ export class Smokescreen extends PlayableCard {
 		});
 		this.baseMagicNumber = 2;
 		this.baseBlock = 6;
-		this.energyCost = 1;
+		this.baseEnergyCost = 1;
 		this.buffs.push(new ExhaustBuff());
 	}
 

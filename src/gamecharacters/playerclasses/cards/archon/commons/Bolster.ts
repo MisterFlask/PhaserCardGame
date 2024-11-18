@@ -1,5 +1,5 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
 export class Bolster extends PlayableCard {
@@ -8,10 +8,10 @@ export class Bolster extends PlayableCard {
             name: "Bolster",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.COMMON,
+            rarity: EntityRarity.COMMON,
         });
         this.baseBlock = 5;
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
         this.resourceScalings.push({
             resource: this.pluck,
             blockScaling: 1,

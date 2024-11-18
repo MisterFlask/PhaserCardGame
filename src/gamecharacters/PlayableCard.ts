@@ -18,7 +18,7 @@ import type { AbstractBuff } from "./buffs/AbstractBuff";
 import { IBaseCharacter } from "./IBaseCharacter";
 import { CardSize, CardType } from "./Primitives";
 
-export class CardRarity {
+export class EntityRarity {
     private constructor({
         id,
         weight,
@@ -41,41 +41,41 @@ export class CardRarity {
     public readonly color: number;
     public readonly basePrice: number;
 
-    static readonly TOKEN = new CardRarity({ id: "TOKEN", weight: 0, color: 0xA0A0A0, basePrice: 0 });
-    static readonly BASIC = new CardRarity({ id: "BASIC", weight: 1, color: 0xA0A0A0, basePrice: 50 });
-    static readonly COMMON = new CardRarity({ id: "COMMON", weight: 2, color: 0xA0A0A0, basePrice: 100 });
-    static readonly UNCOMMON = new CardRarity({ id: "UNCOMMON", weight: 3, color: 0x87CEEB, basePrice: 175 });
-    static readonly RARE = new CardRarity({ id: "RARE", weight: 4, color: 0xDDA0DD, basePrice: 250 });
-    static readonly EPIC = new CardRarity({ id: "EPIC", weight: 5, color: 0xFF69B4, basePrice: 350 });
-    static readonly LEGENDARY = new CardRarity({ id: "LEGENDARY", weight: 6, color: 0xFFD700, basePrice: 500 });
-    static readonly SPECIAL = new CardRarity({ id: "SPECIAL", weight: 7, color: 0xFF4500, basePrice: 400 });
+    static readonly TOKEN = new EntityRarity({ id: "TOKEN", weight: 0, color: 0xA0A0A0, basePrice: 25 });
+    static readonly BASIC = new EntityRarity({ id: "BASIC", weight: 1, color: 0xA0A0A0, basePrice: 25 });
+    static readonly COMMON = new EntityRarity({ id: "COMMON", weight: 2, color: 0xA0A0A0, basePrice: 50 });
+    static readonly UNCOMMON = new EntityRarity({ id: "UNCOMMON", weight: 3, color: 0x87CEEB, basePrice: 100 });
+    static readonly RARE = new EntityRarity({ id: "RARE", weight: 4, color: 0xDDA0DD, basePrice: 200 });
+    static readonly EPIC = new EntityRarity({ id: "EPIC", weight: 5, color: 0xFF69B4, basePrice: 350 });
+    static readonly LEGENDARY = new EntityRarity({ id: "LEGENDARY", weight: 6, color: 0xFFD700, basePrice: 500 });
+    static readonly SPECIAL = new EntityRarity({ id: "SPECIAL", weight: 7, color: 0xFF4500, basePrice: 400 });
 
     toString(): string {
         return this.id;
     }
 
-    static fromString(str: string): CardRarity {
-        const value = (CardRarity as any)[str];
+    static fromString(str: string): EntityRarity {
+        const value = (EntityRarity as any)[str];
         if (!value) {
             throw new Error(`Invalid CardRarity: ${str}`);
         }
         return value;
     }
 
-    static getAllRarities(): CardRarity[] {
+    static getAllRarities(): EntityRarity[] {
         return [
-            CardRarity.TOKEN,
-            CardRarity.BASIC,
-            CardRarity.COMMON,
-            CardRarity.UNCOMMON,
-            CardRarity.RARE,
-            CardRarity.EPIC,
-            CardRarity.LEGENDARY,
-            CardRarity.SPECIAL
+            EntityRarity.TOKEN,
+            EntityRarity.BASIC,
+            EntityRarity.COMMON,
+            EntityRarity.UNCOMMON,
+            EntityRarity.RARE,
+            EntityRarity.EPIC,
+            EntityRarity.LEGENDARY,
+            EntityRarity.SPECIAL
         ];
     }
 
-    isAtLeastAsRareAs(other: CardRarity): boolean {
+    isAtLeastAsRareAs(other: EntityRarity): boolean {
         return this.weight >= other.weight;
     }
 }
@@ -84,14 +84,14 @@ export abstract class PlayableCard extends AbstractCard {
     targetingType: TargetingType;
     override typeTag = "PlayableCard";
 
-    rarity: CardRarity; // Added card rarity
+    rarity: EntityRarity; // Added card rarity
     nativeToCharacterClass?: BaseCharacterClass;
     resourceScalings: CardResourceScaling[] = [];
-    constructor({ name, description, portraitName, cardType, tooltip, characterData, size, targetingType, owner, price: surfaceValue, rarity }: { name: string; description?: string; portraitName?: string; cardType?: CardType; tooltip?: string; characterData?: AbstractCard; size?: CardSize; targetingType?: TargetingType; owner?: IBaseCharacter; price?: number; rarity?: CardRarity }) {
+    constructor({ name, description, portraitName, cardType, tooltip, characterData, size, targetingType, owner, price: surfaceValue, rarity }: { name: string; description?: string; portraitName?: string; cardType?: CardType; tooltip?: string; characterData?: AbstractCard; size?: CardSize; targetingType?: TargetingType; owner?: IBaseCharacter; price?: number; rarity?: EntityRarity }) {
         super({ name, description: description ?? "_", portraitName, cardType, tooltip, characterData, size });
         this.targetingType = targetingType ?? TargetingType.ENEMY;
         this.owner = owner as PlayerCharacter;
-        this.rarity = rarity ?? CardRarity.COMMON;
+        this.rarity = rarity ?? EntityRarity.COMMON;
         this.surfacePurchaseValue = surfaceValue ?? this.rarity.basePrice;
         this.hellPurchaseValue = this.rarity.basePrice;
         this.cardType = cardType ?? CardType.SKILL;
@@ -357,6 +357,10 @@ export abstract class PlayableCard extends AbstractCard {
         let totalDamage = damageCalcResult.totalDamage;
 
         return totalDamage.toString();
+    }
+
+    public get energyCost(): number {
+        return this.baseEnergyCost + this.buffs.reduce((acc, buff) => acc + buff.energyCostModifier(), 0);
     }
 
     public getDisplayedMagicNumber(targetedCharacterIfAny?: IBaseCharacter): string {

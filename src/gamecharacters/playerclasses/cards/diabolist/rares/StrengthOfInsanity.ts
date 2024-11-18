@@ -3,7 +3,7 @@ import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
 import { Stress } from "../../../../buffs/standard/Stress";
 import { Strong } from "../../../../buffs/standard/Strong";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
 export class StrengthOfInsanity extends PlayableCard {
@@ -12,9 +12,9 @@ export class StrengthOfInsanity extends PlayableCard {
             name: "Strength of Insanity",
             cardType: CardType.POWER,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.RARE,
+            rarity: EntityRarity.RARE,
         });
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
         this.baseMagicNumber = 2; // Amount of Strength to apply
     }
 

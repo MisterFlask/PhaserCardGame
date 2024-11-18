@@ -1,7 +1,7 @@
 import { GameState } from "../../../rules/GameState";
 import { TargetingType } from "../../AbstractCard";
 import { IBaseCharacter } from "../../IBaseCharacter";
-import { CardRarity, PlayableCard } from "../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../PlayableCard";
 import { CardType } from "../../Primitives";
 import { AbstractBuff } from "../AbstractBuff";
 import { ExhaustBuff } from "../playable_card/ExhaustBuff";
@@ -61,9 +61,9 @@ class Moth extends PlayableCard {
             name: "Moth",
             cardType: CardType.STATUS,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.SPECIAL,
+            rarity: EntityRarity.SPECIAL,
         });
-        this.energyCost = 3;
+        this.baseEnergyCost = 3;
         this.buffs.push(new ExhaustBuff());
         this.buffs.push(new Hazardous(4));
     }

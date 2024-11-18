@@ -16,7 +16,7 @@ export class Pyrestarter extends PlayableCard {
         });
         this.baseBlock = 6;
         this.baseMagicNumber = 3;
-        this.energyCost = 2;
+        this.baseEnergyCost = 2;
     }
 
     override get description(): string {

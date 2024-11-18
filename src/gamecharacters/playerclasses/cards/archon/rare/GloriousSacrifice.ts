@@ -1,7 +1,7 @@
 import { GameState } from "../../../../../rules/GameState";
 import { ActionManagerFetcher } from "../../../../../utils/ActionManagerFetcher";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { Strong } from "../../../../buffs/standard/Strong";
 import { Vulnerable } from "../../../../buffs/standard/Vulnerable";
@@ -13,9 +13,9 @@ export class GloriousSacrifice extends PlayableCard {
             name: "Glorious Sacrifice",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
-            rarity: CardRarity.RARE,
+            rarity: EntityRarity.RARE,
         });
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
         this.baseDamage = 20;
         this.buffs.push(new Strong(2)); // This character gains 2 strength on startup
     }

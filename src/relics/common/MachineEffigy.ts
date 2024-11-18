@@ -1,6 +1,6 @@
 import { Robotic } from "../../gamecharacters/buffs/enemy_buffs/Robotic";
 import { Strong } from "../../gamecharacters/buffs/standard/Strong";
-import { CardRarity } from "../../gamecharacters/PlayableCard";
+import { EntityRarity } from "../../gamecharacters/PlayableCard";
 import { AbstractRelic } from "../AbstractRelic";
 
 export class MachineEffigy extends AbstractRelic {
@@ -8,7 +8,7 @@ export class MachineEffigy extends AbstractRelic {
         super();
         this.name = "Machine Effigy";
         this.description = "If any enemies have the Robotic buff, your whole party gets 2 Strength.";
-        this.rarity = CardRarity.COMMON;
+        this.rarity = EntityRarity.COMMON;
     }
 
     onCombatStart(): void {

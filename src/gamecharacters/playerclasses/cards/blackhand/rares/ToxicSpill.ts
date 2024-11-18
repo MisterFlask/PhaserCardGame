@@ -4,7 +4,7 @@ import { VolatileBuff } from "../../../../buffs/playable_card/VolatileCardBuff";
 import { Burning } from "../../../../buffs/standard/Burning";
 import { Poison } from "../../../../buffs/standard/Poisoned";
 import { Weak } from "../../../../buffs/standard/Weak";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
 export class ToxicSpill extends PlayableCard {
@@ -12,7 +12,7 @@ export class ToxicSpill extends PlayableCard {
         super({
             name: "Toxic Spill",
             cardType: CardType.SKILL,
-            rarity: CardRarity.RARE,
+            rarity: EntityRarity.RARE,
             targetingType: TargetingType.ENEMY,
         }); 
         this.baseMagicNumber = 6;

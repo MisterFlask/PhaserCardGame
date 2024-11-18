@@ -1,6 +1,6 @@
 import { GameState } from "../../../../../rules/GameState";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
 export class QueensMandate extends PlayableCard {
@@ -9,9 +9,9 @@ export class QueensMandate extends PlayableCard {
             name: "Queen's Mandate",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.RARE,
+            rarity: EntityRarity.RARE,
         });
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

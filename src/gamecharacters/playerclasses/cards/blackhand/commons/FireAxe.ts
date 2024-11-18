@@ -13,7 +13,7 @@ export class FireAxe extends PlayableCard {
         });
         this.baseDamage = 8;
         this.baseMagicNumber = 2;
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
     }
 
     override get description(): string {

@@ -1,6 +1,6 @@
 import { GameState } from "../../../../../rules/GameState";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { BasicProcs } from "../../../../procs/BasicProcs";
 import { Buzzsword } from "../commons/Buzzsword";
@@ -11,9 +11,9 @@ export class Quartermaster extends PlayableCard {
             name: "Quartermaster",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.RARE,
+            rarity: EntityRarity.RARE,
         });
-        this.energyCost = 2;
+        this.baseEnergyCost = 2;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
@@ -23,7 +23,7 @@ export class Quartermaster extends PlayableCard {
 
         livingPartyMembers.forEach(member => {
             const buzzsword = new Buzzsword();
-            buzzsword.energyCost -= 1;
+            buzzsword.baseEnergyCost -= 1;
             buzzsword.owner = member
             BasicProcs.getInstance().ManufactureCardToHand(buzzsword);
         });

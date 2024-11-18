@@ -1,6 +1,6 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { Strong } from "../../../../buffs/standard/Strong";
 
@@ -10,10 +10,10 @@ export class CourageUnderFire extends PlayableCard {
             name: "Courage Under Fire",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.UNCOMMON,
+            rarity: EntityRarity.UNCOMMON,
         });
         this.portraitName = "CourageUnderFire";
-        this.energyCost = 2;
+        this.baseEnergyCost = 2;
         this.baseBlock = 5;
         this.baseMagicNumber = 1; // Amount of Strength to apply
     }

@@ -1,4 +1,4 @@
-import { CardRarity } from "../../gamecharacters/PlayableCard";
+import { EntityRarity } from "../../gamecharacters/PlayableCard";
 import { AbstractRelic } from "../AbstractRelic";
 
 export class MistBottle extends AbstractRelic {
@@ -6,7 +6,7 @@ export class MistBottle extends AbstractRelic {
         super();
         this.name = "Bottle of Fine London Mist";
         this.description = "At the start of combat, increase your Smog by 2.";
-        this.rarity = CardRarity.COMMON;
+        this.rarity = EntityRarity.COMMON;
     }
 
     onCombatStart(): void {

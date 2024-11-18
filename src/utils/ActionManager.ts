@@ -24,6 +24,15 @@ export class ActionManager {
 
     }
 
+    destroyCardInMasterDeck(card: PlayableCard) {
+        if (card.owner) {
+            const index = card.owner.cardsInMasterDeck.indexOf(card);
+            if (index > -1) {
+                card.owner.cardsInMasterDeck.splice(index, 1);
+            }
+        }
+    }
+
     addCardToMasterDeck(card: PlayableCard) {
         if (!card.owner){
             // Assign to a random character in the party
@@ -96,11 +105,11 @@ export class ActionManager {
 
 
     buyItemForHellCurrency(item: PlayableCard) : boolean {
-        const inventory = GameState.getInstance().masterDeckAllCharacters;
         if (GameState.getInstance().hellCurrency < item.hellPurchaseValue) {
             return false;
         }
         
+        this.addCardToMasterDeck(item);
         
         GameState.getInstance().hellCurrency -= item.hellPurchaseValue;
         return true;
@@ -197,7 +206,7 @@ export class ActionManager {
     public applyBuffToCard(card: AbstractCard, buff: AbstractBuff, sourceCharacter?: IBaseCharacter): void {
        this.applyBuffToCharacterOrCard(card, buff, sourceCharacter);
     }
-    
+
     public applyBuffToCharacterOrCard(card: AbstractCard, buff: AbstractBuff, sourceCharacter?: IBaseCharacter): void {
         if (card == null || buff == null) {
             return;

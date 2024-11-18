@@ -198,6 +198,10 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
     }
 
+    energyCostModifier(): number {
+        return 0;
+    }
+
     // this is a FLAT modifier on top of damage taken, not percentage-based.
     //  this refers to pre-block damage.
     getCombatDamageDealtModifier(target?: BaseCharacter, cardPlayed?: PlayableCard): number {
@@ -282,6 +286,10 @@ export abstract class AbstractBuff implements IAbstractBuff {
         return 0;
     }
 
+    purchasePricePercentModifier(): number {
+        return 0;
+    }
+
     surfaceValueModifier(): number {
         return 0;
     }
@@ -313,6 +321,10 @@ export abstract class AbstractBuff implements IAbstractBuff {
     }
 
     public onExhaust(){
+
+    }
+
+    public onAcquisition(){
 
     }
 

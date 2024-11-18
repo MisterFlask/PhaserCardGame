@@ -3,7 +3,7 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
 import { BloodPriceBuff } from "../../../../buffs/standard/Bloodprice";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { BasicProcs } from "../../../../procs/BasicProcs";
 import { EldritchSmoke } from "../tokens/EldritchSmoke";
@@ -14,7 +14,7 @@ export class EldritchBlast extends PlayableCard {
             name: "Eldritch Blast",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
-            rarity: CardRarity.UNCOMMON,
+            rarity: EntityRarity.UNCOMMON,
         });
         this.baseDamage = 12;
         this.baseBlock = 0; // Assuming no block is needed

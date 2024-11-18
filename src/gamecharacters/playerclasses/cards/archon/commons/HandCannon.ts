@@ -1,7 +1,7 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
 import { Vulnerable } from "../../../../buffs/standard/Vulnerable";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { BasicProcs } from "../../../../procs/BasicProcs";
 
@@ -11,10 +11,10 @@ export class HandCannon extends PlayableCard {
             name: "Hand Cannon",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
-            rarity: CardRarity.COMMON,
+            rarity: EntityRarity.COMMON,
         });
         this.baseDamage = 8;
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
         this.baseMagicNumber = 1; // Amount of Vulnerable applied
         this.resourceScalings.push({
             resource: this.iron,

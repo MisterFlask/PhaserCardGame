@@ -15,7 +15,7 @@ export class HazmatSpecialist extends PlayableCard {
 		});
 		this.baseBlock = 6;
 		this.baseMagicNumber = 3;
-		this.energyCost = 1;
+		this.baseEnergyCost = 1;
 	}
 
 	override get description(): string {

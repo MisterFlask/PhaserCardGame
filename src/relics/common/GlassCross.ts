@@ -1,6 +1,6 @@
 import { TargetingType } from "../../gamecharacters/AbstractCard";
 import { ExhaustBuff } from "../../gamecharacters/buffs/playable_card/ExhaustBuff";
-import { CardRarity, PlayableCard } from "../../gamecharacters/PlayableCard";
+import { EntityRarity, PlayableCard } from "../../gamecharacters/PlayableCard";
 import { CardType, } from "../../gamecharacters/Primitives";
 import { BasicProcs } from "../../gamecharacters/procs/BasicProcs";
 import { Faction } from "../../maplogic/Faction";
@@ -12,7 +12,7 @@ class HolyBombardment extends PlayableCard {
             name: "Holy Bombardment",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
-            rarity: CardRarity.SPECIAL,
+            rarity: EntityRarity.SPECIAL,
         });
         this.baseDamage = 25;
         this.buffs = [new ExhaustBuff()];
@@ -36,7 +36,7 @@ export class GlassCross extends AbstractRelic {
         super();
         this.name = "Glass Cross";
         this.description = "In Spanish areas, at the start of combat, manufacture a Holy Bombardment to your hand.";
-        this.rarity = CardRarity.COMMON;
+        this.rarity = EntityRarity.COMMON;
     }
 
     override onCombatStart(): void {

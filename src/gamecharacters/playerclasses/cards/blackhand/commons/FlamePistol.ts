@@ -16,7 +16,7 @@ export class FlamePistol extends PlayableCard {
         });
         this.baseDamage = 4;
         this.baseMagicNumber = 2;
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
 
         this.resourceScalings.push({
             resource: GameState.getInstance().combatState.combatResources.powder,

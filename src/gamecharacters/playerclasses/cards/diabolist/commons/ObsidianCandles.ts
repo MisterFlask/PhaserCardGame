@@ -3,7 +3,7 @@
 import { DeckLogic } from "../../../../../rules/DeckLogic";
 import { GameState } from "../../../../../rules/GameState";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { BasicProcs } from "../../../../procs/BasicProcs";
 import { EldritchSmoke } from "../tokens/EldritchSmoke";
@@ -15,9 +15,9 @@ export class ObsidianCandles extends PlayableCard {
             name: "Obsidian Candles",
             cardType: CardType.POWER,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.COMMON,
+            rarity: EntityRarity.COMMON,
         });
-        this.energyCost = 2;
+        this.baseEnergyCost = 2;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

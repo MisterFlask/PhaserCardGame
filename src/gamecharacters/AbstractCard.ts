@@ -8,7 +8,7 @@ import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
 import ImageUtils from '../utils/ImageUtils';
 import type { BaseCharacter } from './BaseCharacter';
 import type { PlayerCharacter } from './BaseCharacterClass';
-import type { AbstractBuff } from './buffs/AbstractBuff';
+import { AbstractBuff } from './buffs/AbstractBuff';
 import { IAbstractCard } from './IAbstractCard';
 import type { PlayableCard } from './PlayableCard';
 import { CardSize, CardType } from './Primitives'; // Ensure enums are imported from Primitives
@@ -141,7 +141,7 @@ export abstract class AbstractCard implements IAbstractCard {
         return ActionManagerFetcher.getActionManager();
     }
 
-    public energyCost: number = 0;
+    public baseEnergyCost: number = 0;
     protected _name: string;
     protected _description: string;
     public portraitName?: string
@@ -155,6 +155,10 @@ export abstract class AbstractCard implements IAbstractCard {
     block: number = 0
     buffs: AbstractBuff[] = [];
     portraitTint?: number
+
+    applyBuffs(buffs: AbstractBuff[]): void {
+        buffs.forEach(buff => AbstractBuff._applyBuffToCharacterOrCard(this, buff));
+    }
 
     public surfacePurchaseValue: number = -1;
     public hellPurchaseValue: number = -1;
@@ -170,7 +174,6 @@ export abstract class AbstractCard implements IAbstractCard {
             case PriceContext.SURFACE_BUY: 
                 return this.surfacePurchaseValue;
             case PriceContext.SURFACE_SELL: 
-                // Calculate sell value dynamically
                 return this.surfaceSellValue;
             case PriceContext.HELL_BUY: 
                 return this.hellPurchaseValue;

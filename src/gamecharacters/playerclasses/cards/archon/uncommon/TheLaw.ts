@@ -1,6 +1,6 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { AbstractBuff } from "../../../../buffs/AbstractBuff";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { BasicProcs } from "../../../../procs/BasicProcs";
 import { TakeCover } from "../tokens/TakeCover";
@@ -11,9 +11,9 @@ export class TheLaw extends PlayableCard {
             name: "The Law",
             cardType: CardType.POWER,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.UNCOMMON,
+            rarity: EntityRarity.UNCOMMON,
         });
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

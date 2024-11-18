@@ -1,6 +1,6 @@
 import { TargetingType } from "../../../AbstractCard";
 import { HellSellValue } from "../../../buffs/standard/HellSellValue";
-import { CardRarity, PlayableCard } from "../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../PlayableCard";
 import { CardType } from "../../../Primitives";
 
 export class SpicyLiteratureCargo extends PlayableCard {
@@ -9,9 +9,9 @@ export class SpicyLiteratureCargo extends PlayableCard {
             name: "Spicy Literature Cargo",
             cardType: CardType.ITEM,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.COMMON,
+            rarity: EntityRarity.COMMON,
         });
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
         this.surfacePurchaseValue = 20;
         this.hellPurchaseValue = 40;
         this.buffs.push(new HellSellValue(55));   

@@ -1,6 +1,6 @@
 import { AbstractCard, TargetingType } from '../../../../AbstractCard';
 import { IBaseCharacter } from '../../../../IBaseCharacter';
-import { CardRarity } from '../../../../PlayableCard';
+import { EntityRarity } from '../../../../PlayableCard';
 import { PlayableCardWithHelpers } from '../../../../PlayableCardWithHelpers';
 import { CardType } from '../../../../Primitives';
 import { Burning } from '../../../../buffs/standard/Burning';
@@ -12,10 +12,10 @@ export class AndThenHeExploded extends PlayableCardWithHelpers {
             name: "And Then He Exploded",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
-            rarity: CardRarity.UNCOMMON,
+            rarity: EntityRarity.UNCOMMON,
         });
         this.baseDamage = 8;
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
         this.buffs.push(new ExplosiveFinishCardBuff(10));
     }
 

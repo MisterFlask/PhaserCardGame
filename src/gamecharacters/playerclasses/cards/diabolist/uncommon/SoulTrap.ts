@@ -1,6 +1,6 @@
 import { TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
 export class SoulTrap extends PlayableCard {
@@ -9,10 +9,10 @@ export class SoulTrap extends PlayableCard {
             name: "Soul Trap",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
-            rarity: CardRarity.UNCOMMON,
+            rarity: EntityRarity.UNCOMMON,
         });
         this.baseDamage = 9;
-        this.energyCost = 2;
+        this.baseEnergyCost = 2;
     }
 
     override get description(): string {

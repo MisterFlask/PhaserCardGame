@@ -15,7 +15,7 @@ export class StormCloak extends PlayableCard {
             targetingType: TargetingType.ENEMY,
         });
         this.baseBlock = 8
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
 
         this.resourceScalings.push({
             resource: GameState.getInstance().combatState.combatResources.pluck,

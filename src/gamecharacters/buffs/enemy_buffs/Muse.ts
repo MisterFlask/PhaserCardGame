@@ -18,7 +18,7 @@ export class Muse extends AbstractBuff {
     }
 
     override onAnyCardPlayedByAnyone(playedCard: PlayableCard): void {
-        if (playedCard.energyCost === 0) {
+        if (playedCard.baseEnergyCost === 0) {
             const owner = this.getOwnerAsCharacter();
             if (owner) {
                 this.actionManager.applyBuffToCharacterOrCard(owner, new Strong(this.stacks));

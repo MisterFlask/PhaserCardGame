@@ -13,7 +13,7 @@ export class RageFueledAxe extends PlayableCard {
       targetingType: TargetingType.ENEMY,
     });
     this.baseDamage = 8;
-    this.energyCost = 1;
+    this.baseEnergyCost = 1;
     this.buffs.push(new StressReliefFinisher());
   }
 

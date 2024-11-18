@@ -1,7 +1,7 @@
 import { TargetingType } from "../../../AbstractCard";
 import { Devil } from "../../../buffs/standard/Devil";
 import { HellSellValue } from "../../../buffs/standard/HellSellValue";
-import { CardRarity, PlayableCard } from "../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../PlayableCard";
 import { CardType } from "../../../Primitives";
 
 
@@ -12,9 +12,9 @@ export class SacredRelicsCargo extends PlayableCard {
             name: "Sacred Relics Cargo",
             cardType: CardType.ITEM,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.COMMON,
+            rarity: EntityRarity.COMMON,
         });
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
         this.hellPurchaseValue = 40;
         this.surfacePurchaseValue = 20;
         this.baseDamage = 15;

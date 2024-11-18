@@ -1,6 +1,6 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { Vulnerable } from "../../../../buffs/standard/Vulnerable";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
 export class InspireFear extends PlayableCard {
@@ -9,9 +9,9 @@ export class InspireFear extends PlayableCard {
             name: "Inspire Fear",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.UNCOMMON,
+            rarity: EntityRarity.UNCOMMON,
         });
-        this.energyCost = 2;
+        this.baseEnergyCost = 2;
         this.baseDamage = 10;
         this.baseMagicNumber = 2; // Amount of Vulnerable applied to enemies
         this.baseBlock = 1; // Amount of Vulnerable applied to allies

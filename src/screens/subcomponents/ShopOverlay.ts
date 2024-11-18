@@ -155,7 +155,7 @@ export class ShopOverlay {
                         startY + row * verticalSpacing, 
                         item, 
                         true, 
-                        this.buyItem.bind(this), 
+                        this.buyCard.bind(this), 
                         PriceContext.HELL_BUY
                     );
                     this.shopItemsContainer.add(panel);
@@ -198,7 +198,7 @@ export class ShopOverlay {
         return GameState.getInstance().shopCardsForSale;
     }
 
-    private buyItem(item: PlayableCard): void {
+    private buyCard(item: PlayableCard): void {
         // Implement buying logic here
         console.log(`Buying ${item.name}`);
         // remove from shop

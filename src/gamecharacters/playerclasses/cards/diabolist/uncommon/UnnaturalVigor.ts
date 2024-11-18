@@ -1,7 +1,7 @@
 import { GameState } from "../../../../../rules/GameState";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BloodPriceBuff } from "../../../../buffs/standard/Bloodprice";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
 export class UnnaturalVigor extends PlayableCard {
@@ -10,9 +10,9 @@ export class UnnaturalVigor extends PlayableCard {
             name: "Unnatural Vigor",
             cardType: CardType.POWER,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.UNCOMMON,
+            rarity: EntityRarity.UNCOMMON,
         });
-        this.energyCost = 2;
+        this.baseEnergyCost = 2;
         this.baseMagicNumber = 2; // Iron
     }
 

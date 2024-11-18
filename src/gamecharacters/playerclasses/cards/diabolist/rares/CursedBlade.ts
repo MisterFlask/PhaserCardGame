@@ -1,7 +1,7 @@
 import { GameState } from "../../../../../rules/GameState";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { AbstractBuff } from "../../../../buffs/AbstractBuff";
 
@@ -51,9 +51,9 @@ export class CursedBlade extends PlayableCard {
             name: "Cursed Blade",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
-            rarity: CardRarity.RARE,
+            rarity: EntityRarity.RARE,
         });
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
         this.baseDamage = 14;
         this.resourceScalings.push({
             resource: this.iron,

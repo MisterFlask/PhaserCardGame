@@ -5,7 +5,7 @@ import { BaseCharacter } from "../../../gamecharacters/BaseCharacter";
 import { Muse } from "../../../gamecharacters/buffs/enemy_buffs/Muse";
 import { Painful } from "../../../gamecharacters/buffs/playable_card/Painful";
 import { Strong } from "../../../gamecharacters/buffs/standard/Strong";
-import { CardRarity, PlayableCard } from "../../../gamecharacters/PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../gamecharacters/PlayableCard";
 import { CardType } from "../../../gamecharacters/Primitives";
 
 
@@ -47,7 +47,7 @@ class ModernArtAttack extends PlayableCard {
             name: "What The Hell Is This",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
-            rarity: CardRarity.COMMON,
+            rarity: EntityRarity.COMMON,
         });
         this.baseDamage = 5;
         this.buffs.push(new Painful(1));
@@ -68,7 +68,7 @@ class ModernArtDefend extends PlayableCard {
             name: "What Am I Even Looking At",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.COMMON,
+            rarity: EntityRarity.COMMON,
         });
         this.baseBlock = 4;
     }
@@ -92,7 +92,7 @@ class ModernArtStrength extends PlayableCard {
             name: "Afpoiasdoif",
             cardType: CardType.POWER,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.COMMON,
+            rarity: EntityRarity.COMMON,
         });
         this.baseMagicNumber = 1;
     }

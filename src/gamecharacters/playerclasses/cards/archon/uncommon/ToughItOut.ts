@@ -1,7 +1,7 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
 import { Painful } from "../../../../buffs/playable_card/Painful";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 export class ToughItOut extends PlayableCard {
     constructor() {
@@ -9,9 +9,9 @@ export class ToughItOut extends PlayableCard {
             name: "Tough It Out",
             cardType: CardType.SKILL,
             targetingType: TargetingType.ALLY,
-            rarity: CardRarity.UNCOMMON,
+            rarity: EntityRarity.UNCOMMON,
         });
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
         this.baseBlock = 13;
         this.buffs.push(new Painful(1)); // Starts with Painful(1) debuff
     }

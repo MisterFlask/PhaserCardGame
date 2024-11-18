@@ -1,7 +1,7 @@
 import { TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
 import { AbstractBuff } from "../../../../buffs/AbstractBuff";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
 export class Pyronox extends PlayableCard {
@@ -10,10 +10,10 @@ export class Pyronox extends PlayableCard {
             name: "Pyronox",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.RARE,
+            rarity: EntityRarity.RARE,
         });
         this.baseMagicNumber = 3;
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
     }
 
     override get description(): string {

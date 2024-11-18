@@ -1,6 +1,6 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { Strong } from "../../../../buffs/standard/Strong";
 
@@ -10,9 +10,9 @@ export class TacticalManual extends PlayableCard {
             name: "Tactical Manual",
             cardType: CardType.SKILL,
             targetingType: TargetingType.ALLY,
-            rarity: CardRarity.COMMON,
+            rarity: EntityRarity.COMMON,
         });
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
         this.baseMagicNumber = 1; // Base strength gain
         this.resourceScalings.push({
             resource: this.pages,

@@ -1,5 +1,5 @@
 import { TargetingType } from "../../gamecharacters/AbstractCard";
-import { CardRarity, PlayableCard } from "../../gamecharacters/PlayableCard";
+import { EntityRarity, PlayableCard } from "../../gamecharacters/PlayableCard";
 import { CardType } from "../../gamecharacters/Primitives";
 import { BasicProcs } from "../../gamecharacters/procs/BasicProcs";
 import { AbstractRelic } from "../AbstractRelic";
@@ -10,9 +10,9 @@ class SlaughterbotCard extends PlayableCard {
             name: "Slaughterbot",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
-            rarity: CardRarity.SPECIAL,
+            rarity: EntityRarity.SPECIAL,
         });
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
         this.baseDamage = 12;
     }
 
@@ -33,7 +33,7 @@ export class Slaughterbots extends AbstractRelic {
         super();
         this.name = "Slaughterbots";
         this.description = "At the start of combat, add two Slaughterbots to your hand.";
-        this.rarity = CardRarity.UNCOMMON;
+        this.rarity = EntityRarity.UNCOMMON;
     }
 
     override onCombatStart(): void {

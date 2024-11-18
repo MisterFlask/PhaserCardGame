@@ -3,7 +3,7 @@ import { GameState } from "../../../../../rules/GameState";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { ExhaustBuff } from "../../../../buffs/playable_card/ExhaustBuff";
 import { Strong } from "../../../../buffs/standard/Strong";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { BasicProcs } from "../../../../procs/BasicProcs";
 
@@ -13,9 +13,9 @@ export class LastBastion extends PlayableCard {
             name: "Last Bastion",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.RARE,
+            rarity: EntityRarity.RARE,
         });
-        this.energyCost = 2;
+        this.baseEnergyCost = 2;
         this.baseBlock = 20;
         this.buffs.push(new ExhaustBuff());
     }

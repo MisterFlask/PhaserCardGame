@@ -1,6 +1,6 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
 export class EldritchSmoke extends PlayableCard {
@@ -9,12 +9,12 @@ export class EldritchSmoke extends PlayableCard {
             name: "Eldritch Smoke",
             cardType: CardType.SKILL,
             targetingType: TargetingType.ALLY,
-            rarity: CardRarity.SPECIAL,
+            rarity: EntityRarity.SPECIAL,
         });
         this.baseBlock = 4; // Set the base block value
         this.baseDamage = 0; // No damage
         this.baseMagicNumber = 0; // No magic number
-        this.energyCost = 0;
+        this.baseEnergyCost = 0;
         this.resourceScalings.push({
             resource: this.smog,
             blockScaling: 1,

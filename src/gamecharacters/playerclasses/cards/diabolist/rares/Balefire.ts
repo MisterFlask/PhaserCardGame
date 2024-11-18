@@ -6,7 +6,7 @@ import { ExhaustBuff } from "../../../../buffs/playable_card/ExhaustBuff";
 import { BloodPriceBuff } from "../../../../buffs/standard/Bloodprice";
 import { DamageIncreaseOnKill } from "../../../../buffs/standard/DamageIncreaseOnKill";
 import { GiantKiller } from "../../../../buffs/standard/GiantKiller";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
 export class Balefire extends PlayableCard {
@@ -15,9 +15,9 @@ export class Balefire extends PlayableCard {
             name: "Balefire",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
-            rarity: CardRarity.RARE,
+            rarity: EntityRarity.RARE,
         });
-        this.energyCost = 3;
+        this.baseEnergyCost = 3;
         this.baseDamage = 12;
         this.baseMagicNumber = 2; // Number of times damage is dealt
         this.buffs.push(new BloodPriceBuff(3));

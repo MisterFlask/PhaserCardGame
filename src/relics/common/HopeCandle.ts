@@ -1,4 +1,4 @@
-import { CardRarity } from "../../gamecharacters/PlayableCard";
+import { EntityRarity } from "../../gamecharacters/PlayableCard";
 import { AbstractRelic } from "../AbstractRelic";
 
 export class HopeCandle extends AbstractRelic {
@@ -6,7 +6,7 @@ export class HopeCandle extends AbstractRelic {
         super();
         this.name = "Hope Candle";
         this.description = "At the end of combat, decrease your Stress by 1.";
-        this.rarity = CardRarity.COMMON;
+        this.rarity = EntityRarity.COMMON;
     }
 
     onCombatEnd(): void {

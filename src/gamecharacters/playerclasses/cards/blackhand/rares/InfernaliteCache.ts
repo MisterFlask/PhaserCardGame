@@ -11,7 +11,7 @@ export class InfernaliteCache extends PlayableCard {
             targetingType: TargetingType.NO_TARGETING,
         });
         this.baseMagicNumber = 6;
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
     }
 
     override get description(): string {

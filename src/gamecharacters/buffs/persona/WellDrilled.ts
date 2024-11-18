@@ -1,5 +1,5 @@
 import { BaseCharacter } from "../../BaseCharacter";
-import { CardRarity, PlayableCard } from "../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../PlayableCard";
 import { AbstractBuff } from "../AbstractBuff";
 
 export class WellDrilled extends AbstractBuff {
@@ -24,7 +24,7 @@ export class WellDrilled extends AbstractBuff {
             return 0;
         }
 
-        if (cardPlayed?.rarity === CardRarity.BASIC) {
+        if (cardPlayed?.rarity === EntityRarity.BASIC) {
             return this.stacks;
         }
         return 0;
