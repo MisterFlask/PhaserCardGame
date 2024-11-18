@@ -7,6 +7,7 @@ import { AbstractCard } from '../gamecharacters/AbstractCard';
 import { CardSize, CardType } from '../gamecharacters/Primitives';
 import { GameState } from '../rules/GameState';
 import { SceneChanger } from '../screens/SceneChanger';
+import { RestOverlay } from '../screens/subcomponents/RestOverlay';
 import { Faction } from './Faction';
 
 
@@ -101,6 +102,8 @@ export class BossCard extends LocationCard {
 }
 
 export class RestSiteCard extends LocationCard {
+    private static restOverlay: RestOverlay | null = null;
+
     constructor(floor: number, index: number) {
         super({
             name: 'Rest Site',
@@ -111,6 +114,15 @@ export class RestSiteCard extends LocationCard {
         });
         this.portraitName = 'rest-icon';
         this.portraitTint = 0xffa500;
+    }
+
+    override OnLocationSelected(scene: Phaser.Scene): void {
+        console.log(`Rest site ${this.id} selected`);
+        // Create overlay if it doesn't exist
+        if (!RestSiteCard.restOverlay) {
+            RestSiteCard.restOverlay = new RestOverlay(scene);
+        }
+        RestSiteCard.restOverlay.show();
     }
 }
 

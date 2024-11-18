@@ -8,6 +8,7 @@ import { UIContext, UIContextManager } from '../../ui/UIContextManager';
 import { CardGuiUtils } from '../../utils/CardGuiUtils';
 
 export class CharacterDeckOverlay extends Phaser.GameObjects.Container {
+    private staticContainer: Phaser.GameObjects.Container;
     private background: Phaser.GameObjects.Rectangle;
     private cards: PhysicalCard[] = [];
     private closeButton: TextBoxButton;
@@ -24,6 +25,10 @@ export class CharacterDeckOverlay extends Phaser.GameObjects.Container {
         
         this.setDepth(1000);
         
+        // Create a static container for non-scrolling elements
+        this.staticContainer = scene.add.container(0, 0);
+        this.add(this.staticContainer);
+        
         // Create semi-transparent background
         this.background = scene.add.rectangle(
             0, 0,
@@ -33,7 +38,7 @@ export class CharacterDeckOverlay extends Phaser.GameObjects.Container {
             0.8
         );
         this.background.setOrigin(0.5);
-        this.add(this.background);
+        this.staticContainer.add(this.background);
         
         // Create scrollable area container
         this.scrollableArea = scene.add.container(0, 0);
@@ -42,8 +47,8 @@ export class CharacterDeckOverlay extends Phaser.GameObjects.Container {
         // Create mask for scrollable area
         this.maskGraphics = scene.add.graphics();
         this.updateMask();
-        this.maskGraphics.setVisible(false); // Hide the mask graphics
-        this.add(this.maskGraphics); // Ensure maskGraphics is part of the container
+        this.maskGraphics.setVisible(false);
+        this.staticContainer.add(this.maskGraphics);
         
         // Create close button
         this.closeButton = new TextBoxButton({
@@ -58,7 +63,7 @@ export class CharacterDeckOverlay extends Phaser.GameObjects.Container {
             fillColor: 0x555555
         });
         this.closeButton.onClick(() => this.hide());
-        this.add(this.closeButton);
+        this.staticContainer.add(this.closeButton);
         
         // Hide by default
         this.hide();
@@ -66,10 +71,7 @@ export class CharacterDeckOverlay extends Phaser.GameObjects.Container {
         // Add scroll wheel listener
         this.scene.input.on('wheel', (pointer: Phaser.Input.Pointer, gameObjects: any, deltaX: number, deltaY: number) => {
             if (this.visible) {
-                // Prevent default scrolling
                 pointer.event.preventDefault();
-                
-                // Stop event propagation
                 pointer.event.stopPropagation();
 
                 this.scrollableArea.y -= deltaY;
@@ -121,6 +123,9 @@ export class CharacterDeckOverlay extends Phaser.GameObjects.Container {
         this.cards.forEach(card => card.obliterate());
         this.cards = [];
         
+        // Reset scroll position
+        this.scrollableArea.setPosition(0, 0);
+        
         // Define margins to start grid near the upper-left
         const marginX = -this.background.width / 2 + 50;
         const marginY = -this.background.height / 2 + 150;
@@ -167,6 +172,9 @@ export class CharacterDeckOverlay extends Phaser.GameObjects.Container {
             (this.background.width / 2) - 100,
             -(this.background.height / 2) + 50
         );
+
+        // Reset scroll position
+        this.scrollableArea.setPosition(0, 0);
 
         // Update mask dimensions
         this.updateMask();

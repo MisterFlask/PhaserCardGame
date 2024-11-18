@@ -26,6 +26,8 @@ export class DepthManager {
     public readonly SHOP_CARD_HOVER = this.OVERLAY_BASE + 250;
     public readonly MAP_OVERLAY = this.OVERLAY_BASE + 300;
     public readonly DETAILS_OVERLAY = this.OVERLAY_BASE + 400;
+
+    public readonly REST_OVERLAY = this.MAP_OVERLAY + 500;
     
     // Top-level UI elements
     public readonly BATTLEFIELD_HIGHLIGHT = this.UI_BASE + 1000;
