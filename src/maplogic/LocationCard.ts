@@ -1,6 +1,7 @@
 // src/cards/LocationCard.ts
 
 import Phaser from 'phaser';
+import { EncounterEnhancer } from '../encounters/EncounterEnhancer';
 import { EncounterData, EncounterManager } from '../encounters/Encounters';
 import { AbstractCard } from '../gamecharacters/AbstractCard';
 import { CardSize, CardType } from '../gamecharacters/Primitives';
@@ -41,7 +42,6 @@ export class LocationCard extends AbstractCard {
     initEncounter() {
         const encounter = EncounterManager.getInstance().getRandomEncounterFromActSegmentNumbers(1, this.segment);
         const encounterDescription = `Encounter: ${encounter.enemies.map(e => e.name).join(', ')}`;
-        this.encounter = encounter;
         const fullDescription = `${encounterDescription}`;
         this.description = fullDescription;
     }
@@ -138,6 +138,14 @@ export class EliteRoomCard extends LocationCard {
         });
         this.portraitName = 'elite-icon';
         this.portraitTint = 0x8B0000;
+    }
+
+    override OnLocationSelected(scene: Phaser.Scene): void {
+        console.log(`Location ${this.id} selected with encounter: ${this.encounter.enemies.map(e => e.name).join(', ')}`);
+        
+        this.encounter = EncounterEnhancer.enhanceEliteEncounter(this.encounter);
+        GameState.getInstance().eliminatePhysicalCardsBetweenScenes();
+        scene.scene.start('CombatScene', { encounter: this.encounter });
     }
 }
 

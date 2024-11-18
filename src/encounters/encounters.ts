@@ -169,13 +169,19 @@ export class EncounterManager {
         // Find the matching ActSegmentData
         const actSegment = Object.values(ActSegment).find(
             segmentData => segmentData.act === act && segmentData.segment === segment
-        );
+        ) as ActSegmentData;
 
         if (!actSegment || actSegment.encounters.length === 0) {
             throw new Error(`No encounters found for act ${act}, segment ${segment}`);
         }
 
         const randomIndex = Math.floor(Math.random() * actSegment.encounters.length);
-        return actSegment.encounters[randomIndex];
+        return this.CopyEncounterData(actSegment.encounters[randomIndex]);
+    }
+
+    public CopyEncounterData(encounterData: EncounterData): EncounterData {
+        return {
+            enemies: encounterData.enemies.map(e => e.Copy())
+        };
     }
 }
