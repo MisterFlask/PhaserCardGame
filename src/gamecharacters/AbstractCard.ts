@@ -1,5 +1,4 @@
 import { Scene } from 'phaser';
-import { GameState } from '../rules/GameState';
 import type { PhysicalCard } from '../ui/PhysicalCard';
 import { ShadowedImage } from '../ui/ShadowedImage';
 import { TextBox } from '../ui/TextBox';
@@ -246,7 +245,7 @@ export abstract class AbstractCard implements IAbstractCard {
             return canonicalCard as any as this;
         }
         // check for card in inventory
-        const inventory = GameState.getInstance().masterDeckAllCharacters;
+        const inventory = ActionManagerFetcher.getGameState().masterDeckAllCharacters;
         const canonicalCardInInventory = inventory.find((card: AbstractCard) => card.id === this.id);
         if (canonicalCardInInventory) {
             return canonicalCardInInventory as any as this;

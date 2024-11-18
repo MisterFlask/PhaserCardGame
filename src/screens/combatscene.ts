@@ -71,7 +71,7 @@ class CombatScene extends Phaser.Scene {
 
 
     create(): void {
-        ActionManagerFetcher.initActionManager();
+        ActionManagerFetcher.initActionManagerAndGameState();
         this.createBackground();
 
         // Initialize CombatUIManager as a singleton

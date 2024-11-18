@@ -50,14 +50,14 @@ export class HqScene extends Scene {
             loadBar.destroy();
         });
 
-        ActionManagerFetcher.initActionManager();
+        ActionManagerFetcher.initActionManagerAndGameState();
         new GameImageLoader().loadAllImages(this.load);
         SceneChanger.setCurrentScene(this);
         // Load any required assets
     }
 
     create(): void {
-        ActionManagerFetcher.initActionManager();
+        ActionManagerFetcher.initActionManagerAndGameState();
 
         // Initialize all panels
         this.mainHubPanel = new MainHubPanel(this);

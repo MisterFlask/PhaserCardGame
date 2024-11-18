@@ -1,9 +1,10 @@
 import type { AbstractCombatEvent } from "../../rules/AbstractCombatEvent";
 import type { DamageInfo } from "../../rules/DamageInfo";
-import { CombatResources, CombatState, GameState } from "../../rules/GameState";
-import { ActionManager } from "../../utils/ActionManager";
+import type { CombatResources, CombatState, GameState } from "../../rules/GameState";
+import type { ActionManager } from "../../utils/ActionManager";
 import { ActionManagerFetcher } from "../../utils/ActionManagerFetcher";
-import { AbstractCard, generateWordGuid } from "../AbstractCard";
+import type { AbstractCard } from "../AbstractCard";
+import { generateWordGuid } from "../AbstractCard";
 import type { BaseCharacter } from "../BaseCharacter";
 import { PlayerCharacter } from "../BaseCharacterClass";
 import type { IAbstractBuff } from '../IAbstractBuff';
@@ -16,7 +17,11 @@ export abstract class AbstractBuff implements IAbstractBuff {
     }
 
     get combatState(): CombatState {
-        return GameState.getInstance().combatState;
+        return ActionManagerFetcher.getGameState().combatState;
+    }
+
+    get gameState(): GameState {
+        return ActionManagerFetcher.getGameState();
     }
 
     get combatResources(): CombatResources {
@@ -35,8 +40,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
     }
 
     protected forEachAlly(callback: (ally: BaseCharacter) => void): void {
-        const gameState = GameState.getInstance();
-        const playerCharacters = gameState.combatState.playerCharacters;
+        const playerCharacters = this.gameState.combatState.playerCharacters;
         playerCharacters.forEach(callback);
     }
 
@@ -64,8 +68,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
         // Import GameState if not already imported at the top of the file
 
         // Find the owner of this buff by searching through all characters in the combat state
-        const gameState = GameState.getInstance();
-        const combatState = gameState.combatState;
+        const combatState = this.gameState.combatState;
         const allPlayableCards = [...combatState.currentDrawPile, ...combatState.currentHand, ...combatState.currentDiscardPile];
         const owner = allPlayableCards.find(card => card.buffs.some(buff => buff.id === this.id));
 
@@ -81,8 +84,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
         // Import GameState if not already imported at the top of the file
 
         // Find the owner of this buff by searching through all characters in the combat state
-        const gameState = GameState.getInstance();
-        const combatState = gameState.combatState;
+        const combatState = this.gameState.combatState;
         const allCharacters = [...combatState.playerCharacters, ...combatState.enemies];
 
         const owner = allCharacters.find(character => character.buffs.some(buff => buff.id === this.id));
