@@ -4,6 +4,8 @@ import { Delicious } from '../gamecharacters/buffs/enemy_buffs/Delicious';
 import { Stress } from '../gamecharacters/buffs/standard/Stress';
 import { Stressful } from '../gamecharacters/buffs/standard/Stressful';
 import { Strong } from '../gamecharacters/buffs/standard/Strong';
+import { AbstractRelic } from '../relics/AbstractRelic';
+import { RelicsLibrary } from '../relics/RelicsLibrary';
 import { FrenchBlindProphetess } from './monsters/act1_boss/FrenchBlindProphetess';
 import { FrenchChef } from './monsters/act1_segment1/FrenchChef';
 import { FrenchCrow } from './monsters/act1_segment1/FrenchCrow';
@@ -144,6 +146,8 @@ export class ShopGuy extends AutomatedCharacter {
 }
 
 export class TreasureChest extends AutomatedCharacter {
+    public relic?: AbstractRelic;
+    
     constructor() {
         super({ 
             name: 'Treasure Chest', 
@@ -151,6 +155,10 @@ export class TreasureChest extends AutomatedCharacter {
             maxHitpoints: 1, 
             description: 'Contains valuable treasures' 
         });
+        this.relic = RelicsLibrary.getInstance().getRandomRelics(1)[0];
+        if (!this.relic) {
+            throw new Error("Failed to retrieve a relic");
+        }
     }
 
     override generateNewIntents(): AbstractIntent[] {

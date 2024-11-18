@@ -92,7 +92,7 @@ class CombatScene extends Phaser.Scene {
         this.inputHandler.addCardClickListener((card: AbstractCard) => {
             if (UIContextManager.getInstance().getContext() !== UIContext.COMBAT) return;
             this.shopOverlay.handleCardClick(card);
-            this.treasureOverlay.handleCardClick(card);
+            this.treasureOverlay.handleCardClickOnTreasureChest(card);
         });
 
         this.setupResizeHandler();

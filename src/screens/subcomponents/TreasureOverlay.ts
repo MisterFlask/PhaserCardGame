@@ -1,8 +1,6 @@
 import { TreasureChest } from '../../encounters/Encounters';
 import { AbstractCard } from '../../gamecharacters/AbstractCard';
 import { BaseCharacter } from '../../gamecharacters/BaseCharacter';
-import { AbstractRelic } from '../../relics/AbstractRelic';
-import { RelicsLibrary } from '../../relics/RelicsLibrary';
 import { TextBoxButton } from '../../ui/Button';
 import { DepthManager } from '../../ui/DepthManager';
 import { PhysicalRelic } from '../../ui/PhysicalRelic';
@@ -10,11 +8,12 @@ import { UIContext, UIContextManager } from '../../ui/UIContextManager';
 import { ActionManager } from '../../utils/ActionManager';
 
 export class TreasureOverlay extends Phaser.GameObjects.Container {
-    private relic?: AbstractRelic;
+    private chest?: TreasureChest;
     private isVisible: boolean = false;
     private background: Phaser.GameObjects.Rectangle;
     private relicDisplay?: PhysicalRelic;
     private cancelButton: TextBoxButton;
+    private titleText: TextBoxButton;
 
     constructor(scene: Phaser.Scene) {
         super(scene, 0, 0);
@@ -39,6 +38,20 @@ export class TreasureOverlay extends Phaser.GameObjects.Container {
         );
         this.add(this.background);
         
+        // Add the title text
+        this.titleText = new TextBoxButton({
+            scene: this.scene,
+            x: width/2,
+            y: height/2 - 200, // Position above where relic will be
+            width: 400,
+            height: 60,
+            text: 'SEIZE WHAT IS YOURS!',
+            textBoxName: 'treasureTitleText',
+            fillColor: 0x555555
+        });
+        this.titleText.setInteractive(false); // Make it non-interactive since it's just display text
+        this.add(this.titleText);
+        
         // Create the cancel button
         this.cancelButton = new TextBoxButton({
             scene: this.scene,
@@ -62,20 +75,26 @@ export class TreasureOverlay extends Phaser.GameObjects.Container {
     }
 
     private createRelicDisplay(): void {
-        if (!this.relic) {
-            console.log('No relic to display');
-            return;
-        }
 
         // Remove existing relic display if it exists
         this.relicDisplay?.destroy();
+        
+        if (!this.chest) {
+            console.error("No chest provided to createRelicDisplay");
+            throw new Error("No chest provided to createRelicDisplay");
+        }
+
+        if (!this.chest.relic) {
+            console.log('No relic to display');
+            return;
+        }
         
         // Create new PhysicalRelic
         this.relicDisplay = new PhysicalRelic({
             scene: this.scene,
             x: 0,  // Will be centered in container
             y: 0,
-            abstractRelic: this.relic,
+            abstractRelic: this.chest.relic,
             baseSize: 128  // Larger size for better visibility
         });
 
@@ -92,14 +111,15 @@ export class TreasureOverlay extends Phaser.GameObjects.Container {
         );
     }
 
-    public handleCardClick(card: AbstractCard): void {
+    public handleCardClickOnTreasureChest(card: AbstractCard): void {
+        
         if (card instanceof BaseCharacter && card.name === new TreasureChest().name) {
             console.log('Treasure clicked');
-            this.relic = RelicsLibrary.getInstance().getRandomRelics(1)[0];
+            this.chest = card as TreasureChest;
             
             // Verify that a relic was retrieved successfully
-            if (this.relic) {
-                console.log(`Selected relic: ${this.relic.name}`);
+            if (this.chest) {
+                console.log(`Selected relic: ${this.chest.relic?.name}`);
                 this.show();
             } else {
                 console.log('Failed to retrieve a relic');
@@ -108,6 +128,7 @@ export class TreasureOverlay extends Phaser.GameObjects.Container {
     }
 
     public show(): void {
+        
         console.log('Showing TreasureOverlay');
         this.createRelicDisplay();
         this.setVisible(true);
@@ -141,6 +162,8 @@ export class TreasureOverlay extends Phaser.GameObjects.Container {
 
         console.log('Adding relic to player from treasure overlay');
         ActionManager.getInstance().addRelicToInventory(physicalRelic.abstractRelic);
+        this.chest!.relic = undefined;
+
         this.hide();
     }
 } 
