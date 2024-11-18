@@ -19,6 +19,26 @@ import { SubtitleManager } from "../ui/SubtitleManager";
 import { UIContext, UIContextManager } from "../ui/UIContextManager";
 
 export class ActionManager {
+
+    addCardToMasterDeck(card: PlayableCard) {
+        if (!card.owner){
+            // Assign to a random character in the party
+            const gameState = GameState.getInstance();
+            const partyMembers = gameState.currentRunCharacters;
+            if (partyMembers.length > 0) {
+                const randomCharacter = partyMembers[Math.floor(Math.random() * partyMembers.length)];
+                card.owner = randomCharacter;
+            }
+        }
+
+        card.owner?.cardsInMasterDeck.push(card);
+    }
+
+
+    removeCardFromMasterDeck(card: PlayableCard) {
+        card.owner?.cardsInMasterDeck.splice(card.owner?.cardsInMasterDeck.indexOf(card), 1);
+    }
+
     endCombat() {
         this.actionQueue.addAction(new GenericAction(async () => {
 
@@ -51,11 +71,7 @@ export class ActionManager {
     }
 
     sellItemForHellCurrency(item: PlayableCard) {
-        const inventory = GameState.getInstance().cardsInventory;
-        const index = inventory.findIndex(card => card.id === item.id);
-        if (index !== -1) {
-            inventory.splice(index, 1);
-        }
+        this.removeCardFromMasterDeck(item);
 
         GameState.getInstance().hellCurrency += item.hellSellValue;
     }
@@ -76,12 +92,12 @@ export class ActionManager {
 
 
     buyItemForHellCurrency(item: PlayableCard) : boolean {
-        const inventory = GameState.getInstance().cardsInventory;
+        const inventory = GameState.getInstance().masterDeckAllCharacters;
         if (GameState.getInstance().hellCurrency < item.hellPurchaseValue) {
             return false;
         }
         
-        inventory.push(item);
+        
         GameState.getInstance().hellCurrency -= item.hellPurchaseValue;
         return true;
     }
@@ -712,8 +728,7 @@ export class ActionManager {
 
     public purchaseShopItem(item: PlayableCardType): void {
         item.OnPurchase();
-        const inventory = GameState.getInstance().getInventory();
-        inventory.push(item);
+        this.addCardToMasterDeck(item);
         GameState.getInstance().shopCardsForSale = GameState.getInstance().shopCardsForSale.filter(i => i !== item);
     }
 

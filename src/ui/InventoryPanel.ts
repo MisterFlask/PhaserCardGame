@@ -78,7 +78,7 @@ export default class InventoryPanel {
 
     private updateInventoryPanel(): void {
         const gameState = GameState.getInstance();
-        const inventoryItems = gameState.getInventory();
+        const inventoryItems = gameState.allCardsWithHellSellValue;
 
         // Clear previous cards
         this.cardsContainer.removeAll(true);

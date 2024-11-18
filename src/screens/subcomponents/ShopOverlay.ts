@@ -168,7 +168,7 @@ export class ShopOverlay {
     }
 
     private populateSellableInventory(): void {
-        const inventory = GameState.getInstance().cardsInventory;
+        const inventory = GameState.getInstance().allCardsWithHellSellValue;
         inventory.forEach((item, index) => {
 
             if (item.hellSellValue > 0) {

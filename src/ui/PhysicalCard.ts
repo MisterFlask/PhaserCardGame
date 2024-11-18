@@ -240,8 +240,24 @@ export class PhysicalCard implements IPhysicalCardInterface {
             height: 30,
             text: `${this.data.block}`, // Assuming AbstractCard has a 'block' property
             style: { fontSize: '14px', color: '#ffffff', fontFamily: 'Arial' },
-            fillColor: 0x0000ff
+            fillColor: 0x0000ff,
+            textBoxName: "blockText:" + data.id // Add unique identifier
         });
+
+        // Set up tooltip behavior for blockText
+        this.blockText.setInteractive()
+            .on('pointerover', () => {
+                this.tooltipBox.setText("Block reduces incoming damage");
+                this.tooltipBox.setVisible(true);
+                this.tooltipBox.setPosition(
+                    this.blockText.x + this.blockText.width + 10,
+                    this.blockText.y
+                );
+            })
+            .on('pointerout', () => {
+                this.tooltipBox.setVisible(false);
+            });
+
         this.blocksContainer.add(this.blockText);
         this.cardContent.add(this.blocksContainer);
         // Initialize the buffs container positioned to the left of the card
@@ -676,8 +692,10 @@ export class PhysicalCard implements IPhysicalCardInterface {
         const descBoxY = nameBoxY + this.nameBox.height / 2 + this.descBox.height / 2 + 10;
         this.descBox.setPosition(0, descBoxY);
 
-        // Update block text
+        // Update block text and visibility
         this.blockText.setText(`${this.data.block}`);
+        this.blockText.setVisible(this.data.block > 0 && this.data.isBaseCharacter());
+        this.blockIcon?.setVisible(this.data.block > 0 && this.data.isBaseCharacter());
 
         this.updateIntents();
 

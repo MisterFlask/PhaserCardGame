@@ -39,7 +39,14 @@ export class GameState {
     public shopRelicsForSale: AbstractRelic[] = [];
 
     // player's stuff
-    public cardsInventory: PlayableCard[] = [];
+    public get masterDeckAllCharacters(): readonly PlayableCard[] {
+        return [...this.currentRunCharacters.flatMap(c => c.cardsInMasterDeck)]
+    }
+
+    public get allCardsWithHellSellValue(): readonly PlayableCard[] {
+        return this.masterDeckAllCharacters.filter(card => card.hellSellValue > 0)
+    }
+    
     public relicsInventory: AbstractRelic[] = [];
 
     public surfaceCurrency: number = 200
@@ -62,7 +69,7 @@ export class GameState {
     }
 
     public getCardsOwnedByCharacter(character: PlayerCharacter): PlayableCard[]{
-        const inventoryCards = this.cardsInventory.filter(card => card.owner?.id === character.id)
+        const inventoryCards = this.masterDeckAllCharacters.filter(card => card.owner?.id === character.id)
         const currentCharacter = this.currentRunCharacters.filter(card => card.id === character.id)
         const currentCharacterCards = currentCharacter.flatMap(c => c.cardsInMasterDeck)
         return [...inventoryCards, ...currentCharacterCards]
@@ -76,7 +83,7 @@ export class GameState {
         }
     }
 
-    private obliteratePhysicalCardsForArray(items: (AbstractCard | PlayableCard)[]): void {
+    private obliteratePhysicalCardsForArray(items: readonly (AbstractCard | PlayableCard)[]): void {
         items.forEach(item => this.obliteratePhysicalCard(item));
     }
 
@@ -90,7 +97,7 @@ export class GameState {
         // If you need to handle enemy characters, ensure CombatState has this property
         // this.obliteratePhysicalCardsForArray(this.combatState.enemyCharacters);
 
-        this.obliteratePhysicalCardsForArray(this.cardsInventory);
+        this.obliteratePhysicalCardsForArray(this.masterDeckAllCharacters);
     }
 
     // Roster methods
@@ -115,22 +122,8 @@ export class GameState {
         this.currentRunCharacters = this.currentRunCharacters.filter(c => c !== character);
     }
 
-    public getCurrentRunCharacters(): PlayerCharacter[] {
+    public getCurrentRunCharacters(): readonly PlayerCharacter[] {
         return [...this.currentRunCharacters];
-    }
-
-    // Inventory methods
-    public addToInventory(item: PlayableCard): void {
-        this.cardsInventory.push(item);
-        // Optionally, update UI or perform additional actions
-    }
-
-    public removeFromInventory(item: PlayableCard): void {
-        this.cardsInventory = this.cardsInventory.filter(i => i !== item);
-    }
-
-    public getInventory(): PlayableCard[] {
-        return [...this.cardsInventory];
     }
 
     public rerollShop(): void {
@@ -148,7 +141,6 @@ export class GameState {
         this.roster = [];
         this.currentRunCharacters = [];
         this.shopCardsForSale = [];
-        this.cardsInventory = [];
     }
 
     // Serializer function
@@ -163,7 +155,7 @@ export class GameState {
                 ...char
             })),
             shopItems: this.shopCardsForSale,
-            inventory: this.cardsInventory
+            inventory: this.masterDeckAllCharacters
         };
         return JSON.stringify(serializableState);
     }
