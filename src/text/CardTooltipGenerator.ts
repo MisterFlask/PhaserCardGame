@@ -63,9 +63,13 @@ export class CardTooltipGenerator {
             tooltip += `[color=gold]Reference:[/color]\n`;
 
             // for each buff in the result, add the description to the tooltip
+            // Only add buffs that weren't already listed in the card's buffs section
+            magicWordsResult.buffs = magicWordsResult.buffs.filter(buff => 
+                !card.buffs.some(existingBuff => existingBuff.constructor === buff.constructor)
+            );
             for (const buff of magicWordsResult.buffs) {
                 buff.helpMode = true;
-                tooltip += `- [color=yellow]${buff.getName()}[/color] ${buff.getDescription()}\n`;
+                tooltip += `- [color=yellow][b]${buff.getName()}[/b][/color] ${buff.getDescription()}\n`;
             }
         }
 

@@ -109,9 +109,8 @@ export class MagicWords {
         // Get all buffs from the array defined above
         for (const buff of this.buffs) {
             const buffName = buff.getName();
-            // Case insensitive search
-            const regex = new RegExp(buffName, 'gi');
-            
+            // Case insensitive search with word boundaries
+            const regex = new RegExp(`\\b${buffName}\\b`, 'gi');
             // If the buff name exists in the string
             if (regex.test(input)) {
                 // Add the buff to the result

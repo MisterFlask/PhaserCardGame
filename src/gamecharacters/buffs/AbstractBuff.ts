@@ -148,9 +148,9 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
     getStacksDisplayText(): string {
         if (this.helpMode) {
-            return "[color=yellow]stacks[/color]";
+            return "[color=gold](stacks)[/color]";
         }
-        return `${this.stacks}`;
+        return `[color=gold]${this.stacks}[/color]`;
     }
     
     canGoNegative: boolean = false;

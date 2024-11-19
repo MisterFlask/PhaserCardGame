@@ -18,5 +18,6 @@ export class IncreasePages extends AbstractBuff {
 
     public onThisCardInvoked(target?: BaseCharacter): void {
         this.actionManager.modifyPages(this.stacks); 
+        this.actionManager.exhaustCard(this.getOwnerAsPlayableCard()!);
     }
 }
