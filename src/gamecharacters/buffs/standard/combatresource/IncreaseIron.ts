@@ -9,11 +9,11 @@ export class IncreaseIron extends AbstractBuff {
     }
 
     getName(): string {
-        return "Increase Iron";
+        return "Increase Mettle";
     }
 
     getDescription(): string {
-        return `When played, gain ${this.getStacksDisplayText()} Iron.`;
+        return `When played, gain ${this.getStacksDisplayText()} Mettle.`;
     }
 
     public onThisCardInvoked(target?: BaseCharacter): void {

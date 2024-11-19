@@ -30,7 +30,13 @@ export class CardTooltipGenerator {
         if (card.buffs.length > 0) {
             tooltip += `\n[color=cyan]${entityDisplayName} Buffs:[/color]\n`;
             for (const buff of card.buffs) {
-                tooltip += `-[color=cyan] ${buff.getName()}[/color]: ${buff.getDescription()}\n`;
+                let parenthetical = "";
+                if (buff.isPersonaTrait) {
+                    parenthetical = `[color=yellow](Permanent)[/color]`;
+                }else if (buff.isPersistentBetweenCombats){
+                    parenthetical = `[color=yellow](Until End Of Run)[/color]`;
+                }
+                tooltip += `-[color=cyan] ${buff.getName()}[/color] ${parenthetical}: ${buff.getDescription()}\n`;
             }
         }
 
@@ -64,11 +70,7 @@ export class CardTooltipGenerator {
         if (magicWordsResult.buffs.length > 0) {
             // Add card name
             tooltip += `[color=gold]Reference:[/color]\n`;
-
-            // for each buff in the result, add the description to the tooltip
-            // Only add buffs that weren't already listed in the card's buffs section
             for (const buff of magicWordsResult.buffs) {
-                buff.helpMode = true;
                 tooltip += `- [color=yellow][b]${buff.getName()}[/b][/color] ${buff.getDescription()}\n`;
             }
         }
