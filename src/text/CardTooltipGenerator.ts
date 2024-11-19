@@ -57,6 +57,9 @@ export class CardTooltipGenerator {
         
         // Add description with magic words highlighted
         const magicWordsResult = MagicWords.getInstance().getMagicWordsResult(card.description);
+        magicWordsResult.buffs = magicWordsResult.buffs.filter(buff => 
+            !card.buffs.some(existingBuff => existingBuff.constructor === buff.constructor)
+        );
 
         if (magicWordsResult.buffs.length > 0) {
             // Add card name
@@ -64,9 +67,6 @@ export class CardTooltipGenerator {
 
             // for each buff in the result, add the description to the tooltip
             // Only add buffs that weren't already listed in the card's buffs section
-            magicWordsResult.buffs = magicWordsResult.buffs.filter(buff => 
-                !card.buffs.some(existingBuff => existingBuff.constructor === buff.constructor)
-            );
             for (const buff of magicWordsResult.buffs) {
                 buff.helpMode = true;
                 tooltip += `- [color=yellow][b]${buff.getName()}[/b][/color] ${buff.getDescription()}\n`;

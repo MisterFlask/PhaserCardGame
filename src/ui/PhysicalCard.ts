@@ -158,7 +158,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
             scene: this.scene,
             x: cardWidth + cardWidth / 2,
             y: 0,
-            width: cardWidth - 10,
+            width: cardWidth + 100,
             height: cardHeight,
             text: data.tooltip || '',
             textBoxName: "tooltipBox:" + data.id,

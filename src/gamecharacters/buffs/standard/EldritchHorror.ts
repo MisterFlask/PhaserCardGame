@@ -11,7 +11,7 @@ export class EldritchHorror extends AbstractBuff {
     }
 
     override getName(): string {
-        return "Eldritch";
+        return "Eldritch Horror";
     }
 
     override getDescription(): string {

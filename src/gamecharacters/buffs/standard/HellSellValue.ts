@@ -14,7 +14,7 @@ export class HellSellValue extends AbstractBuff {
     }
 
     override getDescription(): string {
-        return `Increases the Hell value of this card by ${this.getStacksDisplayText()}.`;
+        return `The sell value of this card in Hell is, at baseline, ${this.getStacksDisplayText()}.`;
     }
 
     override hellValueModifier(): number {

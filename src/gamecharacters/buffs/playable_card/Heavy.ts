@@ -11,7 +11,7 @@ export class Heavy extends AbstractBuff {
     }
 
     getDescription(): string {
-        return "When drawn, apply Draw One Fewer Card to the owner of the card.";
+        return "When drawn, draw one fewer card next turn.";
     }
 
     override onCardDrawn(): void {

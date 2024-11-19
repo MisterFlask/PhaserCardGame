@@ -1,4 +1,5 @@
 import { AbstractBuff } from '../gamecharacters/buffs/AbstractBuff';
+import { Heavy } from '../gamecharacters/buffs/playable_card/Heavy';
 import { Damaged } from '../gamecharacters/buffs/playable_card/SaleTags/Damaged';
 import { OnSale } from '../gamecharacters/buffs/playable_card/SaleTags/OnSale';
 import { BloodPriceBuff } from '../gamecharacters/buffs/standard/Bloodprice';
@@ -32,7 +33,11 @@ const modifiers: ShopCardModifier[] = [
     }),
     new ShopCardModifier(0.2, (card: PlayableCard) => {
         card.applyBuffs([getRandomEnhancementBuff()]);
-    })
+    }),
+    new ShopCardModifier(0.2, (card: PlayableCard) => {
+        card.applyBuffs([new Heavy()]);
+        card.applyBuffs([new OnSale(90)]);
+    }, (card: PlayableCard) => card.rarity.isAtLeastAsRareAs(EntityRarity.UNCOMMON))
 ];
 
 export class ShopPopulator {
