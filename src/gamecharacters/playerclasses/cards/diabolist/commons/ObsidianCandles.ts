@@ -26,10 +26,8 @@ export class ObsidianCandles extends PlayableCard {
 
         // Draw 2 cards
         const gameState = GameState.getInstance();
-        const combatState = gameState.combatState;
         const deckLogic = DeckLogic.getInstance();
         deckLogic.drawCards(2);
-
     }
 
     override get description(): string {

@@ -7,6 +7,7 @@ import { AbstractBuff } from "../gamecharacters/buffs/AbstractBuff";
 import { Stress } from "../gamecharacters/buffs/standard/Stress";
 import { IBaseCharacter } from "../gamecharacters/IBaseCharacter";
 import { PlayableCard } from "../gamecharacters/PlayableCard";
+import { CardType } from "../gamecharacters/Primitives";
 import { ProcBroadcaster } from "../gamecharacters/procs/ProcBroadcaster";
 import { AbstractRelic } from "../relics/AbstractRelic";
 import { AbstractCombatEvent } from "../rules/AbstractCombatEvent";
@@ -345,7 +346,14 @@ export class ActionManager {
                 buff.provideMissingEnergy_returnsAmountProvided(missingEnergy);
             });
 
-            DeckLogic.moveCardToPile(card.data as PlayableCard, PileName.Discard);
+
+            if (gameState.combatState.currentExhaustPile.includes(playableCard)){
+                // do nothing, don't move it back
+            }else if (playableCard.cardType == CardType.POWER){
+                DeckLogic.moveCardToPile(card.data as PlayableCard, PileName.Exhaust);
+            }else{
+                DeckLogic.moveCardToPile(card.data as PlayableCard, PileName.Discard);
+            }
             await this.animateDiscardCard(card);
             return [];
         }));
