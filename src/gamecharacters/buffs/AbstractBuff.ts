@@ -148,7 +148,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
     getStacksDisplayText(): string {
         if (this.helpMode) {
-            return "[color=green]stacks[/color]";
+            return "[color=yellow]stacks[/color]";
         }
         return `${this.stacks}`;
     }

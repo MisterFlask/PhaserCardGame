@@ -2,10 +2,10 @@ import { GameState } from "../../../rules/GameState";
 import { ActionManager } from "../../../utils/ActionManager";
 import { AbstractBuff } from "../AbstractBuff";
 
-export class Eldritch extends AbstractBuff {
+export class EldritchHorror extends AbstractBuff {
     constructor() {
         super();
-        this.imageName = "eldritch"; // Replace with actual icon name if available
+        this.imageName = "eldritch horror"; // Replace with actual icon name if available
         this.stackable = false;
         this.isDebuff = true;
     }

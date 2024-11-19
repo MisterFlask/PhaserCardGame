@@ -16,7 +16,7 @@ import { Cursed } from "../gamecharacters/buffs/standard/Cursed";
 import { DamageIncreaseOnKill } from "../gamecharacters/buffs/standard/DamageIncreaseOnKill";
 import { Devil } from "../gamecharacters/buffs/standard/Devil";
 import { DrawOneFewerCardNextNTurns } from "../gamecharacters/buffs/standard/DrawOneFewerCardNextNTurns";
-import { Eldritch } from "../gamecharacters/buffs/standard/Eldritch";
+import { EldritchHorror } from "../gamecharacters/buffs/standard/EldritchHorror";
 import { ExplosiveFinishCardBuff } from "../gamecharacters/buffs/standard/ExplosiveFinishCardBuff";
 import { FearGod } from "../gamecharacters/buffs/standard/FearGod";
 import { Fearless } from "../gamecharacters/buffs/standard/Fearless";
@@ -68,7 +68,7 @@ export class MagicWords {
         new DamageIncreaseOnKill(),
         new Devil(),
         new DrawOneFewerCardNextNTurns(),
-        new Eldritch(),
+        new EldritchHorror(),
         new ExplosiveFinishCardBuff(1),
         new FearGod(),
         new Fearless(),

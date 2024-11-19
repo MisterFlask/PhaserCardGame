@@ -22,11 +22,15 @@ export class CardTooltipGenerator {
 
         let tooltip = "";
 
+        var entityDisplayName = "Card";
+        if (card.isBaseCharacter()) {
+            entityDisplayName = "Character";
+        }
         // Add any buffs the card has
         if (card.buffs.length > 0) {
-            tooltip += "\n[color=cyan]Card Buffs:[/color]\n";
+            tooltip += `\n[color=cyan]${entityDisplayName} Buffs:[/color]\n`;
             for (const buff of card.buffs) {
-                tooltip += `- ${buff.getDescription()}\n`;
+                tooltip += `-[color=cyan] ${buff.getName()}[/color]: ${buff.getDescription()}\n`;
             }
         }
 
@@ -37,15 +41,15 @@ export class CardTooltipGenerator {
             if (playableCard.resourceScalings.length > 0) {
                 tooltip += "\n[color=cyan]Resource Scaling:[/color]\n";
                 for (const scaling of playableCard.resourceScalings) {
-                    let resourceNameText = "[color=purple]" + scaling.resource.name + "[/color]";
+                    let resourceNameText = "[color=magenta]" + scaling.resource.name + "[/color]";
                     if (scaling.attackScaling) {
                         tooltip += `- [color=red]Damage[/color] scaling: ${scaling.attackScaling} * ${resourceNameText}\n`;
                     }
                     if (scaling.blockScaling) {
-                        tooltip += `- [color=blue]Block[/color] scaling: ${scaling.blockScaling} * ${resourceNameText}\n`; 
+                        tooltip += `- [color=cyan]Block[/color] scaling: ${scaling.blockScaling} * ${resourceNameText}\n`; 
                     }
                     if (scaling.magicNumberScaling) {
-                        tooltip += `- [color=green]Effect[/color] scaling: ${scaling.magicNumberScaling} * ${resourceNameText}\n`;
+                        tooltip += `- [color=lightgreen]Effect[/color] scaling: ${scaling.magicNumberScaling} * ${resourceNameText}\n`;
                     }
                 }
             }

@@ -289,10 +289,10 @@ export abstract class PlayableCard extends AbstractCard {
      */
     public getDisplayedBlock(targetedCharacterIfAny?: IBaseCharacter): string {
         if (!this.owner) {
-            return "[color=blue]" + this.getBaseBlockAfterResourceScaling().toString() + "[/color]";
+            return "[color=cyan]" + this.getBaseBlockAfterResourceScaling().toString() + "[/color]";
         }
 
-        return CombatRules.calculateBlockSentToCharacterByCard(this, this.owner as IBaseCharacter, targetedCharacterIfAny as IBaseCharacter).toString();
+        return "[color=cyan]" + CombatRules.calculateBlockSentToCharacterByCard(this, this.owner as IBaseCharacter, targetedCharacterIfAny as IBaseCharacter).toString() + "[/color]";
     }
     /**
      * DO NOT OVERRIDE.
