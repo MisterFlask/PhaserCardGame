@@ -5,8 +5,8 @@ import { AbstractCombatResource } from './AbstractCombatResource';
 export class IronResource extends AbstractCombatResource {
     constructor() {
         super(
-            "Iron",
-            "Spend 1 Iron: all characters gain 3 Block.",
+            "Mettle",
+            "Spend 1 Mettle: all characters gain 3 Block.",
             'iron_icon'
         );
         this.tint = 0x808080;

@@ -43,13 +43,13 @@ export class CardTooltipGenerator {
                 for (const scaling of playableCard.resourceScalings) {
                     let resourceNameText = "[color=magenta]" + scaling.resource.name + "[/color]";
                     if (scaling.attackScaling) {
-                        tooltip += `- [color=red]Damage[/color] scaling: ${scaling.attackScaling} * ${resourceNameText}\n`;
+                        tooltip += `- [color=red]Damage[/color] scaling: ${scaling.attackScaling} x ${resourceNameText}\n`;
                     }
                     if (scaling.blockScaling) {
-                        tooltip += `- [color=cyan]Block[/color] scaling: ${scaling.blockScaling} * ${resourceNameText}\n`; 
+                        tooltip += `- [color=cyan]Block[/color] scaling: ${scaling.blockScaling} x ${resourceNameText}\n`; 
                     }
                     if (scaling.magicNumberScaling) {
-                        tooltip += `- [color=lightgreen]Effect[/color] scaling: ${scaling.magicNumberScaling} * ${resourceNameText}\n`;
+                        tooltip += `- [color=lightgreen]Effect[/color] scaling: ${scaling.magicNumberScaling} x ${resourceNameText}\n`;
                     }
                 }
             }
