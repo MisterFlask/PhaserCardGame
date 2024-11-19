@@ -117,7 +117,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
             height: 60,
             text: data.name,
             textBoxName: "nameBox:" + data.id,
-            style: { fontSize: '16px', color: '#000', wordWrap: { width: cardWidth - 10 } },
+            style: { fontSize: '22px', color: '#000', wordWrap: { width: cardWidth - 10 } },
             bigTextOverVariableColors: true
         });
 
@@ -131,7 +131,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
             text: data.description,
             textBoxName: "descBox:" + data.id,
             style: {
-                fontSize: '12px',
+                fontSize: '18px',
                 color: '#000',
                 wordWrap: { width: cardWidth - 20 },
                 align: 'center'
@@ -161,7 +161,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
             text: data.tooltip || '',
             textBoxName: "tooltipBox:" + data.id,
             style: {
-                fontSize: '12px',
+                fontSize: '18px',
                 color: '#000',
                 wordWrap: { width: cardWidth - 20 },
                 align: 'left'

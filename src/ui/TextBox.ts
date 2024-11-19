@@ -1,5 +1,7 @@
 // src/ui/TextBox.ts
 import Phaser from 'phaser';
+import BBCodeText from 'phaser3-rex-plugins/plugins/bbcodetext.js';
+
 import { DepthManager } from './DepthManager';
 
 // Modify the class to extend Phaser.GameObjects.Container
@@ -14,11 +16,22 @@ export class TextBox extends Phaser.GameObjects.Container {
     private isVisible: boolean = true;
     protected background: Phaser.GameObjects.Rectangle ;
     protected backgroundImage: Phaser.GameObjects.Image | null = null;
-    protected text: Phaser.GameObjects.Text;
+    protected text: BBCodeText;
     protected outline: Phaser.GameObjects.Rectangle | null = null;
     textBoxName?: string;
     expandDirection: 'up' | 'down';
     private debugGraphics: Phaser.GameObjects.Graphics;
+    protected fillColor: number;
+
+    // Add a method to determine if a color is light
+    private isColorLight(color: number): boolean {
+        const r = (color >> 16) & 0xff;
+        const g = (color >> 8) & 0xff;
+        const b = color & 0xff;
+        // Calculate brightness using the YIQ formula
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        return brightness > 127;
+    }
 
     constructor(params: {
         scene: Phaser.Scene,
@@ -41,7 +54,7 @@ export class TextBox extends Phaser.GameObjects.Container {
             width = 150,
             height = 60,
             text = '',
-            style = { fontSize: '18px', color: '#ffffff', fontFamily: 'Verdana' },
+            style = { fontSize: '22px', fontFamily: 'Verdana' },
             backgroundImage,
             textBoxName,
             fillColor = 0x2e2e2e,
@@ -63,34 +76,63 @@ export class TextBox extends Phaser.GameObjects.Container {
         this.add(this.background);
         
 
-        // Modify the text style based on bigTextOverVariableColors
-        const textStyle = {
-            ...style,
-            color: '#ffffff',
-            stroke: '#000000',
-            strokeThickness: bigTextOverVariableColors ? 3 : 2,
-            resolution: 1,
+        this.fillColor = fillColor;
+
+        // Determine if the background color is light
+        const isLightBackground = this.isColorLight(this.fillColor);
+
+        // Set text color based on background brightness
+        const textColor = isLightBackground ? '#000000' : '#FFFFFF';
+        const strokeColor = isLightBackground ? '#FFFFFF' : '#000000';
+        const shadowColor = isLightBackground ? '#AAAAAA' : '#222222';
+
+        // Modify the text style to include dynamic colors
+        const textStyle: any = {
+            backgroundColor:fillColor,
+            wrap: {
+                mode: 'word',
+                width: 200
+            },
             fontSize: style.fontSize,
-            fontStyle: bigTextOverVariableColors ? 'bold' : style.fontStyle,
+            fontFamily: style.fontFamily,
+
+            color: textColor,
+            stroke: strokeColor,
+            strokeThickness: 2,
+            shadow: {
+                offsetX: 2,
+                offsetY: 2,
+                blur: 2,
+                color: shadowColor,
+                fill: true,
+                stroke: true,
+            },
+
+            underline: {
+                color: '#000',
+                thickness: 2,
+                offset: 1
+            },
+
+            strikethrough: {
+                color: 'black',
+                thickness: 2,
+                offset: -8
+            }
         };
 
-        this.text = scene.add.text(0, 0, text, textStyle)
-            .setOrigin(0.5, 0.5)
-            .setWordWrapWidth(width - 20)
-            .setAlign('center');
-
-        // Add multiple shadow layers for better outline effect when bigTextOverVariableColors is true
-        if (bigTextOverVariableColors) {
-            this.text.setShadow(2, 2, '#000000', 2, true, true)
-                .setShadow(-2, -2, '#000000', 2, true, true)
-                .setShadow(2, -2, '#000000', 2, true, true)
-                .setShadow(-2, 2, '#000000', 2, true, true);
-        } else {
-            this.text.setShadow(2, 2, '#000000', 2, false, true);
-        }
-
+        // Create the text object
+        this.text = scene.add.rexBBCodeText(0, 0, text, textStyle)
+            .setOrigin(0.5, 0.5);
+        // Remove the immediate setBackgroundColor call
+        // this.text.setBackgroundColor(fillColor);
+        // Remove hardcoded stroke and shadow settings
+        // this.text.setShadow(-2, -2, "black", 2, true, true);
+        // this.text.setStroke("black", 5);
+        // this.text.setShadowStroke(true);
         this.add(this.text);
 
+        // Adjust the text box size
         this.adjustTextBoxSize();
 
         // Add the container to the scene
@@ -100,6 +142,13 @@ export class TextBox extends Phaser.GameObjects.Container {
         this.debugGraphics = this.scene.add.graphics();
         this.debugGraphics.setVisible(true); // Set to false to hide debug hitboxes
         this.add(this.debugGraphics);
+        
+        // Set the background color after text is set
+        try{
+            this.text.setBackgroundColor("transparent");
+        } catch (error) {
+            console.warn("Error setting background color for " + this.textBoxName, error);
+        }
     }
 
     setOrigin(x: number, y?: number): this {
@@ -129,6 +178,8 @@ export class TextBox extends Phaser.GameObjects.Container {
         if (this.background) {
             this.background.setFillStyle(color);
         }
+        this.fillColor = color; // Store the color for later use
+
     }
 
 
@@ -169,15 +220,14 @@ export class TextBox extends Phaser.GameObjects.Container {
         if (this.text.scene?.sys === null) {
             return;
         }
-        if (this.background == null && this.backgroundImage == null){
+        if (this.background == null && this.backgroundImage == null) {
             return;
         }
-        if ((this.text.frame as any)?.data) {
-            this.text.setText(text);
-            this.adjustTextBoxSize();
-        } else{
-            // console.log("text frame data is null for " + this.textBoxName);
-        }
+        // Wrap the text in shadow tags
+        const textWithShadow = `[stroke][bgcolor=rgba(255,0,0,0)][shadow]${text}[/shadow][/bgcolor][/stroke]`;
+        this.text.setText(textWithShadow);
+
+        this.adjustTextBoxSize();
     }
 
     private adjustTextBoxSize(): void {

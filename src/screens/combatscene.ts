@@ -1,6 +1,7 @@
 // src/scenes/CombatScene.ts
 
 import Phaser from 'phaser';
+import BBCodeTextPlugin from 'phaser3-rex-plugins/plugins/bbcodetext-plugin.js';
 import { EncounterData } from '../encounters/Encounters';
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
 import { LocationCard, RestSiteCard } from '../maplogic/LocationCard';
@@ -58,6 +59,8 @@ class CombatScene extends Phaser.Scene {
     preload(): void {
         this.load.setBaseURL('https://raw.githubusercontent.com/');
         new GameImageLoader().loadAllImages(this.load);
+        this.load.plugin('rexbbcodetextplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbbcodetextplugin.min.js', true);
+
     }
 
     init(data: CombatSceneData): void {
@@ -309,6 +312,14 @@ class CombatScene extends Phaser.Scene {
  * Phaser game configuration.
  */
 const gameConfig: Phaser.Types.Core.GameConfig = {
+    plugins: {
+        global: [{
+            key: 'rexBBCodeTextPlugin',
+            plugin: BBCodeTextPlugin,
+            start: true
+        },
+        ]
+      },
     type: Phaser.AUTO,
     width: 1920,
     height: 1080,

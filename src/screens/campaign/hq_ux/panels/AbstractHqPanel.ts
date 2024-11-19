@@ -28,7 +28,7 @@ export abstract class AbstractHqPanel extends Phaser.GameObjects.Container {
             y: 30,
             width: 150,
             height: 40,
-            text: 'Return to Hub',
+            text: 'Return to Hub [img=drawpile]',
             style: { fontSize: '16px', color: '#ffffff' },
             fillColor: 0x444444
         });

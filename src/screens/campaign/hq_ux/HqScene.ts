@@ -53,6 +53,7 @@ export class HqScene extends Scene {
         ActionManagerFetcher.initActionManagerAndGameState();
         new GameImageLoader().loadAllImages(this.load);
         SceneChanger.setCurrentScene(this);
+        this.load.plugin('rexbbcodetextplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbbcodetextplugin.min.js', true);
         // Load any required assets
     }
 
