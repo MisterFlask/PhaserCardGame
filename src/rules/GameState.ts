@@ -69,10 +69,9 @@ export class GameState {
     }
 
     public getCardsOwnedByCharacter(character: PlayerCharacter): PlayableCard[]{
-        const inventoryCards = this.masterDeckAllCharacters.filter(card => card.owner?.id === character.id)
         const currentCharacter = this.currentRunCharacters.filter(card => card.id === character.id)
         const currentCharacterCards = currentCharacter.flatMap(c => c.cardsInMasterDeck)
-        return [...inventoryCards, ...currentCharacterCards]
+        return [...currentCharacterCards]
     }
 
     private obliteratePhysicalCard(item: AbstractCard): void {

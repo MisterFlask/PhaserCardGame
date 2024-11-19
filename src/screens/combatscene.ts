@@ -150,6 +150,13 @@ class CombatScene extends Phaser.Scene {
             }
         });
 
+        // Add new event listener for exhaust pile clicks
+        this.events.on('exhaustPileClicked', () => {
+            if (UIContextManager.getInstance().getContext() === UIContext.COMBAT) {
+                this.characterDeckOverlay.showCardInExhaustPile();
+            }
+        });
+
         // Add event listener for location selection
         this.events.on('locationSelected', (location: LocationCard) => {
             if (location instanceof RestSiteCard) {
@@ -170,6 +177,7 @@ class CombatScene extends Phaser.Scene {
         // Remove the pile click event listeners
         this.events.off('drawPileClicked');
         this.events.off('discardPileClicked');
+        this.events.off('exhaustPileClicked');
         this.events.off('locationSelected');
     }
 

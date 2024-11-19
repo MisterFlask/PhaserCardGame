@@ -7,7 +7,7 @@ export class Poison extends AbstractBuff {
     }
 
     override getDescription(): string {
-        return `At the end of turn, lose ${this.getStacksDisplayText()} HP, then multiple poison stacks by 1/3.  Creature deals 2 less damage.`;
+        return `At the end of turn, lose ${this.getStacksDisplayText()} HP, then halve the stacks (round down).  Creature deals 2 less damage.`;
     }
 
     constructor(stacks: number = 1) {
@@ -24,7 +24,7 @@ export class Poison extends AbstractBuff {
             console.log(`${owner.name} took ${this.stacks} poison damage`);
 
             // Halve the poison stacks, rounding down
-            this.stacks = Math.floor(this.stacks / 3);
+            this.stacks = Math.floor(this.stacks / 2);
         }
     }
 

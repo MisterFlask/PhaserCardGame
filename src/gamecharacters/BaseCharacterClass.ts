@@ -10,7 +10,8 @@ import { IncreasePages } from "./buffs/standard/combatresource/IncreasePages";
 import { IncreasePowder } from "./buffs/standard/combatresource/IncreasePowder";
 import { IncreaseSmog } from "./buffs/standard/combatresource/IncreaseSmog";
 import { IncreaseVenture } from "./buffs/standard/combatresource/IncreaseVenture";
-import { PlayableCard } from "./PlayableCard";
+import { Strong } from "./buffs/standard/Strong";
+import { EntityRarity, PlayableCard } from "./PlayableCard";
 import { Defend } from "./playerclasses/cards/basic/Defend";
 import { Shoot } from "./playerclasses/cards/basic/Shoot";
 
@@ -59,8 +60,16 @@ export abstract class BaseCharacterClass {
             new Shoot().withBuffs([this.getRandomResourceIncreaseBuff()]), 
             new Defend(), 
             new Defend()
+            , this.getRandomCommon()
         ]
     }
+    private getRandomCommon(): PlayableCard {
+        return this.availableCards
+            .filter(card => card.rarity === EntityRarity.COMMON)
+            .sort(() => Math.random() - 0.5)[0] ?? new Shoot().withBuffs([new Strong(2)])
+                .Copy();
+    }
+
     generateStartingPersonaTraits(): AbstractBuff {
         const buffs = [new Scholar(), new WellDrilled(), new StrongBack(2), new Undersider(20), new Merchant(35)]
         return buffs[Math.floor(Math.random() * buffs.length)].clone()

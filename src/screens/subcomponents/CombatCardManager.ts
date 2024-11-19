@@ -17,6 +17,7 @@ export class CombatCardManager {
     public playerUnits: PhysicalCard[] = [];
     public drawPile!: PhysicalCard;
     public discardPile!: PhysicalCard;
+    public exhaustPile!: PhysicalCard;
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -122,11 +123,28 @@ export class CombatCardManager {
         const gameWidth = this.scene.scale.width;
         const pileY = CombatSceneLayoutUtils.getPileY(this.scene);
 
+        this.exhaustPile = CardGuiUtils.getInstance().createCard({
+            scene: this.scene,
+            x: gameWidth * 0.1,
+            y: pileY - 180,
+            data: new UiCard({ name: 'Exhaust Pile (0)', description: 'Exhausted cards', portraitName: "exhaustpile" }),
+            onCardCreatedEventCallback: (card: PhysicalCard) => {
+                card.container.setInteractive({
+                    hitArea: card.cardBackground,
+                    hitAreaCallback: Phaser.Geom.Rectangle.Contains,
+                    useHandCursor: true
+                });
+                card.container.on('pointerdown', () => {
+                    this.scene.events.emit('exhaustPileClicked');
+                });
+            }
+        });
+
         this.drawPile = CardGuiUtils.getInstance().createCard({
             scene: this.scene,
             x: gameWidth * 0.1,
             y: pileY,
-            data: new UiCard({ name: 'Draw Pile (0)', description: 'Cards to draw', portraitName: "drawpile" }),
+            data: new UiCard({ name: 'Draw Pile (0)', description: 'Cards to draw', portraitName: "drawpile-todo" }),
             onCardCreatedEventCallback: (card: PhysicalCard) => {
                 // Make draw pile interactive
                 card.container.setInteractive({
@@ -144,7 +162,7 @@ export class CombatCardManager {
             scene: this.scene,
             x: gameWidth * 0.2,
             y: pileY,
-            data: new UiCard({ name: 'Discard Pile (0)', description: 'Discarded cards', portraitName: "discardpile" }),
+            data: new UiCard({ name: 'Discard Pile (0)', description: 'Discarded cards', portraitName: "discardpile-todo" }),
             onCardCreatedEventCallback: (card: PhysicalCard) => {
                 // Make discard pile interactive
                 card.container.setInteractive({
@@ -262,6 +280,15 @@ export class CombatCardManager {
         }
     }
 
+    public updateExhaustPileCount(): void {
+        if (this.exhaustPile) {
+            const state = GameState.getInstance().combatState;
+            const exhaustPileCount = state.currentExhaustPile.length;
+            this.exhaustPile.data.name = `Exhaust Pile (${exhaustPileCount})`;
+            this.exhaustPile.nameBox.setText(this.exhaustPile.data.name);
+        }
+    }
+
     public update() {
         // Ensure physical cards match the game state
         const state = GameState.getInstance().combatState;
@@ -279,7 +306,8 @@ export class CombatCardManager {
         });
 
         // Set scroll factor to 0 for all cards
-        [...this.playerHand, ...this.enemyUnits, ...this.playerUnits, this.drawPile, this.discardPile].forEach(card => {
+        [...this.playerHand, ...this.enemyUnits, ...this.playerUnits, 
+         this.drawPile, this.discardPile, this.exhaustPile].forEach(card => {
             if (card && card.container) {
                 card.container.setScrollFactor(0);
             }
@@ -288,6 +316,7 @@ export class CombatCardManager {
         // Update draw and discard pile names to reflect current counts
         this.updateDrawPileCount();
         this.updateDiscardPileCount();
+        this.updateExhaustPileCount();
     }
 
 }
