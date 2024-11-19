@@ -4,6 +4,11 @@ import type { ActionManager } from './ActionManager';
 export class ActionManagerFetcher {
     private static _actionManager: ActionManager | null = null;
     private static _gameState: GameState | null = null;
+
+    public static isInitialized(): boolean {
+        return this._actionManager !== null && this._gameState !== null;
+    }
+
     public static getActionManager(): ActionManager {
         if (!this._actionManager) {
             throw new Error('ActionManager not initialized. Call initActionManager() first.');

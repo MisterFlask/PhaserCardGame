@@ -2,7 +2,7 @@
 
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
-import { Poison as Poisoned } from "../../../../buffs/standard/Poisoned";
+import { Poisoned } from "../../../../buffs/standard/Poisoned";
 import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 

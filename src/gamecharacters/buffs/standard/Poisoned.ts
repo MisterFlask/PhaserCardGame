@@ -1,9 +1,9 @@
 import { ActionManager } from "../../../utils/ActionManager";
 import { AbstractBuff } from "../AbstractBuff";
 
-export class Poison extends AbstractBuff {
+export class Poisoned extends AbstractBuff {
     override getName(): string {
-        return "Poison";
+        return "Poisoned";
     }
 
     override getDescription(): string {

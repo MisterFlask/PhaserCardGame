@@ -2,7 +2,7 @@ import { TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
 import { VolatileBuff } from "../../../../buffs/playable_card/VolatileCardBuff";
 import { Burning } from "../../../../buffs/standard/Burning";
-import { Poison } from "../../../../buffs/standard/Poisoned";
+import { Poisoned } from "../../../../buffs/standard/Poisoned";
 import { Weak } from "../../../../buffs/standard/Weak";
 import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
@@ -26,7 +26,7 @@ export class ToxicSpill extends PlayableCard {
     override InvokeCardEffects(targetCard?: BaseCharacter): void {
         if (targetCard) {
             this.actionManager.applyBuffToCharacterOrCard(targetCard, new Burning(4));
-            this.actionManager.applyBuffToCharacterOrCard(targetCard, new Poison(this.getBaseMagicNumberAfterResourceScaling()));
+            this.actionManager.applyBuffToCharacterOrCard(targetCard, new Poisoned(this.getBaseMagicNumberAfterResourceScaling()));
             this.actionManager.applyBuffToCharacterOrCard(targetCard, new Weak(1));
         }
     }

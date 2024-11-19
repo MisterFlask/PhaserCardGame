@@ -1,7 +1,7 @@
 import { GameState } from "../../../rules/GameState";
 import { CardType } from "../../Primitives";
 import { AbstractBuff } from "../AbstractBuff";
-import { Light } from "../playable_card/Lightweight";
+import { Lightweight } from "../playable_card/Lightweight";
 
 export class StrongBack extends AbstractBuff {
     constructor(stacks: number = 1) {
@@ -31,7 +31,7 @@ export class StrongBack extends AbstractBuff {
             // Select a random cargo card
             const randomCargoCard = cargoCards[Math.floor(Math.random() * cargoCards.length)];
             // Apply Light buff
-            this.actionManager.applyBuffToCard(randomCargoCard, new Light(this.stacks));
+            this.actionManager.applyBuffToCard(randomCargoCard, new Lightweight(this.stacks));
         }
     }
 }

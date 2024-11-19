@@ -147,9 +147,12 @@ export abstract class AbstractBuff implements IAbstractBuff {
     }
 
     getStacksDisplayText(): string {
-        if (this.stacks > 0) return `${this.stacks}`;
-        else return "[stacks]";
+        if (this.helpMode) {
+            return "[color=green]stacks[/color]";
+        }
+        return `${this.stacks}`;
     }
+    
     canGoNegative: boolean = false;
     imageName: string = "PLACEHOLDER_IMAGE";
     id: string = generateWordGuid();
@@ -159,7 +162,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
     showSecondaryStacks: boolean = false;
     isDebuff: boolean = false;
     valueMod: number = 0;
-
+    public helpMode: boolean = false;
     private _stacks: number = 1;
 
     get stacks(): number {

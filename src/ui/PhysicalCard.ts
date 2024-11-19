@@ -3,6 +3,8 @@ import Phaser from 'phaser';
 import { AutomatedCharacterType, BaseCharacterType, PlayableCardType } from '../Types';
 import { AbstractCard, IPhysicalCardInterface, PriceContext } from '../gamecharacters/AbstractCard';
 import { AbstractIntent } from '../gamecharacters/AbstractIntent';
+import { CardTooltipGenerator } from '../text/CardTooltipGenerator';
+import { MagicWords } from '../text/MagicWords';
 import type { CardConfig } from '../utils/CardGuiUtils';
 import { CheapGlowEffect } from './CheapGlowEffect';
 import { IncomingIntent } from "./IncomingIntent"; // Import the new class
@@ -475,7 +477,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
         const cardCenterX = this.container.x;
 
         // Set tooltip text
-        this.tooltipBox.setText(this.data.id + "[shift for details]");
+        this.tooltipBox.setText(CardTooltipGenerator.getInstance().generateTooltip(this.data));
 
         // Calculate tooltip dimensions
         const padding = 20;
@@ -635,7 +637,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
             this.nameBox.setText(this.data.name);
         }
 
-        this.descBox.setText(this.data.description);
+        var magicWordsResult = MagicWords.getInstance().getMagicWordsResult(this.data.description);
+        this.descBox.setText(magicWordsResult.stringResult);
 
         // Update HP box if it exists
         if (this.hpBox && this.data.isBaseCharacter()) {

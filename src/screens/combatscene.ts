@@ -60,12 +60,13 @@ class CombatScene extends Phaser.Scene {
         this.load.setBaseURL('https://raw.githubusercontent.com/');
         new GameImageLoader().loadAllImages(this.load);
         this.load.plugin('rexbbcodetextplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbbcodetextplugin.min.js', true);
-
+        ActionManagerFetcher.initActionManagerAndGameState();
     }
 
     init(data: CombatSceneData): void {
         SceneChanger.setCurrentScene(this);
         ActionManager.init(this);
+
         const stateService = CombatStateService.getInstance();
         stateService.initializeCombat(data.encounter, GameState.getInstance().currentRunCharacters);
         UIContextManager.getInstance().setContext(UIContext.COMBAT);
@@ -74,7 +75,6 @@ class CombatScene extends Phaser.Scene {
 
 
     create(): void {
-        ActionManagerFetcher.initActionManagerAndGameState();
         this.createBackground();
 
         // Initialize CombatUIManager as a singleton

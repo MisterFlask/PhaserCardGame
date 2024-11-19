@@ -289,7 +289,7 @@ export abstract class PlayableCard extends AbstractCard {
      */
     public getDisplayedBlock(targetedCharacterIfAny?: IBaseCharacter): string {
         if (!this.owner) {
-            return this.getBaseBlockAfterResourceScaling().toString();
+            return "[color=blue]" + this.getBaseBlockAfterResourceScaling().toString() + "[/color]";
         }
 
         return CombatRules.calculateBlockSentToCharacterByCard(this, this.owner as IBaseCharacter, targetedCharacterIfAny as IBaseCharacter).toString();
@@ -356,7 +356,7 @@ export abstract class PlayableCard extends AbstractCard {
 
         let totalDamage = damageCalcResult.totalDamage;
 
-        return totalDamage.toString();
+        return "[color=red]" + totalDamage.toString() + "[/color]";
     }
 
     public get energyCost(): number {
@@ -364,7 +364,7 @@ export abstract class PlayableCard extends AbstractCard {
     }
 
     public getDisplayedMagicNumber(targetedCharacterIfAny?: IBaseCharacter): string {
-        return this.getBaseMagicNumberAfterResourceScaling().toString();
+        return "[color=green]" + this.getBaseMagicNumberAfterResourceScaling().toString() + "[/color]";
     }
 
     abstract InvokeCardEffects(targetCard?: AbstractCard): void;

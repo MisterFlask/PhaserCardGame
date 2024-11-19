@@ -2,7 +2,7 @@
 import { AbstractBuff } from "../AbstractBuff";
 import { Strong } from "./Strong";
 
-class GrowingPowerBuff extends AbstractBuff {
+export class GrowingPowerBuff extends AbstractBuff {
     constructor(stacks: number = 1) {
         super();
         this.stacks = stacks;

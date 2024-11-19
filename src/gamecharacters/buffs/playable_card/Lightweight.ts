@@ -1,6 +1,6 @@
 import { AbstractBuff } from "../AbstractBuff";
 
-export class Light extends AbstractBuff {
+export class Lightweight extends AbstractBuff {
     constructor(stacks: number = 1) {
         super();
         this.stacks = stacks;
