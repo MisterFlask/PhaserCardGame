@@ -131,7 +131,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
             text: data.description,
             textBoxName: "descBox:" + data.id,
             style: {
-                fontSize: '18px',
+                fontSize: '17px',
                 color: '#000',
                 wordWrap: { width: cardWidth - 20 },
                 align: 'center'

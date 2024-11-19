@@ -57,7 +57,7 @@ export class TextBox extends Phaser.GameObjects.Container {
             style = { fontSize: '22px', fontFamily: 'Verdana' },
             backgroundImage,
             textBoxName,
-            fillColor = 0x2e2e2e,
+            fillColor = 0x000000,
             bigTextOverVariableColors = false
         } = params;
 
@@ -118,7 +118,8 @@ export class TextBox extends Phaser.GameObjects.Container {
                 color: 'black',
                 thickness: 2,
                 offset: -8
-            }
+            },
+            resolution: 4
         };
 
         // Create the text object
@@ -224,7 +225,7 @@ export class TextBox extends Phaser.GameObjects.Container {
             return;
         }
         // Wrap the text in shadow tags
-        const textWithShadow = `[stroke][bgcolor=rgba(255,0,0,0)][shadow]${text}[/shadow][/bgcolor][/stroke]`;
+        const textWithShadow = `[stroke]${text}[/stroke]`;
         this.text.setText(textWithShadow);
 
         this.adjustTextBoxSize();
