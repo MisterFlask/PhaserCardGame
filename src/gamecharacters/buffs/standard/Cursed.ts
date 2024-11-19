@@ -15,7 +15,7 @@ export class Cursed extends AbstractBuff {
     }
 
     override getDescription(): string {
-        return `Negates the next ${this.getStacksDisplayText()} non-debuff buff${this.stacks > 1 ? 's' : ''} applied.`;
+        return `Negates the next non-debuff buff applied, ${this.getStacksDisplayText()} times.`;
     }
 
     override interceptBuffApplication(character: AbstractCard, buffApplied: AbstractBuff, previousStacks: number, changeInStacks: number): BuffApplicationResult {

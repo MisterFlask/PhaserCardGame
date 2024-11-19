@@ -68,9 +68,24 @@ export class ActionManager {
             });
             return [];
         }));
+
+        // clear out all the buffs on the player characters
+        GameState.getInstance().combatState.allPlayerAndEnemyCharacters.forEach(character => {
+            // Only clear non-persona buffs
+            character.buffs = character.buffs.filter(buff => buff.isPersonaTrait || buff.isPersistentBetweenCombats);
+        });
+        // Reset all combat resources to 0
+        const combatResources = GameState.getInstance().combatState.combatResources;
+        combatResources.modifyPages(0 - combatResources.pages.value);
+        combatResources.modifyPluck(0 - combatResources.pluck.value);
+        combatResources.modifyIron(0 - combatResources.iron.value);
+        combatResources.modifyVenture(0 - combatResources.venture.value);
+        combatResources.modifySmog(0 - combatResources.smog.value);
+        combatResources.modifyPowder(0 - combatResources.powder.value);
     }
 
     startCombat() {
+
         this.actionQueue.addAction(new GenericAction(async () => {
             GameState.getInstance().relicsInventory.forEach(relic => {
                 relic.onCombatStart();
@@ -1097,7 +1112,7 @@ export class ActionQueue {
         this.currentActionNode = null;
         this.isResolving = false;
     }
-    
+
     private queue: ActionNode[] = [];
     private currentActionNode: ActionNode | null = null;
     private isResolving: boolean = false;
