@@ -329,6 +329,8 @@ class CombatUIManager {
         this.resourceIndicators.forEach(display => display.destroy());
         this.resourceIndicators = [];
         this.scene.events.off('update', this.updateResourceIndicators, this);
+        this.scene.events.off('update', this.updateEnergyDisplay, this);
+
         this.scene.events.off('update', () => {
             if (this.debugOverlay.visible) {
                 this.updateDebugOverlay();

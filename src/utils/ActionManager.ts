@@ -20,6 +20,7 @@ import { SubtitleManager } from "../ui/SubtitleManager";
 import { UIContext, UIContextManager } from "../ui/UIContextManager";
 
 export class ActionManager {
+    
     pulseBuff(buff: AbstractBuff) {
         this.scene.events.emit('pulseBuff', buff.id);
 
@@ -191,6 +192,7 @@ export class ActionManager {
             ActionManager.instance = new ActionManager();
         }
         this.getInstance().scene = scene;
+        this.getInstance().actionQueue.clear();
     }
 
     public static getInstance(): ActionManager { // Modified getInstance
@@ -1090,6 +1092,12 @@ class ActionNode {
 }
 
 export class ActionQueue {
+    clear() {
+        this.queue = [];
+        this.currentActionNode = null;
+        this.isResolving = false;
+    }
+    
     private queue: ActionNode[] = [];
     private currentActionNode: ActionNode | null = null;
     private isResolving: boolean = false;
