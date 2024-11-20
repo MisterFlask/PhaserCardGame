@@ -5,6 +5,7 @@ import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { AbstractBuff } from "../../../../buffs/AbstractBuff";
 
+
 class WeThirstBuff extends AbstractBuff {
     constructor(stacks: number = 1) {
         super();

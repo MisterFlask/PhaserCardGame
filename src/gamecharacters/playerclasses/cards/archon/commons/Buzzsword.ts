@@ -17,6 +17,10 @@ export class Buzzsword extends PlayableCard {
         this.baseDamage = 13;
         this.buffs.push(new StressReliefFinisher());
         this.buffs.push(new Holy());
+        this.resourceScalings.push({
+            resource: this.pluck,
+            attackScaling: 1,
+        });
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

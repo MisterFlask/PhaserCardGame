@@ -164,7 +164,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
             text: data.tooltip || '',
             textBoxName: "tooltipBox:" + data.id,
             style: {
-                fontSize: '18px',
+                fontSize: '20px',
                 color: '#000',
                 wordWrap: { width: cardWidth - 20 },
                 align: 'left'

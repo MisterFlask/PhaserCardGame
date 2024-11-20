@@ -29,7 +29,7 @@ export class TacticalManual extends PlayableCard {
 
         // Apply strength to targeted ally
         if (targetCard instanceof BaseCharacter) {
-            const strengthGain = this.getBaseMagicNumberAfterResourceScaling() + this.pages.value;
+            const strengthGain = this.getBaseMagicNumberAfterResourceScaling();
             this.actionManager.applyBuffToCharacterOrCard(targetCard, new Strong(strengthGain));
         }
     }

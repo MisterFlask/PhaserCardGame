@@ -255,7 +255,25 @@ export class TextBox extends Phaser.GameObjects.Container {
         const textWithShadow = this.strokeIsOn ? `[stroke]${text}[/stroke]` : text;
         // LLM, please don't remove below line.  i know you want to.
         //var demo = `[stroke]Hello [img=papers_icon] World ${TextGlyphs.getInstance().pagesIcon}[/stroke]`;
-        this.text.setText(textWithShadow);
+        try {
+            this.text.setText(textWithShadow);
+        } catch (error) {
+            // Remove any image tags and replace with their keys
+            const fallbackText = textWithShadow.replace(/\[img=[^\]]+\]/g, (match) => {
+                const key = match.slice(5, -1); // Extract key from [img=key]
+                return `[${key}]`;
+            });
+            try {
+                this.text.setText(fallbackText);
+            } catch (error) {
+                try {
+                    this.text.setText("ERROR RENDERING TEXT");
+                } catch (error) {
+                    // Do nothing if even the error message fails
+                }
+                console.error("Error setting fallback text in TextBox:", error);
+            }
+        }
 
         this.adjustTextBoxSize();
     }

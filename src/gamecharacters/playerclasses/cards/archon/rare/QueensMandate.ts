@@ -11,7 +11,7 @@ export class QueensMandate extends PlayableCard {
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.RARE,
         });
-        this.baseEnergyCost = 1;
+        this.baseEnergyCost = 2;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
@@ -22,7 +22,6 @@ export class QueensMandate extends PlayableCard {
         combatState.combatResources.modifyVenture(2);
         combatState.combatResources.modifyPages(2);
 
-        // Increase defense and offense scaling of all cards in hand by 1 Page
         combatState.currentHand.forEach(card => {
             if (card.baseBlock > 0) {
                 card.resourceScalings.push({

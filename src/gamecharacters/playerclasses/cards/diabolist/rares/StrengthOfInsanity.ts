@@ -1,6 +1,7 @@
 import { GameState } from "../../../../../rules/GameState";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
+import { IncreaseSmog } from "../../../../buffs/standard/combatresource/IncreaseSmog";
 import { Stress } from "../../../../buffs/standard/Stress";
 import { Strong } from "../../../../buffs/standard/Strong";
 import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
@@ -16,6 +17,7 @@ export class StrengthOfInsanity extends PlayableCard {
         });
         this.baseEnergyCost = 1;
         this.baseMagicNumber = 2; // Amount of Strength to apply
+        this.buffs.push(new IncreaseSmog(1));
     }
 
     override get description(): string {

@@ -341,7 +341,7 @@ export abstract class PlayableCard extends AbstractCard {
      */
     public getDisplayedDamage(selectedCharacter?: IBaseCharacter): string {
         if (!this.owner) {
-            return this.getBaseDamageAfterResourceScaling().toString();
+            return "[color=red]" + this.getBaseDamageAfterResourceScaling().toString() + "[/color]";
         }
 
         var targetedCharacterIfAny = selectedCharacter ?? this.hoveredCharacter;

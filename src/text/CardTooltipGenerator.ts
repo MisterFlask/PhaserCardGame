@@ -75,6 +75,14 @@ export class CardTooltipGenerator {
             }
         }
 
+        // do the same for cards
+        if (magicWordsResult.cards.length > 0) {
+            tooltip += `[color=gold]Reference:[/color]\n`;
+            for (const card of magicWordsResult.cards) {
+                tooltip += `- [color=yellow][b]${card.name}[/b][/color] ${card.description}\n`;
+            }
+        }
+
         return tooltip;
     }
 }

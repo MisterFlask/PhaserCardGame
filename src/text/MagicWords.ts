@@ -40,14 +40,21 @@ import { Titan } from "../gamecharacters/buffs/standard/Titan";
 import { ValuableCargo } from "../gamecharacters/buffs/standard/ValuableCargo";
 import { Vulnerable } from "../gamecharacters/buffs/standard/Vulnerable";
 import { Weak } from "../gamecharacters/buffs/standard/Weak";
+import { PlayableCard } from "../gamecharacters/PlayableCard";
+import { EldritchSmoke } from "../gamecharacters/playerclasses/cards/diabolist/tokens/EldritchSmoke";
 
 
 export class MagicWordsResult{
     buffs: AbstractBuff[] = [];
+    cards: PlayableCard[] = [];
     stringResult: string = "";
 }
 
+
 export class MagicWords {
+    cards = [
+        new EldritchSmoke()
+    ]
     buffs = [
         new Strong(),
         new Weak(),
@@ -121,8 +128,17 @@ export class MagicWords {
             }
         }
 
+        // get all cards from the array defined above
+        for (const card of this.cards) {
+            const cardName = card.name
+            const regex = new RegExp(`\\b${cardName}\\b`, 'gi');
+            if (regex.test(input)) {
+                result.cards.push(card);
+                modifiedString = modifiedString.replace(regex, `[color=yellow]${cardName}[/color]`);
+            }
+        }
+
         result.stringResult = modifiedString;
         return result;
-
     }
 }
