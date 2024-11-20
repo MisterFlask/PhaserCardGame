@@ -364,7 +364,7 @@ export abstract class PlayableCard extends AbstractCard {
     }
 
     public getDisplayedMagicNumber(targetedCharacterIfAny?: IBaseCharacter): string {
-        return "[color=green]" + this.getBaseMagicNumberAfterResourceScaling().toString() + "[/color]";
+        return "[color=lightgreen]" + this.getBaseMagicNumberAfterResourceScaling().toString() + "[/color]";
     }
 
     abstract InvokeCardEffects(targetCard?: AbstractCard): void;
@@ -436,4 +436,5 @@ export interface CardResourceScaling {
     attackScaling?: number;
     blockScaling?: number;
     magicNumberScaling?: number;
+    glyph?: string;
 }

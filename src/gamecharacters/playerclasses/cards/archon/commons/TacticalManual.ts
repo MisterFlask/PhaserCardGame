@@ -35,6 +35,6 @@ export class TacticalManual extends PlayableCard {
     }
 
     override get description(): string {
-        return `Draw 2 cards. Discard a card. Target ally gains ${this.getDisplayedMagicNumber()} + [Pages] Strength.`;
+        return `Draw 2 cards. Discard a card. Target ally gains ${this.getDisplayedMagicNumber()} Strength.`;
     }
 }

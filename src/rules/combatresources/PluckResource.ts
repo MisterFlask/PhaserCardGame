@@ -1,3 +1,4 @@
+import { TextGlyphs } from '../../text/TextGlyphs';
 import { ActionManager } from '../../utils/ActionManager';
 import { GameState } from '../GameState';
 import { AbstractCombatResource } from './AbstractCombatResource';
@@ -7,7 +8,8 @@ export class PluckResource extends AbstractCombatResource {
         super(
             "Pluck",
             "Spend 1 Pluck: Gain 1 Stress Block",
-            'feather_icon'
+            'feather_icon',
+            TextGlyphs.getInstance().pluckIcon
         );
         this.tint = 0x00ff00;
     }

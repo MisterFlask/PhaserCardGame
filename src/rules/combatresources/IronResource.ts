@@ -1,3 +1,4 @@
+import { TextGlyphs } from '../../text/TextGlyphs';
 import { ActionManager } from '../../utils/ActionManager';
 import { GameState } from '../GameState';
 import { AbstractCombatResource } from './AbstractCombatResource';
@@ -7,7 +8,8 @@ export class IronResource extends AbstractCombatResource {
         super(
             "Mettle",
             "Spend 1 Mettle: all characters gain 3 Block.",
-            'iron_icon'
+            'iron_icon',
+            TextGlyphs.getInstance().mettleIcon
         );
         this.tint = 0x808080;
     }

@@ -119,8 +119,9 @@ export class PhysicalCard implements IPhysicalCardInterface {
             height: 60,
             text: data.name,
             textBoxName: "nameBox:" + data.id,
-            style: { fontSize: '22px', color: '#000', wordWrap: { width: cardWidth - 10 } },
-            bigTextOverVariableColors: true
+            style: { fontSize: '22px', fontFamily: 'montserrat', color: '#000', wordWrap: { width: cardWidth - 10 } },
+            bigTextOverVariableColors: true,
+            strokeIsOn: true
         });
 
         // Create descBox

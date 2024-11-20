@@ -1,3 +1,4 @@
+import { TextGlyphs } from '../../text/TextGlyphs';
 import { ActionManager } from '../../utils/ActionManager';
 import { PileName } from '../DeckLogic';
 import { GameState } from '../GameState';
@@ -8,7 +9,8 @@ export class SmogResource extends AbstractCombatResource {
         super(
             "Smog",
             "Spend 2 Smog: Return a card from your discard pile to your hand",
-            'smog_icon'
+            'smog_icon',
+            TextGlyphs.getInstance().smogIcon
         );
         this.tint = 0x8B4513;
     }

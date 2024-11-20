@@ -47,7 +47,7 @@ export class CardTooltipGenerator {
             if (playableCard.resourceScalings.length > 0) {
                 tooltip += "\n[color=cyan]Resource Scaling:[/color]\n";
                 for (const scaling of playableCard.resourceScalings) {
-                    let resourceNameText = "[color=magenta]" + scaling.resource.name + "[/color]";
+                    let resourceNameText = scaling.resource.glyph ?? scaling.resource.name;
                     if (scaling.attackScaling) {
                         tooltip += `- [color=red]Damage[/color] scaling: ${scaling.attackScaling} x ${resourceNameText}\n`;
                     }

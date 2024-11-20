@@ -1,3 +1,4 @@
+import { TextGlyphs } from "../../../../text/TextGlyphs";
 import { BaseCharacter } from "../../../BaseCharacter";
 import { AbstractBuff } from "../../AbstractBuff";
 
@@ -13,7 +14,7 @@ export class IncreaseSmog extends AbstractBuff {
     }
 
     getDescription(): string {
-        return `When played, gain ${this.getStacksDisplayText()} Smog.`;
+        return `When played, gain ${this.getStacksDisplayText()} ${TextGlyphs.getInstance().smogIcon}.`;
     }
 
     public onThisCardInvoked(target?: BaseCharacter): void {

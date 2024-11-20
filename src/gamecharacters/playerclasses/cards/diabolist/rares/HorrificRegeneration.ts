@@ -14,9 +14,10 @@ export class HorrificRegeneration extends PlayableCard {
             rarity: EntityRarity.RARE,
         });
         this.baseEnergyCost = 3; // Assuming a cost for the card
+        this.baseMagicNumber = 30;
     }
     override get description(): string {
-        return `All party members heal ${this.getDisplayedMagicNumber()} HP. They also gain 20 stress. Exhaust.`;
+        return `All party members heal ${this.getDisplayedMagicNumber()} HP. They also gain 4 stress. Exhaust.`;
     }
 
     override InvokeCardEffects(targetCard?: BaseCharacter): void {

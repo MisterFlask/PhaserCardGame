@@ -3,21 +3,20 @@ import { ActionManagerFetcher } from "../../../../../utils/ActionManagerFetcher"
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
-import { Strong } from "../../../../buffs/standard/Strong";
+import { ExhaustBuff } from "../../../../buffs/playable_card/ExhaustBuff";
 import { Vulnerable } from "../../../../buffs/standard/Vulnerable";
 import { BasicProcs } from "../../../../procs/BasicProcs";
 
-export class GloriousSacrifice extends PlayableCard {
+export class DeathOrGlory extends PlayableCard {
     constructor() {
         super({
-            name: "Glorious Sacrifice",
+            name: "Death or Glory",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
             rarity: EntityRarity.RARE,
         });
         this.baseEnergyCost = 1;
-        this.baseDamage = 20;
-        this.buffs.push(new Strong(2)); // This character gains 2 strength on startup
+        this.buffs.push(new ExhaustBuff());
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
@@ -25,8 +24,6 @@ export class GloriousSacrifice extends PlayableCard {
         const combatState = gameState.combatState;
 
         if (targetCard) {
-            // Deal 20 damage to the target
-            this.dealDamageToTarget(targetCard);
 
             combatState.enemies.forEach(enemy => {
                 BasicProcs.getInstance().Taunt(enemy, this.owner!);
@@ -37,6 +34,6 @@ export class GloriousSacrifice extends PlayableCard {
     }
 
     override get description(): string {
-        return `STARTUP: This character gains 2 strength. ON PLAY: Deal ${this.getDisplayedDamage()} damage to a target. Taunt all enemies and apply 1 Vulnerable to self. Cost 1.`;
+        return `All characters gain 2 strength.  Taunt all enemies and apply 1 Vulnerable to self. Cost 1.  Exhaust.`;
     }
 }

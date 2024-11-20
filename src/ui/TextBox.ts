@@ -2,6 +2,7 @@
 import Phaser from 'phaser';
 import BBCodeText from 'phaser3-rex-plugins/plugins/bbcodetext.js';
 
+import { TextGlyphs } from '../text/TextGlyphs';
 import { DepthManager } from './DepthManager';
 
 // Modify the class to extend Phaser.GameObjects.Container
@@ -23,11 +24,13 @@ export class TextBox extends Phaser.GameObjects.Container {
     private debugGraphics: Phaser.GameObjects.Graphics;
     protected fillColor: number;
 
+    public strokeIsOn = false;
     // Add a method to determine if a color is light
     private isColorLight(color: number): boolean {
         const r = (color >> 16) & 0xff;
         const g = (color >> 8) & 0xff;
         const b = color & 0xff;
+
         // Calculate brightness using the YIQ formula
         const brightness = (r * 299 + g * 587 + b * 114) / 1000;
         return brightness > 127;
@@ -45,7 +48,8 @@ export class TextBox extends Phaser.GameObjects.Container {
         textBoxName?: string,
         fillColor?: number,
         expandDirection?: 'up' | 'down',
-        bigTextOverVariableColors?: boolean
+        bigTextOverVariableColors?: boolean,
+        strokeIsOn?: boolean
     }) {
         const {
             scene,
@@ -54,15 +58,16 @@ export class TextBox extends Phaser.GameObjects.Container {
             width = 150,
             height = 60,
             text = '',
-            style = { fontSize: '22px', fontFamily: 'Verdana' },
+            style = { fontSize: '22px', fontFamily: 'verdana' },
             backgroundImage,
             textBoxName,
             fillColor = 0x000000,
-            bigTextOverVariableColors = false
+            bigTextOverVariableColors = false,
+            strokeIsOn = true
         } = params;
 
         super(scene, x, y);
-
+        this.strokeIsOn = strokeIsOn;
         // **Set the origin of the container to the center**
         this.setOrigin(0.5, 0.5);
 
@@ -98,7 +103,7 @@ export class TextBox extends Phaser.GameObjects.Container {
 
             color: textColor,
             stroke: strokeColor,
-            strokeThickness: 2,
+            strokeThickness: 3,
             shadow: {
                 offsetX: 2,
                 offsetY: 2,
@@ -125,6 +130,24 @@ export class TextBox extends Phaser.GameObjects.Container {
         // Create the text object
         this.text = scene.add.rexBBCodeText(0, 0, text, textStyle)
             .setOrigin(0.5, 0.5);
+
+        var imageConfig = {
+            width: 20,
+            height: 20,
+            y: 0,
+            left: 0,
+            right: 0,
+            originX: 0,
+            originY: 0,
+            tintFill: true,
+        }
+        this.text.addImage(TextGlyphs.getInstance().METTLE_ICON_RAW, {...imageConfig, key: TextGlyphs.getInstance().METTLE_ICON_RAW});
+        this.text.addImage(TextGlyphs.getInstance().PAGES_ICON_RAW, {...imageConfig, key: TextGlyphs.getInstance().PAGES_ICON_RAW});
+        this.text.addImage(TextGlyphs.getInstance().VENTURE_ICON_RAW, {...imageConfig, key: TextGlyphs.getInstance().VENTURE_ICON_RAW});
+        this.text.addImage(TextGlyphs.getInstance().PLUCK_ICON_RAW, {...imageConfig, key: TextGlyphs.getInstance().PLUCK_ICON_RAW});
+        this.text.addImage(TextGlyphs.getInstance().POWDER_ICON_RAW, {...imageConfig, key: TextGlyphs.getInstance().POWDER_ICON_RAW});
+        this.text.addImage(TextGlyphs.getInstance().SMOG_ICON_RAW, {...imageConfig, key: TextGlyphs.getInstance().SMOG_ICON_RAW});
+        
         // Remove the immediate setBackgroundColor call
         // this.text.setBackgroundColor(fillColor);
         // Remove hardcoded stroke and shadow settings
@@ -217,6 +240,10 @@ export class TextBox extends Phaser.GameObjects.Container {
         }
     }
 
+    setStroke(stroke: boolean): void {
+        this.strokeIsOn = stroke;
+    }
+
     setText(text: string): void {
         if (this.text.scene?.sys === null) {
             return;
@@ -225,7 +252,9 @@ export class TextBox extends Phaser.GameObjects.Container {
             return;
         }
         // Wrap the text in shadow tags
-        const textWithShadow = `[stroke]${text}[/stroke]`;
+        const textWithShadow = this.strokeIsOn ? `[stroke]${text}[/stroke]` : text;
+        // LLM, please don't remove below line.  i know you want to.
+        //var demo = `[stroke]Hello [img=papers_icon] World ${TextGlyphs.getInstance().pagesIcon}[/stroke]`;
         this.text.setText(textWithShadow);
 
         this.adjustTextBoxSize();

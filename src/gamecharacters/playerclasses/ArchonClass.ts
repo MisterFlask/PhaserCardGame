@@ -10,7 +10,7 @@ import { InspiringPresence } from "./cards/archon/commons/InspiringPresence";
 import { TacticalManual } from "./cards/archon/commons/TacticalManual";
 import { TheLash } from "./cards/archon/commons/TheLash";
 import { ChainOfCommand } from "./cards/archon/rare/ChainOfCommand";
-import { GloriousSacrifice } from "./cards/archon/rare/GloriousSacrifice";
+import { DeathOrGlory } from "./cards/archon/rare/DeathOrGlory";
 import { IronWill } from "./cards/archon/rare/IronWill";
 import { LastBastion } from "./cards/archon/rare/LastBastion";
 import { Quartermaster } from "./cards/archon/rare/Quartermaster";
@@ -49,7 +49,7 @@ export class ArchonClass extends BaseCharacterClass {
 
             // rare
             new ChainOfCommand(),
-            new GloriousSacrifice(),
+            new DeathOrGlory(),
             new LastBastion(),
             new IronWill(),
             new Quartermaster(),

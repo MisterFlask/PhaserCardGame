@@ -1,4 +1,5 @@
 import { Strong } from '../../gamecharacters/buffs/standard/Strong';
+import { TextGlyphs } from '../../text/TextGlyphs';
 import { ActionManager } from '../../utils/ActionManager';
 import { GameState } from '../GameState';
 import { AbstractCombatResource } from './AbstractCombatResource';
@@ -8,7 +9,8 @@ export class PowderResource extends AbstractCombatResource {
         super(
             "Powder",
             "Spend 1 Powder: all characters gain 2 Temporary Strength",
-            'powder_icon'
+            'powder_icon',
+            TextGlyphs.getInstance().powderIcon
         );
         this.tint = 0xff0000;
     }
