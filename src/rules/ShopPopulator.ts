@@ -54,6 +54,7 @@ export class ShopPopulator {
         }
         return ShopPopulator.instance;
     }
+    
 
     private getCardPrice(card: PlayableCard): number {
         const basePrice = card.rarity.basePrice;

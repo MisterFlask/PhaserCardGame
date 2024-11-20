@@ -433,6 +433,9 @@ export abstract class PlayableCard extends AbstractCard {
         this.physicalCard?.setGlow(false);
     }
 
+    initialize(): void {
+        this.buffs.forEach(buff => buff.moveToMainDescription = true);
+    }
 }
 
 export interface CardResourceScaling {

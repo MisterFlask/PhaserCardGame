@@ -55,7 +55,7 @@ export class MagicWords {
     cards = [
         new EldritchSmoke()
     ]
-    buffs = [
+    allBuffsThatCouldPossiblyExist = [
         new Strong(),
         new Weak(),
         new ErodingValue(),
@@ -113,8 +113,14 @@ export class MagicWords {
         const result = new MagicWordsResult();
         let modifiedString = input;
 
-        // Get all buffs from the array defined above
-        for (const buff of this.buffs) {
+        modifiedString = this.colorizeAndRecordBuffs(input, result, modifiedString);
+
+        result.stringResult = modifiedString;
+        return result;
+    }
+
+    private colorizeAndRecordBuffs(input: string, result: MagicWordsResult, modifiedString: string) {
+        for (const buff of this.allBuffsThatCouldPossiblyExist) {
             const buffName = buff.getName();
             // Case insensitive search with word boundaries
             const regex = new RegExp(`\\b${buffName}\\b`, 'gi');
@@ -122,7 +128,7 @@ export class MagicWords {
             if (regex.test(input)) {
                 // Add the buff to the result
                 result.buffs.push(buff);
-                
+
                 // Replace the text with yellow bbcode
                 modifiedString = modifiedString.replace(regex, `[color=yellow]${buffName}[/color]`);
             }
@@ -130,15 +136,13 @@ export class MagicWords {
 
         // get all cards from the array defined above
         for (const card of this.cards) {
-            const cardName = card.name
+            const cardName = card.name;
             const regex = new RegExp(`\\b${cardName}\\b`, 'gi');
             if (regex.test(input)) {
                 result.cards.push(card);
                 modifiedString = modifiedString.replace(regex, `[color=yellow]${cardName}[/color]`);
             }
         }
-
-        result.stringResult = modifiedString;
-        return result;
+        return modifiedString;
     }
 }

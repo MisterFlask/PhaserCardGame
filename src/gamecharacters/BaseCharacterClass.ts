@@ -57,12 +57,20 @@ export abstract class BaseCharacterClass {
 
     generateStartingDeck(): PlayableCard[] {
         return [new Shoot(), 
-            new Shoot().withBuffs([this.getRandomResourceIncreaseBuff()]), 
+            this.generateImprovedShoot(),
             new Defend(), 
             new Defend()
             , this.getRandomCommon()
         ]
+    }    
+    
+    generateImprovedShoot(): PlayableCard {
+        var shoot = new Shoot().withBuffs([this.getRandomResourceIncreaseBuff()]).Copy();
+        shoot.name += "+";
+        return shoot;
     }
+
+
     private getRandomCommon(): PlayableCard {
         return this.availableCards
             .filter(card => card.rarity === EntityRarity.COMMON)

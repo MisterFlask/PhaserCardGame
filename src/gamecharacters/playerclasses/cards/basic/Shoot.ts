@@ -3,6 +3,7 @@ import { BaseCharacter } from "../../../BaseCharacter";
 import { EntityRarity, PlayableCard } from "../../../PlayableCard";
 
 export class Shoot extends PlayableCard {
+
     constructor() {
         super({
             name: "Fire Revolver",

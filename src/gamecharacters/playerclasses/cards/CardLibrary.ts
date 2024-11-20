@@ -19,6 +19,11 @@ export class CardLibrary {
         return CardLibrary.instance;
     }
 
+    private cardInit(card: PlayableCard): PlayableCard {
+        card.initialize();
+        return card;
+    }
+
     public getCharacterClasses(): BaseCharacterClass[] {
         var classes = [
             new BlackhandClass(),
@@ -32,12 +37,11 @@ export class CardLibrary {
 
         return classes;
     }
+    
     public getCardsForClassesRelevantToThisRun(): PlayableCard[] {
         var characters = GameState.getInstance().currentRunCharacters;
         var cards = characters.flatMap(c => c.characterClass.availableCards);
-        // Make sure we're copying each card before deduping to avoid any reference issues
-        const cardCopies = cards.map(card => card.Copy());
-        // dedupe
+        const cardCopies = cards.map(card => this.cardInit(card.Copy()));
         return [...new Map(cardCopies.map(item => [item.name, item])).values()];
     }
     public getRandomSelectionOfRelevantClassCards(count: number, rarity?: EntityRarity): PlayableCard[] {
@@ -49,13 +53,13 @@ export class CardLibrary {
     }
 
     public getCardsForClass(characterClass: BaseCharacterClass): PlayableCard[] {
-        return characterClass.availableCards.map(c => c.Copy());
+        return characterClass.availableCards.map(c => this.cardInit(c.Copy()));
     }
 
     public getAllCards(): PlayableCard[] {
         return [
             ... this.getCharacterClasses().flatMap(c => c.availableCards)
-            .map(c => c.Copy()),
+            .map(c => this.cardInit(c.Copy())),
         ];
     }
 }

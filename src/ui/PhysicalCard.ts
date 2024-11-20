@@ -3,8 +3,8 @@ import Phaser from 'phaser';
 import { AutomatedCharacterType, BaseCharacterType, PlayableCardType } from '../Types';
 import { AbstractCard, IPhysicalCardInterface, PriceContext } from '../gamecharacters/AbstractCard';
 import { AbstractIntent } from '../gamecharacters/AbstractIntent';
+import { CardDescriptionGenerator } from '../text/CardDescriptionGenerator';
 import { CardTooltipGenerator } from '../text/CardTooltipGenerator';
-import { MagicWords } from '../text/MagicWords';
 import type { CardConfig } from '../utils/CardGuiUtils';
 import { CheapGlowEffect } from './CheapGlowEffect';
 import { IncomingIntent } from "./IncomingIntent"; // Import the new class
@@ -638,8 +638,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
             this.nameBox.setText(this.data.name);
         }
 
-        var magicWordsResult = MagicWords.getInstance().getMagicWordsResult(this.data.description);
-        this.descBox.setText(magicWordsResult.stringResult);
+        const description = CardDescriptionGenerator.generateCardDescription(this.data);
+        this.descBox.setText(description);
 
         // Update HP box if it exists
         if (this.hpBox && this.data.isBaseCharacter()) {
@@ -807,10 +807,12 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
     // Sync UI buffs with the underlying AbstractCard's buffs
     private syncBuffs(): void {
-        const characterBuffs = this.data.buffs; // Assuming AbstractCard has a 'buffs' property
+        const cardBuffsThatShouldExist = this.data.buffs
+            .filter(buff => !buff.moveToMainDescription);
 
         // Create a set of current buff IDs
-        const currentBuffIds = new Set(characterBuffs.map(buff => buff.id));
+        const currentBuffIds = new Set(cardBuffsThatShouldExist
+            .map(buff => buff.id));
 
         // Remove buffs that are no longer present
         this.currentBuffs.forEach((buffUI, id) => {
@@ -821,7 +823,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
         });
 
         // Add new buffs that are not currently displayed
-        characterBuffs.forEach(buff => {
+        cardBuffsThatShouldExist.forEach(buff => {
             if (!this.currentBuffs.has(buff.id)) {
                 const physicalBuff = new PhysicalBuff(this.scene, 0, 0, buff);
                 this.buffsContainer.add(physicalBuff.container);

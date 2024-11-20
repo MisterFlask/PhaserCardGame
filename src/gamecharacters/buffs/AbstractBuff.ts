@@ -12,6 +12,9 @@ import { IBaseCharacter } from '../IBaseCharacter';
 import type { PlayableCard } from "../PlayableCard";
 export abstract class AbstractBuff implements IAbstractBuff {
 
+    // if this is a "standard" buff that is always on the card, it's added to the main description instead of the tooltip/icon.
+    public moveToMainDescription: boolean = false;
+
     get actionManager(): ActionManager {
         return ActionManagerFetcher.getActionManager();
     }
