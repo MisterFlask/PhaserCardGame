@@ -15,12 +15,12 @@ export class GiantKiller extends AbstractBuff {
     }
 
     override getDescription(): string {
-        return `Increases damage dealt to enemies with Titan by 10% × ${this.getStacksDisplayText()}.`;
+        return `Increases damage dealt to enemies with Titan by 50% × ${this.getStacksDisplayText()}.`;
     }
 
     override getAdditionalPercentCombatDamageDealtModifier(target?: IBaseCharacter): number {
         if (target && target.buffs.some(buff => buff instanceof Titan)) {
-            return 10 * this.stacks;
+            return 50 * this.stacks;
         }
         return 0;
     }

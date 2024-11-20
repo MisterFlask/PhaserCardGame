@@ -17,7 +17,7 @@ export class HandCannon extends PlayableCard {
         this.baseEnergyCost = 1;
         this.baseMagicNumber = 1; // Amount of Vulnerable applied
         this.resourceScalings.push({
-            resource: this.iron,
+            resource: this.mettle,
             attackScaling: 1,
         });
     }

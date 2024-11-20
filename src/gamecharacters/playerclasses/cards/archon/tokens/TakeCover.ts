@@ -15,6 +15,10 @@ export class TakeCover extends PlayableCard {
         this.baseBlock = 4;
         this.baseEnergyCost = 0;
         this.buffs.push(new ExhaustBuff());
+        this.resourceScalings.push({
+            resource: this.mettle,
+            blockScaling: 1,
+        });
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

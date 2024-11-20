@@ -1,5 +1,6 @@
 import { GameState } from "../../../../../rules/GameState";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
+import { ExhaustBuff } from "../../../../buffs/playable_card/ExhaustBuff";
 import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { BasicProcs } from "../../../../procs/BasicProcs";
@@ -24,12 +25,13 @@ export class Quartermaster extends PlayableCard {
         livingPartyMembers.forEach(member => {
             const buzzsword = new Buzzsword();
             buzzsword.baseEnergyCost -= 1;
-            buzzsword.owner = member
+            buzzsword.owner = member;
+            buzzsword.buffs.push(new ExhaustBuff());
             BasicProcs.getInstance().ManufactureCardToHand(buzzsword);
         });
     }
 
     override get description(): string {
-        return `Manufacture a number of Buzzswords to hand equal to the number of living party members. Each costs 1 less and is owned by a different party member.`;
+        return `Manufacture a number of Buzzsword for each party member. Each costs 1 less and exhausts.`;
     }
 }

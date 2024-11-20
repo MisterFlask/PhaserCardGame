@@ -43,6 +43,10 @@ export abstract class AbstractBuff implements IAbstractBuff {
         const playerCharacters = this.gameState.combatState.playerCharacters;
         playerCharacters.forEach(callback);
     }
+    protected forEachEnemy(callback: (enemy: BaseCharacter) => void): void {
+        const enemies = this.gameState.combatState.enemies;
+        enemies.forEach(callback);
+    }
 
     public generateSeededRandomBuffColor(): number {
         let hash = 0;

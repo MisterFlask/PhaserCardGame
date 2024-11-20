@@ -4,7 +4,7 @@ import Phaser from 'phaser';
 import { PlayerCharacter } from '../../gamecharacters/BaseCharacterClass';
 import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
 import { PlayableCard } from '../../gamecharacters/PlayableCard';
-import { CardLibrary } from '../../gamecharacters/playerclasses/cards/CardLibrary';
+import { CardRewardsGenerator } from '../../rules/CardRewardsGenerator';
 import { GameState } from '../../rules/GameState';
 import { TextBoxButton } from '../../ui/Button';
 import { CombatResourceDisplay } from '../../ui/CombatResourceDisplay';
@@ -400,12 +400,20 @@ class CombatUIManager {
         }
     }
 
+    private handleReroll(): void {
+        console.log("Reroll selected.");
+        const rewardCards = this.determineCardRewards();
+        this.cardRewardScreen.rewards = rewardCards;
+        this.cardRewardScreen.displayRewardCards();
+    }
+
     private createCardRewardScreen(): void {
         this.cardRewardScreen = new CardRewardScreen({
             scene: this.scene,
             rewards: [],
             onSelect: this.handleCardSelect.bind(this),
-            onSkip: this.handleSkip.bind(this)
+            onSkip: this.handleSkip.bind(this),
+            onReroll: this.handleReroll.bind(this)
         });
         this.cardRewardScreen.container.setDepth(1001);
         this.cardRewardScreen.container.setScrollFactor(0);
@@ -416,15 +424,13 @@ class CombatUIManager {
         if (this.combatEnded) return;
         this.combatEnded = true;
 
-        const rewardCards = this.determineCardRewards();
-        this.cardRewardScreen.rewards = rewardCards;
-        this.cardRewardScreen.displayRewardCards();
+        this.handleReroll();
         this.cardRewardScreen.show();
         UIContextManager.getInstance().setContext(UIContext.CARD_REWARD);
     }
 
     private determineCardRewards(): CardReward[] {
-        var cards = CardLibrary.getInstance().getRandomSelectionOfRelevantClassCards(3);
+        var cards = CardRewardsGenerator.getInstance().generateCardRewardsForCombat()
         return cards.map(card => new CardReward(card, this.deriveOwnerFromCardNativeClass(card)));
     }
 

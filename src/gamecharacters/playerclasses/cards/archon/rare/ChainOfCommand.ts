@@ -15,6 +15,11 @@ export class ChainOfCommand extends PlayableCard {
         });
         this.baseEnergyCost = 2;
         this.baseDamage = 8;
+        
+        this.resourceScalings.push({
+            resource: this.mettle,
+            attackScaling: 1,
+        });
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

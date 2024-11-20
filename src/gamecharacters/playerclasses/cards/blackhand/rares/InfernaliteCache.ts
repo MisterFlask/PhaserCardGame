@@ -1,3 +1,4 @@
+import { TextGlyphs } from "../../../../../text/TextGlyphs";
 import { TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
 import { PlayableCard } from "../../../../PlayableCard";
@@ -7,7 +8,7 @@ export class InfernaliteCache extends PlayableCard {
         super({
             name: "Infernalite Cache",
             description: `_`,
-            portraitName: "enrage",
+            portraitName: "enrage-test",
             targetingType: TargetingType.NO_TARGETING,
         });
         this.baseMagicNumber = 6;
@@ -15,7 +16,7 @@ export class InfernaliteCache extends PlayableCard {
     }
 
     override get description(): string {
-        return `Gain ${this.getDisplayedMagicNumber()} [Powder].`;
+        return `Gain ${this.getDisplayedMagicNumber()} ${TextGlyphs.getInstance().powderIcon}.`;
     }
     
     override InvokeCardEffects(targetCard?: BaseCharacter): void {

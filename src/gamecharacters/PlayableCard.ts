@@ -23,32 +23,36 @@ export class EntityRarity {
         id,
         weight,
         color,
-        basePrice
+        basePrice,
+        baseCardLevel
     }: {
         id: string;
         weight: number;
         color: number;
         basePrice: number;
+        baseCardLevel: number;
     }) {
         this.id = id;
         this.weight = weight;
         this.color = color;
         this.basePrice = basePrice;
+        this.basePowerLevel = baseCardLevel;
     }
 
     public readonly id: string;
     public readonly weight: number;
     public readonly color: number;
     public readonly basePrice: number;
-
-    static readonly TOKEN = new EntityRarity({ id: "TOKEN", weight: 0, color: 0xA0A0A0, basePrice: 25 });
-    static readonly BASIC = new EntityRarity({ id: "BASIC", weight: 1, color: 0xA0A0A0, basePrice: 25 });
-    static readonly COMMON = new EntityRarity({ id: "COMMON", weight: 2, color: 0xA0A0A0, basePrice: 50 });
-    static readonly UNCOMMON = new EntityRarity({ id: "UNCOMMON", weight: 3, color: 0x87CEEB, basePrice: 100 });
-    static readonly RARE = new EntityRarity({ id: "RARE", weight: 4, color: 0xDDA0DD, basePrice: 200 });
-    static readonly EPIC = new EntityRarity({ id: "EPIC", weight: 5, color: 0xFF69B4, basePrice: 350 });
-    static readonly LEGENDARY = new EntityRarity({ id: "LEGENDARY", weight: 6, color: 0xFFD700, basePrice: 500 });
-    static readonly SPECIAL = new EntityRarity({ id: "SPECIAL", weight: 7, color: 0xFF4500, basePrice: 400 });
+    public readonly basePowerLevel: number;
+    
+    static readonly TOKEN = new EntityRarity({ id: "TOKEN", weight: 0, color: 0xA0A0A0, basePrice: 25, baseCardLevel: 0 });
+    static readonly BASIC = new EntityRarity({ id: "BASIC", weight: 1, color: 0xA0A0A0, basePrice: 25, baseCardLevel: 0 });
+    static readonly COMMON = new EntityRarity({ id: "COMMON", weight: 2, color: 0xA0A0A0, basePrice: 50, baseCardLevel: 1 });
+    static readonly UNCOMMON = new EntityRarity({ id: "UNCOMMON", weight: 3, color: 0x87CEEB, basePrice: 100, baseCardLevel: 2 });
+    static readonly RARE = new EntityRarity({ id: "RARE", weight: 4, color: 0xDDA0DD, basePrice: 200, baseCardLevel: 3 });
+    static readonly EPIC = new EntityRarity({ id: "EPIC", weight: 5, color: 0xFF69B4, basePrice: 350, baseCardLevel: 4 });
+    static readonly LEGENDARY = new EntityRarity({ id: "LEGENDARY", weight: 6, color: 0xFFD700, basePrice: 500, baseCardLevel: 5 });
+    static readonly SPECIAL = new EntityRarity({ id: "SPECIAL", weight: 7, color: 0xFF4500, basePrice: 400, baseCardLevel: 7 });
 
     toString(): string {
         return this.id;
@@ -202,7 +206,7 @@ export abstract class PlayableCard extends AbstractCard {
         return this.combatResources.pages;
     }
 
-    get iron(): IronResource {
+    get mettle(): IronResource {
         return this.combatResources.iron;
     }
 

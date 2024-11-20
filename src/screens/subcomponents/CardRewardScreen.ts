@@ -14,6 +14,7 @@ export interface CardRewardScreenData {
     scene: Phaser.Scene;
     onSelect: (selectedCard: CardReward) => void;
     onSkip: () => void;
+    onReroll?: () => void;
 }
 
 class CardRewardScreen {
@@ -22,19 +23,22 @@ class CardRewardScreen {
     public rewards: CardReward[];
     private onSelect: (selectedCard: CardReward) => void;
     private onSkip: () => void;
-    private selectButton!: TextBoxButton;
+    private goToMapButton!: TextBoxButton;
     private isCardSelected: boolean = false;
+    private rerollButton!: TextBoxButton;
+    private onReroll?: () => void;
 
     constructor(params: CardRewardScreenData) {
         this.scene = params.scene;
         this.rewards = params.rewards;
         this.onSelect = params.onSelect;
         this.onSkip = params.onSkip;
+        this.onReroll = params.onReroll;
 
         this.container = this.scene.add.container(this.scene.scale.width / 2, this.scene.scale.height / 2);
         this.createBackground();
         this.displayRewardCards();
-        this.createActionButton();
+        this.createActionButtons();
         this.hide(); // Initially hidden
     }
 
@@ -89,11 +93,11 @@ class CardRewardScreen {
         });
     }
 
-    private createActionButton(): void {
-        const buttonText = "Go to Map";
-        this.selectButton = new TextBoxButton({
+    private createActionButtons(): void {
+        const buttonText = "Perhaps not";
+        this.goToMapButton = new TextBoxButton({
             scene: this.scene,
-            x: 0,
+            x: -100,
             y: 250,
             width: 300,
             height: 50,
@@ -103,18 +107,41 @@ class CardRewardScreen {
             textBoxName: 'goToMapButton'
         });
 
-        this.selectButton
+        this.goToMapButton
             .onClick(() => {
-                console.log("Go to Map button clicked.");
-                if (this.rewards.length > 0 && !this.isCardSelected) {
-                    console.log("Please select a card before proceeding.");
-                    return;
-                }
+                console.log("Skip card reward button clicked.");
+
                 this.onSkip();
                 this.hide();
             });
 
-        this.container.add(this.selectButton);
+        this.rerollButton = new TextBoxButton({
+            scene: this.scene,
+            x: 100,
+            y: 150,
+            width: 300,
+            height: 50,
+            text: "DEBUG: Reroll",
+            style: { fontSize: '24px', color: '#ffffff', fontFamily: 'Arial', align: 'center' },
+            fillColor: 0x770000,
+            textBoxName: 'rerollButton'
+        });
+
+        this.rerollButton
+            .onClick(() => {
+                console.log("Reroll button clicked");
+                if (this.onReroll) {
+                    this.onReroll(); // actual gameplay logic, not UI logic (which is below)
+                    
+                    // Clear existing UI elements before displaying new ones
+                    this.container.removeAll();
+                    this.createBackground(); // Re-create background since we removed it
+                    this.displayRewardCards()
+                    this.createActionButtons();
+                }
+            });
+
+        this.container.add([this.goToMapButton, this.rerollButton]);
     }
 
     public show(): void {

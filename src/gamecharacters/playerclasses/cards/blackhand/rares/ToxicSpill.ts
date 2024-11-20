@@ -15,6 +15,7 @@ export class ToxicSpill extends PlayableCard {
             rarity: EntityRarity.RARE,
             targetingType: TargetingType.ENEMY,
         }); 
+        this.baseEnergyCost = 2;
         this.baseMagicNumber = 6;
         this.buffs.push(new VolatileBuff());
     }

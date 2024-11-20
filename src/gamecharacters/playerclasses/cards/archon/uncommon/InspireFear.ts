@@ -14,10 +14,14 @@ export class InspireFear extends PlayableCard {
         this.baseEnergyCost = 2;
         this.baseDamage = 10;
         this.baseMagicNumber = 2; // Amount of Vulnerable applied to enemies
-        this.baseBlock = 1; // Amount of Vulnerable applied to allies
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
+        // Deal 10 damage to all enemies
+        this.forEachEnemy(enemy => {
+            this.dealDamageToTarget(enemy);
+        });
+
         // Apply 2 Vulnerable to all enemies
         this.forEachEnemy(enemy => {
             this.actionManager.applyBuffToCharacterOrCard(enemy, new Vulnerable(this.baseMagicNumber));
@@ -25,16 +29,12 @@ export class InspireFear extends PlayableCard {
 
         // Apply 1 Vulnerable to all allies
         this.forEachAlly(ally => {
-            this.actionManager.applyBuffToCharacterOrCard(ally, new Vulnerable(this.baseBlock));
+            this.actionManager.applyBuffToCharacterOrCard(ally, new Vulnerable(1));
         });
 
-        // Deal 10 damage to all enemies
-        this.forEachEnemy(enemy => {
-            this.dealDamageToTarget(enemy);
-        });
     }
 
     override get description(): string {
-        return `Apply ${this.baseMagicNumber} Vulnerable to all enemies. Apply ${this.baseBlock} Vulnerable to all allies. Deal ${this.getDisplayedDamage()} damage to ALL enemies.`;
+        return `Deal ${this.getDisplayedDamage()} damage to ALL enemies.  Apply ${this.getDisplayedMagicNumber()} Vulnerable to all enemies. Apply 1 Vulnerable to all allies.`;
     }
 }

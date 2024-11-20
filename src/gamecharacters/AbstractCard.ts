@@ -268,7 +268,9 @@ export abstract class AbstractCard implements IAbstractCard {
          
         Object.assign(copy, this);
         copy.id = generateWordGuid();
-        copy.owner = this.owner
+        copy.owner = this.owner;
+        // Deep copy the buffs array
+        copy.buffs = this.buffs.map(buff => buff.clone());
         return copy;
     }
 

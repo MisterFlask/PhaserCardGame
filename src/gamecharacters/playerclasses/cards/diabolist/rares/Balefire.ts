@@ -19,7 +19,6 @@ export class Balefire extends PlayableCard {
         });
         this.baseEnergyCost = 3;
         this.baseDamage = 12;
-        this.baseMagicNumber = 2; // Number of times damage is dealt
         this.buffs.push(new BloodPriceBuff(3));
         this.buffs.push(new GiantKiller(1));
         this.buffs.push(new ExhaustBuff())
@@ -31,7 +30,7 @@ export class Balefire extends PlayableCard {
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage ${this.getDisplayedMagicNumber()} times. Giant Killer. Bloodprice 3. Decrease your max HP by 3. Exhaust.`;
+        return `Deal ${this.getDisplayedDamage()} damage 2 times. Giant Killer. Bloodprice 3. Decrease your max HP by 3. Exhaust.`;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

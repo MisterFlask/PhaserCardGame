@@ -57,7 +57,7 @@ export class CursedBlade extends PlayableCard {
         this.baseEnergyCost = 1;
         this.baseDamage = 14;
         this.resourceScalings.push({
-            resource: this.iron,
+            resource: this.mettle,
             attackScaling: 1,
         });
         this.buffs.push(new WeThirstBuff(4));
