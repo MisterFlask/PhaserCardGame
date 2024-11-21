@@ -658,14 +658,16 @@ export class ActionManager {
         sourceCharacter,
         sourceCard,
         fromAttack,
-        callback
+        callback,
+        ignoresBlock
     }: {
         baseDamageAmount: number,
         target: IBaseCharacter,
         sourceCharacter?: IBaseCharacter,
         sourceCard?: PlayableCardType,
         fromAttack?: boolean,
-        callback?: (damageResult: DamageCalculationResult) => void
+        callback?: (damageResult: DamageCalculationResult) => void,
+        ignoresBlock?: boolean
     }): void => {
         this.actionQueue.addAction(new GenericAction(async () => {
             const physicalCardOfTarget = target.physicalCard;
@@ -680,7 +682,8 @@ export class ActionManager {
                 target,
                 sourceCharacter,
                 sourceCard,
-                fromAttack
+                fromAttack,
+                ignoresBlock
             });
             console.log(`Damage Result from ${sourceCharacter?.name || 'Unknown'} to ${target.name}: `, damageResult);
 

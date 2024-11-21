@@ -1,12 +1,10 @@
-import { GameState } from "../../../../../rules/GameState";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
 import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { AbstractBuff } from "../../../../buffs/AbstractBuff";
 
-
-class WeThirstBuff extends AbstractBuff {
+class CursedBladeBuff extends AbstractBuff {
     constructor(stacks: number = 1) {
         super();
         this.stacks = stacks;
@@ -14,35 +12,53 @@ class WeThirstBuff extends AbstractBuff {
     }
 
     override getName(): string {
-        return "WE THIRST";
+        return "Cursed Blade";
+    }
+
+    override getDescription(): string {
+        return `On combat start, apply ${this.getStacksDisplayText()} We Thirst to owner.  If this card kills someone, remove We Thirst.`;
+    }
+
+    override onCombatStart() {
+        const owner = this.getOwnerAsCharacter();
+        if (owner) {
+            this.actionManager.applyBuffToCharacterOrCard(owner, new WeThirstDebuff(this.stacks));
+        }
+    }
+
+    override onFatal(killedUnit: BaseCharacter): void {
+        const owner = this.getOwnerAsCharacter();
+        if (owner) {
+            this.actionManager.removeBuffFromCharacter(owner, "We Thirst");
+        }
+    }
+}
+
+class WeThirstDebuff extends AbstractBuff {
+    constructor(stacks: number = 1) {
+        super();
+        this.stacks = stacks;
+        this.isDebuff = true;
+    }
+
+    override getName(): string {
+        return "We Thirst";
     }
 
     override getDescription(): string {
         return `At end of combat, take ${this.getStacksDisplayText()} damage.`;
     }
 
-    override onLethal(target: BaseCharacter | null): void {
-        this.stacks = 0;
-    }
-
-    /// concept: each combat start, this will already exist on the playable card.  We need to apply it to the character who owns it.
-    override onCombatStart(){
-        const owner = this.getOwnerAsCharacter();
-        if (owner){
-            this.actionManager.applyBuffToCharacterOrCard(owner, new WeThirstBuff(this.stacks));
-        }
-    }
-
-    override onCombatEnd(){
+    override onCombatEnd() {
         const owner = this.getOwnerAsCharacter();
         if (owner) {
             this.actionManager.dealDamage({
                 baseDamageAmount: this.stacks,
                 target: owner,
-                fromAttack: false
+                fromAttack: false,
+                ignoresBlock: true
             });
         }
-        this.stacks = 0;
     }
 }
 
@@ -60,11 +76,11 @@ export class CursedBlade extends PlayableCard {
             resource: this.mettle,
             attackScaling: 1,
         });
-        this.buffs.push(new WeThirstBuff(4));
+        this.buffs.push(new CursedBladeBuff(10));
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage. On combat start, gain 10 "WE THIRST".`;
+        return `Deal ${this.getDisplayedDamage()} damage.`;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
@@ -72,10 +88,5 @@ export class CursedBlade extends PlayableCard {
         if (!target) return;
 
         this.dealDamageToTarget(target);
-    }
-
-    override onAcquisition(newOwner: BaseCharacter): void {
-        const gameState = GameState.getInstance();
-       
     }
 }

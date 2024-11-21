@@ -77,13 +77,15 @@ export class CombatRules {
         target,
         sourceCharacter,
         sourceCard,
-        fromAttack = true
+        fromAttack = true,
+        ignoresBlock = false
     }: {
         baseDamageAmount: number,
         target?: IBaseCharacter,
         sourceCharacter?: IBaseCharacter,
         sourceCard?: PlayableCardType,
-        fromAttack?: boolean
+        fromAttack?: boolean,
+        ignoresBlock?: boolean
     }): DamageCalculationResult => {
         let totalDamage = baseDamageAmount;
         
@@ -116,7 +118,7 @@ export class CombatRules {
         // Ensure damage doesn't go below 0
         totalDamage = Math.max(0, totalDamage);
 
-        let blockedDamage = Math.min(target?.block || 0, totalDamage);
+        let blockedDamage = ignoresBlock ? 0 : Math.min(target?.block || 0, totalDamage);
         let unblockedDamage = totalDamage - blockedDamage;
 
         return new DamageCalculationResult(totalDamage, blockedDamage, unblockedDamage);

@@ -20,7 +20,7 @@ export class AndThenHeExploded extends PlayableCardWithHelpers {
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage. If the target has Burning, do it again. Fatal: all enemies gain 10 Burning.`;
+        return `Deal ${this.getDisplayedDamage()} damage.`;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

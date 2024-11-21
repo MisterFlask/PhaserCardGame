@@ -17,7 +17,6 @@ export class SacrificeBuff extends AbstractBuff {
     }
 
     override onThisCardInvoked(): void {
-            BasicProcs.getInstance().SacrificeACardOtherThan(this.getOwnerAsPlayableCard()!);
-        }
+        BasicProcs.getInstance().SacrificeACardOtherThan(this.getOwnerAsPlayableCard()!);
     }
 }
