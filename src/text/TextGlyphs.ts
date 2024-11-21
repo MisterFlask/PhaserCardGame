@@ -12,9 +12,9 @@ export class TextGlyphs {
     // Image names for resource icons
     public readonly VENTURE_ICON_RAW = "venture_icon";
     public readonly METTLE_ICON_RAW = "iron_icon";
-    public readonly PAGES_ICON_RAW = "papers_icon";
+    public readonly PAGES_ICON_RAW = "ashes_icon";
     public readonly PLUCK_ICON_RAW = "feather_icon";
-    public readonly POWDER_ICON_RAW = "powder_icon";
+    public readonly POWDER_ICON_RAW = "blood_icon";
     public readonly SMOG_ICON_RAW = "smog_icon";
 
     // Resource icons

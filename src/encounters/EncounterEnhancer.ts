@@ -35,7 +35,7 @@ export class StrongEncounterEnhancer extends EncounterEnhancer {
 
     public enhanceEncounter(encounter: EncounterData): EncounterData {
         encounter.enemies.forEach(enemy => {
-            enemy.applyBuffs([new Strong(this.stacks)]);
+            enemy.applyBuffs_useFromActionManager([new Strong(this.stacks)]);
         });
         return encounter;
     }
@@ -49,7 +49,7 @@ export class DrawOneFewerCardNextNTurnsEncounterEnhancer extends EncounterEnhanc
 
     public enhanceEncounter(encounter: EncounterData): EncounterData {
         if (encounter.enemies.length > 0) {
-            encounter.enemies[0].applyBuffs([new DrawOneFewerCardNextNTurns(this.stacks)]);
+            encounter.enemies[0].applyBuffs_useFromActionManager([new DrawOneFewerCardNextNTurns(this.stacks)]);
         }
         return encounter;
     }

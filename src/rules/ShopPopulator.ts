@@ -25,20 +25,20 @@ export class ShopCardModifier {
 
 const modifiers: ShopCardModifier[] = [
     new ShopCardModifier(0.2, (card: PlayableCard) => {
-        card.applyBuffs([new Damaged(1)]);
-        card.applyBuffs([new OnSale(90)]);
+        card.applyBuffs_useFromActionManager([new Damaged(1)]);
+        card.applyBuffs_useFromActionManager([new OnSale(90)]);
         card.name += "?";
     }, (card: PlayableCard) => card.rarity.isAtLeastAsRareAs(EntityRarity.RARE)),
     new ShopCardModifier(0.2, (card: PlayableCard) => {
-        card.applyBuffs([new OnSale(50)]);
+        card.applyBuffs_useFromActionManager([new OnSale(50)]);
     }),
     new ShopCardModifier(0.2, (card: PlayableCard) => {
-        card.applyBuffs([getRandomEnhancementBuff()]);
+        card.applyBuffs_useFromActionManager([getRandomEnhancementBuff()]);
         card.name += "+";
     }),
     new ShopCardModifier(0.2, (card: PlayableCard) => {
-        card.applyBuffs([new Heavy()]);
-        card.applyBuffs([new OnSale(90)]);
+        card.applyBuffs_useFromActionManager([new Heavy()]);
+        card.applyBuffs_useFromActionManager([new OnSale(90)]);
         card.name += "?";
     }, (card: PlayableCard) => card.rarity.isAtLeastAsRareAs(EntityRarity.UNCOMMON))
 ];

@@ -155,7 +155,7 @@ export abstract class AbstractCard implements IAbstractCard {
     buffs: AbstractBuff[] = [];
     portraitTint?: number
 
-    applyBuffs(buffs: AbstractBuff[]): void {
+    applyBuffs_useFromActionManager(buffs: AbstractBuff[]): void {
         buffs.forEach(buff => AbstractBuff._applyBuffToCharacterOrCard(this, buff));
     }
 

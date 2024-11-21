@@ -263,7 +263,7 @@ export default class GameImageLoader {
         },
         combat_resources: {
             prefix: 'Sprites/CombatResources/',
-            files: ['powder_icon.png', 'iron_icon.png', 'papers_icon.png', 'feather_icon.png', 'venture_icon.png', 'smog_icon.png']
+            files: ['powder_icon.png', 'iron_icon.png', 'papers_icon.png', 'feather_icon.png', 'venture_icon.png', 'smog_icon.png', 'ashes_icon.png', 'blood_icon.svg']
         },
         mission_icons: {
             prefix: 'Sprites/MissionIcons/',
