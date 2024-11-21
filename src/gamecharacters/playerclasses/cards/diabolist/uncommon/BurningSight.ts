@@ -13,8 +13,8 @@ export class BurningSight extends PlayableCard {
             rarity: EntityRarity.UNCOMMON,
         });
         this.baseEnergyCost = 2;
-        this.baseMagicNumber = 1; // Bloodprice value
         this.buffs.push(new BloodPriceBuff(2));
+        this.baseMagicNumber = 3
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
@@ -32,10 +32,10 @@ export class BurningSight extends PlayableCard {
         }
 
         // Gain 3 Pages
-        this.actionManager.modifyPages(3);
+        this.actionManager.modifyPages(this.getBaseMagicNumberAfterResourceScaling());
     }
 
     override get description(): string {
-        return `Exhaust the top 2 cards of your deck. Gain 3 Pages. Bloodprice ${this.getDisplayedMagicNumber()}.`;
+        return `Exhaust the top 2 cards of your deck. Gain 2 Pages.}.`;
     }
 }

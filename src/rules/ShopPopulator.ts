@@ -8,7 +8,7 @@ import { IncreasePluck } from '../gamecharacters/buffs/standard/combatresource/I
 import { IncreasePowder } from '../gamecharacters/buffs/standard/combatresource/IncreasePowder';
 import { IncreaseSmog } from '../gamecharacters/buffs/standard/combatresource/IncreaseSmog';
 import { IncreaseVenture } from '../gamecharacters/buffs/standard/combatresource/IncreaseVenture';
-import { Strong } from '../gamecharacters/buffs/standard/Strong';
+import { Lethality } from '../gamecharacters/buffs/standard/Strong';
 import { EntityRarity, PlayableCard } from '../gamecharacters/PlayableCard';
 import { CardLibrary } from '../gamecharacters/playerclasses/cards/CardLibrary';
 import { AbstractRelic } from '../relics/AbstractRelic';
@@ -124,7 +124,7 @@ export class ShopPopulator {
 }
 function getRandomEnhancementBuff(): AbstractBuff {
     var buffs = [
-        new Strong(1),
+        new Lethality(1),
         new IncreaseIron(),
         // new IncreasePages(),
         new IncreasePluck(),

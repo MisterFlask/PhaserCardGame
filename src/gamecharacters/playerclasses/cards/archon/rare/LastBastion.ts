@@ -2,7 +2,7 @@ import { DeckLogic, PileName } from "../../../../../rules/DeckLogic";
 import { GameState } from "../../../../../rules/GameState";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { ExhaustBuff } from "../../../../buffs/playable_card/ExhaustBuff";
-import { Strong } from "../../../../buffs/standard/Strong";
+import { Lethality } from "../../../../buffs/standard/Strong";
 import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { BasicProcs } from "../../../../procs/BasicProcs";
@@ -33,7 +33,7 @@ export class LastBastion extends PlayableCard {
 
             // Party members with >4 stress gain 2 Strength
             if (ally.stress > 4) {
-                const strengthBuff = new Strong(2);
+                const strengthBuff = new Lethality(2);
                 ally.buffs.push(strengthBuff);
             }
         });

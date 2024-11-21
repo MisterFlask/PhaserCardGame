@@ -4,7 +4,7 @@ import { AutomatedCharacter } from "../../../gamecharacters/AutomatedCharacter";
 import { BaseCharacter } from "../../../gamecharacters/BaseCharacter";
 import { Muse } from "../../../gamecharacters/buffs/enemy_buffs/Muse";
 import { Painful } from "../../../gamecharacters/buffs/playable_card/Painful";
-import { Strong } from "../../../gamecharacters/buffs/standard/Strong";
+import { Lethality } from "../../../gamecharacters/buffs/standard/Strong";
 import { EntityRarity, PlayableCard } from "../../../gamecharacters/PlayableCard";
 import { CardType } from "../../../gamecharacters/Primitives";
 
@@ -99,7 +99,7 @@ class ModernArtStrength extends PlayableCard {
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         this.combatState.playerCharacters.forEach(ally => {
-            this.actionManager.applyBuffToCharacterOrCard(ally, new Strong(this.getBaseMagicNumberAfterResourceScaling()) );
+            this.actionManager.applyBuffToCharacterOrCard(ally, new Lethality(this.getBaseMagicNumberAfterResourceScaling()) );
         });
     }
 

@@ -2,7 +2,7 @@ import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
 import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
-import { Strong } from "../../../../buffs/standard/Strong";
+import { Lethality } from "../../../../buffs/standard/Strong";
 
 export class TacticalManual extends PlayableCard {
     constructor() {
@@ -30,7 +30,7 @@ export class TacticalManual extends PlayableCard {
         // Apply strength to targeted ally
         if (targetCard instanceof BaseCharacter) {
             const strengthGain = this.getBaseMagicNumberAfterResourceScaling();
-            this.actionManager.applyBuffToCharacterOrCard(targetCard, new Strong(strengthGain));
+            this.actionManager.applyBuffToCharacterOrCard(targetCard, new Lethality(strengthGain));
         }
     }
 

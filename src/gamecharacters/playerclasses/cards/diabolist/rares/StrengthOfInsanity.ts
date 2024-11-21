@@ -3,7 +3,7 @@ import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
 import { IncreaseSmog } from "../../../../buffs/standard/combatresource/IncreaseSmog";
 import { Stress } from "../../../../buffs/standard/Stress";
-import { Strong } from "../../../../buffs/standard/Strong";
+import { Lethality } from "../../../../buffs/standard/Strong";
 import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
@@ -51,7 +51,7 @@ export class StrengthOfInsanity extends PlayableCard {
 
     private applyStrengthToAllies(): void {
         this.forEachAlly(ally => {
-            this.actionManager.applyBuffToCharacterOrCard(ally as BaseCharacter, new Strong(this.getBaseMagicNumberAfterResourceScaling()));
+            this.actionManager.applyBuffToCharacterOrCard(ally as BaseCharacter, new Lethality(this.getBaseMagicNumberAfterResourceScaling()));
         });
     }
 }

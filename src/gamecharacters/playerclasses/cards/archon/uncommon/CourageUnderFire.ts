@@ -2,7 +2,7 @@ import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
 import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
-import { Strong } from "../../../../buffs/standard/Strong";
+import { Lethality } from "../../../../buffs/standard/Strong";
 
 export class CourageUnderFire extends PlayableCard {
     constructor() {
@@ -36,7 +36,7 @@ export class CourageUnderFire extends PlayableCard {
 
     private applyEffectsToCharacter(character: BaseCharacter): void {
         this.applyBlockToTarget(character);
-        this.actionManager.applyBuffToCharacterOrCard(character, new Strong(this.getBaseMagicNumberAfterResourceScaling()));
+        this.actionManager.applyBuffToCharacterOrCard(character, new Lethality(this.getBaseMagicNumberAfterResourceScaling()));
     }
 
     override get description(): string {

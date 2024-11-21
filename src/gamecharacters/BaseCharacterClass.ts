@@ -10,7 +10,7 @@ import { IncreasePages } from "./buffs/standard/combatresource/IncreasePages";
 import { IncreasePowder } from "./buffs/standard/combatresource/IncreasePowder";
 import { IncreaseSmog } from "./buffs/standard/combatresource/IncreaseSmog";
 import { IncreaseVenture } from "./buffs/standard/combatresource/IncreaseVenture";
-import { Strong } from "./buffs/standard/Strong";
+import { Lethality } from "./buffs/standard/Strong";
 import { EntityRarity, PlayableCard } from "./PlayableCard";
 import { Defend } from "./playerclasses/cards/basic/Defend";
 import { Shoot } from "./playerclasses/cards/basic/Shoot";
@@ -63,7 +63,7 @@ export abstract class BaseCharacterClass {
             , this.getRandomCommon()
         ]
     }    
-    
+
     generateImprovedShoot(): PlayableCard {
         var shoot = new Shoot().withBuffs([this.getRandomResourceIncreaseBuff()]).Copy();
         shoot.name += "+";
@@ -74,7 +74,7 @@ export abstract class BaseCharacterClass {
     private getRandomCommon(): PlayableCard {
         return this.availableCards
             .filter(card => card.rarity === EntityRarity.COMMON)
-            .sort(() => Math.random() - 0.5)[0] ?? new Shoot().withBuffs([new Strong(2)])
+            .sort(() => Math.random() - 0.5)[0] ?? new Shoot().withBuffs([new Lethality(2)])
                 .Copy();
     }
 

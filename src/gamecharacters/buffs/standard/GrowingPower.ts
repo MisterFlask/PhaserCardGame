@@ -1,6 +1,6 @@
 
 import { AbstractBuff } from "../AbstractBuff";
-import { Strong } from "./Strong";
+import { Lethality } from "./Strong";
 
 export class GrowingPowerBuff extends AbstractBuff {
     constructor(stacks: number = 1) {
@@ -21,7 +21,7 @@ export class GrowingPowerBuff extends AbstractBuff {
     override onTurnStart(): void {
         const owner = this.getOwnerAsCharacter();
         if (owner) {
-            this.actionManager.applyBuffToCharacterOrCard(owner, new Strong(this.stacks));
+            this.actionManager.applyBuffToCharacterOrCard(owner, new Lethality(this.stacks));
         }
     }   
 }

@@ -1,6 +1,6 @@
 import { PlayableCard } from "../../PlayableCard";
 import { AbstractBuff } from "../AbstractBuff";
-import { Strong } from "../standard/Strong";
+import { Lethality } from "../standard/Strong";
 
 export class Muse extends AbstractBuff {
     constructor(stacks: number = 1) {
@@ -21,7 +21,7 @@ export class Muse extends AbstractBuff {
         if (playedCard.baseEnergyCost === 0) {
             const owner = this.getOwnerAsCharacter();
             if (owner) {
-                this.actionManager.applyBuffToCharacterOrCard(owner, new Strong(this.stacks));
+                this.actionManager.applyBuffToCharacterOrCard(owner, new Lethality(this.stacks));
             }
         }
     }

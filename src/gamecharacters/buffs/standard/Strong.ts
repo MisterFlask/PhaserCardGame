@@ -1,7 +1,7 @@
 import { AbstractBuff } from "../AbstractBuff";
-export class Strong extends AbstractBuff {
+export class Lethality extends AbstractBuff {
     override getName(): string {
-        return "Strong"
+        return "Lethality"
     }
     override getDescription(): string {
         return `Increases damage by ${this.getStacksDisplayText()}`

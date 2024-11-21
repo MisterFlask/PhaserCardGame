@@ -1,12 +1,12 @@
 import { TextGlyphs } from '../../text/TextGlyphs';
 import { AbstractCombatResource } from './AbstractCombatResource';
 
-export class PagesResource extends AbstractCombatResource {
+export class Ashes extends AbstractCombatResource {
     constructor() {
         super(
-            "Pages",
-            `If you win combat with at least 4 Pages, gain an additional card reward option. At 10, get 2 instead.`,
-            'papers_icon',
+            "Ashes",
+            `If you win combat with at least 4 Ashes, gain an additional card reward option. At 10, get 2 instead.`,
+            'ashes_icon',
             TextGlyphs.getInstance().pagesIcon
         );
         this.tint = 0xF5F5DC;

@@ -1,5 +1,5 @@
 import { Robotic } from "../../gamecharacters/buffs/enemy_buffs/Robotic";
-import { Strong } from "../../gamecharacters/buffs/standard/Strong";
+import { Lethality } from "../../gamecharacters/buffs/standard/Strong";
 import { EntityRarity } from "../../gamecharacters/PlayableCard";
 import { AbstractRelic } from "../AbstractRelic";
 
@@ -18,7 +18,7 @@ export class MachineEffigy extends AbstractRelic {
 
         if (hasRoboticEnemy) {
             this.combatState.playerCharacters.forEach(character => {
-                this.actionManager.applyBuffToCharacterOrCard(character, new Strong(2));
+                this.actionManager.applyBuffToCharacterOrCard(character, new Lethality(2));
             });
         }
     }

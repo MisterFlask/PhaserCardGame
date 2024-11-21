@@ -6,7 +6,7 @@ import { AbstractIntent, ApplyBuffToSelfIntent, AttackIntent } from '../../../ga
 import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
 import { Flying } from '../../../gamecharacters/buffs/standard/Flying';
 import { Stressful } from '../../../gamecharacters/buffs/standard/Stressful';
-import { Strong } from '../../../gamecharacters/buffs/standard/Strong';
+import { Lethality } from '../../../gamecharacters/buffs/standard/Strong';
 
 export class FrenchCrow extends AutomatedCharacter {
     constructor() {
@@ -34,7 +34,7 @@ export class FrenchCrow extends AutomatedCharacter {
             return [new AttackIntent({ baseDamage: 6, owner: this }).withTitle("Void Strike")];
         } else {
             // Buff itself with 2 strength
-            return [new ApplyBuffToSelfIntent({ buff: new Strong(2), owner: this }).withTitle("Eldritch Empowerment")];
+            return [new ApplyBuffToSelfIntent({ buff: new Lethality(2), owner: this }).withTitle("Eldritch Empowerment")];
         }
     }
 }

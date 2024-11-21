@@ -7,9 +7,9 @@ import type { AutomatedCharacterType, BaseCharacterType } from '../Types';
 import type { PhysicalCard } from '../ui/PhysicalCard';
 import { AbstractCombatResource } from './combatresources/AbstractCombatResource';
 import { IronResource } from './combatresources/IronResource';
-import { PagesResource } from './combatresources/PagesResource';
+import { Ashes } from './combatresources/PagesResource';
 import { PluckResource } from './combatresources/PluckResource';
-import { PowderResource } from './combatresources/PowderResource';
+import { BloodResource } from './combatresources/PowderResource';
 import { SmogResource } from './combatresources/SmogResource';
 import { VentureResource } from './combatresources/VentureResource';
 import { ShopPopulator } from './ShopPopulator';
@@ -233,9 +233,9 @@ export class MissionDetails{
 }
 
 export class CombatResources {
-    powder: PowderResource = new PowderResource();
+    powder: BloodResource = new BloodResource();
     iron: IronResource = new IronResource();
-    pages: PagesResource = new PagesResource();
+    pages: Ashes = new Ashes();
     pluck: PluckResource = new PluckResource();
     smog: SmogResource = new SmogResource();
     venture: VentureResource = new VentureResource();

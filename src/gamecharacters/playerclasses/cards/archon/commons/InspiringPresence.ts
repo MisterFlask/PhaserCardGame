@@ -1,7 +1,7 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
-import { Strong } from "../../../../buffs/standard/Strong";
+import { Lethality } from "../../../../buffs/standard/Strong";
 
 export class InspiringPresence extends PlayableCard {
     constructor() {
@@ -21,7 +21,7 @@ export class InspiringPresence extends PlayableCard {
 
         // Apply Strong to all allies
         this.forEachAlly(ally => {
-            this.actionManager.applyBuffToCharacterOrCard(ally, new Strong(1));
+            this.actionManager.applyBuffToCharacterOrCard(ally, new Lethality(1));
         });
     }
 

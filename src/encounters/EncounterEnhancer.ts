@@ -1,5 +1,5 @@
 import { DrawOneFewerCardNextNTurns } from "../gamecharacters/buffs/standard/DrawOneFewerCardNextNTurns";
-import { Strong } from "../gamecharacters/buffs/standard/Strong";
+import { Lethality } from "../gamecharacters/buffs/standard/Strong";
 import { EncounterData } from "./Encounters";
 
 export abstract class EncounterEnhancer {
@@ -35,7 +35,7 @@ export class StrongEncounterEnhancer extends EncounterEnhancer {
 
     public enhanceEncounter(encounter: EncounterData): EncounterData {
         encounter.enemies.forEach(enemy => {
-            enemy.applyBuffs_useFromActionManager([new Strong(this.stacks)]);
+            enemy.applyBuffs_useFromActionManager([new Lethality(this.stacks)]);
         });
         return encounter;
     }

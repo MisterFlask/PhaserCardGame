@@ -32,7 +32,7 @@ import { ReactiveShielding } from "../gamecharacters/buffs/standard/ReactiveShie
 import { Stress } from "../gamecharacters/buffs/standard/Stress";
 import { Stressful } from "../gamecharacters/buffs/standard/Stressful";
 import { StressReliefFinisher } from "../gamecharacters/buffs/standard/StressReliefFinisher";
-import { Strong } from "../gamecharacters/buffs/standard/Strong";
+import { Lethality } from "../gamecharacters/buffs/standard/Strong";
 import { SurfaceSellValue } from "../gamecharacters/buffs/standard/SurfaceSellValue";
 import { Swarm } from "../gamecharacters/buffs/standard/Swarm";
 import { Tense } from "../gamecharacters/buffs/standard/Tense";
@@ -56,7 +56,7 @@ export class MagicWords {
         new EldritchSmoke()
     ]
     allBuffsThatCouldPossiblyExist = [
-        new Strong(),
+        new Lethality(),
         new Weak(),
         new ErodingValue(),
         new ExhaustBuff(),

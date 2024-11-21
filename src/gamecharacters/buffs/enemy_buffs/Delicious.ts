@@ -3,7 +3,7 @@ import { ActionManager } from "../../../utils/ActionManager";
 import { BaseCharacter } from "../../BaseCharacter";
 import { PlayableCard } from "../../PlayableCard";
 import { AbstractBuff } from "../AbstractBuff";
-import { Strong } from "../standard/Strong";
+import { Lethality } from "../standard/Strong";
 export class Delicious extends AbstractBuff {
     override getName(): string {
         return "Delicious";
@@ -22,7 +22,7 @@ export class Delicious extends AbstractBuff {
     }
 
     override onOwnerStruck_CannotModifyDamage(strikingUnit: BaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void {
-        const strongBuff = new Strong(this.stacks);
+        const strongBuff = new Lethality(this.stacks);
         ActionManager.getInstance().applyBuffToCharacterOrCard(strikingUnit, strongBuff);
     }
 }

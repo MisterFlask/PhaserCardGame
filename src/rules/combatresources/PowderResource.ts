@@ -1,15 +1,15 @@
-import { Strong } from '../../gamecharacters/buffs/standard/Strong';
+import { Lethality } from '../../gamecharacters/buffs/standard/Strong';
 import { TextGlyphs } from '../../text/TextGlyphs';
 import { ActionManager } from '../../utils/ActionManager';
 import { GameState } from '../GameState';
 import { AbstractCombatResource } from './AbstractCombatResource';
 
-export class PowderResource extends AbstractCombatResource {
+export class BloodResource extends AbstractCombatResource {
     constructor() {
         super(
-            "Powder",
-            "Spend 1 Powder: all characters gain 2 Temporary Strength",
-            'powder_icon',
+            "Blood",
+            "Spend 1 Blood: all characters gain 2 Temporary Strength",
+            'blood_icon',
             TextGlyphs.getInstance().powderIcon
         );
         this.tint = 0xff0000;
@@ -22,7 +22,7 @@ export class PowderResource extends AbstractCombatResource {
                 gameState.combatState.allPlayerAndEnemyCharacters.forEach(character => {
                     ActionManager.getInstance().applyBuffToCharacterOrCard(
                         character, 
-                        new Strong(2)
+                        new Lethality(2)
                     );
                 });
                 this.value -= 1;

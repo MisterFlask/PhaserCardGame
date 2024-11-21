@@ -3,7 +3,7 @@ import { AutomatedCharacter } from '../gamecharacters/AutomatedCharacter';
 import { Delicious } from '../gamecharacters/buffs/enemy_buffs/Delicious';
 import { Stress } from '../gamecharacters/buffs/standard/Stress';
 import { Stressful } from '../gamecharacters/buffs/standard/Stressful';
-import { Strong } from '../gamecharacters/buffs/standard/Strong';
+import { Lethality } from '../gamecharacters/buffs/standard/Strong';
 import { AbstractRelic } from '../relics/AbstractRelic';
 import { RelicsLibrary } from '../relics/RelicsLibrary';
 import { FrenchBlindProphetess } from './monsters/act1_boss/FrenchBlindProphetess';
@@ -33,7 +33,7 @@ export class ClockworkAbomination extends AutomatedCharacter {
 export class BaconBeast extends AutomatedCharacter {
     constructor() {
         super({ name: 'Breakfast Nightmares Bacon Beast', portraitName: 'Breakfast Nightmares Bacon Beast', maxHitpoints: 25, description: 'A cunning dark elf assassin' });
-        this.buffs.push(new Strong(2))
+        this.buffs.push(new Lethality(2))
         this.buffs.push(new Delicious(1));
         this.buffs.push(new Stressful(1));
     }
@@ -47,7 +47,7 @@ export class BaconBeast extends AutomatedCharacter {
 export class BloodManipulationSlime extends AutomatedCharacter {
     constructor() {
         super({ name: 'Blood Manipulation Slime', portraitName: 'Blood Manipulation Slime', maxHitpoints: 20, description: 'Gross.' });
-        this.buffs.push(new Strong(3))
+        this.buffs.push(new Lethality(3))
 
     }
     
