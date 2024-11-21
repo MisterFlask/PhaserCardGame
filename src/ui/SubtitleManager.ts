@@ -33,7 +33,8 @@ export class SubtitleManager {
                 height: 50,
                 text: text,
                 style: { fontSize: '24px', color: '#ffffff' },
-                expandDirection: 'down'
+                verticalExpand: 'down',
+                horizontalExpand: 'right'
             });
             this.subtitleTextBox.setDepth(100); // Ensure it's on top
         } else {

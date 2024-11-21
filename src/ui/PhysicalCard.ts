@@ -5,6 +5,7 @@ import { AbstractCard, IPhysicalCardInterface, PriceContext } from '../gamechara
 import { AbstractIntent } from '../gamecharacters/AbstractIntent';
 import { CardDescriptionGenerator } from '../text/CardDescriptionGenerator';
 import { CardTooltipGenerator } from '../text/CardTooltipGenerator';
+import { ResourceDisplayGenerator } from '../text/ResourceDisplayGenerator';
 import type { CardConfig } from '../utils/CardGuiUtils';
 import { CheapGlowEffect } from './CheapGlowEffect';
 import { IncomingIntent } from "./IncomingIntent"; // Import the new class
@@ -56,6 +57,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
     public glowEffect?: CheapGlowEffect;
     private costBox: TextBox | null = null; // Add costBox property
     private priceBox!: TextBox; // Add this property
+    private resourceScalingBox: TextBox | null = null; // Add this property
 
     // This should be false in production; used for debugging depth-related issues in cards
     depthDebug: boolean = false;
@@ -138,7 +140,9 @@ export class PhysicalCard implements IPhysicalCardInterface {
                 color: '#000',
                 wordWrap: { width: cardWidth - 20 },
                 align: 'center'
-            }
+            },
+            verticalExpand: 'down',
+            horizontalExpand: 'center'
         });
         this.descBox.setVisible(false);
 
@@ -199,6 +203,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
             const playableCard = this.data as PlayableCardType;
             const cardWidth = this.cardBackground.displayWidth;
             const cardHeight = this.cardBackground.displayHeight;
+            
+            // Cost box setup remains the same
             this.costBox = new TextBox({
                 scene: this.scene,
                 x: cardWidth / 2 - 10,
@@ -209,7 +215,20 @@ export class PhysicalCard implements IPhysicalCardInterface {
                 style: { fontSize: '14px', color: '#ffffff', fontFamily: 'Arial' },
                 fillColor: 0x0000ff
             });
-            this.cardContent.add(this.costBox);
+            
+            // Add resource scaling box below cost box
+            this.resourceScalingBox = new TextBox({
+                scene: this.scene,
+                x: cardWidth / 2 - 40,
+                y: -cardHeight / 2 + 45, // Position it below the cost box
+                width: 30,
+                height: 30,
+                text: '',
+                style: { fontSize: '14px', color: '#ffffff', fontFamily: 'Arial' },
+                fillColor: 0x000000
+            });
+            
+            this.cardContent.add([this.costBox, this.resourceScalingBox]);
         }
 
         // Load the rollover sound if it's not already loaded
@@ -425,6 +444,13 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
         if (this.cardTypeBox) {
             this.cardTypeBox.destroy();
+        }
+
+        if (this.costBox) {
+            this.costBox.destroy();
+        }
+        if (this.resourceScalingBox) {
+            this.resourceScalingBox.destroy();
         }
 
         this.obliterated = true;
@@ -652,13 +678,33 @@ export class PhysicalCard implements IPhysicalCardInterface {
             this.nameBox.setBackgroundColor(playableCard.rarity.color);
         }
 
-        // Update cost box if it exists
-        if (this.costBox && this.data.isPlayableCard()) {
+        // Update cost box and resource scaling if it exists
+        if (this.costBox && this.resourceScalingBox && this.data.isPlayableCard()) {
             const playableCard = this.data as PlayableCardType;
             this.costBox.setText(`${playableCard.energyCost}`);
+            
+            // Position resource scaling box below the card type box
+            if (this.cardTypeBox) {
+                const cardTypeBottom = this.cardTypeBox.y + this.cardTypeBox.height / 2;
+                this.resourceScalingBox.setPosition(
+                    this.cardTypeBox.x + 22, 
+                    cardTypeBottom + 22  
+                );
+            }
+            
+            // Update resource scaling display
+            if (playableCard.resourceScalings && playableCard.resourceScalings.length > 0) {
+                const scalingText = ResourceDisplayGenerator.getInstance().generateResourceScalingText(playableCard.resourceScalings);
+                this.resourceScalingBox.setText(scalingText);
+                this.resourceScalingBox.setVerticalExpand('down');
+                this.resourceScalingBox.setHorizontalExpand('left');
+                this.resourceScalingBox.setVisible(true);
+            } else {
+                this.resourceScalingBox.setVisible(false);
+            }
         }
 
-        // Update card image and tint
+        // Update card image and portrait positioning
         const effectivePortraitName = this.data.getEffectivePortraitName(this.scene);
         const effectivePortraitTint = this.data.getEffectivePortraitTint(this.scene);
         
@@ -986,6 +1032,9 @@ export class PhysicalCard implements IPhysicalCardInterface {
         }
         if (this.costBox) {
             this.costBox.setDepth(depth);
+        }
+        if (this.resourceScalingBox) {
+            this.resourceScalingBox.setDepth(depth);
         }
         
         // Set depth for containers and their contents

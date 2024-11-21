@@ -203,7 +203,7 @@ export class CombatState{
         return [...this.playerCharacters, ...this.enemies];
     }
 
-    get allCardsInAllPilesExceptExhaust(): AbstractCard[] {
+    get allCardsInAllPilesExceptExhaust(): PlayableCard[] {
         return [...this.currentDrawPile, ...this.currentDiscardPile, ...this.currentHand];
     }
 

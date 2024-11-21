@@ -5,7 +5,7 @@ export class PagesResource extends AbstractCombatResource {
     constructor() {
         super(
             "Pages",
-            `If you win combat with at least 4 ${TextGlyphs.getInstance().pagesIcon}, gain an additional card reward option. At 10, get 2 instead.`,
+            `If you win combat with at least 4 Pages, gain an additional card reward option. At 10, get 2 instead.`,
             'papers_icon',
             TextGlyphs.getInstance().pagesIcon
         );

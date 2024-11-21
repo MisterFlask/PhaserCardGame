@@ -6,6 +6,9 @@ import { TextGlyphs } from '../text/TextGlyphs';
 import { DepthManager } from './DepthManager';
 
 // Modify the class to extend Phaser.GameObjects.Container
+export type VerticalExpand = 'up' | 'down';
+export type HorizontalExpand = 'left' | 'right'| 'center';
+
 export class TextBox extends Phaser.GameObjects.Container {
 
     public static readonly YELLOW = 0xFFFF00;
@@ -18,9 +21,9 @@ export class TextBox extends Phaser.GameObjects.Container {
     protected background: Phaser.GameObjects.Rectangle ;
     protected backgroundImage: Phaser.GameObjects.Image | null = null;
     protected text: BBCodeText;
-    protected outline: Phaser.GameObjects.Rectangle | null = null;
     textBoxName?: string;
-    expandDirection: 'up' | 'down';
+    protected verticalExpand: VerticalExpand;
+    protected horizontalExpand: HorizontalExpand;
     private debugGraphics: Phaser.GameObjects.Graphics;
     protected fillColor: number;
 
@@ -47,7 +50,8 @@ export class TextBox extends Phaser.GameObjects.Container {
         backgroundImage?: string,
         textBoxName?: string,
         fillColor?: number,
-        expandDirection?: 'up' | 'down',
+        verticalExpand?: VerticalExpand,
+        horizontalExpand?: HorizontalExpand,
         bigTextOverVariableColors?: boolean,
         strokeIsOn?: boolean
     }) {
@@ -62,8 +66,10 @@ export class TextBox extends Phaser.GameObjects.Container {
             backgroundImage,
             textBoxName,
             fillColor = 0x000000,
+            verticalExpand = 'down',
+            horizontalExpand = 'right',
             bigTextOverVariableColors = false,
-            strokeIsOn = true
+            strokeIsOn = true,
         } = params;
 
         super(scene, x, y);
@@ -72,7 +78,8 @@ export class TextBox extends Phaser.GameObjects.Container {
         this.setOrigin(0.5, 0.5);
 
         this.textBoxName = textBoxName ?? "anonymousTextBox";
-        this.expandDirection = params.expandDirection ?? 'down';
+        this.verticalExpand = verticalExpand;
+        this.horizontalExpand = horizontalExpand;
         
         this.background = scene.add.rectangle(0, 0, width, height, fillColor)
             .setStrokeStyle(2, 0xffffff)
@@ -201,6 +208,9 @@ export class TextBox extends Phaser.GameObjects.Container {
     setBackgroundColor(color: number): void {
         if (this.background) {
             this.background.setFillStyle(color);
+            // Determine outline color based on background color lightness
+            const outlineColor = this.isColorLight(color) ? 0x000000 : 0xFFFFFF;
+            this.background.setStrokeStyle(2, outlineColor);
         }
         this.fillColor = color; // Store the color for later use
 
@@ -292,10 +302,20 @@ export class TextBox extends Phaser.GameObjects.Container {
             
             target.setSize(newWidth, newHeight);
             
-            if (this.expandDirection === 'down') {
+            // Handle vertical expansion
+            if (this.verticalExpand === 'down') {
                 this.y += heightIncrease / 2;
-            } else {
+            } else { // 'up'
                 this.y -= heightIncrease / 2;
+            }
+
+            // Handle horizontal expansion
+            if (this.horizontalExpand === 'right') {
+                this.x += widthIncrease / 2;
+            } else if (this.horizontalExpand === 'left') { // 'left'
+                this.x -= widthIncrease / 2;
+            } else { 
+                // 'center'; we do nothing
             }
 
             this.text.setWordWrapWidth(newWidth - padding * 2);
@@ -350,5 +370,16 @@ export class TextBox extends Phaser.GameObjects.Container {
         }
         const { displayWidth: width, displayHeight: height } = target;
         return { width, height };
+    }
+
+    // Add methods to change expansion direction at runtime
+    setVerticalExpand(direction: VerticalExpand): void {
+        this.verticalExpand = direction;
+        this.adjustTextBoxSize(); // Readjust size with new direction
+    }
+
+    setHorizontalExpand(direction: HorizontalExpand): void {
+        this.horizontalExpand = direction;
+        this.adjustTextBoxSize(); // Readjust size with new direction
     }
 }

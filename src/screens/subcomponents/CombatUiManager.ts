@@ -383,7 +383,8 @@ class CombatUIManager {
                 height: 50,
                 text: text,
                 style: { fontSize: '24px', color: '#ffffff' },
-                expandDirection: 'down'
+                verticalExpand: 'down',
+                horizontalExpand: 'right'
             });
             this.subtitleTextBox.setDepth(100);
             this.subtitleTextBox.setScrollFactor(0);

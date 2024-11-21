@@ -17,7 +17,7 @@ export class SoulEater extends AbstractBuff {
         return `When acquired, reduces max HP by ${this.stacks}.`;
     }
 
-    override onAcquisition(): void {
+    override onGainingThisCard(): void {
         const owner = this.getOwnerAsPlayableCard();
         if (owner?.owner) {
             owner.owner.maxHitpoints -= this.stacks;

@@ -27,16 +27,19 @@ const modifiers: ShopCardModifier[] = [
     new ShopCardModifier(0.2, (card: PlayableCard) => {
         card.applyBuffs([new Damaged(1)]);
         card.applyBuffs([new OnSale(90)]);
+        card.name += "?";
     }, (card: PlayableCard) => card.rarity.isAtLeastAsRareAs(EntityRarity.RARE)),
     new ShopCardModifier(0.2, (card: PlayableCard) => {
         card.applyBuffs([new OnSale(50)]);
     }),
     new ShopCardModifier(0.2, (card: PlayableCard) => {
         card.applyBuffs([getRandomEnhancementBuff()]);
+        card.name += "+";
     }),
     new ShopCardModifier(0.2, (card: PlayableCard) => {
         card.applyBuffs([new Heavy()]);
         card.applyBuffs([new OnSale(90)]);
+        card.name += "?";
     }, (card: PlayableCard) => card.rarity.isAtLeastAsRareAs(EntityRarity.UNCOMMON))
 ];
 
@@ -54,7 +57,7 @@ export class ShopPopulator {
         }
         return ShopPopulator.instance;
     }
-    
+
 
     private getCardPrice(card: PlayableCard): number {
         const basePrice = card.rarity.basePrice;

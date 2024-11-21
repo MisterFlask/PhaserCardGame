@@ -225,13 +225,13 @@ export abstract class PlayableCard extends AbstractCard {
     /**
      * DO NOT OVERRIDE.
      */
-    protected dealDamageToTarget(targetCard?: AbstractCard, callback?: (damageResult: DamageCalculationResult) => void): void {
+    protected dealDamageToTarget(targetCard?: AbstractCard, baseDamageOverride?: number, callback?: (damageResult: DamageCalculationResult) => void): void {
         if (!(targetCard instanceof BaseCharacter)) {
             return;
         }
         if (targetCard) {
             this.actionManager.dealDamage({
-                baseDamageAmount: this.getBaseDamageAfterResourceScaling(),
+                baseDamageAmount: baseDamageOverride ?? this.getBaseDamageAfterResourceScaling(),
                 target: targetCard,
                 sourceCharacter: this.owner,
                 fromAttack: true,
@@ -443,5 +443,4 @@ export interface CardResourceScaling {
     attackScaling?: number;
     blockScaling?: number;
     magicNumberScaling?: number;
-    glyph?: string;
 }

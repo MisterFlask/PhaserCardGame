@@ -19,7 +19,7 @@ export class TextGlyphs {
 
     // Resource icons
     public get ventureIcon(): string {
-        return `[color=lightgreen][img=${this.VENTURE_ICON_RAW}][/color]`;
+        return `[color=yellow][img=${this.VENTURE_ICON_RAW}][/color]`;
     }
 
     public get mettleIcon(): string {
@@ -31,7 +31,7 @@ export class TextGlyphs {
     }
 
     public get pluckIcon(): string {
-        return `[color=lightblue][img=${this.PLUCK_ICON_RAW}][/color]`;
+        return `[color=green][img=${this.PLUCK_ICON_RAW}][/color]`;
     }
 
     public get powderIcon(): string {

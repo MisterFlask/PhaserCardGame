@@ -11,7 +11,7 @@ export class InfernaliteCache extends PlayableCard {
             portraitName: "enrage-test",
             targetingType: TargetingType.NO_TARGETING,
         });
-        this.baseMagicNumber = 6;
+        this.baseMagicNumber = 3;
         this.baseEnergyCost = 1;
     }
 
@@ -22,8 +22,6 @@ export class InfernaliteCache extends PlayableCard {
     override InvokeCardEffects(targetCard?: BaseCharacter): void {
         if (this.owner) {
             this.actionManager.modifyPowder(this.getBaseMagicNumberAfterResourceScaling(), this.owner as BaseCharacter);
-
-            console.log(`Gained ${this.getDisplayedMagicNumber()} [Powder]`);
         }
     }
 }

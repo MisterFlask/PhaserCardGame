@@ -58,7 +58,7 @@ export class CardRewardsGenerator {
         }, 1),
         new CardAlteration("Weaker", (card: PlayableCard) => {
             card.baseDamage -= card.baseDamage * 0.5;
-            card.name += "-"
+            card.name += "?"
         }, (card: PlayableCard) => {
             return card.baseDamage > 0;
         }, -1),
@@ -68,7 +68,7 @@ export class CardRewardsGenerator {
             }else{
                 card.buffs.push(new Painful(1));
             }
-            card.name = "Jagged " + card.name;
+            card.name += "?";
         }, (card: PlayableCard) => {
             return true;
         }, -1),

@@ -7,7 +7,7 @@ import { Strong } from "../../../../buffs/standard/Strong";
 export class CourageUnderFire extends PlayableCard {
     constructor() {
         super({
-            name: "Courage Under Fire",
+            name: "Hold The Line",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.UNCOMMON,
@@ -15,7 +15,7 @@ export class CourageUnderFire extends PlayableCard {
         this.portraitName = "CourageUnderFire";
         this.baseEnergyCost = 2;
         this.baseBlock = 5;
-        this.baseMagicNumber = 1; // Amount of Strength to apply
+        this.baseMagicNumber = 1;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

@@ -336,7 +336,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
     }
 
-    public onAcquisition(){
+    public onGainingThisCard(){
 
     }
 

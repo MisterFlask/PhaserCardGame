@@ -31,7 +31,7 @@ export class OnSale extends AbstractBuff {
         return -1 * this.stacks;
     }
 
-    override onAcquisition(): void {
+    override onGainingThisCard(): void {
         this.stacks = 0; // should not persist after the card is bought
     }
 }

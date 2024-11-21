@@ -2,6 +2,7 @@
 
 import { TargetingType } from '../../../../AbstractCard';
 import { BaseCharacter } from '../../../../BaseCharacter';
+import { Burning } from '../../../../buffs/standard/Burning';
 import { StressReliefFinisher } from '../../../../buffs/standard/StressReliefFinisher';
 import { PlayableCard } from '../../../../PlayableCard';
 
@@ -22,7 +23,7 @@ export class RageFueledAxe extends PlayableCard {
   }
 
   override InvokeCardEffects(target?: BaseCharacter): void {
-    this.dealDamageToTarget(target);
+    this.dealDamageToTarget(target, this.getBaseDamageAfterResourceScaling() + (target?.getBuffStacks(new Burning().getName() )?? 0));
   }
 
 }

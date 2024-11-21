@@ -30,7 +30,7 @@ export class Balefire extends PlayableCard {
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage 2 times. Giant Killer. Bloodprice 3. Decrease your max HP by 3. Exhaust.`;
+        return `Deal ${this.getDisplayedDamage()} damage 2 times.  Decrease ${this.owner?.name}'s max HP by 3.`;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
