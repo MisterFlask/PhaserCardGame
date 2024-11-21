@@ -240,6 +240,7 @@ export default class GameImageLoader {
         attributes_and_augments: {
             prefix: 'Sprites/AttributesAndAugments/',
             files: [
+                "sale_tag.png",
                 'abdominal-armor.png', 'abstract-024.png', 'abstract-025.png', 'abstract-085.png',
                 'achilles-heel.png', 'acrobatic.png', 'angry-eyes.png', 'armor-punch.png',
                 'barricade.png', 'bleeding-wound.png', 'body-balance.png', 'bottom-right-3d-arrow.png',

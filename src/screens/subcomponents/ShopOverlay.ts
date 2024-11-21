@@ -29,6 +29,8 @@ export class ShopOverlay {
     private inventoryOutline!: Phaser.GameObjects.Rectangle;
     private relicsOutline!: Phaser.GameObjects.Rectangle;
     private debugOutlinesVisible: boolean = false;
+    private readonly SHOP_BASE_DEPTH = DepthManager.getInstance().SHOP_OVERLAY;
+    private readonly HOVER_DEPTH_BOOST = 1000;
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -71,8 +73,10 @@ export class ShopOverlay {
         this.relicsOutline.setOrigin(0, 0);
         this.relicsOutline.setVisible(false);
 
-        this.shopItemsContainer = this.scene.add.container(50, 100);
-        this.inventoryContainer = this.scene.add.container(width / 2 - 200, 200);
+        this.shopItemsContainer = this.scene.add.container(50, 100)
+            .setDepth(this.SHOP_BASE_DEPTH);
+        this.inventoryContainer = this.scene.add.container(width / 2 - 200, 200)
+            .setDepth(this.SHOP_BASE_DEPTH);
 
         const closeButton = new TextBox({
             scene: this.scene,
@@ -178,7 +182,6 @@ export class ShopOverlay {
             for (let col = 0; col < gridColumns; col++) {
                 const index = row * gridColumns + col;
                 
-                // Only create a panel if there's an item available
                 if (index < shopItems.length) {
                     const item = shopItems[index];
                     const panel = new ShopCardPanel(
@@ -191,7 +194,18 @@ export class ShopOverlay {
                         PriceContext.HELL_BUY
                     );
                     this.shopItemsContainer.add(panel);
-                    panel.setDepth(this.BASE_PANEL_DEPTH);
+                    
+                    panel.on('pointerover', () => {
+                        this.shopItemsContainer.setDepth(this.SHOP_BASE_DEPTH + this.HOVER_DEPTH_BOOST);
+                        panel.setDepth(DepthManager.getInstance().SHOP_CARD_HOVER);
+                        TransientUiState.getInstance().hoveredCard = panel.physicalCard;
+                    });
+                    
+                    panel.on('pointerout', () => {
+                        this.shopItemsContainer.setDepth(this.SHOP_BASE_DEPTH);
+                        panel.setDepth(this.BASE_PANEL_DEPTH);
+                        TransientUiState.getInstance().hoveredCard = undefined;
+                    });
                     
                     this.shopItemPanels.push(panel);
                 }
@@ -225,12 +239,15 @@ export class ShopOverlay {
                 panel.setDepth(this.BASE_PANEL_DEPTH);
                 
                 panel.on('pointerover', () => {
+                    this.inventoryContainer.setDepth(this.SHOP_BASE_DEPTH + this.HOVER_DEPTH_BOOST);
                     panel.setDepth(DepthManager.getInstance().SHOP_CARD_HOVER);
                     TransientUiState.getInstance().hoveredCard = panel.physicalCard;
                 });
                 
                 panel.on('pointerout', () => {
+                    this.inventoryContainer.setDepth(this.SHOP_BASE_DEPTH);
                     panel.setDepth(this.BASE_PANEL_DEPTH);
+                    TransientUiState.getInstance().hoveredCard = undefined;
                 });
                 
                 this.inventoryItemPanels.push(panel);

@@ -4,7 +4,7 @@ export class OnSale extends AbstractBuff {
     private realName: string;
     constructor(stacks: number = 1) {
         super();
-        this.imageName = "sale-tag";
+        this.imageName = "sale_tag";
         this.stackable = true;
         this.isDebuff = false;
         this.stacks = stacks;
