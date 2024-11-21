@@ -10,7 +10,7 @@ export class BloodResource extends AbstractCombatResource {
             "Blood",
             "Spend 1 Blood: all characters gain 2 Temporary Strength",
             'blood_icon',
-            TextGlyphs.getInstance().powderIcon
+            TextGlyphs.getInstance().bloodIcon
         );
         this.tint = 0xff0000;
     }

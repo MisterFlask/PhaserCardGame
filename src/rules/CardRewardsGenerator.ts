@@ -1,8 +1,8 @@
 import { Painful } from "../gamecharacters/buffs/playable_card/Painful";
-import { IncreaseIron } from "../gamecharacters/buffs/standard/combatresource/IncreaseIron";
+import { IncreaseBlood } from "../gamecharacters/buffs/standard/combatresource/IncreaseBlood";
+import { IncreaseIron } from "../gamecharacters/buffs/standard/combatresource/IncreaseMetal";
 import { IncreasePages } from "../gamecharacters/buffs/standard/combatresource/IncreasePages";
 import { IncreasePluck } from "../gamecharacters/buffs/standard/combatresource/IncreasePluck";
-import { IncreasePowder } from "../gamecharacters/buffs/standard/combatresource/IncreasePowder";
 import { IncreaseSmog } from "../gamecharacters/buffs/standard/combatresource/IncreaseSmog";
 import { IncreaseVenture } from "../gamecharacters/buffs/standard/combatresource/IncreaseVenture";
 import { EntityRarity, PlayableCard } from "../gamecharacters/PlayableCard";
@@ -85,7 +85,7 @@ export class CardRewardsGenerator {
         new IncreaseIron(),
         new IncreasePages(),
         new IncreasePluck(),
-        new IncreasePowder(),
+        new IncreaseBlood(),
         new IncreaseVenture(),
         new IncreaseSmog(),
     ]

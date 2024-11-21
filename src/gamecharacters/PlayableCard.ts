@@ -1,8 +1,8 @@
 import { AbstractCombatResource } from "../rules/combatresources/AbstractCombatResource";
+import { Ashes } from "../rules/combatresources/AshesResource";
+import { BloodResource } from "../rules/combatresources/BloodResource";
 import { IronResource } from "../rules/combatresources/IronResource";
-import { Ashes } from "../rules/combatresources/PagesResource";
 import { PluckResource } from "../rules/combatresources/PluckResource";
-import { BloodResource } from "../rules/combatresources/PowderResource";
 import { SmogResource } from "../rules/combatresources/SmogResource";
 import { VentureResource } from "../rules/combatresources/VentureResource";
 import { CombatRules, DamageCalculationResult } from "../rules/CombatRules";

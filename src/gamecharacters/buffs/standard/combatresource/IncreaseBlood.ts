@@ -2,7 +2,7 @@ import { TextGlyphs } from "../../../../text/TextGlyphs";
 import { BaseCharacter } from "../../../BaseCharacter";
 import { AbstractBuff } from "../../AbstractBuff";
 
-export class IncreasePowder extends AbstractBuff {
+export class IncreaseBlood extends AbstractBuff {
     constructor() {
         super();
         this.stackable = true;
@@ -10,11 +10,11 @@ export class IncreasePowder extends AbstractBuff {
     }
 
     getName(): string {
-        return "Increase Powder";
+        return "Increase Blood";
     }
 
     getDescription(): string {
-        return `When played, gain ${this.getStacksDisplayText()} ${TextGlyphs.getInstance().powderIcon}.`;
+        return `When played, gain ${this.getStacksDisplayText()} ${TextGlyphs.getInstance().bloodIcon}.`;
     }
 
     public onThisCardInvoked(target?: BaseCharacter): void {

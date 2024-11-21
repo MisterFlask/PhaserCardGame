@@ -1,4 +1,5 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
+import { Burning } from "../../../../buffs/standard/Burning";
 import { Vulnerable } from "../../../../buffs/standard/Vulnerable";
 import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
@@ -12,19 +13,22 @@ export class InspireFear extends PlayableCard {
             rarity: EntityRarity.UNCOMMON,
         });
         this.baseEnergyCost = 2;
-        this.baseDamage = 10;
         this.baseMagicNumber = 2; // Amount of Vulnerable applied to enemies
+        this.resourceScalings.push({
+            resource: this.pluck,
+            magicNumberScaling: 1
+        });
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
-        // Deal 10 damage to all enemies
-        this.forEachEnemy(enemy => {
-            this.dealDamageToTarget(enemy);
-        });
 
         // Apply 2 Vulnerable to all enemies
         this.forEachEnemy(enemy => {
-            this.actionManager.applyBuffToCharacterOrCard(enemy, new Vulnerable(this.baseMagicNumber));
+            this.actionManager.applyBuffToCharacterOrCard(enemy, new Vulnerable(this.getBaseMagicNumberAfterResourceScaling()));
+        });
+        // Apply 2 Burning to all enemies
+        this.forEachEnemy(enemy => {
+            this.actionManager.applyBuffToCharacterOrCard(enemy, new Burning(this.getBaseMagicNumberAfterResourceScaling()));
         });
 
         // Apply 1 Vulnerable to all allies
@@ -35,6 +39,6 @@ export class InspireFear extends PlayableCard {
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage to ALL enemies.  Apply ${this.getDisplayedMagicNumber()} Vulnerable to all enemies. Apply 1 Vulnerable to all allies.`;
+        return `Apply ${this.getDisplayedMagicNumber()} Vulnerable and Burning to ALL enemies. Apply 1 Vulnerable to all allies.`;
     }
 }

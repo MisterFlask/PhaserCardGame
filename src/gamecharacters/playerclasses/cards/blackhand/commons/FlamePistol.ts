@@ -8,7 +8,7 @@ import { CardType } from "../../../../Primitives";
 export class FlamePistol extends PlayableCard {
     constructor() {
         super({
-            name: "Flame Pistol",
+            name: "Flame Revolver",
             description: `_`,
             portraitName: "fire-ray",
             targetingType: TargetingType.ENEMY,

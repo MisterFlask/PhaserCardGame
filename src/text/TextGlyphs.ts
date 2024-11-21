@@ -34,7 +34,7 @@ export class TextGlyphs {
         return `[color=green][img=${this.PLUCK_ICON_RAW}][/color]`;
     }
 
-    public get powderIcon(): string {
+    public get bloodIcon(): string {
         return `[color=red][img=${this.POWDER_ICON_RAW}][/color]`;
     }
 

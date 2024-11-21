@@ -78,7 +78,7 @@ export class ActionManager {
         const combatResources = GameState.getInstance().combatState.combatResources;
         combatResources.modifyPages(0 - combatResources.pages.value);
         combatResources.modifyPluck(0 - combatResources.pluck.value);
-        combatResources.modifyIron(0 - combatResources.iron.value);
+        combatResources.modifyMettle(0 - combatResources.iron.value);
         combatResources.modifyVenture(0 - combatResources.venture.value);
         combatResources.modifySmog(0 - combatResources.smog.value);
         combatResources.modifyPowder(0 - combatResources.powder.value);
@@ -862,7 +862,7 @@ export class ActionManager {
     }
     public modifyIron(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
         this.actionQueue.addAction(new GenericAction(async () => {
-            GameState.getInstance().combatState.combatResources.modifyIron(amount);
+            GameState.getInstance().combatState.combatResources.modifyMettle(amount);
             return [];
         }));
     }

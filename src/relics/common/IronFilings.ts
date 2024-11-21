@@ -10,6 +10,6 @@ export class IronFilings extends AbstractRelic {
     }
 
     onCombatStart(): void {
-        this.combatState.combatResources.modifyIron(2);
+        this.combatState.combatResources.modifyMettle(2);
     }
 }

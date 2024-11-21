@@ -17,7 +17,7 @@ export class CampaignRules {
         const characters: PlayerCharacter[] = [];
 
         for (let i = 0; i < 5; i++) {
-            const character = CharacterGenerator.generateRandomCharacter();
+            const character = CharacterGenerator.getInstance().generateRandomCharacter();
             
             // Reroll portrait up to 5 times to avoid duplicates
             let attempts = 0;

@@ -6,10 +6,10 @@ import { AbstractRelic } from '../relics/AbstractRelic';
 import type { AutomatedCharacterType, BaseCharacterType } from '../Types';
 import type { PhysicalCard } from '../ui/PhysicalCard';
 import { AbstractCombatResource } from './combatresources/AbstractCombatResource';
+import { Ashes } from './combatresources/AshesResource';
+import { BloodResource } from './combatresources/BloodResource';
 import { IronResource } from './combatresources/IronResource';
-import { Ashes } from './combatresources/PagesResource';
 import { PluckResource } from './combatresources/PluckResource';
-import { BloodResource } from './combatresources/PowderResource';
 import { SmogResource } from './combatresources/SmogResource';
 import { VentureResource } from './combatresources/VentureResource';
 import { ShopPopulator } from './ShopPopulator';
@@ -248,7 +248,7 @@ export class CombatResources {
         this.pages.value += byAmount;
         console.log(`Modified Pages by ${byAmount}. New value: ${this.pages.value}`);
     }
-    modifyIron(byAmount: number) {
+    modifyMettle(byAmount: number) {
         this.iron.value += byAmount;
         console.log(`Modified Iron by ${byAmount}. New value: ${this.iron.value}`);
     }
