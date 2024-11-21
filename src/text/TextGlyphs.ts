@@ -14,7 +14,7 @@ export class TextGlyphs {
     public readonly METTLE_ICON_RAW = "iron_icon";
     public readonly PAGES_ICON_RAW = "ashes_icon";
     public readonly PLUCK_ICON_RAW = "feather_icon";
-    public readonly POWDER_ICON_RAW = "blood_icon";
+    public readonly BLOOD_ICON_RAW = "blood_icon";
     public readonly SMOG_ICON_RAW = "smog_icon";
 
     // Resource icons
@@ -35,7 +35,7 @@ export class TextGlyphs {
     }
 
     public get bloodIcon(): string {
-        return `[color=red][img=${this.POWDER_ICON_RAW}][/color]`;
+        return `[color=pink][img=${this.BLOOD_ICON_RAW}][/color]`;
     }
 
     public get smogIcon(): string {

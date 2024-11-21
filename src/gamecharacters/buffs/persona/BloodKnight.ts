@@ -18,6 +18,6 @@ export class BloodKnight extends AbstractBuff {
     }
 
     override onCombatStart(): void {
-        this.combatState.combatResources.modifyPowder(this.stacks);
+        this.combatState.combatResources.modifyBlood(this.stacks);
     }
 } 

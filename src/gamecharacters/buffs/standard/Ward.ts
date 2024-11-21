@@ -1,17 +1,17 @@
 import { AbstractCard } from "../../AbstractCard";
 import { AbstractBuff, BuffApplicationResult } from "../AbstractBuff";
 
-export class Blessed extends AbstractBuff {
+export class Ward extends AbstractBuff {
     constructor(stacks: number = 1) {
         super();
-        this.imageName = "blessed";
+        this.imageName = "ward";
         this.stackable = true;
         this.isDebuff = false;
         this.stacks = stacks;
     }
 
     override getName(): string {
-        return "Blessed";
+        return "Ward";
     }
 
     override getDescription(): string {

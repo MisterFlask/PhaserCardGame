@@ -152,7 +152,7 @@ export class TextBox extends Phaser.GameObjects.Container {
         this.text.addImage(TextGlyphs.getInstance().PAGES_ICON_RAW, {...imageConfig, key: TextGlyphs.getInstance().PAGES_ICON_RAW});
         this.text.addImage(TextGlyphs.getInstance().VENTURE_ICON_RAW, {...imageConfig, key: TextGlyphs.getInstance().VENTURE_ICON_RAW});
         this.text.addImage(TextGlyphs.getInstance().PLUCK_ICON_RAW, {...imageConfig, key: TextGlyphs.getInstance().PLUCK_ICON_RAW});
-        this.text.addImage(TextGlyphs.getInstance().POWDER_ICON_RAW, {...imageConfig, key: TextGlyphs.getInstance().POWDER_ICON_RAW});
+        this.text.addImage(TextGlyphs.getInstance().BLOOD_ICON_RAW, {...imageConfig, key: TextGlyphs.getInstance().BLOOD_ICON_RAW});
         this.text.addImage(TextGlyphs.getInstance().SMOG_ICON_RAW, {...imageConfig, key: TextGlyphs.getInstance().SMOG_ICON_RAW});
         
         // Remove the immediate setBackgroundColor call

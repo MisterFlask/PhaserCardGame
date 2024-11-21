@@ -82,11 +82,11 @@ export class DebugMenu {
                 callback: () => {
                     const combatResources = GameState.getInstance().combatState.combatResources;
                     combatResources.modifyPluck(4);
-                    combatResources.modifyPages(4);
+                    combatResources.modifyAshes(4);
                     combatResources.modifyMettle(4);
                     combatResources.modifyVenture(4);
                     combatResources.modifySmog(4);
-                    combatResources.modifyPowder(4);
+                    combatResources.modifyBlood(4);
                 }
             },
             {

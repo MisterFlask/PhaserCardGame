@@ -7,7 +7,6 @@ import { Heavy } from "../gamecharacters/buffs/playable_card/Heavy";
 import { Lightweight } from "../gamecharacters/buffs/playable_card/Lightweight";
 import { Painful } from "../gamecharacters/buffs/playable_card/Painful";
 import { VolatileBuff } from "../gamecharacters/buffs/playable_card/VolatileCardBuff";
-import { Blessed } from "../gamecharacters/buffs/standard/Blessed";
 import { Blind } from "../gamecharacters/buffs/standard/Blind";
 import { BloodPriceBuff } from "../gamecharacters/buffs/standard/Bloodprice";
 import { Bulwark } from "../gamecharacters/buffs/standard/Bulwark";
@@ -30,15 +29,16 @@ import { Obsession } from "../gamecharacters/buffs/standard/Obsession";
 import { Poisoned } from "../gamecharacters/buffs/standard/Poisoned";
 import { ReactiveShielding } from "../gamecharacters/buffs/standard/ReactiveShielding";
 import { Stress } from "../gamecharacters/buffs/standard/Stress";
-import { Stressful } from "../gamecharacters/buffs/standard/Stressful";
 import { StressReliefFinisher } from "../gamecharacters/buffs/standard/StressReliefFinisher";
 import { Lethality } from "../gamecharacters/buffs/standard/Strong";
 import { SurfaceSellValue } from "../gamecharacters/buffs/standard/SurfaceSellValue";
 import { Swarm } from "../gamecharacters/buffs/standard/Swarm";
 import { Tense } from "../gamecharacters/buffs/standard/Tense";
+import { Terrifying } from "../gamecharacters/buffs/standard/Terrifying";
 import { Titan } from "../gamecharacters/buffs/standard/Titan";
 import { ValuableCargo } from "../gamecharacters/buffs/standard/ValuableCargo";
 import { Vulnerable } from "../gamecharacters/buffs/standard/Vulnerable";
+import { Ward } from "../gamecharacters/buffs/standard/Ward";
 import { Weak } from "../gamecharacters/buffs/standard/Weak";
 import { PlayableCard } from "../gamecharacters/PlayableCard";
 import { EldritchSmoke } from "../gamecharacters/playerclasses/cards/diabolist/tokens/EldritchSmoke";
@@ -66,7 +66,7 @@ export class MagicWords {
         new Lightweight(),
         new Painful(),
         new VolatileBuff(),
-        new Blessed(),
+        new Ward(),
         new Blind(),
         new BloodPriceBuff(1),
         new Bulwark(),
@@ -89,7 +89,7 @@ export class MagicWords {
         new Poisoned(),
         new ReactiveShielding(),
         new Stress(),
-        new Stressful(),
+        new Terrifying(),
         new StressReliefFinisher(),
         new SurfaceSellValue(),
         new Swarm(),

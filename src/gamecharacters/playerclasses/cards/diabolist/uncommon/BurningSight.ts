@@ -32,7 +32,7 @@ export class BurningSight extends PlayableCard {
         }
 
         // Gain 3 Pages
-        this.actionManager.modifyPages(this.getBaseMagicNumberAfterResourceScaling());
+        this.actionManager.modifyAshes(this.getBaseMagicNumberAfterResourceScaling());
     }
 
     override get description(): string {

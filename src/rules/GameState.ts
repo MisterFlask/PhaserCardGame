@@ -8,7 +8,7 @@ import type { PhysicalCard } from '../ui/PhysicalCard';
 import { AbstractCombatResource } from './combatresources/AbstractCombatResource';
 import { Ashes } from './combatresources/AshesResource';
 import { BloodResource } from './combatresources/BloodResource';
-import { IronResource } from './combatresources/IronResource';
+import { MettleResource } from './combatresources/MettleResource';
 import { PluckResource } from './combatresources/PluckResource';
 import { SmogResource } from './combatresources/SmogResource';
 import { VentureResource } from './combatresources/VentureResource';
@@ -234,7 +234,7 @@ export class MissionDetails{
 
 export class CombatResources {
     powder: BloodResource = new BloodResource();
-    iron: IronResource = new IronResource();
+    iron: MettleResource = new MettleResource();
     pages: Ashes = new Ashes();
     pluck: PluckResource = new PluckResource();
     smog: SmogResource = new SmogResource();
@@ -244,7 +244,7 @@ export class CombatResources {
         this.pluck.value += byAmount;
         console.log(`Modified Pluck by ${byAmount}. New value: ${this.pluck.value}`);
     }
-    modifyPages(byAmount: number) {
+    modifyAshes(byAmount: number) {
         this.pages.value += byAmount;
         console.log(`Modified Pages by ${byAmount}. New value: ${this.pages.value}`);
     }
@@ -260,7 +260,7 @@ export class CombatResources {
         this.smog.value += byAmount;
         console.log(`Modified Smog by ${byAmount}. New value: ${this.smog.value}`);
     }
-    modifyPowder(byAmount: number) {
+    modifyBlood(byAmount: number) {
         this.powder.value += byAmount;
         console.log(`Modified Powder by ${byAmount}. New value: ${this.powder.value}`);
     }

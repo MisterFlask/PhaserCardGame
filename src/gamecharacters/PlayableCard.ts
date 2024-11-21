@@ -1,7 +1,7 @@
 import { AbstractCombatResource } from "../rules/combatresources/AbstractCombatResource";
 import { Ashes } from "../rules/combatresources/AshesResource";
 import { BloodResource } from "../rules/combatresources/BloodResource";
-import { IronResource } from "../rules/combatresources/IronResource";
+import { MettleResource } from "../rules/combatresources/MettleResource";
 import { PluckResource } from "../rules/combatresources/PluckResource";
 import { SmogResource } from "../rules/combatresources/SmogResource";
 import { VentureResource } from "../rules/combatresources/VentureResource";
@@ -206,7 +206,7 @@ export abstract class PlayableCard extends AbstractCard {
         return this.combatResources.pages;
     }
 
-    get mettle(): IronResource {
+    get mettle(): MettleResource {
         return this.combatResources.iron;
     }
 
@@ -218,7 +218,7 @@ export abstract class PlayableCard extends AbstractCard {
         return this.combatResources.smog;
     }
 
-    get powder(): BloodResource {
+    get blood(): BloodResource {
         return this.combatResources.powder;
     }
 

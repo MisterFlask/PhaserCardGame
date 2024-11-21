@@ -1,7 +1,5 @@
-import type { DamageInfo } from "../../../rules/DamageInfo";
-import type { BaseCharacter } from "../../BaseCharacter";
-import type { PlayableCard } from "../../PlayableCard";
 import { AbstractBuff } from "../AbstractBuff";
+import { Lethality } from "./Strong";
 
 export class Stress extends AbstractBuff {
     override getName(): string {
@@ -9,7 +7,7 @@ export class Stress extends AbstractBuff {
     }
 
     override getDescription(): string {
-        return `When stress is above ${this.secondaryStacks}, character receives double damage.`;
+        return `For every 10 Stress stacks, enemies start combat with 1 more Lethality.`;
     }
 
     constructor(stacks: number = 0) {
@@ -22,18 +20,10 @@ export class Stress extends AbstractBuff {
         this.showSecondaryStacks = true;
     }
 
-    override getAdditionalPercentCombatDamageTakenModifier(): number {
-        if (this.stacks > 10) {
-            return 100;
-        } else {
-            return 0;
-        }
+    override onCombatStart(): void {
+        this.forEachEnemy((enemy) => {
+            this.actionManager.applyBuffToCharacterOrCard(enemy, new Lethality(Math.floor(this.stacks / 10)));
+        });
     }
-        
-    override onOwnerStruck_CannotModifyDamage(strikingUnit: BaseCharacter | null, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void {
-        if (damageInfo.unblockedDamageTaken > 0) {
-            this.stacks += 1;
-            console.log(`${this.getOwnerAsCharacter()?.name}'s stress increased to ${this.stacks}`);
-        }
-    }
+
 }

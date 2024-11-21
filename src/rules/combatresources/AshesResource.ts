@@ -7,7 +7,7 @@ export class Ashes extends AbstractCombatResource {
     constructor() {
         super(
             "Ashes",
-            `Passive: If you win combat with at least 4 Ashes, gain an additional card reward option. At 10, get 2 instead.  Active: pay 2 Ashes to upgrade a random block or damage card in hand.`,
+            `Passive: If you win combat with at least 4 Ashes, gain an additional card reward option. At 10, get 2 instead.`,
             'ashes_icon',
             TextGlyphs.getInstance().pagesIcon
         );

@@ -19,7 +19,7 @@ export class RageFueledAxe extends PlayableCard {
   }
 
   override get description(): string {
-    return `Deal ${this.getDisplayedDamage()} damage.  Deals more damage for each Burning on the target.`;
+    return `Deal ${this.getDisplayedDamage()} damage.  Deals 1 more damage for each Burning on the target.`;
   }
 
   override InvokeCardEffects(target?: BaseCharacter): void {

@@ -21,7 +21,7 @@ export class Lifesteal extends PlayableCard {
             magicNumberScaling: 1
         });
         this.resourceScalings.push({
-            resource: this.powder,
+            resource: this.blood,
             attackScaling: 1
         });
     }

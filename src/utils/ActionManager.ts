@@ -76,12 +76,12 @@ export class ActionManager {
         });
         // Reset all combat resources to 0
         const combatResources = GameState.getInstance().combatState.combatResources;
-        combatResources.modifyPages(0 - combatResources.pages.value);
+        combatResources.modifyAshes(0 - combatResources.pages.value);
         combatResources.modifyPluck(0 - combatResources.pluck.value);
         combatResources.modifyMettle(0 - combatResources.iron.value);
         combatResources.modifyVenture(0 - combatResources.venture.value);
         combatResources.modifySmog(0 - combatResources.smog.value);
-        combatResources.modifyPowder(0 - combatResources.powder.value);
+        combatResources.modifyBlood(0 - combatResources.powder.value);
     }
 
     startCombat() {
@@ -854,9 +854,9 @@ export class ActionManager {
             return [];
         }));
     }
-    public modifyPages(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
+    public modifyAshes(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
         this.actionQueue.addAction(new GenericAction(async () => {
-            GameState.getInstance().combatState.combatResources.modifyPages(amount);
+            GameState.getInstance().combatState.combatResources.modifyAshes(amount);
             return [];
         }));
     }
@@ -872,9 +872,9 @@ export class ActionManager {
             return [];
         }));
     }
-    public modifyPowder(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
+    public modifyBlood(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
         this.actionQueue.addAction(new GenericAction(async () => {
-            GameState.getInstance().combatState.combatResources.modifyPowder(amount);
+            GameState.getInstance().combatState.combatResources.modifyBlood(amount);
             return [];
         }));
     }

@@ -1,5 +1,4 @@
 import { BaseCharacter, Gender } from "./BaseCharacter";
-import { CharacterGenerator } from "./CharacterGenerator";
 import { PlayableCard } from "./PlayableCard";
 
 
@@ -29,17 +28,6 @@ export abstract class BaseCharacterClass {
 
     addCard(card: PlayableCard) {
         this.availableCards.push(card);
-    }
-
-    createCharacterFromClass(){
-        var character = new PlayerCharacter({ name: this.name, portraitName: this.iconName, characterClass: this })
-        character.cardsInMasterDeck = CharacterGenerator.getInstance().generateStartingDeck(this)
-        for (const card of character.cardsInMasterDeck) {
-            card.owner = character;
-        }
-        character.buffs = [CharacterGenerator.getInstance().generateStartingPersonaTraits()]
-
-        return character
     }
 }
 

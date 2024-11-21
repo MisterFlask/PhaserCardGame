@@ -12,20 +12,20 @@ export class UnnaturalVigor extends PlayableCard {
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.UNCOMMON,
         });
-        this.baseEnergyCost = 2;
-        this.baseMagicNumber = 2; // Iron
+        this.baseEnergyCost = 1;
+        this.baseMagicNumber = 2;
         this.buffs.push(new SacrificeBuff());
     }
 
     override get description(): string {
-        return `Gain ${this.getDisplayedMagicNumber()} Iron.`; 
+        return `Gain ${this.getDisplayedMagicNumber()} Blood.`; 
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         const gameState = GameState.getInstance();
         const combatState = gameState.combatState;
 
-        this.actionManager.modifyIron(this.getBaseMagicNumberAfterResourceScaling());
+        this.actionManager.modifyBlood(this.getBaseMagicNumberAfterResourceScaling());
     }
 
     override OnPurchase(): void {

@@ -3,7 +3,7 @@ import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
 import { FearEater } from '../../../gamecharacters/buffs/enemy_buffs/FearEater';
 import { Regeneration } from '../../../gamecharacters/buffs/enemy_buffs/Regeneration';
 import { Stress } from '../../../gamecharacters/buffs/standard/Stress';
-import { Stressful } from '../../../gamecharacters/buffs/standard/Stressful';
+import { Terrifying } from '../../../gamecharacters/buffs/standard/Terrifying';
 
 
 export class FrenchCaptain extends AutomatedCharacter {
@@ -16,7 +16,7 @@ export class FrenchCaptain extends AutomatedCharacter {
         });
         
         this.buffs.push(new FearEater(1));
-        this.buffs.push(new Stressful(1));
+        this.buffs.push(new Terrifying(1));
         this.buffs.push(new Regeneration(4));
     }
 

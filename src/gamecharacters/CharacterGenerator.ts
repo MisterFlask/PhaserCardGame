@@ -54,7 +54,7 @@ export class CharacterGenerator {
         const portraitName = selectedClass.getPortraitNameAtRandom(gender);
 
         // Create character from class
-        const character = selectedClass.createCharacterFromClass();
+        const character = CharacterGenerator.getInstance().createCharacterFromClass(selectedClass);
         character.portraitName = portraitName;
         character.gender = gender;
         character.name = CharacterNameGenerator.getRandomName(gender);
@@ -101,8 +101,19 @@ export class CharacterGenerator {
         return buffs[Math.floor(Math.random() * buffs.length)].clone()
     }
 
+    createCharacterFromClass(characterClass: BaseCharacterClass){
+        var character = new PlayerCharacter({ name: characterClass.name, portraitName: characterClass.iconName, characterClass: characterClass })
+        character.cardsInMasterDeck = CharacterGenerator.getInstance().generateStartingDeck(characterClass)
+        for (const card of character.cardsInMasterDeck) {
+            card.owner = character;
+        }
+        character.buffs = [CharacterGenerator.getInstance().generateStartingPersonaTraits()]
+
+        return character
+    }
+
     private getRandomStartingAttackBuff(): AbstractBuff {
-        const buffs = [new IncreaseAshes(), new IncreaseIron(), new IncreaseVenture(), new IncreaseSmog(), new IncreaseBlood()]
+        const buffs = [new IncreaseAshes(), new IncreaseIron(), new IncreaseVenture(), new IncreaseSmog(), new IncreaseBlood(), new Lethality(2)]
         return buffs[Math.floor(Math.random() * buffs.length)]
     }
 }

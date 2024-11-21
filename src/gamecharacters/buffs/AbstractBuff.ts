@@ -15,6 +15,14 @@ export abstract class AbstractBuff implements IAbstractBuff {
     // if this is a "standard" buff that is always on the card, it's added to the main description instead of the tooltip/icon.
     public moveToMainDescription: boolean = false;
 
+
+    public getCardOwner(): BaseCharacter | null {
+        return this.getOwnerAsPlayableCard()?.owner ?? null;
+    }
+    public getCardOwnerName(): string {
+        return this.getOwnerAsPlayableCard()?.owner?.name ?? "(owner)";
+    }
+
     get actionManager(): ActionManager {
         return ActionManagerFetcher.getActionManager();
     }

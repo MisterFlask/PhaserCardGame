@@ -20,7 +20,7 @@ export class QueensMandate extends PlayableCard {
 
         // Increase Venture and Pages by 2
         combatState.combatResources.modifyVenture(2);
-        combatState.combatResources.modifyPages(2);
+        combatState.combatResources.modifyAshes(2);
 
         combatState.currentHand.forEach(card => {
             if (card.baseBlock > 0) {

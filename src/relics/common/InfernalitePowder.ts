@@ -10,6 +10,6 @@ export class InfernalitePowder extends AbstractRelic {
     }
 
     onCombatStart(): void {
-        this.combatState.combatResources.modifyPowder(2);
+        this.combatState.combatResources.modifyBlood(2);
     }
 }

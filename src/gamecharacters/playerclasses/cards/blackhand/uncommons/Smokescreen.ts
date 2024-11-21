@@ -19,7 +19,7 @@ export class Smokescreen extends PlayableCard {
 	}
 
 	override get description(): string {
-		return `Apply ${this.getDisplayedMagicNumber()} Burning to ALL enemies. All party members gain ${this.getDisplayedBlock()} Block, plus 1 for each Burning on the enemy. Exhaust.`;
+		return `All party members gain ${this.getDisplayedBlock()} Block, plus 1 for each Burning on the enemy. Gain ${this.getDisplayedMagicNumber()} Smog.`;
 	}
 	
 	override InvokeCardEffects(): void {

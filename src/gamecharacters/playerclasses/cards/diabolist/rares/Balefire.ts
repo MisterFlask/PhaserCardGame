@@ -17,20 +17,20 @@ export class Balefire extends PlayableCard {
             targetingType: TargetingType.ENEMY,
             rarity: EntityRarity.RARE,
         });
-        this.baseEnergyCost = 3;
+        this.baseEnergyCost = 4;
         this.baseDamage = 12;
         this.buffs.push(new BloodPriceBuff(3));
         this.buffs.push(new GiantKiller(1));
         this.buffs.push(new ExhaustBuff())
         this.buffs.push(new DamageIncreaseOnKill(5));
         this.resourceScalings.push({
-            resource: this.powder,
+            resource: this.blood,
             attackScaling: 1,
         });
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage 2 times.  Decrease ${this.owner?.name}'s max HP by 3.`;
+        return `Deal ${this.getDisplayedDamage()} damage 2 times.`;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

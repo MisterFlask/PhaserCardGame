@@ -14,10 +14,10 @@ export class Scholar extends AbstractBuff {
     }
 
     override getDescription(): string {
-        return `At the start of combat, gain ${this.getStacksDisplayText()} Pages.`;
+        return `At the start of combat, gain ${this.getStacksDisplayText()} Ashes.`;
     }
 
     override onCombatStart(): void {
-        this.combatState.combatResources.modifyPages(this.stacks);
+        this.combatState.combatResources.modifyAshes(this.stacks);
     }
 }

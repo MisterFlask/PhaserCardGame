@@ -21,7 +21,7 @@ export class InfernaliteCache extends PlayableCard {
     
     override InvokeCardEffects(targetCard?: BaseCharacter): void {
         if (this.owner) {
-            this.actionManager.modifyPowder(this.getBaseMagicNumberAfterResourceScaling(), this.owner as BaseCharacter);
+            this.actionManager.modifyBlood(this.getBaseMagicNumberAfterResourceScaling(), this.owner as BaseCharacter);
         }
     }
 }

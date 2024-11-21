@@ -2,8 +2,8 @@ import { AbstractIntent, ApplyDebuffToRandomCharacterIntent, AttackIntent } from
 import { AutomatedCharacter } from '../gamecharacters/AutomatedCharacter';
 import { Delicious } from '../gamecharacters/buffs/enemy_buffs/Delicious';
 import { Stress } from '../gamecharacters/buffs/standard/Stress';
-import { Stressful } from '../gamecharacters/buffs/standard/Stressful';
 import { Lethality } from '../gamecharacters/buffs/standard/Strong';
+import { Terrifying } from '../gamecharacters/buffs/standard/Terrifying';
 import { AbstractRelic } from '../relics/AbstractRelic';
 import { RelicsLibrary } from '../relics/RelicsLibrary';
 import { FrenchBlindProphetess } from './monsters/act1_boss/FrenchBlindProphetess';
@@ -35,7 +35,7 @@ export class BaconBeast extends AutomatedCharacter {
         super({ name: 'Breakfast Nightmares Bacon Beast', portraitName: 'Breakfast Nightmares Bacon Beast', maxHitpoints: 25, description: 'A cunning dark elf assassin' });
         this.buffs.push(new Lethality(2))
         this.buffs.push(new Delicious(1));
-        this.buffs.push(new Stressful(1));
+        this.buffs.push(new Terrifying(1));
     }
     
 

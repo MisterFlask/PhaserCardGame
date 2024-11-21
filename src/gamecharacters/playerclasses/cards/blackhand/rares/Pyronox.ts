@@ -1,6 +1,7 @@
 import { TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
 import { AbstractBuff } from "../../../../buffs/AbstractBuff";
+import { Burning } from "../../../../buffs/standard/Burning";
 import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
@@ -17,7 +18,7 @@ export class Pyronox extends PlayableCard {
     }
 
     override get description(): string {
-        return `Apply Flames Amplifier to ALL enemies. Flames Amplifier increases the damage dealt by Burning by ${this.getDisplayedMagicNumber()}.`;
+        return `Apply ${this.getDisplayedMagicNumber()} stacks of Flames Amplifier to ALL enemies.`;
     }
 
     override InvokeCardEffects(targetCard?: BaseCharacter): void {
@@ -41,6 +42,12 @@ export class FlamesAmplifierBuff extends AbstractBuff {
     }
 
     override getDescription(): string {
-        return `Increases the damage dealt by Burning by ${this.getStacksDisplayText()}.`;
+        return `If this character is Burning, they take ${this.getStacksDisplayText()} additional damage at start of turn.`;
+    }
+
+    override onTurnStart(): void {
+        if (this.getOwnerAsCharacter() && this.getOwnerAsCharacter()?.hasBuff(new Burning().getName())) {
+            this.actionManager.dealDamage({ baseDamageAmount: this.stacks, target: this.getOwnerAsCharacter()!});
+        }
     }
 }

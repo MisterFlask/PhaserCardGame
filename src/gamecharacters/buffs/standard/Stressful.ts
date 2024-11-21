@@ -1,31 +1,27 @@
-import { DamageInfo } from "../../../rules/DamageInfo";
-import { ActionManager } from "../../../utils/ActionManager";
-import { BaseCharacter } from "../../BaseCharacter";
-import { PlayableCard } from "../../PlayableCard";
 import { AbstractBuff } from "../AbstractBuff";
 import { Stress } from "./Stress";
 
 export class Stressful extends AbstractBuff {
+    constructor(stacks: number = 1) {
+        super();
+        this.imageName = "shattered-heart"; // Using same icon as Stress
+        this.stacks = stacks;
+        this.stackable = true;
+        this.isDebuff = true;
+    }
+
     override getName(): string {
         return "Stressful";
     }
 
     override getDescription(): string {
-        return `Applies ${this.getStacksDisplayText()} additional Stress whenever it successfully damages someone.`;
+        return `When played, apply ${this.getStacksDisplayText()} Stress to ${this.getCardOwnerName()}.`;
     }
 
-    constructor(stacks: number = 1) {
-        super();
-        this.imageName = "shattered-heart"; // Replace with actual icon name
-        this.stacks = stacks;
-        this.stackable = true;
-    }
-
-    override onOwnerStriking_CannotModifyDamage(struckUnit: BaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void {
-        if (damageInfo.unblockedDamageTaken > 0) {
-            const stressBuff = new Stress(this.stacks);
-            ActionManager.getInstance().applyBuffToCharacterOrCard(struckUnit, stressBuff);
-            console.log(`${struckUnit.name} received ${this.stacks} Stress from Stressful effect`);
+    override onThisCardInvoked(): void {
+        const owner = this.getOwnerAsCharacter();
+        if (owner) {
+            this.actionManager.applyBuffToCharacterOrCard(owner, new Stress(this.stacks));
         }
     }
 }

@@ -3,7 +3,7 @@ import { ActionManager } from '../../utils/ActionManager';
 import { GameState } from '../GameState';
 import { AbstractCombatResource } from './AbstractCombatResource';
 
-export class IronResource extends AbstractCombatResource {
+export class MettleResource extends AbstractCombatResource {
     constructor() {
         super(
             "Mettle",

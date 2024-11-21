@@ -18,6 +18,6 @@ export class IncreaseBlood extends AbstractBuff {
     }
 
     public onThisCardInvoked(target?: BaseCharacter): void {
-        this.actionManager.modifyPowder(this.stacks);
+        this.actionManager.modifyBlood(this.stacks);
     }
 } 

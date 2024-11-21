@@ -10,6 +10,6 @@ export class TornPage extends AbstractRelic {
     }
 
     onCombatStart(): void {
-        this.combatState.combatResources.modifyPages(2);
+        this.combatState.combatResources.modifyAshes(2);
     }
 }
