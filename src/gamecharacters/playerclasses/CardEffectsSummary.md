@@ -484,6 +484,131 @@
   - IncreasePluck (1 stack)
 - **Effect**: All allies gain 4 Lethality. If >10 stress, repeat. If >30 stress, repeat again
 
+## Cog Class Cards
+
+### Commons
+`Clockwork Strike`
+- **Type**: Attack
+- **Energy Cost**: 1
+- **Rarity**: Common
+- **Base Stats**:
+  - Damage: 6
+- **Resource Scaling**:
+  - Resource: cogs
+  - Scaling Type: attackScaling
+  - Scaling Value: 2
+- **Buffs/Modifiers**: None
+- **Effect**: Deal 6 damage. Gain 1 Cog.
+
+`Steam Shield`
+- **Type**: Skill
+- **Energy Cost**: 1
+- **Rarity**: Common
+- **Base Stats**:
+  - Block: 7
+- **Resource Scaling**:
+  - Resource: steam
+  - Scaling Type: blockScaling
+  - Scaling Value: 1
+- **Buffs/Modifiers**: None
+- **Effect**: Gain 7 Block. Gain 1 Steam.
+
+`Gadgeteer's Insight`
+- **Type**: Skill
+- **Energy Cost**: 1
+- **Rarity**: Common
+- **Base Stats**:
+  - Magic Number: 2
+- **Buffs/Modifiers**: None
+- **Effect**: Draw 2 cards. If any card has a cost of 2, gain 1 Cog.
+
+`Autonomous Servant`
+- **Type**: Power
+- **Energy Cost**: 1
+- **Rarity**: Common
+- **Buffs/Modifiers**:
+  - Autonomous 2
+- **Effect**: Whenever you play a card costing 2, gain 1 Cog.
+
+`Brass Knuckles`
+- **Type**: Attack
+- **Energy Cost**: 1
+- **Rarity**: Common
+- **Base Stats**:
+  - Damage: 5
+- **Buffs/Modifiers**: None
+- **Effect**: Deal 5 damage. If you have more than 3 Cogs, deal 2 additional damage.
+
+### Uncommons
+`Mechanical Overdrive`
+- **Type**: Skill
+- **Energy Cost**: 2
+- **Rarity**: Uncommon
+- **Base Stats**:
+  - Block: 10
+- **Resource Scaling**:
+  - Resource: steam
+  - Scaling Type: blockScaling
+  - Scaling Value: 2
+- **Buffs/Modifiers**: None
+- **Effect**: Gain 10 Block. If you have more than 5 Steam, gain 1 extra energy.
+
+`Autonomous Engineer`
+- **Type**: Power
+- **Energy Cost**: 1
+- **Rarity**: Uncommon
+- **Buffs/Modifiers**:
+  - Autonomous 3
+- **Effect**: Whenever you play a card costing 3, draw a card.
+
+`Steam-Powered Cannon`
+- **Type**: Attack
+- **Energy Cost**: 2
+- **Rarity**: Uncommon
+- **Base Stats**:
+  - Damage: 12
+- **Resource Scaling**:
+  - Resource: cogs
+  - Scaling Type: attackScaling
+  - Scaling Value: 1
+- **Buffs/Modifiers**: None
+- **Effect**: Deal 12 damage. If you have more than 3 Cogs, apply 1 Weak.
+
+### Rares
+`Clockwork Colossus`
+- **Type**: Power
+- **Energy Cost**: 3
+- **Rarity**: Rare
+- **Buffs/Modifiers**:
+  - Autonomous 2
+- **Effect**: Whenever you play a card costing 2, gain 2 Block and 1 Cog.
+
+`Inventor's Masterpiece`
+- **Type**: Skill
+- **Energy Cost**: 2
+- **Rarity**: Rare
+- **Base Stats**:
+  - Magic Number: 5
+- **Resource Scaling**:
+  - Resource: steam
+  - Scaling Type: magicNumberScaling
+  - Scaling Value: 2
+- **Buffs/Modifiers**: None
+- **Effect**: Gain 5 Steam. All cards in hand gain 1 additional effect based on their type.
+
+`Steampunk Revolution`
+- **Type**: Attack
+- **Energy Cost**: 3
+- **Rarity**: Rare
+- **Base Stats**:
+  - Damage: 15
+- **Resource Scaling**:
+  - Resource: cogs
+  - Scaling Type: attackScaling
+  - Scaling Value: 2
+- **Buffs/Modifiers**: None
+- **Effect**: Deal 15 damage. If you have more than 5 Cogs, deal 5 additional damage to all enemies.
+
 ## Cargo Cards
 
 `Alcohol Cargo`
