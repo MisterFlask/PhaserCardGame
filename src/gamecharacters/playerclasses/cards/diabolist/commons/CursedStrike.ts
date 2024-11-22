@@ -16,18 +16,22 @@ export class CursedStrike extends PlayableCard {
         });
         this.baseDamage = 7;
         this.baseEnergyCost = 1;
-        this.baseMagicNumber = 2; // Apply 2 Cursed instead of 1
+        this.baseMagicNumber = 1; 
         this.rarity = EntityRarity.COMMON;
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage. Apply 1 Cursed.`;
+        return `Deal ${this.getDisplayedDamage()} damage. Apply ${this.getDisplayedMagicNumber()} Cursed.  If you have >3 Blood: apply 1 more.`;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         if (targetCard) {
             this.dealDamageToTarget(targetCard as BaseCharacter);
-            this.actionManager.applyBuffToCharacterOrCard(targetCard as BaseCharacter, new Cursed(1)); // Assuming Cursed takes a number of stacks
+            if (targetCard.hasBuff(new Cursed(1).getName())) {
+                this.actionManager.applyBuffToCharacterOrCard(targetCard as BaseCharacter, new Cursed(this.getBaseMagicNumberAfterResourceScaling()));
+            }else{
+                this.actionManager.applyBuffToCharacterOrCard(targetCard as BaseCharacter, new Cursed(this.getBaseMagicNumberAfterResourceScaling() + 1));
+            }
         }
     }
 }

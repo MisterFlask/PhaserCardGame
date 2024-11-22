@@ -84,7 +84,7 @@ export class CardRewardsGenerator {
     private resourceGainBuffs = [
         new IncreaseIron(),
         new IncreasePages(),
-        new IncreasePluck(),
+        new IncreasePluck(1),
         new IncreaseBlood(),
         new IncreaseVenture(),
         new IncreaseSmog(),

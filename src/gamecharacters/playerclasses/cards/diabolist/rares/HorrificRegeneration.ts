@@ -14,8 +14,8 @@ export class HorrificRegeneration extends PlayableCard {
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.RARE,
         });
-        this.baseEnergyCost = 3; // Assuming a cost for the card
-        this.baseMagicNumber = 30;
+        this.baseEnergyCost = 0; 
+        this.baseMagicNumber = 10;
         this.buffs.push(new ExhaustBuff());
     }
     override get description(): string {
@@ -36,7 +36,4 @@ export class HorrificRegeneration extends PlayableCard {
         this.actionManager.exhaustCard(this);
     }
 
-    override OnPurchase(): void {
-        // Logic for when the card is purchased, if needed
-    }
 }

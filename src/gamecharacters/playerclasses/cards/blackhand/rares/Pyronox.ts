@@ -1,7 +1,6 @@
 import { TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
 import { AbstractBuff } from "../../../../buffs/AbstractBuff";
-import { Burning } from "../../../../buffs/standard/Burning";
 import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
@@ -42,12 +41,9 @@ export class FlamesAmplifierBuff extends AbstractBuff {
     }
 
     override getDescription(): string {
-        return `If this character is Burning, they take ${this.getStacksDisplayText()} additional damage at start of turn.`;
+        return `This character takes ${this.getStacksDisplayText()} additional damage from Burning.`;
     }
 
-    override onTurnStart(): void {
-        if (this.getOwnerAsCharacter() && this.getOwnerAsCharacter()?.hasBuff(new Burning().getName())) {
-            this.actionManager.dealDamage({ baseDamageAmount: this.stacks, target: this.getOwnerAsCharacter()!});
-        }
-    }
+    // no implementation needed; this is handled in the Burning debuff
+
 }

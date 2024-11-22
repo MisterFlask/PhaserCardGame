@@ -1,7 +1,7 @@
 import { GameState } from "../../../../../rules/GameState";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
-import { IncreaseSmog } from "../../../../buffs/standard/combatresource/IncreaseSmog";
+import { IncreasePluck } from "../../../../buffs/standard/combatresource/IncreasePluck";
 import { Stress } from "../../../../buffs/standard/Stress";
 import { Lethality } from "../../../../buffs/standard/Strong";
 import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
@@ -16,12 +16,12 @@ export class StrengthOfInsanity extends PlayableCard {
             rarity: EntityRarity.RARE,
         });
         this.baseEnergyCost = 1;
-        this.baseMagicNumber = 2; // Amount of Strength to apply
-        this.buffs.push(new IncreaseSmog(1));
+        this.baseMagicNumber = 4; // Amount of Strength to apply
+        this.buffs.push(new IncreasePluck(1));
     }
 
     override get description(): string {
-        return `All allies gain ${this.getDisplayedMagicNumber()} Strength. >4 stress: repeat. >9 stress: repeat again.`;
+        return `All allies gain ${this.getDisplayedMagicNumber()} Lethality. >10 stress: repeat. >30 stress: repeat again.`;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

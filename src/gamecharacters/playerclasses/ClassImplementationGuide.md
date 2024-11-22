@@ -72,7 +72,6 @@ export class [CardName] extends PlayableCard {
 - Use action manager methods for game state changes
 
 ## Performance and Best Practices
-- Keep calculations simple and deterministic
 - Use resource scaling for dynamic card power
 - Implement clear, thematic card mechanics
 - Consider card interactions and potential combos

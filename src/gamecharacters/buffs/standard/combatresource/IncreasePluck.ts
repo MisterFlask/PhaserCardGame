@@ -3,10 +3,11 @@ import { BaseCharacter } from "../../../BaseCharacter";
 import { AbstractBuff } from "../../AbstractBuff";
 
 export class IncreasePluck extends AbstractBuff {
-    constructor() {
+    constructor(stacks: number) {
         super();
         this.stackable = true;
         this.isDebuff = false;
+        this.stacks = stacks;
     }
 
     getName(): string {

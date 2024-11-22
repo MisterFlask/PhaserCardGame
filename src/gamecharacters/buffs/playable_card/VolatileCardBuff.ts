@@ -24,6 +24,7 @@ export class VolatileBuff extends AbstractBuff {
             }
 
             ownerCard.InvokeCardEffects(targetCard);
+            ActionManager.getInstance().exhaustCard(this.getOwnerAsPlayableCard()!);
 
             // Exhaust a random card in hand
             ActionManager.getInstance().exhaustRandomCardInHand();
@@ -34,7 +35,7 @@ export class VolatileBuff extends AbstractBuff {
         return "Volatile";
     }
     getDescription(): string {
-        return "When this card is discarded, play it instead and exhaust a random card in hand.";
+        return "When this card is discarded, play it instead, exhaust it, and exhaust another random card in hand.";
     }
 }
 

@@ -30,7 +30,7 @@ export class Balefire extends PlayableCard {
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage 2 times.`;
+        return `Deal ${this.getDisplayedDamage()} damage 2 times, plus 1 time for each Curse the target has.`;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

@@ -35,11 +35,11 @@ class AxeCritBuff extends AbstractBuff {
   }
 
   override getName(): string {
-    return "Axe Crit";
+    return "Flaming Crit";
   }
 
   override getDescription(): string {
-    return "Crits against Burning targets.";
+    return "Doubles damage against Burning targets.";
   }
 
   override getAdditionalPercentCombatDamageDealtModifier(target?: IBaseCharacter): number {

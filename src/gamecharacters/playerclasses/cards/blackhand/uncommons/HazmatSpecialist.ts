@@ -19,7 +19,7 @@ export class HazmatSpecialist extends PlayableCard {
 	}
 
 	override get description(): string {
-		return `Grant ${this.getDisplayedBlock()} block and 1 Ward to ALL party members. Apply ${this.getDisplayedMagicNumber()} Burning to a random enemy.`;
+		return `Grant ${this.getDisplayedBlock()} block and 1 Ward to ALL party members. Gain 1 Venture.`;
 	}
 	
 	override InvokeCardEffects(targetCard?: AbstractCardType): void {

@@ -1,30 +1,29 @@
 import { GameState } from "../../../../../rules/GameState";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
-import { SacrificeBuff } from "../../../../buffs/standard/SacrificeBuff";
 import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
-export class UnnaturalVigor extends PlayableCard {
+export class Hemomancer extends PlayableCard {
     constructor() {
         super({
-            name: "Unnatural Vigor",
-            cardType: CardType.POWER,
+            name: "Hemomancer",
+            cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: EntityRarity.UNCOMMON,
+            rarity: EntityRarity.RARE,
         });
         this.baseEnergyCost = 1;
-        this.baseMagicNumber = 2;
-        this.buffs.push(new SacrificeBuff());
     }
 
     override get description(): string {
-        return `Gain ${this.getDisplayedMagicNumber()} Blood.`; 
+        return `Double your Blood.  >5 Mettle:  Do it again.`;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         const gameState = GameState.getInstance();
-        const combatState = gameState.combatState;
-
-        this.actionManager.modifyBlood(this.getBaseMagicNumberAfterResourceScaling());
+        const currentBlood = this.blood.value;
+        this.actionManager.modifyBlood(currentBlood);
+        if (this.mettle.value > 5) {
+            this.actionManager.modifyBlood(currentBlood);
+        }
     }
 }

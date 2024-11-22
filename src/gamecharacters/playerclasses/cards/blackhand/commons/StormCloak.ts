@@ -21,18 +21,6 @@ export class StormCloak extends PlayableCard {
             resource: GameState.getInstance().combatState.combatResources.pluck,
             blockScaling: 2
         })
-        this.resourceScalings.push({
-            resource: GameState.getInstance().combatState.combatResources.pluck,
-            attackScaling: 2
-        })
-        this.resourceScalings.push({
-            resource: GameState.getInstance().combatState.combatResources.pluck,
-            magicNumberScaling: 2
-        })
-        this.resourceScalings.push({
-            resource: GameState.getInstance().combatState.combatResources.iron,
-            magicNumberScaling: 2
-        })
     }
 
 

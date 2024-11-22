@@ -20,6 +20,13 @@ import { SubtitleManager } from "../ui/SubtitleManager";
 import { UIContext, UIContextManager } from "../ui/UIContextManager";
 
 export class ActionManager {
+    gainEnergy(amount: number) {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            const gameState = GameState.getInstance();
+            gameState.combatState.energyAvailable += amount;
+            return [];
+        }));
+    }
     
     pulseBuff(buff: AbstractBuff) {
         this.scene.events.emit('pulseBuff', buff.id);

@@ -34,6 +34,6 @@ export class DeathOrGlory extends PlayableCard {
     }
 
     override get description(): string {
-        return `All characters gain 2 strength.  Taunt all enemies and apply 1 Vulnerable to self.`;
+        return `Taunt all enemies and apply 1 Vulnerable to self.  Double your Pluck.`;
     }
 }

@@ -14,12 +14,12 @@ export class Buzzsword extends PlayableCard {
             rarity: EntityRarity.COMMON,
         });
         this.baseEnergyCost = 2;
-        this.baseDamage = 13;
+        this.baseDamage = 11;
         this.buffs.push(new StressReliefFinisher());
         this.buffs.push(new Holy());
         this.resourceScalings.push({
             resource: this.pluck,
-            attackScaling: 1,
+            attackScaling: 3,
         });
     }
 

@@ -127,7 +127,7 @@ function getRandomEnhancementBuff(): AbstractBuff {
         new Lethality(1),
         new IncreaseIron(),
         // new IncreasePages(),
-        new IncreasePluck(),
+        new IncreasePluck(1),
         new IncreaseBlood(),
         new IncreaseSmog(),
         new IncreaseVenture(),
