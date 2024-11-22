@@ -487,7 +487,7 @@
 ## Cog Class Cards
 
 ### Commons
-`Clockwork Strike`
+`Eldritch Gear Grind`
 - **Type**: Attack
 - **Energy Cost**: 1
 - **Rarity**: Common
@@ -498,9 +498,9 @@
   - Scaling Type: attackScaling
   - Scaling Value: 2
 - **Buffs/Modifiers**: None
-- **Effect**: Deal 6 damage. Gain 1 Mettle.
+- **Effect**: Deal 6 damage. Gain 1 Mettle. The gears whisper secrets.
 
-`Steam Shield`
+`Veil of the Smog`
 - **Type**: Skill
 - **Energy Cost**: 1
 - **Rarity**: Common
@@ -511,36 +511,36 @@
   - Scaling Type: blockScaling
   - Scaling Value: 1
 - **Buffs/Modifiers**: None
-- **Effect**: Gain 7 Block. Gain 1 Smog.
+- **Effect**: Gain 7 Block. Gain 1 Smog. The smog obscures reality.
 
-`Gadgeteer's Insight`
+`Tinker's Revelation`
 - **Type**: Skill
 - **Energy Cost**: 1
 - **Rarity**: Common
 - **Base Stats**:
   - Magic Number: 2
 - **Buffs/Modifiers**: None
-- **Effect**: Draw 2 cards. If any card has a cost of 2, gain 1 Pluck.
+- **Effect**: Draw 2 cards. If any card has a cost of 2, gain 1 Pluck. The revelation is unsettling.
 
-`Autonomous Servant`
+`Clockwork Minion`
 - **Type**: Power
 - **Energy Cost**: 1
 - **Rarity**: Common
 - **Buffs/Modifiers**:
   - Autonomous 2
-- **Effect**: Whenever you play a card costing 2, gain 1 Venture.
+- **Effect**: Whenever you play a card costing 2, gain 1 Venture. It moves with a mind of its own.
 
-`Brass Knuckles`
+`Eldritch Fist`
 - **Type**: Attack
 - **Energy Cost**: 1
 - **Rarity**: Common
 - **Base Stats**:
   - Damage: 5
 - **Buffs/Modifiers**: None
-- **Effect**: Deal 5 damage. If you have more than 3 Ashes, deal 2 additional damage.
+- **Effect**: Deal 5 damage. If you have more than 3 Ashes, deal 2 additional damage. The fist pulses with dark energy.
 
 ### Uncommons
-`Mechanical Overdrive`
+`Arcane Overdrive`
 - **Type**: Skill
 - **Energy Cost**: 2
 - **Rarity**: Uncommon
@@ -551,17 +551,17 @@
   - Scaling Type: blockScaling
   - Scaling Value: 2
 - **Buffs/Modifiers**: None
-- **Effect**: Gain 10 Block. If you have more than 5 Smog, gain 1 extra energy.
+- **Effect**: Gain 10 Block. If you have more than 5 Smog, gain 1 extra energy. The overdrive hums with forbidden power.
 
-`Autonomous Engineer`
+`Eldritch Tinkerer`
 - **Type**: Power
 - **Energy Cost**: 1
 - **Rarity**: Uncommon
 - **Buffs/Modifiers**:
   - Autonomous 3
-- **Effect**: Whenever you play a card costing 3, draw a card.
+- **Effect**: Whenever you play a card costing 3, draw a card. The tinkerer whispers secrets of the void.
 
-`Steam-Powered Cannon`
+`Abyssal Cannon`
 - **Type**: Attack
 - **Energy Cost**: 2
 - **Rarity**: Uncommon
@@ -572,18 +572,18 @@
   - Scaling Type: attackScaling
   - Scaling Value: 1
 - **Buffs/Modifiers**: None
-- **Effect**: Deal 12 damage. If you have more than 3 Mettle, apply 1 Weak.
+- **Effect**: Deal 12 damage. If you have more than 3 Mettle, apply 1 Weak. The cannon fires with a roar from the abyss.
 
 ### Rares
-`Clockwork Colossus`
+`Eldritch Colossus`
 - **Type**: Power
 - **Energy Cost**: 3
 - **Rarity**: Rare
 - **Buffs/Modifiers**:
   - Autonomous 2
-- **Effect**: Whenever you play a card costing 2, gain 2 Block and 1 Ash.
+- **Effect**: Whenever you play a card costing 2, gain 2 Block and 1 Ash. The colossus looms with an ancient presence.
 
-`Inventor's Masterpiece`
+`Arcane Machination`
 - **Type**: Skill
 - **Energy Cost**: 2
 - **Rarity**: Rare
@@ -594,9 +594,9 @@
   - Scaling Type: magicNumberScaling
   - Scaling Value: 2
 - **Buffs/Modifiers**: None
-- **Effect**: Gain 5 Smog. All cards in hand gain 1 additional effect based on their type.
+- **Effect**: Gain 5 Smog. All cards in hand gain 1 additional effect based on their type. The machination twists reality.
 
-`Steampunk Revolution`
+`Eldritch Revolution`
 - **Type**: Attack
 - **Energy Cost**: 3
 - **Rarity**: Rare
@@ -607,7 +607,7 @@
   - Scaling Type: attackScaling
   - Scaling Value: 2
 - **Buffs/Modifiers**: None
-- **Effect**: Deal 15 damage. If you have more than 5 Venture, deal 5 additional damage to all enemies.
+- **Effect**: Deal 15 damage. If you have more than 5 Venture, deal 5 additional damage to all enemies. The revolution is fueled by the unknown.
 
 ## Cargo Cards
 
