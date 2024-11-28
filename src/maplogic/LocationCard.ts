@@ -2,7 +2,7 @@
 
 import Phaser from 'phaser';
 import { EncounterEnhancer } from '../encounters/EncounterEnhancer';
-import { EncounterData, EncounterManager } from '../encounters/Encounters';
+import { ActSegment, EncounterData, EncounterManager } from '../encounters/Encounters';
 import { AbstractCard } from '../gamecharacters/AbstractCard';
 import { CardSize, CardType } from '../gamecharacters/Primitives';
 import { GameState } from '../rules/GameState';
@@ -86,17 +86,23 @@ export class EntranceCard extends LocationCard {
     }
 }
 
-export class BossCard extends LocationCard {
+export class BossRoomCard extends LocationCard {
     constructor(floor: number, index: number) {
         super({
             name: 'Boss Room',
             description: 'The final challenge awaits here.',
-            size: CardSize.SMALL,
+            size: CardSize.LARGE,
             floor,
             index
         });
         this.portraitName = 'boss-icon';
         this.portraitTint = 0x800080;
+    }    
+    override initEncounter(): void {
+        this.encounter = ActSegment.Boss_Act1.encounters[0];
+        const encounterDescription = `Encounter: ${this.encounter.enemies.map(e => e.name).join(', ')}`;
+        const fullDescription = `${encounterDescription}`;
+        this.description = fullDescription;
     }
 }
 

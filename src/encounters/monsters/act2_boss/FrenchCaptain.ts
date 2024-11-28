@@ -4,6 +4,7 @@ import { FearEater } from '../../../gamecharacters/buffs/enemy_buffs/FearEater';
 import { Regeneration } from '../../../gamecharacters/buffs/enemy_buffs/Regeneration';
 import { Stress } from '../../../gamecharacters/buffs/standard/Stress';
 import { Terrifying } from '../../../gamecharacters/buffs/standard/Terrifying';
+import { CardSize } from '../../../gamecharacters/Primitives';
 
 
 export class FrenchCaptain extends AutomatedCharacter {
@@ -18,6 +19,8 @@ export class FrenchCaptain extends AutomatedCharacter {
         this.buffs.push(new FearEater(1));
         this.buffs.push(new Terrifying(1));
         this.buffs.push(new Regeneration(4));
+
+        this.size = CardSize.LARGE;
     }
 
     override generateNewIntents(): AbstractIntent[] {

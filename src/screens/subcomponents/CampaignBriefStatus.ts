@@ -50,8 +50,6 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
             fillColor: 0x333333  // Dark gray background for surface currency tooltip
         });
 
-        var brimstoneDistillate: number = GameState.getInstance().brimstoneDistillate;
-
 
 
         this.hellCurrencyText = new TextBox({
@@ -83,7 +81,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
             y: 80,  // Position below hell currency
             width: this.CURRENCY_WIDTH,
             height: 30,
-            text: `Brimstone: ${GameState.getInstance().brimstoneDistillate}`,
+            text: `Brimstone Distillate: ${GameState.getInstance().brimstoneDistillate}`,
             style: {
                 fontSize: '16px',
                 color: '#8B0000',  // Dark red color for brimstone
@@ -96,7 +94,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
         this.brimstoneTooltip = new TooltipAttachment({
             scene: this.scene,
             container: this.brimstoneDistillateText,
-            tooltipText: "Brimstone Distillate: Sells for a bunch of money on the surface, but worthless in Hell.",
+            tooltipText: "Valuable on the surface, but not considered legal tender in Hell.",
             fillColor: 0x200000  // Optional dark red background
         });
 

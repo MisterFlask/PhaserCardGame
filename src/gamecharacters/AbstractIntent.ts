@@ -288,11 +288,8 @@ export class ApplyDebuffToAllPlayerCharactersIntent extends AbstractIntent {
     }
 
     act(): void {
-        if (!this.target) {
-            throw new Error('Target cannot be null');
-        }
-        console.log(`Applying ${this.debuff.stacks} stack(s) of ${this.debuff.getDisplayName()} to ${this.target.name}`);
         for (const target of TargetingUtils.getInstance().selectAllPlayerCharacters()) {
+            console.log(`Applying ${this.debuff.stacks} stack(s) of ${this.debuff.getDisplayName()} to ${target.name}`)
             ActionManager.getInstance().tiltCharacter(this.owner);
             ActionManager.getInstance().applyBuffToCharacterOrCard(target, this.debuff);
         }

@@ -4,6 +4,7 @@ import { MothGod } from '../../../gamecharacters/buffs/enemy_buffs/MothGod';
 import { Stress } from '../../../gamecharacters/buffs/standard/Stress';
 import { Vulnerable } from '../../../gamecharacters/buffs/standard/Vulnerable';
 import { Weak } from '../../../gamecharacters/buffs/standard/Weak';
+import { CardSize } from '../../../gamecharacters/Primitives';
 export class FrenchBlindProphetess extends AutomatedCharacter {
     constructor() {
         super({
@@ -13,6 +14,7 @@ export class FrenchBlindProphetess extends AutomatedCharacter {
             description: "whispers of the Final Argument"
         });
         
+        this.size = CardSize.LARGE;
         // Apply initial MothGod buff
         this.buffs.push(new MothGod(2));
     }

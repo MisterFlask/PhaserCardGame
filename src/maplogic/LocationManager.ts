@@ -1,7 +1,7 @@
 // src/managers/LocationManager.ts
 
 import { GameState } from "../rules/GameState";
-import { BossCard, EliteRoomCard, EntranceCard, EventRoomCard, LocationCard, NormalRoomCard, RestSiteCard, ShopCard, TreasureRoomCard } from "./LocationCard";
+import { BossRoomCard, EliteRoomCard, EntranceCard, EventRoomCard, LocationCard, NormalRoomCard, RestSiteCard, ShopCard, TreasureRoomCard } from "./LocationCard";
 
 export class LocationManager {
 
@@ -29,7 +29,7 @@ export class LocationManager {
                     location = new EntranceCard(floor, i); // Step 5. Entrance node at floor 1
                     GameState.getInstance().setCurrentLocation(location);
                 } else if (floor === numberOfFloors && i === Math.floor(numNodesOnThisFloor/2)) {
-                    location = new BossCard(floor, i); // Step 6. Boss node at top floor
+                    location = new BossRoomCard(floor, i); // Step 6. Boss node at top floor
                 } else {
                     const rand = Phaser.Math.FloatBetween(0, 1);
                     if (!restSiteAssigned && i === numNodesOnThisFloor - 2) { // Ensure at least one Rest Site
@@ -64,7 +64,7 @@ export class LocationManager {
 
             // remove all non-boss rooms from the last floor, and all non-entrance rooms from the first floor
             if (floor === numberOfFloors) {
-                floorLocationData = floorLocationData.filter(card => card instanceof BossCard);
+                floorLocationData = floorLocationData.filter(card => card instanceof BossRoomCard);
             } else if (floor === 1) {
                 floorLocationData = floorLocationData.filter(card => card instanceof EntranceCard);
             }

@@ -10,6 +10,7 @@ import { PhysicalCard } from '../../ui/PhysicalCard';
 import { UIContext, UIContextManager } from '../../ui/UIContextManager';
 import { ActionManagerFetcher } from '../../utils/ActionManagerFetcher';
 import { CardGuiUtils } from '../../utils/CardGuiUtils';
+import { CampaignBriefStatus } from './CampaignBriefStatus';
 
 export class MapOverlay {
     private scene: Phaser.Scene;
@@ -18,6 +19,7 @@ export class MapOverlay {
     private locationCards: PhysicalCard[] = [];
     private characterCards: PhysicalCard[] = [];
     private adjacencyGraphics: Phaser.GameObjects.Graphics | null = null;
+    private campaignBriefStatus: CampaignBriefStatus | null = null;
 
     // Managers
     private locationManager: LocationManager;
@@ -53,6 +55,7 @@ export class MapOverlay {
         this.spatialManager.updateDimensions(width, height);
 
         this.createBackground();
+        this.createCampaignBriefStatus();
         this.createAdjacencyGraphics();
         this.generateAndPlaceLocations();
         this.createPhysicalLocationCards();
@@ -92,6 +95,14 @@ export class MapOverlay {
         this.background.setScrollFactor(0);
         this.background.setDisplaySize(this.scene.scale.width, this.scene.scale.height);
         this.overlay.add(this.background);
+    }
+
+    // Campaign Brief Status
+    private createCampaignBriefStatus() {
+        this.campaignBriefStatus = new CampaignBriefStatus(this.scene);
+        this.campaignBriefStatus.setScrollFactor(0);
+        this.campaignBriefStatus.setDepth(DepthManager.getInstance().UI_BASE);
+        this.overlay.add(this.campaignBriefStatus);
     }
 
     // Adjacency Graphics
@@ -379,6 +390,11 @@ export class MapOverlay {
             this.background.setPosition(width / 2, height / 2);
         }
 
+        // Update campaign brief status position
+        if (this.campaignBriefStatus) {
+            this.campaignBriefStatus.setPosition(600, 10);
+        }
+
         // Update spatial manager dimensions
         this.spatialManager.updateDimensions(width, height);
 
@@ -453,6 +469,11 @@ export class MapOverlay {
         this.isVisible = false;
         this.resetCameraPosition();
         UIContextManager.getInstance().setContext(UIContext.COMBAT);
+        
+        // Ensure the campaign brief status is properly updated when hiding
+        if (this.campaignBriefStatus) {
+            this.scene.events.emit('propagateGameStateChangesToUi');
+        }
     }
 
     public toggle(): void {
