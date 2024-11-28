@@ -166,22 +166,6 @@ export class TreasureChest extends AutomatedCharacter {
     }
 }
 
-export class Charon extends AutomatedCharacter {
-    
-    constructor() {
-        super({ 
-            name: 'Charon', 
-            portraitName: 'Charon', 
-            maxHitpoints: 200, 
-            description: 'Charon demands payment for his generous passage' 
-        });
-    }
-
-    override generateNewIntents(): AbstractIntent[] {
-        return []; 
-    }
-}
-
 export class EncounterManager {
     private static instance: EncounterManager;
 

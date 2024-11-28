@@ -1,4 +1,4 @@
-import { Lethality } from '../../gamecharacters/buffs/standard/Strong';
+import { TemporaryStrength } from '../../gamecharacters/buffs/standard/TemporaryStrength';
 import { TextGlyphs } from '../../text/TextGlyphs';
 import { ActionManager } from '../../utils/ActionManager';
 import { GameState } from '../GameState';
@@ -20,7 +20,7 @@ export class PluckResource extends AbstractCombatResource {
         if (this.value >= 1) {
             ActionManager.getInstance().DoAThing("Pluck Resource Click", () => {
                 GameState.getInstance().combatState.playerCharacters.forEach(character => {
-                    ActionManager.getInstance().applyBuffToCharacterOrCard(character, new Lethality(2));
+                    ActionManager.getInstance().applyBuffToCharacterOrCard(character, new TemporaryStrength(2));
                 });
                 this.value -= 1;
             });

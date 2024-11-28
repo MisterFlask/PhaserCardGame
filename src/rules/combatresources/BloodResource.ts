@@ -1,4 +1,4 @@
-import { Lethality } from '../../gamecharacters/buffs/standard/Strong';
+import { TemporaryStrength } from '../../gamecharacters/buffs/standard/TemporaryStrength';
 import { TextGlyphs } from '../../text/TextGlyphs';
 import { ActionManager } from '../../utils/ActionManager';
 import { GameState } from '../GameState';
@@ -22,7 +22,7 @@ export class BloodResource extends AbstractCombatResource {
                 gameState.combatState.allPlayerAndEnemyCharacters.forEach(character => {
                     ActionManager.getInstance().applyBuffToCharacterOrCard(
                         character, 
-                        new Lethality(2)
+                        new TemporaryStrength(2)
                     );
                 });
                 this.value -= 1;

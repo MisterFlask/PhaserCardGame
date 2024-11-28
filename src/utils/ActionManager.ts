@@ -937,7 +937,6 @@ export class ActionManager {
 
 
 
-
         // Remove intents from dead enemies
         combatState.enemies.forEach(enemy => {
             if (enemy.hitpoints <= 0) {
@@ -961,6 +960,10 @@ export class ActionManager {
 
         // Queue discard actions instead of direct discard
         this.basicDiscardCards(combatState.currentHand);
+
+        combatState.enemies.forEach(character => {
+            character.block = 0;
+        });
 
         combatState.enemies.forEach(enemy => {
             for (const intent of [...enemy.intents]) {
@@ -1047,6 +1050,11 @@ export class ActionManager {
         ActionManager.getInstance().actionQueue.addAction(new GenericAction(async () => {
             const gameState = GameState.getInstance();
             const combatState = gameState.combatState;
+
+            // erase block from all player characters
+            combatState.playerCharacters.forEach(character => {
+                character.block = 0;
+            });
 
             // Prevent dead enemies from gaining new intents
             combatState.enemies.forEach(enemy => {

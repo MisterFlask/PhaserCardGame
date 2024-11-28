@@ -108,7 +108,7 @@ export class PhysicalBuff {
             this.secondaryStacksText.setVisible(false);
         }
         
-        this.tooltipAttachment.updateText(`${this.abstractBuff.getDisplayName()}: ${this.abstractBuff.getDescription()}`);
+        this.tooltipAttachment.updateText(`<color=gold>${this.abstractBuff.getDisplayName()}</color> <b>${this.abstractBuff.stacks}</b>: ${this.abstractBuff.getDescription()}`);
     }
 
     destroy() {
