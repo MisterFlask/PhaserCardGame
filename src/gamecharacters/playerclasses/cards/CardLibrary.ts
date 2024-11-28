@@ -42,8 +42,23 @@ export class CardLibrary {
         var characters = GameState.getInstance().currentRunCharacters;
         var cards = characters.flatMap(c => c.characterClass.availableCards);
         const cardCopies = cards.map(card => this.cardInit(card.Copy()));
+
+        // Assign native class based on which class's deck the card originated from
+        cardCopies.forEach(card => {
+            const ownerClass = characters.find(char => 
+                char.characterClass.availableCards.some(classCard => 
+                    classCard.name === card.name
+                )
+            )?.characterClass;
+            
+            if (ownerClass) {
+                card.nativeToCharacterClass = ownerClass;
+            }
+        });
+
         return [...new Map(cardCopies.map(item => [item.name, item])).values()];
     }
+    
     public getRandomSelectionOfRelevantClassCards(count: number, rarity?: EntityRarity): PlayableCard[] {
         var cards = this.getCardsForClassesRelevantToThisRun();
         if (rarity) {

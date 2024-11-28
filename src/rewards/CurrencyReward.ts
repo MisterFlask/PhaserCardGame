@@ -1,5 +1,4 @@
 import { GameState } from '../rules/GameState';
-import { RewardDisplay } from '../ui/RewardDisplay';
 import { AbstractReward, RewardType } from './AbstractReward';
 
 export class CurrencyReward extends AbstractReward {
@@ -8,18 +7,6 @@ export class CurrencyReward extends AbstractReward {
     constructor(amount: number) {
         super(RewardType.HellCurrency);
         this.amount = amount;
-    }
-
-    createRewardElement(scene: Phaser.Scene, x: number, y: number): Phaser.GameObjects.Container {
-        return new RewardDisplay({
-            scene,
-            x,
-            y,
-            text: this.getDisplayText(),
-            iconTexture: this.getIconTexture(),
-            tooltipText: this.getTooltipText(),
-            onClick: () => this.collect(scene)
-        });
     }
 
     getDisplayText(): string {
@@ -31,7 +18,7 @@ export class CurrencyReward extends AbstractReward {
     }
 
     getIconTexture(): string {
-        return 'hell_currency_icon';
+        return 'abstract-047';    
     }
 
     collect(scene: Phaser.Scene): void {

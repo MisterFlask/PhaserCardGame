@@ -33,7 +33,7 @@ export class DepthManager {
     public readonly BATTLEFIELD_HIGHLIGHT = this.UI_BASE + 1000;
     public readonly TOOLTIP = this.UI_BASE + 2000;
     public readonly MODAL = this.UI_BASE + 3000;
-
+    public readonly REWARD_SCREEN = this.UI_BASE + 4000;
     private constructor() {}
 
     public static getInstance(): DepthManager {

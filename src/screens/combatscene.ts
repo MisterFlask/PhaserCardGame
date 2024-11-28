@@ -265,6 +265,7 @@ class CombatScene extends Phaser.Scene {
         if (this.isCombatFinished() && !this.combatEndHandled) {
             this.combatEndHandled = true;
             ActionManager.getInstance().endCombat();
+            this.cardManager.onCombatEnd();
             this.uiManager.onCombatEnd();
         }
 

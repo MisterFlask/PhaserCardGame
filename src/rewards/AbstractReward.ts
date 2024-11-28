@@ -12,7 +12,6 @@ export abstract class AbstractReward {
         this.type = type;
     }
 
-    abstract createRewardElement(scene: Phaser.Scene, x: number, y: number): Phaser.GameObjects.Container;
     abstract collect(scene: Phaser.Scene): void;
     abstract getDisplayText(): string;
     abstract getTooltipText(): string;

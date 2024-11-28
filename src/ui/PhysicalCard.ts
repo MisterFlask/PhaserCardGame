@@ -462,16 +462,22 @@ export class PhysicalCard implements IPhysicalCardInterface {
         this.cardContent.setScale(scale);
     }
 
-    setupInteractivity(): void {
-        this.container.setInteractive(new Phaser.Geom.Rectangle(
-            -this.cardBackground.displayWidth / 2,
-            -this.cardBackground.displayHeight / 2,
-            this.cardBackground.displayWidth,
-            this.cardBackground.displayHeight
-        ), Phaser.Geom.Rectangle.Contains)
+
+    getRectangleBoundaries(container: Phaser.GameObjects.Container): Phaser.Geom.Rectangle {
+        return new Phaser.Geom.Rectangle(
+            -container.displayWidth / 2,
+            -container.displayHeight / 2,
+            container.displayWidth,
+            container.displayHeight
+        );
+    }
+    
+    setupInteractivity(): this {
+        this.container.setInteractive(this.getRectangleBoundaries(this.container), Phaser.Geom.Rectangle.Contains)
             .on('pointerover', this.onPointerOver_PhysicalCard, this)
             .on('pointerout', this.onPointerOut_PhysicalCard, this)
             .on('pointerdown', this.onPointerDown_PhysicalCard, this);
+        return this;
     }
 
     onPointerOver_PhysicalCard = (): void => {

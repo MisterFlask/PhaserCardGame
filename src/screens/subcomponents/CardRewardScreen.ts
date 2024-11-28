@@ -36,6 +36,7 @@ class CardRewardScreen {
         this.onReroll = params.onReroll;
 
         this.container = this.scene.add.container(this.scene.scale.width / 2, this.scene.scale.height / 2);
+        this.container.setDepth(1000);
         this.createBackground();
         this.displayRewardCards();
         this.createActionButtons();
@@ -49,12 +50,20 @@ class CardRewardScreen {
         this.container.add(background);
     }
 
+    private handleCardSelection(selectedCard: PlayableCard): void {
+        console.log("Card clicked:", selectedCard.name);
+        this.isCardSelected = true;
+        this.onSelect(selectedCard);
+        this.scene.events.emit('cardReward:selected');
+        this.hide();
+    }
+
     public displayRewardCards(): void {
         const cardSpacing = 220;
         const startX = -cardSpacing;
         const yPosition = -100;
 
-        const cardGuiUtils = CardGuiUtils.getInstance(); // Get instance of CardGuiUtils
+        const cardGuiUtils = CardGuiUtils.getInstance();
 
         this.rewards.forEach((cardReward, index) => {
             const physicalCard = cardGuiUtils.createCard({
@@ -63,12 +72,9 @@ class CardRewardScreen {
                 y: yPosition,
                 data: cardReward,
                 onCardCreatedEventCallback: (cardInstance: PhysicalCard) => {
-                    cardInstance.container.setInteractive({ useHandCursor: true });
+                    cardInstance.setupInteractivity();
                     cardInstance.container.on('pointerdown', () => {
-                        console.log("Card clicked:", cardReward.name);
-                        this.isCardSelected = true;
-                        this.onSelect(cardReward);
-                        this.hide();
+                        this.handleCardSelection(cardReward);
                     });
                 }
             });
@@ -174,6 +180,30 @@ class CardRewardScreen {
                 }
             }
         });
+    }
+
+    public destroy(): void {
+        // Clean up buttons
+        this.goToMapButton?.destroy();
+        this.rerollButton?.destroy();
+
+        // Clean up container and all its contents
+        this.container.destroy();
+
+        // Obliterate all physical cards
+        if (this.rewards) {
+            this.rewards.forEach(card => {
+                if (card) {
+                    card.physicalCard?.obliterate();
+                }
+            });
+        }
+
+        // Clear references
+        this.rewards = [];
+        this.onSelect = () => {};
+        this.onSkip = () => {};
+        this.onReroll = undefined;
     }
 }
 

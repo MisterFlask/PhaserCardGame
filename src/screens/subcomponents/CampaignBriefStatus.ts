@@ -8,6 +8,8 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
     private hellCurrencyText: TextBox;
     private brimstoneDistillateText: TextBox;
     private brimstoneTooltip: TooltipAttachment;
+    private hellCurrencyTooltip: TooltipAttachment;
+    private surfaceCurrencyTooltip: TooltipAttachment;
     private relicContainer: Phaser.GameObjects.Container;
     private readonly CURRENCY_WIDTH = 180;
     private readonly RELIC_GRID_WIDTH = 900; // 5x currency width
@@ -40,6 +42,14 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
             }
         });
 
+        // Add tooltip to surface currency display
+        this.surfaceCurrencyTooltip = new TooltipAttachment({
+            scene: this.scene,
+            container: this.surfaceCurrencyText,
+            tooltipText: "Utterly worthless and inaccessible in Hell but i guess it's nice to know you have it",
+            fillColor: 0x333333  // Dark gray background for surface currency tooltip
+        });
+
         var brimstoneDistillate: number = GameState.getInstance().brimstoneDistillate;
 
 
@@ -56,6 +66,14 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
                 color: '#ff4444',
                 fontFamily: 'Arial'
             }
+        });
+
+        // Add tooltip to hell currency display
+        this.hellCurrencyTooltip = new TooltipAttachment({
+            scene: this.scene,
+            container: this.hellCurrencyText,
+            tooltipText: "Can't be brought back to the surface because something something Charon is a bastard",
+            fillColor: 0x440000  // Dark red background for hell currency tooltip
         });
 
         // Add brimstone distillate display
@@ -146,6 +164,8 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
 
     public destroy(fromScene?: boolean): void {
         this.brimstoneTooltip.destroy();
+        this.hellCurrencyTooltip.destroy();
+        this.surfaceCurrencyTooltip.destroy();
         this.scene?.events?.off('update', this.updateCurrencyDisplay, this);
         this.scene?.events?.off('propagateGameStateChangesToUi', this.updateRelicDisplay, this);
         super.destroy(fromScene);

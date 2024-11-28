@@ -11,6 +11,33 @@ import { PhysicalCard } from '../../ui/PhysicalCard';
 import { CardGuiUtils } from '../../utils/CardGuiUtils';
 
 export class CombatCardManager {
+    onCombatEnd() {
+        // Fade out player hand cards
+        this.playerHand.forEach(card => {
+            this.scene.tweens.add({
+                targets: card.container,
+                alpha: 0,
+                duration: 800,
+                ease: 'Power1',
+                onComplete: () => {
+                    card.obliterate();
+                }
+            });
+        });
+
+        // Fade out enemy cards
+        this.enemyUnits.forEach(card => {
+            this.scene.tweens.add({
+                targets: card.container, 
+                alpha: 0,
+                duration: 800,
+                ease: 'Power1',
+                onComplete: () => {
+                    card.obliterate();
+                }
+            });
+        });
+    }
     private scene: Phaser.Scene;
     public playerHand: PhysicalCard[] = [];
     public enemyUnits: PhysicalCard[] = [];
