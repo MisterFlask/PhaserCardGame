@@ -9,12 +9,14 @@ export class FrenchBlindProphetess extends AutomatedCharacter {
     constructor() {
         super({
             name: "La Prophétesse Aveugle",
-            portraitName: "Eldritch Blind Prophetess",
+            portraitName: "Boss Zodiac Virgo",
             maxHitpoints: 200,
             description: "whispers of the Final Argument"
         });
-        
-        this.size = CardSize.LARGE;
+        this.portraitTargetLargestDimension = 600;
+        this.portraitOffsetXOverride = -100
+        this.portraitOffsetYOverride = 0
+        this.size = CardSize.SMALL;
         // Apply initial MothGod buff
         this.buffs.push(new MothGod(2));
     }

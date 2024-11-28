@@ -95,7 +95,7 @@ export abstract class PlayableCard extends AbstractCard {
     constructor({ name, description, portraitName, cardType, tooltip, characterData, size, targetingType, owner, price: surfaceValue, rarity }: { name: string; description?: string; portraitName?: string; cardType?: CardType; tooltip?: string; characterData?: AbstractCard; size?: CardSize; targetingType?: TargetingType; owner?: IBaseCharacter; price?: number; rarity?: EntityRarity }) {
         super({ name, description: description ?? "_", portraitName, cardType, tooltip, characterData, size });
         this.targetingType = targetingType ?? TargetingType.ENEMY;
-        this.owner = owner as PlayerCharacter;
+        this.owningCharacter = owner as PlayerCharacter;
         this.rarity = rarity ?? EntityRarity.COMMON;
         this.surfacePurchaseValue = surfaceValue ?? this.rarity.basePrice;
         this.hellPurchaseValue = this.rarity.basePrice;
@@ -103,7 +103,7 @@ export abstract class PlayableCard extends AbstractCard {
     }
 
     withOwner(owner: PlayerCharacter): this {
-        this.owner = owner;
+        this.owningCharacter = owner;
         return this;
     }
 
@@ -164,7 +164,7 @@ export abstract class PlayableCard extends AbstractCard {
      * DO NOT OVERRIDE.
      */
     public ownedBy(owner: PlayerCharacter): this {
-        this.owner = owner;
+        this.owningCharacter = owner;
         return this;
     }
 
@@ -234,7 +234,7 @@ export abstract class PlayableCard extends AbstractCard {
             this.actionManager.dealDamage({
                 baseDamageAmount: baseDamageOverride ?? this.getBaseDamageAfterResourceScaling(),
                 target: targetCard,
-                sourceCharacter: this.owner,
+                sourceCharacter: this.owningCharacter,
                 fromAttack: true,
                 sourceCard: this,
                 callback: callback
@@ -260,7 +260,7 @@ export abstract class PlayableCard extends AbstractCard {
                 blockTargetCharacter: targetCard,
                 baseBlockValue: this.getBaseBlockAfterResourceScaling(),
                 appliedViaPlayableCard: this,
-                blockSourceCharacter: this.owner
+                blockSourceCharacter: this.owningCharacter
             });
         }
     }    
@@ -293,11 +293,11 @@ export abstract class PlayableCard extends AbstractCard {
      * DO NOT OVERRIDE.
      */
     public getDisplayedBlock(targetedCharacterIfAny?: IBaseCharacter): string {
-        if (!this.owner) {
+        if (!this.owningCharacter) {
             return "[color=cyan]" + this.getBaseBlockAfterResourceScaling().toString() + "[/color]";
         }
 
-        return "[color=cyan]" + CombatRules.calculateBlockSentToCharacterByCard(this, this.owner as IBaseCharacter, targetedCharacterIfAny as IBaseCharacter).toString() + "[/color]";
+        return "[color=cyan]" + CombatRules.calculateBlockSentToCharacterByCard(this, this.owningCharacter as IBaseCharacter, targetedCharacterIfAny as IBaseCharacter).toString() + "[/color]";
     }
     /**
      * DO NOT OVERRIDE.
@@ -345,7 +345,7 @@ export abstract class PlayableCard extends AbstractCard {
      * DO NOT OVERRIDE.
      */
     public getDisplayedDamage(selectedCharacter?: IBaseCharacter): string {
-        if (!this.owner) {
+        if (!this.owningCharacter) {
             return "[color=red]" + this.getBaseDamageAfterResourceScaling().toString() + "[/color]";
         }
 
@@ -354,7 +354,7 @@ export abstract class PlayableCard extends AbstractCard {
         const damageCalcResult = CombatRules.calculateDamage({
             baseDamageAmount: this.getBaseDamageAfterResourceScaling(),
             target: targetedCharacterIfAny,
-            sourceCharacter: this.owner,
+            sourceCharacter: this.owningCharacter,
             sourceCard: this,
             fromAttack: true
         });

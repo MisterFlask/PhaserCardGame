@@ -25,7 +25,7 @@ export class Quartermaster extends PlayableCard {
         livingPartyMembers.forEach(member => {
             const buzzsword = new Buzzsword();
             buzzsword.baseEnergyCost -= 1;
-            buzzsword.owner = member;
+            buzzsword.owningCharacter = member;
             buzzsword.buffs.push(new ExhaustBuff());
             BasicProcs.getInstance().ManufactureCardToHand(buzzsword);
         });

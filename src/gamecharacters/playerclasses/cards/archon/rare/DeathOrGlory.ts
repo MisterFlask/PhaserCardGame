@@ -26,10 +26,10 @@ export class DeathOrGlory extends PlayableCard {
         if (targetCard) {
 
             combatState.enemies.forEach(enemy => {
-                BasicProcs.getInstance().Taunt(enemy, this.owner!);
+                BasicProcs.getInstance().Taunt(enemy, this.owningCharacter!);
             });
 
-            ActionManagerFetcher.getActionManager().applyBuffToCharacterOrCard(this.owner!,new Vulnerable(1));
+            ActionManagerFetcher.getActionManager().applyBuffToCharacterOrCard(this.owningCharacter!,new Vulnerable(1));
         }
     }
 

@@ -28,7 +28,7 @@ export class HazmatSpecialist extends PlayableCard {
 			this.actionManager.applyBuffToCharacterOrCard(ally, new Ward(1), ally);
 		});
 		this.performActionOnRandomEnemy(enemy => {
-			this.actionManager.applyBuffToCharacterOrCard(enemy, new Burning(this.getBaseMagicNumberAfterResourceScaling()), this.owner as BaseCharacter);
+			this.actionManager.applyBuffToCharacterOrCard(enemy, new Burning(this.getBaseMagicNumberAfterResourceScaling()), this.owningCharacter as BaseCharacter);
 		});
 	}
 }

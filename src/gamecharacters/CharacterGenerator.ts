@@ -105,7 +105,7 @@ export class CharacterGenerator {
         var character = new PlayerCharacter({ name: characterClass.name, portraitName: characterClass.iconName, characterClass: characterClass })
         character.cardsInMasterDeck = CharacterGenerator.getInstance().generateStartingDeck(characterClass)
         for (const card of character.cardsInMasterDeck) {
-            card.owner = character;
+            card.owningCharacter = character;
         }
         character.buffs = [CharacterGenerator.getInstance().generateStartingPersonaTraits()]
 

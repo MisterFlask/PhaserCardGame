@@ -21,10 +21,10 @@ export abstract class AbstractBuff implements IAbstractBuff {
     }
 
     public getCardOwner(): BaseCharacter | null {
-        return this.getOwnerAsPlayableCard()?.owner ?? null;
+        return this.getOwnerAsPlayableCard()?.owningCharacter ?? null;
     }
     public getCardOwnerName(): string {
-        return this.getOwnerAsPlayableCard()?.owner?.name ?? "(owner)";
+        return this.getOwnerAsPlayableCard()?.owningCharacter?.name ?? "(owner)";
     }
 
     get actionManager(): ActionManager {

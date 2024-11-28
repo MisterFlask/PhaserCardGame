@@ -20,7 +20,7 @@ export class Blind extends AbstractBuff {
     }
 
     override onAnyCardPlayedByAnyone(playedCard: PlayableCard, target?: BaseCharacter): void {
-        if (playedCard.owner != this.getOwnerAsCharacter()) {
+        if (playedCard.owningCharacter != this.getOwnerAsCharacter()) {
             return;
         }
         if (this.stacks > 0) {

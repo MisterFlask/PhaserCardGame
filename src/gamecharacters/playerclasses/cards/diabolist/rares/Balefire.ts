@@ -41,7 +41,7 @@ export class Balefire extends PlayableCard {
             this.dealDamageToTarget(target);
         }
 
-        const owner = this.owner as BaseCharacter;
+        const owner = this.owningCharacter as BaseCharacter;
         if (owner) {
             owner.maxHitpoints -= 3;
             owner.hitpoints = Math.min(owner.hitpoints, owner.maxHitpoints);

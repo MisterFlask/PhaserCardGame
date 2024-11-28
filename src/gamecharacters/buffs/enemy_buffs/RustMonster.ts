@@ -30,7 +30,7 @@ export class RustMonster extends AbstractBuff {
             ...combatState.currentDiscardPile
         ]
         .filter(card => card instanceof PlayableCard)
-        .filter(card => card.owner === targetCharacter && (card as PlayableCard).baseBlock > 0);
+        .filter(card => card.owningCharacter === targetCharacter && (card as PlayableCard).baseBlock > 0);
 
         if (nonExhaustedCards.length > 0) {
             // Select a random card with >0 defense

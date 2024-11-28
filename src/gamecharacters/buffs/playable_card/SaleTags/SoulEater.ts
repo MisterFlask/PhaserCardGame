@@ -19,11 +19,11 @@ export class SoulEater extends AbstractBuff {
 
     override onGainingThisCard(): void {
         const owner = this.getOwnerAsPlayableCard();
-        if (owner?.owner) {
-            owner.owner.maxHitpoints -= this.stacks;
+        if (owner?.owningCharacter) {
+            owner.owningCharacter.maxHitpoints -= this.stacks;
             // Ensure current HP doesn't exceed new max
-            if (owner.owner.hitpoints > owner.owner.maxHitpoints) {
-                owner.owner.hitpoints = owner.owner.maxHitpoints;
+            if (owner.owningCharacter.hitpoints > owner.owningCharacter.maxHitpoints) {
+                owner.owningCharacter.hitpoints = owner.owningCharacter.maxHitpoints;
             }
         }
     }

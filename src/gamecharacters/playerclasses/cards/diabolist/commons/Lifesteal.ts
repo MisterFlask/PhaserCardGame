@@ -31,9 +31,9 @@ export class Lifesteal extends PlayableCard {
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
-        if (targetCard && this.owner) {
+        if (targetCard && this.owningCharacter) {
             this.dealDamageToTarget(targetCard as BaseCharacter);
-            this.actionManager.heal(this.owner, this.getBaseMagicNumberAfterResourceScaling());
+            this.actionManager.heal(this.owningCharacter, this.getBaseMagicNumberAfterResourceScaling());
         }
     }
 }

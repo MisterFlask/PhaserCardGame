@@ -17,7 +17,7 @@ export class TheLaw extends PlayableCard {
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
-        this.actionManager.applyBuffToCharacterOrCard(this.owner!, new TheLawBuff(1));
+        this.actionManager.applyBuffToCharacterOrCard(this.owningCharacter!, new TheLawBuff(1));
     }
 
     override get description(): string {

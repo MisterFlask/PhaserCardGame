@@ -35,7 +35,7 @@ export class IronWill extends PlayableCard {
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
-        const owner = this.owner;
+        const owner = this.owningCharacter;
 
         if (owner) {
             // Owner gains 2 stress

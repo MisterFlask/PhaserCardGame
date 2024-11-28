@@ -20,7 +20,7 @@ export class DoNotLookAtMe extends AbstractBuff {
     }
 
     public onAnyCardPlayedByAnyone(playedCard: PlayableCard, target?: BaseCharacter){
-        const ownerOfCard = playedCard?.owner
+        const ownerOfCard = playedCard?.owningCharacter
         if (ownerOfCard) {
             const stressBuff = new Stress(this.stacks);
             this.actionManager.applyBuffToCharacter(ownerOfCard, stressBuff);

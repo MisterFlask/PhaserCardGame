@@ -34,31 +34,31 @@ export class ActionManager {
     }
 
     destroyCardInMasterDeck(card: PlayableCard) {
-        if (card.owner) {
-            const index = card.owner.cardsInMasterDeck.indexOf(card);
+        if (card.owningCharacter) {
+            const index = card.owningCharacter.cardsInMasterDeck.indexOf(card);
             if (index > -1) {
-                card.owner.cardsInMasterDeck.splice(index, 1);
+                card.owningCharacter.cardsInMasterDeck.splice(index, 1);
             }
         }
     }
 
     addCardToMasterDeck(card: PlayableCard) {
-        if (!card.owner){
+        if (!card.owningCharacter){
             // Assign to a random character in the party
             const gameState = GameState.getInstance();
             const partyMembers = gameState.currentRunCharacters;
             if (partyMembers.length > 0) {
                 const randomCharacter = partyMembers[Math.floor(Math.random() * partyMembers.length)];
-                card.owner = randomCharacter;
+                card.owningCharacter = randomCharacter;
             }
         }
 
-        card.owner?.cardsInMasterDeck.push(card);
+        card.owningCharacter?.cardsInMasterDeck.push(card);
     }
 
 
     removeCardFromMasterDeck(card: PlayableCard) {
-        card.owner?.cardsInMasterDeck.splice(card.owner?.cardsInMasterDeck.indexOf(card), 1);
+        card.owningCharacter?.cardsInMasterDeck.splice(card.owningCharacter?.cardsInMasterDeck.indexOf(card), 1);
     }
 
     endCombat() {

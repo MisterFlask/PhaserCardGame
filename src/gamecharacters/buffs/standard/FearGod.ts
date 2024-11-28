@@ -49,8 +49,8 @@ class PhobiaBuff extends AbstractBuff {
 
     override onThisCardInvoked(target?: IBaseCharacter): void {
         const owner = this.getOwnerAsPlayableCard();
-        if (owner && owner.owner) {
-            this.actionManager.applyBuffToCharacterOrCard(owner.owner as BaseCharacter, new Stress(1));
+        if (owner && owner.owningCharacter) {
+            this.actionManager.applyBuffToCharacterOrCard(owner.owningCharacter as BaseCharacter, new Stress(1));
         }
     }
 }

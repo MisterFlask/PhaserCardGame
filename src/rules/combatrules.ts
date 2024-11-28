@@ -47,7 +47,7 @@ export class CombatRules {
         const combatState = gameState.combatState;
 
         const removeDeadCharacterCards = (pile: PlayableCardType[]) => {
-            return pile.filter(card => card.owner !== character);
+            return pile.filter(card => card.owningCharacter !== character);
         };
 
         combatState.currentHand = removeDeadCharacterCards(combatState.currentHand );

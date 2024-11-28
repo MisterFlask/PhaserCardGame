@@ -11,6 +11,6 @@ export abstract class PlayableCardWithHelpers extends PlayableCard {
     }
 
     addBuff(target: BaseCharacter, buff: AbstractBuff): void {
-        this.actionManager.applyBuffToCharacterOrCard(target, buff, this.owner);
+        this.actionManager.applyBuffToCharacterOrCard(target, buff, this.owningCharacter);
     }
 }

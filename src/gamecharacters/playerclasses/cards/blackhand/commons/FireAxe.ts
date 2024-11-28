@@ -23,7 +23,7 @@ export class FireAxe extends PlayableCard {
     override InvokeCardEffects(targetCard?: BaseCharacter): void {
         if (targetCard && targetCard instanceof BaseCharacter) {
             this.dealDamageToTarget(targetCard);
-            this.actionManager.applyBuffToCharacterOrCard(targetCard, new Burning(this.getBaseMagicNumberAfterResourceScaling()), this.owner as BaseCharacter);
+            this.actionManager.applyBuffToCharacterOrCard(targetCard, new Burning(this.getBaseMagicNumberAfterResourceScaling()), this.owningCharacter as BaseCharacter);
         }
     }
 }

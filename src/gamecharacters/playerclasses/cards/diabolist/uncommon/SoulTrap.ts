@@ -22,13 +22,13 @@ export class SoulTrap extends PlayableCard {
     override InvokeCardEffects(targetCard?: BaseCharacter): void {
         this.dealDamageToTarget(targetCard as BaseCharacter);
 
-        if (!this.owner) {
+        if (!this.owningCharacter) {
             return;
         }
 
         if (targetCard && targetCard.hitpoints <= 0) {
-            this.owner.maxHitpoints += 2; // Gain 2 max HP
-            this.owner.hitpoints += 2;
+            this.owningCharacter.maxHitpoints += 2; // Gain 2 max HP
+            this.owningCharacter.hitpoints += 2;
         }
 
         this.actionManager.exhaustCard(this);

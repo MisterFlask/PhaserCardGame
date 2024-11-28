@@ -460,6 +460,10 @@ export class PhysicalCard implements IPhysicalCardInterface {
     applyCardSize(): void {
         const scale = this.data.size.sizeModifier;
         this.cardContent.setScale(scale);
+
+        if (this.data.portraitTargetLargestDimension){
+            this.cardImage.setImageScale(this.data.portraitTargetLargestDimension);
+        }
     }
 
 
@@ -719,22 +723,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
         texture.setFilter(Phaser.Textures.LINEAR);
         
         // Update the ShadowedImage
-        const frame = texture.get();
-        const aspectRatio = frame.width / frame.height;
-
-        const availableWidth = this.cardBackground.displayWidth * 0.9;
-        const availableHeight = this.cardBackground.displayHeight * 0.7;
-
-        let newWidth = availableWidth;
-        let newHeight = availableWidth / aspectRatio;
-
-        if (newHeight > availableHeight) {
-            newHeight = availableHeight;
-            newWidth = availableHeight * aspectRatio;
-        }
-
-        this.cardImage.setDisplaySize(newWidth, newHeight);
-        this.cardImage.setPosition(0, -this.cardBackground.displayHeight * 0.2);
+        this.setDisplaySizeOfPortraitTexture(texture);
+        this.cardImage.setPosition(this.data.portraitOffsetXOverride ?? 0, this.data.portraitOffsetYOverride ?? -this.cardBackground.displayHeight * 0.2);
         this.cardImage.setTint(effectivePortraitTint);
 
         if (this.cardBackground.scene?.sys){
@@ -793,6 +783,24 @@ export class PhysicalCard implements IPhysicalCardInterface {
             const playableCard = this.data as PlayableCardType;
             this.cardTypeBox.setText(playableCard.cardType.displayName);
         }
+    }
+
+    private setDisplaySizeOfPortraitTexture(texture: Phaser.Textures.Texture) {
+        const frame = texture.get();
+        const aspectRatio = frame.width / frame.height;
+
+        const availableWidth = this.data.portraitTargetLargestDimension ?? this.cardBackground.displayWidth * 0.9;
+        const availableHeight = this.data.portraitTargetLargestDimension ? availableWidth / aspectRatio : this.cardBackground.displayHeight * 0.7;
+
+        let newWidth = availableWidth;
+        let newHeight = availableWidth / aspectRatio;
+
+        if (newHeight > availableHeight) {
+            newHeight = availableHeight;
+            newWidth = availableHeight * aspectRatio;
+        }
+
+        this.cardImage.setDisplaySize(newWidth, newHeight);
     }
 
     updateIntents(): void {

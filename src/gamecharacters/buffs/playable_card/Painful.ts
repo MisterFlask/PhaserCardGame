@@ -23,7 +23,7 @@ export class Painful extends AbstractBuff {
         if (ownerCard === null) {
             return;
         }
-        const ownerAsCharacter = ownerCard.owner;
+        const ownerAsCharacter = ownerCard.owningCharacter;
         if (!ownerAsCharacter) {
             return;
         }

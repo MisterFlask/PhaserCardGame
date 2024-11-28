@@ -26,7 +26,7 @@ export class Smokescreen extends PlayableCard {
 		let burningCount = 0;
 		this.forEachEnemy(enemy => {
 			burningCount += enemy.getBuffStacks(new Burning(1).getDisplayName());
-			this.actionManager.applyBuffToCharacterOrCard(enemy as BaseCharacter, new Burning(this.getBaseMagicNumberAfterResourceScaling()), this.owner as BaseCharacter);
+			this.actionManager.applyBuffToCharacterOrCard(enemy as BaseCharacter, new Burning(this.getBaseMagicNumberAfterResourceScaling()), this.owningCharacter as BaseCharacter);
 		});
 
 		this.forEachAlly(ally => {

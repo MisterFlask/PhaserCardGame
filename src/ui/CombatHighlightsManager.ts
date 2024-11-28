@@ -45,7 +45,7 @@ export class CombatHighlightsManager {
         const hoveredCard = this.transientUiState.hoveredCard;
 
         if (hoveredCard && !draggedCard) {  // Only do this when not dragging a card
-            const cardOwner = allCharacters.find(char => char.id === hoveredCard.data.owner?.id);
+            const cardOwner = allCharacters.find(char => char.id === hoveredCard.data.owningCharacter?.id);
             if (cardOwner?.physicalCard) {
                 cardOwner.physicalCard.glowColor = CombatHighlightsManager.ELIGIBLE_TARGET_COLOR;
                 cardOwner.physicalCard.setGlow(true);

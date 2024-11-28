@@ -28,7 +28,7 @@ export class StrengthOfInsanity extends PlayableCard {
         const gameState = GameState.getInstance();
 
         // Get the owner of this card
-        const owner = this.owner as BaseCharacter;
+        const owner = this.owningCharacter as BaseCharacter;
         if (!owner) {
             console.warn("StrengthOfInsanity: No owner found for this card");
             return;

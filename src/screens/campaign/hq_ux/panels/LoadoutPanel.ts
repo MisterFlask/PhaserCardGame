@@ -106,7 +106,7 @@ export class LoadoutPanel extends AbstractHqPanel {
             const campaignState = CampaignState.getInstance();
             campaignState.selectedParty.forEach(character => {
                 const assignedTradeGoods = campaignState.ownedTradeGoods.filter(
-                    good => good.owner === character
+                    good => good.owningCharacter === character
                 );
                 character.cardsInMasterDeck.push(...assignedTradeGoods);
             });
@@ -340,8 +340,8 @@ class CaravanPartyPanel extends Phaser.GameObjects.Container {
         // Assign all unowned cargo to this character
         const campaignState = CampaignState.getInstance();
         campaignState.ownedTradeGoods.forEach(good => {
-            if (!good.owner) {
-                good.owner = character;
+            if (!good.owningCharacter) {
+                good.owningCharacter = character;
             }
         });
         
@@ -387,13 +387,13 @@ class CaravanPartyPanel extends Phaser.GameObjects.Container {
         const remainingParty = campaignState.selectedParty.filter(c => c !== formerOwner);
         
         campaignState.ownedTradeGoods.forEach(good => {
-            if (good.owner === formerOwner) {
+            if (good.owningCharacter === formerOwner) {
                 if (remainingParty.length > 0) {
                     // Randomly assign to another party member
-                    good.owner = remainingParty[Math.floor(Math.random() * remainingParty.length)];
+                    good.owningCharacter = remainingParty[Math.floor(Math.random() * remainingParty.length)];
                 } else {
                     // If no party members left, unassign
-                    good.owner = undefined;
+                    good.owningCharacter = undefined;
                 }
             }
         });
@@ -490,10 +490,10 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
                         y: CARD_HEIGHT / 2,
                         width: 120,
                         height: 30,
-                        text: good.owner ? `Assigned to:\n${good.owner.name}` : 'Unassigned (will not be taken)',
+                        text: good.owningCharacter ? `Assigned to:\n${good.owningCharacter.name}` : 'Unassigned (will not be taken)',
                         style: { 
                             fontSize: '14px', 
-                            color: good.owner ? '#006400' : '#8B0000', // Dark green and dark red
+                            color: good.owningCharacter ? '#006400' : '#8B0000', // Dark green and dark red
                             align: 'left',
                             wordWrap: { width: 110 }
                         }
@@ -530,14 +530,14 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
         const campaignState = CampaignState.getInstance();
         const partyMembers = campaignState.selectedParty;
         
-        if (!card.data.owner) {
+        if (!card.data.owningCharacter) {
             // If unassigned, assign to first party member
             if (partyMembers.length > 0) {
                 this.equipTradeGood(card, partyMembers[0]);
             }
         } else {
             // Find current owner's index
-            const currentIndex = partyMembers.indexOf(card.data.owner);
+            const currentIndex = partyMembers.indexOf(card.data.owningCharacter);
             if (currentIndex === partyMembers.length - 1) {
                 // If last party member, unassign
                 this.unequipTradeGood(card);
@@ -549,7 +549,7 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
     }
 
     private unequipTradeGood(tradeGood: PhysicalCard): void {
-        tradeGood.data.owner = undefined;
+        tradeGood.data.owningCharacter = undefined;
         
         const assignmentText = (tradeGood as any).assignmentText as TextBox;
         if (assignmentText) {
@@ -559,7 +559,7 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
     }
 
     private equipTradeGood(tradeGood: PhysicalCard, character: PlayerCharacter): void {
-        tradeGood.data.owner = character;
+        tradeGood.data.owningCharacter = character;
 
         const assignmentText = (tradeGood as any).assignmentText as TextBox;
         if (assignmentText) {
@@ -664,10 +664,10 @@ class ExpeditionSummaryPanel extends Phaser.GameObjects.Container {
         
         // Update cargo value
         const totalValue = campaignState.ownedTradeGoods.reduce((total, good) => 
-            total + (good.owner ? good.hellSellValue : 0), 0);
+            total + (good.owningCharacter ? good.hellSellValue : 0), 0);
         this.cargoValueText.setText(
             `Total Cargo Value: ${totalValue} Hell\n` +
-            `Assigned Cards: ${campaignState.ownedTradeGoods.filter(g => g.owner).length}/${campaignState.ownedTradeGoods.length}`
+            `Assigned Cards: ${campaignState.ownedTradeGoods.filter(g => g.owningCharacter).length}/${campaignState.ownedTradeGoods.length}`
         );
 
         // Update party info

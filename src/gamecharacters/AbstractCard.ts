@@ -98,6 +98,10 @@ export abstract class AbstractCard implements IAbstractCard {
 
     public typeTag: string = "AbstractCard"
     
+    public portraitTargetLargestDimension?: number
+    public portraitOffsetXOverride?: number
+    public portraitOffsetYOverride?: number 
+    
     public get name(): string {
         return this._name;
     }
@@ -146,7 +150,7 @@ export abstract class AbstractCard implements IAbstractCard {
     public portraitName?: string
     cardType: CardType
     public tooltip: string
-    owner?: PlayerCharacter
+    owningCharacter?: PlayerCharacter
     size: CardSize
     id: string
     physicalCard?: PhysicalCard // this is a hack, it's just always PhysicalCard
@@ -219,7 +223,7 @@ export abstract class AbstractCard implements IAbstractCard {
         this.portraitName = portraitName
         this.cardType = cardType || CardType.SKILL
         this.tooltip = tooltip || "Lorem ipsum dolor sit amet"
-        this.owner = characterData as unknown as PlayerCharacter || undefined
+        this.owningCharacter = characterData as unknown as PlayerCharacter || undefined
         this.size = size || CardSize.SMALL
         this.team = team || Team.ENEMY
     }
@@ -237,7 +241,7 @@ export abstract class AbstractCard implements IAbstractCard {
     
     getCanonicalCard(): this | null{
         // check for card in character deck
-        const character = this.owner as PlayerCharacter;
+        const character = this.owningCharacter as PlayerCharacter;
         if (character == null) return null;
         const deck = character.cardsInMasterDeck;
         const canonicalCard = deck.find((card: AbstractCard) => card.id === this.id);
@@ -268,7 +272,7 @@ export abstract class AbstractCard implements IAbstractCard {
          
         Object.assign(copy, this);
         copy.id = generateWordGuid();
-        copy.owner = this.owner;
+        copy.owner = this.owningCharacter;
         // Deep copy the buffs array
         copy.buffs = this.buffs.map(buff => buff.clone());
         return copy;
@@ -288,7 +292,7 @@ export abstract class AbstractCard implements IAbstractCard {
             size: this.size,
             cardType: this.cardType,
             tooltip: this.tooltip,
-            owner: this.owner?.name,
+            owner: this.owningCharacter?.name,
             team: this.team,
             block: this.block,
         }, null, 2);
@@ -330,8 +334,8 @@ export abstract class AbstractCard implements IAbstractCard {
         // if card is a BaseCharacter, check if it has a class.  If it does use the class's cardBackgroundImageName.  Otherwise, if the card has an owner, use the owner's class's cardBackgroundImageName.  Otherwise, use the default "greyscale"
         if ((this as unknown as PlayerCharacter)?.characterClass) {
             return (this as unknown as PlayerCharacter)!.characterClass.cardBackgroundImageName;
-        } else if ((this as unknown as PlayableCard)?.owner) {
-            return (this as unknown as PlayableCard)!.owner!.characterClass!.cardBackgroundImageName;
+        } else if ((this as unknown as PlayableCard)?.owningCharacter) {
+            return (this as unknown as PlayableCard)!.owningCharacter!.characterClass!.cardBackgroundImageName;
         }
         return "greyscale";
     }

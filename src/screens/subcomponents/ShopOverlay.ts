@@ -265,7 +265,7 @@ export class ShopOverlay {
             if (!character) {
                 character = GameState.getInstance().currentRunCharacters[Math.floor(Math.random() * GameState.getInstance().currentRunCharacters.length)];
             }
-            card.owner = character;
+            card.owningCharacter = character;
         });
         return cards;
     }

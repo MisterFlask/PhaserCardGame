@@ -56,8 +56,8 @@ export class ObsidianCandles extends PlayableCard {
         deckLogic.drawCards(2);
 
         // Add the buff to the player
-        if (this.owner) {
-            this.actionManager.applyBuffToCharacter(this.owner, new ObsidianCandlesEffect());
+        if (this.owningCharacter) {
+            this.actionManager.applyBuffToCharacter(this.owningCharacter, new ObsidianCandlesEffect());
         }
     }
 

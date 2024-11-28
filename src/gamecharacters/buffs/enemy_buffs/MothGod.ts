@@ -43,15 +43,20 @@ class EggsBuff extends AbstractBuff {
     }
 
     override getDescription(): string {
-        return "If this card is in your hand at the end of turn, it is exhausted and a Moth is added to your draw pile.";
+        return "If this card is in your hand at the end of turn, it is exhausted and a Moth is added to your draw pile.  Removed if card is played.";
     }
     override onInHandAtEndOfTurn(): void {
-        const owner = this.getOwnerAsPlayableCard();
-        if (owner) {
-            this.actionManager.exhaustCard(owner);
+        const ownerCard = this.getOwnerAsPlayableCard();
+        if (ownerCard) {
+            this.actionManager.exhaustCard(ownerCard);
             const moth = new Moth();
+            moth.owningCharacter = ownerCard.owningCharacter;
             this.actionManager.createCardToDrawPile(moth);
         }
+    }
+
+    override onThisCardInvoked(): void {
+        this.stacks = 0;
     }
 }
 
@@ -63,13 +68,13 @@ class Moth extends PlayableCard {
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.SPECIAL,
         });
-        this.baseEnergyCost = 3;
+        this.baseEnergyCost = 1;
         this.buffs.push(new ExhaustBuff());
         this.buffs.push(new Hazardous(4));
     }
 
     override get description(): string {
-        return "At the end of turn, deal 4 damage to you. Exhaust.";
+        return "";
     }
 
     override InvokeCardEffects(): void {
@@ -94,11 +99,11 @@ class Hazardous extends AbstractBuff {
 
     override onInHandAtEndOfTurn(): void {
         const owner = this.getOwnerAsPlayableCard();
-        if (owner) {
+        if (owner?.owningCharacter) {
             this.actionManager.dealDamage({
                 baseDamageAmount: this.stacks,
-                target: owner.owner as IBaseCharacter,
-                sourceCharacter: owner.owner,
+                target: owner.owningCharacter as IBaseCharacter,
+                sourceCharacter: owner.owningCharacter,
                 fromAttack: false,
                 sourceCard: owner
             });

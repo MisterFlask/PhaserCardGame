@@ -20,7 +20,7 @@ export class AxeCrazy extends PlayableCard {
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
-        this.actionManager.applyBuffToCharacterOrCard(this.owner!, new AxeCrazyBuff(1));
+        this.actionManager.applyBuffToCharacterOrCard(this.owningCharacter!, new AxeCrazyBuff(1));
     }
 }
 
@@ -40,7 +40,7 @@ class AxeCrazyBuff extends AbstractBuff {
     }
 
     override onAnyCardPlayedByAnyone(card: AbstractCard): void {
-        if (card.owner !== this.getOwnerAsCharacter()) return;
+        if (card.owningCharacter !== this.getOwnerAsCharacter()) return;
         if (card.name.toLowerCase().includes("axe")) {
             GameState.getInstance().combatState.combatResources.modifyBlood(2);
         }
