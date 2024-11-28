@@ -6,7 +6,7 @@ import { CursedStrike } from "./cards/diabolist/commons/CursedStrike";
 import { DarkWhisper } from "./cards/diabolist/commons/DarkWhisper";
 import { ObsidianCandles } from "./cards/diabolist/commons/ObsidianCandles";
 import { Balefire } from "./cards/diabolist/rares/Balefire";
-import { IllFatedBlade } from "./cards/diabolist/rares/CursedBlade";
+import { IllFatedBlade } from "./cards/diabolist/rares/IllFatedBlade";
 import { HorrificRegeneration } from "./cards/diabolist/rares/HorrificRegeneration";
 import { StrengthOfInsanity } from "./cards/diabolist/rares/StrengthOfInsanity";
 import { BurningSight } from "./cards/diabolist/uncommon/BurningSight";

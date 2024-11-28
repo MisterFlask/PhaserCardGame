@@ -53,6 +53,7 @@ export class EntityRarity {
     static readonly EPIC = new EntityRarity({ id: "EPIC", weight: 5, color: 0xFF69B4, basePrice: 350, baseCardLevel: 4 });
     static readonly LEGENDARY = new EntityRarity({ id: "LEGENDARY", weight: 6, color: 0xFFD700, basePrice: 500, baseCardLevel: 5 });
     static readonly SPECIAL = new EntityRarity({ id: "SPECIAL", weight: 7, color: 0xFF4500, basePrice: 400, baseCardLevel: 7 });
+    static readonly BOSS = new EntityRarity({ id: "BOSS", weight: 8, color: 0xFF4500, basePrice: 400, baseCardLevel: 7 });
 
     toString(): string {
         return this.id;

@@ -91,6 +91,10 @@ export class ActionManager {
         combatResources.modifyBlood(0 - combatResources.powder.value);
     }
 
+    modifyMaxEnergy(amount: number) {
+        GameState.getInstance().combatState.maxEnergy += amount;
+    }
+
     initializeCombatDeck(){
         const gameState = GameState.getInstance();
         const combatState = gameState.combatState;
@@ -109,7 +113,11 @@ export class ActionManager {
 
     startCombat() {
         this.actionQueue.addAction(new GenericAction(async () => {
+            
             this.initializeCombatDeck();
+
+            // Set max energy based on relics
+            GameState.getInstance().combatState.maxEnergy = 3; // Base energy
 
             GameState.getInstance().relicsInventory.forEach(relic => {
                 relic.onCombatStart();
@@ -129,6 +137,7 @@ export class ActionManager {
 
         GameState.getInstance().brimstoneDistillate += item.hellSellValue;
     }
+    
     buyRelicForHellCurrency(relic: AbstractRelic, price: number) : boolean {
         if (GameState.getInstance().hellCurrency < price) {
             return false;
