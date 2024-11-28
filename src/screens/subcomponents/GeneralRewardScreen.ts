@@ -6,6 +6,7 @@ class GeneralRewardScreen {
     public container: Phaser.GameObjects.Container;
     public rewards: AbstractReward[];
     private rewardElements: Phaser.GameObjects.Container[] = [];
+    private shouldShow: boolean = false;
 
     constructor(scene: Phaser.Scene, rewards: AbstractReward[]) {
         this.scene = scene;
@@ -16,6 +17,7 @@ class GeneralRewardScreen {
         );
         this.createBackground();
         this.displayRewards();
+        this.hide(); // Initially hidden
     }
 
     private createBackground(): void {
@@ -36,7 +38,10 @@ class GeneralRewardScreen {
             this.container.add(rewardElement);
             this.rewardElements.push(rewardElement);
 
-            rewardElement.on('pointerdown', () => {
+            // Make reward element interactive
+            rewardElement.setInteractive({ useHandCursor: true });
+
+            rewardElement.on('pointerup', () => {
                 this.removeRewardElement(rewardElement, reward);
             });
         });
@@ -50,16 +55,54 @@ class GeneralRewardScreen {
         rewardElement.destroy();
         this.rewards.splice(this.rewards.indexOf(reward), 1);
         if (this.rewards.length === 0) {
-            this.hide();
+
         }
     }
 
     public show(): void {
+        this.shouldShow = true;
         this.container.setVisible(true);
+        this.container.alpha = 0;
+
+        // Disable interactions during fade-in
+        this.container.list.forEach(child => {
+            if (child instanceof Phaser.GameObjects.Container || child instanceof Phaser.GameObjects.Sprite || child instanceof Phaser.GameObjects.Image) {
+                child.disableInteractive();
+            }
+        });
+
+        this.scene.tweens.add({
+            targets: this.container,
+            alpha: 1,
+            duration: 500,
+            ease: 'Power2',
+            onComplete: () => {
+                // Only enable interactions if we still should be showing
+                if (this.shouldShow) {
+                    this.container.list.forEach(child => {
+                        if (child instanceof Phaser.GameObjects.Container || child instanceof Phaser.GameObjects.Sprite || child instanceof Phaser.GameObjects.Image) {
+                            child.setInteractive({ useHandCursor: true });
+                        }
+                    });
+                }
+            }
+        });
     }
 
     public hide(): void {
-        this.container.setVisible(false);
+        this.shouldShow = false;
+        console.log("Hiding general reward screen");
+        this.scene.tweens.add({
+            targets: this.container,
+            alpha: { from: this.container.alpha, to: 0 },
+            duration: 500,
+            ease: 'Power2',
+            onComplete: () => {
+                if (!this.shouldShow) {  // Only hide if we still should be hidden
+                    this.container.setVisible(false);
+                }
+            }
+        });
     }
 }
 

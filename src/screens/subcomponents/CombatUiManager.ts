@@ -411,6 +411,7 @@ class CombatUIManager {
         UIContextManager.getInstance().setContext(UIContext.REWARD_SCREEN);
     }
 
+    // TODO: Placeholder, not really appropriate for this class
     private determineRewards(): AbstractReward[] {
         const rewards: AbstractReward[] = [];
 

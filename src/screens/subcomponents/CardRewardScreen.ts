@@ -26,6 +26,7 @@ class CardRewardScreen {
     private isCardSelected: boolean = false;
     private rerollButton!: TextBoxButton;
     private onReroll?: () => void;
+    private shouldShow: boolean = false;
 
     constructor(params: CardRewardScreenData) {
         this.scene = params.scene;
@@ -144,23 +145,33 @@ class CardRewardScreen {
     }
 
     public show(): void {
+        this.shouldShow = true;
         this.container.setVisible(true);
         this.scene.tweens.add({
             targets: this.container,
             alpha: { from: 0, to: 1 },
             duration: 500,
-            ease: 'Power2'
+            ease: 'Power2',
+            onComplete: () => {
+                if (!this.shouldShow) {
+                    this.container.setVisible(false);
+                    this.container.alpha = 0;
+                }
+            }
         });
     }
 
     public hide(): void {
+        this.shouldShow = false;
         this.scene.tweens.add({
             targets: this.container,
-            alpha: { from: 1, to: 0 },
+            alpha: { from: this.container.alpha, to: 0 },
             duration: 500,
             ease: 'Power2',
             onComplete: () => {
-                this.container.setVisible(false);
+                if (!this.shouldShow) {  // Only hide if we still should be hidden
+                    this.container.setVisible(false);
+                }
             }
         });
     }

@@ -51,6 +51,7 @@ class CombatScene extends Phaser.Scene {
     private characterDeckOverlay!: CharacterDeckOverlay;
     private treasureOverlay!: TreasureOverlay;
     private restOverlay!: RestOverlay;
+    private combatEndHandled: boolean = false;
 
     constructor() {
         super('CombatScene');
@@ -70,6 +71,7 @@ class CombatScene extends Phaser.Scene {
         const stateService = CombatStateService.getInstance();
         stateService.initializeCombat(data.encounter, GameState.getInstance().currentRunCharacters);
         UIContextManager.getInstance().setContext(UIContext.COMBAT);
+        this.combatEndHandled = false;
     }
 
 
@@ -260,7 +262,8 @@ class CombatScene extends Phaser.Scene {
         }
 
         // Check if combat is finished
-        if (this.isCombatFinished()) {
+        if (this.isCombatFinished() && !this.combatEndHandled) {
+            this.combatEndHandled = true;
             ActionManager.getInstance().endCombat();
             this.uiManager.onCombatEnd();
         }
