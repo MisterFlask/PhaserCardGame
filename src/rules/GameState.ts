@@ -186,6 +186,7 @@ export class GameState {
         }
         scene.events.emit('propagateGameStateChangesToUi');
     }
+
 }
 
 export class CombatState{

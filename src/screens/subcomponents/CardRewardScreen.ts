@@ -1,7 +1,6 @@
 import Phaser from 'phaser';
-import { AbstractCard } from '../../gamecharacters/AbstractCard';
-import { PlayerCharacter } from '../../gamecharacters/BaseCharacterClass';
 import { PlayableCard } from '../../gamecharacters/PlayableCard';
+import { CardRuleUtils } from '../../rules/CardRuleUtils';
 import { TextBoxButton } from '../../ui/Button';
 import { PhysicalCard } from '../../ui/PhysicalCard';
 import { CardGuiUtils } from '../../utils/CardGuiUtils';
@@ -10,9 +9,9 @@ import { CardGuiUtils } from '../../utils/CardGuiUtils';
  * Interface for initializing CardRewardScreen with necessary data.
  */
 export interface CardRewardScreenData {
-    rewards: CardReward[];
+    rewards: PlayableCard[];
     scene: Phaser.Scene;
-    onSelect: (selectedCard: CardReward) => void;
+    onSelect: (selectedCard: PlayableCard) => void;
     onSkip: () => void;
     onReroll?: () => void;
 }
@@ -20,8 +19,8 @@ export interface CardRewardScreenData {
 class CardRewardScreen {
     private scene: Phaser.Scene;
     public container: Phaser.GameObjects.Container;
-    public rewards: CardReward[];
-    private onSelect: (selectedCard: CardReward) => void;
+    public rewards: PlayableCard[];
+    private onSelect: (selectedCard: PlayableCard) => void;
     private onSkip: () => void;
     private goToMapButton!: TextBoxButton;
     private isCardSelected: boolean = false;
@@ -61,11 +60,11 @@ class CardRewardScreen {
                 scene: this.scene,
                 x: startX + index * cardSpacing,
                 y: yPosition,
-                data: cardReward.card,
+                data: cardReward,
                 onCardCreatedEventCallback: (cardInstance: PhysicalCard) => {
                     cardInstance.container.setInteractive({ useHandCursor: true });
                     cardInstance.container.on('pointerdown', () => {
-                        console.log("Card clicked:", cardReward.card.name);
+                        console.log("Card clicked:", cardReward.name);
                         this.isCardSelected = true;
                         this.onSelect(cardReward);
                         this.hide();
@@ -80,7 +79,7 @@ class CardRewardScreen {
             const ownerNameText = this.scene.add.text(
                 physicalCard.container.x,
                 physicalCard.container.y + physicalCard.container.height / 2 + 20,
-                cardReward.owner.name,
+                CardRuleUtils.getInstance().deriveOwnerFromCardNativeClass(cardReward).name,
                 {
                     fontSize: '16px',
                     color: '#ffffff',
@@ -164,17 +163,6 @@ class CardRewardScreen {
                 this.container.setVisible(false);
             }
         });
-    }
-}
-
-export class CardReward{
-    card: AbstractCard
-    owner: PlayerCharacter
-
-    constructor(card: PlayableCard, owner: PlayerCharacter){
-        this.card = card
-        this.card.owner = owner
-        this.owner = owner
     }
 }
 

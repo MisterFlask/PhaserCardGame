@@ -1,9 +1,10 @@
 // src/subcomponents/CombatUIManager.ts
 
 import Phaser from 'phaser';
-import { PlayerCharacter } from '../../gamecharacters/BaseCharacterClass';
 import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
-import { PlayableCard } from '../../gamecharacters/PlayableCard';
+import { AbstractReward } from '../../rewards/AbstractReward';
+import { CardReward } from '../../rewards/CardReward';
+import { CurrencyReward } from '../../rewards/CurrencyReward';
 import { CardRewardsGenerator } from '../../rules/CardRewardsGenerator';
 import { GameState } from '../../rules/GameState';
 import { TextBoxButton } from '../../ui/Button';
@@ -17,7 +18,7 @@ import { TextBox } from '../../ui/TextBox';
 import { TransientUiState } from '../../ui/TransientUiState';
 import { UIContext, UIContextManager } from '../../ui/UIContextManager';
 import { ActionManager } from '../../utils/ActionManager';
-import CardRewardScreen, { CardReward } from './CardRewardScreen';
+import GeneralRewardScreen from './GeneralRewardScreen';
 
 interface MenuOption {
     text: string;
@@ -34,7 +35,7 @@ class CombatUIManager {
     public energyDisplay!: TextBox;
     public resourceIndicators: CombatResourceDisplay[] = [];
     private subtitleTextBox?: TextBox;
-    private cardRewardScreen!: CardRewardScreen;
+    private generalRewardScreen!: GeneralRewardScreen;
     private combatEnded: boolean = false;
     private debugOverlay!: TextBox;
     public dropZoneHighlight!: Phaser.GameObjects.Image;
@@ -44,7 +45,6 @@ class CombatUIManager {
         this.scene = scene;
         SubtitleManager.setInstance(scene);
         this.createUI();
-        this.createCardRewardScreen();
 
         this.scene.events.on('disableInteractions', this.disableInteractions, this);
         this.scene.events.on('enableInteractions', this.enableInteractions, this);
@@ -401,49 +401,28 @@ class CombatUIManager {
         }
     }
 
-    private handleReroll(): void {
-        console.log("Reroll selected.");
-        const rewardCards = this.determineCardRewards();
-        this.cardRewardScreen.rewards = rewardCards;
-        this.cardRewardScreen.displayRewardCards();
-    }
-
-    private createCardRewardScreen(): void {
-        this.cardRewardScreen = new CardRewardScreen({
-            scene: this.scene,
-            rewards: [],
-            onSelect: this.handleCardSelect.bind(this),
-            onSkip: this.handleSkip.bind(this),
-            onReroll: this.handleReroll.bind(this)
-        });
-        this.cardRewardScreen.container.setDepth(1001);
-        this.cardRewardScreen.container.setScrollFactor(0);
-        this.cardRewardScreen.hide();
-    }
-
     public onCombatEnd(): void {
         if (this.combatEnded) return;
         this.combatEnded = true;
 
-        this.handleReroll();
-        this.cardRewardScreen.show();
-        UIContextManager.getInstance().setContext(UIContext.CARD_REWARD);
+        const rewards = this.determineRewards();
+        this.generalRewardScreen = new GeneralRewardScreen(this.scene, rewards);
+        this.generalRewardScreen.show();
+        UIContextManager.getInstance().setContext(UIContext.REWARD_SCREEN);
     }
 
-    private determineCardRewards(): CardReward[] {
-        var cards = CardRewardsGenerator.getInstance().generateCardRewardsForCombat()
-        return cards.map(card => new CardReward(card, this.deriveOwnerFromCardNativeClass(card)));
-    }
+    private determineRewards(): AbstractReward[] {
+        const rewards: AbstractReward[] = [];
 
-    private handleCardSelect(selectedCard: CardReward): void {
-        console.log("Card selected:", selectedCard.card.name);
-        selectedCard.owner.cardsInMasterDeck.push(selectedCard.card as PlayableCard);
-        this.cardRewardScreen.hide();
-        UIContextManager.getInstance().setContext(UIContext.COMBAT);
-    }
+        // Generate card rewards
+        const cardRewards = CardRewardsGenerator.getInstance()
+            .generateCardRewardsForCombat();
+        rewards.push(new CardReward(cardRewards));
 
-    private handleSkip(): void {
-        console.log("Skip selected.");
+        // Add hell currency reward
+        rewards.push(new CurrencyReward(100));
+
+        return rewards;
     }
 
     public disableInteractions(): void {
@@ -539,18 +518,6 @@ class CombatUIManager {
 
     private createDebugMenu(): void {
         this.debugMenu = new DebugMenu(this.scene);
-    }
-    private deriveOwnerFromCardNativeClass(card: PlayableCard): PlayerCharacter { 
-        var clazz = card.nativeToCharacterClass;
-        if (!clazz) {
-            console.warn(`Card ${card.name} has no associated character class`);
-        }
-        var playerCharacter = GameState.getInstance().getCurrentRunCharacters().find(c => c.characterClass.id === clazz?.id);
-        if (!playerCharacter) {
-            // If no matching class found, randomly assign to a current run character
-            playerCharacter = GameState.getInstance().getCurrentRunCharacters()[Math.floor(Math.random() * GameState.getInstance().getCurrentRunCharacters().length)];
-        }
-        return playerCharacter;
     }
 }
 
