@@ -1,7 +1,7 @@
 // src/managers/LocationManager.ts
 
 import { GameState } from "../rules/GameState";
-import { BossRoomCard, EliteRoomCard, EntranceCard, EventRoomCard, LocationCard, NormalRoomCard, RestSiteCard, ShopCard, TreasureRoomCard } from "./LocationCard";
+import { BossRoomCard, CharonRoomCard, EliteRoomCard, EntranceCard, EventRoomCard, LocationCard, NormalRoomCard, RestSiteCard, ShopCard, TreasureRoomCard } from "./LocationCard";
 
 export class LocationManager {
 
@@ -77,7 +77,27 @@ export class LocationManager {
             locationData.push(...floorLocationData);
         }
 
+        // After generating all floors, add the Charon Room on the floor below the Boss Room
+        const bossFloor = numberOfFloors;
+        const charonFloor = bossFloor + 1;
 
+        // Create the Charon Room
+        const charonRoom = new CharonRoomCard(charonFloor, 0);
+        charonRoom.floor = charonFloor;
+        charonRoom.roomNumber = 0;
+        charonRoom.initEncounter();
+        locationData.push(charonRoom);
+
+        // Find the Boss Room and set adjacency
+        const bossRoom = locationData.find(
+            location => location instanceof BossRoomCard
+        );
+
+        if (bossRoom) {
+            // Set adjacency between Boss Room and Charon Room
+            bossRoom.setAdjacent(charonRoom);
+            charonRoom.setAdjacent(bossRoom);
+        }
 
         return locationData;
     }

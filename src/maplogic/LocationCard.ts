@@ -3,6 +3,7 @@
 import Phaser from 'phaser';
 import { EncounterEnhancer } from '../encounters/EncounterEnhancer';
 import { ActSegment, EncounterData, EncounterManager } from '../encounters/Encounters';
+import { Charon } from '../encounters/monsters/special/Charon';
 import { AbstractCard } from '../gamecharacters/AbstractCard';
 import { CardSize, CardType } from '../gamecharacters/Primitives';
 import { GameState } from '../rules/GameState';
@@ -123,6 +124,27 @@ export class RestSiteCard extends LocationCard {
     override OnLocationSelected(scene: Phaser.Scene): void {
         console.log(`Rest site ${this.id} selected`);
         scene.events.emit('locationSelected', this);
+    }
+}
+
+
+export class CharonRoomCard extends LocationCard {
+    constructor(floor: number, index: number) {
+        super({
+            name: 'Charon',
+            description: `Incur a debt of 100 Denarians for passage, payable on departure from Hell.`,
+            size: CardSize.SMALL,
+            floor,
+            index
+        });
+        this.portraitName = 'CharonRoom';
+        this.portraitTint = 0x800080;
+    }
+
+    override initEncounter(): void {
+        this.encounter = {
+            enemies: [new Charon()]
+        };
     }
 }
 
