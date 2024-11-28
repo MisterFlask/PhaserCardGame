@@ -3,7 +3,7 @@ import { AbstractBuff } from "../AbstractBuff";
 export class TemporaryStrength extends AbstractBuff {
     
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Temporary Strength";
     }
 

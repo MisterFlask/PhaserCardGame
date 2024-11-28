@@ -34,7 +34,7 @@ class AxeCritBuff extends AbstractBuff {
     this.stackable = false;
   }
 
-  override getName(): string {
+  override getDisplayName(): string {
     return "Flaming Crit";
   }
 

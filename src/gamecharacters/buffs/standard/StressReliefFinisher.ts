@@ -1,7 +1,7 @@
-import { AbstractBuff } from '../AbstractBuff';
-import { IBaseCharacter } from '../../IBaseCharacter';
 import { GameState } from '../../../rules/GameState';
 import { ActionManager } from '../../../utils/ActionManager';
+import { IBaseCharacter } from '../../IBaseCharacter';
+import { AbstractBuff } from '../AbstractBuff';
 import { Stress } from './Stress';
 
 export class StressReliefFinisher extends AbstractBuff {
@@ -12,7 +12,7 @@ export class StressReliefFinisher extends AbstractBuff {
         this.stacks = 1;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Stress Relief Finisher";
     }
 
@@ -23,7 +23,7 @@ export class StressReliefFinisher extends AbstractBuff {
     override onFatal(killedUnit: IBaseCharacter): void {
         const gameState = GameState.getInstance();
         gameState.combatState.playerCharacters.forEach(ally => {
-            ActionManager.getInstance().removeBuffFromCharacter(ally, new Stress(1).getName(), this.stacks);
+            ActionManager.getInstance().removeBuffFromCharacter(ally, new Stress(1).getDisplayName(), this.stacks);
         });
     }
 }

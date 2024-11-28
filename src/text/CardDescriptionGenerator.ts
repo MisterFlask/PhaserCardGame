@@ -11,7 +11,7 @@ export class CardDescriptionGenerator {
         // Add any buffs that should be moved to the main description
         let descriptionAdditions = "";
         for (const buff of card.buffs) {
-            descriptionAdditions += ` [color=yellow]${buff.getName()} (${buff.stacks})[/color]. `;
+            descriptionAdditions += ` [color=yellow]${buff.getDisplayName()} (${buff.stacks})[/color]. `;
         }
         var baseDescription = card.description;
 

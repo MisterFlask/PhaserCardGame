@@ -6,7 +6,7 @@ export class TougherEnemies extends LocationCardBuff {
         super();
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Tougher Enemies";
     }
 

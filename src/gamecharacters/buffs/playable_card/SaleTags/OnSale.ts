@@ -19,7 +19,7 @@ export class OnSale extends AbstractBuff {
         "ALL SUPPLIES MUST GO!"
     ]
 
-    override getName(): string {
+    override getDisplayName(): string {
         return this.realName;
     }
 

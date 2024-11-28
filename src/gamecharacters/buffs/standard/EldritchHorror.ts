@@ -10,7 +10,7 @@ export class EldritchHorror extends AbstractBuff {
         this.isDebuff = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Eldritch Horror";
     }
 

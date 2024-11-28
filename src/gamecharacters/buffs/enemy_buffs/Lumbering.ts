@@ -11,7 +11,7 @@ export class Lumbering extends AbstractBuff {
         this.showSecondaryStacks = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Lumbering";
     }
 

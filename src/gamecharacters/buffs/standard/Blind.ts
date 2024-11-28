@@ -11,7 +11,7 @@ export class Blind extends AbstractBuff {
         this.imageName = "blind"; // Replace with actual icon name if available
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Blind";
     }
 

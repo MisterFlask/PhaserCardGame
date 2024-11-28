@@ -13,7 +13,7 @@ export class EarWorm extends AbstractBuff {
         this.imageName = "ear-worm"; // Replace with actual icon name if available
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Ear Worm";
     }
 

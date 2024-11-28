@@ -37,11 +37,21 @@ export class BasicProcs {
         }
     }
 
+    /**
+     * Takes away energy from the player's pool up to the maxEnergyExerted, and calls the callback with the amount of energy exerted.
+     * @param card - The card that is exerting energy.
+     * @param maxEnergyExerted - The maximum amount of energy to exert.
+     * @param callback - A callback function that is called with the amount of energy exerted.
+     */
     public Exert(card: PlayableCard, maxEnergyExerted: number, callback: (energyExerted: number) => void): void {
         const gameState = GameState.getInstance();
         const combat = gameState.combatState;
         const energyRemaining = combat.energyAvailable;
         const energyExerted = Math.min(maxEnergyExerted, energyRemaining);
+        if (energyExerted == 0){
+            console.log(`${card.name} has no energy to exert`);
+            return;
+        }
         console.log(`Exerting ${energyExerted} energy from ${card.name}`);
         callback(energyExerted);
         combat.energyAvailable -= energyExerted;

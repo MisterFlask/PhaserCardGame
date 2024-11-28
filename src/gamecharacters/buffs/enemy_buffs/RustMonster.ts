@@ -11,7 +11,7 @@ export class RustMonster extends AbstractBuff {
         this.isDebuff = false;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Rust Monster";
     }
 
@@ -25,7 +25,7 @@ export class RustMonster extends AbstractBuff {
 
         // Get all non-exhausted cards of the target character
         const nonExhaustedCards = [
-            ...combatState.currentDrawPile,
+            ...combatState.drawPile,
             ...combatState.currentHand,
             ...combatState.currentDiscardPile
         ]

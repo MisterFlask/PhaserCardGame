@@ -162,7 +162,7 @@ export abstract class AbstractCard implements IAbstractCard {
     public surfacePurchaseValue: number = -1;
     public hellPurchaseValue: number = -1;
     public get hellSellValue(): number {
-        return this.getBuffStacks("Hell Sell Value")
+        return this.getBuffStacks("HELL_SELL_VALUE")
     }
     public get surfaceSellValue(): number {
         return this.getBuffStacks("Surface Sell Value")
@@ -255,7 +255,7 @@ export abstract class AbstractCard implements IAbstractCard {
     }
 
     getBuffStacks(buffName: string): number {
-        const buff = this.buffs.find(buff => buff.getName() === buffName);
+        const buff = this.buffs.find(buff => buff.getBuffCanonicalName() === buffName);
         return buff ? buff.stacks : 0;
     }
 
@@ -275,7 +275,7 @@ export abstract class AbstractCard implements IAbstractCard {
     }
 
     hasBuff(buffName: string): boolean {
-        return this.buffs.some(buff => buff.getName() === buffName);
+        return this.buffs.some(buff => buff.getDisplayName() === buffName);
     }
     
     createJsonRepresentation(): string {

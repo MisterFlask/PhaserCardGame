@@ -8,7 +8,7 @@ export class SacrificeBuff extends AbstractBuff {
         this.isDebuff = false;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Sacrifice";
     }
 

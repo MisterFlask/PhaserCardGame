@@ -27,7 +27,7 @@ export class CursedStrike extends PlayableCard {
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         if (targetCard) {
             this.dealDamageToTarget(targetCard as BaseCharacter);
-            if (targetCard.hasBuff(new Cursed(1).getName())) {
+            if (targetCard.hasBuff(new Cursed(1).getDisplayName())) {
                 this.actionManager.applyBuffToCharacterOrCard(targetCard as BaseCharacter, new Cursed(this.getBaseMagicNumberAfterResourceScaling()));
             }else{
                 this.actionManager.applyBuffToCharacterOrCard(targetCard as BaseCharacter, new Cursed(this.getBaseMagicNumberAfterResourceScaling() + 1));

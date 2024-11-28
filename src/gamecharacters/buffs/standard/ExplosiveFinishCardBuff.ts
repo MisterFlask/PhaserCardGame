@@ -12,7 +12,7 @@ export class ExplosiveFinishCardBuff extends AbstractBuff {
         this.stackable = false;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Explosive Finish";
     }
 

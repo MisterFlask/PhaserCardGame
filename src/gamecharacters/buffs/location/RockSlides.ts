@@ -8,7 +8,7 @@ export class RockSlides extends LocationCardBuff {
         this.isDebuff = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Rock Slides";
     }
 

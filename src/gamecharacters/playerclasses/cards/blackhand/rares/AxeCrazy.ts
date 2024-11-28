@@ -31,7 +31,7 @@ class AxeCrazyBuff extends AbstractBuff {
         this.imageName = "axe-crazy";
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Axe Crazy";
     }
 

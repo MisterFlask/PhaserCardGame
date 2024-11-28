@@ -52,7 +52,7 @@ export class CombatRules {
 
         combatState.currentHand = removeDeadCharacterCards(combatState.currentHand );
         combatState.currentDiscardPile = removeDeadCharacterCards(combatState.currentDiscardPile );
-        combatState.currentDrawPile = removeDeadCharacterCards(combatState.currentDrawPile );
+        combatState.drawPile = removeDeadCharacterCards(combatState.drawPile );
     }
 
     public static handleStateBasedEffects(){

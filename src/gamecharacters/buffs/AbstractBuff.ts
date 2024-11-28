@@ -15,6 +15,10 @@ export abstract class AbstractBuff implements IAbstractBuff {
     // if this is a "standard" buff that is always on the card, it's added to the main description instead of the tooltip/icon.
     public moveToMainDescription: boolean = false;
 
+    /// used when we want to refer to the buff by a unique name, like when we want to check if a card has a buff.
+    public getBuffCanonicalName(): string {
+        return this.getDisplayName();
+    }
 
     public getCardOwner(): BaseCharacter | null {
         return this.getOwnerAsPlayableCard()?.owner ?? null;
@@ -61,8 +65,8 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
     public generateSeededRandomBuffColor(): number {
         let hash = 0;
-        for (let i = 0; i < this.getName().length; i++) {
-            const char = this.getName().charCodeAt(i);
+        for (let i = 0; i < this.getDisplayName().length; i++) {
+            const char = this.getDisplayName().charCodeAt(i);
             hash = ((hash << 5) - hash) + char;
             hash = hash & hash; // Convert to 32bit integer
         }
@@ -76,7 +80,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
     public pulseBuff(){
         this.actionManager.pulseBuff(this);
-        this.actionManager.displaySubtitle(this.getName(), 500);
+        this.actionManager.displaySubtitle(this.getDisplayName(), 500);
     }
 
     public getOwnerAsPlayableCard(): PlayableCard | null {
@@ -84,11 +88,11 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
         // Find the owner of this buff by searching through all characters in the combat state
         const combatState = this.gameState.combatState;
-        const allPlayableCards = [...combatState.currentDrawPile, ...combatState.currentHand, ...combatState.currentDiscardPile];
+        const allPlayableCards = [...combatState.drawPile, ...combatState.currentHand, ...combatState.currentDiscardPile];
         const owner = allPlayableCards.find(card => card.buffs.some(buff => buff.id === this.id));
 
         if (!owner) {
-            console.warn(`No owner found for buff ${this.getName()} with id ${this.id}`);
+            console.warn(`No owner found for buff ${this.getDisplayName()} with id ${this.id}`);
             return null;
         }
 
@@ -105,7 +109,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
         const owner = allCharacters.find(character => character.buffs.some(buff => buff.id === this.id));
 
         if (!owner) {
-            console.warn(`No owner found for buff ${this.getName()} with id ${this.id}`);
+            console.warn(`No owner found for buff ${this.getDisplayName()} with id ${this.id}`);
             return null;
         }
 
@@ -148,7 +152,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
                 existingBuff.stacks += buff.stacks;
             } else {
                 // If the buff is not stackable, we'll just log this information
-                console.log(`Buff ${existingBuff.getName()} is not stackable. Ignoring new application.`);
+                console.log(`Buff ${existingBuff.getDisplayName()} is not stackable. Ignoring new application.`);
             }
             // If not stackable, we don't add a new one or modify the existing one
         } else {
@@ -206,7 +210,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
     }
 
 
-    abstract getName(): string;
+    abstract getDisplayName(): string;
 
     /**
      * make sure to use getStacksDisplayText() in the description if you want to show the number of stacks.
@@ -302,7 +306,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
     }
 
-    hellValueModifier(): number {
+    hellValueFlatModifier(): number {
         return 0;
     }
 

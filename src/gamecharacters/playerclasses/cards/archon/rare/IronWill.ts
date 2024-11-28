@@ -9,7 +9,7 @@ class IronWillBuff extends AbstractBuff {
         super();
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Iron Will";
     }
 

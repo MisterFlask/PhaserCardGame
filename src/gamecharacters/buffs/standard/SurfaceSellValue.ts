@@ -9,7 +9,7 @@ export class SurfaceSellValue extends AbstractBuff {
         this.stacks = stacks;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Surface Sell Value";
     }
 

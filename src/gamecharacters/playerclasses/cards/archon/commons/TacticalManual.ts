@@ -15,7 +15,7 @@ export class TacticalManual extends PlayableCard {
         this.baseEnergyCost = 1;
         this.baseMagicNumber = 1; // Base strength gain
         this.resourceScalings.push({
-            resource: this.pages,
+            resource: this.ashes,
             magicNumberScaling: 1,
         });
     }

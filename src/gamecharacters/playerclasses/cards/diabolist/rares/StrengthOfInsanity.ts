@@ -35,7 +35,7 @@ export class StrengthOfInsanity extends PlayableCard {
         }
 
         // Find the Stress buff on the owner
-        const stressBuff = owner.buffs.find(buff => buff.getName() === new Stress().getName());
+        const stressBuff = owner.buffs.find(buff => buff.getDisplayName() === new Stress().getDisplayName());
         const stress = stressBuff ? stressBuff.stacks : 0;
         // Apply Strength to all allies
         this.applyStrengthToAllies();

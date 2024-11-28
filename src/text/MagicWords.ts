@@ -47,9 +47,19 @@ import { EldritchSmoke } from "../gamecharacters/playerclasses/cards/diabolist/t
 export class MagicWordsResult{
     buffs: AbstractBuff[] = [];
     cards: PlayableCard[] = [];
+    concepts: MagicConcept[] = [];
     stringResult: string = "";
 }
 
+export class MagicConcept{
+    constructor(name: string, description: string){
+        this.name = name;
+        this.description = description;
+    }
+
+    public name: string = "";
+    public description: string = "";
+}
 
 export class MagicWords {
     cards = [
@@ -98,7 +108,12 @@ export class MagicWords {
         new ValuableCargo(),
         new Vulnerable()
     ];
+
+    private concepts: MagicConcept[] = [
+        new MagicConcept("Exert", "Spend up to X energy after playing this card to activate an effect.")
+    ];
     
+
     private static instance: MagicWords;
     private constructor() {}
 
@@ -121,7 +136,7 @@ export class MagicWords {
 
     private colorizeAndRecordBuffs(input: string, result: MagicWordsResult, modifiedString: string) {
         for (const buff of this.allBuffsThatCouldPossiblyExist) {
-            const buffName = buff.getName();
+            const buffName = buff.getDisplayName();
             // Case insensitive search with word boundaries
             const regex = new RegExp(`\\b${buffName}\\b`, 'gi');
             // If the buff name exists in the string
@@ -131,6 +146,15 @@ export class MagicWords {
 
                 // Replace the text with yellow bbcode
                 modifiedString = modifiedString.replace(regex, `[color=yellow]${buffName}[/color]`);
+            }
+        }
+
+        for (const concept of this.concepts){
+            const conceptName = concept.name;
+            const regex = new RegExp(`\\b${conceptName}\\b`, 'gi');
+            if (regex.test(input)) {
+                result.concepts.push(concept);
+                modifiedString = modifiedString.replace(regex, `[color=yellow]${conceptName}[/color]`);
             }
         }
 

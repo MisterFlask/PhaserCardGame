@@ -35,7 +35,7 @@ export class TextGlyphs {
     }
 
     public get bloodIcon(): string {
-        return `[color=pink][img=${this.BLOOD_ICON_RAW}][/color]`;
+        return `[color=red][img=${this.BLOOD_ICON_RAW}][/color]`;
     }
 
     public get smogIcon(): string {

@@ -10,7 +10,7 @@ export class Desirous extends AbstractBuff {
         this.isDebuff = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Desirous";
     }
 

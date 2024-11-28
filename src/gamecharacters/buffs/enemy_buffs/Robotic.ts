@@ -10,7 +10,7 @@ export class Robotic extends AbstractBuff {
         this.isPersonaTrait = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Robotic";
     }
 
@@ -19,7 +19,7 @@ export class Robotic extends AbstractBuff {
     }
 
     override interceptBuffApplication(character: AbstractCard, buffApplied: AbstractBuff, previousStacks: number, changeInStacks: number): BuffApplicationResult {
-        if (buffApplied.getName() === "Burning" || buffApplied.getName() === "Poison") {
+        if (buffApplied.getDisplayName() === "Burning" || buffApplied.getDisplayName() === "Poison") {
             return { logicTriggered: true, newChangeInStacks: 0 };
         }
         return { logicTriggered: false, newChangeInStacks: changeInStacks };

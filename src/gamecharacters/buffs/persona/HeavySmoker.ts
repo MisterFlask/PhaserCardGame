@@ -9,7 +9,7 @@ export class HeavySmoker extends AbstractBuff {
         this.isPersonaTrait = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Heavy Smoker";
     }
 

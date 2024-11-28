@@ -9,7 +9,7 @@ export class Penance extends AbstractBuff {
         this.isDebuff = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Penance";
     }
 

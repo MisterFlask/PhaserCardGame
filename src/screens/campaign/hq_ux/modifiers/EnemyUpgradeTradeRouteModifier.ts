@@ -2,7 +2,7 @@ import { AbstractTradeRouteModifier } from '../AbstractTradeRouteModifier';
 
 export class EnemyUpgradeTradeRouteModifier extends AbstractTradeRouteModifier {
     
-    getName(): string {
+    getDisplayName(): string {
         return "Enemy Upgrade";
     }
 

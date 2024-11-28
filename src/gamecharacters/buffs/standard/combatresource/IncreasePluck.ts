@@ -10,7 +10,7 @@ export class IncreasePluck extends AbstractBuff {
         this.stacks = stacks;
     }
 
-    getName(): string {
+    getDisplayName(): string {
         return "Increase Pluck";
     }
 

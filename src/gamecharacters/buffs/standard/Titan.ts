@@ -8,7 +8,7 @@ export class Titan extends AbstractBuff {
         this.stackable = true;
         
     }
-    override getName(): string {
+    override getDisplayName(): string {
         return "Titan";
     }
     

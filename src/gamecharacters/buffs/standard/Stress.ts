@@ -2,7 +2,7 @@ import { AbstractBuff } from "../AbstractBuff";
 import { Lethality } from "./Strong";
 
 export class Stress extends AbstractBuff {
-    override getName(): string {
+    override getDisplayName(): string {
         return "Stress";
     }
 

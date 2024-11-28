@@ -593,6 +593,7 @@
   - Resource: smog
   - Scaling Type: magicNumberScaling
   - Scaling Value: 2
+  
 - **Buffs/Modifiers**: None
 - **Effect**: Gain 5 Smog. All cards in hand gain 1 additional effect based on their type. The machination twists reality.
 

@@ -10,7 +10,7 @@ export class Ward extends AbstractBuff {
         this.stacks = stacks;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Ward";
     }
 

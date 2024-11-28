@@ -8,7 +8,7 @@ export class Painful extends AbstractBuff {
         this.isDebuff = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Painful";
     }
 

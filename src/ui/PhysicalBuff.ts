@@ -1,8 +1,7 @@
 import { AbstractBuff } from '../gamecharacters/buffs/AbstractBuff';
 import ImageUtils from '../utils/ImageUtils';
-import { DepthManager } from './DepthManager';
 import { ShadowedImage } from './ShadowedImage';
-import { TextBox } from './TextBox';
+import { TooltipAttachment } from './TooltipAttachment';
 
 export class PhysicalBuff {
     abstractBuff: AbstractBuff;
@@ -10,7 +9,7 @@ export class PhysicalBuff {
     image!: Phaser.GameObjects.Image;
     stacksText: Phaser.GameObjects.Text;
     secondaryStacksText: Phaser.GameObjects.Text;
-    tooltipBox: TextBox;
+    tooltipAttachment: TooltipAttachment;
     scene: Phaser.Scene;
     shadowImage!: Phaser.GameObjects.Image;
 
@@ -18,12 +17,10 @@ export class PhysicalBuff {
         this.scene = scene;
         this.abstractBuff = abstractBuff;
         this.container = scene.add.container(x, y);
-        // Create the image
-        const containerSize = 40; // Adjust this value as needed
+        const containerSize = 40;
 
-        this.setBuffImage(scene, abstractBuff,containerSize);
+        this.setBuffImage(scene, abstractBuff, containerSize);
         
-        // Update the text creation with new styling and position
         this.stacksText = scene.add.text(0, 0, `${abstractBuff.stacks}`, {
             fontSize: '19px',
             color: '#ffffff',
@@ -32,13 +29,11 @@ export class PhysicalBuff {
             stroke: '#000000',
             strokeThickness: 3
         });
-        // Change origin to bottom-left instead of center
         this.stacksText.setOrigin(0, 1);
 
-        // Create the secondary stacks text
         this.secondaryStacksText = scene.add.text(0, 0, '', {
             fontSize: '19px',
-            color: '#ffff00', // Yellow color to distinguish from primary stacks
+            color: '#ffff00',
             fontFamily: 'Arial',
             align: 'left',
             stroke: '#000000',
@@ -46,35 +41,22 @@ export class PhysicalBuff {
         });
         this.secondaryStacksText.setOrigin(0, 1);
 
-        // Create the description box (initially hidden)
-        this.tooltipBox = new TextBox({
+        this.tooltipAttachment = new TooltipAttachment({
             scene: this.scene,
-            width: 200,
-            height: 100,
-            text: this.abstractBuff.getDescription(),
-            textBoxName: `${this.abstractBuff.getName()}Description`
+            container: this.container,
+            tooltipText: `${this.abstractBuff.getDisplayName()}: ${this.abstractBuff.getDescription()}`
         });
-        this.tooltipBox.setVisible(false);
 
-        // Set the size of the container
         this.container.setSize(containerSize, containerSize);
 
-        // Update text position to bottom-left of the container
         const halfContainerSize = containerSize / 2;
-        this.stacksText.setPosition(-halfContainerSize + 6, halfContainerSize - 20); // Moved up to make room for secondary
-        this.secondaryStacksText.setPosition(-halfContainerSize + 6, halfContainerSize - 6); // Positioned below stacksText
+        this.stacksText.setPosition(-halfContainerSize + 6, halfContainerSize - 20);
+        this.secondaryStacksText.setPosition(-halfContainerSize + 6, halfContainerSize - 6);
         
-        // Update the container.add to include secondaryStacksText
         this.container.add([this.stacksText, this.secondaryStacksText]);
 
-        // Adjust the interactive area to match the container's size
         this.container.setInteractive(new Phaser.Geom.Rectangle(-containerSize / 2, -containerSize / 2, containerSize, containerSize), Phaser.Geom.Rectangle.Contains);
-        
-        // Add mouse over and mouse out events
-        this.container.on('pointerover', this.showDescription, this);
-        this.container.on('pointerout', this.hideDescription, this);
 
-        // Add a tween to briefly enlarge the buff when it's added
         this.scene.tweens.add({
             targets: this.container,
             scale: { from: 1, to: 1.2 },
@@ -82,16 +64,14 @@ export class PhysicalBuff {
             yoyo: true,
             ease: 'Power2',
             onComplete: () => {
-                this.container.setScale(1); // Ensure scale resets to original
+                this.container.setScale(1);
             }
         });
 
-        // Add event listener for pulsing
         this.scene.events.on('pulseBuff', this.handlePulseEvent, this);
     }
 
     private handlePulseEvent = (buffId: string) => {
-        // Only pulse if this buff matches the ID
         if (this.abstractBuff.id === buffId) {
             this.pulse();
         }
@@ -115,47 +95,12 @@ export class PhysicalBuff {
     }
 
     private getAbstractIcon(abstractBuff: AbstractBuff) {
-        return ImageUtils.getDeterministicAbstractPlaceholder(abstractBuff.getName());
-    }
-
-    showDescription() {
-        const bufferSpace = 10;
-
-        // Get the container's world position
-        const containerWorldPosition = this.container.getWorldTransformMatrix();
-
-        let descX = containerWorldPosition.tx - this.tooltipBox.width / 2 - bufferSpace;
-        let descY = containerWorldPosition.ty;
-
-        // If too close to the left edge, show on the right side instead
-        if (descX < 0) {
-            descX = containerWorldPosition.tx + this.container.width / 2 + this.tooltipBox.width / 2 + bufferSpace;
-        }
-
-        // Adjust Y position if it goes off screen
-        const screenWidth = this.scene.sys.game.config.width as number;
-        const screenHeight = this.scene.sys.game.config.height as number;
-        if (descY + this.tooltipBox.height / 2 > screenHeight) {
-            descY = screenHeight - this.tooltipBox.height / 2 - bufferSpace;
-        } else if (descY - this.tooltipBox.height / 2 < 0) {
-            descY = this.tooltipBox.height / 2 + bufferSpace;
-        }
-
-        this.tooltipBox.setPosition(descX, descY);
-        this.tooltipBox.setVisible(true);
-        this.tooltipBox.setDepth(DepthManager.getInstance().TOOLTIP);
-        this.updateText();
-    }
-
-    hideDescription() {
-        this.tooltipBox.setVisible(false);
+        return ImageUtils.getDeterministicAbstractPlaceholder(abstractBuff.getDisplayName());
     }
 
     updateText() {
-        // Update the primary stacks text
         this.stacksText.setText(`${this.abstractBuff.stacks}`);
         
-        // Update the secondary stacks text
         if (this.abstractBuff.showSecondaryStacks && this.abstractBuff.secondaryStacks >= 0) {
             this.secondaryStacksText.setText(`/${this.abstractBuff.secondaryStacks}`);
             this.secondaryStacksText.setVisible(true);
@@ -163,23 +108,18 @@ export class PhysicalBuff {
             this.secondaryStacksText.setVisible(false);
         }
         
-        // Update the description text
-        this.tooltipBox.setText(`${this.abstractBuff.getName()}: ${this.abstractBuff.getDescription()}`);
+        this.tooltipAttachment.updateText(`${this.abstractBuff.getDisplayName()}: ${this.abstractBuff.getDescription()}`);
     }
 
     destroy() {
-        // Remove the event listener when destroying
         this.scene.events.off('pulseBuff', this.handlePulseEvent, this);
-        
+        this.tooltipAttachment.destroy();
         this.container.destroy();
-        this.tooltipBox.destroy();
     }
 
     pulse() {
-        // Save original scale
         const originalScale = this.container.scale;
 
-        // Create tween to scale up and back down
         this.scene.tweens.add({
             targets: this.container,
             scaleX: originalScale * 1.5,
@@ -188,23 +128,19 @@ export class PhysicalBuff {
             yoyo: true,
             ease: 'Quad.easeOut',
             onComplete: () => {
-                // Ensure we return to exact original scale
                 this.container.setScale(originalScale);
             }
         });
     }
 }
 
-
-// Add subclasses for location buffs
-
 export class CurrentLocationBuff extends AbstractBuff {
     constructor(scene: Phaser.Scene, x: number, y: number) {
         super();
-        this.imageName = 'current_location_icon'; // Ensure this texture is loaded
+        this.imageName = 'current_location_icon';
     }
 
-    getName(): string {
+    getDisplayName(): string {
         return 'Current Location';
     }
 
@@ -216,10 +152,10 @@ export class CurrentLocationBuff extends AbstractBuff {
 export class AdjacentLocationBuff extends AbstractBuff {
     constructor(scene: Phaser.Scene, x: number, y: number) {
         super();
-        this.imageName = 'adjacent_location_icon'; // Ensure this texture is loaded
+        this.imageName = 'adjacent_location_icon';
     }
 
-    getName(): string {
+    getDisplayName(): string {
         return 'Adjacent Location';
     }
 

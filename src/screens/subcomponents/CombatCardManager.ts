@@ -265,7 +265,7 @@ export class CombatCardManager {
     public updateDrawPileCount(): void {
         if (this.drawPile) {
             const state = GameState.getInstance().combatState;
-            const drawPileCount = state.currentDrawPile.length;
+            const drawPileCount = state.drawPile.length;
             this.drawPile.data.name = `Draw Pile (${drawPileCount})`;
             this.drawPile.nameBox.setText(this.drawPile.data.name);
         }

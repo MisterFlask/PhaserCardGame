@@ -28,7 +28,7 @@ export class SacredRelicsCargo extends PlayableCard {
     override InvokeCardEffects(): void {
         this.actionManager.drawCards(1);
         this.forEachEnemy((enemy) => {
-            if (enemy.hasBuff(new Devil().getName())) {
+            if (enemy.hasBuff(new Devil().getDisplayName())) {
                 this.dealDamageToTarget(enemy);
             }
         });

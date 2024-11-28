@@ -25,7 +25,7 @@ export class Smokescreen extends PlayableCard {
 	override InvokeCardEffects(): void {
 		let burningCount = 0;
 		this.forEachEnemy(enemy => {
-			burningCount += enemy.getBuffStacks(new Burning(1).getName());
+			burningCount += enemy.getBuffStacks(new Burning(1).getDisplayName());
 			this.actionManager.applyBuffToCharacterOrCard(enemy as BaseCharacter, new Burning(this.getBaseMagicNumberAfterResourceScaling()), this.owner as BaseCharacter);
 		});
 

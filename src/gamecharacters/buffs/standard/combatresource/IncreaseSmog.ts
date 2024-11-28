@@ -9,7 +9,7 @@ export class IncreaseSmog extends AbstractBuff {
         this.isDebuff = false;
     }
 
-    getName(): string {
+    getDisplayName(): string {
         return "Increase Smog";
     }
 

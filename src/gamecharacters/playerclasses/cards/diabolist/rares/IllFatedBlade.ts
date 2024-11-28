@@ -4,14 +4,14 @@ import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { AbstractBuff } from "../../../../buffs/AbstractBuff";
 
-class CursedBladeBuff extends AbstractBuff {
+class IllFatedBladeBuff extends AbstractBuff {
     constructor(stacks: number = 1) {
         super();
         this.stacks = stacks;
         this.isDebuff = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Cursed Blade";
     }
 
@@ -41,7 +41,7 @@ class WeThirstDebuff extends AbstractBuff {
         this.isDebuff = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "We Thirst";
     }
 
@@ -62,7 +62,7 @@ class WeThirstDebuff extends AbstractBuff {
     }
 }
 
-export class CursedBlade extends PlayableCard {
+export class IllFatedBlade extends PlayableCard {
     constructor() {
         super({
             name: "Cursed Blade",
@@ -76,7 +76,7 @@ export class CursedBlade extends PlayableCard {
             resource: this.mettle,
             attackScaling: 1,
         });
-        this.buffs.push(new CursedBladeBuff(10));
+        this.buffs.push(new IllFatedBladeBuff(10));
     }
 
     override get description(): string {

@@ -91,9 +91,26 @@ export class ActionManager {
         combatResources.modifyBlood(0 - combatResources.powder.value);
     }
 
-    startCombat() {
+    initializeCombatDeck(){
+        const gameState = GameState.getInstance();
+        const combatState = gameState.combatState;
+        combatState.drawPile = [...gameState.currentRunCharacters.flatMap(c => c.cardsInMasterDeck)];
+        // Fisher-Yates shuffle algorithm
+        for (let i = combatState.drawPile.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [combatState.drawPile[i], combatState.drawPile[j]] = [combatState.drawPile[j], combatState.drawPile[i]];
+        }
 
+        combatState.currentHand = [];
+        combatState.currentDiscardPile = [];
+        combatState.currentExhaustPile = [];
+        combatState.currentExhaustPile = [];
+    }
+
+    startCombat() {
         this.actionQueue.addAction(new GenericAction(async () => {
+            this.initializeCombatDeck();
+
             GameState.getInstance().relicsInventory.forEach(relic => {
                 relic.onCombatStart();
             });
@@ -107,10 +124,10 @@ export class ActionManager {
         }));
     }
 
-    sellItemForHellCurrency(item: PlayableCard) {
+    sellItemForBrimstoneDistillate(item: PlayableCard) {
         this.removeCardFromMasterDeck(item);
 
-        GameState.getInstance().hellCurrency += item.hellSellValue;
+        GameState.getInstance().brimstoneDistillate += item.hellSellValue;
     }
     buyRelicForHellCurrency(relic: AbstractRelic, price: number) : boolean {
         if (GameState.getInstance().hellCurrency < price) {
@@ -155,7 +172,7 @@ export class ActionManager {
     public createCardToDrawPile(card: PlayableCard) {
         this.actionQueue.addAction(new GenericAction(async () => {
             const gameState = GameState.getInstance();
-            gameState.combatState.currentDrawPile.push(card);
+            gameState.combatState.drawPile.push(card);
             return [];
         }));
     }
@@ -240,7 +257,7 @@ export class ActionManager {
         }
         this.actionQueue.addAction(new GenericAction(async () => {
             AbstractBuff._applyBuffToCharacterOrCard(card, buff);
-            console.log(`Applied buff ${buff.getName()} to ${card.name}`);
+            console.log(`Applied buff ${buff.getDisplayName()} to ${card.name}`);
             // You might want to add some animation or visual feedback here
             await new WaitAction(20).playAction(); // Short delay for visual feedback
             return [];
@@ -253,7 +270,7 @@ export class ActionManager {
         }
         this.actionQueue.addAction(new GenericAction(async () => {
             AbstractBuff._applyBuffToCharacterOrCard(character as BaseCharacterType, buff);
-            console.log(`Applied buff ${buff.getName()} to ${character.name}`);
+            console.log(`Applied buff ${buff.getDisplayName()} to ${character.name}`);
             // You might want to add some animation or visual feedback here
             await new WaitAction(20).playAction(); // Short delay for visual feedback
             return [];
@@ -262,7 +279,7 @@ export class ActionManager {
 
     public removeBuffFromCharacter(character: IBaseCharacter, buffName: string, stacksToRemove?: number): void {
         this.actionQueue.addAction(new GenericAction(async () => {
-            const buff = character.buffs.find(b => b.getName() === buffName);
+            const buff = character.buffs.find(b => b.getDisplayName() === buffName);
             if (buff) {
                 if (!stacksToRemove){
                     buff.stacks = 0
@@ -546,7 +563,7 @@ export class ActionManager {
         this.drawCards(handSize + cardModifier);
 
         console.log('State of all piles:');
-        console.log('Draw Pile:', combatState.currentDrawPile.map(card => card.name));
+        console.log('Draw Pile:', combatState.drawPile.map(card => card.name));
         console.log('Discard Pile:', combatState.currentDiscardPile.map(card => card.name));
         console.log('Hand:', combatState.currentHand.map(card => card.name));
     }
@@ -1003,7 +1020,7 @@ export class ActionManager {
     public relieveStressFromCharacter(character: BaseCharacter, amount: number): void {
         this.actionQueue.addAction(new GenericAction(async () => {
             const reliefBuff = new Stress(amount);
-            this.removeBuffFromCharacter(character, reliefBuff.getName(), amount);
+            this.removeBuffFromCharacter(character, reliefBuff.getDisplayName(), amount);
             console.log(`Relieved ${amount} Stress from ${character.name}`);
             return [];
         }));

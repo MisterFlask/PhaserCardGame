@@ -11,7 +11,7 @@ export class WellDrilled extends AbstractBuff {
         this.isPersonaTrait = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Well-Drilled";
     }
 

@@ -6,7 +6,7 @@ export class Heavy extends AbstractBuff {
         super();
     }
 
-    getName(): string {
+    getDisplayName(): string {
         return "Heavy";
     }
 

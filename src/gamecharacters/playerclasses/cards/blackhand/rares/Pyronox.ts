@@ -36,7 +36,7 @@ export class FlamesAmplifierBuff extends AbstractBuff {
         this.isDebuff = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Flames Amplifier";
     }
 

@@ -9,7 +9,7 @@ export class Daring extends AbstractBuff {
         this.isPersonaTrait = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Daring";
     }
 

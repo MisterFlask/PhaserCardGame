@@ -6,7 +6,7 @@ import { AbstractBuff } from "../AbstractBuff";
 import { Stress } from "./Stress";
 
 export class Terrifying extends AbstractBuff {
-    override getName(): string {
+    override getDisplayName(): string {
         return "Terrifying";
     }
 

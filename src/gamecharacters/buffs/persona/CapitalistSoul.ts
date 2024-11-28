@@ -9,7 +9,7 @@ export class CapitalistSoul extends AbstractBuff {
         this.isPersonaTrait = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Capitalist Soul";
     }
 

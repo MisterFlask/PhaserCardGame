@@ -31,7 +31,7 @@ export class AndThenHeExploded extends PlayableCardWithHelpers {
 
         this.dealDamageToTarget(targetCard);
 
-        if (target.hasBuff(new Burning(1).getName())) {
+        if (target.hasBuff(new Burning(1).getDisplayName())) {
             this.dealDamageToTarget(targetCard);
         }
     }

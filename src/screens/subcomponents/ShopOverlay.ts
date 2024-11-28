@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { ShopGuy } from '../../encounters/Encounters';
 import { AbstractCard, PriceContext } from '../../gamecharacters/AbstractCard';
 import { BaseCharacter } from '../../gamecharacters/BaseCharacter';
+import { PlayerCharacter } from '../../gamecharacters/BaseCharacterClass';
 import { PlayableCard } from '../../gamecharacters/PlayableCard';
 import { AbstractRelic } from '../../relics/AbstractRelic';
 import { GameState } from '../../rules/GameState';
@@ -256,9 +257,17 @@ export class ShopOverlay {
     }
 
     private getShopItems(): PlayableCard[] {
-        // This method should be implemented to return the list of items for sale
-        // For now, we'll return an array with three Rummage cards
-        return GameState.getInstance().shopCardsForSale;
+        var cards = GameState.getInstance().shopCardsForSale;
+
+        // assign each card to a random character of the appropriate class, or if no such character exists, assign it to a random player character
+        cards.forEach(card => {
+            var character = GameState.getInstance().currentRunCharacters.find((c: PlayerCharacter) => c.characterClass === card.nativeToCharacterClass);
+            if (!character) {
+                character = GameState.getInstance().currentRunCharacters[Math.floor(Math.random() * GameState.getInstance().currentRunCharacters.length)];
+            }
+            card.owner = character;
+        });
+        return cards;
     }
 
     private buyCard(item: PlayableCard): void {
@@ -297,7 +306,7 @@ export class ShopOverlay {
     private sellItem(item: PlayableCard): void {
         // Implement selling logic here
         console.log(`Selling ${item.name}`);
-        ActionManagerFetcher.getActionManager().sellItemForHellCurrency(item);
+        ActionManagerFetcher.getActionManager().sellItemForBrimstoneDistillate(item);
         
         // After selling, refresh the shop and inventory
         this.refreshShop();

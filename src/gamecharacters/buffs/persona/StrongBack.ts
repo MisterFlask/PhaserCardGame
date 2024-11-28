@@ -12,7 +12,7 @@ export class StrongBack extends AbstractBuff {
         this.isPersonaTrait = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Strong Back";
     }
 
@@ -22,7 +22,7 @@ export class StrongBack extends AbstractBuff {
 
     override onCombatStart(): void {
         const gameState = GameState.getInstance();
-        const drawPile = gameState.combatState.currentDrawPile;
+        const drawPile = gameState.combatState.drawPile;
         
         // Filter for cargo cards
         const cargoCards = drawPile.filter(card => card.cardType === CardType.ITEM);

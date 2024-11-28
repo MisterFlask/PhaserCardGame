@@ -110,7 +110,7 @@ export class CharacterDeckOverlay extends Phaser.GameObjects.Container {
     }
 
     public showCardInDrawPile(): void {
-        this.showCards(GameState.getInstance().combatState.currentDrawPile);
+        this.showCards(GameState.getInstance().combatState.drawPile);
     }
 
     public showCardInDiscardPile(): void {

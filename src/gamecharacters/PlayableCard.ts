@@ -202,7 +202,7 @@ export abstract class PlayableCard extends AbstractCard {
         return this.combatResources.pluck;
     }
 
-    get pages(): Ashes {
+    get ashes(): Ashes {
         return this.combatResources.pages;
     }
 

@@ -12,7 +12,7 @@ export class Holy extends AbstractBuff {
         this.stacks = stacks;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Holy";
     }
 

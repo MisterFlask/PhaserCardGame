@@ -1,6 +1,7 @@
 import { Scene } from "phaser";
 import { AbstractIntent } from "../gamecharacters/AbstractIntent";
 import { IntentEmitter } from "../utils/IntentEmitter";
+import { TooltipAttachment } from "./TooltipAttachment";
 
 export class IncomingIntent {
     static readonly WIDTH: number = 40;
@@ -11,7 +12,7 @@ export class IncomingIntent {
     private container: Phaser.GameObjects.Container;
     private image: Phaser.GameObjects.Image;
     private text: Phaser.GameObjects.Text;
-    private tooltip: Phaser.GameObjects.Text;
+    private tooltipAttachment: TooltipAttachment;
 
     constructor(scene: Scene, intent: AbstractIntent, x: number, y: number) {
         this.scene = scene;
@@ -29,24 +30,17 @@ export class IncomingIntent {
 
         this.container.add([this.image, this.text]);
         
-        // Create tooltip (initially invisible)
-        this.tooltip = this.scene.add.text(-200, 0, '', { 
-            fontSize: '16px', 
-            color: '#ffffff',
-            backgroundColor: '#000000',
-            padding: { x: 8, y: 4 },
-            wordWrap: { width: 200 }
-        });
-        this.tooltip.setOrigin(1, 0.5);
-        this.tooltip.setVisible(false);
-        
-        this.container.add(this.tooltip);
-        
         // Set interactive for the container to detect pointer events
         this.container.setSize(IncomingIntent.WIDTH, IncomingIntent.HEIGHT)
             .setInteractive({ useHandCursor: true })
             .on('pointerover', this.onPointerOver, this)
             .on('pointerout', this.onPointerOut, this);
+        
+        this.tooltipAttachment = new TooltipAttachment({
+            scene: this.scene,
+            container: this.container,
+            tooltipText: `Targeted by: ${this.intent.tooltipText()}`,
+        });
         
         var incomingIntent = this;
         this.container.on('pointerover', () => {
@@ -61,13 +55,11 @@ export class IncomingIntent {
     }
 
     private onPointerOver(): void {
-        const tooltipText = `Targeted by: ${this.intent.tooltipText()}`;
-        this.tooltip.setText(tooltipText);
-        this.tooltip.setVisible(true);
+        // No need to handle tooltip visibility - TooltipAttachment handles it
     }
 
     private onPointerOut(): void {
-        this.tooltip.setVisible(false);
+        // No need to handle tooltip visibility - TooltipAttachment handles it
     }
 
     update(): void {
@@ -79,9 +71,7 @@ export class IncomingIntent {
         this.intent = newIntent;
         this.image.setTexture(this.intent.imageName);
         this.text.setText(this.intent.displayText());
-        if (this.tooltip.visible) {
-            this.tooltip.setText(`Targeted by: ${this.intent.tooltipText()}`);
-        }
+        this.tooltipAttachment.updateText(`Targeted by: ${this.intent.tooltipText()}`);
     }
 
     setPosition(x: number, y: number): void {
@@ -89,12 +79,11 @@ export class IncomingIntent {
     }
 
     destroy(): void {
+        this.tooltipAttachment.destroy();
         this.container.destroy();
     }
 
     getContainer(): Phaser.GameObjects.Container {
         return this.container;
     }
-
-    
 }

@@ -13,7 +13,7 @@ export class MothGod extends AbstractBuff {
         this.isDebuff = false;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Moth God";
     }
 
@@ -23,7 +23,7 @@ export class MothGod extends AbstractBuff {
 
     override onTurnStart(): void {
         const gameState = GameState.getInstance();
-        const drawPile = gameState.combatState.currentDrawPile;
+        const drawPile = gameState.combatState.drawPile;
 
         for (let i = 0; i < this.stacks; i++) {
             if (drawPile.length > 0) {
@@ -38,7 +38,7 @@ export class MothGod extends AbstractBuff {
 }
 
 class EggsBuff extends AbstractBuff {
-    override getName(): string {
+    override getDisplayName(): string {
         return "Eggs";
     }
 
@@ -84,7 +84,7 @@ class Hazardous extends AbstractBuff {
         this.stackable = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Hazardous";
     }
 

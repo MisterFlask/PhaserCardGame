@@ -5,7 +5,7 @@ import { AbstractBuff } from "../AbstractBuff";
 export class Burning extends AbstractBuff {
     private readonly baseDamage: number = 4;
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Burning";
     }
 

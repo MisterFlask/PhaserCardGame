@@ -1,6 +1,6 @@
 import { AbstractBuff } from "../AbstractBuff";
 export class Lethality extends AbstractBuff {
-    override getName(): string {
+    override getDisplayName(): string {
         return "Lethality"
     }
     override getDescription(): string {

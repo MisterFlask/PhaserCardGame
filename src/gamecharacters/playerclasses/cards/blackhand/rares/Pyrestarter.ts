@@ -39,7 +39,7 @@ export class PyrestarterBuff extends AbstractBuff {
         this.stackable = false;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Pyrestarter Effect";
     }
 

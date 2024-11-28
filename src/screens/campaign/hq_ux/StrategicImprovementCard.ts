@@ -7,7 +7,7 @@ export enum FactoryEffectType {
     PERSISTENT = "PERSISTENT"
 }
 
-export class FactoryCard extends AbstractCard {
+export class StrategicImprovementCard extends AbstractCard {
     public purchaseCost: number;
 
     constructor({ 

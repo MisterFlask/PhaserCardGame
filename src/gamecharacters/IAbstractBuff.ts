@@ -14,7 +14,7 @@ export interface IAbstractBuff {
     isDebuff: boolean;
     
     getOwnerAsPlayableCard(): PlayableCard | null;
-    getName(): string;
+    getDisplayName(): string;
     getDescription(): string;
     getStacksDisplayText(): string;
     getOwnerAsCharacter(): BaseCharacter | null;

@@ -5,12 +5,10 @@ import BBCodeText from 'phaser3-rex-plugins/plugins/bbcodetext.js';
 import { TextGlyphs } from '../text/TextGlyphs';
 import { DepthManager } from './DepthManager';
 
-// Modify the class to extend Phaser.GameObjects.Container
 export type VerticalExpand = 'up' | 'down';
 export type HorizontalExpand = 'left' | 'right'| 'center';
 
 export class TextBox extends Phaser.GameObjects.Container {
-
     public static readonly YELLOW = 0xFFFF00;
     public static readonly GREEN = 0x00FF00;
     public static readonly RED = 0xFF0000;

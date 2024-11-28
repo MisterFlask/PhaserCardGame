@@ -99,7 +99,7 @@ export class DetailsScreenManager {
             this.detailsContainer.add(buffIcon);
 
             // Add buff name and description
-            const buffText = this.scene.add.text(50, buffY, `${buff.getName()} [${buff.stacks}]: ${buff.getDescription()}`, {
+            const buffText = this.scene.add.text(50, buffY, `${buff.getDisplayName()} [${buff.stacks}]: ${buff.getDescription()}`, {
                 fontSize: '16px',
                 color: '#ffffff',
                 wordWrap: { width: width * 0.25 }
@@ -126,7 +126,7 @@ export class DetailsScreenManager {
     private getEffectiveImage(buff: AbstractBuff): string {
         return this.scene.textures.exists(buff.imageName) 
             ? buff.imageName 
-            : ImageUtils.getDeterministicAbstractPlaceholder(buff.getName());
+            : ImageUtils.getDeterministicAbstractPlaceholder(buff.getDisplayName());
     }
 
     private getEffectiveRandomizedColor(buff: AbstractBuff): number {

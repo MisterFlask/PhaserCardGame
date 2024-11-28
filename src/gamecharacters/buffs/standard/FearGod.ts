@@ -13,7 +13,7 @@ export class FearGod extends AbstractBuff {
         this.isDebuff = false;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Fear God";
     }
 
@@ -39,7 +39,7 @@ class PhobiaBuff extends AbstractBuff {
         this.isDebuff = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Phobia";
     }
 

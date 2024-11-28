@@ -9,7 +9,7 @@ export class Muse extends AbstractBuff {
         this.isDebuff = false;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Muse";
     }
 

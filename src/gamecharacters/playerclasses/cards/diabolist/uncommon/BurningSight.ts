@@ -23,8 +23,8 @@ export class BurningSight extends PlayableCard {
 
         // Exhaust the top 2 cards of the deck
         for (let i = 0; i < 2; i++) {
-            if (combatState.currentDrawPile.length > 0) {
-                const cardToExhaust = combatState.currentDrawPile.pop();
+            if (combatState.drawPile.length > 0) {
+                const cardToExhaust = combatState.drawPile.pop();
                 if (cardToExhaust) {
                     this.actionManager.exhaustCard(cardToExhaust as PlayableCard);
                 }

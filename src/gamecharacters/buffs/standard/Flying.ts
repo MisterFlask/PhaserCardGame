@@ -12,7 +12,7 @@ export class Flying extends AbstractBuff {
         this.showSecondaryStacks = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Flying";
     }
 

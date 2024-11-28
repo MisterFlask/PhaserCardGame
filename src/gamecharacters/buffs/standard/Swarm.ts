@@ -8,7 +8,7 @@ export class Swarm extends AbstractBuff {
         this.imageName = "bee-swarm"; // Replace with actual icon name if available
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Swarm";
     }
 

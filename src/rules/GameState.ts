@@ -51,6 +51,8 @@ export class GameState {
 
     public surfaceCurrency: number = 200
     public hellCurrency: number = 0
+    public brimstoneDistillate: number = 0
+
     public combatState: CombatState = new CombatState()
 
     // Add tracking for player's current location
@@ -189,7 +191,7 @@ export class GameState {
 export class CombatState{
 
     // Removed direct property, now using TransientUiState
-    currentDrawPile: PlayableCard[] = []
+    drawPile: PlayableCard[] = []
     currentDiscardPile: PlayableCard[] = []
     currentHand: PlayableCard[] = []
     currentExhaustPile: PlayableCard[] = []
@@ -204,7 +206,7 @@ export class CombatState{
     }
 
     get allCardsInAllPilesExceptExhaust(): PlayableCard[] {
-        return [...this.currentDrawPile, ...this.currentDiscardPile, ...this.currentHand];
+        return [...this.drawPile, ...this.currentDiscardPile, ...this.currentHand];
     }
 
     combatResources: CombatResources = new CombatResources()
@@ -213,7 +215,7 @@ export class CombatState{
     public maxEnergy: number = 3
         
     getBattleCardLocation = (cardId: string): BattleCardLocation => {
-        if (this.currentDrawPile.some(c => c.id === cardId)) return BattleCardLocation.DrawPile
+        if (this.drawPile.some(c => c.id === cardId)) return BattleCardLocation.DrawPile
         if (this.currentDiscardPile.some(c => c.id === cardId)) return BattleCardLocation.DiscardPile
         if (this.currentHand.some(c => c.id === cardId)) return BattleCardLocation.Hand
         return BattleCardLocation.Unknown

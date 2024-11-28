@@ -8,7 +8,7 @@ export class BloodPriceBuff extends AbstractBuff {
         this.stacks = stacks;
     }
 
-    getName(): string {
+    getDisplayName(): string {
         return "BloodPrice";
     }
 

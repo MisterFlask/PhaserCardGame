@@ -27,7 +27,7 @@ export class PocketVial extends PlayableCardWithHelpers {
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         if (targetCard) {
-            const burningCount = targetCard.getBuffStacks(new Burning(1).getName());
+            const burningCount = targetCard.getBuffStacks(new Burning(1).getDisplayName());
             const totalDamage = this.getBaseDamageAfterResourceScaling() + burningCount;
             
             this.dealDamageToTarget(targetCard as BaseCharacter);

@@ -7,7 +7,7 @@ export class EldritchFoes extends LocationCardBuff {
         super();
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Interdimensional Seepage";
     }
 

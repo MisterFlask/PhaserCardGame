@@ -10,7 +10,7 @@ export class BloodGod extends AbstractBuff {
         this.isDebuff = false;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Blood God";
     }
 

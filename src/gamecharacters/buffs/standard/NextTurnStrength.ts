@@ -8,7 +8,7 @@ export class NextTurnStrength extends AbstractBuff {
         this.isDebuff = false;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Next Turn Strength";
     }
 

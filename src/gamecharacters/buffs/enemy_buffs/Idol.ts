@@ -11,7 +11,7 @@ export class Idol extends AbstractBuff {
         this.isDebuff = false;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Idol";
     }
 

@@ -5,7 +5,7 @@ export class Fragile extends AbstractBuff {
         super();
     }
 
-    getName(): string {
+    getDisplayName(): string {
         return "Fragile";
     }
 

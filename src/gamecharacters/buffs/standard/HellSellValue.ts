@@ -9,15 +9,19 @@ export class HellSellValue extends AbstractBuff {
         this.stacks = stacks;
     }
 
-    override getName(): string {
+    override getBuffCanonicalName(): string {
+        return "HELL_SELL_VALUE";
+    }
+
+    override getDisplayName(): string {
         return "Hell Sell Value";
     }
 
     override getDescription(): string {
-        return `The sell value of this card in Hell is, at baseline, ${this.getStacksDisplayText()}.`;
+        return `The sell value of this card in Hell is, at baseline, ${this.getStacksDisplayText()} in Brimstone Distillate.`;
     }
 
-    override hellValueModifier(): number {
+    override hellValueFlatModifier(): number {
         return this.stacks;
     }
 }

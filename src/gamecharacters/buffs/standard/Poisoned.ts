@@ -2,7 +2,7 @@ import { ActionManager } from "../../../utils/ActionManager";
 import { AbstractBuff } from "../AbstractBuff";
 
 export class Poisoned extends AbstractBuff {
-    override getName(): string {
+    override getDisplayName(): string {
         return "Poisoned";
     }
 

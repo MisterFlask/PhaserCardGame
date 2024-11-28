@@ -23,7 +23,7 @@ export class RageFueledAxe extends PlayableCard {
   }
 
   override InvokeCardEffects(target?: BaseCharacter): void {
-    this.dealDamageToTarget(target, this.getBaseDamageAfterResourceScaling() + (target?.getBuffStacks(new Burning().getName() )?? 0));
+    this.dealDamageToTarget(target, this.getBaseDamageAfterResourceScaling() + (target?.getBuffStacks(new Burning().getDisplayName() )?? 0));
   }
 
 }

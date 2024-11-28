@@ -5,7 +5,7 @@ import { PlayableCard } from "../../PlayableCard";
 import { AbstractBuff } from "../AbstractBuff";
 import { Lethality } from "../standard/Strong";
 export class Delicious extends AbstractBuff {
-    override getName(): string {
+    override getDisplayName(): string {
         return "Delicious";
     }
 

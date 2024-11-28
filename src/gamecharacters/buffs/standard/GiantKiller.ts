@@ -10,7 +10,7 @@ export class GiantKiller extends AbstractBuff {
         this.imageName = "giant-axe"; // Replace with actual icon name if available
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Giant Killer";
     }
 

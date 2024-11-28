@@ -6,7 +6,7 @@ export class Lightweight extends AbstractBuff {
         this.stacks = stacks;
     }
 
-    getName(): string {
+    getDisplayName(): string {
         return "Light";
     }
 

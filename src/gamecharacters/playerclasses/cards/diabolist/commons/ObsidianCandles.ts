@@ -25,7 +25,7 @@ export class ObsidianCandlesEffect extends AbstractBuff {
         }
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Obsidian Candles";
     }
 

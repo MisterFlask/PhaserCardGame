@@ -31,7 +31,7 @@ export class VolatileBuff extends AbstractBuff {
         }
     }
 
-    public getName(): string {
+    public getDisplayName(): string {
         return "Volatile";
     }
     getDescription(): string {

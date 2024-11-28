@@ -13,6 +13,7 @@ import { PhysicalBuff } from './PhysicalBuff';
 import { PhysicalIntent } from "./PhysicalIntent";
 import { ShadowedImage } from './ShadowedImage'; // Add this import
 import { TextBox } from "./TextBox"; // Ensure correct relative path
+import { TooltipAttachment } from './TooltipAttachment';
 import { TransientUiState } from './TransientUiState'; // Added import
 import { UIContext } from './UIContextManager';
 
@@ -34,6 +35,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
     physicalBuffs: PhysicalBuff[];
     scene: Phaser.Scene;
     isSelected: boolean = false;
+
+    private blockTooltip: TooltipAttachment;
     private wiggleTween: Phaser.Tweens.Tween | null = null;
     private hoverSound: Phaser.Sound.BaseSound | null = null;
     private cardContent: Phaser.GameObjects.Container;
@@ -266,19 +269,13 @@ export class PhysicalCard implements IPhysicalCardInterface {
             textBoxName: "blockText:" + data.id // Add unique identifier
         });
 
-        // Set up tooltip behavior for blockText
-        this.blockText.setInteractive()
-            .on('pointerover', () => {
-                this.tooltipBox.setText("Block reduces incoming damage");
-                this.tooltipBox.setVisible(true);
-                this.tooltipBox.setPosition(
-                    this.blockText.x + this.blockText.width + 10,
-                    this.blockText.y
-                );
-            })
-            .on('pointerout', () => {
-                this.tooltipBox.setVisible(false);
-            });
+        // Add tooltip to block display
+        this.blockTooltip = new TooltipAttachment({
+            scene: this.scene,
+            container: this.blockText,
+            tooltipText: "Block: Reduces incoming damage",
+            fillColor: 0x000044
+        });
 
         this.blocksContainer.add(this.blockText);
         this.cardContent.add(this.blocksContainer);
@@ -405,6 +402,10 @@ export class PhysicalCard implements IPhysicalCardInterface {
         this.tooltipBox.destroy();
         if (this.hpBox) {
             this.hpBox.destroy();
+        }
+
+        if (this.blockTooltip) {
+            this.blockTooltip.destroy();
         }
 
         // Destroy the card image

@@ -9,7 +9,7 @@ export class Damaged extends AbstractBuff {
         this.stacks = stacks;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Damaged";
     }
 

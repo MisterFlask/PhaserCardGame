@@ -11,7 +11,7 @@ export class DoNotLookAtMe extends AbstractBuff {
         this.imageName = "hidden-face"; // Replace with actual icon name if available
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "DO NOT LOOK AT ME";
     }
 

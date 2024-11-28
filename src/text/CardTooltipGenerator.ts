@@ -36,7 +36,7 @@ export class CardTooltipGenerator {
                 }else if (buff.isPersistentBetweenCombats){
                     parenthetical = `[color=yellow](Until End Of Run)[/color]`;
                 }
-                tooltip += `-[color=cyan] ${buff.getName()}[/color] ${parenthetical}: ${buff.getDescription()}\n`;
+                tooltip += `-[color=cyan] ${buff.getDisplayName()}[/color] ${parenthetical}: ${buff.getDescription()}\n`;
             }
         }
 
@@ -71,7 +71,7 @@ export class CardTooltipGenerator {
             // Add card name
             tooltip += `[color=gold]Reference:[/color]\n`;
             for (const buff of magicWordsResult.buffs) {
-                tooltip += `- [color=yellow][b]${buff.getName()}[/b][/color] ${buff.getDescription()}\n`;
+                tooltip += `- [color=yellow][b]${buff.getDisplayName()}[/b][/color] ${buff.getDescription()}\n`;
             }
         }
 
