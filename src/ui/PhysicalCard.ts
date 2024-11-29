@@ -224,7 +224,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
                 scene: this.scene,
                 x: cardWidth / 2 - 40,
                 y: -cardHeight / 2 + 45, // Position it below the cost box
-                width: 30,
+                width: 100,
                 height: 30,
                 text: '',
                 style: { fontSize: '14px', color: '#ffffff', fontFamily: 'Arial' },
@@ -359,7 +359,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
                 scene: this.scene,
                 x: -cardWidth / 2,
                 y: -cardHeight / 2,
-                width: 22,
+                width: 70,
                 height: 11,
                 text: playableCard.cardType.displayName,
                 style: { 

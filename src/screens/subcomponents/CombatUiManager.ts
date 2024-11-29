@@ -534,6 +534,8 @@ class CombatUIManager {
             (nextEvent: AbstractEvent | null) => {
                 if (nextEvent) {
                     this.showEvent(nextEvent);
+                }else{
+                    this.currentPhysicalEvent?.destroy();
                 }
             }
         );

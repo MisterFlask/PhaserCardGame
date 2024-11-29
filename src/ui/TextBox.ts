@@ -72,7 +72,7 @@ export class TextBox extends Phaser.GameObjects.Container {
         super(scene, x, y);
         this.strokeIsOn = strokeIsOn;
         // **Set the origin of the container to the center**
-        this.setOrigin(0.5, 0.5);
+        this.setOrigin(0,0);
 
         this.textBoxName = textBoxName ?? "anonymousTextBox";
         this.verticalExpand = verticalExpand;
@@ -99,7 +99,8 @@ export class TextBox extends Phaser.GameObjects.Container {
         const textStyle: any = {
             backgroundColor:fillColor,
             wrap: {
-                mode: 'word'
+                mode: 'word',
+                width: width,
             },
             fontSize: style.fontSize,
             fontFamily: style.fontFamily,

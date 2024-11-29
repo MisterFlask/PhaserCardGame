@@ -26,12 +26,25 @@ export abstract class AbstractChoice {
         this.actionManager().createLedgerItem(ledgerItem);
     }
 }
+export class FinishChoice extends AbstractChoice {
+    constructor() {
+        super("Ah.", ".");
+        this.nextEvent = null;
+    }
+
+    canChoose(): boolean {
+        return true;
+    }
+
+    effect(): void {
+    }
+}
 
 export class AbstractEvent {
     public portraitName: string = "";
     public name: string = "";
     public description: string = "";
-    public choices: AbstractChoice[] = [];
+    public choices: AbstractChoice[] = [new FinishChoice()];
 
     public isEligible(): boolean {
         return true;
@@ -56,6 +69,8 @@ export class AbstractEvent {
 export class DeadEndEvent extends AbstractEvent {
     constructor() {
         super();
-        this.description = "We're done here.";
+        this.choices = [
+            new FinishChoice()
+        ];
     }
 }
