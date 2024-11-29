@@ -1,7 +1,7 @@
 // Power: Manufacture an Eldritch Smoke to your hand.  Draw 2 cards.  Cost 2.  Whenever you Sacrifice, manufacture an Eldritch Smoke to your hand.
 
 import { AbstractCombatEvent } from "../../../../../rules/AbstractCombatEvent";
-import { DeckLogic } from "../../../../../rules/DeckLogic";
+import { DeckLogic } from "../../../../../rules/DeckLogicHelper";
 import { GameState } from "../../../../../rules/GameState";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { AbstractBuff } from "../../../../buffs/AbstractBuff";

@@ -1,4 +1,4 @@
-import { DeckLogic } from "../../../../../rules/DeckLogic";
+import { DeckLogic } from "../../../../../rules/DeckLogicHelper";
 import { GameState } from "../../../../../rules/GameState";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { HellSellValue } from "../../../../buffs/standard/HellSellValue";

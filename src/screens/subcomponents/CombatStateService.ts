@@ -2,7 +2,7 @@
 
 import { EncounterData } from "../../encounters/EncountersList";
 import { PlayerCharacter } from "../../gamecharacters/BaseCharacterClass";
-import { DeckLogic } from "../../rules/DeckLogic";
+import { DeckLogic } from "../../rules/DeckLogicHelper";
 import { GameState } from "../../rules/GameState";
 
 class CombatStateService {

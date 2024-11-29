@@ -1,4 +1,4 @@
-import { DeckLogic, PileName } from "../../../../../rules/DeckLogic";
+import { DeckLogic, PileName } from "../../../../../rules/DeckLogicHelper";
 import { GameState } from "../../../../../rules/GameState";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { ExhaustBuff } from "../../../../buffs/playable_card/ExhaustBuff";
