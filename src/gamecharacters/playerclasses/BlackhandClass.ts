@@ -17,13 +17,16 @@ import { ReIgnition } from "./cards/blackhand/uncommons/ReIgnition";
 import { Smokescreen } from "./cards/blackhand/uncommons/Smokescreen";
 
 export class BlackhandClass extends BaseCharacterClass {
+    
     getPortraitNameAtRandom(gender: Gender): string {
         return ImageUtils.getRandomImageNameFromCategory(`portraits_blackhand_${gender === Gender.Female ? "female" : "male"}` as "portraits_blackhand_female");
     }
+
     constructor() {
         super({ name: "Blackhand", id: CharacterClasses.BLACKHAND_ID, iconName: "blackhand_icon", startingMaxHp: 30 })
         // Add Blackhand-specific cards here
         this.cardBackgroundImageName = "blackhand_background"
+        this.longDescription = "Called 'Blackhands' after the skeletal-hand-holding-a-cigar emblem of the unit, these mercs are specialists in destruction. Of the enemy, of allies, whoever.";
 
         this.addCard(new FireAxe())
         this.addCard(new FlamePistol())
