@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
   mode: 'development',  // Set development mode to avoid minification
-  entry: './src/screens/combatscene.ts',
+  entry: './src/screens/CombatAndMapScene.ts',
   module: {
     rules: [
       {
