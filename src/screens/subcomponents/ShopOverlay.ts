@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { ShopGuy } from '../../encounters/Encounters';
+import { ShopGuy } from '../../encounters/EncountersList';
 import { AbstractCard, PriceContext } from '../../gamecharacters/AbstractCard';
 import { BaseCharacter } from '../../gamecharacters/BaseCharacter';
 import { PlayerCharacter } from '../../gamecharacters/BaseCharacterClass';

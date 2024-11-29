@@ -1,4 +1,4 @@
-import { TreasureChest } from '../../encounters/Encounters';
+import { TreasureChest } from '../../encounters/EncountersList';
 import { AbstractCard } from '../../gamecharacters/AbstractCard';
 import { BaseCharacter } from '../../gamecharacters/BaseCharacter';
 import { TextBoxButton } from '../../ui/Button';

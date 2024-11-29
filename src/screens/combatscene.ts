@@ -2,7 +2,7 @@
 
 import Phaser from 'phaser';
 import BBCodeTextPlugin from 'phaser3-rex-plugins/plugins/bbcodetext-plugin.js';
-import { EncounterData } from '../encounters/Encounters';
+import { EncounterData } from '../encounters/EncountersList';
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
 import { LocationCard, RestSiteCard } from '../maplogic/LocationCard';
 import { GameState } from '../rules/GameState';
