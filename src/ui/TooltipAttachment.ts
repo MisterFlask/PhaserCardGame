@@ -48,7 +48,7 @@ export class TooltipAttachment {
         this.tooltip.setVisible(false);
         
         // Add hover listeners
-        this.gameObject.setInteractive();
+        // assume it's interactive
         this.gameObject.on('pointerover', this.showTooltip, this);
         this.gameObject.on('pointerout', this.hideTooltip, this);
     }

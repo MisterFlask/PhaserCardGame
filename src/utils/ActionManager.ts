@@ -9,6 +9,7 @@ import { IBaseCharacter } from "../gamecharacters/IBaseCharacter";
 import { CardResourceScaling, PlayableCard } from "../gamecharacters/PlayableCard";
 import { CardType } from "../gamecharacters/Primitives";
 import { ProcBroadcaster } from "../gamecharacters/procs/ProcBroadcaster";
+import { LedgerItem } from "../ledger/LedgerItem";
 import { AbstractRelic } from "../relics/AbstractRelic";
 import { AbstractCombatEvent } from "../rules/AbstractCombatEvent";
 import { CombatRules, DamageCalculationResult } from "../rules/CombatRulesHelper";
@@ -1000,6 +1001,10 @@ export class ActionManager {
             });
             return [];
         }));
+    }
+
+    public createLedgerItem(item: LedgerItem): void {
+        GameState.getInstance().ledger.push(item);
     }
 
     public exhaustCard(card: PlayableCardType): void {

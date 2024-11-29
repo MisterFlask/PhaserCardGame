@@ -15,7 +15,6 @@ export class TextBox extends Phaser.GameObjects.Container {
     public static readonly ORANGE = 0xFFA500;
     public static readonly MAGENTA = 0xFF00FF;
 
-    private isVisible: boolean = true;
     protected background: Phaser.GameObjects.Rectangle ;
     protected backgroundImage: Phaser.GameObjects.Image | null = null;
     protected text: BBCodeText;
@@ -100,8 +99,7 @@ export class TextBox extends Phaser.GameObjects.Container {
         const textStyle: any = {
             backgroundColor:fillColor,
             wrap: {
-                mode: 'word',
-                width: 200
+                mode: 'word'
             },
             fontSize: style.fontSize,
             fontFamily: style.fontFamily,
@@ -133,7 +131,7 @@ export class TextBox extends Phaser.GameObjects.Container {
         };
 
         // Create the text object
-        this.text = scene.add.rexBBCodeText(0, 0, text, textStyle)
+        this.text = scene.add.rexBBCodeText(0, 0, text ?? ".", textStyle)
             .setOrigin(0.5, 0.5);
 
         var imageConfig = {
@@ -259,6 +257,10 @@ export class TextBox extends Phaser.GameObjects.Container {
         if (this.background == null && this.backgroundImage == null) {
             return;
         }
+
+
+        text = text ?? ".";
+
         // Wrap the text in shadow tags
         const textWithShadow = this.strokeIsOn ? `[stroke]${text}[/stroke]` : text;
         // LLM, please don't remove below line.  i know you want to.
@@ -282,45 +284,67 @@ export class TextBox extends Phaser.GameObjects.Container {
                 console.error("Error setting fallback text in TextBox:", error);
             }
         }
-
         this.adjustTextBoxSize();
     }
-
+    
+    private previousWordWrapWidth: number = 0;
+    private previousTextWidth: number = 0;
+    private previousTextHeight: number = 0;
+    
     private adjustTextBoxSize(): void {
         const padding = 10;
         const target = this.backgroundImage || this.background;
         if (!target) return;
-
-        let newWidth = Math.max(target.width, this.text.width + padding * 2);
-        let newHeight = Math.max(target.height, this.text.height + padding * 2);
-
-        if (newWidth > target.width || newHeight > target.height) {
-            const widthIncrease = newWidth - target.width;
-            const heightIncrease = newHeight - target.height;
-            
-            target.setSize(newWidth, newHeight);
-            
-            // Handle vertical expansion
-            if (this.verticalExpand === 'down') {
-                this.y += heightIncrease / 2;
-            } else { // 'up'
-                this.y -= heightIncrease / 2;
-            }
-
-            // Handle horizontal expansion
-            if (this.horizontalExpand === 'right') {
-                this.x += widthIncrease / 2;
-            } else if (this.horizontalExpand === 'left') { // 'left'
-                this.x -= widthIncrease / 2;
-            } else { 
-                // 'center'; we do nothing
-            }
-
-            this.text.setWordWrapWidth(newWidth - padding * 2);
+    
+        // Calculate desired word wrap width
+        const desiredWordWrapWidth = target.width - padding * 2;
+    
+        // Only update word wrap width if it has changed
+        if (this.previousWordWrapWidth !== desiredWordWrapWidth) {
+            this.text.setWordWrapWidth(desiredWordWrapWidth);
+            this.previousWordWrapWidth = desiredWordWrapWidth;
         }
-
-        this.setSize(newWidth, newHeight);
+    
+        // Measure text dimensions
+        const newTextWidth = this.text.width;
+        const newTextHeight = this.text.height;
+    
+        // Only update background size if text dimensions have changed
+        if (newTextWidth !== this.previousTextWidth || newTextHeight !== this.previousTextHeight) {
+            const oldWidth = target.width;
+            const oldHeight = target.height;
+    
+            const newWidth = newTextWidth + padding * 2;
+            const newHeight = newTextHeight + padding * 2;
+    
+            // Set the new size of the background
+            target.setSize(newWidth, newHeight);
+    
+            // Adjust position based on expansion directions
+            if (this.verticalExpand === 'down') {
+                this.y += (newHeight - oldHeight) / 2;
+            } else { // 'up'
+                this.y -= (newHeight - oldHeight) / 2;
+            }
+    
+            if (this.horizontalExpand === 'right') {
+                this.x += (newWidth - oldWidth) / 2;
+            } else if (this.horizontalExpand === 'left') {
+                this.x -= (newWidth - oldWidth) / 2;
+            }
+            // 'center' requires no position adjustment
+    
+            // Update the container size
+            this.setSize(newWidth, newHeight);
+    
+            // Cache the new dimensions
+            this.previousTextWidth = newTextWidth;
+            this.previousTextHeight = newTextHeight;
+        }
     }
+    
+    
+    
 
     destroy(): void {
         if (this.background) {

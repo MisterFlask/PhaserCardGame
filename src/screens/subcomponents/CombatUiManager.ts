@@ -42,7 +42,7 @@ class CombatUIManager {
     private debugOverlay!: TextBox;
     public dropZoneHighlight!: Phaser.GameObjects.Image;
     private debugMenu!: DebugMenu;
-    private currentEvent: PhysicalEvent | null = null;
+    private currentPhysicalEvent: PhysicalEvent | null = null;
 
     private constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -175,7 +175,6 @@ class CombatUIManager {
                         enemy.hitpoints = 0;
                     });
                     console.log("All enemies defeated for debugging purposes.");
-                    this.onCombatEnd();
                 }
             }
         ];
@@ -525,11 +524,11 @@ class CombatUIManager {
     }
 
     public showEvent(event: AbstractEvent): void {
-        if (this.currentEvent) {
-            this.currentEvent.destroy();
+        if (this.currentPhysicalEvent) {
+            this.currentPhysicalEvent.destroy();
         }
 
-        this.currentEvent = new PhysicalEvent(
+        this.currentPhysicalEvent = new PhysicalEvent(
             this.scene,
             event,
             (nextEvent: AbstractEvent | null) => {

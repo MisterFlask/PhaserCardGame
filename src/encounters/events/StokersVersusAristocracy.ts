@@ -1,8 +1,14 @@
-import { AbstractChoice, AbstractEvent } from "../../events/AbstractEvent";
+import { AbstractChoice, AbstractEvent, DeadEndEvent } from "../../events/AbstractEvent";
+import { CinderCourtEsteem, StokersUnionEsteem } from "../../ledger/Esteem";
 
 class SupportStokersChoice extends AbstractChoice {
     constructor() {
-        super("Support the Stoker's Union");
+        super(
+            "Support the Stoker's Union",
+            "Gain 1 Esteem with the Stoker's Union, lose 1 Esteem with the Cinder Court"
+        );
+        this.nextEvent = new DeadEndEvent();
+        this.nextEvent.description = "The grim-faced laborers nod in approval as you take their side. Their leader, a burly demon with coal dust permanently etched into his skin, grasps your hand with calloused fingers. 'The Union remembers its friends,' he growls. 'When the Furnace burns hot and the aristocrats come begging for warmth, we'll remember who stood with us.' The floating obsidian carriages depart in a huff of indignation and brimstone, their occupants already plotting their revenge.";
     }
 
     canChoose(): boolean {
@@ -10,13 +16,19 @@ class SupportStokersChoice extends AbstractChoice {
     }
 
     effect(): void {
-        // Add reputation with Stokers, lose reputation with Aristocracy
+        this.addLedgerItem(new StokersUnionEsteem(1));
+        this.addLedgerItem(new CinderCourtEsteem(-1));
     }
 }
 
 class SupportAristocracyChoice extends AbstractChoice {
     constructor() {
-        super("Side with the Cinder Court");
+        super(
+            "Side with the Cinder Court",
+            "Lose 1 Esteem with the Stoker's Union, gain 1 Esteem with the Cinder Court"
+        );
+        this.nextEvent = new DeadEndEvent();
+        this.nextEvent.description = "The aristocrats smile thinly as you take their side, their perfect porcelain masks gleaming in the dim light of the idle Furnace. 'How refreshing to find someone who understands progress,' purrs a Duchess through lips stained with brimstone wine. 'These... laborers will learn that they are as replaceable as any other component of Hell's machinery.' The striking workers depart with murderous glares and muttered curses that leave scorch marks on the ground.";
     }
 
     canChoose(): boolean {
@@ -24,13 +36,19 @@ class SupportAristocracyChoice extends AbstractChoice {
     }
 
     effect(): void {
-        // Add reputation with Aristocracy, lose reputation with Stokers
+        this.addLedgerItem(new StokersUnionEsteem(-1));
+        this.addLedgerItem(new CinderCourtEsteem(1));
     }
 }
 
 class MediateChoice extends AbstractChoice {
     constructor() {
-        super("Attempt to mediate the dispute");
+        super("Attempt to mediate the dispute",
+            "Nothing happens."
+        );        
+        this.nextEvent = new DeadEndEvent();
+        this.nextEvent.description = "Hours of tense negotiation follow, punctuated by bursts of hellfire and the occasional shattering of priceless porcelain masks. You manage to broker an uneasy compromise: the Stoker's Union will accept limited automation in exchange for ownership stakes in the new machinery and guaranteed positions maintaining the Styx turbines. Neither side is entirely pleased - the aristocrats sneer at having to negotiate with 'mere laborers,' while the Union representatives grumble about the march of progress. Still, the Furnace roars back to life, and Hell remains unfrozen... for now."      
+
     }
 
     canChoose(): boolean {
@@ -38,8 +56,8 @@ class MediateChoice extends AbstractChoice {
     }
 
     effect(): void {
-        // Small reputation gain with both factions
     }
+
 }
 
 export class StokersVersusAristocracy extends AbstractEvent {

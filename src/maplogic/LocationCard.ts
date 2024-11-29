@@ -4,6 +4,8 @@ import Phaser from 'phaser';
 import { EncounterEnhancer } from '../encounters/EncounterEnhancer';
 import { ActSegment, EncounterData, EncounterManager } from '../encounters/EncountersList';
 import { Charon } from '../encounters/monsters/special/Charon';
+import { AbstractEvent } from '../events/AbstractEvent';
+import { EventsManager } from '../events/EventsManager';
 import { AbstractCard } from '../gamecharacters/AbstractCard';
 import { CardSize, CardType } from '../gamecharacters/Primitives';
 import { GameState } from '../rules/GameState';
@@ -22,6 +24,7 @@ export class LocationCard extends AbstractCard {
     public roomNumber: number = 0;
     public segment: number = 0;
     public backgroundName?: string;
+    public gameEvent?: AbstractEvent;
 
     constructor({ name, description, portraitName, tooltip, size, floor, index }: { name: string; description: string; portraitName?: string; tooltip?: string; size: CardSize; floor: number; index: number }) { 
         const fullName = `${name} ${floor}-${index + 1}`;
@@ -242,5 +245,14 @@ export class EventRoomCard extends LocationCard {
             index
         });
         this.portraitName = 'event-icon';
+    }
+    override OnLocationSelected(scene: Phaser.Scene): void {
+        console.log(`Event room ${this.id} selected`);
+        this.gameEvent = EventsManager.getInstance().getRandomEvent();  
+        SceneChanger.switchToCombatScene({ 
+            encounter: {
+                enemies: []
+            } 
+        });
     }
 }

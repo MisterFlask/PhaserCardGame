@@ -46,7 +46,7 @@ export class StandardTradeRoute extends AbstractTradeRoute {
     constructor() {
         super({
             name: tradeRouteNames[Math.floor(Math.random() * tradeRouteNames.length)],
-            description: "A lucrative trade route connecting distant markets",
+            description: "A lucrative trade route connecting distant markets.",
         });
         this.buffs = [new EnemyUpgradeTradeRouteModifier()];
     }

@@ -3,6 +3,7 @@
 import Phaser from 'phaser';
 import BBCodeTextPlugin from 'phaser3-rex-plugins/plugins/bbcodetext-plugin.js';
 import { EncounterData } from '../encounters/EncountersList';
+import { AbstractEvent } from '../events/AbstractEvent';
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
 import { LocationCard, RestSiteCard } from '../maplogic/LocationCard';
 import { GameState } from '../rules/GameState';
@@ -52,6 +53,14 @@ class CombatScene extends Phaser.Scene {
     private treasureOverlay!: TreasureOverlay;
     private restOverlay!: RestOverlay;
     private combatEndHandled: boolean = false;
+
+    private eventToRunNext?: AbstractEvent;
+    private hasEventBeenRun: boolean = false;
+
+    private setNewEvent(event?: AbstractEvent): void {
+        this.eventToRunNext = event;
+        this.hasEventBeenRun = false;
+    }
 
     constructor() {
         super('CombatScene');
@@ -168,6 +177,7 @@ class CombatScene extends Phaser.Scene {
                 this.restOverlay.show();
             }
         });
+        this.setNewEvent(GameState.getInstance().currentLocation?.gameEvent);
     }
 
     private obliterate(): void {
@@ -280,6 +290,11 @@ class CombatScene extends Phaser.Scene {
 
         // Update card manager
         this.cardManager.update();
+
+        if (this.eventToRunNext && !this.hasEventBeenRun) {
+            this.uiManager.showEvent(this.eventToRunNext);
+            this.hasEventBeenRun = true;
+        }
     }
 
     /**

@@ -42,7 +42,6 @@ export class PhysicalChoice {
 export class PhysicalEvent extends Phaser.GameObjects.Container {
     private background: Phaser.GameObjects.Rectangle;
     private portrait: Phaser.GameObjects.Image;
-    private nameText: TextBox;
     private descriptionText: TextBox;
     private choices: PhysicalChoice[] = [];
 
@@ -58,63 +57,67 @@ export class PhysicalEvent extends Phaser.GameObjects.Container {
         const { width, height } = scene.scale;
 
         // Create semi-transparent background
-        this.background = scene.add.rectangle(0, 0, width, height, 0x000000, 0.8);
+        this.background = scene.add.rectangle(
+            width / 2,
+            height / 2,
+            width,
+            height,
+            0x000000,
+            0.8
+        );
         this.add(this.background);
 
-        // Add portrait on the left side
-        const portraitWidth = width * 0.4;
-        const portraitHeight = height * 0.6;
-        this.portrait = scene.add.image(
-            width * 0.25,
-            height * 0.5,
-            event.portraitName
-        )
-            .setDisplaySize(portraitWidth, portraitHeight);
+        // Add portrait filling the left half
+        this.portrait = scene.add
+            .image(width * 0.25, height / 2, event.portraitName)
+            .setDisplaySize(width * 0.5, height);
         this.add(this.portrait);
 
-        // Add name text in upper-right quadrant
-        this.nameText = new TextBox({
-            scene,
-            x: width * 0.7,
-            y: height * 0.2,
-            text: event.name,
-            style: { fontSize: '32px', color: '#ffffff' }
-        });
-        this.add(this.nameText);
-
-        // Add description text below name
+        // Add description text at the upper right
+        const descriptionX = width * 0.55; // Start slightly into the right half
+        const descriptionWidth = width * 0.4; // Width for the description text
         this.descriptionText = new TextBox({
             scene,
-            x: width * 0.7,
-            y: height * 0.3,
-            width: width * 0.4,
+            x: descriptionX,
+            y: height-height * 0.1,
+            width: descriptionWidth,
             text: event.description,
-            style: { fontSize: '24px', color: '#ffffff', wordWrap: { width: width * 0.4 } }
+            style: {
+                fontSize: '24px',
+                color: '#ffffff',
+                wordWrap: { width: descriptionWidth },
+                align: 'left',
+            },
         });
+        this.descriptionText.setOrigin(0, 0); // Top-left alignment
         this.add(this.descriptionText);
 
-        // Add choice buttons
-        const buttonStartY = height * 0.5;
+        // Add choice buttons at the bottom right
+        const buttonStartY = height * 0.6;
         const buttonSpacing = 60;
         event.choices.forEach((choice, index) => {
+            const buttonX = width * 0.75; // Center of the right half
+            const buttonY = buttonStartY + index * buttonSpacing;
+            const buttonWidth = width * 0.4;
             const physicalChoice = new PhysicalChoice(
                 scene,
                 choice,
-                width * 0.7,
-                buttonStartY + index * buttonSpacing,
-                width * 0.4,
+                buttonX,
+                buttonY,
+                buttonWidth,
                 () => {
                     onEventComplete(choice.nextEvent);
                     this.destroy();
                 }
             );
+            physicalChoice.button.setOrigin(0.5, 0); // Top-center alignment
             this.choices.push(physicalChoice);
             this.add(physicalChoice.button);
         });
     }
 
     public destroy(): void {
-        this.choices.forEach(choice => choice.destroy());
+        this.choices.forEach((choice) => choice.destroy());
         super.destroy();
     }
-} 
+}

@@ -1,6 +1,7 @@
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
 import type { PlayerCharacter } from '../gamecharacters/BaseCharacterClass';
 import type { PlayableCard } from '../gamecharacters/PlayableCard';
+import { LedgerItem } from '../ledger/LedgerItem';
 import type { LocationCard } from '../maplogic/LocationCard';
 import { AbstractRelic } from '../relics/AbstractRelic';
 import type { AutomatedCharacterType, BaseCharacterType } from '../Types';
@@ -30,6 +31,7 @@ export class GameState {
     }
 
     private static instance: GameState;
+    ledger: LedgerItem[] = [];
 
     public roster: PlayerCharacter[] = [];
     public currentRunCharacters: PlayerCharacter[] = [];
