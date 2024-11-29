@@ -1,6 +1,6 @@
 // src/services/StateService.ts
 
-import { EncounterData } from "../../encounters/Encounters";
+import { EncounterData } from "../../encounters/EncountersList";
 import { PlayerCharacter } from "../../gamecharacters/BaseCharacterClass";
 import { DeckLogic } from "../../rules/DeckLogic";
 import { GameState } from "../../rules/GameState";

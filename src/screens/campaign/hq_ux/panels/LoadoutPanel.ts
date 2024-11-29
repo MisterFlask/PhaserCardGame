@@ -1,5 +1,5 @@
 import { Scene } from 'phaser';
-import { EncounterManager } from '../../../../encounters/Encounters';
+import { EncounterManager } from '../../../../encounters/EncountersList';
 import { PlayerCharacter } from '../../../../gamecharacters/BaseCharacterClass';
 import { GameState } from '../../../../rules/GameState';
 import { TextBoxButton } from '../../../../ui/Button';

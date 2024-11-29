@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { EncounterData } from '../encounters/Encounters';
+import { EncounterData } from '../encounters/EncountersList';
 import { GameState } from '../rules/GameState';
 
 export class SceneChanger {

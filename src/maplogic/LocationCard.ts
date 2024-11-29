@@ -2,7 +2,7 @@
 
 import Phaser from 'phaser';
 import { EncounterEnhancer } from '../encounters/EncounterEnhancer';
-import { ActSegment, EncounterData, EncounterManager } from '../encounters/Encounters';
+import { ActSegment, EncounterData, EncounterManager } from '../encounters/EncountersList';
 import { Charon } from '../encounters/monsters/special/Charon';
 import { AbstractCard } from '../gamecharacters/AbstractCard';
 import { CardSize, CardType } from '../gamecharacters/Primitives';
