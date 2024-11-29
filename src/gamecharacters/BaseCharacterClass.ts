@@ -18,6 +18,7 @@ export abstract class BaseCharacterClass {
     availableCards: PlayableCard[]
     cardBackgroundImageName: string = "greyscale"
     startingMaxHp: number
+    longDescription: string = ""
 
     abstract getPortraitNameAtRandom(gender: Gender): string;
 

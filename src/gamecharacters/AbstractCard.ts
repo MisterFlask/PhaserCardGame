@@ -95,6 +95,12 @@ export enum PriceContext {
 }
 
 export abstract class AbstractCard implements IAbstractCard {
+    asPlayerCharacter() : PlayerCharacter | null {
+        if (this.hasOwnProperty("characterClass")) {
+            return this as unknown as PlayerCharacter;
+        }
+        return null;
+    }
 
     public typeTag: string = "AbstractCard"
     

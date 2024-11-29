@@ -8,6 +8,10 @@ export class CardDescriptionGenerator {
             return "No card data found for description generation";
         }
         
+        if (card.asPlayerCharacter()) {
+            return card.asPlayerCharacter()!.characterClass.longDescription;
+        }
+
         // Add any buffs that should be moved to the main description
         let descriptionAdditions = "";
         for (const buff of card.buffs) {

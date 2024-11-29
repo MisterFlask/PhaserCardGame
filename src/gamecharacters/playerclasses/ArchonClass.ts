@@ -30,6 +30,7 @@ export class ArchonClass extends BaseCharacterClass {
         super({ name: "Archon", id: CharacterClasses.ARCHON_ID, iconName: "archon_icon", startingMaxHp: 30 })
         // Add Archon-specific cards here
         this.cardBackgroundImageName = "archon_background"
+        this.longDescription = "The Third Circle Company's Archons are Her Majesty's chosen overseers of expeditions into the infernal realms. Part military officer, part occult specialist, they command absolute authority over their charges - as decreed by both Crown and Contract."
         this.availableCards = [
             // common
             new Bolster(),
