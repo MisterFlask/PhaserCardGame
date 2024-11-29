@@ -1,6 +1,6 @@
 import { TextGlyphs } from '../../text/TextGlyphs';
 import { ActionManager } from '../../utils/ActionManager';
-import { PileName } from '../DeckLogic';
+import { PileName } from '../DeckLogicHelper';
 import { GameState } from '../GameState';
 import { AbstractCombatResource } from './AbstractCombatResource';
 

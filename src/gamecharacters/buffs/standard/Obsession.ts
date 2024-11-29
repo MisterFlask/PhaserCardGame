@@ -1,4 +1,4 @@
-import { PileName } from "../../../rules/DeckLogic";
+import { PileName } from "../../../rules/DeckLogicHelper";
 import { AbstractBuff } from "../AbstractBuff";
 
 export class Obsession extends AbstractBuff {
