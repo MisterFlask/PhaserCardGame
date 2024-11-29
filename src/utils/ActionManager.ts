@@ -11,7 +11,7 @@ import { CardType } from "../gamecharacters/Primitives";
 import { ProcBroadcaster } from "../gamecharacters/procs/ProcBroadcaster";
 import { AbstractRelic } from "../relics/AbstractRelic";
 import { AbstractCombatEvent } from "../rules/AbstractCombatEvent";
-import { CombatRules, DamageCalculationResult } from "../rules/CombatRules";
+import { CombatRules, DamageCalculationResult } from "../rules/CombatRulesHelper";
 import { DeckLogic, PileName } from "../rules/DeckLogicHelper";
 import CombatUiManager from "../screens/subcomponents/CombatUiManager";
 import { AutomatedCharacterType, BaseCharacterType, PlayableCardType } from "../Types";

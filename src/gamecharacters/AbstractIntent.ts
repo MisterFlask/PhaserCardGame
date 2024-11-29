@@ -1,5 +1,5 @@
 import { JsonRepresentable } from '../interfaces/JsonRepresentable';
-import { CombatRules } from '../rules/CombatRules';
+import { CombatRules } from '../rules/CombatRulesHelper';
 import { GameState } from '../rules/GameState';
 import { PhysicalCard } from '../ui/PhysicalCard';
 import { ActionManager } from "../utils/ActionManager";

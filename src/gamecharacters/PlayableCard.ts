@@ -5,7 +5,7 @@ import { MettleResource } from "../rules/combatresources/MettleResource";
 import { PluckResource } from "../rules/combatresources/PluckResource";
 import { SmogResource } from "../rules/combatresources/SmogResource";
 import { VentureResource } from "../rules/combatresources/VentureResource";
-import { CombatRules, DamageCalculationResult } from "../rules/CombatRules";
+import { CombatRules, DamageCalculationResult } from "../rules/CombatRulesHelper";
 import { CombatResources, CombatState, GameState } from "../rules/GameState";
 import { BaseCharacterType } from "../Types";
 import { TransientUiState } from "../ui/TransientUiState";
