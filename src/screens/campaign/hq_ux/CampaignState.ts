@@ -4,7 +4,7 @@ import { PlayableCard } from '../../../gamecharacters/PlayableCard';
 import { CoalCargo } from '../../../gamecharacters/playerclasses/cards/cargo/CoalCargo';
 import { CoffeeCargo } from '../../../gamecharacters/playerclasses/cards/cargo/CoffeeCargo';
 import { SpicyLiteratureCargo } from '../../../gamecharacters/playerclasses/cards/cargo/SpicyLiteratureCargo';
-import { CampaignRules } from '../../../rules/CampaignRules';
+import { CampaignRules } from '../../../rules/CampaignRulesHelper';
 import { GameState } from '../../../rules/GameState';
 import { AbstractTradeRoute, StandardTradeRoute } from './AbstractTradeRoute';
 import { StrategicImprovementCard } from './StrategicImprovementCard';

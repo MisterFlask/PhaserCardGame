@@ -1,4 +1,4 @@
-// src/scenes/CombatScene.ts
+// src/scenes/CombatAndMapScene.ts
 
 import Phaser from 'phaser';
 import BBCodeTextPlugin from 'phaser3-rex-plugins/plugins/bbcodetext-plugin.js';

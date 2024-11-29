@@ -1,5 +1,4 @@
 import { AbstractChoice, AbstractEvent } from "../../events/AbstractEvent";
-import { GameState } from "../../rules/GameState";
 
 class SupportStokersChoice extends AbstractChoice {
     constructor() {
@@ -40,7 +39,6 @@ class MediateChoice extends AbstractChoice {
 
     effect(): void {
         // Small reputation gain with both factions
-        GameState.instance.addGold(25); // Token of appreciation from both sides
     }
 }
 
