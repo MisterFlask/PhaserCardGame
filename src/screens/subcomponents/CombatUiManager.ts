@@ -1,6 +1,7 @@
 // src/subcomponents/CombatUIManager.ts
 
 import Phaser from 'phaser';
+import { AbstractEvent } from '../../events/AbstractEvent';
 import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
 import { AbstractReward } from '../../rewards/AbstractReward';
 import { CardReward } from '../../rewards/CardReward';
@@ -13,6 +14,7 @@ import { DebugMenu } from '../../ui/DebugMenu';
 import { DepthManager } from '../../ui/DepthManager';
 import { default as CombatSceneLayoutUtils, default as LayoutUtils } from '../../ui/LayoutUtils';
 import Menu from '../../ui/Menu';
+import { PhysicalEvent } from '../../ui/PhysicalEvent';
 import { SubtitleManager } from '../../ui/SubtitleManager';
 import { TextBox } from '../../ui/TextBox';
 import { TransientUiState } from '../../ui/TransientUiState';
@@ -40,6 +42,7 @@ class CombatUIManager {
     private debugOverlay!: TextBox;
     public dropZoneHighlight!: Phaser.GameObjects.Image;
     private debugMenu!: DebugMenu;
+    private currentEvent: PhysicalEvent | null = null;
 
     private constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -519,6 +522,22 @@ class CombatUIManager {
 
     private createDebugMenu(): void {
         this.debugMenu = new DebugMenu(this.scene);
+    }
+
+    public showEvent(event: AbstractEvent): void {
+        if (this.currentEvent) {
+            this.currentEvent.destroy();
+        }
+
+        this.currentEvent = new PhysicalEvent(
+            this.scene,
+            event,
+            (nextEvent: AbstractEvent | null) => {
+                if (nextEvent) {
+                    this.showEvent(nextEvent);
+                }
+            }
+        );
     }
 }
 

@@ -346,6 +346,24 @@ export class CombatCardManager {
         this.updateExhaustPileCount();
     }
 
+    public removeEnemyCard(enemyCard: PhysicalCard): void {
+        // Remove from enemy units array
+        this.enemyUnits = this.enemyUnits.filter(card => card !== enemyCard);
+
+        // Fade and scale down animation
+        this.scene.tweens.add({
+            targets: enemyCard.container,
+            alpha: 0,
+            scaleX: 0.1,
+            scaleY: 0.1,
+            duration: 800,
+            ease: 'Power2',
+            onComplete: () => {
+                enemyCard.obliterate();
+            }
+        });
+    }
+
 }
 
 export default CombatCardManager;
