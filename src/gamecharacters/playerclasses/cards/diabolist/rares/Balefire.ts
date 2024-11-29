@@ -6,7 +6,7 @@ import { ExhaustBuff } from "../../../../buffs/playable_card/ExhaustBuff";
 import { BloodPriceBuff } from "../../../../buffs/standard/Bloodprice";
 import { DamageIncreaseOnKill } from "../../../../buffs/standard/DamageIncreaseOnKill";
 import { GiantKiller } from "../../../../buffs/standard/GiantKiller";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
 export class Balefire extends PlayableCard {
@@ -15,23 +15,22 @@ export class Balefire extends PlayableCard {
             name: "Balefire",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
-            rarity: CardRarity.RARE,
+            rarity: EntityRarity.RARE,
         });
-        this.energyCost = 3;
+        this.baseEnergyCost = 4;
         this.baseDamage = 12;
-        this.baseMagicNumber = 2; // Number of times damage is dealt
         this.buffs.push(new BloodPriceBuff(3));
         this.buffs.push(new GiantKiller(1));
         this.buffs.push(new ExhaustBuff())
         this.buffs.push(new DamageIncreaseOnKill(5));
         this.resourceScalings.push({
-            resource: this.powder,
+            resource: this.blood,
             attackScaling: 1,
         });
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage ${this.getDisplayedMagicNumber()} times. Giant Killer. Bloodprice 3. Decrease your max HP by 3. Exhaust.`;
+        return `Deal ${this.getDisplayedDamage()} damage 2 times, plus 1 time for each Curse the target has.`;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
@@ -42,7 +41,7 @@ export class Balefire extends PlayableCard {
             this.dealDamageToTarget(target);
         }
 
-        const owner = this.owner as BaseCharacter;
+        const owner = this.owningCharacter as BaseCharacter;
         if (owner) {
             owner.maxHitpoints -= 3;
             owner.hitpoints = Math.min(owner.hitpoints, owner.maxHitpoints);

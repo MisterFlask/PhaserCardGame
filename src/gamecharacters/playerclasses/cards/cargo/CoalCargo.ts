@@ -1,7 +1,7 @@
 import { TargetingType } from "../../../AbstractCard";
 import { Heavy } from "../../../buffs/playable_card/Heavy";
 import { HellSellValue } from "../../../buffs/standard/HellSellValue";
-import { CardRarity, PlayableCard } from "../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../PlayableCard";
 import { CardType } from "../../../Primitives";
 
 
@@ -11,9 +11,9 @@ export class CoalCargo extends PlayableCard {
             name: "Coal Cargo",
             cardType: CardType.ITEM,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.COMMON,
+            rarity: EntityRarity.COMMON,
         });
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
         this.buffs.push(new HellSellValue(85));
         this.buffs.push(new Heavy());
     }

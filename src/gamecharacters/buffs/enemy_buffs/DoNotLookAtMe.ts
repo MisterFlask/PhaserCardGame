@@ -11,7 +11,7 @@ export class DoNotLookAtMe extends AbstractBuff {
         this.imageName = "hidden-face"; // Replace with actual icon name if available
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "DO NOT LOOK AT ME";
     }
 
@@ -19,14 +19,12 @@ export class DoNotLookAtMe extends AbstractBuff {
         return `Whenever targeted by a card, applies ${this.getStacksDisplayText()} Stress to the owner.`;
     }
 
-    public onAnyCardPlayed(playedCard: PlayableCard, target?: BaseCharacter){
-        if (target && target === this.getOwnerAsCharacter()) {
-            const owner = this.getOwnerAsCharacter();
-            if (owner) {
-                const stressBuff = new Stress(this.stacks);
-                this.actionManager.applyBuffToCharacter(owner, stressBuff);
-                console.log(`${owner.name} received ${this.stacks} Stress from Do Not Look At Me effect`);
-            }
+    public onAnyCardPlayedByAnyone(playedCard: PlayableCard, target?: BaseCharacter){
+        const ownerOfCard = playedCard?.owningCharacter
+        if (ownerOfCard) {
+            const stressBuff = new Stress(this.stacks);
+            this.actionManager.applyBuffToCharacter(ownerOfCard, stressBuff);
+            console.log(`${ownerOfCard.name} received ${this.stacks} Stress from Do Not Look At Me effect`);
         }
     }
 }

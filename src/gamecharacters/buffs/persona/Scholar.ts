@@ -9,15 +9,15 @@ export class Scholar extends AbstractBuff {
         this.isPersonaTrait = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Scholar";
     }
 
     override getDescription(): string {
-        return `At the start of combat, gain ${this.getStacksDisplayText()} Pages.`;
+        return `At the start of combat, gain ${this.getStacksDisplayText()} Ashes.`;
     }
 
     override onCombatStart(): void {
-        this.combatState.combatResources.modifyPages(this.stacks);
+        this.combatState.combatResources.modifyAshes(this.stacks);
     }
 }

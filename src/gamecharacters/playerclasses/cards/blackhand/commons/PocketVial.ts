@@ -3,7 +3,7 @@ import { BaseCharacter } from "../../../../BaseCharacter";
 import { VolatileBuff } from "../../../../buffs/playable_card/VolatileCardBuff";
 import { Burning } from "../../../../buffs/standard/Burning";
 import { Weak } from "../../../../buffs/standard/Weak";
-import { CardRarity } from "../../../../PlayableCard";
+import { EntityRarity } from "../../../../PlayableCard";
 import { PlayableCardWithHelpers } from "../../../../PlayableCardWithHelpers";
 import { CardType } from "../../../../Primitives";
 
@@ -13,11 +13,11 @@ export class PocketVial extends PlayableCardWithHelpers {
             name: "Pocket Vial",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
-            rarity: CardRarity.COMMON,
+            rarity: EntityRarity.COMMON,
         });
         this.baseDamage = 5;
         this.baseMagicNumber = 1;
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
         this.buffs.push(new VolatileBuff());
     }
 
@@ -27,7 +27,7 @@ export class PocketVial extends PlayableCardWithHelpers {
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         if (targetCard) {
-            const burningCount = targetCard.getBuffStacks(new Burning(1).getName());
+            const burningCount = targetCard.getBuffStacks(new Burning(1).getDisplayName());
             const totalDamage = this.getBaseDamageAfterResourceScaling() + burningCount;
             
             this.dealDamageToTarget(targetCard as BaseCharacter);

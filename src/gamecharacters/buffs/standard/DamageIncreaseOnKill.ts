@@ -10,7 +10,7 @@ export class DamageIncreaseOnKill extends AbstractBuff {
         this.stacks = stacks;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Damage Increase On Kill";
     }
 

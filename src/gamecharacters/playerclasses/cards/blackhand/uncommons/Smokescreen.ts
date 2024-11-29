@@ -14,19 +14,19 @@ export class Smokescreen extends PlayableCard {
 		});
 		this.baseMagicNumber = 2;
 		this.baseBlock = 6;
-		this.energyCost = 1;
+		this.baseEnergyCost = 1;
 		this.buffs.push(new ExhaustBuff());
 	}
 
 	override get description(): string {
-		return `Apply ${this.getDisplayedMagicNumber()} Burning to ALL enemies. All party members gain ${this.getDisplayedBlock()} Block, plus 1 for each Burning on the enemy. Exhaust.`;
+		return `All party members gain ${this.getDisplayedBlock()} Block, plus 1 for each Burning on the enemy. Gain ${this.getDisplayedMagicNumber()} Smog.`;
 	}
 	
 	override InvokeCardEffects(): void {
 		let burningCount = 0;
 		this.forEachEnemy(enemy => {
-			burningCount += enemy.getBuffStacks(new Burning(1).getName());
-			this.actionManager.applyBuffToCharacter(enemy as BaseCharacter, new Burning(this.getBaseMagicNumberAfterResourceScaling()), this.owner as BaseCharacter);
+			burningCount += enemy.getBuffStacks(new Burning(1).getDisplayName());
+			this.actionManager.applyBuffToCharacterOrCard(enemy as BaseCharacter, new Burning(this.getBaseMagicNumberAfterResourceScaling()), this.owningCharacter as BaseCharacter);
 		});
 
 		this.forEachAlly(ally => {

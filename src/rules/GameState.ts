@@ -6,10 +6,10 @@ import { AbstractRelic } from '../relics/AbstractRelic';
 import type { AutomatedCharacterType, BaseCharacterType } from '../Types';
 import type { PhysicalCard } from '../ui/PhysicalCard';
 import { AbstractCombatResource } from './combatresources/AbstractCombatResource';
-import { IronResource } from './combatresources/IronResource';
-import { PagesResource } from './combatresources/PagesResource';
+import { Ashes } from './combatresources/AshesResource';
+import { BloodResource } from './combatresources/BloodResource';
+import { MettleResource } from './combatresources/MettleResource';
 import { PluckResource } from './combatresources/PluckResource';
-import { PowderResource } from './combatresources/PowderResource';
 import { SmogResource } from './combatresources/SmogResource';
 import { VentureResource } from './combatresources/VentureResource';
 import { ShopPopulator } from './ShopPopulator';
@@ -39,11 +39,20 @@ export class GameState {
     public shopRelicsForSale: AbstractRelic[] = [];
 
     // player's stuff
-    public cardsInventory: PlayableCard[] = [];
+    public get masterDeckAllCharacters(): readonly PlayableCard[] {
+        return [...this.currentRunCharacters.flatMap(c => c.cardsInMasterDeck)]
+    }
+
+    public get allCardsWithHellSellValue(): readonly PlayableCard[] {
+        return this.masterDeckAllCharacters.filter(card => card.hellSellValue > 0)
+    }
+    
     public relicsInventory: AbstractRelic[] = [];
 
     public surfaceCurrency: number = 200
     public hellCurrency: number = 0
+    public brimstoneDistillate: number = 0
+
     public combatState: CombatState = new CombatState()
 
     // Add tracking for player's current location
@@ -62,10 +71,9 @@ export class GameState {
     }
 
     public getCardsOwnedByCharacter(character: PlayerCharacter): PlayableCard[]{
-        const inventoryCards = this.cardsInventory.filter(card => card.owner?.id === character.id)
         const currentCharacter = this.currentRunCharacters.filter(card => card.id === character.id)
         const currentCharacterCards = currentCharacter.flatMap(c => c.cardsInMasterDeck)
-        return [...inventoryCards, ...currentCharacterCards]
+        return [...currentCharacterCards]
     }
 
     private obliteratePhysicalCard(item: AbstractCard): void {
@@ -76,7 +84,7 @@ export class GameState {
         }
     }
 
-    private obliteratePhysicalCardsForArray(items: (AbstractCard | PlayableCard)[]): void {
+    private obliteratePhysicalCardsForArray(items: readonly (AbstractCard | PlayableCard)[]): void {
         items.forEach(item => this.obliteratePhysicalCard(item));
     }
 
@@ -90,7 +98,7 @@ export class GameState {
         // If you need to handle enemy characters, ensure CombatState has this property
         // this.obliteratePhysicalCardsForArray(this.combatState.enemyCharacters);
 
-        this.obliteratePhysicalCardsForArray(this.cardsInventory);
+        this.obliteratePhysicalCardsForArray(this.masterDeckAllCharacters);
     }
 
     // Roster methods
@@ -115,22 +123,8 @@ export class GameState {
         this.currentRunCharacters = this.currentRunCharacters.filter(c => c !== character);
     }
 
-    public getCurrentRunCharacters(): PlayerCharacter[] {
+    public getCurrentRunCharacters(): readonly PlayerCharacter[] {
         return [...this.currentRunCharacters];
-    }
-
-    // Inventory methods
-    public addToInventory(item: PlayableCard): void {
-        this.cardsInventory.push(item);
-        // Optionally, update UI or perform additional actions
-    }
-
-    public removeFromInventory(item: PlayableCard): void {
-        this.cardsInventory = this.cardsInventory.filter(i => i !== item);
-    }
-
-    public getInventory(): PlayableCard[] {
-        return [...this.cardsInventory];
     }
 
     public rerollShop(): void {
@@ -148,7 +142,6 @@ export class GameState {
         this.roster = [];
         this.currentRunCharacters = [];
         this.shopCardsForSale = [];
-        this.cardsInventory = [];
     }
 
     // Serializer function
@@ -163,7 +156,7 @@ export class GameState {
                 ...char
             })),
             shopItems: this.shopCardsForSale,
-            inventory: this.cardsInventory
+            inventory: this.masterDeckAllCharacters
         };
         return JSON.stringify(serializableState);
     }
@@ -187,14 +180,19 @@ export class GameState {
 
     public addRelic(relic: AbstractRelic, scene: Phaser.Scene): void {
         this.relicsInventory.push(relic);
+        if (!scene){
+            console.error("No scene provided to addRelic")
+            return;
+        }
         scene.events.emit('propagateGameStateChangesToUi');
     }
+
 }
 
 export class CombatState{
 
     // Removed direct property, now using TransientUiState
-    currentDrawPile: PlayableCard[] = []
+    drawPile: PlayableCard[] = []
     currentDiscardPile: PlayableCard[] = []
     currentHand: PlayableCard[] = []
     currentExhaustPile: PlayableCard[] = []
@@ -208,8 +206,8 @@ export class CombatState{
         return [...this.playerCharacters, ...this.enemies];
     }
 
-    get allCardsInAllPilesExceptExhaust(): AbstractCard[] {
-        return [...this.currentDrawPile, ...this.currentDiscardPile, ...this.currentHand];
+    get allCardsInAllPilesExceptExhaust(): PlayableCard[] {
+        return [...this.drawPile, ...this.currentDiscardPile, ...this.currentHand];
     }
 
     combatResources: CombatResources = new CombatResources()
@@ -218,7 +216,7 @@ export class CombatState{
     public maxEnergy: number = 3
         
     getBattleCardLocation = (cardId: string): BattleCardLocation => {
-        if (this.currentDrawPile.some(c => c.id === cardId)) return BattleCardLocation.DrawPile
+        if (this.drawPile.some(c => c.id === cardId)) return BattleCardLocation.DrawPile
         if (this.currentDiscardPile.some(c => c.id === cardId)) return BattleCardLocation.DiscardPile
         if (this.currentHand.some(c => c.id === cardId)) return BattleCardLocation.Hand
         return BattleCardLocation.Unknown
@@ -238,9 +236,9 @@ export class MissionDetails{
 }
 
 export class CombatResources {
-    powder: PowderResource = new PowderResource();
-    iron: IronResource = new IronResource();
-    pages: PagesResource = new PagesResource();
+    powder: BloodResource = new BloodResource();
+    iron: MettleResource = new MettleResource();
+    pages: Ashes = new Ashes();
     pluck: PluckResource = new PluckResource();
     smog: SmogResource = new SmogResource();
     venture: VentureResource = new VentureResource();
@@ -249,11 +247,11 @@ export class CombatResources {
         this.pluck.value += byAmount;
         console.log(`Modified Pluck by ${byAmount}. New value: ${this.pluck.value}`);
     }
-    modifyPages(byAmount: number) {
+    modifyAshes(byAmount: number) {
         this.pages.value += byAmount;
         console.log(`Modified Pages by ${byAmount}. New value: ${this.pages.value}`);
     }
-    modifyIron(byAmount: number) {
+    modifyMettle(byAmount: number) {
         this.iron.value += byAmount;
         console.log(`Modified Iron by ${byAmount}. New value: ${this.iron.value}`);
     }
@@ -265,7 +263,7 @@ export class CombatResources {
         this.smog.value += byAmount;
         console.log(`Modified Smog by ${byAmount}. New value: ${this.smog.value}`);
     }
-    modifyPowder(byAmount: number) {
+    modifyBlood(byAmount: number) {
         this.powder.value += byAmount;
         console.log(`Modified Powder by ${byAmount}. New value: ${this.powder.value}`);
     }

@@ -4,10 +4,10 @@ import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
 export class FrenchTotem extends AutomatedCharacter {
     constructor() {
         super({
-            name: "Totem de Stress",
+            name: "Veil Capacitor",
             portraitName: "Stress Totem",
             maxHitpoints: 5,
-            description: "A small, unsettling totem that emanates an aura of anxiety."
+            description: "A small, unsettling totem.  Probably not worth worrying about."
         });
     }
 

@@ -138,7 +138,7 @@ export class PersonnelPanel extends AbstractHqPanel {
             `Class: ${character.characterClass?.name || 'Unknown'}`,
             `HP: ${character.hitpoints}/${character.maxHitpoints}`,
             `Stress: ${character.stress}`,
-            `Quirks: ${character.buffs.map(buff => buff.getName()).join(', ') || 'None'}`
+            `Quirks: ${character.buffs.map(buff => buff.getDisplayName()).join(', ') || 'None'}`
         ];
 
         details.forEach((detail, index) => {

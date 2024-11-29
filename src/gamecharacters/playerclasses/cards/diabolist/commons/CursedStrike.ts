@@ -3,7 +3,7 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import type { BaseCharacter } from "../../../../BaseCharacter";
 import { Cursed } from "../../../../buffs/standard/Cursed";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
 export class CursedStrike extends PlayableCard {
@@ -12,22 +12,26 @@ export class CursedStrike extends PlayableCard {
             name: "Cursed Strike",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
-            rarity: CardRarity.COMMON,
+            rarity: EntityRarity.COMMON,
         });
         this.baseDamage = 7;
-        this.energyCost = 1;
-        this.baseMagicNumber = 2; // Apply 2 Cursed instead of 1
-        this.rarity = CardRarity.COMMON;
+        this.baseEnergyCost = 1;
+        this.baseMagicNumber = 1; 
+        this.rarity = EntityRarity.COMMON;
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage. Apply 1 Cursed.`;
+        return `Deal ${this.getDisplayedDamage()} damage. Apply ${this.getDisplayedMagicNumber()} Cursed.  If you have >3 Blood: apply 1 more.`;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         if (targetCard) {
             this.dealDamageToTarget(targetCard as BaseCharacter);
-            this.actionManager.applyBuffToCharacter(targetCard as BaseCharacter, new Cursed(1)); // Assuming Cursed takes a number of stacks
+            if (targetCard.hasBuff(new Cursed(1).getDisplayName())) {
+                this.actionManager.applyBuffToCharacterOrCard(targetCard as BaseCharacter, new Cursed(this.getBaseMagicNumberAfterResourceScaling()));
+            }else{
+                this.actionManager.applyBuffToCharacterOrCard(targetCard as BaseCharacter, new Cursed(this.getBaseMagicNumberAfterResourceScaling() + 1));
+            }
         }
     }
 }

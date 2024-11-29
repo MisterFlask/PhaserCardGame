@@ -1,5 +1,5 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { BasicProcs } from "../../../../procs/BasicProcs";
 import { TakeCover } from "../tokens/TakeCover";
@@ -10,9 +10,9 @@ export class Incoming extends PlayableCard {
             name: "Incoming",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.COMMON,
+            rarity: EntityRarity.COMMON,
         });
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
         this.baseMagicNumber = 2; // Number of Take Cover cards to add
     }
 

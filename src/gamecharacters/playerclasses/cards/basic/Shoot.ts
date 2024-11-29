@@ -1,8 +1,9 @@
 import { TargetingType } from "../../../AbstractCard";
 import { BaseCharacter } from "../../../BaseCharacter";
-import { CardRarity, PlayableCard } from "../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../PlayableCard";
 
 export class Shoot extends PlayableCard {
+
     constructor() {
         super({
             name: "Fire Revolver",
@@ -11,8 +12,8 @@ export class Shoot extends PlayableCard {
             targetingType: TargetingType.ENEMY,
         });
         this.baseDamage = 6;
-        this.energyCost = 1;
-        this.rarity = CardRarity.BASIC;
+        this.baseEnergyCost = 1;
+        this.rarity = EntityRarity.BASIC;
     }
 
     override get description(): string {

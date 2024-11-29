@@ -12,7 +12,7 @@ export interface IAbstractCard extends JsonRepresentable {
     portraitName?: string;
     cardType: CardType;
     tooltip: string;
-    owner?: IBaseCharacter;
+    owningCharacter?: IBaseCharacter;
     size: CardSize;
     id: string;
     team: Team;

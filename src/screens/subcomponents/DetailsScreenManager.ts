@@ -23,9 +23,14 @@ export class DetailsScreenManager {
         this.scene.input.keyboard?.on('keyup-SHIFT', this.hideDetails, this);
     }
 
+    // can be overridden for non-combat scenes
+    public findHoveredCard(): PhysicalCard | undefined {
+        return TransientUiState.getInstance().hoveredCard;
+    }
+
     private showDetails(): void {
         this.isVisible = true;
-        console.log('Details screen is now visible; hovered card:', TransientUiState.getInstance().hoveredCard);
+        console.log('Details screen is now visible; hovered card:', this.findHoveredCard());
         this.detailsContainer.setVisible(true);
     }
 
@@ -35,10 +40,11 @@ export class DetailsScreenManager {
         this.detailsContainer.setVisible(false);
     }
 
-    public update(hoveredCard?: PhysicalCard): void {
+    public update(): void {
         if (!this.isVisible) {
             return;
         }
+        var hoveredCard = this.findHoveredCard();
 
         if (!hoveredCard) {
             this.detailsContainer.removeAll(true);
@@ -93,7 +99,7 @@ export class DetailsScreenManager {
             this.detailsContainer.add(buffIcon);
 
             // Add buff name and description
-            const buffText = this.scene.add.text(50, buffY, `${buff.getName()} [${buff.stacks}]: ${buff.getDescription()}`, {
+            const buffText = this.scene.add.text(50, buffY, `${buff.getDisplayName()} [${buff.stacks}]: ${buff.getDescription()}`, {
                 fontSize: '16px',
                 color: '#ffffff',
                 wordWrap: { width: width * 0.25 }
@@ -120,7 +126,7 @@ export class DetailsScreenManager {
     private getEffectiveImage(buff: AbstractBuff): string {
         return this.scene.textures.exists(buff.imageName) 
             ? buff.imageName 
-            : ImageUtils.getDeterministicAbstractPlaceholder(buff.getName());
+            : ImageUtils.getDeterministicAbstractPlaceholder(buff.getDisplayName());
     }
 
     private getEffectiveRandomizedColor(buff: AbstractBuff): number {

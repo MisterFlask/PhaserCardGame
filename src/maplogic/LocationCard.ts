@@ -1,7 +1,9 @@
 // src/cards/LocationCard.ts
 
 import Phaser from 'phaser';
-import { EncounterData, EncounterManager } from '../encounters/Encounters';
+import { EncounterEnhancer } from '../encounters/EncounterEnhancer';
+import { ActSegment, EncounterData, EncounterManager } from '../encounters/Encounters';
+import { Charon } from '../encounters/monsters/special/Charon';
 import { AbstractCard } from '../gamecharacters/AbstractCard';
 import { CardSize, CardType } from '../gamecharacters/Primitives';
 import { GameState } from '../rules/GameState';
@@ -19,6 +21,7 @@ export class LocationCard extends AbstractCard {
     public floor: number = 0;
     public roomNumber: number = 0;
     public segment: number = 0;
+    public backgroundName?: string;
 
     constructor({ name, description, portraitName, tooltip, size, floor, index }: { name: string; description: string; portraitName?: string; tooltip?: string; size: CardSize; floor: number; index: number }) { 
         const fullName = `${name} ${floor}-${index + 1}`;
@@ -40,9 +43,9 @@ export class LocationCard extends AbstractCard {
     initEncounter() {
         const encounter = EncounterManager.getInstance().getRandomEncounterFromActSegmentNumbers(1, this.segment);
         const encounterDescription = `Encounter: ${encounter.enemies.map(e => e.name).join(', ')}`;
-        this.encounter = encounter;
         const fullDescription = `${encounterDescription}`;
         this.description = fullDescription;
+        this.encounter = encounter;
     }
 
     setAdjacent(location: LocationCard) {
@@ -62,6 +65,7 @@ export class LocationCard extends AbstractCard {
     OnLocationSelected(scene: Phaser.Scene): void {
         console.log(`Location ${this.id} selected with encounter: ${this.encounter.enemies.map(e => e.name).join(', ')}`);
         
+
         GameState.getInstance().eliminatePhysicalCardsBetweenScenes();
         scene.scene.start('CombatScene', { encounter: this.encounter });
     }
@@ -79,23 +83,32 @@ export class EntranceCard extends LocationCard {
             index
         });
         this.portraitName = 'entrance-icon';
+        this.portraitTint = 0x00ffff;
     }
 }
 
-export class BossCard extends LocationCard {
+export class BossRoomCard extends LocationCard {
     constructor(floor: number, index: number) {
         super({
             name: 'Boss Room',
             description: 'The final challenge awaits here.',
-            size: CardSize.SMALL,
+            size: CardSize.LARGE,
             floor,
             index
         });
         this.portraitName = 'boss-icon';
+        this.portraitTint = 0x800080;
+    }    
+    override initEncounter(): void {
+        this.encounter = ActSegment.Boss_Act1.encounters[0];
+        const encounterDescription = `Encounter: ${this.encounter.enemies.map(e => e.name).join(', ')}`;
+        const fullDescription = `${encounterDescription}`;
+        this.description = fullDescription;
     }
 }
 
 export class RestSiteCard extends LocationCard {
+
     constructor(floor: number, index: number) {
         super({
             name: 'Rest Site',
@@ -105,6 +118,33 @@ export class RestSiteCard extends LocationCard {
             index
         });
         this.portraitName = 'rest-icon';
+        this.portraitTint = 0xffa500;
+    }
+
+    override OnLocationSelected(scene: Phaser.Scene): void {
+        console.log(`Rest site ${this.id} selected`);
+        scene.events.emit('locationSelected', this);
+    }
+}
+
+
+export class CharonRoomCard extends LocationCard {
+    constructor(floor: number, index: number) {
+        super({
+            name: 'Charon',
+            description: `Incur a debt of 100 Denarians for passage, payable on departure from Hell.`,
+            size: CardSize.SMALL,
+            floor,
+            index
+        });
+        this.portraitName = 'CharonRoom';
+        this.portraitTint = 0x800080;
+    }
+
+    override initEncounter(): void {
+        this.encounter = {
+            enemies: [new Charon()]
+        };
     }
 }
 
@@ -118,6 +158,7 @@ export class NormalRoomCard extends LocationCard {
             index
         });
         this.portraitName = 'room-fight-icon';
+        this.portraitTint = 0xff0000;
     }
 }
 
@@ -131,8 +172,19 @@ export class EliteRoomCard extends LocationCard {
             index
         });
         this.portraitName = 'elite-icon';
+        this.portraitTint = 0x8B0000;
+    }
+
+    override OnLocationSelected(scene: Phaser.Scene): void {
+        console.log(`Location ${this.id} selected with encounter: ${this.encounter.enemies.map(e => e.name).join(', ')}`);
+        
+        this.encounter = EncounterEnhancer.enhanceEliteEncounter(this.encounter);
+        GameState.getInstance().eliminatePhysicalCardsBetweenScenes();
+        scene.scene.start('CombatScene', { encounter: this.encounter });
     }
 }
+
+const shopBackgrounds = ["shop-background-1"];
 
 export class ShopCard extends LocationCard {
     constructor(floor: number, index: number) {
@@ -144,6 +196,8 @@ export class ShopCard extends LocationCard {
             index
         });
         this.portraitName = 'shop-icon';
+        this.portraitTint = 0x00ff00;
+        this.backgroundName = shopBackgrounds[Math.floor(Math.random() * shopBackgrounds.length)];
     }
 
     override OnLocationSelected(scene: Phaser.Scene): void {
@@ -159,12 +213,22 @@ export class TreasureRoomCard extends LocationCard {
     constructor(floor: number, index: number) {
         super({
             name: 'Treasure Room',
-            description: `This is a treasure room on floor ${floor}.`,
+            description: `A mysterious chest awaits...`,
             size: CardSize.SMALL,
             floor,
             index
         });
         this.portraitName = 'treasure-icon';
+        this.portraitTint = 0xFFD700;
+    }
+
+    override OnLocationSelected(scene: Phaser.Scene): void {
+        console.log(`Treasure room ${this.id} selected`);
+        
+        GameState.getInstance().eliminatePhysicalCardsBetweenScenes();
+        SceneChanger.switchToCombatScene({ 
+            encounter: EncounterManager.getInstance().getTreasureEncounter().data 
+        });
     }
 }
 

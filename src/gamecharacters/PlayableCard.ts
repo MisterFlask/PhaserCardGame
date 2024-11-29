@@ -1,8 +1,8 @@
 import { AbstractCombatResource } from "../rules/combatresources/AbstractCombatResource";
-import { IronResource } from "../rules/combatresources/IronResource";
-import { PagesResource } from "../rules/combatresources/PagesResource";
+import { Ashes } from "../rules/combatresources/AshesResource";
+import { BloodResource } from "../rules/combatresources/BloodResource";
+import { MettleResource } from "../rules/combatresources/MettleResource";
 import { PluckResource } from "../rules/combatresources/PluckResource";
-import { PowderResource } from "../rules/combatresources/PowderResource";
 import { SmogResource } from "../rules/combatresources/SmogResource";
 import { VentureResource } from "../rules/combatresources/VentureResource";
 import { CombatRules, DamageCalculationResult } from "../rules/CombatRules";
@@ -18,64 +18,69 @@ import type { AbstractBuff } from "./buffs/AbstractBuff";
 import { IBaseCharacter } from "./IBaseCharacter";
 import { CardSize, CardType } from "./Primitives";
 
-export class CardRarity {
+export class EntityRarity {
     private constructor({
         id,
         weight,
         color,
-        basePrice
+        basePrice,
+        baseCardLevel
     }: {
         id: string;
         weight: number;
         color: number;
         basePrice: number;
+        baseCardLevel: number;
     }) {
         this.id = id;
         this.weight = weight;
         this.color = color;
         this.basePrice = basePrice;
+        this.basePowerLevel = baseCardLevel;
     }
 
     public readonly id: string;
     public readonly weight: number;
     public readonly color: number;
     public readonly basePrice: number;
-
-    static readonly TOKEN = new CardRarity({ id: "TOKEN", weight: 0, color: 0xA0A0A0, basePrice: 0 });
-    static readonly BASIC = new CardRarity({ id: "BASIC", weight: 1, color: 0xA0A0A0, basePrice: 50 });
-    static readonly COMMON = new CardRarity({ id: "COMMON", weight: 2, color: 0xA0A0A0, basePrice: 100 });
-    static readonly UNCOMMON = new CardRarity({ id: "UNCOMMON", weight: 3, color: 0x87CEEB, basePrice: 175 });
-    static readonly RARE = new CardRarity({ id: "RARE", weight: 4, color: 0xDDA0DD, basePrice: 250 });
-    static readonly EPIC = new CardRarity({ id: "EPIC", weight: 5, color: 0xFF69B4, basePrice: 350 });
-    static readonly LEGENDARY = new CardRarity({ id: "LEGENDARY", weight: 6, color: 0xFFD700, basePrice: 500 });
-    static readonly SPECIAL = new CardRarity({ id: "SPECIAL", weight: 7, color: 0xFF4500, basePrice: 400 });
+    public readonly basePowerLevel: number;
+    
+    static readonly TOKEN = new EntityRarity({ id: "TOKEN", weight: 0, color: 0xA0A0A0, basePrice: 25, baseCardLevel: 0 });
+    static readonly BASIC = new EntityRarity({ id: "BASIC", weight: 1, color: 0xA0A0A0, basePrice: 25, baseCardLevel: 0 });
+    static readonly COMMON = new EntityRarity({ id: "COMMON", weight: 2, color: 0xA0A0A0, basePrice: 50, baseCardLevel: 1 });
+    static readonly UNCOMMON = new EntityRarity({ id: "UNCOMMON", weight: 3, color: 0x87CEEB, basePrice: 100, baseCardLevel: 2 });
+    static readonly RARE = new EntityRarity({ id: "RARE", weight: 4, color: 0xDDA0DD, basePrice: 200, baseCardLevel: 3 });
+    static readonly EPIC = new EntityRarity({ id: "EPIC", weight: 5, color: 0xFF69B4, basePrice: 350, baseCardLevel: 4 });
+    static readonly LEGENDARY = new EntityRarity({ id: "LEGENDARY", weight: 6, color: 0xFFD700, basePrice: 500, baseCardLevel: 5 });
+    static readonly SPECIAL = new EntityRarity({ id: "SPECIAL", weight: 7, color: 0xFF4500, basePrice: 400, baseCardLevel: 7 });
+    static readonly BOSS = new EntityRarity({ id: "BOSS", weight: 8, color: 0xFF4500, basePrice: 400, baseCardLevel: 7 });
 
     toString(): string {
         return this.id;
     }
 
-    static fromString(str: string): CardRarity {
-        const value = (CardRarity as any)[str];
+    static fromString(str: string): EntityRarity {
+        const value = (EntityRarity as any)[str];
         if (!value) {
             throw new Error(`Invalid CardRarity: ${str}`);
         }
         return value;
     }
 
-    static getAllRarities(): CardRarity[] {
+    static getAllRarities(): EntityRarity[] {
         return [
-            CardRarity.TOKEN,
-            CardRarity.BASIC,
-            CardRarity.COMMON,
-            CardRarity.UNCOMMON,
-            CardRarity.RARE,
-            CardRarity.EPIC,
-            CardRarity.LEGENDARY,
-            CardRarity.SPECIAL
+            EntityRarity.TOKEN,
+            EntityRarity.BASIC,
+            EntityRarity.COMMON,
+            EntityRarity.UNCOMMON,
+            EntityRarity.RARE,
+            EntityRarity.EPIC,
+            EntityRarity.LEGENDARY,
+            EntityRarity.SPECIAL
         ];
     }
 
-    isAtLeastAsRareAs(other: CardRarity): boolean {
+    isAtLeastAsRareAs(other: EntityRarity): boolean {
         return this.weight >= other.weight;
     }
 }
@@ -84,21 +89,21 @@ export abstract class PlayableCard extends AbstractCard {
     targetingType: TargetingType;
     override typeTag = "PlayableCard";
 
-    rarity: CardRarity; // Added card rarity
+    rarity: EntityRarity; // Added card rarity
     nativeToCharacterClass?: BaseCharacterClass;
     resourceScalings: CardResourceScaling[] = [];
-    constructor({ name, description, portraitName, cardType, tooltip, characterData, size, targetingType, owner, price: surfaceValue, rarity }: { name: string; description?: string; portraitName?: string; cardType?: CardType; tooltip?: string; characterData?: AbstractCard; size?: CardSize; targetingType?: TargetingType; owner?: IBaseCharacter; price?: number; rarity?: CardRarity }) {
+    constructor({ name, description, portraitName, cardType, tooltip, characterData, size, targetingType, owner, price: surfaceValue, rarity }: { name: string; description?: string; portraitName?: string; cardType?: CardType; tooltip?: string; characterData?: AbstractCard; size?: CardSize; targetingType?: TargetingType; owner?: IBaseCharacter; price?: number; rarity?: EntityRarity }) {
         super({ name, description: description ?? "_", portraitName, cardType, tooltip, characterData, size });
         this.targetingType = targetingType ?? TargetingType.ENEMY;
-        this.owner = owner as PlayerCharacter;
-        this.rarity = rarity ?? CardRarity.COMMON;
+        this.owningCharacter = owner as PlayerCharacter;
+        this.rarity = rarity ?? EntityRarity.COMMON;
         this.surfacePurchaseValue = surfaceValue ?? this.rarity.basePrice;
         this.hellPurchaseValue = this.rarity.basePrice;
-        this.cardType = cardType ?? CardType.NON_PLAYABLE;
+        this.cardType = cardType ?? CardType.SKILL;
     }
 
     withOwner(owner: PlayerCharacter): this {
-        this.owner = owner;
+        this.owningCharacter = owner;
         return this;
     }
 
@@ -159,7 +164,7 @@ export abstract class PlayableCard extends AbstractCard {
      * DO NOT OVERRIDE.
      */
     public ownedBy(owner: PlayerCharacter): this {
-        this.owner = owner;
+        this.owningCharacter = owner;
         return this;
     }
 
@@ -198,11 +203,11 @@ export abstract class PlayableCard extends AbstractCard {
         return this.combatResources.pluck;
     }
 
-    get pages(): PagesResource {
+    get ashes(): Ashes {
         return this.combatResources.pages;
     }
 
-    get iron(): IronResource {
+    get mettle(): MettleResource {
         return this.combatResources.iron;
     }
 
@@ -214,22 +219,22 @@ export abstract class PlayableCard extends AbstractCard {
         return this.combatResources.smog;
     }
 
-    get powder(): PowderResource {
+    get blood(): BloodResource {
         return this.combatResources.powder;
     }
 
     /**
      * DO NOT OVERRIDE.
      */
-    protected dealDamageToTarget(targetCard?: AbstractCard, callback?: (damageResult: DamageCalculationResult) => void): void {
+    protected dealDamageToTarget(targetCard?: AbstractCard, baseDamageOverride?: number, callback?: (damageResult: DamageCalculationResult) => void): void {
         if (!(targetCard instanceof BaseCharacter)) {
             return;
         }
         if (targetCard) {
             this.actionManager.dealDamage({
-                baseDamageAmount: this.getBaseDamageAfterResourceScaling(),
+                baseDamageAmount: baseDamageOverride ?? this.getBaseDamageAfterResourceScaling(),
                 target: targetCard,
-                sourceCharacter: this.owner,
+                sourceCharacter: this.owningCharacter,
                 fromAttack: true,
                 sourceCard: this,
                 callback: callback
@@ -255,7 +260,7 @@ export abstract class PlayableCard extends AbstractCard {
                 blockTargetCharacter: targetCard,
                 baseBlockValue: this.getBaseBlockAfterResourceScaling(),
                 appliedViaPlayableCard: this,
-                blockSourceCharacter: this.owner
+                blockSourceCharacter: this.owningCharacter
             });
         }
     }    
@@ -288,11 +293,11 @@ export abstract class PlayableCard extends AbstractCard {
      * DO NOT OVERRIDE.
      */
     public getDisplayedBlock(targetedCharacterIfAny?: IBaseCharacter): string {
-        if (!this.owner) {
-            return this.getBaseBlockAfterResourceScaling().toString();
+        if (!this.owningCharacter) {
+            return "[color=cyan]" + this.getBaseBlockAfterResourceScaling().toString() + "[/color]";
         }
 
-        return CombatRules.calculateBlockSentToCharacterByCard(this, this.owner as IBaseCharacter, targetedCharacterIfAny as IBaseCharacter).toString();
+        return "[color=cyan]" + CombatRules.calculateBlockSentToCharacterByCard(this, this.owningCharacter as IBaseCharacter, targetedCharacterIfAny as IBaseCharacter).toString() + "[/color]";
     }
     /**
      * DO NOT OVERRIDE.
@@ -340,8 +345,8 @@ export abstract class PlayableCard extends AbstractCard {
      * DO NOT OVERRIDE.
      */
     public getDisplayedDamage(selectedCharacter?: IBaseCharacter): string {
-        if (!this.owner) {
-            return this.getBaseDamageAfterResourceScaling().toString();
+        if (!this.owningCharacter) {
+            return "[color=red]" + this.getBaseDamageAfterResourceScaling().toString() + "[/color]";
         }
 
         var targetedCharacterIfAny = selectedCharacter ?? this.hoveredCharacter;
@@ -349,18 +354,22 @@ export abstract class PlayableCard extends AbstractCard {
         const damageCalcResult = CombatRules.calculateDamage({
             baseDamageAmount: this.getBaseDamageAfterResourceScaling(),
             target: targetedCharacterIfAny,
-            sourceCharacter: this.owner,
+            sourceCharacter: this.owningCharacter,
             sourceCard: this,
             fromAttack: true
         });
 
         let totalDamage = damageCalcResult.totalDamage;
 
-        return totalDamage.toString();
+        return "[color=red]" + totalDamage.toString() + "[/color]";
+    }
+
+    public get energyCost(): number {
+        return this.baseEnergyCost + this.buffs.reduce((acc, buff) => acc + buff.energyCostModifier(), 0);
     }
 
     public getDisplayedMagicNumber(targetedCharacterIfAny?: IBaseCharacter): string {
-        return this.getBaseMagicNumberAfterResourceScaling().toString();
+        return "[color=lightgreen]" + this.getBaseMagicNumberAfterResourceScaling().toString() + "[/color]";
     }
 
     abstract InvokeCardEffects(targetCard?: AbstractCard): void;
@@ -425,6 +434,9 @@ export abstract class PlayableCard extends AbstractCard {
         this.physicalCard?.setGlow(false);
     }
 
+    initialize(): void {
+        this.buffs.forEach(buff => buff.moveToMainDescription = true);
+    }
 }
 
 export interface CardResourceScaling {

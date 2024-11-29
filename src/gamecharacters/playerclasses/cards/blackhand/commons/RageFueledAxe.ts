@@ -2,6 +2,7 @@
 
 import { TargetingType } from '../../../../AbstractCard';
 import { BaseCharacter } from '../../../../BaseCharacter';
+import { Burning } from '../../../../buffs/standard/Burning';
 import { StressReliefFinisher } from '../../../../buffs/standard/StressReliefFinisher';
 import { PlayableCard } from '../../../../PlayableCard';
 
@@ -13,16 +14,16 @@ export class RageFueledAxe extends PlayableCard {
       targetingType: TargetingType.ENEMY,
     });
     this.baseDamage = 8;
-    this.energyCost = 1;
+    this.baseEnergyCost = 1;
     this.buffs.push(new StressReliefFinisher());
   }
 
   override get description(): string {
-    return `Deal ${this.getDisplayedDamage()} damage.  Deals more damage for each Burning on the target.`;
+    return `Deal ${this.getDisplayedDamage()} damage.  Deals 1 more damage for each Burning on the target.`;
   }
 
   override InvokeCardEffects(target?: BaseCharacter): void {
-    this.dealDamageToTarget(target);
+    this.dealDamageToTarget(target, this.getBaseDamageAfterResourceScaling() + (target?.getBuffStacks(new Burning().getDisplayName() )?? 0));
   }
 
 }

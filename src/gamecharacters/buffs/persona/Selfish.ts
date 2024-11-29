@@ -10,7 +10,7 @@ export class Selfish extends AbstractBuff {
         this.isPersonaTrait = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Selfish";
     }
 

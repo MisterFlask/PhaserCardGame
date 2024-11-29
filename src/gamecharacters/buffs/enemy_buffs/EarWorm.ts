@@ -1,7 +1,7 @@
 import { GameState } from "../../../rules/GameState";
 import { ActionManager } from "../../../utils/ActionManager";
 import { AbstractCard, TargetingType } from "../../AbstractCard";
-import { CardRarity, PlayableCard } from "../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../PlayableCard";
 import { CardType } from "../../Primitives";
 import { AbstractBuff } from "../AbstractBuff";
 
@@ -13,7 +13,7 @@ export class EarWorm extends AbstractBuff {
         this.imageName = "ear-worm"; // Replace with actual icon name if available
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Ear Worm";
     }
 
@@ -46,12 +46,12 @@ export class EarWormCard extends PlayableCard {
             name: "Ear Worm",
             cardType: CardType.NON_PLAYABLE,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.COMMON,
+            rarity: EntityRarity.COMMON,
         });
         this.baseDamage = 0;
         this.baseBlock = 0;
         this.baseMagicNumber = 1;
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
         this.buffs.push(new EarWorm(this.baseMagicNumber));
     }
 

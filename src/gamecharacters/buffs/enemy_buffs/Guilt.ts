@@ -10,7 +10,7 @@ export class Guilt extends AbstractBuff {
         this.isDebuff = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Guilt";
     }
 
@@ -18,8 +18,8 @@ export class Guilt extends AbstractBuff {
         return `Whenever a card with cost >2 is played, exhaust ${this.getStacksDisplayText()} card(s) from your discard pile.`;
     }
 
-    override onAnyCardPlayed(playedCard: PlayableCard, target?: BaseCharacter): void {
-        if (playedCard.energyCost > 2) {
+    override onAnyCardPlayedByAnyone(playedCard: PlayableCard, target?: BaseCharacter): void {
+        if (playedCard.baseEnergyCost > 2) {
             const gameState = GameState.getInstance();
             const discardPile = gameState.combatState.currentDiscardPile;
             

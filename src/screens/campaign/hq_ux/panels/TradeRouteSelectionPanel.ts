@@ -87,7 +87,7 @@ export class TradeRouteSelectionPanel extends AbstractHqPanel {
                 y: this.scene.scale.height * (0.3 + index * 0.1),
                 width: 300,
                 height: 40,
-                text: `${modifier.getName()}: ${modifier.getDescription()}`,
+                text: `${modifier.getDisplayName()}: ${modifier.getDescription()}`,
                 style: { fontSize: '16px', color: '#ffffff' },
                 fillColor: 0x333333
             });

@@ -1,6 +1,6 @@
 import { AbstractCard, TargetingType } from '../../../../AbstractCard';
 import { IBaseCharacter } from '../../../../IBaseCharacter';
-import { CardRarity } from '../../../../PlayableCard';
+import { EntityRarity } from '../../../../PlayableCard';
 import { PlayableCardWithHelpers } from '../../../../PlayableCardWithHelpers';
 import { CardType } from '../../../../Primitives';
 import { Burning } from '../../../../buffs/standard/Burning';
@@ -12,15 +12,15 @@ export class AndThenHeExploded extends PlayableCardWithHelpers {
             name: "And Then He Exploded",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
-            rarity: CardRarity.UNCOMMON,
+            rarity: EntityRarity.UNCOMMON,
         });
         this.baseDamage = 8;
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
         this.buffs.push(new ExplosiveFinishCardBuff(10));
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage. If the target has Burning, do it again. Fatal: all enemies gain 10 Burning.`;
+        return `Deal ${this.getDisplayedDamage()} damage.`;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
@@ -31,7 +31,7 @@ export class AndThenHeExploded extends PlayableCardWithHelpers {
 
         this.dealDamageToTarget(targetCard);
 
-        if (target.hasBuff(new Burning(1).getName())) {
+        if (target.hasBuff(new Burning(1).getDisplayName())) {
             this.dealDamageToTarget(targetCard);
         }
     }

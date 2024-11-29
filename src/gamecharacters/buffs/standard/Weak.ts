@@ -1,7 +1,7 @@
 import { AbstractBuff } from "../AbstractBuff";
 
 export class Weak extends AbstractBuff {
-    override getName(): string {
+    override getDisplayName(): string {
         return "Weak";
     }
 

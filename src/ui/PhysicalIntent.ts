@@ -3,6 +3,7 @@ import { AbstractIntent } from "../gamecharacters/AbstractIntent";
 import { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { JsonRepresentable } from "../interfaces/JsonRepresentable";
 import { IntentEmitter } from "../utils/IntentEmitter";
+import { TooltipAttachment } from "./TooltipAttachment";
 import { TransientUiState } from './TransientUiState';
 
 export class PhysicalIntent implements JsonRepresentable {
@@ -15,7 +16,7 @@ export class PhysicalIntent implements JsonRepresentable {
     private image: Phaser.GameObjects.Image;
     private alwaysDisplayedIntentText: Phaser.GameObjects.Text;
     private transientUiState = TransientUiState.getInstance();
-    private tooltipText: Phaser.GameObjects.Text;
+    private tooltipAttachment: TooltipAttachment;
 
     constructor(scene: Scene, intent: AbstractIntent, x: number, y: number) {
         this.scene = scene;
@@ -25,6 +26,7 @@ export class PhysicalIntent implements JsonRepresentable {
         
         this.image = this.scene.add.image(0, 0, intent.imageName);
         this.image.setDisplaySize(PhysicalIntent.WIDTH, PhysicalIntent.HEIGHT);
+        this.image.setTint(intent.iconTint);
         
         this.alwaysDisplayedIntentText = this.scene.add.text(0, PhysicalIntent.HEIGHT / 2, 
             intent.displayText(), 
@@ -32,25 +34,19 @@ export class PhysicalIntent implements JsonRepresentable {
         );
         this.alwaysDisplayedIntentText.setOrigin(0.5);
         
-        this.tooltipText = this.scene.add.text(0, -PhysicalIntent.HEIGHT, '', 
-            { 
-                fontSize: '16px', 
-                color: '#ffffff',
-                backgroundColor: '#000000',
-                padding: { x: 5, y: 5 },
-                wordWrap: { width: 200 }
-            }
-        );
-        this.tooltipText.setOrigin(0.5, 1);
-        this.tooltipText.setVisible(false);
-        
-        this.container.add([this.image, this.alwaysDisplayedIntentText, this.tooltipText]);
+        this.container.add([this.image, this.alwaysDisplayedIntentText]);
         
         // Set interactive for the container to detect pointer events
         this.container.setSize(PhysicalIntent.WIDTH, PhysicalIntent.HEIGHT)
             .setInteractive({ useHandCursor: true })
             .on('pointerover', this.onPointerOver, this)
             .on('pointerout', this.onPointerOut, this);
+
+        this.tooltipAttachment = new TooltipAttachment({
+            scene: this.scene,
+            container: this.container,
+            tooltipText: this.intent.tooltipText(),
+        });
         
         this.update();
     }
@@ -59,10 +55,6 @@ export class PhysicalIntent implements JsonRepresentable {
         console.log(`Pointer over intent: ${this.intent.displayText()}`);
         this.transientUiState.setHoveredIntent(this);
         IntentEmitter.getInstance().emitIntentHover(this);
-        
-        // Show and update tooltip
-        this.tooltipText.setText(this.intent.tooltipText());
-        this.tooltipText.setVisible(true);
     }
 
     private onPointerOut(): void {
@@ -71,28 +63,19 @@ export class PhysicalIntent implements JsonRepresentable {
             this.transientUiState.setHoveredIntent(undefined);
         }
         IntentEmitter.getInstance().emitIntentHoverEnd(this);
-        
-        // Hide tooltip
-        this.tooltipText.setVisible(false);
     }
 
     update(): void {
         this.image.setTexture(this.intent.imageName);
         this.alwaysDisplayedIntentText.setText(this.intent.displayText());
-        // Update tooltip text if it's visible
-        if (this.tooltipText.visible) {
-            this.tooltipText.setText(this.intent.tooltipText());
-        }
+        this.tooltipAttachment.updateText(this.intent.tooltipText());
     }
 
     updateIntent(newIntent: AbstractIntent): void {
         this.intent = newIntent;
         this.image.setTexture(this.intent.imageName);
         this.alwaysDisplayedIntentText.setText(this.intent.displayText());
-        // Update tooltip text if it's visible
-        if (this.tooltipText.visible) {
-            this.tooltipText.setText(this.intent.tooltipText());
-        }
+        this.tooltipAttachment.updateText(this.intent.tooltipText());
     }
 
     setPosition(x: number, y: number): void {
@@ -100,6 +83,7 @@ export class PhysicalIntent implements JsonRepresentable {
     }
 
     destroy(): void {
+        this.tooltipAttachment.destroy();
         this.container.destroy();
     }
 

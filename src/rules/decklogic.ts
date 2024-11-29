@@ -47,7 +47,7 @@ export class DeckLogic {
     const drawnCards: PlayableCard[] = [];
 
     for (let i = 0; i < count; i++) {
-      if (combatState.currentDrawPile.length === 0) {
+      if (combatState.drawPile.length === 0) {
         if (combatState.currentDiscardPile.length === 0) {
           console.warn('No more cards to draw.');
           break;
@@ -57,8 +57,8 @@ export class DeckLogic {
         shuffledCards.forEach(card => DeckLogic.moveCardToPile(card, PileName.Draw));
       }
 
-      if (combatState.currentDrawPile.length > 0) {
-        const drawnCard = combatState.currentDrawPile[combatState.currentDrawPile.length - 1];
+      if (combatState.drawPile.length > 0) {
+        const drawnCard = combatState.drawPile[combatState.drawPile.length - 1];
         DeckLogic.moveCardToPile(drawnCard, PileName.Hand);
         drawnCards.push(drawnCard);
       } else {
@@ -80,7 +80,7 @@ export class DeckLogic {
       switch (pile) {
           case PileName.Draw:
               this.removeCardFromAllPiles(card);
-              combatState.currentDrawPile.push(card);
+              combatState.drawPile.push(card);
               break;
           case PileName.Discard:
               this.removeCardFromAllPiles(card);
@@ -103,7 +103,7 @@ export class DeckLogic {
     const gameState = GameState.getInstance();
     const combatState = gameState.combatState;
 
-    combatState.currentDrawPile = combatState.currentDrawPile.filter(c => c !== card);
+    combatState.drawPile = combatState.drawPile.filter(c => c !== card);
     combatState.currentDiscardPile = combatState.currentDiscardPile.filter(c => c !== card);
     combatState.currentHand = combatState.currentHand.filter(c => c !== card);
   }

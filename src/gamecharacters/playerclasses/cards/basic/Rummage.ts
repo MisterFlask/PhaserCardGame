@@ -8,7 +8,7 @@ export class Rummage extends PlayableCard {
       portraitName: 'rummage',
       targetingType: TargetingType.NO_TARGETING,
     });
-    this.energyCost = 1;
+    this.baseEnergyCost = 1;
   }
 
   override get description(): string {

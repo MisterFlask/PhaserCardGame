@@ -1,3 +1,4 @@
+import { TextGlyphs } from '../../text/TextGlyphs';
 import { ActionManager } from '../../utils/ActionManager';
 import { AbstractCombatResource } from './AbstractCombatResource';
 
@@ -6,7 +7,8 @@ export class VentureResource extends AbstractCombatResource {
         super(
             "Venture",
             "Spend 1 Venture: Draw a card",
-            'venture_icon'
+            'venture_icon',
+            TextGlyphs.getInstance().ventureIcon
         );
         this.tint = 0xFFD700;
     }

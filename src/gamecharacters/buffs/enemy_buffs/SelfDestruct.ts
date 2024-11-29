@@ -11,7 +11,7 @@ export class SelfDestruct extends AbstractBuff {
         this.showSecondaryStacks = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Self Destruct";
     }
     override getDescription(): string {

@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { ShopGuy } from '../../encounters/Encounters';
 import { AbstractCard, PriceContext } from '../../gamecharacters/AbstractCard';
 import { BaseCharacter } from '../../gamecharacters/BaseCharacter';
+import { PlayerCharacter } from '../../gamecharacters/BaseCharacterClass';
 import { PlayableCard } from '../../gamecharacters/PlayableCard';
 import { AbstractRelic } from '../../relics/AbstractRelic';
 import { GameState } from '../../rules/GameState';
@@ -9,6 +10,7 @@ import { DepthManager } from '../../ui/DepthManager';
 import { ShopCardPanel } from '../../ui/ShopCardPanel';
 import { ShopRelicPanel } from '../../ui/ShopRelicPanel';
 import { TextBox } from '../../ui/TextBox';
+import { TransientUiState } from '../../ui/TransientUiState';
 import { UIContext, UIContextManager } from '../../ui/UIContextManager';
 import { ActionManagerFetcher } from '../../utils/ActionManagerFetcher';
 import { CampaignBriefStatus } from './CampaignBriefStatus';
@@ -24,6 +26,12 @@ export class ShopOverlay {
     private shopRelicPanels: ShopRelicPanel[] = [];
     private readonly BASE_PANEL_DEPTH = DepthManager.getInstance().SHOP_OVERLAY;
     private campaignBriefStatus: CampaignBriefStatus;
+    private shopCardsOutline!: Phaser.GameObjects.Rectangle;
+    private inventoryOutline!: Phaser.GameObjects.Rectangle;
+    private relicsOutline!: Phaser.GameObjects.Rectangle;
+    private debugOutlinesVisible: boolean = false;
+    private readonly SHOP_BASE_DEPTH = DepthManager.getInstance().SHOP_OVERLAY;
+    private readonly HOVER_DEPTH_BOOST = 1000;
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -35,6 +43,9 @@ export class ShopOverlay {
         this.campaignBriefStatus = new CampaignBriefStatus(scene);
         
         this.createOverlay();
+        
+        // Add keyboard listener for Control key
+        this.scene.input?.keyboard?.on('keydown-CTRL', this.toggleDebugOutlines, this);
     }
 
     private createOverlay(): void {
@@ -47,8 +58,26 @@ export class ShopOverlay {
         this.campaignBriefStatus.setPosition(width / 2, title.y + title.height + 30);
         title.setOrigin(0.5);
 
-        this.shopItemsContainer = this.scene.add.container(50, 100);
-        this.inventoryContainer = this.scene.add.container(width - 300, 100);
+        // Create debug outlines for each section - initially invisible
+        this.shopCardsOutline = this.scene.add.rectangle(50, 100, 600, height - 150, 0xff0000, 0.2);
+        this.shopCardsOutline.setStrokeStyle(2, 0xff0000);
+        this.shopCardsOutline.setOrigin(0, 0);
+        this.shopCardsOutline.setVisible(false);
+
+        this.inventoryOutline = this.scene.add.rectangle(width / 2 - 200, 200, 600, height - 250, 0x00ff00, 0.2);
+        this.inventoryOutline.setStrokeStyle(2, 0x00ff00);
+        this.inventoryOutline.setOrigin(0, 0);
+        this.inventoryOutline.setVisible(false);
+
+        this.relicsOutline = this.scene.add.rectangle(width - 400, 100, 250, height - 150, 0x0000ff, 0.2);
+        this.relicsOutline.setStrokeStyle(2, 0x0000ff);
+        this.relicsOutline.setOrigin(0, 0);
+        this.relicsOutline.setVisible(false);
+
+        this.shopItemsContainer = this.scene.add.container(50, 100)
+            .setDepth(this.SHOP_BASE_DEPTH);
+        this.inventoryContainer = this.scene.add.container(width / 2 - 200, 200)
+            .setDepth(this.SHOP_BASE_DEPTH);
 
         const closeButton = new TextBox({
             scene: this.scene,
@@ -61,10 +90,19 @@ export class ShopOverlay {
             textBoxName: 'closeButton'
         });
 
-        // Use the new makeInteractive method
         closeButton.makeInteractive(this.hide.bind(this));
 
-        this.overlay.add([background, title, this.shopItemsContainer, this.inventoryContainer, closeButton, this.campaignBriefStatus]);
+        this.overlay.add([
+            background, 
+            this.shopCardsOutline,
+            this.inventoryOutline,
+            this.relicsOutline,
+            title, 
+            this.shopItemsContainer, 
+            this.inventoryContainer, 
+            closeButton, 
+            this.campaignBriefStatus
+        ]);
 
         this.populatePurchasableShopCards();
         this.populatePurchasableShopRelics();
@@ -74,7 +112,7 @@ export class ShopOverlay {
     private populatePurchasableShopRelics(): void {
         const { width, height } = this.scene.scale;
 
-        const gridColumns = 3;
+        const gridColumns = 2;
         const verticalSpacing = 122;
         const horizontalSpacing = 122;
         
@@ -145,7 +183,6 @@ export class ShopOverlay {
             for (let col = 0; col < gridColumns; col++) {
                 const index = row * gridColumns + col;
                 
-                // Only create a panel if there's an item available
                 if (index < shopItems.length) {
                     const item = shopItems[index];
                     const panel = new ShopCardPanel(
@@ -154,11 +191,22 @@ export class ShopOverlay {
                         startY + row * verticalSpacing, 
                         item, 
                         true, 
-                        this.buyItem.bind(this), 
+                        this.buyCard.bind(this), 
                         PriceContext.HELL_BUY
                     );
                     this.shopItemsContainer.add(panel);
-                    panel.setDepth(this.BASE_PANEL_DEPTH);
+                    
+                    panel.on('pointerover', () => {
+                        this.shopItemsContainer.setDepth(this.SHOP_BASE_DEPTH + this.HOVER_DEPTH_BOOST);
+                        panel.setDepth(DepthManager.getInstance().SHOP_CARD_HOVER);
+                        TransientUiState.getInstance().hoveredCard = panel.physicalCard;
+                    });
+                    
+                    panel.on('pointerout', () => {
+                        this.shopItemsContainer.setDepth(this.SHOP_BASE_DEPTH);
+                        panel.setDepth(this.BASE_PANEL_DEPTH);
+                        TransientUiState.getInstance().hoveredCard = undefined;
+                    });
                     
                     this.shopItemPanels.push(panel);
                 }
@@ -167,22 +215,40 @@ export class ShopOverlay {
     }
 
     private populateSellableInventory(): void {
-        const inventory = GameState.getInstance().cardsInventory;
+        const inventory = GameState.getInstance().allCardsWithHellSellValue;
+        
+        const gridColumns = 3;
+        const horizontalSpacing = 200;
+        const verticalSpacing = 250;
+        
         inventory.forEach((item, index) => {
-
             if (item.hellSellValue > 0) {
-                const panel = new ShopCardPanel(this.scene, 0, index * 200 + 100, item, false, this.sellItem.bind(this), PriceContext.HELL_SELL);
-                this.inventoryContainer.add(panel); // Changed from panel.container to panel
-
+                const row = Math.floor(index / gridColumns);
+                const col = index % gridColumns;
+                
+                const panel = new ShopCardPanel(
+                    this.scene, 
+                    col * horizontalSpacing, 
+                    row * verticalSpacing + 100, 
+                    item, 
+                    false, 
+                    this.sellItem.bind(this), 
+                    PriceContext.HELL_SELL
+                );
+                
+                this.inventoryContainer.add(panel);
                 panel.setDepth(this.BASE_PANEL_DEPTH);
                 
-                // Add hover handlers
-                panel.on('pointerover', () => { // Updated to use container's event
+                panel.on('pointerover', () => {
+                    this.inventoryContainer.setDepth(this.SHOP_BASE_DEPTH + this.HOVER_DEPTH_BOOST);
                     panel.setDepth(DepthManager.getInstance().SHOP_CARD_HOVER);
+                    TransientUiState.getInstance().hoveredCard = panel.physicalCard;
                 });
                 
-                panel.on('pointerout', () => { // Updated to use container's event
+                panel.on('pointerout', () => {
+                    this.inventoryContainer.setDepth(this.SHOP_BASE_DEPTH);
                     panel.setDepth(this.BASE_PANEL_DEPTH);
+                    TransientUiState.getInstance().hoveredCard = undefined;
                 });
                 
                 this.inventoryItemPanels.push(panel);
@@ -191,12 +257,20 @@ export class ShopOverlay {
     }
 
     private getShopItems(): PlayableCard[] {
-        // This method should be implemented to return the list of items for sale
-        // For now, we'll return an array with three Rummage cards
-        return GameState.getInstance().shopCardsForSale;
+        var cards = GameState.getInstance().shopCardsForSale;
+
+        // assign each card to a random character of the appropriate class, or if no such character exists, assign it to a random player character
+        cards.forEach(card => {
+            var character = GameState.getInstance().currentRunCharacters.find((c: PlayerCharacter) => c.characterClass === card.nativeToCharacterClass);
+            if (!character) {
+                character = GameState.getInstance().currentRunCharacters[Math.floor(Math.random() * GameState.getInstance().currentRunCharacters.length)];
+            }
+            card.owningCharacter = character;
+        });
+        return cards;
     }
 
-    private buyItem(item: PlayableCard): void {
+    private buyCard(item: PlayableCard): void {
         // Implement buying logic here
         console.log(`Buying ${item.name}`);
         // remove from shop
@@ -232,7 +306,7 @@ export class ShopOverlay {
     private sellItem(item: PlayableCard): void {
         // Implement selling logic here
         console.log(`Selling ${item.name}`);
-        ActionManagerFetcher.getActionManager().sellItemForHellCurrency(item);
+        ActionManagerFetcher.getActionManager().sellItemForBrimstoneDistillate(item);
         
         // After selling, refresh the shop and inventory
         this.refreshShop();
@@ -289,5 +363,17 @@ export class ShopOverlay {
             console.log('Shop clicked');
             this.toggle();
         }
+    }
+
+    private toggleDebugOutlines(): void {
+        this.debugOutlinesVisible = !this.debugOutlinesVisible;
+        this.shopCardsOutline.setVisible(this.debugOutlinesVisible);
+        this.inventoryOutline.setVisible(this.debugOutlinesVisible);
+        this.relicsOutline.setVisible(this.debugOutlinesVisible);
+    }
+
+    public destroy(): void {
+        // Clean up keyboard listener when overlay is destroyed
+        this.scene.input?.keyboard?.off('keydown-CTRL', this.toggleDebugOutlines, this);
     }
 }

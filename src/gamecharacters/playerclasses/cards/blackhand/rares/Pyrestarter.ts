@@ -16,7 +16,7 @@ export class Pyrestarter extends PlayableCard {
         });
         this.baseBlock = 6;
         this.baseMagicNumber = 3;
-        this.energyCost = 2;
+        this.baseEnergyCost = 2;
     }
 
     override get description(): string {
@@ -26,7 +26,7 @@ export class Pyrestarter extends PlayableCard {
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         this.forEachAlly(ally => {
             this.applyBlockToTarget(ally);
-            this.actionManager.applyBuffToCharacter(ally, new PyrestarterBuff(this.getBaseMagicNumberAfterResourceScaling()));
+            this.actionManager.applyBuffToCharacterOrCard(ally, new PyrestarterBuff(this.getBaseMagicNumberAfterResourceScaling()));
         });
     }
 }
@@ -39,7 +39,7 @@ export class PyrestarterBuff extends AbstractBuff {
         this.stackable = false;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Pyrestarter Effect";
     }
 
@@ -47,10 +47,10 @@ export class PyrestarterBuff extends AbstractBuff {
         return `Attacks apply ${this.getStacksDisplayText()} Burning. Removed at end of turn.`;
     }
 
-    override onOwnerStriking(struckUnit: IBaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: any): void {
+    override onOwnerStriking_CannotModifyDamage(struckUnit: IBaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: any): void {
         if (struckUnit.team !== this.getOwnerAsCharacter()?.team) {
             
-                ActionManager.getInstance().applyBuffToCharacter(
+                ActionManager.getInstance().applyBuffToCharacterOrCard(
                     struckUnit as BaseCharacter,
                     new Burning(this.stacks),
                     this.getOwnerAsCharacter()!

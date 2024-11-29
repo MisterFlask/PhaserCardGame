@@ -51,6 +51,7 @@ export default class Menu {
         // Initially hide the menu
         this.container.setVisible(false);
         this.container.setAlpha(0);
+        this.container.setScrollFactor(0);
     }
 
     public updatePosition(x: number, y: number): void {
@@ -185,7 +186,7 @@ export default class Menu {
     private showDeckContents(): void {
         const gameState = GameState.getInstance();
         const deckContents = {
-            drawPile: gameState.combatState.currentDrawPile.map(card => card.createJsonRepresentation()),
+            drawPile: gameState.combatState.drawPile.map(card => card.createJsonRepresentation()),
             hand: gameState.combatState.currentHand.map(card => card.createJsonRepresentation()),
             discardPile: gameState.combatState.currentDiscardPile.map(card => card.createJsonRepresentation())
         };

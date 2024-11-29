@@ -4,7 +4,6 @@ import Phaser from 'phaser';
 import { AbstractCard, Team, UiCard } from '../../gamecharacters/AbstractCard';
 import { AutomatedCharacter } from '../../gamecharacters/AutomatedCharacter';
 import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
-import type { PlayableCard } from '../../gamecharacters/PlayableCard';
 import { GameState } from '../../rules/GameState';
 import { DepthManager } from '../../ui/DepthManager';
 import CombatSceneLayoutUtils from '../../ui/LayoutUtils';
@@ -12,12 +11,40 @@ import { PhysicalCard } from '../../ui/PhysicalCard';
 import { CardGuiUtils } from '../../utils/CardGuiUtils';
 
 export class CombatCardManager {
+    onCombatEnd() {
+        // Fade out player hand cards
+        this.playerHand.forEach(card => {
+            this.scene.tweens.add({
+                targets: card.container,
+                alpha: 0,
+                duration: 800,
+                ease: 'Power1',
+                onComplete: () => {
+                    card.obliterate();
+                }
+            });
+        });
+
+        // Fade out enemy cards
+        this.enemyUnits.forEach(card => {
+            this.scene.tweens.add({
+                targets: card.container, 
+                alpha: 0,
+                duration: 800,
+                ease: 'Power1',
+                onComplete: () => {
+                    card.obliterate();
+                }
+            });
+        });
+    }
     private scene: Phaser.Scene;
     public playerHand: PhysicalCard[] = [];
     public enemyUnits: PhysicalCard[] = [];
     public playerUnits: PhysicalCard[] = [];
     public drawPile!: PhysicalCard;
     public discardPile!: PhysicalCard;
+    public exhaustPile!: PhysicalCard;
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -43,6 +70,7 @@ export class CombatCardManager {
                         useHandCursor: true
                     });
                     this.scene.input.setDraggable(card.container);
+                    card.data.physicalCard = card;
                 }
             });
             this.playerHand.push(card);
@@ -63,7 +91,6 @@ export class CombatCardManager {
             onComplete: () => {
                 this.discardPile.data.name = `Discard Pile (${GameState.getInstance().combatState.currentDiscardPile.length + 1})`;
                 this.discardPile.nameBox.setText(this.discardPile.data.name);
-                GameState.getInstance().combatState.currentDiscardPile.push(card.data as PlayableCard);
                 card.obliterate(); // Remove the card after animation
             }
         });
@@ -123,20 +150,57 @@ export class CombatCardManager {
         const gameWidth = this.scene.scale.width;
         const pileY = CombatSceneLayoutUtils.getPileY(this.scene);
 
+        this.exhaustPile = CardGuiUtils.getInstance().createCard({
+            scene: this.scene,
+            x: gameWidth * 0.1,
+            y: pileY - 180,
+            data: new UiCard({ name: 'Exhaust Pile (0)', description: 'Exhausted cards', portraitName: "exhaustpile" }),
+            onCardCreatedEventCallback: (card: PhysicalCard) => {
+                card.container.setInteractive({
+                    hitArea: card.cardBackground,
+                    hitAreaCallback: Phaser.Geom.Rectangle.Contains,
+                    useHandCursor: true
+                });
+                card.container.on('pointerdown', () => {
+                    this.scene.events.emit('exhaustPileClicked');
+                });
+            }
+        });
+
         this.drawPile = CardGuiUtils.getInstance().createCard({
             scene: this.scene,
             x: gameWidth * 0.1,
             y: pileY,
-            data: new UiCard({ name: 'Draw Pile (0)', description: 'Cards to draw', portraitName: "drawpile" }),
-            onCardCreatedEventCallback: () => { }
+            data: new UiCard({ name: 'Draw Pile (0)', description: 'Cards to draw', portraitName: "drawpile-todo" }),
+            onCardCreatedEventCallback: (card: PhysicalCard) => {
+                // Make draw pile interactive
+                card.container.setInteractive({
+                    hitArea: card.cardBackground,
+                    hitAreaCallback: Phaser.Geom.Rectangle.Contains,
+                    useHandCursor: true
+                });
+                card.container.on('pointerdown', () => {
+                    this.scene.events.emit('drawPileClicked');
+                });
+            }
         });
 
         this.discardPile = CardGuiUtils.getInstance().createCard({
             scene: this.scene,
             x: gameWidth * 0.2,
             y: pileY,
-            data: new UiCard({ name: 'Discard Pile (0)', description: 'Discarded cards', portraitName: "discardpile" }),
-            onCardCreatedEventCallback: () => { }
+            data: new UiCard({ name: 'Discard Pile (0)', description: 'Discarded cards', portraitName: "discardpile-todo" }),
+            onCardCreatedEventCallback: (card: PhysicalCard) => {
+                // Make discard pile interactive
+                card.container.setInteractive({
+                    hitArea: card.cardBackground,
+                    hitAreaCallback: Phaser.Geom.Rectangle.Contains,
+                    useHandCursor: true
+                });
+                card.container.on('pointerdown', () => {
+                    this.scene.events.emit('discardPileClicked');
+                });
+            }
         });
     }
 
@@ -228,7 +292,7 @@ export class CombatCardManager {
     public updateDrawPileCount(): void {
         if (this.drawPile) {
             const state = GameState.getInstance().combatState;
-            const drawPileCount = state.currentDrawPile.length;
+            const drawPileCount = state.drawPile.length;
             this.drawPile.data.name = `Draw Pile (${drawPileCount})`;
             this.drawPile.nameBox.setText(this.drawPile.data.name);
         }
@@ -241,6 +305,63 @@ export class CombatCardManager {
             this.discardPile.data.name = `Discard Pile (${discardPileCount})`;
             this.discardPile.nameBox.setText(this.discardPile.data.name);
         }
+    }
+
+    public updateExhaustPileCount(): void {
+        if (this.exhaustPile) {
+            const state = GameState.getInstance().combatState;
+            const exhaustPileCount = state.currentExhaustPile.length;
+            this.exhaustPile.data.name = `Exhaust Pile (${exhaustPileCount})`;
+            this.exhaustPile.nameBox.setText(this.exhaustPile.data.name);
+        }
+    }
+
+    public update() {
+        // Ensure physical cards match the game state
+        const state = GameState.getInstance().combatState;
+        state.currentHand.forEach(cardData => {
+            if (!cardData.physicalCard) {
+                // Find the matching physical card in our hand
+                const matchingPhysicalCard = this.playerHand.find(physicalCard => 
+                    physicalCard.data === cardData
+                );
+                
+                if (matchingPhysicalCard) {
+                    cardData.physicalCard = matchingPhysicalCard;
+                }
+            }
+        });
+
+        // Set scroll factor to 0 for all cards
+        [...this.playerHand, ...this.enemyUnits, ...this.playerUnits, 
+         this.drawPile, this.discardPile, this.exhaustPile].forEach(card => {
+            if (card && card.container) {
+                card.container.setScrollFactor(0);
+            }
+        });
+
+        // Update draw and discard pile names to reflect current counts
+        this.updateDrawPileCount();
+        this.updateDiscardPileCount();
+        this.updateExhaustPileCount();
+    }
+
+    public removeEnemyCard(enemyCard: PhysicalCard): void {
+        // Remove from enemy units array
+        this.enemyUnits = this.enemyUnits.filter(card => card !== enemyCard);
+
+        // Fade and scale down animation
+        this.scene.tweens.add({
+            targets: enemyCard.container,
+            alpha: 0,
+            scaleX: 0.1,
+            scaleY: 0.1,
+            duration: 800,
+            ease: 'Power2',
+            onComplete: () => {
+                enemyCard.obliterate();
+            }
+        });
     }
 
 }

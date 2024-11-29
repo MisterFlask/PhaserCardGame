@@ -1,7 +1,7 @@
 import { IBaseCharacter } from "../../IBaseCharacter";
 import { AbstractBuff } from "../AbstractBuff";
 import { Devil } from "./Devil";
-import { Eldritch } from "./Eldritch";
+import { EldritchHorror } from "./EldritchHorror";
 
 export class Holy extends AbstractBuff {
     constructor(stacks: number = 1) {
@@ -12,7 +12,7 @@ export class Holy extends AbstractBuff {
         this.stacks = stacks;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Holy";
     }
 
@@ -21,7 +21,7 @@ export class Holy extends AbstractBuff {
     }
 
     override getAdditionalPercentCombatDamageDealtModifier(target?: IBaseCharacter): number {
-        if (target && (target.buffs.some(buff => buff instanceof Devil) || target.buffs.some(buff => buff instanceof Eldritch))) {
+        if (target && (target.buffs.some(buff => buff instanceof Devil) || target.buffs.some(buff => buff instanceof EldritchHorror))) {
             return 50;
         }
         if (target && target.buffs.some(buff => buff instanceof Holy)) {

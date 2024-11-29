@@ -1,7 +1,7 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
-import { Strong } from "../../../../buffs/standard/Strong";
+import { Lethality } from "../../../../buffs/standard/Strong";
 
 export class InspiringPresence extends PlayableCard {
     constructor() {
@@ -9,9 +9,9 @@ export class InspiringPresence extends PlayableCard {
             name: "Inspiring Presence",
             cardType: CardType.POWER,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.COMMON,
+            rarity: EntityRarity.COMMON,
         });
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
         this.baseMagicNumber = 2; // Amount of Pluck gained
     }
 
@@ -21,7 +21,7 @@ export class InspiringPresence extends PlayableCard {
 
         // Apply Strong to all allies
         this.forEachAlly(ally => {
-            this.actionManager.applyBuffToCharacter(ally, new Strong(1));
+            this.actionManager.applyBuffToCharacterOrCard(ally, new Lethality(1));
         });
     }
 

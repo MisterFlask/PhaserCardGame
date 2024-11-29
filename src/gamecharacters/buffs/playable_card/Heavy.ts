@@ -6,16 +6,16 @@ export class Heavy extends AbstractBuff {
         super();
     }
 
-    getName(): string {
+    getDisplayName(): string {
         return "Heavy";
     }
 
     getDescription(): string {
-        return "When drawn, apply Draw One Fewer Card to the owner of the card.";
+        return "When drawn, draw one fewer card next turn.";
     }
 
     override onCardDrawn(): void {
        // apply Draw One Fewer Card to the owner of the card
-       this.actionManager.applyBuffToCharacter(this.getOwnerAsPlayableCard()?.owner!, new DrawOneFewerCardNextNTurns(1));
+       this.actionManager.applyBuffToCharacterOrCard(this.getOwnerAsPlayableCard()?.owningCharacter!, new DrawOneFewerCardNextNTurns(1));
     }
 }

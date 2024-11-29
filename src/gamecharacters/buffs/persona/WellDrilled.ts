@@ -1,5 +1,5 @@
 import { BaseCharacter } from "../../BaseCharacter";
-import { CardRarity, PlayableCard } from "../../PlayableCard";
+import { PlayableCard } from "../../PlayableCard";
 import { AbstractBuff } from "../AbstractBuff";
 
 export class WellDrilled extends AbstractBuff {
@@ -11,12 +11,12 @@ export class WellDrilled extends AbstractBuff {
         this.isPersonaTrait = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Well-Drilled";
     }
 
     override getDescription(): string {
-        return `Basic attacks played by this character deal ${this.getStacksDisplayText()} additional damage.`;
+        return `Revolver attacks played by this character deal ${this.getStacksDisplayText()} additional damage.`;
     }
 
     override getCombatDamageDealtModifier(target: BaseCharacter, cardPlayed?: PlayableCard): number {
@@ -24,7 +24,7 @@ export class WellDrilled extends AbstractBuff {
             return 0;
         }
 
-        if (cardPlayed?.rarity === CardRarity.BASIC) {
+        if (cardPlayed?.name?.toLowerCase()?.includes("revolver")) {
             return this.stacks;
         }
         return 0;

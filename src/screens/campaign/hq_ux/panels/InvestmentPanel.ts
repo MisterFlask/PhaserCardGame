@@ -2,7 +2,7 @@ import { Scene } from 'phaser';
 import { PhysicalCard } from '../../../../ui/PhysicalCard';
 import { CardGuiUtils } from '../../../../utils/CardGuiUtils';
 import { CampaignState } from '../CampaignState';
-import { FactoryCard } from '../FactoryCard';
+import { StrategicImprovementCard } from '../StrategicImprovementCard';
 import { AbstractHqPanel } from './AbstractHqPanel';
 
 export class InvestmentPanel extends AbstractHqPanel {
@@ -46,7 +46,7 @@ export class InvestmentPanel extends AbstractHqPanel {
         });
     }
 
-    private createFactoryCard(factory: FactoryCard, x: number, y: number): PhysicalCard {
+    private createFactoryCard(factory: StrategicImprovementCard, x: number, y: number): PhysicalCard {
         const card = CardGuiUtils.getInstance().createCard({
             scene: this.scene,
             x,
@@ -72,7 +72,7 @@ export class InvestmentPanel extends AbstractHqPanel {
     }
 
     private handleFactoryCardClick(card: PhysicalCard): void {
-        const factory = card.data as FactoryCard;
+        const factory = card.data as StrategicImprovementCard;
         const campaignState = CampaignState.getInstance();
 
         if (!campaignState.ownedFactories.includes(factory) && 

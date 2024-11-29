@@ -12,7 +12,7 @@ export class Flying extends AbstractBuff {
         this.showSecondaryStacks = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Flying";
     }
 
@@ -26,7 +26,6 @@ export class Flying extends AbstractBuff {
 
     override getCombatDamageTakenModifier(sourceCharacter?: IBaseCharacter, sourceCard?: PlayableCard): number {
         if (this.secondaryStacks > 0) {
-            this.secondaryStacks--;
             console.log(`Flying buff activated. Dodged attack. Remaining dodges this turn: ${this.secondaryStacks}`);
             return -1000;
         }
@@ -34,6 +33,8 @@ export class Flying extends AbstractBuff {
     }
 
     override onOwnerStruck_CannotModifyDamage(strikingUnit: IBaseCharacter | null, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void {
-        this.secondaryStacks --;    
+        if (this.secondaryStacks > 0) {
+            this.secondaryStacks --;    
+        }
     }
 }

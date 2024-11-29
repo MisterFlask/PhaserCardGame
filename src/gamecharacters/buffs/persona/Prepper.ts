@@ -10,7 +10,7 @@ export class Prepper extends AbstractBuff {
         this.isPersonaTrait = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Prepper";
     }
 

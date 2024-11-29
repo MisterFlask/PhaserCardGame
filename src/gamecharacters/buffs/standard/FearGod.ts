@@ -13,7 +13,7 @@ export class FearGod extends AbstractBuff {
         this.isDebuff = false;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Fear God";
     }
 
@@ -25,7 +25,7 @@ export class FearGod extends AbstractBuff {
         this.cardsPlayedThisTurn = 0;
     }
 
-    override onAnyCardPlayed(playedCard: PlayableCard, target?: IBaseCharacter): void {
+    override onAnyCardPlayedByAnyone(playedCard: PlayableCard, target?: IBaseCharacter): void {
         if (this.cardsPlayedThisTurn < this.stacks) {
             this.actionManager.applyBuffToCard(playedCard, new PhobiaBuff());
             this.cardsPlayedThisTurn++;
@@ -39,7 +39,7 @@ class PhobiaBuff extends AbstractBuff {
         this.isDebuff = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Phobia";
     }
 
@@ -49,8 +49,8 @@ class PhobiaBuff extends AbstractBuff {
 
     override onThisCardInvoked(target?: IBaseCharacter): void {
         const owner = this.getOwnerAsPlayableCard();
-        if (owner && owner.owner) {
-            this.actionManager.applyBuffToCharacter(owner.owner as BaseCharacter, new Stress(1));
+        if (owner && owner.owningCharacter) {
+            this.actionManager.applyBuffToCharacterOrCard(owner.owningCharacter as BaseCharacter, new Stress(1));
         }
     }
 }

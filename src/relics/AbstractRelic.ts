@@ -1,4 +1,5 @@
-import { CardRarity, PlayableCard } from "../gamecharacters/PlayableCard";
+import { BaseCharacter } from "../gamecharacters/BaseCharacter";
+import { EntityRarity, PlayableCard } from "../gamecharacters/PlayableCard";
 import { LocationCard } from "../maplogic/LocationCard";
 import { CombatState, GameState } from "../rules/GameState";
 import { ActionManager } from "../utils/ActionManager";
@@ -8,7 +9,7 @@ import ImageUtils from "../utils/ImageUtils";
 export abstract class AbstractRelic {
     name!: string;
     description!: string;
-    rarity!: CardRarity;
+    rarity!: EntityRarity;
     price: number = -1;
     portraitName!: string
     tint!: number
@@ -32,7 +33,7 @@ export abstract class AbstractRelic {
         return this.description;
     }
 
-    public getTier(): CardRarity {
+    public getTier(): EntityRarity {
         return this.rarity;
     }
 
@@ -57,7 +58,7 @@ export abstract class AbstractRelic {
 
     public onCombatEnd(): void {}
 
-    public onCardPlayed(card: PlayableCard): void {}
+    public onCardPlayed(card: PlayableCard, target: BaseCharacter | undefined): void {}
 
     public damageModifierOnCardPlayed(card: PlayableCard): DamageModifier {
         return new DamageModifier();

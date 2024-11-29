@@ -31,6 +31,7 @@ export default class InventoryPanel {
             style: { fontSize: '24px' },
             fillColor: 0x000000
         }).onClick(() => this.toggleInventory());
+        this.inventoryButton.setScrollFactor(0);
 
         // Initialize the inventory panel but keep it hidden
         this.inventoryPanel = this.scene.add.container(this.scene.scale.width / 2, this.scene.scale.height / 2).setVisible(false);
@@ -77,7 +78,7 @@ export default class InventoryPanel {
 
     private updateInventoryPanel(): void {
         const gameState = GameState.getInstance();
-        const inventoryItems = gameState.getInventory();
+        const inventoryItems = gameState.allCardsWithHellSellValue;
 
         // Clear previous cards
         this.cardsContainer.removeAll(true);

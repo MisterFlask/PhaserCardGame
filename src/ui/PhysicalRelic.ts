@@ -32,6 +32,10 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
     }) {
         super(scene, x, y);
 
+        if (!scene){
+            console.error("No scene provided to PhysicalRelic");
+            throw new Error("No scene provided to PhysicalRelic");
+        }
         console.log(`Initializing PhysicalRelic for: ${abstractRelic.getName()} at (${x}, ${y})`);
 
         this.abstractRelic = abstractRelic;
@@ -135,9 +139,11 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
     private onPointerDown = (): void => {
         if (this.obliterated) return;
         this.abstractRelic.onRelicClicked();
+        console.log('PhysicalRelic: onPointerDown');
         
         // Emit the event to parent
-        this.parentContainer?.emit('pointerdown');
+        this?.emit('relic_pointerdown', this);
+        this.parentContainer?.emit('pointerdown', this);
     }
 
     highlight(): void {

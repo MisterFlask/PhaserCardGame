@@ -1,6 +1,6 @@
 import { GameState } from "../../../../../rules/GameState";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { BasicProcs } from "../../../../procs/BasicProcs";
 import { TakeCover } from "../tokens/TakeCover";
@@ -11,10 +11,15 @@ export class ChainOfCommand extends PlayableCard {
             name: "Chain of Command",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.RARE,
+            rarity: EntityRarity.RARE,
         });
-        this.energyCost = 2;
+        this.baseEnergyCost = 2;
         this.baseDamage = 8;
+        
+        this.resourceScalings.push({
+            resource: this.mettle,
+            attackScaling: 1,
+        });
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

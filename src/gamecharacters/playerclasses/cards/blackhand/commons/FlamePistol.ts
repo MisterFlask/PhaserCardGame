@@ -8,7 +8,7 @@ import { CardType } from "../../../../Primitives";
 export class FlamePistol extends PlayableCard {
     constructor() {
         super({
-            name: "Flame Pistol",
+            name: "Flame Revolver",
             description: `_`,
             portraitName: "fire-ray",
             targetingType: TargetingType.ENEMY,
@@ -16,11 +16,11 @@ export class FlamePistol extends PlayableCard {
         });
         this.baseDamage = 4;
         this.baseMagicNumber = 2;
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
 
         this.resourceScalings.push({
-            resource: GameState.getInstance().combatState.combatResources.powder,
-            attackScaling: 1
+            resource: GameState.getInstance().combatState.combatResources.smog,
+            magicNumberScaling: 1
         })
     }
 
@@ -31,7 +31,7 @@ export class FlamePistol extends PlayableCard {
     override InvokeCardEffects(targetCard?: BaseCharacter): void {
         if (targetCard && targetCard instanceof BaseCharacter) {
             this.dealDamageToTarget(targetCard);
-            this.actionManager.applyBuffToCharacter(targetCard, new Burning(this.getBaseMagicNumberAfterResourceScaling()), this.owner as BaseCharacter);
+            this.actionManager.applyBuffToCharacterOrCard(targetCard, new Burning(this.getBaseMagicNumberAfterResourceScaling()), this.owningCharacter as BaseCharacter);
         }
     }
 }

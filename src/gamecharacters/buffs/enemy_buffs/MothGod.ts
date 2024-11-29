@@ -1,7 +1,7 @@
 import { GameState } from "../../../rules/GameState";
 import { TargetingType } from "../../AbstractCard";
 import { IBaseCharacter } from "../../IBaseCharacter";
-import { CardRarity, PlayableCard } from "../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../PlayableCard";
 import { CardType } from "../../Primitives";
 import { AbstractBuff } from "../AbstractBuff";
 import { ExhaustBuff } from "../playable_card/ExhaustBuff";
@@ -13,7 +13,7 @@ export class MothGod extends AbstractBuff {
         this.isDebuff = false;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Moth God";
     }
 
@@ -23,7 +23,7 @@ export class MothGod extends AbstractBuff {
 
     override onTurnStart(): void {
         const gameState = GameState.getInstance();
-        const drawPile = gameState.combatState.currentDrawPile;
+        const drawPile = gameState.combatState.drawPile;
 
         for (let i = 0; i < this.stacks; i++) {
             if (drawPile.length > 0) {
@@ -38,20 +38,25 @@ export class MothGod extends AbstractBuff {
 }
 
 class EggsBuff extends AbstractBuff {
-    override getName(): string {
+    override getDisplayName(): string {
         return "Eggs";
     }
 
     override getDescription(): string {
-        return "If this card is in your hand at the end of turn, it is exhausted and a Moth is added to your draw pile.";
+        return "If this card is in your hand at the end of turn, it is exhausted and a Moth is added to your draw pile.  Removed if card is played.";
     }
     override onInHandAtEndOfTurn(): void {
-        const owner = this.getOwnerAsPlayableCard();
-        if (owner) {
-            this.actionManager.exhaustCard(owner);
+        const ownerCard = this.getOwnerAsPlayableCard();
+        if (ownerCard) {
+            this.actionManager.exhaustCard(ownerCard);
             const moth = new Moth();
+            moth.owningCharacter = ownerCard.owningCharacter;
             this.actionManager.createCardToDrawPile(moth);
         }
+    }
+
+    override onThisCardInvoked(): void {
+        this.stacks = 0;
     }
 }
 
@@ -61,15 +66,15 @@ class Moth extends PlayableCard {
             name: "Moth",
             cardType: CardType.STATUS,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.SPECIAL,
+            rarity: EntityRarity.SPECIAL,
         });
-        this.energyCost = 3;
+        this.baseEnergyCost = 1;
         this.buffs.push(new ExhaustBuff());
         this.buffs.push(new Hazardous(4));
     }
 
     override get description(): string {
-        return "At the end of turn, deal 4 damage to you. Exhaust.";
+        return "";
     }
 
     override InvokeCardEffects(): void {
@@ -84,7 +89,7 @@ class Hazardous extends AbstractBuff {
         this.stackable = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Hazardous";
     }
 
@@ -94,11 +99,11 @@ class Hazardous extends AbstractBuff {
 
     override onInHandAtEndOfTurn(): void {
         const owner = this.getOwnerAsPlayableCard();
-        if (owner) {
+        if (owner?.owningCharacter) {
             this.actionManager.dealDamage({
                 baseDamageAmount: this.stacks,
-                target: owner.owner as IBaseCharacter,
-                sourceCharacter: owner.owner,
+                target: owner.owningCharacter as IBaseCharacter,
+                sourceCharacter: owner.owningCharacter,
                 fromAttack: false,
                 sourceCard: owner
             });

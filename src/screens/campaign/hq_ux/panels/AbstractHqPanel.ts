@@ -5,10 +5,12 @@ import { TextBox } from '../../../../ui/TextBox';
 export abstract class AbstractHqPanel extends Phaser.GameObjects.Container {
     protected titleText: TextBox;
     protected returnButton: TextBoxButton;
-
+    protected title: string;
     constructor(scene: Scene, title: string) {
         super(scene, 0, 0);
         scene.add.existing(this);
+
+        this.title = title;
 
         // Add title
         this.titleText = new TextBox({
@@ -43,6 +45,7 @@ export abstract class AbstractHqPanel extends Phaser.GameObjects.Container {
     }
 
     public show(): void {
+        this.titleText.setText(this.title)
         this.setVisible(true);
     }
 

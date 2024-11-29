@@ -2,19 +2,25 @@ import { AbstractIntent, ApplyDebuffToAllPlayerCharactersIntent, AttackIntent, I
 import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
 import { MothGod } from '../../../gamecharacters/buffs/enemy_buffs/MothGod';
 import { Stress } from '../../../gamecharacters/buffs/standard/Stress';
+import { Titan } from '../../../gamecharacters/buffs/standard/Titan';
 import { Vulnerable } from '../../../gamecharacters/buffs/standard/Vulnerable';
 import { Weak } from '../../../gamecharacters/buffs/standard/Weak';
+import { CardSize } from '../../../gamecharacters/Primitives';
 export class FrenchBlindProphetess extends AutomatedCharacter {
     constructor() {
         super({
-            name: "La Prophétesse Aveugle",
-            portraitName: "Eldritch Blind Prophetess",
+            name: "Doris Smith",
+            portraitName: "Boss Zodiac Virgo",
             maxHitpoints: 200,
             description: "whispers of the Final Argument"
         });
-        
+        this.portraitTargetLargestDimension = 600;
+        this.portraitOffsetXOverride = -100
+        this.portraitOffsetYOverride = 0
+        this.size = CardSize.SMALL;
         // Apply initial MothGod buff
         this.buffs.push(new MothGod(2));
+        this.buffs.push(new Titan(2))
     }
 
     override generateNewIntents(): AbstractIntent[] {

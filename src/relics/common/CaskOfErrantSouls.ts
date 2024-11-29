@@ -1,4 +1,4 @@
-import { CardRarity } from "../../gamecharacters/PlayableCard";
+import { EntityRarity } from "../../gamecharacters/PlayableCard";
 import { LocationCard, RestSiteCard } from "../../maplogic/LocationCard";
 import { AbstractRelic } from "../AbstractRelic";
 export class CaskOfErrantSouls extends AbstractRelic {
@@ -6,7 +6,7 @@ export class CaskOfErrantSouls extends AbstractRelic {
         super();
         this.name = "Cask of Errant Souls";
         this.description = "Each time you enter a rest site, gain 10 Hell Currency.";
-        this.rarity = CardRarity.COMMON;
+        this.rarity = EntityRarity.COMMON;
     }
 
     override onLocationEntered(location: LocationCard): void {

@@ -8,7 +8,7 @@ export class Titan extends AbstractBuff {
         this.stackable = true;
         
     }
-    override getName(): string {
+    override getDisplayName(): string {
         return "Titan";
     }
     
@@ -17,7 +17,7 @@ export class Titan extends AbstractBuff {
     }
 
     override getDescription(): string {
-        return `Decreases all incoming damage by ${this.stacks}.`;
+        return `Decreases all incoming attack damage by ${this.stacks}.`;
     }
 }
 

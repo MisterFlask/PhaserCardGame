@@ -1,8 +1,8 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
-import { Strong } from "../../../../buffs/standard/Strong";
+import { Lethality } from "../../../../buffs/standard/Strong";
 
 export class TacticalManual extends PlayableCard {
     constructor() {
@@ -10,12 +10,12 @@ export class TacticalManual extends PlayableCard {
             name: "Tactical Manual",
             cardType: CardType.SKILL,
             targetingType: TargetingType.ALLY,
-            rarity: CardRarity.COMMON,
+            rarity: EntityRarity.COMMON,
         });
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
         this.baseMagicNumber = 1; // Base strength gain
         this.resourceScalings.push({
-            resource: this.pages,
+            resource: this.ashes,
             magicNumberScaling: 1,
         });
     }
@@ -29,12 +29,12 @@ export class TacticalManual extends PlayableCard {
 
         // Apply strength to targeted ally
         if (targetCard instanceof BaseCharacter) {
-            const strengthGain = this.getBaseMagicNumberAfterResourceScaling() + this.pages.value;
-            this.actionManager.applyBuffToCharacter(targetCard, new Strong(strengthGain));
+            const strengthGain = this.getBaseMagicNumberAfterResourceScaling();
+            this.actionManager.applyBuffToCharacterOrCard(targetCard, new Lethality(strengthGain));
         }
     }
 
     override get description(): string {
-        return `Draw 2 cards. Discard a card. Target ally gains ${this.getDisplayedMagicNumber()} + [Pages] Strength.`;
+        return `Draw 2 cards. Discard a card. Target ally gains ${this.getDisplayedMagicNumber()} Strength.`;
     }
 }

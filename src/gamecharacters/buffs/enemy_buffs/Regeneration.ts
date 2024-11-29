@@ -8,7 +8,7 @@ export class Regeneration extends AbstractBuff {
         this.imageName = "healing";
     }
 
-    getName(): string {
+    getDisplayName(): string {
         return "Regeneration";
     }
 

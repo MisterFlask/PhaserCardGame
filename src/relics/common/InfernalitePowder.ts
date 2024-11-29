@@ -1,4 +1,4 @@
-import { CardRarity } from "../../gamecharacters/PlayableCard";
+import { EntityRarity } from "../../gamecharacters/PlayableCard";
 import { AbstractRelic } from "../AbstractRelic";
 
 export class InfernalitePowder extends AbstractRelic {
@@ -6,10 +6,10 @@ export class InfernalitePowder extends AbstractRelic {
         super();
         this.name = "Infernalite Powder";
         this.description = "At the start of combat, increase your Powder by 2.";
-        this.rarity = CardRarity.COMMON;
+        this.rarity = EntityRarity.COMMON;
     }
 
     onCombatStart(): void {
-        this.combatState.combatResources.modifyPowder(2);
+        this.combatState.combatResources.modifyBlood(2);
     }
 }

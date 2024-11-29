@@ -5,7 +5,7 @@ export class Fragile extends AbstractBuff {
         super();
     }
 
-    getName(): string {
+    getDisplayName(): string {
         return "Fragile";
     }
 
@@ -16,14 +16,14 @@ export class Fragile extends AbstractBuff {
     override onExhaust(): void {
         const ownerCard = this.getOwnerAsPlayableCard();
         if (ownerCard) {
-            //this.actionManager.destroyCard(ownerCard);
+            this.actionManager.destroyCardInMasterDeck(ownerCard);
         }
     }
 
     override onActiveDiscard(): void {
         const ownerCard = this.getOwnerAsPlayableCard();
         if (ownerCard) {
-            //this.actionManager.destroyCard(ownerCard);
+            this.actionManager.destroyCardInMasterDeck(ownerCard);
         }
     }
 }

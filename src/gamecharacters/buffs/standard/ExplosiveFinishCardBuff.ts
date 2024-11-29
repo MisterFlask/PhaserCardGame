@@ -1,8 +1,8 @@
-import { AbstractBuff } from '../AbstractBuff';
-import { IBaseCharacter } from '../../IBaseCharacter';
-import { Burning } from './Burning';
-import { ActionManager } from '../../../utils/ActionManager';
 import { GameState } from '../../../rules/GameState';
+import { ActionManager } from '../../../utils/ActionManager';
+import { IBaseCharacter } from '../../IBaseCharacter';
+import { AbstractBuff } from '../AbstractBuff';
+import { Burning } from './Burning';
 
 export class ExplosiveFinishCardBuff extends AbstractBuff {
     constructor(stacks: number) {
@@ -12,7 +12,7 @@ export class ExplosiveFinishCardBuff extends AbstractBuff {
         this.stackable = false;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Explosive Finish";
     }
 
@@ -22,7 +22,7 @@ export class ExplosiveFinishCardBuff extends AbstractBuff {
 
     override onFatal(killedUnit: IBaseCharacter): void {
         GameState.getInstance().combatState.enemies.forEach(enemy => {
-            ActionManager.getInstance().applyBuffToCharacter(enemy, new Burning(this.stacks), this.getOwnerAsCharacter()!);
+            ActionManager.getInstance().applyBuffToCharacterOrCard(enemy, new Burning(this.stacks), this.getOwnerAsCharacter()!);
         });
     }
 }

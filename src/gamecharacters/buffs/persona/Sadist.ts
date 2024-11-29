@@ -11,7 +11,7 @@ export class Sadist extends AbstractBuff {
         this.isPersonaTrait = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Sadist";
     }
 
@@ -22,7 +22,7 @@ export class Sadist extends AbstractBuff {
     override onFatal(killedUnit: BaseCharacter): void {
         const owner = this.getOwnerAsCharacter();
         if (owner) {
-           this.actionManager.removeBuffFromCharacter(owner, new Stress(1).getName(), this.stacks);
+           this.actionManager.removeBuffFromCharacter(owner, new Stress(1).getDisplayName(), this.stacks);
         }
     }
 }

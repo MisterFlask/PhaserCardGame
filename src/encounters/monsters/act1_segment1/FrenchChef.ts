@@ -8,7 +8,7 @@ export class FrenchChef extends AutomatedCharacter {
             name: "Le Chef Gourmand",
             portraitName: "Eldritch Slime Spawn",
             maxHitpoints: 25,
-            description: "Ah yes, french cuisine—where snails are a 'delicacy' and they consider raw beef and a runny egg an entire meal."
+            description: "you will be baked, and then there will be cake"
         });
     }
 

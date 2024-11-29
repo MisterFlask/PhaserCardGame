@@ -9,7 +9,7 @@ export class Accursed extends AbstractBuff {
         this.isDebuff = false;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Accursed";
     }
 
@@ -20,7 +20,7 @@ export class Accursed extends AbstractBuff {
     override onCombatStart(): void {
         const gameState = GameState.getInstance();
         gameState.combatState.playerCharacters.forEach((character) => {
-            this.actionManager.applyBuffToCharacter(character, new Cursed(this.stacks));
+            this.actionManager.applyBuffToCharacterOrCard(character, new Cursed(this.stacks));
         });
     }
 }

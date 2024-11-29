@@ -12,7 +12,7 @@ export class ReactiveShielding extends AbstractBuff {
         this.showSecondaryStacks = false;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Reactive Shielding";
     }
 

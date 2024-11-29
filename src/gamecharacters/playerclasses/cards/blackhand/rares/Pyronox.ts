@@ -1,7 +1,7 @@
 import { TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
 import { AbstractBuff } from "../../../../buffs/AbstractBuff";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
 export class Pyronox extends PlayableCard {
@@ -10,19 +10,19 @@ export class Pyronox extends PlayableCard {
             name: "Pyronox",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.RARE,
+            rarity: EntityRarity.RARE,
         });
         this.baseMagicNumber = 3;
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
     }
 
     override get description(): string {
-        return `Apply Flames Amplifier to ALL enemies. Flames Amplifier increases the damage dealt by Burning by ${this.getDisplayedMagicNumber()}.`;
+        return `Apply ${this.getDisplayedMagicNumber()} stacks of Flames Amplifier to ALL enemies.`;
     }
 
     override InvokeCardEffects(targetCard?: BaseCharacter): void {
         this.forEachEnemy(enemy => {
-            this.actionManager.applyBuffToCharacter(enemy, new FlamesAmplifierBuff(this.getBaseMagicNumberAfterResourceScaling()), this.owner as BaseCharacter);
+            this.actionManager.applyBuffToCharacterOrCard(enemy, new FlamesAmplifierBuff(this.getBaseMagicNumberAfterResourceScaling()), this.owningCharacter as BaseCharacter);
         });
     }
 }
@@ -36,11 +36,14 @@ export class FlamesAmplifierBuff extends AbstractBuff {
         this.isDebuff = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Flames Amplifier";
     }
 
     override getDescription(): string {
-        return `Increases the damage dealt by Burning by ${this.getStacksDisplayText()}.`;
+        return `This character takes ${this.getStacksDisplayText()} additional damage from Burning.`;
     }
+
+    // no implementation needed; this is handled in the Burning debuff
+
 }

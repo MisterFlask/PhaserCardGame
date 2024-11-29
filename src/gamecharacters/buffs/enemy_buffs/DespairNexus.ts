@@ -8,7 +8,7 @@ export class DespairNexus extends AbstractBuff {
         this.isDebuff = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Despair Nexus";
     }
 

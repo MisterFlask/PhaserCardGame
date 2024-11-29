@@ -7,7 +7,7 @@ import { PhysicalCard } from './PhysicalCard';
 
 export class ShopCardPanel extends Phaser.GameObjects.Container {
     private card: PlayableCard;
-    private physicalCard!: PhysicalCard;
+    public physicalCard!: PhysicalCard;
     private isBuyable: boolean;
 
     constructor(scene: Phaser.Scene, x: number, y: number, card: PlayableCard, isBuyable: boolean, onPurchase: (card: PlayableCard) => void, priceContext: PriceContext) {

@@ -10,6 +10,7 @@ import { PhysicalCard } from '../../ui/PhysicalCard';
 import { UIContext, UIContextManager } from '../../ui/UIContextManager';
 import { ActionManagerFetcher } from '../../utils/ActionManagerFetcher';
 import { CardGuiUtils } from '../../utils/CardGuiUtils';
+import { CampaignBriefStatus } from './CampaignBriefStatus';
 
 export class MapOverlay {
     private scene: Phaser.Scene;
@@ -18,6 +19,7 @@ export class MapOverlay {
     private locationCards: PhysicalCard[] = [];
     private characterCards: PhysicalCard[] = [];
     private adjacencyGraphics: Phaser.GameObjects.Graphics | null = null;
+    private campaignBriefStatus: CampaignBriefStatus | null = null;
 
     // Managers
     private locationManager: LocationManager;
@@ -53,6 +55,7 @@ export class MapOverlay {
         this.spatialManager.updateDimensions(width, height);
 
         this.createBackground();
+        this.createCampaignBriefStatus();
         this.createAdjacencyGraphics();
         this.generateAndPlaceLocations();
         this.createPhysicalLocationCards();
@@ -81,6 +84,7 @@ export class MapOverlay {
             textBoxName: 'closeButton'
         });
         this.closeButton.onClick(this.hide.bind(this));
+        this.closeButton.setScrollFactor(0);
         this.overlay.add(this.closeButton);
     }
 
@@ -91,6 +95,14 @@ export class MapOverlay {
         this.background.setScrollFactor(0);
         this.background.setDisplaySize(this.scene.scale.width, this.scene.scale.height);
         this.overlay.add(this.background);
+    }
+
+    // Campaign Brief Status
+    private createCampaignBriefStatus() {
+        this.campaignBriefStatus = new CampaignBriefStatus(this.scene);
+        this.campaignBriefStatus.setScrollFactor(0);
+        this.campaignBriefStatus.setDepth(DepthManager.getInstance().UI_BASE);
+        this.overlay.add(this.campaignBriefStatus);
     }
 
     // Adjacency Graphics
@@ -148,7 +160,7 @@ export class MapOverlay {
             const portraitWidth = currentLocationCard.cardImage.displayWidth;
             const portraitHeight = currentLocationCard.cardImage.displayHeight;
 
-            const currentLocationIcon = this.scene.add.image(0, -currentLocationCard.cardBackground.displayHeight / 4, 'cursed-star');
+            const currentLocationIcon = this.scene.add.image(0, -currentLocationCard.cardBackground.displayHeight / 4, 'old-wagon');
             currentLocationIcon.setDisplaySize(portraitWidth / 2, portraitHeight / 2);
             currentLocationIcon.setDepth(1);
             currentLocationIcon.setName("currentLocationIcon");
@@ -303,6 +315,8 @@ export class MapOverlay {
 
         // Add scroll wheel functionality for camera panning
         this.scene.input.on('wheel', (pointer: Phaser.Input.Pointer, gameObjects: Phaser.GameObjects.GameObject[], deltaX: number, deltaY: number, deltaZ: number) => {
+            if (!this.isVisible) return;
+
             if (deltaY > 0) {
                 this.panCameraDown();
             } else if (deltaY < 0) {
@@ -323,6 +337,11 @@ export class MapOverlay {
 
     // Highlight Updates
     public updateHighlights() {
+        // Clear glow effects on all location cards
+        this.locationCards.forEach(card => {
+            card.setGlow(false);
+        });
+        
         const currentLocation = GameState.getInstance().getCurrentLocation();
         const currentLocationCard = this.locationCards.find(card => (card.data as LocationCard).id === currentLocation?.id);
         if (currentLocationCard) {
@@ -345,6 +364,11 @@ export class MapOverlay {
             if (card.data instanceof LocationCard) {
                 const gameState = GameState.getInstance();
                 gameState.setCurrentLocation(card.data);
+                
+                GameState.getInstance().relicsInventory.forEach(relic => {
+                    relic.onLocationEntered(card.data as LocationCard)
+                });
+
                 card.data.OnLocationSelected(this.scene);
                 this.updatePlayerLocationIcon();
             }
@@ -364,6 +388,11 @@ export class MapOverlay {
         if (this.background) {
             this.background.setDisplaySize(width, height);
             this.background.setPosition(width / 2, height / 2);
+        }
+
+        // Update campaign brief status position
+        if (this.campaignBriefStatus) {
+            this.campaignBriefStatus.setPosition(600, 10);
         }
 
         // Update spatial manager dimensions
@@ -417,13 +446,9 @@ export class MapOverlay {
 
     // Update Method
     private update(time: number, delta: number): void {
-        // Any dynamic updates for the overlay can be handled here
+        this.updateHighlights();
     }
 
-    // Abolish/Destroy Method
-    private abolish(): void {
-        // Clean up overlay elements if necessary
-    }
 
     // Abort Mission Logic
     private onAbortMission(): void {
@@ -435,16 +460,28 @@ export class MapOverlay {
     public show(): void {
         this.overlay.setVisible(true);
         this.isVisible = true;
+        this.resetCameraPosition();
         UIContextManager.getInstance().setContext(UIContext.MAP);
     }
 
     public hide(): void {
         this.overlay.setVisible(false);
         this.isVisible = false;
+        this.resetCameraPosition();
         UIContextManager.getInstance().setContext(UIContext.COMBAT);
+        
+        // Ensure the campaign brief status is properly updated when hiding
+        if (this.campaignBriefStatus) {
+            this.scene.events.emit('propagateGameStateChangesToUi');
+        }
     }
 
     public toggle(): void {
         this.isVisible ? this.hide() : this.show();
+    }
+
+    private resetCameraPosition(): void {
+        this.scene.cameras.main.scrollX = 0;
+        this.scene.cameras.main.scrollY = 0;
     }
 }

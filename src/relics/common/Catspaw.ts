@@ -1,4 +1,4 @@
-import { CardRarity, PlayableCard } from "../../gamecharacters/PlayableCard";
+import { EntityRarity, PlayableCard } from "../../gamecharacters/PlayableCard";
 import { Shoot } from "../../gamecharacters/playerclasses/cards/basic/Shoot";
 import { AbstractRelic, DamageModifier } from "../AbstractRelic";
 
@@ -7,7 +7,7 @@ export class Catspaw extends AbstractRelic {
         super();
         this.name = "Catspaw";
         this.description = "Shoot cards deal 2 more damage.";
-        this.rarity = CardRarity.COMMON;
+        this.rarity = EntityRarity.COMMON;
     }
 
     public damageModifierOnCardPlayed(card: PlayableCard): DamageModifier {

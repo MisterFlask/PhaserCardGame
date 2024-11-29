@@ -1,8 +1,9 @@
 import { GameState } from "../../../../../rules/GameState";
 import { TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
+import { ExhaustBuff } from "../../../../buffs/playable_card/ExhaustBuff";
 import { Stress } from "../../../../buffs/standard/Stress";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
 export class HorrificRegeneration extends PlayableCard {
@@ -11,12 +12,14 @@ export class HorrificRegeneration extends PlayableCard {
             name: "Horrific Regeneration",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.RARE,
+            rarity: EntityRarity.RARE,
         });
-        this.energyCost = 3; // Assuming a cost for the card
+        this.baseEnergyCost = 0; 
+        this.baseMagicNumber = 10;
+        this.buffs.push(new ExhaustBuff());
     }
     override get description(): string {
-        return `All party members heal ${this.getDisplayedMagicNumber()} HP. They also gain 20 stress. Exhaust.`;
+        return `All party members heal ${this.getDisplayedMagicNumber()} HP. They also gain 4 stress.`;
     }
 
     override InvokeCardEffects(targetCard?: BaseCharacter): void {
@@ -33,7 +36,4 @@ export class HorrificRegeneration extends PlayableCard {
         this.actionManager.exhaustCard(this);
     }
 
-    override OnPurchase(): void {
-        // Logic for when the card is purchased, if needed
-    }
 }

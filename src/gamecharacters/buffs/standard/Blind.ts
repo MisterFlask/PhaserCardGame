@@ -11,7 +11,7 @@ export class Blind extends AbstractBuff {
         this.imageName = "blind"; // Replace with actual icon name if available
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Blind";
     }
 
@@ -19,8 +19,8 @@ export class Blind extends AbstractBuff {
         return `The next ${this.getStacksDisplayText()} card[s] played by this character discard[s] a card at random from your hand.`;
     }
 
-    override onAnyCardPlayed(playedCard: PlayableCard, target?: BaseCharacter): void {
-        if (playedCard.owner != this.getOwnerAsCharacter()) {
+    override onAnyCardPlayedByAnyone(playedCard: PlayableCard, target?: BaseCharacter): void {
+        if (playedCard.owningCharacter != this.getOwnerAsCharacter()) {
             return;
         }
         if (this.stacks > 0) {

@@ -1,13 +1,39 @@
 // Power: Manufacture an Eldritch Smoke to your hand.  Draw 2 cards.  Cost 2.  Whenever you Sacrifice, manufacture an Eldritch Smoke to your hand.
 
+import { AbstractCombatEvent } from "../../../../../rules/AbstractCombatEvent";
 import { DeckLogic } from "../../../../../rules/DeckLogic";
 import { GameState } from "../../../../../rules/GameState";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { AbstractBuff } from "../../../../buffs/AbstractBuff";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
-import { BasicProcs } from "../../../../procs/BasicProcs";
+import { BasicProcs, SacrificeEvent } from "../../../../procs/BasicProcs";
 import { EldritchSmoke } from "../tokens/EldritchSmoke";
 
+export class ObsidianCandlesEffect extends AbstractBuff {
+    constructor() {
+        super();
+        this.imageName = "obsidian_candles";
+        this.isDebuff = false;
+    }
+
+    override onEvent(event: AbstractCombatEvent): void {
+        if (event instanceof SacrificeEvent) {
+            for (let i = 0; i < this.stacks; i++) {
+                BasicProcs.getInstance().ManufactureCardToHand(new EldritchSmoke());
+            }
+        }
+    }
+
+    override getDisplayName(): string {
+        return "Obsidian Candles";
+    }
+
+    override getDescription(): string {
+        return "Whenever you Sacrifice a card, manufacture an Eldritch Smoke to your hand.";
+    }
+
+}
 
 export class ObsidianCandles extends PlayableCard {
     constructor() {
@@ -15,9 +41,9 @@ export class ObsidianCandles extends PlayableCard {
             name: "Obsidian Candles",
             cardType: CardType.POWER,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.COMMON,
+            rarity: EntityRarity.COMMON,
         });
-        this.energyCost = 2;
+        this.baseEnergyCost = 2;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
@@ -26,10 +52,13 @@ export class ObsidianCandles extends PlayableCard {
 
         // Draw 2 cards
         const gameState = GameState.getInstance();
-        const combatState = gameState.combatState;
         const deckLogic = DeckLogic.getInstance();
         deckLogic.drawCards(2);
 
+        // Add the buff to the player
+        if (this.owningCharacter) {
+            this.actionManager.applyBuffToCharacter(this.owningCharacter, new ObsidianCandlesEffect());
+        }
     }
 
     override get description(): string {

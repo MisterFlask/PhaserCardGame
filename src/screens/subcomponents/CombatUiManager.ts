@@ -1,10 +1,12 @@
 // src/subcomponents/CombatUIManager.ts
 
 import Phaser from 'phaser';
-import { PlayerCharacter } from '../../gamecharacters/BaseCharacterClass';
+import { AbstractEvent } from '../../events/AbstractEvent';
 import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
-import { PlayableCard } from '../../gamecharacters/PlayableCard';
-import { CardLibrary } from '../../gamecharacters/playerclasses/cards/CardLibrary';
+import { AbstractReward } from '../../rewards/AbstractReward';
+import { CardReward } from '../../rewards/CardReward';
+import { CurrencyReward } from '../../rewards/CurrencyReward';
+import { CardRewardsGenerator } from '../../rules/CardRewardsGenerator';
 import { GameState } from '../../rules/GameState';
 import { TextBoxButton } from '../../ui/Button';
 import { CombatResourceDisplay } from '../../ui/CombatResourceDisplay';
@@ -12,12 +14,13 @@ import { DebugMenu } from '../../ui/DebugMenu';
 import { DepthManager } from '../../ui/DepthManager';
 import { default as CombatSceneLayoutUtils, default as LayoutUtils } from '../../ui/LayoutUtils';
 import Menu from '../../ui/Menu';
+import { PhysicalEvent } from '../../ui/PhysicalEvent';
 import { SubtitleManager } from '../../ui/SubtitleManager';
 import { TextBox } from '../../ui/TextBox';
 import { TransientUiState } from '../../ui/TransientUiState';
 import { UIContext, UIContextManager } from '../../ui/UIContextManager';
 import { ActionManager } from '../../utils/ActionManager';
-import CardRewardScreen, { CardReward } from './CardRewardScreen';
+import GeneralRewardScreen from './GeneralRewardScreen';
 
 interface MenuOption {
     text: string;
@@ -34,17 +37,17 @@ class CombatUIManager {
     public energyDisplay!: TextBox;
     public resourceIndicators: CombatResourceDisplay[] = [];
     private subtitleTextBox?: TextBox;
-    private cardRewardScreen!: CardRewardScreen;
+    private generalRewardScreen!: GeneralRewardScreen;
     private combatEnded: boolean = false;
     private debugOverlay!: TextBox;
     public dropZoneHighlight!: Phaser.GameObjects.Image;
     private debugMenu!: DebugMenu;
+    private currentEvent: PhysicalEvent | null = null;
 
     private constructor(scene: Phaser.Scene) {
         this.scene = scene;
         SubtitleManager.setInstance(scene);
         this.createUI();
-        this.createCardRewardScreen();
 
         this.scene.events.on('disableInteractions', this.disableInteractions, this);
         this.scene.events.on('enableInteractions', this.enableInteractions, this);
@@ -74,6 +77,29 @@ class CombatUIManager {
         this.createDebugOverlay();
         this.setupDebugOverlayToggle();
         this.createDebugMenu();
+        
+        this.setScrollFactorForAllElements();
+    }
+
+    private setScrollFactorForAllElements(): void {
+        this.menu.container.setScrollFactor(0);
+        this.endTurnButton.setScrollFactor(0);
+
+        this.battlefieldArea.setScrollFactor(0);
+        this.handArea.setScrollFactor(0);
+        this.dropZoneHighlight.setScrollFactor(0);
+
+        this.energyDisplay.setScrollFactor(0);
+
+        this.resourceIndicators.forEach(indicator => {
+            indicator.setScrollFactor(0);
+        });
+
+        this.debugOverlay.setScrollFactor(0);
+
+        if (this.subtitleTextBox) {
+            this.subtitleTextBox.setScrollFactor(0);
+        }
     }
 
     private createEnergyDisplay(): void {
@@ -183,6 +209,7 @@ class CombatUIManager {
         menuButton
             .onClick(() => this.menu.toggle());
 
+        menuButton.setScrollFactor(0);
         this.scene.add.existing(menuButton);
     }
 
@@ -212,6 +239,7 @@ class CombatUIManager {
         });
 
         this.endTurnButton.onClick(() => {
+            if (UIContextManager.getInstance().getContext() === UIContext.COMBAT_BUT_NOT_YOUR_TURN) return;
             ActionManager.getInstance().endTurn();
         });
 
@@ -304,6 +332,8 @@ class CombatUIManager {
         this.resourceIndicators.forEach(display => display.destroy());
         this.resourceIndicators = [];
         this.scene.events.off('update', this.updateResourceIndicators, this);
+        this.scene.events.off('update', this.updateEnergyDisplay, this);
+
         this.scene.events.off('update', () => {
             if (this.debugOverlay.visible) {
                 this.updateDebugOverlay();
@@ -356,9 +386,11 @@ class CombatUIManager {
                 height: 50,
                 text: text,
                 style: { fontSize: '24px', color: '#ffffff' },
-                expandDirection: 'down'
+                verticalExpand: 'down',
+                horizontalExpand: 'right'
             });
             this.subtitleTextBox.setDepth(100);
+            this.subtitleTextBox.setScrollFactor(0);
             this.scene.add.existing(this.subtitleTextBox);
         } else {
             this.subtitleTextBox.setText(text);
@@ -372,40 +404,29 @@ class CombatUIManager {
         }
     }
 
-    private createCardRewardScreen(): void {
-        this.cardRewardScreen = new CardRewardScreen({
-            scene: this.scene,
-            rewards: [],
-            onSelect: this.handleCardSelect.bind(this),
-            onSkip: this.handleSkip.bind(this)
-        });
-        this.cardRewardScreen.container.setDepth(1001);
-        this.cardRewardScreen.container.setScrollFactor(0);
-        this.cardRewardScreen.hide();
-    }
-
     public onCombatEnd(): void {
         if (this.combatEnded) return;
         this.combatEnded = true;
 
-        const rewardCards = this.determineCardRewards();
-        this.cardRewardScreen.rewards = rewardCards;
-        this.cardRewardScreen.displayRewardCards();
-        this.cardRewardScreen.show();
-        UIContextManager.getInstance().setContext(UIContext.CARD_REWARD);
+        const rewards = this.determineRewards();
+        this.generalRewardScreen = new GeneralRewardScreen(this.scene, rewards);
+        this.generalRewardScreen.show();
+        UIContextManager.getInstance().setContext(UIContext.REWARD_SCREEN);
     }
 
-    private determineCardRewards(): CardReward[] {
-        var cards = CardLibrary.getInstance().getRandomSelectionOfRelevantClassCards(3);
-        return cards.map(card => new CardReward(card, this.deriveOwnerFromCardNativeClass(card)));
-    }
+    // TODO: Placeholder, not really appropriate for this class
+    private determineRewards(): AbstractReward[] {
+        const rewards: AbstractReward[] = [];
 
-    private handleCardSelect(selectedCard: CardReward): void {
-        console.log("Card selected:", selectedCard.card.name);
-    }
+        // Generate card rewards
+        const cardRewards = CardRewardsGenerator.getInstance()
+            .generateCardRewardsForCombat();
+        rewards.push(new CardReward(cardRewards));
 
-    private handleSkip(): void {
-        console.log("Skip selected.");
+        // Add hell currency reward
+        rewards.push(new CurrencyReward(100));
+
+        return rewards;
     }
 
     public disableInteractions(): void {
@@ -502,17 +523,21 @@ class CombatUIManager {
     private createDebugMenu(): void {
         this.debugMenu = new DebugMenu(this.scene);
     }
-    private deriveOwnerFromCardNativeClass(card: PlayableCard): PlayerCharacter { 
-        var clazz = card.nativeToCharacterClass;
-        if (!clazz) {
-            console.warn(`Card ${card.name} has no associated character class`);
+
+    public showEvent(event: AbstractEvent): void {
+        if (this.currentEvent) {
+            this.currentEvent.destroy();
         }
-        var playerCharacter = GameState.getInstance().getCurrentRunCharacters().find(c => c.characterClass.id === clazz?.id);
-        if (!playerCharacter) {
-            // If no matching class found, randomly assign to a current run character
-            playerCharacter = GameState.getInstance().getCurrentRunCharacters()[Math.floor(Math.random() * GameState.getInstance().getCurrentRunCharacters().length)];
-        }
-        return playerCharacter;
+
+        this.currentEvent = new PhysicalEvent(
+            this.scene,
+            event,
+            (nextEvent: AbstractEvent | null) => {
+                if (nextEvent) {
+                    this.showEvent(nextEvent);
+                }
+            }
+        );
     }
 }
 

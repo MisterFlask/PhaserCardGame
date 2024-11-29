@@ -1,14 +1,15 @@
 // src/scenes/CombatScene.ts
 
 import Phaser from 'phaser';
+import BBCodeTextPlugin from 'phaser3-rex-plugins/plugins/bbcodetext-plugin.js';
 import { EncounterData } from '../encounters/Encounters';
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
+import { LocationCard, RestSiteCard } from '../maplogic/LocationCard';
 import { GameState } from '../rules/GameState';
 import { TextBoxButton } from '../ui/Button';
 import { CombatHighlightsManager } from '../ui/CombatHighlightsManager';
 import InventoryPanel from '../ui/InventoryPanel';
 import CombatSceneLayoutUtils from '../ui/LayoutUtils';
-import { TransientUiState } from '../ui/TransientUiState';
 import { UIContext, UIContextManager } from '../ui/UIContextManager';
 import { ActionManager } from '../utils/ActionManager';
 import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
@@ -24,7 +25,9 @@ import CombatUIManager from './subcomponents/CombatUiManager';
 import { DetailsScreenManager } from './subcomponents/DetailsScreenManager';
 import { MapOverlay } from './subcomponents/MapOverlay';
 import PerformanceMonitor from './subcomponents/PerformanceMonitor';
+import { RestOverlay } from './subcomponents/RestOverlay';
 import { ShopOverlay } from './subcomponents/ShopOverlay';
+import { TreasureOverlay } from './subcomponents/TreasureOverlay';
 
 /**
  * Interface for initializing CombatScene with necessmorniary data.
@@ -46,6 +49,9 @@ class CombatScene extends Phaser.Scene {
     private mapButton!: TextBoxButton;
     private campaignBriefStatus!: CampaignBriefStatus;
     private characterDeckOverlay!: CharacterDeckOverlay;
+    private treasureOverlay!: TreasureOverlay;
+    private restOverlay!: RestOverlay;
+    private combatEndHandled: boolean = false;
 
     constructor() {
         super('CombatScene');
@@ -54,18 +60,23 @@ class CombatScene extends Phaser.Scene {
     preload(): void {
         this.load.setBaseURL('https://raw.githubusercontent.com/');
         new GameImageLoader().loadAllImages(this.load);
+        this.load.plugin('rexbbcodetextplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbbcodetextplugin.min.js', true);
+        ActionManagerFetcher.initActionManagerAndGameState();
     }
 
     init(data: CombatSceneData): void {
         SceneChanger.setCurrentScene(this);
         ActionManager.init(this);
+
         const stateService = CombatStateService.getInstance();
         stateService.initializeCombat(data.encounter, GameState.getInstance().currentRunCharacters);
         UIContextManager.getInstance().setContext(UIContext.COMBAT);
+        this.combatEndHandled = false;
     }
 
+
+
     create(): void {
-        ActionManagerFetcher.initActionManager();
         this.createBackground();
 
         // Initialize CombatUIManager as a singleton
@@ -83,15 +94,22 @@ class CombatScene extends Phaser.Scene {
 
         // Initialize ShopOverlay
         this.shopOverlay = new ShopOverlay(this);
+        this.treasureOverlay = new TreasureOverlay(this);
+
+        // Initialize RestOverlay
+        this.restOverlay = new RestOverlay(this);
+        this.restOverlay.hide();
 
         // Set up the onCardClick handler
         this.inputHandler.addCardClickListener((card: AbstractCard) => {
             if (UIContextManager.getInstance().getContext() !== UIContext.COMBAT) return;
             this.shopOverlay.handleCardClick(card);
+            this.treasureOverlay.handleCardClickOnTreasureChest(card);
         });
 
         this.setupResizeHandler();
         GameState.getInstance().combatState.currentTurn = 0;
+        ActionManager.getInstance().startCombat();
         ActionManager.beginTurn()
 
         this.inventoryPanel = new InventoryPanel(this);
@@ -123,6 +141,33 @@ class CombatScene extends Phaser.Scene {
         this.characterDeckOverlay = new CharacterDeckOverlay(this);
         this.characterDeckOverlay.hide();
         this.setupCharacterClickHandlers();
+
+        // Add event listeners for draw and discard pile clicks
+        this.events.on('drawPileClicked', () => {
+            if (UIContextManager.getInstance().getContext() === UIContext.COMBAT) {
+                this.characterDeckOverlay.showCardInDrawPile();
+            }
+        });
+
+        this.events.on('discardPileClicked', () => {
+            if (UIContextManager.getInstance().getContext() === UIContext.COMBAT) {
+                this.characterDeckOverlay.showCardInDiscardPile();
+            }
+        });
+
+        // Add new event listener for exhaust pile clicks
+        this.events.on('exhaustPileClicked', () => {
+            if (UIContextManager.getInstance().getContext() === UIContext.COMBAT) {
+                this.characterDeckOverlay.showCardInExhaustPile();
+            }
+        });
+
+        // Add event listener for location selection
+        this.events.on('locationSelected', (location: LocationCard) => {
+            if (location instanceof RestSiteCard) {
+                this.restOverlay.show();
+            }
+        });
     }
 
     private obliterate(): void {
@@ -133,10 +178,18 @@ class CombatScene extends Phaser.Scene {
         if (this.campaignBriefStatus) {
             this.campaignBriefStatus.destroy();
         }
+
+        // Remove the pile click event listeners
+        this.events.off('drawPileClicked');
+        this.events.off('discardPileClicked');
+        this.events.off('exhaustPileClicked');
+        this.events.off('locationSelected');
     }
 
     private createBackground(): void {
-        this.background = this.add.image(this.scale.width / 2, this.scale.height / 2, 'battleback1')
+        const backgroundName = GameState.getInstance().currentLocation?.backgroundName || "battleback1";
+
+        this.background = this.add.image(this.scale.width / 2, this.scale.height / 2, backgroundName)
             .setOrigin(0.5)
             .setDisplaySize(this.scale.width, this.scale.height)
             .setDepth(-10)
@@ -183,6 +236,10 @@ class CombatScene extends Phaser.Scene {
             this.mapButton.setPosition(100, 200);
         }
 
+        this.mapButton.setScrollFactor(0);
+        this.background.setScrollFactor(0);
+        this.campaignBriefStatus.setScrollFactor(0);
+
         if (this.campaignBriefStatus) {
             this.campaignBriefStatus.setPosition(700, 11);
         }
@@ -193,7 +250,9 @@ class CombatScene extends Phaser.Scene {
     }
 
     update(time: number, delta: number): void {
-        if (UIContextManager.getInstance().getContext() !== UIContext.COMBAT) return;
+
+        this.cardManager.drawPile.setGlow(false);
+        this.cardManager.discardPile.setGlow(false);
 
         this.performanceMonitor.update(time, delta);
 
@@ -203,19 +262,24 @@ class CombatScene extends Phaser.Scene {
         }
 
         // Check if combat is finished
-        if (this.isCombatFinished()) {
+        if (this.isCombatFinished() && !this.combatEndHandled) {
+            this.combatEndHandled = true;
+            ActionManager.getInstance().endCombat();
+            this.cardManager.onCombatEnd();
             this.uiManager.onCombatEnd();
         }
 
         // Update DetailsScreenManager
-        const hoveredCard = TransientUiState.getInstance().hoveredCard;
-        this.detailsScreenManager.update(hoveredCard);
+        this.detailsScreenManager.update();
 
         // Get all characters (both allies and enemies)
         const allCharacters = [...GameState.getInstance().combatState.playerCharacters, ...     GameState.getInstance().combatState.enemies];
         
         // Update highlights
         CombatHighlightsManager.getInstance().update(allCharacters);
+
+        // Update card manager
+        this.cardManager.update();
     }
 
     /**
@@ -252,6 +316,14 @@ class CombatScene extends Phaser.Scene {
  * Phaser game configuration.
  */
 const gameConfig: Phaser.Types.Core.GameConfig = {
+    plugins: {
+        global: [{
+            key: 'rexBBCodeTextPlugin',
+            plugin: BBCodeTextPlugin,
+            start: true
+        },
+        ]
+      },
     type: Phaser.AUTO,
     width: 1920,
     height: 1080,

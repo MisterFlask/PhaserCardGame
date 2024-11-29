@@ -45,7 +45,7 @@ export class ShadowedImage extends Phaser.GameObjects.Container {
         this.setSize(displaySize, displaySize);
     }
 
-    setScale(scale: number): this {
+    setImageScale(scale: number): this {
         this.mainImage.setScale(scale);
         this.shadowImage.setScale(scale);
         return this;

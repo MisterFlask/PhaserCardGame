@@ -1,7 +1,7 @@
 import { AbstractCombatEvent } from "../../../rules/AbstractCombatEvent";
 import { SacrificeEvent } from "../../procs/BasicProcs";
 import { AbstractBuff } from "../AbstractBuff";
-import { Strong } from "../standard/Strong";
+import { Lethality } from "../standard/Strong";
 
 export class BloodGod extends AbstractBuff {
     constructor(stacks: number = 1) {
@@ -10,7 +10,7 @@ export class BloodGod extends AbstractBuff {
         this.isDebuff = false;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Blood God";
     }
 
@@ -22,7 +22,7 @@ export class BloodGod extends AbstractBuff {
         if (event instanceof SacrificeEvent) {
             const owner = this.getOwnerAsCharacter();
             if (owner) {
-                this.actionManager.applyBuffToCharacter(owner, new Strong(this.stacks));
+                this.actionManager.applyBuffToCharacterOrCard(owner, new Lethality(this.stacks));
             }
         }
     }

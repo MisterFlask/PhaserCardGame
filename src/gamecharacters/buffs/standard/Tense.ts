@@ -11,7 +11,7 @@ export class Tense extends AbstractBuff {
         this.stacks = stacks;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Tense";
     }
 
@@ -20,10 +20,10 @@ export class Tense extends AbstractBuff {
     }
 
     override onTurnStart(): void {
-        const currentStress = this.getOwnerAsCharacter()?.getBuffStacks(new Stress().getName());
+        const currentStress = this.getOwnerAsCharacter()?.getBuffStacks(new Stress().getDisplayName());
         if (currentStress && currentStress < this.stacks) {
             const stressToAdd = this.stacks - currentStress;
-            ActionManager.getInstance().applyBuffToCharacter(this.getOwnerAsCharacter()!,       new Stress(stressToAdd));
+            ActionManager.getInstance().applyBuffToCharacterOrCard(this.getOwnerAsCharacter()!,       new Stress(stressToAdd));
         }
     }
 }

@@ -1,6 +1,7 @@
 import { GameState } from "../../../../../rules/GameState";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { ExhaustBuff } from "../../../../buffs/playable_card/ExhaustBuff";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { BasicProcs } from "../../../../procs/BasicProcs";
 import { Buzzsword } from "../commons/Buzzsword";
@@ -11,9 +12,9 @@ export class Quartermaster extends PlayableCard {
             name: "Quartermaster",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.RARE,
+            rarity: EntityRarity.RARE,
         });
-        this.energyCost = 2;
+        this.baseEnergyCost = 2;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
@@ -23,13 +24,14 @@ export class Quartermaster extends PlayableCard {
 
         livingPartyMembers.forEach(member => {
             const buzzsword = new Buzzsword();
-            buzzsword.energyCost -= 1;
-            buzzsword.owner = member
+            buzzsword.baseEnergyCost -= 1;
+            buzzsword.owningCharacter = member;
+            buzzsword.buffs.push(new ExhaustBuff());
             BasicProcs.getInstance().ManufactureCardToHand(buzzsword);
         });
     }
 
     override get description(): string {
-        return `Manufacture a number of Buzzswords to hand equal to the number of living party members. Each costs 1 less and is owned by a different party member.`;
+        return `Manufacture a number of Buzzsword for each party member. Each costs 1 less and exhausts.`;
     }
 }

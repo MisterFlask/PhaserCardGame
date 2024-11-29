@@ -2,8 +2,8 @@ import { DeckLogic, PileName } from "../../../../../rules/DeckLogic";
 import { GameState } from "../../../../../rules/GameState";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { ExhaustBuff } from "../../../../buffs/playable_card/ExhaustBuff";
-import { Strong } from "../../../../buffs/standard/Strong";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { Lethality } from "../../../../buffs/standard/Strong";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { BasicProcs } from "../../../../procs/BasicProcs";
 
@@ -13,9 +13,9 @@ export class LastBastion extends PlayableCard {
             name: "Last Bastion",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.RARE,
+            rarity: EntityRarity.RARE,
         });
-        this.energyCost = 2;
+        this.baseEnergyCost = 2;
         this.baseBlock = 20;
         this.buffs.push(new ExhaustBuff());
     }
@@ -33,7 +33,7 @@ export class LastBastion extends PlayableCard {
 
             // Party members with >4 stress gain 2 Strength
             if (ally.stress > 4) {
-                const strengthBuff = new Strong(2);
+                const strengthBuff = new Lethality(2);
                 ally.buffs.push(strengthBuff);
             }
         });

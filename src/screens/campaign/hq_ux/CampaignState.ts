@@ -7,7 +7,7 @@ import { SpicyLiteratureCargo } from '../../../gamecharacters/playerclasses/card
 import { CampaignRules } from '../../../rules/CampaignRules';
 import { GameState } from '../../../rules/GameState';
 import { AbstractTradeRoute, StandardTradeRoute } from './AbstractTradeRoute';
-import { FactoryCard } from './FactoryCard';
+import { StrategicImprovementCard } from './StrategicImprovementCard';
 
 export class CampaignState {
     private static instance: CampaignState;
@@ -15,8 +15,8 @@ export class CampaignState {
     public currentYear: number = 1;
     public shareholderExpectation: number = 1000;
     public availableTradeRoutes: AbstractTradeRoute[] = [new StandardTradeRoute(),new StandardTradeRoute(),new StandardTradeRoute()];
-    public ownedFactories: FactoryCard[] = [];
-    public availableFactories: FactoryCard[] = [];
+    public ownedFactories: StrategicImprovementCard[] = [];
+    public availableFactories: StrategicImprovementCard[] = [];
     public selectedTradeRoute: AbstractTradeRoute | null = null;
     public selectedParty: PlayerCharacter[] = [];
     public roster: PlayerCharacter[] = CampaignRules.getInstance().generateLogicalCharacterRoster();

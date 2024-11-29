@@ -17,6 +17,7 @@ export abstract class AbstractIntent implements JsonRepresentable {
     owner: BaseCharacter;
     title: string;
     targetsAllPlayers: boolean = false;
+    iconTint: number = 0xffffff;
 
     constructor({imageName, target, owner }: {imageName: string, target: BaseCharacter | undefined, owner: BaseCharacter }) {
         this.imageName = imageName;
@@ -107,7 +108,7 @@ export class AddCardToPileIntent extends AbstractIntent {
 
         switch (this.pileName) {
             case 'draw':
-                combatState.currentDrawPile.push(this.cardToAdd);
+                combatState.drawPile.push(this.cardToAdd);
                 break;
             case 'discard':
                 combatState.currentDiscardPile.push(this.cardToAdd);
@@ -187,7 +188,7 @@ export class TagCardsIntent extends AbstractIntent {
     }
 
     tooltipText(): string {
-        const buffNames = this.buffs.map(buff => buff.getName()).join(', ');
+        const buffNames = this.buffs.map(buff => buff.getDisplayName()).join(', ');
         return `Tag ${this.numCardsToTag} random card${this.numCardsToTag > 1 ? 's' : ''} in the ${this.pileToTagFrom} pile with ${buffNames}`;
     }
 
@@ -198,7 +199,7 @@ export class TagCardsIntent extends AbstractIntent {
     act(): void {
         console.log(`Tagging ${this.numCardsToTag} cards in the ${this.pileToTagFrom} pile`);
         const gameState = GameState.getInstance();
-        const pile = this.pileToTagFrom === 'draw' ? gameState.combatState.currentDrawPile : gameState.combatState.currentDiscardPile;
+        const pile = this.pileToTagFrom === 'draw' ? gameState.combatState.drawPile : gameState.combatState.currentDiscardPile;
         
         // Shallow clone the pile to avoid modifying the original
         const clonedPile = [...pile];
@@ -219,7 +220,7 @@ export class TagCardsIntent extends AbstractIntent {
         return JSON.stringify({
             ...baseRepresentation,
             className: this.constructor.name,
-            buffs: this.buffs.map(buff => buff.getName()),
+            buffs: this.buffs.map(buff => buff.getDisplayName()),
             numCardsToTag: this.numCardsToTag,
             pileToTagFrom: this.pileToTagFrom,
         }, null, 2);
@@ -231,8 +232,9 @@ export class AttackAllPlayerCharactersIntent extends AbstractIntent {
     baseDamage: number;
 
     constructor({ baseDamage, owner }: { baseDamage: number, owner: BaseCharacter }) {
-        super({ imageName: 'area-damage', target: undefined, owner: owner });
+        super({ imageName: 'sword-array', target: undefined, owner: owner });
         this.baseDamage = baseDamage;
+        this.iconTint = 0xff0000;
         this.targetsAllPlayers = true;
     }
 
@@ -278,7 +280,7 @@ export class ApplyDebuffToAllPlayerCharactersIntent extends AbstractIntent {
     }
 
     tooltipText(): string {
-        return `Applying ${this.debuff.getName()} to a random player`;
+        return `Applying ${this.debuff.getDisplayName()} to a random player`;
     }
 
     displayText(): string {
@@ -286,13 +288,10 @@ export class ApplyDebuffToAllPlayerCharactersIntent extends AbstractIntent {
     }
 
     act(): void {
-        if (!this.target) {
-            throw new Error('Target cannot be null');
-        }
-        console.log(`Applying ${this.debuff.stacks} stack(s) of ${this.debuff.getName()} to ${this.target.name}`);
         for (const target of TargetingUtils.getInstance().selectAllPlayerCharacters()) {
+            console.log(`Applying ${this.debuff.stacks} stack(s) of ${this.debuff.getDisplayName()} to ${target.name}`)
             ActionManager.getInstance().tiltCharacter(this.owner);
-            ActionManager.getInstance().applyBuffToCharacter(target, this.debuff);
+            ActionManager.getInstance().applyBuffToCharacterOrCard(target, this.debuff);
         }
     }
 
@@ -301,7 +300,7 @@ export class ApplyDebuffToAllPlayerCharactersIntent extends AbstractIntent {
         return JSON.stringify({
             ...baseRepresentation,
             className: this.constructor.name,
-            debuff: this.debuff.getName(),
+            debuff: this.debuff.getDisplayName(),
             stacks: this.debuff.stacks,
         }, null, 2);
     }
@@ -317,7 +316,7 @@ export class ApplyDebuffToRandomCharacterIntent extends AbstractIntent {
     }
 
     tooltipText(): string {
-        return `Applying ${this.debuff.getName()} to a random player`;
+        return `Applying ${this.debuff.getDisplayName()} to a random player`;
     }
 
     displayText(): string {
@@ -330,8 +329,8 @@ export class ApplyDebuffToRandomCharacterIntent extends AbstractIntent {
         }
         ActionManager.getInstance().tiltCharacter(this.owner);
 
-        console.log(`Applying ${this.debuff.stacks} stack(s) of ${this.debuff.getName()} to ${this.target.name}`);
-        ActionManager.getInstance().applyBuffToCharacter(this.target, this.debuff);
+        console.log(`Applying ${this.debuff.stacks} stack(s) of ${this.debuff.getDisplayName()} to ${this.target.name}`);
+        ActionManager.getInstance().applyBuffToCharacterOrCard(this.target, this.debuff);
     }
 
     createJsonRepresentation(): string {
@@ -339,7 +338,7 @@ export class ApplyDebuffToRandomCharacterIntent extends AbstractIntent {
         return JSON.stringify({
             ...baseRepresentation,
             className: this.constructor.name,
-            debuff: this.debuff.getName(),
+            debuff: this.debuff.getDisplayName(),
             stacks: this.debuff.stacks,
         }, null, 2);
     }
@@ -387,7 +386,7 @@ export class ApplyBuffToSelfIntent extends AbstractIntent {
     }
 
     tooltipText(): string {
-        return `Applying ${this.buff.getName()} to self`;
+        return `Applying ${this.buff.getDisplayName()} to self`;
     }
 
     displayText(): string {
@@ -396,8 +395,8 @@ export class ApplyBuffToSelfIntent extends AbstractIntent {
 
     act(): void {
         ActionManager.getInstance().tiltCharacter(this.owner);
-        console.log(`Applying ${this.buff.stacks} stack(s) of ${this.buff.getName()} to allies`);
-        ActionManager.getInstance().applyBuffToCharacter(this.owner, this.buff);
+        console.log(`Applying ${this.buff.stacks} stack(s) of ${this.buff.getDisplayName()} to allies`);
+        ActionManager.getInstance().applyBuffToCharacterOrCard(this.owner, this.buff);
     }
 
     createJsonRepresentation(): string {
@@ -405,7 +404,7 @@ export class ApplyBuffToSelfIntent extends AbstractIntent {
         return JSON.stringify({
             ...baseRepresentation,
             className: this.constructor.name,
-            debuff: this.buff.getName(),
+            debuff: this.buff.getDisplayName(),
             stacks: this.buff.stacks,
         }, null, 2);
     }

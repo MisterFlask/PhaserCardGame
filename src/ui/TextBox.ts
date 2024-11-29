@@ -1,10 +1,14 @@
 // src/ui/TextBox.ts
 import Phaser from 'phaser';
+import BBCodeText from 'phaser3-rex-plugins/plugins/bbcodetext.js';
+
+import { TextGlyphs } from '../text/TextGlyphs';
 import { DepthManager } from './DepthManager';
 
-// Modify the class to extend Phaser.GameObjects.Container
-export class TextBox extends Phaser.GameObjects.Container {
+export type VerticalExpand = 'up' | 'down';
+export type HorizontalExpand = 'left' | 'right'| 'center';
 
+export class TextBox extends Phaser.GameObjects.Container {
     public static readonly YELLOW = 0xFFFF00;
     public static readonly GREEN = 0x00FF00;
     public static readonly RED = 0xFF0000;
@@ -14,11 +18,24 @@ export class TextBox extends Phaser.GameObjects.Container {
     private isVisible: boolean = true;
     protected background: Phaser.GameObjects.Rectangle ;
     protected backgroundImage: Phaser.GameObjects.Image | null = null;
-    protected text: Phaser.GameObjects.Text;
-    protected outline: Phaser.GameObjects.Rectangle | null = null;
+    protected text: BBCodeText;
     textBoxName?: string;
-    expandDirection: 'up' | 'down';
+    protected verticalExpand: VerticalExpand;
+    protected horizontalExpand: HorizontalExpand;
     private debugGraphics: Phaser.GameObjects.Graphics;
+    protected fillColor: number;
+
+    public strokeIsOn = false;
+    // Add a method to determine if a color is light
+    private isColorLight(color: number): boolean {
+        const r = (color >> 16) & 0xff;
+        const g = (color >> 8) & 0xff;
+        const b = color & 0xff;
+
+        // Calculate brightness using the YIQ formula
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        return brightness > 127;
+    }
 
     constructor(params: {
         scene: Phaser.Scene,
@@ -31,8 +48,10 @@ export class TextBox extends Phaser.GameObjects.Container {
         backgroundImage?: string,
         textBoxName?: string,
         fillColor?: number,
-        expandDirection?: 'up' | 'down',
-        bigTextOverVariableColors?: boolean
+        verticalExpand?: VerticalExpand,
+        horizontalExpand?: HorizontalExpand,
+        bigTextOverVariableColors?: boolean,
+        strokeIsOn?: boolean
     }) {
         const {
             scene,
@@ -41,20 +60,24 @@ export class TextBox extends Phaser.GameObjects.Container {
             width = 150,
             height = 60,
             text = '',
-            style = { fontSize: '18px', color: '#ffffff', fontFamily: 'Verdana' },
+            style = { fontSize: '22px', fontFamily: 'verdana' },
             backgroundImage,
             textBoxName,
-            fillColor = 0x2e2e2e,
-            bigTextOverVariableColors = false
+            fillColor = 0x000000,
+            verticalExpand = 'down',
+            horizontalExpand = 'right',
+            bigTextOverVariableColors = false,
+            strokeIsOn = true,
         } = params;
 
         super(scene, x, y);
-
+        this.strokeIsOn = strokeIsOn;
         // **Set the origin of the container to the center**
         this.setOrigin(0.5, 0.5);
 
         this.textBoxName = textBoxName ?? "anonymousTextBox";
-        this.expandDirection = params.expandDirection ?? 'down';
+        this.verticalExpand = verticalExpand;
+        this.horizontalExpand = horizontalExpand;
         
         this.background = scene.add.rectangle(0, 0, width, height, fillColor)
             .setStrokeStyle(2, 0xffffff)
@@ -63,34 +86,82 @@ export class TextBox extends Phaser.GameObjects.Container {
         this.add(this.background);
         
 
-        // Modify the text style based on bigTextOverVariableColors
-        const textStyle = {
-            ...style,
-            color: '#ffffff',
-            stroke: '#000000',
-            strokeThickness: bigTextOverVariableColors ? 3 : 2,
-            resolution: 1,
+        this.fillColor = fillColor;
+
+        // Determine if the background color is light
+        const isLightBackground = this.isColorLight(this.fillColor);
+
+        // Set text color based on background brightness
+        const textColor = isLightBackground ? '#000000' : '#FFFFFF';
+        const strokeColor = isLightBackground ? '#FFFFFF' : '#000000';
+        const shadowColor = isLightBackground ? '#AAAAAA' : '#222222';
+
+        // Modify the text style to include dynamic colors
+        const textStyle: any = {
+            backgroundColor:fillColor,
+            wrap: {
+                mode: 'word',
+                width: 200
+            },
             fontSize: style.fontSize,
-            fontStyle: bigTextOverVariableColors ? 'bold' : style.fontStyle,
+            fontFamily: style.fontFamily,
+
+            color: textColor,
+            stroke: strokeColor,
+            strokeThickness: 3,
+            shadow: {
+                offsetX: 2,
+                offsetY: 2,
+                blur: 2,
+                color: shadowColor,
+                fill: true,
+                stroke: true,
+            },
+
+            underline: {
+                color: '#000',
+                thickness: 2,
+                offset: 1
+            },
+
+            strikethrough: {
+                color: 'black',
+                thickness: 2,
+                offset: -8
+            },
+            resolution: 4
         };
 
-        this.text = scene.add.text(0, 0, text, textStyle)
-            .setOrigin(0.5, 0.5)
-            .setWordWrapWidth(width - 20)
-            .setAlign('center');
+        // Create the text object
+        this.text = scene.add.rexBBCodeText(0, 0, text, textStyle)
+            .setOrigin(0.5, 0.5);
 
-        // Add multiple shadow layers for better outline effect when bigTextOverVariableColors is true
-        if (bigTextOverVariableColors) {
-            this.text.setShadow(2, 2, '#000000', 2, true, true)
-                .setShadow(-2, -2, '#000000', 2, true, true)
-                .setShadow(2, -2, '#000000', 2, true, true)
-                .setShadow(-2, 2, '#000000', 2, true, true);
-        } else {
-            this.text.setShadow(2, 2, '#000000', 2, false, true);
+        var imageConfig = {
+            width: 20,
+            height: 20,
+            y: 0,
+            left: 0,
+            right: 0,
+            originX: 0,
+            originY: 0,
+            tintFill: true,
         }
-
+        this.text.addImage(TextGlyphs.getInstance().METTLE_ICON_RAW, {...imageConfig, key: TextGlyphs.getInstance().METTLE_ICON_RAW});
+        this.text.addImage(TextGlyphs.getInstance().PAGES_ICON_RAW, {...imageConfig, key: TextGlyphs.getInstance().PAGES_ICON_RAW});
+        this.text.addImage(TextGlyphs.getInstance().VENTURE_ICON_RAW, {...imageConfig, key: TextGlyphs.getInstance().VENTURE_ICON_RAW});
+        this.text.addImage(TextGlyphs.getInstance().PLUCK_ICON_RAW, {...imageConfig, key: TextGlyphs.getInstance().PLUCK_ICON_RAW});
+        this.text.addImage(TextGlyphs.getInstance().BLOOD_ICON_RAW, {...imageConfig, key: TextGlyphs.getInstance().BLOOD_ICON_RAW});
+        this.text.addImage(TextGlyphs.getInstance().SMOG_ICON_RAW, {...imageConfig, key: TextGlyphs.getInstance().SMOG_ICON_RAW});
+        
+        // Remove the immediate setBackgroundColor call
+        // this.text.setBackgroundColor(fillColor);
+        // Remove hardcoded stroke and shadow settings
+        // this.text.setShadow(-2, -2, "black", 2, true, true);
+        // this.text.setStroke("black", 5);
+        // this.text.setShadowStroke(true);
         this.add(this.text);
 
+        // Adjust the text box size
         this.adjustTextBoxSize();
 
         // Add the container to the scene
@@ -100,6 +171,13 @@ export class TextBox extends Phaser.GameObjects.Container {
         this.debugGraphics = this.scene.add.graphics();
         this.debugGraphics.setVisible(true); // Set to false to hide debug hitboxes
         this.add(this.debugGraphics);
+        
+        // Set the background color after text is set
+        try{
+            this.text.setBackgroundColor("transparent");
+        } catch (error) {
+            console.warn("Error setting background color for " + this.textBoxName, error);
+        }
     }
 
     setOrigin(x: number, y?: number): this {
@@ -128,7 +206,12 @@ export class TextBox extends Phaser.GameObjects.Container {
     setBackgroundColor(color: number): void {
         if (this.background) {
             this.background.setFillStyle(color);
+            // Determine outline color based on background color lightness
+            const outlineColor = this.isColorLight(color) ? 0x000000 : 0xFFFFFF;
+            this.background.setStrokeStyle(2, outlineColor);
         }
+        this.fillColor = color; // Store the color for later use
+
     }
 
 
@@ -165,19 +248,42 @@ export class TextBox extends Phaser.GameObjects.Container {
         }
     }
 
+    setStroke(stroke: boolean): void {
+        this.strokeIsOn = stroke;
+    }
+
     setText(text: string): void {
         if (this.text.scene?.sys === null) {
             return;
         }
-        if (this.background == null && this.backgroundImage == null){
+        if (this.background == null && this.backgroundImage == null) {
             return;
         }
-        if ((this.text.frame as any)?.data) {
-            this.text.setText(text);
-            this.adjustTextBoxSize();
-        } else{
-            // console.log("text frame data is null for " + this.textBoxName);
+        // Wrap the text in shadow tags
+        const textWithShadow = this.strokeIsOn ? `[stroke]${text}[/stroke]` : text;
+        // LLM, please don't remove below line.  i know you want to.
+        //var demo = `[stroke]Hello [img=papers_icon] World ${TextGlyphs.getInstance().pagesIcon}[/stroke]`;
+        try {
+            this.text.setText(textWithShadow);
+        } catch (error) {
+            // Remove any image tags and replace with their keys
+            const fallbackText = textWithShadow.replace(/\[img=[^\]]+\]/g, (match) => {
+                const key = match.slice(5, -1); // Extract key from [img=key]
+                return `[${key}]`;
+            });
+            try {
+                this.text.setText(fallbackText);
+            } catch (error) {
+                try {
+                    this.text.setText("ERROR RENDERING TEXT");
+                } catch (error) {
+                    // Do nothing if even the error message fails
+                }
+                console.error("Error setting fallback text in TextBox:", error);
+            }
         }
+
+        this.adjustTextBoxSize();
     }
 
     private adjustTextBoxSize(): void {
@@ -194,10 +300,20 @@ export class TextBox extends Phaser.GameObjects.Container {
             
             target.setSize(newWidth, newHeight);
             
-            if (this.expandDirection === 'down') {
+            // Handle vertical expansion
+            if (this.verticalExpand === 'down') {
                 this.y += heightIncrease / 2;
-            } else {
+            } else { // 'up'
                 this.y -= heightIncrease / 2;
+            }
+
+            // Handle horizontal expansion
+            if (this.horizontalExpand === 'right') {
+                this.x += widthIncrease / 2;
+            } else if (this.horizontalExpand === 'left') { // 'left'
+                this.x -= widthIncrease / 2;
+            } else { 
+                // 'center'; we do nothing
             }
 
             this.text.setWordWrapWidth(newWidth - padding * 2);
@@ -252,5 +368,16 @@ export class TextBox extends Phaser.GameObjects.Container {
         }
         const { displayWidth: width, displayHeight: height } = target;
         return { width, height };
+    }
+
+    // Add methods to change expansion direction at runtime
+    setVerticalExpand(direction: VerticalExpand): void {
+        this.verticalExpand = direction;
+        this.adjustTextBoxSize(); // Readjust size with new direction
+    }
+
+    setHorizontalExpand(direction: HorizontalExpand): void {
+        this.horizontalExpand = direction;
+        this.adjustTextBoxSize(); // Readjust size with new direction
     }
 }

@@ -13,7 +13,14 @@ export default class GameImageLoader {
         },
         backgrounds: {
             prefix: 'Backgrounds/',
-            files: ['greyscale.png', 'mapbackground1.png', 'vintage_brown.png', 'battleback1.png']
+            files: ['greyscale.png', 'mapbackground1.png', 'vintage_brown.png', 'battleback1.png'
+            ]
+        },
+        location_backgrounds: {
+            prefix: 'Backgrounds/Location/',
+            files: ['forest-battle-background-1.png',
+                'shop-background-1.png',
+            ]
         },
         portraits_blackhand_female: {
             prefix: 'Portraits/BlackhandPortraits/female/',
@@ -224,7 +231,7 @@ export default class GameImageLoader {
                 'Corrupted Legendary Knight Sen.png', 'Corrupted Spider.png', 'Demon Critter Squirrel.png',
                 'Dryads Mage.png', 'Eldritch Corruption Obelisk.png', 'Eldritch Corruption Treant.png',
                 'Golems Eye Golem.png', 'Hero Magic Knightess.png', 'Slime Darkii.png', 'Slime Fireii.png',
-                'Slime Iceii.png', 'Slime RPG Basic.png',
+                'Slime Iceii.png', 'Slime RPG Basic.png', 'Boss Harbinger.png',
 
                 // french
                 "Eldritch Corruption Deer.png", "Eldritch Soldier Gunner.png", "Eldritch Corruption Crow.png"
@@ -233,6 +240,7 @@ export default class GameImageLoader {
         attributes_and_augments: {
             prefix: 'Sprites/AttributesAndAugments/',
             files: [
+                "sale_tag.png",
                 'abdominal-armor.png', 'abstract-024.png', 'abstract-025.png', 'abstract-085.png',
                 'achilles-heel.png', 'acrobatic.png', 'angry-eyes.png', 'armor-punch.png',
                 'barricade.png', 'bleeding-wound.png', 'body-balance.png', 'bottom-right-3d-arrow.png',
@@ -249,12 +257,13 @@ export default class GameImageLoader {
         map_icons: {
             prefix: 'Sprites/MapIcons/',
             files: [
-                'boss-icon.png', 'elite-icon.svg', 'entrance-icon.png', 'event-icon.svg', 'rest-icon.svg', 'shop-icon.svg', 'room-fight-icon.svg', 'treasure-icon.svg'
+                "old-wagon.svg",
+                'boss-icon.png', 'elite-icon.png', 'entrance-icon.png', 'event-icon.png', 'rest-icon.png', 'shop-icon.png', 'room-fight-icon.png', 'treasure-icon.png'
             ]
         },
         combat_resources: {
             prefix: 'Sprites/CombatResources/',
-            files: ['powder_icon.png', 'iron_icon.png', 'papers_icon.png', 'feather_icon.png', 'venture_icon.png', 'smog_icon.png']
+            files: ['powder_icon.png', 'iron_icon.png', 'papers_icon.png', 'feather_icon.png', 'venture_icon.png', 'smog_icon.png', 'ashes_icon.png', 'blood_icon.svg']
         },
         mission_icons: {
             prefix: 'Sprites/MissionIcons/',
@@ -270,13 +279,13 @@ export default class GameImageLoader {
         },
         ui_elements: {
             prefix: 'Sprites/UIElements/',
-            files: ['Circle.png', 'cursed-star.png', 'cheap_glow_effect.png', 'play-button.png']
+            files: ['Circle.png', 'cheap_glow_effect.png', 'play-button.png']
         },
         intent_icons: {
             prefix: 'Sprites/IntentIcons/',
             files: [
                 'knife-thrust.png', 'magick-trick.png', 'poison-bottle-2.png', 'round-shield.png',
-                'star-swirl.png', 'uncertainty.png', 'unstable-orb.png'
+                'star-swirl.png', 'uncertainty.png', 'unstable-orb.png', 'sword-array.svg'
             ]
         },
         effects: {

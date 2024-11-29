@@ -1,6 +1,6 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { AbstractBuff } from "../../../../buffs/AbstractBuff";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { BasicProcs } from "../../../../procs/BasicProcs";
 import { TakeCover } from "../tokens/TakeCover";
@@ -11,13 +11,13 @@ export class TheLaw extends PlayableCard {
             name: "The Law",
             cardType: CardType.POWER,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.UNCOMMON,
+            rarity: EntityRarity.UNCOMMON,
         });
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
-        this.actionManager.applyBuffToCharacter(this.owner!, new TheLawBuff(1));
+        this.actionManager.applyBuffToCharacterOrCard(this.owningCharacter!, new TheLawBuff(1));
     }
 
     override get description(): string {
@@ -30,7 +30,7 @@ class TheLawBuff extends AbstractBuff {
         this.stacks = stacks;
     }
     
-    override getName(): string {
+    override getDisplayName(): string {
         return "The Law";
     }
 

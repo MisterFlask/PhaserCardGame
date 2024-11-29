@@ -2,7 +2,7 @@ import { AbstractBuff } from "../AbstractBuff";
 
 export class DrawOneFewerCardNextNTurns extends AbstractBuff {
 
-    getName(): string {
+    getDisplayName(): string {
         return "Draw One Fewer Card";
     }
 

@@ -1,4 +1,5 @@
 import { Scene } from 'phaser';
+import { TextGlyphs } from '../../../../text/TextGlyphs';
 import { TextBoxButton } from '../../../../ui/Button';
 import { TextBox } from '../../../../ui/TextBox';
 import { CampaignState } from '../CampaignState';
@@ -12,7 +13,7 @@ export class MainHubPanel extends AbstractHqPanel {
     private navigationButtons: Map<string, TextBoxButton>;
 
     constructor(scene: Scene) {
-        super(scene, 'Company HQ');
+        super(scene, `! Company HQ${TextGlyphs.getInstance().pagesIcon}! ${TextGlyphs.getInstance().pagesIcon}`);
 
         const campaignState = CampaignState.getInstance();
 

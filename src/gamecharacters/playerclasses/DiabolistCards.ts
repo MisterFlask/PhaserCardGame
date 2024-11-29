@@ -1,5 +1,5 @@
 import { ActionManager } from "../../utils/ActionManager";
-import { TargetingType, AbstractCard } from "../AbstractCard";
+import { AbstractCard, TargetingType } from "../AbstractCard";
 import { BaseCharacter } from "../BaseCharacter";
 import { PlayableCard } from "../PlayableCard";
 export class ArcaneRitualCard extends PlayableCard {
@@ -22,7 +22,7 @@ export class ArcaneRitualCard extends PlayableCard {
         if (targetCard && targetCard instanceof BaseCharacter) {
             this.dealDamageToTarget(targetCard);
             ActionManager.getInstance().drawCards(1);
-            this.applyBlockToTarget(this.owner);
+            this.applyBlockToTarget(this.owningCharacter);
         }
     }
 }

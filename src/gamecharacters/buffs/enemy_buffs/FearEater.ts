@@ -9,7 +9,7 @@ export class FearEater extends AbstractBuff {
         this.isDebuff = false;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Fear Eater";
     }
 

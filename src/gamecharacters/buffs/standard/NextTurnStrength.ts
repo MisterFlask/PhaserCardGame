@@ -1,5 +1,5 @@
 import { AbstractBuff } from "../AbstractBuff";
-import { Strong } from "./Strong";
+import { Lethality } from "./Strong";
 
 export class NextTurnStrength extends AbstractBuff {
     constructor(stacks: number = 1) {
@@ -8,7 +8,7 @@ export class NextTurnStrength extends AbstractBuff {
         this.isDebuff = false;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Next Turn Strength";
     }
 
@@ -19,7 +19,7 @@ export class NextTurnStrength extends AbstractBuff {
     override onTurnStart(): void {
         const owner = this.getOwnerAsCharacter();
         if (owner) {
-            this.actionManager.applyBuffToCharacter(owner, new Strong(this.stacks));
+            this.actionManager.applyBuffToCharacterOrCard(owner, new Lethality(this.stacks));
             this.stacks = 0;
         }
     }

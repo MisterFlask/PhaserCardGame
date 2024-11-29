@@ -13,7 +13,7 @@ export class ReIgnition extends PlayableCard {
         });
         this.baseBlock = 5;
         this.baseMagicNumber = 3;
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
     }
 
     override get description(): string {
@@ -25,7 +25,7 @@ export class ReIgnition extends PlayableCard {
             this.applyBlockToTarget(targetCard);
             
             this.forEachEnemy(enemy => {
-                this.actionManager.applyBuffToCharacter(enemy as BaseCharacter, new Burning(this.getBaseMagicNumberAfterResourceScaling()), this.owner as BaseCharacter);
+                this.actionManager.applyBuffToCharacterOrCard(enemy as BaseCharacter, new Burning(this.getBaseMagicNumberAfterResourceScaling()), this.owningCharacter as BaseCharacter);
             });
         }
     }

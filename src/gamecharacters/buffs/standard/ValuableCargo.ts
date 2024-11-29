@@ -9,7 +9,7 @@ export class ValuableCargo extends AbstractBuff {
         this.stackable = false;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Valuable Cargo";
     }
 

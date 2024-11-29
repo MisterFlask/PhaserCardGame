@@ -1,4 +1,4 @@
-import { GameState } from "../rules/GameState";
+import { CombatState, GameState } from "../rules/GameState";
 
 import Phaser, { Scene } from 'phaser';
 import { AbstractCard, IPhysicalCardInterface } from '../gamecharacters/AbstractCard';
@@ -6,7 +6,8 @@ import type { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { AbstractBuff } from "../gamecharacters/buffs/AbstractBuff";
 import { Stress } from "../gamecharacters/buffs/standard/Stress";
 import { IBaseCharacter } from "../gamecharacters/IBaseCharacter";
-import { PlayableCard } from "../gamecharacters/PlayableCard";
+import { CardResourceScaling, PlayableCard } from "../gamecharacters/PlayableCard";
+import { CardType } from "../gamecharacters/Primitives";
 import { ProcBroadcaster } from "../gamecharacters/procs/ProcBroadcaster";
 import { AbstractRelic } from "../relics/AbstractRelic";
 import { AbstractCombatEvent } from "../rules/AbstractCombatEvent";
@@ -16,19 +17,127 @@ import CombatUiManager from "../screens/subcomponents/CombatUiManager";
 import { AutomatedCharacterType, BaseCharacterType, PlayableCardType } from "../Types";
 import CardSelectionFromHandManager from '../ui/CardSelectionFromHandManager';
 import { SubtitleManager } from "../ui/SubtitleManager";
+import { UIContext, UIContextManager } from "../ui/UIContextManager";
 
 export class ActionManager {
+    gainEnergy(amount: number) {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            const gameState = GameState.getInstance();
+            gameState.combatState.energyAvailable += amount;
+            return [];
+        }));
+    }
+    
+    pulseBuff(buff: AbstractBuff) {
+        this.scene.events.emit('pulseBuff', buff.id);
 
+    }
 
-    sellItemForHellCurrency(item: PlayableCard) {
-        const inventory = GameState.getInstance().cardsInventory;
-        const index = inventory.findIndex(card => card.id === item.id);
-        if (index !== -1) {
-            inventory.splice(index, 1);
+    destroyCardInMasterDeck(card: PlayableCard) {
+        if (card.owningCharacter) {
+            const index = card.owningCharacter.cardsInMasterDeck.indexOf(card);
+            if (index > -1) {
+                card.owningCharacter.cardsInMasterDeck.splice(index, 1);
+            }
+        }
+    }
+
+    addCardToMasterDeck(card: PlayableCard) {
+        if (!card.owningCharacter){
+            // Assign to a random character in the party
+            const gameState = GameState.getInstance();
+            const partyMembers = gameState.currentRunCharacters;
+            if (partyMembers.length > 0) {
+                const randomCharacter = partyMembers[Math.floor(Math.random() * partyMembers.length)];
+                card.owningCharacter = randomCharacter;
+            }
         }
 
-        GameState.getInstance().hellCurrency += item.hellSellValue;
+        card.owningCharacter?.cardsInMasterDeck.push(card);
     }
+
+
+    removeCardFromMasterDeck(card: PlayableCard) {
+        card.owningCharacter?.cardsInMasterDeck.splice(card.owningCharacter?.cardsInMasterDeck.indexOf(card), 1);
+    }
+
+    endCombat() {
+        this.actionQueue.addAction(new GenericAction(async () => {
+
+            GameState.getInstance().relicsInventory.forEach(relic => {
+                relic.onCombatEnd();
+            });
+
+            GameState.getInstance().combatState.allPlayerAndEnemyCharacters.forEach(character => {
+                character.buffs.forEach(buff => {
+                    buff.onCombatEnd();
+                });
+            });
+            return [];
+        }));
+
+        // clear out all the buffs on the player characters
+        GameState.getInstance().combatState.allPlayerAndEnemyCharacters.forEach(character => {
+            // Only clear non-persona buffs
+            character.buffs = character.buffs.filter(buff => buff.isPersonaTrait || buff.isPersistentBetweenCombats);
+        });
+        // Reset all combat resources to 0
+        const combatResources = GameState.getInstance().combatState.combatResources;
+        combatResources.modifyAshes(0 - combatResources.pages.value);
+        combatResources.modifyPluck(0 - combatResources.pluck.value);
+        combatResources.modifyMettle(0 - combatResources.iron.value);
+        combatResources.modifyVenture(0 - combatResources.venture.value);
+        combatResources.modifySmog(0 - combatResources.smog.value);
+        combatResources.modifyBlood(0 - combatResources.powder.value);
+    }
+
+    modifyMaxEnergy(amount: number) {
+        GameState.getInstance().combatState.maxEnergy += amount;
+    }
+
+    initializeCombatDeck(){
+        const gameState = GameState.getInstance();
+        const combatState = gameState.combatState;
+        combatState.drawPile = [...gameState.currentRunCharacters.flatMap(c => c.cardsInMasterDeck)];
+        // Fisher-Yates shuffle algorithm
+        for (let i = combatState.drawPile.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [combatState.drawPile[i], combatState.drawPile[j]] = [combatState.drawPile[j], combatState.drawPile[i]];
+        }
+
+        combatState.currentHand = [];
+        combatState.currentDiscardPile = [];
+        combatState.currentExhaustPile = [];
+        combatState.currentExhaustPile = [];
+    }
+
+    startCombat() {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            
+            this.initializeCombatDeck();
+
+            // Set max energy based on relics
+            GameState.getInstance().combatState.maxEnergy = 3; // Base energy
+
+            GameState.getInstance().relicsInventory.forEach(relic => {
+                relic.onCombatStart();
+            });
+
+            GameState.getInstance().combatState.allPlayerAndEnemyCharacters.forEach(character => {
+                character.buffs.forEach(buff => {
+                    buff.onCombatStart();
+                });
+            });
+            return [];
+        }));
+    }
+
+    sellItemForBrimstoneDistillate(item: PlayableCard) {
+        this.removeCardFromMasterDeck(item);
+
+        GameState.getInstance().brimstoneDistillate += item.hellSellValue;
+    }
+    
     buyRelicForHellCurrency(relic: AbstractRelic, price: number) : boolean {
         if (GameState.getInstance().hellCurrency < price) {
             return false;
@@ -40,18 +149,20 @@ export class ActionManager {
         return true;
     }
 
-    addRelicToInventory(relic: AbstractRelic, scene: Phaser.Scene) {
-        GameState.getInstance().addRelic(relic, scene);
+    addRelicToInventory(relic: AbstractRelic) {
+        GameState.getInstance().addRelic(relic, this.scene);
     }
 
 
     buyItemForHellCurrency(item: PlayableCard) : boolean {
-        const inventory = GameState.getInstance().cardsInventory;
         if (GameState.getInstance().hellCurrency < item.hellPurchaseValue) {
             return false;
         }
-        
-        inventory.push(item);
+
+        this.addCardToMasterDeck(item);
+        item.buffs.forEach(buff => {
+            buff.onGainingThisCard();
+        });
         GameState.getInstance().hellCurrency -= item.hellPurchaseValue;
         return true;
     }
@@ -70,7 +181,7 @@ export class ActionManager {
     public createCardToDrawPile(card: PlayableCard) {
         this.actionQueue.addAction(new GenericAction(async () => {
             const gameState = GameState.getInstance();
-            gameState.combatState.currentDrawPile.push(card);
+            gameState.combatState.drawPile.push(card);
             return [];
         }));
     }
@@ -131,6 +242,7 @@ export class ActionManager {
             ActionManager.instance = new ActionManager();
         }
         this.getInstance().scene = scene;
+        this.getInstance().actionQueue.clear();
     }
 
     public static getInstance(): ActionManager { // Modified getInstance
@@ -144,10 +256,19 @@ export class ActionManager {
         this.animateAttackerTilt(character.physicalCard!);
     }
 
-    public applyBuffToCard(card: PlayableCard, buff: AbstractBuff) {
+    public applyBuffToCard(card: AbstractCard, buff: AbstractBuff, sourceCharacter?: IBaseCharacter): void {
+       this.applyBuffToCharacterOrCard(card, buff, sourceCharacter);
+    }
+
+    public applyBuffToCharacterOrCard(card: AbstractCard, buff: AbstractBuff, sourceCharacter?: IBaseCharacter): void {
+        if (card == null || buff == null) {
+            return;
+        }
         this.actionQueue.addAction(new GenericAction(async () => {
-            card.buffs.push(buff);
-            console.log(`Applied buff ${buff.getName()} to card ${card.name}`);
+            AbstractBuff._applyBuffToCharacterOrCard(card, buff);
+            console.log(`Applied buff ${buff.getDisplayName()} to ${card.name}`);
+            // You might want to add some animation or visual feedback here
+            await new WaitAction(20).playAction(); // Short delay for visual feedback
             return [];
         }));
     }
@@ -157,8 +278,8 @@ export class ActionManager {
             return;
         }
         this.actionQueue.addAction(new GenericAction(async () => {
-            AbstractBuff._applyBuffToCharacter(character as BaseCharacterType, buff);
-            console.log(`Applied buff ${buff.getName()} to ${character.name}`);
+            AbstractBuff._applyBuffToCharacterOrCard(character as BaseCharacterType, buff);
+            console.log(`Applied buff ${buff.getDisplayName()} to ${character.name}`);
             // You might want to add some animation or visual feedback here
             await new WaitAction(20).playAction(); // Short delay for visual feedback
             return [];
@@ -167,7 +288,7 @@ export class ActionManager {
 
     public removeBuffFromCharacter(character: IBaseCharacter, buffName: string, stacksToRemove?: number): void {
         this.actionQueue.addAction(new GenericAction(async () => {
-            const buff = character.buffs.find(b => b.getName() === buffName);
+            const buff = character.buffs.find(b => b.getDisplayName() === buffName);
             if (buff) {
                 if (!stacksToRemove){
                     buff.stacks = 0
@@ -200,6 +321,10 @@ export class ActionManager {
 
     public getCanPlayCardResult(card: IPhysicalCardInterface, target?: BaseCharacterType): {canPlay: boolean, reason?: string} {
         const playableCard = card.data as PlayableCardType;
+        if (!card.data){
+            console.error("No data found for card " + card);
+            return {canPlay: false, reason: "No data found for card"};
+        }
         const gameState = GameState.getInstance();
         const combatState = gameState.combatState;
 
@@ -229,6 +354,11 @@ export class ActionManager {
     }
 
     public playCard(card: IPhysicalCardInterface, target?: BaseCharacterType): boolean {
+        if (!card?.data){
+            console.error("No data found for card " + card);
+            return false;
+        }
+        
         const playResult = this.getCanPlayCardResult(card, target);
         if (!playResult.canPlay) {
             if (playResult.reason) {
@@ -258,24 +388,47 @@ export class ActionManager {
                 }
             }
 
-            if (target) {
-                combatState.energyAvailable -= playableCard.energyCost;
-                playableCard.InvokeCardEffects(target);
-            } else {
-                playableCard.InvokeCardEffects();
-            }
+            combatState.energyAvailable -= playableCard.energyCost;
+            playableCard.InvokeCardEffects(target);
+
+            this.InvokeSecondaryEffectsOfPlayingCard(playableCard, target);
 
             // Pay the missing energy through buffs
             missingEnergyBuffs.forEach(buff => {
                 buff.provideMissingEnergy_returnsAmountProvided(missingEnergy);
             });
 
-            DeckLogic.moveCardToPile(card.data as PlayableCard, PileName.Discard);
+
+            if (gameState.combatState.currentExhaustPile.includes(playableCard)){
+                // do nothing, don't move it back
+            }else if (playableCard.cardType == CardType.POWER){
+                DeckLogic.moveCardToPile(card.data as PlayableCard, PileName.Exhaust);
+            }else{
+                DeckLogic.moveCardToPile(card.data as PlayableCard, PileName.Discard);
+            }
             await this.animateDiscardCard(card);
             return [];
         }));
 
         return true;
+    }
+    InvokeSecondaryEffectsOfPlayingCard(playableCard: PlayableCard, target: BaseCharacter | undefined) 
+    {
+        playableCard.buffs.forEach(buff => {
+            buff.onThisCardInvoked(target);
+        });    
+
+        GameState.getInstance().combatState.allPlayerAndEnemyCharacters.forEach(character => {
+            character.buffs.forEach(buff => {
+                buff.onAnyCardPlayedByAnyone(playableCard, target);
+            });
+        });
+
+        
+        GameState.getInstance().relicsInventory.forEach(relic => {
+            relic.onCardPlayed(playableCard, target);
+        });
+
     }
 
     public stateBasedEffects(){
@@ -284,43 +437,88 @@ export class ActionManager {
 
         combatState.allPlayerAndEnemyCharacters.forEach(character => {
             character.buffs.slice().forEach(buff => { // Create a copy of buffs
-                if (buff.stacks <= 0) {
+                if (buff.stacks <= 0 && !buff.canGoNegative) {
                     character.buffs = character.buffs.filter(existingBuff => existingBuff !== buff);
                 }
             });
         });
 
-
+        combatState.allCardsInAllPilesExceptExhaust.forEach(card => {
+            this.consolidateBuffsOnCard(card);
+            this.consolidateResourceScalingOnCard(card);
+        });
 
         // Consolidate stacks of buffs of the same type
+        this.consolidateBuffsOnCharacters(combatState);
+    }
+    consolidateResourceScalingOnCard(card: PlayableCard) {
+        if (!card.resourceScalings || card.resourceScalings.length <= 1) {
+            return; // Nothing to consolidate
+        }
+
+        // Create a map to track scalings by resource
+        const scalingsByResource = new Map<string, CardResourceScaling[]>();
+
+        // Group scalings by resource
+        card.resourceScalings.forEach(scaling => {
+            const resourceName = scaling.resource.name;
+            if (!scalingsByResource.has(resourceName)) {
+                scalingsByResource.set(resourceName, []);
+            }
+            scalingsByResource.get(resourceName)!.push(scaling);
+        });
+
+        // Consolidate scalings for each resource
+        const consolidatedScalings: CardResourceScaling[] = [];
+        scalingsByResource.forEach((scalings, resourceName) => {
+            if (scalings.length > 1) {
+                // Sum up all scaling values for this resource
+                const consolidated: CardResourceScaling = {
+                    resource: scalings[0].resource,
+                    attackScaling: scalings.reduce((sum, s) => sum + (s.attackScaling || 0), 0),
+                    blockScaling: scalings.reduce((sum, s) => sum + (s.blockScaling || 0), 0),
+                    magicNumberScaling: scalings.reduce((sum, s) => sum + (s.magicNumberScaling || 0), 0)
+                };
+                consolidatedScalings.push(consolidated);
+            }
+        });
+
+        card.resourceScalings = consolidatedScalings;
+    }
+
+    private consolidateBuffsOnCharacters(combatState: CombatState) {
         combatState.allPlayerAndEnemyCharacters.forEach(character => {
             // Create a map to track buffs by their constructor name
-            const buffsByType = new Map<string, AbstractBuff[]>();
-            
-            character.buffs.forEach(buff => {
-                const buffType = buff.constructor.name;
-                if (!buffsByType.has(buffType)) {
-                    buffsByType.set(buffType, []);
-                }
-                buffsByType.get(buffType)!.push(buff);
-            });
+            this.consolidateBuffsOnCard(character);
+        });
+    }
 
-            // For each buff type that has multiple instances
-            buffsByType.forEach((buffs, buffType) => {
-                if (buffs.length > 1) {
-                    // Sum up all stacks
-                    const totalStacks = buffs.reduce((sum, buff) => sum + buff.stacks, 0);
-                    
-                    // Keep the first buff and update its stacks
-                    const firstBuff = buffs[0];
-                    firstBuff.stacks = totalStacks;
+    private consolidateBuffsOnCard(character: AbstractCard) {
+        const buffsByType = new Map<string, AbstractBuff[]>();
 
-                    // Remove other buffs of the same type
-                    character.buffs = character.buffs.filter(buff => 
-                        buff === firstBuff || buff.constructor.name !== buffType
-                    );
-                }
-            });
+        character.buffs.forEach(buff => {
+            const buffType = buff.constructor.name;
+            if (!buffsByType.has(buffType)) {
+                buffsByType.set(buffType, []);
+            }
+            buffsByType.get(buffType)!.push(buff);
+        });
+
+        // For each buff type that has multiple instances
+        buffsByType.forEach((buffs, buffType) => {
+            if (buffs.length > 1) {
+                console.log("consolidating " + buffType);
+                // Sum up all stacks
+                const totalStacks = buffs.reduce((sum, buff) => sum + buff.stacks, 0);
+
+                // Keep the first buff and update its stacks
+                const firstBuff = buffs[0];
+                firstBuff.stacks = totalStacks;
+
+                // Remove other buffs of the same type
+                character.buffs = character.buffs.filter(buff => buff === firstBuff || buff.constructor.name !== buffType
+                );
+            }
         });
     }
 
@@ -360,12 +558,21 @@ export class ActionManager {
         console.log('Drawing hand for new turn');
         const gameState = GameState.getInstance();
         const combatState = gameState.combatState;
-        const handSize = 3; // Assuming a hand size of 3 cards
+        const handSize = 5;
 
-        this.drawCards(handSize);
+        // Check each character's buffs at start of turn
+        const allCharacters = [...combatState.playerCharacters, ...combatState.enemies];
+        var cardModifier = 0;
+        allCharacters.forEach(character => {
+            character.buffs.forEach(buff => {
+                cardModifier += buff.getCardsDrawnAtStartOfTurnModifier();
+            });
+        });
+
+        this.drawCards(handSize + cardModifier);
 
         console.log('State of all piles:');
-        console.log('Draw Pile:', combatState.currentDrawPile.map(card => card.name));
+        console.log('Draw Pile:', combatState.drawPile.map(card => card.name));
         console.log('Discard Pile:', combatState.currentDiscardPile.map(card => card.name));
         console.log('Hand:', combatState.currentHand.map(card => card.name));
     }
@@ -377,6 +584,20 @@ export class ActionManager {
             // Add a small delay after drawing each card
             for (let i = 0; i < count; i++) {
                 const drawnCard = deckLogic.drawCards(1)[0];
+                
+                if (!drawnCard) {
+                    console.warn("No card drawn");
+                    break;
+                }
+                
+                drawnCard.buffs.forEach(buff => {
+                    buff.onCardDrawn();
+                });
+                
+                GameState.getInstance().relicsInventory.forEach(relic => {
+                    relic.onCardDrawn(drawnCard);
+                });
+
                 await this.animateDrawCard(drawnCard);
                 await new WaitAction(50).playAction();
                 drawnCards.push(drawnCard);
@@ -384,6 +605,7 @@ export class ActionManager {
 
             const gameState = GameState.getInstance();
             const combatState = gameState.combatState;
+
 
 
             console.log('Cards drawn:', drawnCards.map(card => card.name));
@@ -469,14 +691,16 @@ export class ActionManager {
         sourceCharacter,
         sourceCard,
         fromAttack,
-        callback
+        callback,
+        ignoresBlock
     }: {
         baseDamageAmount: number,
         target: IBaseCharacter,
         sourceCharacter?: IBaseCharacter,
         sourceCard?: PlayableCardType,
         fromAttack?: boolean,
-        callback?: (damageResult: DamageCalculationResult) => void
+        callback?: (damageResult: DamageCalculationResult) => void,
+        ignoresBlock?: boolean
     }): void => {
         this.actionQueue.addAction(new GenericAction(async () => {
             const physicalCardOfTarget = target.physicalCard;
@@ -491,8 +715,10 @@ export class ActionManager {
                 target,
                 sourceCharacter,
                 sourceCard,
-                fromAttack
+                fromAttack,
+                ignoresBlock
             });
+            console.log(`Damage Result from ${sourceCharacter?.name || 'Unknown'} to ${target.name}: `, damageResult);
 
             if (damageResult.unblockedDamage > 0) {
                 target.hitpoints = Math.max(0, target.hitpoints - damageResult.unblockedDamage);
@@ -514,7 +740,7 @@ export class ActionManager {
 
                 // now for every buff on the source character, invoke its onOwnerStriking method
                 sourceCharacter?.buffs.forEach(buff => {
-                    buff.onOwnerStriking(target as BaseCharacterType, sourceCard || null, {
+                    buff.onOwnerStriking_CannotModifyDamage(target as BaseCharacterType, sourceCard || null, {
                         damageDealt: damageResult.totalDamage,
                         unblockedDamageTaken: damageResult.unblockedDamage,
                         damageBlocked: damageResult.blockedDamage
@@ -632,8 +858,7 @@ export class ActionManager {
 
     public purchaseShopItem(item: PlayableCardType): void {
         item.OnPurchase();
-        const inventory = GameState.getInstance().getInventory();
-        inventory.push(item);
+        this.addCardToMasterDeck(item);
         GameState.getInstance().shopCardsForSale = GameState.getInstance().shopCardsForSale.filter(i => i !== item);
     }
 
@@ -662,15 +887,15 @@ export class ActionManager {
             return [];
         }));
     }
-    public modifyPages(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
+    public modifyAshes(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
         this.actionQueue.addAction(new GenericAction(async () => {
-            GameState.getInstance().combatState.combatResources.modifyPages(amount);
+            GameState.getInstance().combatState.combatResources.modifyAshes(amount);
             return [];
         }));
     }
     public modifyIron(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
         this.actionQueue.addAction(new GenericAction(async () => {
-            GameState.getInstance().combatState.combatResources.modifyIron(amount);
+            GameState.getInstance().combatState.combatResources.modifyMettle(amount);
             return [];
         }));
     }
@@ -680,9 +905,9 @@ export class ActionManager {
             return [];
         }));
     }
-    public modifyPowder(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
+    public modifyBlood(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
         this.actionQueue.addAction(new GenericAction(async () => {
-            GameState.getInstance().combatState.combatResources.modifyPowder(amount);
+            GameState.getInstance().combatState.combatResources.modifyBlood(amount);
             return [];
         }));
     }
@@ -704,32 +929,40 @@ export class ActionManager {
         SubtitleManager.getInstance().hideSubtitle();
     }
 
-    public PlayCard = (card: PlayableCardType, target: BaseCharacterType): void => {
-        // Invoke the effect of the card
-        if (card.IsPerformableOn(target)) {
-            card.InvokeCardEffects(target);
-            
-            // now for each buff on the card, invoke its onCardInvoked effect
-            card.buffs.forEach(buff => {
-                buff.onThisCardInvoked(target);
-            });
-        }
-
-        // Queue discard action instead of direct discard
-        ActionManager.getInstance().basicDiscardCard(card);
-    };
-
     public endTurn(): void {
+        UIContextManager.getInstance().setContext(UIContext.COMBAT_BUT_NOT_YOUR_TURN);
         console.log('Ending turn');
         const gameState = GameState.getInstance();
         const combatState = gameState.combatState;
 
-        // {{ edit_1 }}
+
+
         // Remove intents from dead enemies
         combatState.enemies.forEach(enemy => {
             if (enemy.hitpoints <= 0) {
                 enemy.intents = [];
             }
+        });
+
+        // end turn buffs
+        combatState.allPlayerAndEnemyCharacters.forEach(character => {
+            character.buffs.forEach(buff => {
+                buff.onTurnEnd_CharacterBuff();
+            });
+        });
+
+        // end turn buffs on cards in hand
+        combatState.currentHand.forEach(card => {
+            card.buffs.forEach(buff => {
+                buff.onInHandAtEndOfTurn();
+            });
+        });
+
+        // Queue discard actions instead of direct discard
+        this.basicDiscardCards(combatState.currentHand);
+
+        combatState.enemies.forEach(character => {
+            character.block = 0;
         });
 
         combatState.enemies.forEach(enemy => {
@@ -750,17 +983,7 @@ export class ActionManager {
                 });
             }
         });
-
-        // end turn buffs
-        combatState.allPlayerAndEnemyCharacters.forEach(character => {
-            character.buffs.forEach(buff => {
-                buff.onTurnEnd_CharacterBuff();
-            });
-        });
-
         
-        // Queue discard actions instead of direct discard
-        ActionManager.getInstance().basicDiscardCards(combatState.currentHand);
         combatState.currentTurn++;
         ActionManager.beginTurn();
     }
@@ -772,6 +995,9 @@ export class ActionManager {
             for (const buff of card.buffs) {
                 buff.onActiveDiscard();
             }
+            GameState.getInstance().relicsInventory.forEach(relic => {
+                relic.onCardDiscarded(card);
+            });
             return [];
         }));
     }
@@ -785,6 +1011,9 @@ export class ActionManager {
                 buff.onExhaust();
             }
 
+            GameState.getInstance().relicsInventory.forEach(relic => {
+                relic.onCardExhausted(card);
+            });
             ProcBroadcaster.getInstance().broadcastCombatEvent(new ExhaustEvent(card));
 
             return [];
@@ -803,7 +1032,7 @@ export class ActionManager {
     public relieveStressFromCharacter(character: BaseCharacter, amount: number): void {
         this.actionQueue.addAction(new GenericAction(async () => {
             const reliefBuff = new Stress(amount);
-            this.removeBuffFromCharacter(character, reliefBuff.getName(), amount);
+            this.removeBuffFromCharacter(character, reliefBuff.getDisplayName(), amount);
             console.log(`Relieved ${amount} Stress from ${character.name}`);
             return [];
         }));
@@ -818,26 +1047,35 @@ export class ActionManager {
     }
 
     public static beginTurn(): void {
-        const gameState = GameState.getInstance();
-        const combatState = gameState.combatState;
+        ActionManager.getInstance().actionQueue.addAction(new GenericAction(async () => {
+            const gameState = GameState.getInstance();
+            const combatState = gameState.combatState;
 
-        // Prevent dead enemies from gaining new intents
-        combatState.enemies.forEach(enemy => {
-            if (enemy.hitpoints > 0) {
-                enemy.setNewIntents();
-            }
-        });
-
-        // Queue draw action instead of direct draw
-        ActionManager.getInstance().drawHandForNewTurn();
-
-        combatState.allPlayerAndEnemyCharacters.forEach(character => {
-            character.buffs.forEach(buff => {
-                buff.onTurnStart();
+            // erase block from all player characters
+            combatState.playerCharacters.forEach(character => {
+                character.block = 0;
             });
-        });
 
-        combatState.energyAvailable = combatState.maxEnergy
+            // Prevent dead enemies from gaining new intents
+            combatState.enemies.forEach(enemy => {
+                if (enemy.hitpoints > 0) {
+                    enemy.setNewIntents();
+                }
+            });
+
+            // Queue draw action instead of direct draw
+            ActionManager.getInstance().drawHandForNewTurn();
+
+            combatState.allPlayerAndEnemyCharacters.forEach(character => {
+                character.buffs.forEach(buff => {
+                    buff.onTurnStart();
+                });
+            });
+
+            combatState.energyAvailable = combatState.maxEnergy;
+            UIContextManager.getInstance().setContext(UIContext.COMBAT);
+            return [];
+        }));
     }
 
     public static ExecuteIntents(): void {
@@ -872,7 +1110,7 @@ public chooseCardToDiscard(): void {
         cancellable: false,
         action: (selectedCards: PlayableCardType[]) => {
             if (selectedCards.length > 0) {
-                this.basicDiscardCard(selectedCards[0]);
+                this.activeDiscardCard(selectedCards[0]);
             }
         }
     });
@@ -959,6 +1197,12 @@ class ActionNode {
 }
 
 export class ActionQueue {
+    clear() {
+        this.queue = [];
+        this.currentActionNode = null;
+        this.isResolving = false;
+    }
+
     private queue: ActionNode[] = [];
     private currentActionNode: ActionNode | null = null;
     private isResolving: boolean = false;

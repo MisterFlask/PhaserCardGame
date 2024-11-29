@@ -1,5 +1,5 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
 export class Orders extends PlayableCard {
@@ -8,9 +8,9 @@ export class Orders extends PlayableCard {
             name: "Orders",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.UNCOMMON,
+            rarity: EntityRarity.UNCOMMON,
         });
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

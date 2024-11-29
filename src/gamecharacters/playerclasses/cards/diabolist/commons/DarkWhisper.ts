@@ -2,8 +2,8 @@
 
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
-import { Poison as Poisoned } from "../../../../buffs/standard/Poisoned";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { Poisoned } from "../../../../buffs/standard/Poisoned";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
 
@@ -13,12 +13,12 @@ export class DarkWhisper extends PlayableCard {
             name: "Dark Whisper",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.COMMON,
+            rarity: EntityRarity.COMMON,
         });
         this.baseBlock = 4;
         this.baseMagicNumber = 2;
-        this.energyCost = 1;
-        this.rarity = CardRarity.COMMON;
+        this.baseEnergyCost = 1;
+        this.rarity = EntityRarity.COMMON;
     }
 
     override get description(): string {
@@ -27,7 +27,7 @@ export class DarkWhisper extends PlayableCard {
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         this.forEachEnemy(enemy => {
-            this.actionManager.applyBuffToCharacter(enemy as BaseCharacter, new Poisoned(this.getBaseMagicNumberAfterResourceScaling()));
+            this.actionManager.applyBuffToCharacterOrCard(enemy as BaseCharacter, new Poisoned(this.getBaseMagicNumberAfterResourceScaling()));
         });
         this.forEachAlly(ally => {
             this.applyBlockToTarget(ally);

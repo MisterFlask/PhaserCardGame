@@ -232,18 +232,8 @@ class CombatInputHandler {
         return card.isValidTarget(target);
     }
 
-    private isAlly(target: BaseCharacter): boolean {
-        // Implement actual ally checking logic
-        return true;
-    }
-
-    private isEnemy(target: BaseCharacter): boolean {
-        // Implement actual enemy checking logic
-        return true;
-    }
 
     private playCardOnBattlefield(card: PhysicalCard): void {
-        const playableCard = card.data as PlayableCard;
         ActionManager.getInstance().playCard(card);
         console.log(`Card played on battlefield: ${card.data.name}`);
     }
@@ -272,7 +262,6 @@ class CombatInputHandler {
             onComplete: () => {
                 this.cardManager.discardPile.data.name = `Discard Pile (${GameState.getInstance().combatState.currentDiscardPile.length + 1})`;
                 this.cardManager.discardPile.nameBox.setText(this.cardManager.discardPile.data.name);
-                GameState.getInstance().combatState.currentDiscardPile.push(card.data as PlayableCard);
                 card.obliterate(); // Remove the card after animation
             }
         });

@@ -2,8 +2,10 @@ import { AbstractIntent, ApplyDebuffToRandomCharacterIntent, AttackIntent } from
 import { AutomatedCharacter } from '../gamecharacters/AutomatedCharacter';
 import { Delicious } from '../gamecharacters/buffs/enemy_buffs/Delicious';
 import { Stress } from '../gamecharacters/buffs/standard/Stress';
-import { Stressful } from '../gamecharacters/buffs/standard/Stressful';
-import { Strong } from '../gamecharacters/buffs/standard/Strong';
+import { Lethality } from '../gamecharacters/buffs/standard/Strong';
+import { Terrifying } from '../gamecharacters/buffs/standard/Terrifying';
+import { AbstractRelic } from '../relics/AbstractRelic';
+import { RelicsLibrary } from '../relics/RelicsLibrary';
 import { FrenchBlindProphetess } from './monsters/act1_boss/FrenchBlindProphetess';
 import { FrenchChef } from './monsters/act1_segment1/FrenchChef';
 import { FrenchCrow } from './monsters/act1_segment1/FrenchCrow';
@@ -31,9 +33,9 @@ export class ClockworkAbomination extends AutomatedCharacter {
 export class BaconBeast extends AutomatedCharacter {
     constructor() {
         super({ name: 'Breakfast Nightmares Bacon Beast', portraitName: 'Breakfast Nightmares Bacon Beast', maxHitpoints: 25, description: 'A cunning dark elf assassin' });
-        this.buffs.push(new Strong(2))
+        this.buffs.push(new Lethality(2))
         this.buffs.push(new Delicious(1));
-        this.buffs.push(new Stressful(1));
+        this.buffs.push(new Terrifying(1));
     }
     
 
@@ -45,7 +47,7 @@ export class BaconBeast extends AutomatedCharacter {
 export class BloodManipulationSlime extends AutomatedCharacter {
     constructor() {
         super({ name: 'Blood Manipulation Slime', portraitName: 'Blood Manipulation Slime', maxHitpoints: 20, description: 'Gross.' });
-        this.buffs.push(new Strong(3))
+        this.buffs.push(new Lethality(3))
 
     }
     
@@ -143,6 +145,27 @@ export class ShopGuy extends AutomatedCharacter {
     }
 }
 
+export class TreasureChest extends AutomatedCharacter {
+    public relic?: AbstractRelic;
+    
+    constructor() {
+        super({ 
+            name: 'Treasure Chest', 
+            portraitName: 'TreasureChest', 
+            maxHitpoints: 1, 
+            description: 'Contains valuable treasures' 
+        });
+        this.relic = RelicsLibrary.getInstance().getRandomRelics(1)[0];
+        if (!this.relic) {
+            throw new Error("Failed to retrieve a relic");
+        }
+    }
+
+    override generateNewIntents(): AbstractIntent[] {
+        return []; // Treasure chest doesn't attack or have intents
+    }
+}
+
 export class EncounterManager {
     private static instance: EncounterManager;
 
@@ -169,13 +192,30 @@ export class EncounterManager {
         // Find the matching ActSegmentData
         const actSegment = Object.values(ActSegment).find(
             segmentData => segmentData.act === act && segmentData.segment === segment
-        );
+        ) as ActSegmentData;
 
         if (!actSegment || actSegment.encounters.length === 0) {
             throw new Error(`No encounters found for act ${act}, segment ${segment}`);
         }
 
         const randomIndex = Math.floor(Math.random() * actSegment.encounters.length);
-        return actSegment.encounters[randomIndex];
+        return this.CopyEncounterData(actSegment.encounters[randomIndex]);
+    }
+
+    public CopyEncounterData(encounterData: EncounterData): EncounterData {
+        return {
+            enemies: encounterData.enemies.map(e => e.Copy())
+        };
+    }
+
+    public getTreasureEncounter(): Encounter {
+        return {
+            data: {
+                enemies: [new TreasureChest()],
+            },
+            peaceful: true,
+            act: 0,
+            segment: 0
+        };
     }
 }

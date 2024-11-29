@@ -9,7 +9,7 @@ export class Penance extends AbstractBuff {
         this.isDebuff = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Penance";
     }
 
@@ -17,10 +17,10 @@ export class Penance extends AbstractBuff {
         return `Whenever you play a card of cost 2 or less, increase its cost by ${this.getStacksDisplayText()}.`;
     }
 
-    override onAnyCardPlayed(playedCard: PlayableCard, target?: BaseCharacter): void {
-        if (playedCard.energyCost <= 2) {
-            playedCard.energyCost += this.stacks;
-            console.log(`Penance increased the cost of ${playedCard.name} by ${this.stacks}. New cost: ${playedCard.energyCost}`);
+    override onAnyCardPlayedByAnyone(playedCard: PlayableCard, target?: BaseCharacter): void {
+        if (playedCard.baseEnergyCost <= 2) {
+            playedCard.baseEnergyCost += this.stacks;
+            console.log(`Penance increased the cost of ${playedCard.name} by ${this.stacks}. New cost: ${playedCard.baseEnergyCost}`);
         }
     }
 }

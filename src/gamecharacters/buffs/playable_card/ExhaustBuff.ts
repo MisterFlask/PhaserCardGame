@@ -16,7 +16,7 @@ export class ExhaustBuff extends AbstractBuff {
         }
     }
 
-    public getName(): string {
+    public getDisplayName(): string {
         return "Exhaust";
     }
 

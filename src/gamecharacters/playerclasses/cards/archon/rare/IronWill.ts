@@ -1,5 +1,5 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { AbstractBuff } from "../../../../buffs/AbstractBuff";
 import { ExhaustBuff } from "../../../../buffs/playable_card/ExhaustBuff";
@@ -9,7 +9,7 @@ class IronWillBuff extends AbstractBuff {
         super();
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Iron Will";
     }
 
@@ -28,14 +28,14 @@ export class IronWill extends PlayableCard {
             name: "Iron Will",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.RARE,
+            rarity: EntityRarity.RARE,
         });
         this.buffs.push(new ExhaustBuff());
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
-        const owner = this.owner;
+        const owner = this.owningCharacter;
 
         if (owner) {
             // Owner gains 2 stress

@@ -5,7 +5,7 @@ export class Figment extends AbstractBuff {
         super();
     }
 
-    getName(): string {
+    getDisplayName(): string {
         return "Figment";
     }
 

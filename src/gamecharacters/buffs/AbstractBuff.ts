@@ -1,8 +1,9 @@
 import type { AbstractCombatEvent } from "../../rules/AbstractCombatEvent";
 import type { DamageInfo } from "../../rules/DamageInfo";
-import { CombatResources, CombatState, GameState } from "../../rules/GameState";
-import { ActionManager } from "../../utils/ActionManager";
+import type { CombatResources, CombatState, GameState } from "../../rules/GameState";
+import type { ActionManager } from "../../utils/ActionManager";
 import { ActionManagerFetcher } from "../../utils/ActionManagerFetcher";
+import type { AbstractCard } from "../AbstractCard";
 import { generateWordGuid } from "../AbstractCard";
 import type { BaseCharacter } from "../BaseCharacter";
 import { PlayerCharacter } from "../BaseCharacterClass";
@@ -11,12 +12,31 @@ import { IBaseCharacter } from '../IBaseCharacter';
 import type { PlayableCard } from "../PlayableCard";
 export abstract class AbstractBuff implements IAbstractBuff {
 
+    // if this is a "standard" buff that is always on the card, it's added to the main description instead of the tooltip/icon.
+    public moveToMainDescription: boolean = false;
+
+    /// used when we want to refer to the buff by a unique name, like when we want to check if a card has a buff.
+    public getBuffCanonicalName(): string {
+        return this.getDisplayName();
+    }
+
+    public getCardOwner(): BaseCharacter | null {
+        return this.getOwnerAsPlayableCard()?.owningCharacter ?? null;
+    }
+    public getCardOwnerName(): string {
+        return this.getOwnerAsPlayableCard()?.owningCharacter?.name ?? "(owner)";
+    }
+
     get actionManager(): ActionManager {
         return ActionManagerFetcher.getActionManager();
     }
 
     get combatState(): CombatState {
-        return GameState.getInstance().combatState;
+        return ActionManagerFetcher.getGameState().combatState;
+    }
+
+    get gameState(): GameState {
+        return ActionManagerFetcher.getGameState();
     }
 
     get combatResources(): CombatResources {
@@ -35,15 +55,18 @@ export abstract class AbstractBuff implements IAbstractBuff {
     }
 
     protected forEachAlly(callback: (ally: BaseCharacter) => void): void {
-        const gameState = GameState.getInstance();
-        const playerCharacters = gameState.combatState.playerCharacters;
+        const playerCharacters = this.gameState.combatState.playerCharacters;
         playerCharacters.forEach(callback);
+    }
+    protected forEachEnemy(callback: (enemy: BaseCharacter) => void): void {
+        const enemies = this.gameState.combatState.enemies;
+        enemies.forEach(callback);
     }
 
     public generateSeededRandomBuffColor(): number {
         let hash = 0;
-        for (let i = 0; i < this.getName().length; i++) {
-            const char = this.getName().charCodeAt(i);
+        for (let i = 0; i < this.getDisplayName().length; i++) {
+            const char = this.getDisplayName().charCodeAt(i);
             hash = ((hash << 5) - hash) + char;
             hash = hash & hash; // Convert to 32bit integer
         }
@@ -55,17 +78,21 @@ export abstract class AbstractBuff implements IAbstractBuff {
         return (r << 16) | (g << 8) | b;
     }
 
+    public pulseBuff(){
+        this.actionManager.pulseBuff(this);
+        this.actionManager.displaySubtitle(this.getDisplayName(), 500);
+    }
+
     public getOwnerAsPlayableCard(): PlayableCard | null {
         // Import GameState if not already imported at the top of the file
 
         // Find the owner of this buff by searching through all characters in the combat state
-        const gameState = GameState.getInstance();
-        const combatState = gameState.combatState;
-        const allPlayableCards = [...combatState.currentDrawPile, ...combatState.currentHand, ...combatState.currentDiscardPile];
+        const combatState = this.gameState.combatState;
+        const allPlayableCards = [...combatState.drawPile, ...combatState.currentHand, ...combatState.currentDiscardPile];
         const owner = allPlayableCards.find(card => card.buffs.some(buff => buff.id === this.id));
 
         if (!owner) {
-            console.warn(`No owner found for buff ${this.getName()} with id ${this.id}`);
+            console.warn(`No owner found for buff ${this.getDisplayName()} with id ${this.id}`);
             return null;
         }
 
@@ -76,14 +103,13 @@ export abstract class AbstractBuff implements IAbstractBuff {
         // Import GameState if not already imported at the top of the file
 
         // Find the owner of this buff by searching through all characters in the combat state
-        const gameState = GameState.getInstance();
-        const combatState = gameState.combatState;
+        const combatState = this.gameState.combatState;
         const allCharacters = [...combatState.playerCharacters, ...combatState.enemies];
 
         const owner = allCharacters.find(character => character.buffs.some(buff => buff.id === this.id));
 
         if (!owner) {
-            console.warn(`No owner found for buff ${this.getName()} with id ${this.id}`);
+            console.warn(`No owner found for buff ${this.getDisplayName()} with id ${this.id}`);
             return null;
         }
 
@@ -93,13 +119,30 @@ export abstract class AbstractBuff implements IAbstractBuff {
     /*
     * Generally you'll want to use the ActionManager method for this since that allows game animations to play.
     */
-    public static _applyBuffToCharacter(character: BaseCharacter, buff: AbstractBuff) {
+    public static _applyBuffToCharacterOrCard(character: AbstractCard, buff: AbstractBuff) {
         if (character == null) {
             return;
         }
         if (character.buffs == null) {
             character.buffs = [];
         }
+
+        // Check for buff interception from existing buffs
+        let changeInStacks = buff.stacks;
+        const previousStacks = character.buffs.find(b => b.constructor === buff.constructor)?.stacks || 0;
+
+        for (const existingBuff of character.buffs) {
+            const interceptionResult = existingBuff.interceptBuffApplication(character, buff, previousStacks, changeInStacks);
+            if (interceptionResult.logicTriggered) {
+                changeInStacks = interceptionResult.newChangeInStacks;
+                if (changeInStacks <= 0) {
+                    return; // Buff was fully intercepted
+                }
+            }
+        }
+        buff.stacks = changeInStacks;
+
+
         // Check if the character already has a buff of the same type
         let existingBuff = character.buffs.find(existingBuff => existingBuff.constructor === buff.constructor);
         if (existingBuff) {
@@ -109,7 +152,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
                 existingBuff.stacks += buff.stacks;
             } else {
                 // If the buff is not stackable, we'll just log this information
-                console.log(`Buff ${existingBuff.getName()} is not stackable. Ignoring new application.`);
+                console.log(`Buff ${existingBuff.getDisplayName()} is not stackable. Ignoring new application.`);
             }
             // If not stackable, we don't add a new one or modify the existing one
         } else {
@@ -123,9 +166,12 @@ export abstract class AbstractBuff implements IAbstractBuff {
     }
 
     getStacksDisplayText(): string {
-        if (this.stacks > 0) return `${this.stacks}`;
-        else return "[stacks]";
+        if (this.helpMode) {
+            return "[color=gold](stacks)[/color]";
+        }
+        return `[color=gold]${this.stacks}[/color]`;
     }
+    
     canGoNegative: boolean = false;
     imageName: string = "PLACEHOLDER_IMAGE";
     id: string = generateWordGuid();
@@ -135,7 +181,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
     showSecondaryStacks: boolean = false;
     isDebuff: boolean = false;
     valueMod: number = 0;
-
+    public helpMode: boolean = false;
     private _stacks: number = 1;
 
     get stacks(): number {
@@ -164,7 +210,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
     }
 
 
-    abstract getName(): string;
+    abstract getDisplayName(): string;
 
     /**
      * make sure to use getStacksDisplayText() in the description if you want to show the number of stacks.
@@ -174,6 +220,10 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
     onRunStart(): void {
 
+    }
+
+    energyCostModifier(): number {
+        return 0;
     }
 
     // this is a FLAT modifier on top of damage taken, not percentage-based.
@@ -224,7 +274,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
     /**
      * This is called when the owner of the buff is striking another unit.  It CANNOT BE USED to modify damage dealt; use getPercentCombatDamageDealtModifier or getCombatDamageDealtModifier instead for that.
      */
-    onOwnerStriking(struckUnit: IBaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo) {
+    onOwnerStriking_CannotModifyDamage(struckUnit: IBaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo) {
 
     }
 
@@ -240,7 +290,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
     }
 
-    interceptBuffApplication(character: IBaseCharacter, buffApplied: AbstractBuff, previousStacks: number, changeInStacks: number) : BuffApplicationResult {
+    interceptBuffApplication(character: AbstractCard, buffApplied: AbstractBuff, previousStacks: number, changeInStacks: number) : BuffApplicationResult {
         return {logicTriggered: false, newChangeInStacks: changeInStacks};
     }
 
@@ -256,7 +306,11 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
     }
 
-    hellValueModifier(): number {
+    hellValueFlatModifier(): number {
+        return 0;
+    }
+
+    purchasePricePercentModifier(): number {
         return 0;
     }
 
@@ -282,7 +336,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
     }
 
-    public onAnyCardPlayed(playedCard: PlayableCard, target?: BaseCharacter){
+    public onAnyCardPlayedByAnyone(playedCard: PlayableCard, target?: BaseCharacter){
 
     }
 
@@ -291,6 +345,10 @@ export abstract class AbstractBuff implements IAbstractBuff {
     }
 
     public onExhaust(){
+
+    }
+
+    public onGainingThisCard(){
 
     }
 
@@ -312,7 +370,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
     // Applies to character buffs ONLY.  If true, buff is not removed at end of combat.
     public isPersistentBetweenCombats: boolean = false;
 
-    // Applies to character buffs ONLY.  If true, buff is not removed at end of the run (meaning it's basically forever on this character)
+    // Applies to character buffs ONLY.  If true, buff is not removed at end of the run OR at end of combat (meaning it's basically forever on this character)
     public isPersonaTrait: boolean = false;
 
     // done for bloodprice buffs.

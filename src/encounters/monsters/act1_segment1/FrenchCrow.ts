@@ -5,8 +5,8 @@
 import { AbstractIntent, ApplyBuffToSelfIntent, AttackIntent } from '../../../gamecharacters/AbstractIntent';
 import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
 import { Flying } from '../../../gamecharacters/buffs/standard/Flying';
-import { Stressful } from '../../../gamecharacters/buffs/standard/Stressful';
-import { Strong } from '../../../gamecharacters/buffs/standard/Strong';
+import { Lethality } from '../../../gamecharacters/buffs/standard/Strong';
+import { Terrifying } from '../../../gamecharacters/buffs/standard/Terrifying';
 
 export class FrenchCrow extends AutomatedCharacter {
     constructor() {
@@ -17,7 +17,7 @@ export class FrenchCrow extends AutomatedCharacter {
             description: "A pest that tends to materialize in the wake of the French cults."
         });
         this.buffs.push(new Flying(1));
-        this.buffs.push(new Stressful(1));
+        this.buffs.push(new Terrifying(1));
     }
 
     override generateNewIntents(): AbstractIntent[] {
@@ -34,7 +34,7 @@ export class FrenchCrow extends AutomatedCharacter {
             return [new AttackIntent({ baseDamage: 6, owner: this }).withTitle("Void Strike")];
         } else {
             // Buff itself with 2 strength
-            return [new ApplyBuffToSelfIntent({ buff: new Strong(2), owner: this }).withTitle("Eldritch Empowerment")];
+            return [new ApplyBuffToSelfIntent({ buff: new Lethality(2), owner: this }).withTitle("Eldritch Empowerment")];
         }
     }
 }

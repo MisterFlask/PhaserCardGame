@@ -1,5 +1,4 @@
 import { Scene } from 'phaser';
-import { GameState } from '../rules/GameState';
 import type { PhysicalCard } from '../ui/PhysicalCard';
 import { ShadowedImage } from '../ui/ShadowedImage';
 import { TextBox } from '../ui/TextBox';
@@ -8,7 +7,7 @@ import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
 import ImageUtils from '../utils/ImageUtils';
 import type { BaseCharacter } from './BaseCharacter';
 import type { PlayerCharacter } from './BaseCharacterClass';
-import type { AbstractBuff } from './buffs/AbstractBuff';
+import { AbstractBuff } from './buffs/AbstractBuff';
 import { IAbstractCard } from './IAbstractCard';
 import type { PlayableCard } from './PlayableCard';
 import { CardSize, CardType } from './Primitives'; // Ensure enums are imported from Primitives
@@ -99,6 +98,10 @@ export abstract class AbstractCard implements IAbstractCard {
 
     public typeTag: string = "AbstractCard"
     
+    public portraitTargetLargestDimension?: number
+    public portraitOffsetXOverride?: number
+    public portraitOffsetYOverride?: number 
+    
     public get name(): string {
         return this._name;
     }
@@ -141,13 +144,13 @@ export abstract class AbstractCard implements IAbstractCard {
         return ActionManagerFetcher.getActionManager();
     }
 
-    public energyCost: number = 0;
+    public baseEnergyCost: number = 0;
     protected _name: string;
     protected _description: string;
     public portraitName?: string
     cardType: CardType
     public tooltip: string
-    owner?: PlayerCharacter
+    owningCharacter?: PlayerCharacter
     size: CardSize
     id: string
     physicalCard?: PhysicalCard // this is a hack, it's just always PhysicalCard
@@ -156,10 +159,14 @@ export abstract class AbstractCard implements IAbstractCard {
     buffs: AbstractBuff[] = [];
     portraitTint?: number
 
+    applyBuffs_useFromActionManager(buffs: AbstractBuff[]): void {
+        buffs.forEach(buff => AbstractBuff._applyBuffToCharacterOrCard(this, buff));
+    }
+
     public surfacePurchaseValue: number = -1;
     public hellPurchaseValue: number = -1;
     public get hellSellValue(): number {
-        return this.getBuffStacks("Hell Sell Value")
+        return this.getBuffStacks("HELL_SELL_VALUE")
     }
     public get surfaceSellValue(): number {
         return this.getBuffStacks("Surface Sell Value")
@@ -170,7 +177,6 @@ export abstract class AbstractCard implements IAbstractCard {
             case PriceContext.SURFACE_BUY: 
                 return this.surfacePurchaseValue;
             case PriceContext.SURFACE_SELL: 
-                // Calculate sell value dynamically
                 return this.surfaceSellValue;
             case PriceContext.HELL_BUY: 
                 return this.hellPurchaseValue;
@@ -188,9 +194,9 @@ export abstract class AbstractCard implements IAbstractCard {
         if (price <= 0) return '';
 
         switch (context) {
-            case PriceContext.SURFACE_BUY: return `Buy: $${price}`;
-            case PriceContext.SURFACE_SELL: return `Sell: $${price}`;
-            case PriceContext.HELL_BUY: return `Buy: $${price}`;
+            case PriceContext.SURFACE_BUY: return `$${price}`;
+            case PriceContext.SURFACE_SELL: return `$${price}`;
+            case PriceContext.HELL_BUY: return `$${price}`;
             case PriceContext.HELL_SELL: return `Sell: $${price}`;
             default: return '';
         }
@@ -201,7 +207,7 @@ export abstract class AbstractCard implements IAbstractCard {
         switch (context) {
             case PriceContext.SURFACE_BUY:
             case PriceContext.HELL_BUY:
-                return 0x00ff00; // Green for buying
+                return 0xF5F5DC; // Beige for buying
             case PriceContext.SURFACE_SELL:
             case PriceContext.HELL_SELL:
                 return 0xffff00; // Yellow for selling
@@ -217,7 +223,7 @@ export abstract class AbstractCard implements IAbstractCard {
         this.portraitName = portraitName
         this.cardType = cardType || CardType.SKILL
         this.tooltip = tooltip || "Lorem ipsum dolor sit amet"
-        this.owner = characterData as unknown as PlayerCharacter || undefined
+        this.owningCharacter = characterData as unknown as PlayerCharacter || undefined
         this.size = size || CardSize.SMALL
         this.team = team || Team.ENEMY
     }
@@ -235,7 +241,7 @@ export abstract class AbstractCard implements IAbstractCard {
     
     getCanonicalCard(): this | null{
         // check for card in character deck
-        const character = this.owner as PlayerCharacter;
+        const character = this.owningCharacter as PlayerCharacter;
         if (character == null) return null;
         const deck = character.cardsInMasterDeck;
         const canonicalCard = deck.find((card: AbstractCard) => card.id === this.id);
@@ -243,7 +249,7 @@ export abstract class AbstractCard implements IAbstractCard {
             return canonicalCard as any as this;
         }
         // check for card in inventory
-        const inventory = GameState.getInstance().cardsInventory;
+        const inventory = ActionManagerFetcher.getGameState().masterDeckAllCharacters;
         const canonicalCardInInventory = inventory.find((card: AbstractCard) => card.id === this.id);
         if (canonicalCardInInventory) {
             return canonicalCardInInventory as any as this;
@@ -253,7 +259,7 @@ export abstract class AbstractCard implements IAbstractCard {
     }
 
     getBuffStacks(buffName: string): number {
-        const buff = this.buffs.find(buff => buff.getName() === buffName);
+        const buff = this.buffs.find(buff => buff.getBuffCanonicalName() === buffName);
         return buff ? buff.stacks : 0;
     }
 
@@ -266,12 +272,14 @@ export abstract class AbstractCard implements IAbstractCard {
          
         Object.assign(copy, this);
         copy.id = generateWordGuid();
-        copy.owner = this.owner
+        copy.owner = this.owningCharacter;
+        // Deep copy the buffs array
+        copy.buffs = this.buffs.map(buff => buff.clone());
         return copy;
     }
 
     hasBuff(buffName: string): boolean {
-        return this.buffs.some(buff => buff.getName() === buffName);
+        return this.buffs.some(buff => buff.getDisplayName() === buffName);
     }
     
     createJsonRepresentation(): string {
@@ -284,7 +292,7 @@ export abstract class AbstractCard implements IAbstractCard {
             size: this.size,
             cardType: this.cardType,
             tooltip: this.tooltip,
-            owner: this.owner?.name,
+            owner: this.owningCharacter?.name,
             team: this.team,
             block: this.block,
         }, null, 2);
@@ -326,8 +334,8 @@ export abstract class AbstractCard implements IAbstractCard {
         // if card is a BaseCharacter, check if it has a class.  If it does use the class's cardBackgroundImageName.  Otherwise, if the card has an owner, use the owner's class's cardBackgroundImageName.  Otherwise, use the default "greyscale"
         if ((this as unknown as PlayerCharacter)?.characterClass) {
             return (this as unknown as PlayerCharacter)!.characterClass.cardBackgroundImageName;
-        } else if ((this as unknown as PlayableCard)?.owner) {
-            return (this as unknown as PlayableCard)!.owner!.characterClass!.cardBackgroundImageName;
+        } else if ((this as unknown as PlayableCard)?.owningCharacter) {
+            return (this as unknown as PlayableCard)!.owningCharacter!.characterClass!.cardBackgroundImageName;
         }
         return "greyscale";
     }

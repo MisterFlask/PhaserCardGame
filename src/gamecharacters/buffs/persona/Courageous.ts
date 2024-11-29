@@ -10,7 +10,7 @@ export class Courageous extends AbstractBuff {
         this.isPersonaTrait = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Courageous";
     }
 
@@ -21,7 +21,7 @@ export class Courageous extends AbstractBuff {
     override onCombatStart(): void {
         const owner = this.getOwnerAsCharacter();
         if (owner) {
-            this.actionManager.applyBuffToCharacter(owner, new Fearless(this.stacks));
+            this.actionManager.applyBuffToCharacterOrCard(owner, new Fearless(this.stacks));
         }
     }
 

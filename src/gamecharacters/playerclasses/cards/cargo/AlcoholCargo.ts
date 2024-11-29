@@ -1,6 +1,6 @@
 import { TargetingType } from "../../../AbstractCard";
 import { BaseCharacter } from "../../../BaseCharacter";
-import { CardRarity, PlayableCard } from "../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../PlayableCard";
 import { CardType } from "../../../Primitives";
 import { HellSellValue } from "../../../buffs/standard/HellSellValue";
 
@@ -10,9 +10,9 @@ export class AlcoholCargo extends PlayableCard {
             name: "Alcohol Cargo",
             cardType: CardType.ITEM,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.COMMON,
+            rarity: EntityRarity.COMMON,
         });
-        this.energyCost = 1;
+        this.baseEnergyCost = 1;
         this.buffs.push(new HellSellValue(40));
         this.surfacePurchaseValue = 30;
     }

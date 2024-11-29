@@ -1,4 +1,4 @@
-import { IBaseCharacter } from "../../IBaseCharacter";
+import type { AbstractCard } from "../../AbstractCard";
 import { AbstractBuff, BuffApplicationResult } from "../AbstractBuff";
 import { Stress } from "./Stress";
 
@@ -11,7 +11,7 @@ export class Fearless extends AbstractBuff {
         this.stacks = stacks;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Fearless";
     }
 
@@ -19,7 +19,7 @@ export class Fearless extends AbstractBuff {
         return `Absorbs the next ${this.getStacksDisplayText()} stack${this.stacks > 1 ? 's' : ''} of Stress applied.`;
     }
 
-    override interceptBuffApplication(character: IBaseCharacter, buffApplied: AbstractBuff, previousStacks: number, changeInStacks: number): BuffApplicationResult {
+    override interceptBuffApplication(character: AbstractCard, buffApplied: AbstractBuff, previousStacks: number, changeInStacks: number): BuffApplicationResult {
         if (buffApplied instanceof Stress && changeInStacks > 0) {
             const absorbedStacks = Math.min(this.stacks, changeInStacks);
             this.stacks -= absorbedStacks;

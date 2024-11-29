@@ -11,7 +11,7 @@ export class RustMonster extends AbstractBuff {
         this.isDebuff = false;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Rust Monster";
     }
 
@@ -19,18 +19,18 @@ export class RustMonster extends AbstractBuff {
         return `When the owner hits a character, if that character has at least one card in the non-exhaust piles, a random card with >0 defense gets -${this.getStacksDisplayText()} to defense.`;
     }
 
-    override onOwnerStriking(targetCharacter: BaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void {
+    override onOwnerStriking_CannotModifyDamage(targetCharacter: BaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void {
         const gameState = GameState.getInstance();
         const combatState = gameState.combatState;
 
         // Get all non-exhausted cards of the target character
         const nonExhaustedCards = [
-            ...combatState.currentDrawPile,
+            ...combatState.drawPile,
             ...combatState.currentHand,
             ...combatState.currentDiscardPile
         ]
         .filter(card => card instanceof PlayableCard)
-        .filter(card => card.owner === targetCharacter && (card as PlayableCard).baseBlock > 0);
+        .filter(card => card.owningCharacter === targetCharacter && (card as PlayableCard).baseBlock > 0);
 
         if (nonExhaustedCards.length > 0) {
             // Select a random card with >0 defense

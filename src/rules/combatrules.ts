@@ -47,12 +47,12 @@ export class CombatRules {
         const combatState = gameState.combatState;
 
         const removeDeadCharacterCards = (pile: PlayableCardType[]) => {
-            return pile.filter(card => card.owner !== character);
+            return pile.filter(card => card.owningCharacter !== character);
         };
 
         combatState.currentHand = removeDeadCharacterCards(combatState.currentHand );
         combatState.currentDiscardPile = removeDeadCharacterCards(combatState.currentDiscardPile );
-        combatState.currentDrawPile = removeDeadCharacterCards(combatState.currentDrawPile );
+        combatState.drawPile = removeDeadCharacterCards(combatState.drawPile );
     }
 
     public static handleStateBasedEffects(){
@@ -77,18 +77,20 @@ export class CombatRules {
         target,
         sourceCharacter,
         sourceCard,
-        fromAttack = true
+        fromAttack = true,
+        ignoresBlock = false
     }: {
         baseDamageAmount: number,
         target?: IBaseCharacter,
         sourceCharacter?: IBaseCharacter,
         sourceCard?: PlayableCardType,
-        fromAttack?: boolean
+        fromAttack?: boolean,
+        ignoresBlock?: boolean
     }): DamageCalculationResult => {
         let totalDamage = baseDamageAmount;
         
         sourceCharacter?.buffs.forEach(buff => {
-            totalDamage += buff.getCombatDamageDealtModifier(target as BaseCharacterType);
+            totalDamage += buff.getCombatDamageDealtModifier(target as BaseCharacterType, sourceCard);
             totalDamage *= (1 + buff.getAdditionalPercentCombatDamageDealtModifier() / 100);
         });
         // Apply target character buffs
@@ -99,7 +101,7 @@ export class CombatRules {
 
         //apply playable card buffs
         sourceCard?.buffs.forEach(buff => {
-            totalDamage += buff.getCombatDamageDealtModifier(target as BaseCharacterType);
+            totalDamage += buff.getCombatDamageDealtModifier(target as BaseCharacterType, sourceCard);
             totalDamage *= (1 + buff.getAdditionalPercentCombatDamageDealtModifier() / 100);
         });
 
@@ -116,20 +118,8 @@ export class CombatRules {
         // Ensure damage doesn't go below 0
         totalDamage = Math.max(0, totalDamage);
 
-        if (sourceCard){
-            totalDamage = totalDamage;
-        }
-
-        let blockedDamage = 0;
-        let unblockedDamage = totalDamage;
-
-        if (target?.block || 0 >= totalDamage) {
-            blockedDamage = totalDamage;
-            unblockedDamage = 0;
-        } else {
-            blockedDamage = target?.block || 0;
-            unblockedDamage = totalDamage - blockedDamage;
-        }
+        let blockedDamage = ignoresBlock ? 0 : Math.min(target?.block || 0, totalDamage);
+        let unblockedDamage = totalDamage - blockedDamage;
 
         return new DamageCalculationResult(totalDamage, blockedDamage, unblockedDamage);
     };

@@ -1,12 +1,12 @@
 import { AbstractBuff } from "../AbstractBuff";
 
 export class Vulnerable extends AbstractBuff {
-    override getName(): string {
+    override getDisplayName(): string {
         return "Vulnerable";
     }
 
     override getDescription(): string {
-        return `Increases damage taken by 50% for ${this.getStacksDisplayText()} turn[s].`;
+        return `Increases damage taken by 50% for ${this.getStacksDisplayText()} turns.`;
     }
 
     constructor(stacks: number = 1) {

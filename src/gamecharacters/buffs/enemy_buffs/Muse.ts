@@ -1,6 +1,6 @@
 import { PlayableCard } from "../../PlayableCard";
 import { AbstractBuff } from "../AbstractBuff";
-import { Strong } from "../standard/Strong";
+import { Lethality } from "../standard/Strong";
 
 export class Muse extends AbstractBuff {
     constructor(stacks: number = 1) {
@@ -9,7 +9,7 @@ export class Muse extends AbstractBuff {
         this.isDebuff = false;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Muse";
     }
 
@@ -17,11 +17,11 @@ export class Muse extends AbstractBuff {
         return `Whenever a cost 0 card is played, gain ${this.getStacksDisplayText()} Strength.`;
     }
 
-    override onAnyCardPlayed(playedCard: PlayableCard): void {
-        if (playedCard.energyCost === 0) {
+    override onAnyCardPlayedByAnyone(playedCard: PlayableCard): void {
+        if (playedCard.baseEnergyCost === 0) {
             const owner = this.getOwnerAsCharacter();
             if (owner) {
-                this.actionManager.applyBuffToCharacter(owner, new Strong(this.stacks));
+                this.actionManager.applyBuffToCharacterOrCard(owner, new Lethality(this.stacks));
             }
         }
     }

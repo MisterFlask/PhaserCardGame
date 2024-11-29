@@ -12,7 +12,7 @@ export class Merchant extends AbstractBuff {
         this.isPersonaTrait = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Merchant";
     }
 
@@ -21,7 +21,7 @@ export class Merchant extends AbstractBuff {
     }
 
     override onRunStart(): void {
-        const cards = GameState.getInstance().getCardsOwnedByCharacter(this.getOwnerAsCharacter()!)
+        const cards = GameState.getInstance().masterDeckAllCharacters
         
         // Filter for cargo cards
         const cargoCards = cards.filter(card => card.cardType === CardType.ITEM);

@@ -1,6 +1,6 @@
 import { GameState } from '../../../rules/GameState';
 import { BaseCharacterClass } from '../../BaseCharacterClass';
-import { PlayableCard } from '../../PlayableCard';
+import { EntityRarity, PlayableCard } from '../../PlayableCard';
 import { ArchonClass } from '../ArchonClass';
 import { BlackhandClass } from '../BlackhandClass';
 import { DiabolistClass } from '../DiabolistClass';
@@ -19,6 +19,11 @@ export class CardLibrary {
         return CardLibrary.instance;
     }
 
+    private cardInit(card: PlayableCard): PlayableCard {
+        card.initialize();
+        return card;
+    }
+
     public getCharacterClasses(): BaseCharacterClass[] {
         var classes = [
             new BlackhandClass(),
@@ -32,25 +37,44 @@ export class CardLibrary {
 
         return classes;
     }
+    
     public getCardsForClassesRelevantToThisRun(): PlayableCard[] {
         var characters = GameState.getInstance().currentRunCharacters;
         var cards = characters.flatMap(c => c.characterClass.availableCards);
-        // dedupe
-        return [...new Map(cards.map(item => [item.name, item])).values()];
-    }
+        const cardCopies = cards.map(card => this.cardInit(card.Copy()));
 
-    public getRandomSelectionOfRelevantClassCards(count: number): PlayableCard[] {
+        // Assign native class based on which class's deck the card originated from
+        cardCopies.forEach(card => {
+            const ownerClass = characters.find(char => 
+                char.characterClass.availableCards.some(classCard => 
+                    classCard.name === card.name
+                )
+            )?.characterClass;
+            
+            if (ownerClass) {
+                card.nativeToCharacterClass = ownerClass;
+            }
+        });
+
+        return [...new Map(cardCopies.map(item => [item.name, item])).values()];
+    }
+    
+    public getRandomSelectionOfRelevantClassCards(count: number, rarity?: EntityRarity): PlayableCard[] {
         var cards = this.getCardsForClassesRelevantToThisRun();
+        if (rarity) {
+            cards = cards.filter(card => card.rarity === rarity);
+        }
         return cards.sort(() => Math.random() - 0.5).slice(0, count);
     }
 
     public getCardsForClass(characterClass: BaseCharacterClass): PlayableCard[] {
-        return characterClass.availableCards;
+        return characterClass.availableCards.map(c => this.cardInit(c.Copy()));
     }
 
     public getAllCards(): PlayableCard[] {
         return [
-            ... this.getCharacterClasses().flatMap(c => c.availableCards),
+            ... this.getCharacterClasses().flatMap(c => c.availableCards)
+            .map(c => this.cardInit(c.Copy())),
         ];
     }
 }

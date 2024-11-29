@@ -1,4 +1,4 @@
-import { IBaseCharacter } from "../../IBaseCharacter";
+import { AbstractCard } from "../../AbstractCard";
 import { AbstractBuff, BuffApplicationResult } from "../AbstractBuff";
 
 export class Robotic extends AbstractBuff {
@@ -10,7 +10,7 @@ export class Robotic extends AbstractBuff {
         this.isPersonaTrait = true;
     }
 
-    override getName(): string {
+    override getDisplayName(): string {
         return "Robotic";
     }
 
@@ -18,8 +18,8 @@ export class Robotic extends AbstractBuff {
         return `Negates all Burning or Poison applied.`;
     }
 
-    override interceptBuffApplication(character: IBaseCharacter, buffApplied: AbstractBuff, previousStacks: number, changeInStacks: number): BuffApplicationResult {
-        if (buffApplied.getName() === "Burning" || buffApplied.getName() === "Poison") {
+    override interceptBuffApplication(character: AbstractCard, buffApplied: AbstractBuff, previousStacks: number, changeInStacks: number): BuffApplicationResult {
+        if (buffApplied.getDisplayName() === "Burning" || buffApplied.getDisplayName() === "Poison") {
             return { logicTriggered: true, newChangeInStacks: 0 };
         }
         return { logicTriggered: false, newChangeInStacks: changeInStacks };

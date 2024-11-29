@@ -1,21 +1,21 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
-import { Strong } from "../../../../buffs/standard/Strong";
+import { Lethality } from "../../../../buffs/standard/Strong";
 
 export class CourageUnderFire extends PlayableCard {
     constructor() {
         super({
-            name: "Courage Under Fire",
+            name: "Hold The Line",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.UNCOMMON,
+            rarity: EntityRarity.UNCOMMON,
         });
         this.portraitName = "CourageUnderFire";
-        this.energyCost = 2;
+        this.baseEnergyCost = 2;
         this.baseBlock = 5;
-        this.baseMagicNumber = 1; // Amount of Strength to apply
+        this.baseMagicNumber = 1;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
@@ -36,7 +36,7 @@ export class CourageUnderFire extends PlayableCard {
 
     private applyEffectsToCharacter(character: BaseCharacter): void {
         this.applyBlockToTarget(character);
-        this.actionManager.applyBuffToCharacter(character, new Strong(this.getBaseMagicNumberAfterResourceScaling()));
+        this.actionManager.applyBuffToCharacterOrCard(character, new Lethality(this.getBaseMagicNumberAfterResourceScaling()));
     }
 
     override get description(): string {

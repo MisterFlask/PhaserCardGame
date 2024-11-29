@@ -1,6 +1,7 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
+import { Burning } from "../../../../buffs/standard/Burning";
 import { Vulnerable } from "../../../../buffs/standard/Vulnerable";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
 export class InspireFear extends PlayableCard {
@@ -9,32 +10,35 @@ export class InspireFear extends PlayableCard {
             name: "Inspire Fear",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.UNCOMMON,
+            rarity: EntityRarity.UNCOMMON,
         });
-        this.energyCost = 2;
-        this.baseDamage = 10;
+        this.baseEnergyCost = 2;
         this.baseMagicNumber = 2; // Amount of Vulnerable applied to enemies
-        this.baseBlock = 1; // Amount of Vulnerable applied to allies
+        this.resourceScalings.push({
+            resource: this.pluck,
+            magicNumberScaling: 1
+        });
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
+
         // Apply 2 Vulnerable to all enemies
         this.forEachEnemy(enemy => {
-            this.actionManager.applyBuffToCharacter(enemy, new Vulnerable(this.baseMagicNumber));
+            this.actionManager.applyBuffToCharacterOrCard(enemy, new Vulnerable(this.getBaseMagicNumberAfterResourceScaling()));
+        });
+        // Apply 2 Burning to all enemies
+        this.forEachEnemy(enemy => {
+            this.actionManager.applyBuffToCharacterOrCard(enemy, new Burning(this.getBaseMagicNumberAfterResourceScaling()));
         });
 
         // Apply 1 Vulnerable to all allies
         this.forEachAlly(ally => {
-            this.actionManager.applyBuffToCharacter(ally, new Vulnerable(this.baseBlock));
+            this.actionManager.applyBuffToCharacterOrCard(ally, new Vulnerable(1));
         });
 
-        // Deal 10 damage to all enemies
-        this.forEachEnemy(enemy => {
-            this.dealDamageToTarget(enemy);
-        });
     }
 
     override get description(): string {
-        return `Apply ${this.baseMagicNumber} Vulnerable to all enemies. Apply ${this.baseBlock} Vulnerable to all allies. Deal ${this.getDisplayedDamage()} damage to ALL enemies.`;
+        return `Apply ${this.getDisplayedMagicNumber()} Vulnerable and Burning to ALL enemies. Apply 1 Vulnerable to all allies.`;
     }
 }

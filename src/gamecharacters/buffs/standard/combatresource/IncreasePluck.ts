@@ -1,19 +1,21 @@
+import { TextGlyphs } from "../../../../text/TextGlyphs";
 import { BaseCharacter } from "../../../BaseCharacter";
 import { AbstractBuff } from "../../AbstractBuff";
 
 export class IncreasePluck extends AbstractBuff {
-    constructor() {
+    constructor(stacks: number) {
         super();
         this.stackable = true;
         this.isDebuff = false;
+        this.stacks = stacks;
     }
 
-    getName(): string {
+    getDisplayName(): string {
         return "Increase Pluck";
     }
 
     getDescription(): string {
-        return `When played, gain ${this.getStacksDisplayText()} Pluck.`;
+        return `When played, gain ${this.getStacksDisplayText()} ${TextGlyphs.getInstance().pluckIcon}.`;
     }
 
     public onThisCardInvoked(target?: BaseCharacter): void {

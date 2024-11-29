@@ -2,9 +2,9 @@ import { TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
 import { VolatileBuff } from "../../../../buffs/playable_card/VolatileCardBuff";
 import { Burning } from "../../../../buffs/standard/Burning";
-import { Poison } from "../../../../buffs/standard/Poisoned";
+import { Poisoned } from "../../../../buffs/standard/Poisoned";
 import { Weak } from "../../../../buffs/standard/Weak";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
 export class ToxicSpill extends PlayableCard {
@@ -12,9 +12,10 @@ export class ToxicSpill extends PlayableCard {
         super({
             name: "Toxic Spill",
             cardType: CardType.SKILL,
-            rarity: CardRarity.RARE,
+            rarity: EntityRarity.RARE,
             targetingType: TargetingType.ENEMY,
         }); 
+        this.baseEnergyCost = 2;
         this.baseMagicNumber = 6;
         this.buffs.push(new VolatileBuff());
     }
@@ -25,9 +26,9 @@ export class ToxicSpill extends PlayableCard {
 
     override InvokeCardEffects(targetCard?: BaseCharacter): void {
         if (targetCard) {
-            this.actionManager.applyBuffToCharacter(targetCard, new Burning(4));
-            this.actionManager.applyBuffToCharacter(targetCard, new Poison(this.getBaseMagicNumberAfterResourceScaling()));
-            this.actionManager.applyBuffToCharacter(targetCard, new Weak(1));
+            this.actionManager.applyBuffToCharacterOrCard(targetCard, new Burning(4));
+            this.actionManager.applyBuffToCharacterOrCard(targetCard, new Poisoned(this.getBaseMagicNumberAfterResourceScaling()));
+            this.actionManager.applyBuffToCharacterOrCard(targetCard, new Weak(1));
         }
     }
 }

@@ -1,4 +1,4 @@
-import { CardRarity } from "../../gamecharacters/PlayableCard";
+import { EntityRarity } from "../../gamecharacters/PlayableCard";
 import { AbstractRelic } from "../AbstractRelic";
 
 export class IronFilings extends AbstractRelic {
@@ -6,10 +6,10 @@ export class IronFilings extends AbstractRelic {
         super();
         this.name = "Iron Filings";
         this.description = "At the start of combat, increase your Iron by 2.";
-        this.rarity = CardRarity.COMMON;
+        this.rarity = EntityRarity.COMMON;
     }
 
     onCombatStart(): void {
-        this.combatState.combatResources.modifyIron(2);
+        this.combatState.combatResources.modifyMettle(2);
     }
 }

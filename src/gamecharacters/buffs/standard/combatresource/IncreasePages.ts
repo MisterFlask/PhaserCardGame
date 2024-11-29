@@ -1,3 +1,4 @@
+import { TextGlyphs } from "../../../../text/TextGlyphs";
 import { BaseCharacter } from "../../../BaseCharacter";
 import { AbstractBuff } from "../../AbstractBuff";
 
@@ -8,15 +9,16 @@ export class IncreasePages extends AbstractBuff {
         this.isDebuff = false;
     }
 
-    getName(): string {
+    getDisplayName(): string {
         return "Increase Pages";
     }
 
     getDescription(): string {
-        return `When card is played, gain ${this.getStacksDisplayText()} Pages.  Exhaust.`;
+        return `When card is played, gain ${this.getStacksDisplayText()} ${TextGlyphs.getInstance().pagesIcon}.  Exhaust.`;
     }
 
     public onThisCardInvoked(target?: BaseCharacter): void {
-        this.actionManager.modifyPages(this.stacks); 
+        this.actionManager.modifyAshes(this.stacks); 
+        this.actionManager.exhaustCard(this.getOwnerAsPlayableCard()!);
     }
 }

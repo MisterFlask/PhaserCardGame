@@ -106,7 +106,7 @@ export class LoadoutPanel extends AbstractHqPanel {
             const campaignState = CampaignState.getInstance();
             campaignState.selectedParty.forEach(character => {
                 const assignedTradeGoods = campaignState.ownedTradeGoods.filter(
-                    good => good.owner === character
+                    good => good.owningCharacter === character
                 );
                 character.cardsInMasterDeck.push(...assignedTradeGoods);
             });
@@ -336,6 +336,15 @@ class CaravanPartyPanel extends Phaser.GameObjects.Container {
         this.characterCards.set(character, card);
         this.add(card.container);
         CampaignState.getInstance().selectedParty.push(character);
+        
+        // Assign all unowned cargo to this character
+        const campaignState = CampaignState.getInstance();
+        campaignState.ownedTradeGoods.forEach(good => {
+            if (!good.owningCharacter) {
+                good.owningCharacter = character;
+            }
+        });
+        
         this.repositionCards();
     }
 
@@ -362,8 +371,32 @@ class CaravanPartyPanel extends Phaser.GameObjects.Container {
             card.container.destroy();
             this.characterCards.delete(character);
             this.repositionCards();
-            CampaignState.getInstance().selectedParty = CampaignState.getInstance().selectedParty.filter(c => c !== character);
+            
+            // Remove character from selected party
+            CampaignState.getInstance().selectedParty = 
+                CampaignState.getInstance().selectedParty.filter(c => c !== character);
+            
+            // Reassign their cargo
+            this.reassignCargo(character);
+            
         }
+    }
+
+    private reassignCargo(formerOwner: PlayerCharacter): void {
+        const campaignState = CampaignState.getInstance();
+        const remainingParty = campaignState.selectedParty.filter(c => c !== formerOwner);
+        
+        campaignState.ownedTradeGoods.forEach(good => {
+            if (good.owningCharacter === formerOwner) {
+                if (remainingParty.length > 0) {
+                    // Randomly assign to another party member
+                    good.owningCharacter = remainingParty[Math.floor(Math.random() * remainingParty.length)];
+                } else {
+                    // If no party members left, unassign
+                    good.owningCharacter = undefined;
+                }
+            }
+        });
     }
 
     private repositionCards(): void {
@@ -397,8 +430,7 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
 
         this.createTitle();
         this.createAssignableCardsGrid();
-
-        // Subscribe to trade goods changes
+        
         this.scene.events.on('tradeGoodsChanged', () => {
             this.refreshGrid();
         });
@@ -458,10 +490,10 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
                         y: CARD_HEIGHT / 2,
                         width: 120,
                         height: 30,
-                        text: good.owner ? `Assigned to:\n${good.owner.name}` : 'Unassigned (will not be taken)',
+                        text: good.owningCharacter ? `Assigned to:\n${good.owningCharacter.name}` : 'Unassigned (will not be taken)',
                         style: { 
                             fontSize: '14px', 
-                            color: good.owner ? '#90EE90' : '#FFB6C1',
+                            color: good.owningCharacter ? '#006400' : '#8B0000', // Dark green and dark red
                             align: 'left',
                             wordWrap: { width: 110 }
                         }
@@ -478,85 +510,61 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
     }
 
     private setupTradeGoodCard(card: PhysicalCard): void {
-        card.container.setInteractive({ draggable: true });
-
-        const originalX = card.container.x;
-        const originalY = card.container.y;
+        card.container.setInteractive();
+        
         const originalScale = card.container.scale;
 
         card.container
-            .on('dragstart', () => {
-                card.container.setScale(0.8);
-                this.scene.children.bringToTop(card.container);
-                // Highlight character cards when starting drag
-                this.loadoutPanel.partyPanel.getCharacterCards().forEach((characterCard) => {
-                    characterCard.setGlow(true);
-                });
-            })
-            .on('drag', (pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
-                card.container.x = dragX;
-                card.container.y = dragY;
-            })
-            .on('dragend', () => {
-                const droppedOnCharacter = this.checkDropOnCharacter(card);
-                
-                // Remove highlighting when drag ends
-                this.loadoutPanel.partyPanel.getCharacterCards().forEach((characterCard) => {
-                    characterCard.setGlow(false);
-                });
-                
-                // Return to original position
-                card.container.x = originalX;
-                card.container.y = originalY;
-                card.container.setScale(originalScale);
+            .on('pointerdown', () => {
+                this.rotateTradeGoodAssignment(card);
             })
             .on('pointerover', () => {
-                if (card.container.input?.dragState != 2) {
-                    card.container.setScale(1.1);
-                }
+                card.container.setScale(1.1);
             })
             .on('pointerout', () => {
-                if (card.container.input?.dragState != 2) {
-                    card.container.setScale(1.0);
-                }
+                card.container.setScale(1.0);
             });
     }
 
-    private checkDropOnCharacter(cargoCard: PhysicalCard): boolean {
-        // Get the CaravanPartyPanel instance
-        console.log("checking drop on character");
-        const partyPanel = this.loadoutPanel.partyPanel;
+    private rotateTradeGoodAssignment(card: PhysicalCard): void {
+        const campaignState = CampaignState.getInstance();
+        const partyMembers = campaignState.selectedParty;
         
-        if (!partyPanel) {
-            console.error("party panel not found");
-            return false;
-        }
-
-        // Check overlap with each character card using mouse cursor
-        for (const [character, characterCard] of partyPanel.getCharacterCards()) {
-            const bounds = characterCard.container.getBounds();
-            const pointer = this.scene.input.activePointer;
-
-            if (Phaser.Geom.Rectangle.Contains(bounds, pointer.x, pointer.y)) {
-                this.equipTradeGood(cargoCard, character);
-                console.log("dropped on character ", character.name);
-                return true;
+        if (!card.data.owningCharacter) {
+            // If unassigned, assign to first party member
+            if (partyMembers.length > 0) {
+                this.equipTradeGood(card, partyMembers[0]);
+            }
+        } else {
+            // Find current owner's index
+            const currentIndex = partyMembers.indexOf(card.data.owningCharacter);
+            if (currentIndex === partyMembers.length - 1) {
+                // If last party member, unassign
+                this.unequipTradeGood(card);
+            } else {
+                // Assign to next party member
+                this.equipTradeGood(card, partyMembers[currentIndex + 1]);
             }
         }
+    }
 
-        console.log("not dropped on character");
-        return false;
+    private unequipTradeGood(tradeGood: PhysicalCard): void {
+        tradeGood.data.owningCharacter = undefined;
+        
+        const assignmentText = (tradeGood as any).assignmentText as TextBox;
+        if (assignmentText) {
+            assignmentText.setText('Unassigned (will not be taken)');
+            assignmentText.setFillColor(0x8B0000); // Dark red
+        }
     }
 
     private equipTradeGood(tradeGood: PhysicalCard, character: PlayerCharacter): void {
-        // Update the trade good's owner
-        tradeGood.data.owner = character;
+        tradeGood.data.owningCharacter = character;
 
-        // Update the assignment text box directly through the stored reference
         const assignmentText = (tradeGood as any).assignmentText as TextBox;
         if (assignmentText) {
             assignmentText.setText(`Assigned to:\n${character.name}`);
-            assignmentText.setFillColor(0x90EE90);
+            assignmentText.setFillColor(0x006400); // Dark green
         }
 
         console.log("assigned trade good to character ", character.name, " with trade good ", tradeGood.data.name);
@@ -656,10 +664,10 @@ class ExpeditionSummaryPanel extends Phaser.GameObjects.Container {
         
         // Update cargo value
         const totalValue = campaignState.ownedTradeGoods.reduce((total, good) => 
-            total + (good.owner ? good.hellSellValue : 0), 0);
+            total + (good.owningCharacter ? good.hellSellValue : 0), 0);
         this.cargoValueText.setText(
             `Total Cargo Value: ${totalValue} Hell\n` +
-            `Assigned Cards: ${campaignState.ownedTradeGoods.filter(g => g.owner).length}/${campaignState.ownedTradeGoods.length}`
+            `Assigned Cards: ${campaignState.ownedTradeGoods.filter(g => g.owningCharacter).length}/${campaignState.ownedTradeGoods.length}`
         );
 
         // Update party info

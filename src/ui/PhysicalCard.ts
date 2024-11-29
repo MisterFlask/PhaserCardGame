@@ -3,6 +3,9 @@ import Phaser from 'phaser';
 import { AutomatedCharacterType, BaseCharacterType, PlayableCardType } from '../Types';
 import { AbstractCard, IPhysicalCardInterface, PriceContext } from '../gamecharacters/AbstractCard';
 import { AbstractIntent } from '../gamecharacters/AbstractIntent';
+import { CardDescriptionGenerator } from '../text/CardDescriptionGenerator';
+import { CardTooltipGenerator } from '../text/CardTooltipGenerator';
+import { ResourceDisplayGenerator } from '../text/ResourceDisplayGenerator';
 import type { CardConfig } from '../utils/CardGuiUtils';
 import { CheapGlowEffect } from './CheapGlowEffect';
 import { IncomingIntent } from "./IncomingIntent"; // Import the new class
@@ -10,6 +13,7 @@ import { PhysicalBuff } from './PhysicalBuff';
 import { PhysicalIntent } from "./PhysicalIntent";
 import { ShadowedImage } from './ShadowedImage'; // Add this import
 import { TextBox } from "./TextBox"; // Ensure correct relative path
+import { TooltipAttachment } from './TooltipAttachment';
 import { TransientUiState } from './TransientUiState'; // Added import
 import { UIContext } from './UIContextManager';
 
@@ -31,6 +35,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
     physicalBuffs: PhysicalBuff[];
     scene: Phaser.Scene;
     isSelected: boolean = false;
+
+    private blockTooltip: TooltipAttachment;
     private wiggleTween: Phaser.Tweens.Tween | null = null;
     private hoverSound: Phaser.Sound.BaseSound | null = null;
     private cardContent: Phaser.GameObjects.Container;
@@ -54,6 +60,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
     public glowEffect?: CheapGlowEffect;
     private costBox: TextBox | null = null; // Add costBox property
     private priceBox!: TextBox; // Add this property
+    private resourceScalingBox: TextBox | null = null; // Add this property
 
     // This should be false in production; used for debugging depth-related issues in cards
     depthDebug: boolean = false;
@@ -117,8 +124,9 @@ export class PhysicalCard implements IPhysicalCardInterface {
             height: 60,
             text: data.name,
             textBoxName: "nameBox:" + data.id,
-            style: { fontSize: '16px', color: '#000', wordWrap: { width: cardWidth - 10 } },
-            bigTextOverVariableColors: true
+            style: { fontSize: '22px', fontFamily: 'impact', color: '#000', wordWrap: { width: cardWidth - 10 } },
+            bigTextOverVariableColors: true,
+            strokeIsOn: true
         });
 
         // Create descBox
@@ -131,11 +139,13 @@ export class PhysicalCard implements IPhysicalCardInterface {
             text: data.description,
             textBoxName: "descBox:" + data.id,
             style: {
-                fontSize: '12px',
+                fontSize: '17px',
                 color: '#000',
                 wordWrap: { width: cardWidth - 20 },
                 align: 'center'
-            }
+            },
+            verticalExpand: 'down',
+            horizontalExpand: 'center'
         });
         this.descBox.setVisible(false);
 
@@ -156,12 +166,12 @@ export class PhysicalCard implements IPhysicalCardInterface {
             scene: this.scene,
             x: cardWidth + cardWidth / 2,
             y: 0,
-            width: cardWidth - 10,
+            width: cardWidth + 100,
             height: cardHeight,
             text: data.tooltip || '',
             textBoxName: "tooltipBox:" + data.id,
             style: {
-                fontSize: '12px',
+                fontSize: '20px',
                 color: '#000',
                 wordWrap: { width: cardWidth - 20 },
                 align: 'left'
@@ -196,6 +206,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
             const playableCard = this.data as PlayableCardType;
             const cardWidth = this.cardBackground.displayWidth;
             const cardHeight = this.cardBackground.displayHeight;
+            
+            // Cost box setup remains the same
             this.costBox = new TextBox({
                 scene: this.scene,
                 x: cardWidth / 2 - 10,
@@ -206,7 +218,20 @@ export class PhysicalCard implements IPhysicalCardInterface {
                 style: { fontSize: '14px', color: '#ffffff', fontFamily: 'Arial' },
                 fillColor: 0x0000ff
             });
-            this.cardContent.add(this.costBox);
+            
+            // Add resource scaling box below cost box
+            this.resourceScalingBox = new TextBox({
+                scene: this.scene,
+                x: cardWidth / 2 - 40,
+                y: -cardHeight / 2 + 45, // Position it below the cost box
+                width: 30,
+                height: 30,
+                text: '',
+                style: { fontSize: '14px', color: '#ffffff', fontFamily: 'Arial' },
+                fillColor: 0x000000
+            });
+            
+            this.cardContent.add([this.costBox, this.resourceScalingBox]);
         }
 
         // Load the rollover sound if it's not already loaded
@@ -240,8 +265,18 @@ export class PhysicalCard implements IPhysicalCardInterface {
             height: 30,
             text: `${this.data.block}`, // Assuming AbstractCard has a 'block' property
             style: { fontSize: '14px', color: '#ffffff', fontFamily: 'Arial' },
-            fillColor: 0x0000ff
+            fillColor: 0x0000ff,
+            textBoxName: "blockText:" + data.id // Add unique identifier
         });
+
+        // Add tooltip to block display
+        this.blockTooltip = new TooltipAttachment({
+            scene: this.scene,
+            container: this.blockText,
+            tooltipText: "Block: Reduces incoming damage",
+            fillColor: 0x000044
+        });
+
         this.blocksContainer.add(this.blockText);
         this.cardContent.add(this.blocksContainer);
         // Initialize the buffs container positioned to the left of the card
@@ -279,8 +314,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
         this.priceBox = new TextBox({
             scene: this.scene,
-            x: -this.cardBackground.displayWidth / 2 + 40,
-            y: -this.cardBackground.displayHeight / 2 + 40,
+            x: this.cardBackground.displayWidth / 2 + 20,
+            y: 0,
             width: 80,
             height: 30,
             text: '',
@@ -369,6 +404,10 @@ export class PhysicalCard implements IPhysicalCardInterface {
             this.hpBox.destroy();
         }
 
+        if (this.blockTooltip) {
+            this.blockTooltip.destroy();
+        }
+
         // Destroy the card image
         if (this.cardImage) {
             this.cardImage.destroy();
@@ -408,24 +447,41 @@ export class PhysicalCard implements IPhysicalCardInterface {
             this.cardTypeBox.destroy();
         }
 
+        if (this.costBox) {
+            this.costBox.destroy();
+        }
+        if (this.resourceScalingBox) {
+            this.resourceScalingBox.destroy();
+        }
+
         this.obliterated = true;
     }
 
     applyCardSize(): void {
         const scale = this.data.size.sizeModifier;
         this.cardContent.setScale(scale);
+
+        if (this.data.portraitTargetLargestDimension){
+            this.cardImage.setImageScale(this.data.portraitTargetLargestDimension);
+        }
     }
 
-    setupInteractivity(): void {
-        this.container.setInteractive(new Phaser.Geom.Rectangle(
-            -this.cardBackground.displayWidth / 2,
-            -this.cardBackground.displayHeight / 2,
-            this.cardBackground.displayWidth,
-            this.cardBackground.displayHeight
-        ), Phaser.Geom.Rectangle.Contains)
+
+    getRectangleBoundaries(container: Phaser.GameObjects.Container): Phaser.Geom.Rectangle {
+        return new Phaser.Geom.Rectangle(
+            -container.displayWidth / 2,
+            -container.displayHeight / 2,
+            container.displayWidth,
+            container.displayHeight
+        );
+    }
+    
+    setupInteractivity(): this {
+        this.container.setInteractive(this.getRectangleBoundaries(this.container), Phaser.Geom.Rectangle.Contains)
             .on('pointerover', this.onPointerOver_PhysicalCard, this)
             .on('pointerout', this.onPointerOut_PhysicalCard, this)
             .on('pointerdown', this.onPointerDown_PhysicalCard, this);
+        return this;
     }
 
     onPointerOver_PhysicalCard = (): void => {
@@ -459,7 +515,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
         const cardCenterX = this.container.x;
 
         // Set tooltip text
-        this.tooltipBox.setText(this.data.id + "[shift for details]");
+        this.tooltipBox.setText(CardTooltipGenerator.getInstance().generateTooltip(this.data));
 
         // Calculate tooltip dimensions
         const padding = 20;
@@ -619,7 +675,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
             this.nameBox.setText(this.data.name);
         }
 
-        this.descBox.setText(this.data.description);
+        const description = CardDescriptionGenerator.generateCardDescription(this.data);
+        this.descBox.setText(description);
 
         // Update HP box if it exists
         if (this.hpBox && this.data.isBaseCharacter()) {
@@ -632,13 +689,33 @@ export class PhysicalCard implements IPhysicalCardInterface {
             this.nameBox.setBackgroundColor(playableCard.rarity.color);
         }
 
-        // Update cost box if it exists
-        if (this.costBox && this.data.isPlayableCard()) {
+        // Update cost box and resource scaling if it exists
+        if (this.costBox && this.resourceScalingBox && this.data.isPlayableCard()) {
             const playableCard = this.data as PlayableCardType;
             this.costBox.setText(`${playableCard.energyCost}`);
+            
+            // Position resource scaling box below the card type box
+            if (this.cardTypeBox) {
+                const cardTypeBottom = this.cardTypeBox.y + this.cardTypeBox.height / 2;
+                this.resourceScalingBox.setPosition(
+                    this.cardTypeBox.x + 22, 
+                    cardTypeBottom + 22  
+                );
+            }
+            
+            // Update resource scaling display
+            if (playableCard.resourceScalings && playableCard.resourceScalings.length > 0) {
+                const scalingText = ResourceDisplayGenerator.getInstance().generateResourceScalingText(playableCard.resourceScalings);
+                this.resourceScalingBox.setText(scalingText);
+                this.resourceScalingBox.setVerticalExpand('down');
+                this.resourceScalingBox.setHorizontalExpand('left');
+                this.resourceScalingBox.setVisible(true);
+            } else {
+                this.resourceScalingBox.setVisible(false);
+            }
         }
 
-        // Update card image and tint
+        // Update card image and portrait positioning
         const effectivePortraitName = this.data.getEffectivePortraitName(this.scene);
         const effectivePortraitTint = this.data.getEffectivePortraitTint(this.scene);
         
@@ -646,22 +723,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
         texture.setFilter(Phaser.Textures.LINEAR);
         
         // Update the ShadowedImage
-        const frame = texture.get();
-        const aspectRatio = frame.width / frame.height;
-
-        const availableWidth = this.cardBackground.displayWidth * 0.9;
-        const availableHeight = this.cardBackground.displayHeight * 0.7;
-
-        let newWidth = availableWidth;
-        let newHeight = availableWidth / aspectRatio;
-
-        if (newHeight > availableHeight) {
-            newHeight = availableHeight;
-            newWidth = availableHeight * aspectRatio;
-        }
-
-        this.cardImage.setDisplaySize(newWidth, newHeight);
-        this.cardImage.setPosition(0, -this.cardBackground.displayHeight * 0.2);
+        this.setDisplaySizeOfPortraitTexture(texture);
+        this.cardImage.setPosition(this.data.portraitOffsetXOverride ?? 0, this.data.portraitOffsetYOverride ?? -this.cardBackground.displayHeight * 0.2);
         this.cardImage.setTint(effectivePortraitTint);
 
         if (this.cardBackground.scene?.sys){
@@ -676,8 +739,10 @@ export class PhysicalCard implements IPhysicalCardInterface {
         const descBoxY = nameBoxY + this.nameBox.height / 2 + this.descBox.height / 2 + 10;
         this.descBox.setPosition(0, descBoxY);
 
-        // Update block text
+        // Update block text and visibility
         this.blockText.setText(`${this.data.block}`);
+        this.blockText.setVisible(this.data.block > 0 && this.data.isBaseCharacter());
+        this.blockIcon?.setVisible(this.data.block > 0 && this.data.isBaseCharacter());
 
         this.updateIntents();
 
@@ -712,18 +777,30 @@ export class PhysicalCard implements IPhysicalCardInterface {
             this.priceBox.setVisible(false);
         }
 
-        // Update glow effect size if it exists and is visible
-        if (this.glowEffect?.visible) {
-            const currentScale = this.cardContent.scale;
-            const scaledWidth = this.cardBackground.displayWidth * PhysicalCard.GLOW_SCALE_MULTIPLIER * currentScale;
-            const scaledHeight = this.cardBackground.displayHeight * PhysicalCard.GLOW_SCALE_MULTIPLIER * currentScale;
-            this.glowEffect.setDisplaySize(scaledWidth, scaledHeight);
-        }
+        this.glowEffect?.update();
 
         if (this.cardTypeBox && this.data.isPlayableCard()) {
             const playableCard = this.data as PlayableCardType;
             this.cardTypeBox.setText(playableCard.cardType.displayName);
         }
+    }
+
+    private setDisplaySizeOfPortraitTexture(texture: Phaser.Textures.Texture) {
+        const frame = texture.get();
+        const aspectRatio = frame.width / frame.height;
+
+        const availableWidth = this.data.portraitTargetLargestDimension ?? this.cardBackground.displayWidth * 0.9;
+        const availableHeight = this.data.portraitTargetLargestDimension ? availableWidth / aspectRatio : this.cardBackground.displayHeight * 0.7;
+
+        let newWidth = availableWidth;
+        let newHeight = availableWidth / aspectRatio;
+
+        if (newHeight > availableHeight) {
+            newHeight = availableHeight;
+            newWidth = availableHeight * aspectRatio;
+        }
+
+        this.cardImage.setDisplaySize(newWidth, newHeight);
     }
 
     updateIntents(): void {
@@ -791,10 +868,12 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
     // Sync UI buffs with the underlying AbstractCard's buffs
     private syncBuffs(): void {
-        const characterBuffs = this.data.buffs; // Assuming AbstractCard has a 'buffs' property
+        const cardBuffsThatShouldExist = this.data.buffs
+            .filter(buff => !buff.moveToMainDescription);
 
         // Create a set of current buff IDs
-        const currentBuffIds = new Set(characterBuffs.map(buff => buff.id));
+        const currentBuffIds = new Set(cardBuffsThatShouldExist
+            .map(buff => buff.id));
 
         // Remove buffs that are no longer present
         this.currentBuffs.forEach((buffUI, id) => {
@@ -805,7 +884,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
         });
 
         // Add new buffs that are not currently displayed
-        characterBuffs.forEach(buff => {
+        cardBuffsThatShouldExist.forEach(buff => {
             if (!this.currentBuffs.has(buff.id)) {
                 const physicalBuff = new PhysicalBuff(this.scene, 0, 0, buff);
                 this.buffsContainer.add(physicalBuff.container);
@@ -836,6 +915,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
                 col * (buffWidth + padding),
                 row * (buffHeight + padding)
             );
+
+            buffUI.updateText();
             index++;
         });
 
@@ -901,17 +982,14 @@ export class PhysicalCard implements IPhysicalCardInterface {
         if (!this.glowEffect) return;
         
         if (isGlowing) {
-            this.glowEffect.turnOn();
+            this.glowEffect.turnOn(true);
             
-            // Update glow size when card scales
-            const currentScale = this.cardContent.scale;
-            const scaledWidth = this.cardBackground.displayWidth * PhysicalCard.GLOW_SCALE_MULTIPLIER * currentScale;
-            const scaledHeight = this.cardBackground.displayHeight * PhysicalCard.GLOW_SCALE_MULTIPLIER * currentScale;
-            this.glowEffect.setDisplaySize(scaledWidth, scaledHeight);
         } else {
             this.glowEffect.turnOff();
         }
     }
+
+    
     /**
      * Layout the targeting intents in a row that expands leftward
      */
@@ -969,6 +1047,9 @@ export class PhysicalCard implements IPhysicalCardInterface {
         }
         if (this.costBox) {
             this.costBox.setDepth(depth);
+        }
+        if (this.resourceScalingBox) {
+            this.resourceScalingBox.setDepth(depth);
         }
         
         // Set depth for containers and their contents

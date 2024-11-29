@@ -1,6 +1,6 @@
 import { GameState } from "../../../../../rules/GameState";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
-import { CardRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
 export class QueensMandate extends PlayableCard {
@@ -9,9 +9,9 @@ export class QueensMandate extends PlayableCard {
             name: "Queen's Mandate",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
-            rarity: CardRarity.RARE,
+            rarity: EntityRarity.RARE,
         });
-        this.energyCost = 1;
+        this.baseEnergyCost = 2;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
@@ -20,9 +20,8 @@ export class QueensMandate extends PlayableCard {
 
         // Increase Venture and Pages by 2
         combatState.combatResources.modifyVenture(2);
-        combatState.combatResources.modifyPages(2);
+        combatState.combatResources.modifyAshes(2);
 
-        // Increase defense and offense scaling of all cards in hand by 1 Page
         combatState.currentHand.forEach(card => {
             if (card.baseBlock > 0) {
                 card.resourceScalings.push({
