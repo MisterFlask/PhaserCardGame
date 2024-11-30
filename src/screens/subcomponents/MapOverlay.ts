@@ -52,6 +52,11 @@ export class MapOverlay {
         this.scene.events.on('regenerateMap', (force: boolean) => {
             this.regenerateMap(force);
         });
+
+        // Listen for show map overlay event
+        this.scene.events.on('showMapOverlay', () => {
+            this.show();
+        });
     }
 
     private createOverlay(): void {
@@ -95,10 +100,13 @@ export class MapOverlay {
 
     // Background creation
     private createBackground() {
-        this.background = this.scene.add.image(this.scene.scale.width / 2, this.scene.scale.height / 2, 'mapbackground1');
+        this.background = this.scene.add.image(this.scene.scale.width / 2, this.scene.scale.height / 2, 'styx_delta');
         this.background.setOrigin(0.5, 0.5);
-        this.background.setScrollFactor(0);
-        this.background.setDisplaySize(this.scene.scale.width, this.scene.scale.height);
+        this.background.setScrollFactor(1);
+        const aspectRatio = this.background.height / this.background.width;
+        const newWidth = this.scene.scale.width;
+        const newHeight = newWidth * aspectRatio;
+        this.background.setDisplaySize(newWidth, newHeight);
         this.overlay.add(this.background);
     }
 

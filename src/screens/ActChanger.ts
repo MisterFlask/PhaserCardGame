@@ -27,5 +27,8 @@ export class ActChanger {
         if (locations.length > 0) {
             gameState.setCurrentLocation(locations[0]);
         }
+
+        // Emit event to show map overlay
+        this.scene.events.emit('showMapOverlay');
     }
 }

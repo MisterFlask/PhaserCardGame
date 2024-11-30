@@ -213,6 +213,10 @@ export default class GameImageLoader {
                 'spider-face.png', 'templar-shield.png', 'terror.png', 'wasp-sting.png'
             ]
         },
+        maps: {
+            prefix: 'Backgrounds/Act/',
+            files: ['styx_delta.png']
+        },
         enemies: {
             prefix: 'Sprites/Enemies/v2/',
             files: [
