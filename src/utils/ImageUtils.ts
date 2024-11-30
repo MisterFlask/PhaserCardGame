@@ -215,7 +215,7 @@ export default class GameImageLoader {
         },
         maps: {
             prefix: 'Backgrounds/Act/',
-            files: ['styx_delta.png']
+            files: ['styx_delta.png', "dis.png"]
         },
         enemies: {
             prefix: 'Sprites/Enemies/v2/',

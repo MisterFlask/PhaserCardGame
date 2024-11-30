@@ -101,7 +101,7 @@ export class MapOverlay {
     // Background creation
     private createBackground() {
         this.background = this.scene.add.image(this.scene.scale.width / 2, this.scene.scale.height / 2, 'styx_delta');
-        this.background.setOrigin(0.5, 0.5);
+        this.background.setOrigin(0.5, 0.2);
         this.background.setScrollFactor(1);
         
         // Calculate scaling to cover the screen while maintaining aspect ratio
