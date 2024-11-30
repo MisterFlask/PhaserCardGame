@@ -78,9 +78,9 @@ export class MapOverlay {
         this.createBackground();
         this.createCampaignBriefStatus();
         this.generateAndPlaceLocations();
+        this.createAdjacencyLines();
         this.createPhysicalLocationCards();
         this.createCharacterCards();
-        this.createAdjacencyLines();
         this.createAbortButton();
         this.createCampaignStatusText();
         this.createCameraButtons();
@@ -518,7 +518,7 @@ export class MapOverlay {
 
         // Regenerate the map
         this.generateAndPlaceLocations(force);
-        this.createPhysicalLocationCards();
         this.createAdjacencyLines();
+        this.createPhysicalLocationCards();
     }
 }

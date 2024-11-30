@@ -47,7 +47,7 @@ export class AdjacencyLineRenderer {
             const x = fromX + (toX - fromX) * progress;
             const y = fromY + (toY - fromY) * progress;
 
-            const breadcrumb = this.scene.add.image(x, y, 'breadcrumbs');
+            const breadcrumb = this.scene.add.image(x, y, 'Circle');
             breadcrumb.setName('breadcrumb');
             breadcrumb.setDisplaySize(20, 20);
             breadcrumb.setRotation(angle);
