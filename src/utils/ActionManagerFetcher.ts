@@ -33,13 +33,11 @@ export class ActionManagerFetcher {
     }
 
     public static async initServicesAsync(scene: Phaser.Scene): Promise<void> {
-        if (!this._actionManager || !this._gameState || !this._actChanger) {
-            const { ActionManager } = await import('./ActionManager');
-            const { GameState } = await import('../rules/GameState');
-            const { ActChanger } = await import('../screens/ActChanger');
-            this._actionManager = ActionManager.getInstance();
-            this._gameState = GameState.getInstance();
-            this._actChanger = ActChanger.getInitialInstance(scene);
-        }
+        const { ActionManager } = await import('./ActionManager');
+        const { GameState } = await import('../rules/GameState');
+        const { ActChanger } = await import('../screens/ActChanger');
+        this._actionManager = ActionManager.getInstance();
+        this._gameState = GameState.getInstance();
+        this._actChanger = ActChanger.getInitialInstance(scene);
     }
 }

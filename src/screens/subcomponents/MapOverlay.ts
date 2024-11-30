@@ -56,11 +56,13 @@ export class MapOverlay {
 
         // Listen for map regeneration event
         this.scene.events.on('regenerateMap', (force: boolean) => {
+            console.log('regenerateMap', force);
             this.regenerateMap(force);
         });
 
         // Listen for show map overlay event
         this.scene.events.on('showMapOverlay', () => {
+            console.log('showMapOverlay');
             this.show();
         });
     }
@@ -515,9 +517,18 @@ export class MapOverlay {
     private regenerateMap(force: boolean): void {
         // Clear existing location cards
         this.locationCards.forEach(card => {
-            card.container.destroy();
+            card.obliterate()
         });
         this.locationCards = [];
+
+        // Remove existing background
+        if (this.background) {
+            this.background.destroy();
+            this.background = null;
+        }
+
+        // Recreate background
+        this.createBackground();
 
         // Regenerate the map
         this.generateAndPlaceLocations(force);
