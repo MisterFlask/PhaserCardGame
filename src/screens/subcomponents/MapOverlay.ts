@@ -162,7 +162,7 @@ export class MapOverlay {
                 data: location,
                 onCardCreatedEventCallback: this.setupLocationCardEvents
             });
-            card.container.setDepth(depthManager.CARD_BASE);
+            card.container.setDepth(depthManager.MAP_LOCATIONS);
             this.locationCards.push(card);
             this.overlay.add(card.container);
         });

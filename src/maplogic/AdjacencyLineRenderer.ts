@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { DepthManager } from '../ui/DepthManager';
 import { LocationCard } from './LocationCard';
 
 export class AdjacencyLineRenderer {
@@ -51,6 +52,7 @@ export class AdjacencyLineRenderer {
             breadcrumb.setDisplaySize(20, 20);
             breadcrumb.setRotation(angle);
             breadcrumb.setTint(AdjacencyLineRenderer.DEFAULT_COLOR);
+            breadcrumb.setDepth(DepthManager.getInstance().MAP_CONNECTIONS);
             
             this.container.add(breadcrumb);
             breadcrumbs.push(breadcrumb);

@@ -34,6 +34,11 @@ export class DepthManager {
     public readonly TOOLTIP = this.UI_BASE + 2000;
     public readonly MODAL = this.UI_BASE + 3000;
     public readonly REWARD_SCREEN = this.UI_BASE + 4000;
+
+    // Map-specific depths
+    public readonly MAP_CONNECTIONS = 1000;  // Lower depth for connections
+    public readonly MAP_LOCATIONS = 1100;    // Higher depth for location cards
+    
     private constructor() {}
 
     public static getInstance(): DepthManager {

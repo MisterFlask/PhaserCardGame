@@ -120,7 +120,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
             scene: this.scene,
             x: 0,
             y: cardHeight / 4,
-            width: cardWidth - 10,
+            width: cardWidth + 40,
             height: 60,
             text: data.name,
             textBoxName: "nameBox:" + data.id,
