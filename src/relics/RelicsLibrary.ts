@@ -4,7 +4,7 @@ import { Catspaw } from './common/Catspaw';
 import { FrozenDew } from './common/FrozenDew';
 import { GlassCross } from './common/GlassCross';
 import { HopeCandle } from './common/HopeCandle';
-import { InfernalitePowder } from './common/InfernalitePowder';
+import { VialOfBlood } from './common/InfernalitePowder';
 import { IronFilings } from './common/IronFilings';
 import { MistBottle } from './common/MistBottle';
 import { TornPage } from './common/TornPage';
@@ -23,7 +23,7 @@ export class RelicsLibrary {
             new IronFilings(),
             new GlassCross(),
             new CaskOfErrantSouls(),
-            new InfernalitePowder()
+            new VialOfBlood()
         ];
     }
 

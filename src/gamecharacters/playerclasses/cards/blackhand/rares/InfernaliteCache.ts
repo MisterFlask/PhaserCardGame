@@ -11,12 +11,12 @@ export class InfernaliteCache extends PlayableCard {
             portraitName: "enrage-test",
             targetingType: TargetingType.NO_TARGETING,
         });
-        this.baseMagicNumber = 6;
+        this.baseMagicNumber = 4;
         this.baseEnergyCost = 1;
     }
 
     override get description(): string {
-        return `Gain ${this.getDisplayedMagicNumber()} ${TextGlyphs.getInstance().PAGES_ICON_RAW}.`;
+        return `Gain ${this.getDisplayedMagicNumber()} ${TextGlyphs.getInstance().smogIcon}.`;
     }
     
     override InvokeCardEffects(targetCard?: BaseCharacter): void {

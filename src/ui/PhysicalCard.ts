@@ -191,7 +191,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
                 scene: this.scene,
                 x: cardWidth / 2 - 10,
                 y: -cardHeight / 2 + 10,
-                width: 60,
+                width: 160,
                 height: 30,
                 text: `${baseCharacter.hitpoints}/${baseCharacter.maxHitpoints}`,
                 style: { fontSize: '14px', color: '#ff0000', fontFamily: 'Arial' }
