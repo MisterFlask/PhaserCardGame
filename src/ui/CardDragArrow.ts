@@ -3,12 +3,14 @@ import Phaser from 'phaser';
 export class CardDragArrow extends Phaser.GameObjects.Container {
     private static readonly BREADCRUMB_SPACING = 20; // pixels between each breadcrumb
     private static readonly BREADCRUMB_SIZE = 8; // size of each breadcrumb sprite
-    private static readonly ARROW_COLOR = 0xffff00; // yellow color for the arrow
+    private static readonly DEFAULT_COLOR = 0xffff00; // yellow color for the arrow
+    private static readonly VALID_TARGET_COLOR = 0xff0000; // red color for valid targets
     private static readonly MAX_BREADCRUMBS = 30; // maximum number of breadcrumbs to show
 
     private breadcrumbs: Phaser.GameObjects.Arc[] = [];
     private startPoint: Phaser.Math.Vector2;
     private endPoint: Phaser.Math.Vector2;
+    private currentColor: number;
 
     constructor(scene: Phaser.Scene, x: number, y: number) {
         super(scene, x, y);
@@ -16,6 +18,7 @@ export class CardDragArrow extends Phaser.GameObjects.Container {
         
         this.startPoint = new Phaser.Math.Vector2(0, 0);
         this.endPoint = new Phaser.Math.Vector2(0, 0);
+        this.currentColor = CardDragArrow.DEFAULT_COLOR;
         
         // Initially hide the arrow
         this.setVisible(false);
@@ -28,6 +31,11 @@ export class CardDragArrow extends Phaser.GameObjects.Container {
 
     public setEndPoint(x: number, y: number): void {
         this.endPoint.set(x, y);
+        this.updateArrow();
+    }
+
+    public setValidTarget(isValid: boolean): void {
+        this.currentColor = isValid ? CardDragArrow.VALID_TARGET_COLOR : CardDragArrow.DEFAULT_COLOR;
         this.updateArrow();
     }
 
@@ -70,7 +78,7 @@ export class CardDragArrow extends Phaser.GameObjects.Container {
             const breadcrumb = this.scene.add.circle(
                 x, y,
                 CardDragArrow.BREADCRUMB_SIZE / 2,
-                CardDragArrow.ARROW_COLOR,
+                this.currentColor,
                 1
             );
             

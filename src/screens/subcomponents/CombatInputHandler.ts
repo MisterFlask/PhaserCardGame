@@ -7,6 +7,7 @@ import { BaseCharacter } from '../../gamecharacters/BaseCharacter';
 import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
 import { PlayableCard } from '../../gamecharacters/PlayableCard';
 import { GameState } from '../../rules/GameState';
+import { PlayableCardType } from '../../Types';
 import { CardDragArrow } from '../../ui/CardDragArrow';
 import { DepthManager } from '../../ui/DepthManager';
 import CombatSceneLayoutUtils from '../../ui/LayoutUtils';
@@ -143,6 +144,16 @@ class CombatInputHandler {
             // Update the arrow end point instead of moving the card
             this.cardDragArrow.setEndPoint(pointer.x, pointer.y);
             this.checkCardUnderPointer(pointer);
+
+            // Update arrow color based on target validity
+            const draggedCard = this.transientUiState.draggedCard;
+            const hoveredCard = this.transientUiState.hoveredCard;
+            
+            if (draggedCard.data.isPlayableCard()) {
+                const playableCard = draggedCard.data as PlayableCardType;
+                const hasValidTarget = hoveredCard && this.isValidTarget(playableCard, hoveredCard.data);
+                this.cardDragArrow.setValidTarget(hasValidTarget || false);
+            }
         }
     }
 

@@ -6,6 +6,7 @@ import { TextBox } from '../ui/TextBox';
 import type { ActionManager } from '../utils/ActionManager';
 import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
 import ImageUtils from '../utils/ImageUtils';
+import { AbstractPeriodicBark } from './AbstractPeriodicBark';
 import type { BaseCharacter } from './BaseCharacter';
 import type { PlayerCharacter } from './BaseCharacterClass';
 import { AbstractBuff } from './buffs/AbstractBuff';
@@ -368,6 +369,10 @@ export abstract class AbstractCard implements IAbstractCard {
 
 
     onClickLaunchEvent(): AbstractEvent | null {
+        return null;
+    }
+
+    getPeriodicBark(): AbstractPeriodicBark | null {
         return null;
     }
 }
