@@ -8,6 +8,7 @@ import { GameState } from '../../rules/GameState';
 import { TextBoxButton } from '../../ui/Button';
 import { DepthManager } from '../../ui/DepthManager';
 import { PhysicalCard } from '../../ui/PhysicalCard';
+import { TransientUiState } from '../../ui/TransientUiState';
 import { UIContext, UIContextManager } from '../../ui/UIContextManager';
 import { ActionManagerFetcher } from '../../utils/ActionManagerFetcher';
 import { CardGuiUtils } from '../../utils/CardGuiUtils';
@@ -350,23 +351,39 @@ export class MapOverlay {
         });
         this.adjacencyLineRenderer.clearHighlights();
         
+        const hoveredCard = TransientUiState.getInstance().hoveredCard;
         const currentLocation = GameState.getInstance().getCurrentLocation();
-        const currentLocationCard = this.locationCards.find(card => (card.data as LocationCard).id === currentLocation?.id);
-        
-        if (currentLocationCard) {
-            currentLocationCard.glowColor = 0x00ff00;
-            currentLocationCard.setGlow(true);
-            // Highlight connections for current location
-            this.adjacencyLineRenderer.highlightConnectionsForLocation(currentLocation!);
-        }
-        
-        const nextLocations = currentLocation?.adjacentLocations;
-        nextLocations?.forEach(loc => {
-            const nextLocationCard = this.locationCards.find(card => (card.data as LocationCard).id === loc.id);
-            if (nextLocationCard) {
-                nextLocationCard.setGlow(true);
+
+        if (hoveredCard && hoveredCard.data instanceof LocationCard) {
+            // If we're hovering a location, highlight its connections
+            hoveredCard.glowColor = 0x00ff00;
+            hoveredCard.setGlow(true);
+            this.adjacencyLineRenderer.highlightConnectionsForLocation(hoveredCard.data);
+            
+            // Also highlight adjacent locations
+            hoveredCard.data.adjacentLocations?.forEach(loc => {
+                const adjacentCard = this.locationCards.find(card => (card.data as LocationCard).id === loc.id);
+                if (adjacentCard) {
+                    adjacentCard.setGlow(true);
+                }
+            });
+        } else if (currentLocation) {
+            // If no location is hovered, highlight current location and its connections
+            const currentLocationCard = this.locationCards.find(card => (card.data as LocationCard).id === currentLocation?.id);
+            if (currentLocationCard) {
+                currentLocationCard.glowColor = 0x00ff00;
+                currentLocationCard.setGlow(true);
+                this.adjacencyLineRenderer.highlightConnectionsForLocation(currentLocation);
             }
-        });
+            
+            const nextLocations = currentLocation?.adjacentLocations;
+            nextLocations?.forEach(loc => {
+                const nextLocationCard = this.locationCards.find(card => (card.data as LocationCard).id === loc.id);
+                if (nextLocationCard) {
+                    nextLocationCard.setGlow(true);
+                }
+            });
+        }
     }
 
     // Setup Location Card Events

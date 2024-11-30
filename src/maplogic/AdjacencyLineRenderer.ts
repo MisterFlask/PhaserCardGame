@@ -5,7 +5,7 @@ import { LocationCard } from './LocationCard';
 export class AdjacencyLineRenderer {
     private scene: Phaser.Scene;
     private container: Phaser.GameObjects.Container;
-    private breadcrumbsPerLine: number = 10;
+    private breadcrumbsPerLine: number = 25;
     private breadcrumbsByConnection: Map<string, Phaser.GameObjects.Image[]> = new Map();
 
     // Color constants similar to CombatHighlightsManager
@@ -49,7 +49,7 @@ export class AdjacencyLineRenderer {
 
             const breadcrumb = this.scene.add.image(x, y, 'Circle');
             breadcrumb.setName('breadcrumb');
-            breadcrumb.setDisplaySize(20, 20);
+            breadcrumb.setDisplaySize(10, 10);
             breadcrumb.setRotation(angle);
             breadcrumb.setTint(AdjacencyLineRenderer.DEFAULT_COLOR);
             breadcrumb.setDepth(DepthManager.getInstance().MAP_CONNECTIONS);
