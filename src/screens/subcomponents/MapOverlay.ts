@@ -103,10 +103,13 @@ export class MapOverlay {
         this.background = this.scene.add.image(this.scene.scale.width / 2, this.scene.scale.height / 2, 'styx_delta');
         this.background.setOrigin(0.5, 0.5);
         this.background.setScrollFactor(1);
-        const aspectRatio = this.background.height / this.background.width;
-        const newWidth = this.scene.scale.width;
-        const newHeight = newWidth * aspectRatio;
-        this.background.setDisplaySize(newWidth, newHeight);
+        
+        // Calculate scaling to cover the screen while maintaining aspect ratio
+        const scaleX = this.scene.scale.width / this.background.width;
+        const scaleY = this.scene.scale.height / this.background.height;
+        const scale = Math.max(scaleX, scaleY);
+        
+        this.background.setScale(scale);
         this.overlay.add(this.background);
     }
 
@@ -399,7 +402,10 @@ export class MapOverlay {
 
         // Update background
         if (this.background) {
-            this.background.setDisplaySize(width, height);
+            const scaleX = width / this.background.width;
+            const scaleY = height / this.background.height;
+            const scale = Math.max(scaleX, scaleY);
+            this.background.setScale(scale);
             this.background.setPosition(width / 2, height / 2);
         }
 
