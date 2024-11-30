@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { AdjacencyLineRenderer } from '../../maplogic/AdjacencyLineRenderer';
 import { AdjacencyManager } from '../../maplogic/AdjacencyManager';
 import { LocationCard } from '../../maplogic/LocationCard';
 import { LocationManager } from '../../maplogic/LocationManager';
@@ -18,7 +19,6 @@ export class MapOverlay {
     private isVisible: boolean = false;
     private locationCards: PhysicalCard[] = [];
     private characterCards: PhysicalCard[] = [];
-    private adjacencyGraphics: Phaser.GameObjects.Graphics | null = null;
     private campaignBriefStatus: CampaignBriefStatus | null = null;
 
     // Managers
@@ -32,6 +32,8 @@ export class MapOverlay {
     private moveUpButton: TextBoxButton | null = null;
     private moveDownButton: TextBoxButton | null = null;
     private closeButton: TextBoxButton | null = null;
+
+    private adjacencyLineRenderer: AdjacencyLineRenderer;
 
     background_by_act: Record<number, string> = {
         1: 'styx_delta',
@@ -52,6 +54,7 @@ export class MapOverlay {
 
         // Initialize components
         ActionManagerFetcher.getActionManager();
+        this.adjacencyLineRenderer = new AdjacencyLineRenderer(this.scene, this.overlay);
         this.createOverlay();
 
         // Listen for map regeneration event
@@ -74,7 +77,6 @@ export class MapOverlay {
 
         this.createBackground();
         this.createCampaignBriefStatus();
-        this.createAdjacencyGraphics();
         this.generateAndPlaceLocations();
         this.createPhysicalLocationCards();
         this.createCharacterCards();
@@ -131,12 +133,6 @@ export class MapOverlay {
         this.overlay.add(this.campaignBriefStatus);
     }
 
-    // Adjacency Graphics
-    private createAdjacencyGraphics() {
-        this.adjacencyGraphics = new Phaser.GameObjects.Graphics(this.scene, { lineStyle: { width: 2, color: 0xffffff } });
-        this.overlay.add(this.adjacencyGraphics!);
-    }
-
     // Generate and place locations
     public generateAndPlaceLocations(force: boolean = false) {
         if (GameState.getInstance().mapInitialized && !force) {
@@ -148,6 +144,8 @@ export class MapOverlay {
 
         this.adjacencyManager.enrichLocationsWithAdjacencies();
         this.spatialManager.enrichLocationsWithPositioning();
+        const reachableLocations = this.locationManager.cullUnreachableRooms(locationData);
+        GameState.getInstance().setLocations(reachableLocations);
         GameState.getInstance().mapInitialized = true;
     }
 
@@ -214,25 +212,8 @@ export class MapOverlay {
 
     // Create Adjacency Lines
     private createAdjacencyLines() {
-        if (!this.adjacencyGraphics) return;
-
-        this.adjacencyGraphics.clear();
-        this.adjacencyGraphics.lineStyle(2, 0xaaaaaa, 1);
-
         const locations = GameState.getInstance().getLocations();
-
-        locations.forEach(location => {
-            const fromX = location.xPos;
-            const fromY = location.yPos;
-
-            location.adjacentLocations.forEach(adj => {
-                if (adj.id > location.id) {
-                    const toX = adj.xPos;
-                    const toY = adj.yPos;
-                    this.adjacencyGraphics!.strokeLineShape(new Phaser.Geom.Line(fromX, fromY, toX, toY));
-                }
-            });
-        });
+        this.adjacencyLineRenderer.renderAdjacencyLines(locations);
     }
 
     // Create Abort Button
@@ -363,17 +344,22 @@ export class MapOverlay {
 
     // Highlight Updates
     public updateHighlights() {
-        // Clear glow effects on all location cards
+        // Clear glow effects on all location cards and breadcrumb highlights
         this.locationCards.forEach(card => {
             card.setGlow(false);
         });
+        this.adjacencyLineRenderer.clearHighlights();
         
         const currentLocation = GameState.getInstance().getCurrentLocation();
         const currentLocationCard = this.locationCards.find(card => (card.data as LocationCard).id === currentLocation?.id);
+        
         if (currentLocationCard) {
             currentLocationCard.glowColor = 0x00ff00;
             currentLocationCard.setGlow(true);
+            // Highlight connections for current location
+            this.adjacencyLineRenderer.highlightConnectionsForLocation(currentLocation!);
         }
+        
         const nextLocations = currentLocation?.adjacentLocations;
         nextLocations?.forEach(loc => {
             const nextLocationCard = this.locationCards.find(card => (card.data as LocationCard).id === loc.id);

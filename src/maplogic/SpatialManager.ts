@@ -31,10 +31,13 @@ export class SpatialManager {
             floorLocations.sort((a, b) => a.roomNumber - b.roomNumber);
             
             const roomCount = floorLocations.length;
-            const roomWidth = roomCount > 1 ? usableWidth / (roomCount - 1) : 0; // Handle single room
+            const roomWidth = roomCount > 1 ? usableWidth / (roomCount - 1) : 0;
             
             floorLocations.forEach((location, index) => {
-                const x = leftMargin + index * roomWidth;
+                // Center single rooms, otherwise space them evenly
+                const x = roomCount === 1 
+                    ? this.width / 2  // Center single room
+                    : leftMargin + index * roomWidth;
                 const y = floorHeight * floorNumber;
                 location.setPosition(x, y);
             });

@@ -71,6 +71,18 @@ export class AdjacencyManager {
 
         // Step 6: Ensure the graph is fully connected
         this.ensureFullConnectivity(locations);
+
+        // After adjacency creation, get the Entrance node
+        const entranceNode = floors.get(1)![0]; // Assuming single Entrance node
+
+        // Explicitly connect any unconnected floor 2 nodes to the Entrance node
+        const floor2Nodes = floors.get(2)!;
+        floor2Nodes.forEach(loc => {
+            if (loc.adjacentLocations.length === 0) {
+                this.addAdjacency(loc, entranceNode);
+                console.log(`Connected unconnected floor 2 node ${loc.id} to Entrance node`);
+            }
+        });
     }
 
     private ensurePath(floors: Map<number, LocationCard[]>, sortedFloors: number[], bossNode: LocationCard): void {
@@ -127,7 +139,7 @@ export class AdjacencyManager {
 
         if (locations.length === 0) return;
 
-        // Start BFS from the first location
+        // Start BFS from the first location (entrance)
         queue.push(locations[0]);
         visited.add(locations[0]);
 
@@ -144,25 +156,49 @@ export class AdjacencyManager {
         // Find disconnected locations
         const disconnected = locations.filter(loc => !visited.has(loc));
 
-        // Connect disconnected locations to the main component
-        disconnected.forEach(loc => {
-            // Find the closest location in the visited set on the same floor or adjacent floors
-            let closest: LocationCard | null = null;
-            let minDistance = Infinity;
-            locations.forEach(other => {
-                if (visited.has(other) && Math.abs(other.floor - loc.floor) <= 1 && Math.abs(other.roomNumber - loc.roomNumber) <= this.maxIndexDifference) {
-                    const distance = this.calculateDistance(loc, other);
-                    if (distance < minDistance) {
-                        minDistance = distance;
-                        closest = other;
-                    }
-                }
-            });
+        // Group locations by floor for easier previous floor lookup
+        const floorMap = new Map<number, LocationCard[]>();
+        locations.forEach(loc => {
+            if (!floorMap.has(loc.floor)) {
+                floorMap.set(loc.floor, []);
+            }
+            floorMap.get(loc.floor)!.push(loc);
+        });
 
-            if (closest) {
-                this.addAdjacency(loc, closest);
-                visited.add(loc);
-                queue.push(loc);
+        // Connect disconnected locations to the previous floor
+        disconnected.forEach(loc => {
+            const previousFloor = loc.floor - 1;
+            const previousFloorRooms = floorMap.get(previousFloor);
+
+            if (previousFloorRooms && previousFloorRooms.length > 0) {
+                // Find the closest room on the previous floor within maxIndexDifference
+                const validPreviousRooms = previousFloorRooms.filter(prev => 
+                    Math.abs(prev.roomNumber - loc.roomNumber) <= this.maxIndexDifference
+                );
+
+                if (validPreviousRooms.length > 0) {
+                    // Connect to the closest valid room on the previous floor
+                    const closest = validPreviousRooms.reduce((prev, curr) => {
+                        const prevDist = Math.abs(prev.roomNumber - loc.roomNumber);
+                        const currDist = Math.abs(curr.roomNumber - loc.roomNumber);
+                        return prevDist < currDist ? prev : curr;
+                    });
+
+                    this.addAdjacency(loc, closest);
+                    visited.add(loc);
+                    queue.push(loc);
+                } else {
+                    // If no valid rooms within maxIndexDifference, connect to the closest room anyway
+                    const closest = previousFloorRooms.reduce((prev, curr) => {
+                        const prevDist = Math.abs(prev.roomNumber - loc.roomNumber);
+                        const currDist = Math.abs(curr.roomNumber - loc.roomNumber);
+                        return prevDist < currDist ? prev : curr;
+                    });
+
+                    this.addAdjacency(loc, closest);
+                    visited.add(loc);
+                    queue.push(loc);
+                }
             }
         });
     }

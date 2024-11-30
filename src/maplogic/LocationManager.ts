@@ -9,30 +9,25 @@ export class LocationManager {
     }
 
     public initializeLocations() : LocationCard[]{
-        const numberOfFloors = 9; // Step 2. Set number of floors between 3 and 5
-
+        const numberOfFloors = 9;
         const locationData: LocationCard[] = [];
 
-        for (let floor = 1; floor <= numberOfFloors; floor++) { // Step 3. For each floor
-            const numNodesOnThisFloor = 5; // Step 3a. Create 5-8 nodes per floor
-
+        for (let floor = 1; floor <= numberOfFloors; floor++) {
+            const numNodesOnThisFloor = 5;
             let floorLocationData: LocationCard[] = [];
-            
-
-            // Ensure at least one Rest Site per floor
             let restSiteAssigned = false;
 
             for (let i = 0; i < numNodesOnThisFloor; i++) {
                 let location: LocationCard;
 
-                if (i === Math.floor(numNodesOnThisFloor/2) && floor === 1) {
-                    location = new EntranceCard(floor, i); // Step 5. Entrance node at floor 1
+                if (floor === 1 && i === 3) {
+                    location = new EntranceCard(floor, i);
                     GameState.getInstance().setCurrentLocation(location);
-                } else if (floor === numberOfFloors && i === Math.floor(numNodesOnThisFloor/2)) {
-                    location = new BossRoomCard(floor, i); // Step 6. Boss node at top floor
+                } else if (floor === numberOfFloors && i === 3) {
+                    location = new BossRoomCard(floor, i);
                 } else {
                     const rand = Phaser.Math.FloatBetween(0, 1);
-                    if (!restSiteAssigned && i === numNodesOnThisFloor - 2) { // Ensure at least one Rest Site
+                    if (!restSiteAssigned && i === numNodesOnThisFloor - 2) {
                         location = new RestSiteCard(floor, i);
                         restSiteAssigned = true;
                     } else if (rand < 0.3) {
@@ -50,7 +45,7 @@ export class LocationManager {
                     }
                 }
 
-                if (location.floor < 5){
+                if (location.floor < 5) {
                     location.segment = 1;
                 } else {
                     location.segment = 2;
@@ -61,72 +56,60 @@ export class LocationManager {
                 floorLocationData.push(location);
             }
 
-
-            // remove all non-boss rooms from the last floor, and all non-entrance rooms from the first floor
             if (floor === numberOfFloors) {
                 floorLocationData = floorLocationData.filter(card => card instanceof BossRoomCard);
             } else if (floor === 1) {
                 floorLocationData = floorLocationData.filter(card => card instanceof EntranceCard);
             }
 
-            // Cull unreachable rooms
-            //const reachableRooms = this.findReachableRooms(floorLocationData);
-            //floorLocationData = reachableRooms;
-
-
             locationData.push(...floorLocationData);
         }
 
-        // After generating all floors, add the Charon Room on the floor below the Boss Room
-        const bossFloor = numberOfFloors;
-        const charonFloor = bossFloor + 1;
-
-        // Create the Charon Room
-        const charonRoom = new CharonRoomCard(charonFloor, 0);
+        const charonFloor = numberOfFloors + 1;
+        const charonRoom = new CharonRoomCard(charonFloor, 3);
         charonRoom.floor = charonFloor;
-        charonRoom.roomNumber = 0;
+        charonRoom.roomNumber = 3;
         charonRoom.initEncounter();
         locationData.push(charonRoom);
 
-        // Find the Boss Room and set adjacency
         const bossRoom = locationData.find(
             location => location instanceof BossRoomCard
         );
 
         if (bossRoom) {
-            // Set adjacency between Boss Room and Charon Room
             bossRoom.setAdjacent(charonRoom);
             charonRoom.setAdjacent(bossRoom);
         }
-
         return locationData;
     }
 
-    findReachableRooms(floorLocationData: LocationCard[]): LocationCard[] {
-        const reachableRooms: LocationCard[] = [];
-        const visited = new Set<LocationCard>();
-        const queue: LocationCard[] = [];
+    public cullUnreachableRooms(locationData: LocationCard[]): LocationCard[] {
+        const entrance = locationData.find(loc => loc instanceof EntranceCard);
+        if (!entrance) return locationData;
 
-        // Start from the entrance room
-        const entrance = GameState.getInstance().getCurrentLocation()
-        if (entrance && floorLocationData.includes(entrance)) {
-            queue.push(entrance);
-            visited.add(entrance);
-        }
-
+        const reachable = new Set<LocationCard>();
+        const queue: LocationCard[] = [entrance];
+        
         while (queue.length > 0) {
-            const currentRoom = queue.shift()!;
-            reachableRooms.push(currentRoom);
-
-            // Check adjacent rooms
-            for (const adjacentRoom of currentRoom.adjacentLocations) {
-                if (!visited.has(adjacentRoom) && floorLocationData.includes(adjacentRoom)) {
-                    visited.add(adjacentRoom);
-                    queue.push(adjacentRoom);
+            const current = queue.shift()!;
+            if (reachable.has(current)) continue;
+            
+            reachable.add(current);
+            
+            for (const adjacent of current.adjacentLocations) {
+                if (!reachable.has(adjacent)) {
+                    queue.push(adjacent);
                 }
             }
         }
 
-        return reachableRooms;
+        const specialRooms = locationData.filter(
+            loc => loc instanceof BossRoomCard || loc instanceof CharonRoomCard
+        );
+        specialRooms.forEach(room => reachable.add(room));
+
+        const numCulled = locationData.length - reachable.size;
+        console.log(`Culled ${numCulled} unreachable rooms`);
+        return locationData.filter(loc => reachable.has(loc));
     }
 }
