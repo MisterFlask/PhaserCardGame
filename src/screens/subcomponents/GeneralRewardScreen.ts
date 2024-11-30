@@ -4,6 +4,7 @@ import { AbstractReward } from '../../rewards/AbstractReward';
 import { CardReward } from '../../rewards/CardReward';
 import { CardRuleUtils } from '../../rules/CardRuleUtils';
 import { TextBoxButton } from '../../ui/Button';
+import { DepthManager } from '../../ui/DepthManager';
 import { ActionManager } from '../../utils/ActionManager';
 import CardRewardScreen from './CardRewardScreen';
 
@@ -21,9 +22,9 @@ const CONSTANTS = {
     TOOLTIP_Y_OFFSET: -70,
     FADE_DURATION: 500,
     UI_DEPTH: {
-        BACKGROUND: 100,
-        REWARDS: 101,
-        TOOLTIPS: 102
+        BACKGROUND: DepthManager.getInstance().REWARD_SCREEN + 100,
+        REWARDS: DepthManager.getInstance().REWARD_SCREEN + 101,
+        TOOLTIPS: DepthManager.getInstance().REWARD_SCREEN + 102
     }
 } as const;
 

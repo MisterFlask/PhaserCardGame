@@ -8,6 +8,10 @@ import { AbstractEvent } from '../events/AbstractEvent';
 import { EventsManager } from '../events/EventsManager';
 import { AbstractCard } from '../gamecharacters/AbstractCard';
 import { CardSize, CardType } from '../gamecharacters/Primitives';
+import { AbstractReward } from '../rewards/AbstractReward';
+import { CardReward } from '../rewards/CardReward';
+import { CurrencyReward } from '../rewards/CurrencyReward';
+import { CardRewardsGenerator } from '../rules/CardRewardsGenerator';
 import { GameState } from '../rules/GameState';
 import { SceneChanger } from '../screens/SceneChanger';
 import { Faction } from './Faction';
@@ -73,6 +77,9 @@ export class LocationCard extends AbstractCard {
         scene.scene.start('CombatScene', { encounter: this.encounter });
     }
 
+    public determineRewards(): AbstractReward[] {
+        return []; // Base location cards yield no rewards by default
+    }
 }
 
 // Add specific LocationCard subclasses
@@ -107,6 +114,14 @@ export class BossRoomCard extends LocationCard {
         const encounterDescription = `Encounter: ${this.encounter.enemies.map(e => e.name).join(', ')}`;
         const fullDescription = `${encounterDescription}`;
         this.description = fullDescription;
+    }
+
+    override determineRewards(): AbstractReward[] {
+        const rewards: AbstractReward[] = [];
+        const cardRewards = CardRewardsGenerator.getInstance().generateCardRewardsForCombat();
+        rewards.push(new CardReward(cardRewards));
+        rewards.push(new CurrencyReward(200)); // Boss rooms give the most currency
+        return rewards;
     }
 }
 
@@ -163,6 +178,14 @@ export class NormalRoomCard extends LocationCard {
         this.portraitName = 'room-fight-icon';
         this.portraitTint = 0xff0000;
     }
+
+    override determineRewards(): AbstractReward[] {
+        const rewards: AbstractReward[] = [];
+        const cardRewards = CardRewardsGenerator.getInstance().generateCardRewardsForCombat();
+        rewards.push(new CardReward(cardRewards));
+        rewards.push(new CurrencyReward(100));
+        return rewards;
+    }
 }
 
 export class EliteRoomCard extends LocationCard {
@@ -176,6 +199,14 @@ export class EliteRoomCard extends LocationCard {
         });
         this.portraitName = 'elite-icon';
         this.portraitTint = 0x8B0000;
+    }
+
+    override determineRewards(): AbstractReward[] {
+        const rewards: AbstractReward[] = [];
+        const cardRewards = CardRewardsGenerator.getInstance().generateCardRewardsForCombat();
+        rewards.push(new CardReward(cardRewards));
+        rewards.push(new CurrencyReward(150)); // Elite rooms give more currency
+        return rewards;
     }
 
     override OnLocationSelected(scene: Phaser.Scene): void {

@@ -4,9 +4,6 @@ import Phaser from 'phaser';
 import { AbstractEvent } from '../../events/AbstractEvent';
 import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
 import { AbstractReward } from '../../rewards/AbstractReward';
-import { CardReward } from '../../rewards/CardReward';
-import { CurrencyReward } from '../../rewards/CurrencyReward';
-import { CardRewardsGenerator } from '../../rules/CardRewardsGenerator';
 import { GameState } from '../../rules/GameState';
 import { TextBoxButton } from '../../ui/Button';
 import { CombatResourceDisplay } from '../../ui/CombatResourceDisplay';
@@ -54,6 +51,11 @@ class CombatUIManager {
 
         this.scene.events.once('shutdown', this.obliterate, this);
         this.scene.events.once('destroy', this.obliterate, this);
+        this.scene.events.on('abstractEvent:launch', this.onAbstractEventLaunch, this);
+    }
+
+    onAbstractEventLaunch(event: AbstractEvent): void {
+        this.showEvent(event);
     }
 
     public static getInstance(): CombatUIManager {
@@ -333,6 +335,7 @@ class CombatUIManager {
         this.scene.events.off('update', this.updateResourceIndicators, this);
         this.scene.events.off('update', this.updateEnergyDisplay, this);
 
+        this.scene.events.off('abstractEvent:launch', this.onAbstractEventLaunch, this);
         this.scene.events.off('update', () => {
             if (this.debugOverlay.visible) {
                 this.updateDebugOverlay();
@@ -408,24 +411,22 @@ class CombatUIManager {
         this.combatEnded = true;
 
         const rewards = this.determineRewards();
-        this.generalRewardScreen = new GeneralRewardScreen(this.scene, rewards);
-        this.generalRewardScreen.show();
-        UIContextManager.getInstance().setContext(UIContext.REWARD_SCREEN);
+        if (rewards.length > 0) {       
+            this.generalRewardScreen = new GeneralRewardScreen(this.scene, rewards);
+            this.generalRewardScreen.show();
+            UIContextManager.getInstance().setContext(UIContext.REWARD_SCREEN);
+        }else{
+            console.log("No rewards to show for room: " + GameState.getInstance().currentLocation?.name);
+        }
     }
 
-    // TODO: Placeholder, not really appropriate for this class
     private determineRewards(): AbstractReward[] {
-        const rewards: AbstractReward[] = [];
-
-        // Generate card rewards
-        const cardRewards = CardRewardsGenerator.getInstance()
-            .generateCardRewardsForCombat();
-        rewards.push(new CardReward(cardRewards));
-
-        // Add hell currency reward
-        rewards.push(new CurrencyReward(100));
-
-        return rewards;
+        const gameState = GameState.getInstance();
+        const currentLocation = gameState.currentLocation;
+        if (!currentLocation) {
+            return []; // No rewards if no location
+        }
+        return currentLocation.determineRewards();
     }
 
     public disableInteractions(): void {

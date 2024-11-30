@@ -11,7 +11,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
     private hellCurrencyTooltip: TooltipAttachment;
     private surfaceCurrencyTooltip: TooltipAttachment;
     private relicContainer: Phaser.GameObjects.Container;
-    private readonly CURRENCY_WIDTH = 180;
+    private readonly CURRENCY_WIDTH = 280;
     private readonly RELIC_GRID_WIDTH = 900; // 5x currency width
     private readonly RELIC_GRID_HEIGHT = 60; // 2x currency height
     private readonly RELIC_SIZE = 44; 

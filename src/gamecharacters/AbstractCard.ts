@@ -1,4 +1,5 @@
 import { Scene } from 'phaser';
+import { AbstractEvent } from '../events/AbstractEvent';
 import type { PhysicalCard } from '../ui/PhysicalCard';
 import { ShadowedImage } from '../ui/ShadowedImage';
 import { TextBox } from '../ui/TextBox';
@@ -363,6 +364,11 @@ export abstract class AbstractCard implements IAbstractCard {
             }
         }
         return false;
+    }
+
+
+    onClickLaunchEvent(): AbstractEvent | null {
+        return null;
     }
 }
 

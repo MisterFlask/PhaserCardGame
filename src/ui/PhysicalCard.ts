@@ -591,6 +591,10 @@ export class PhysicalCard implements IPhysicalCardInterface {
         const jsonData = this.data.createJsonRepresentation();
         console.log("jsonData of card clicked: " + jsonData);
         //this.showJsonModal(jsonData);
+        const event = this.data.onClickLaunchEvent();
+        if (event){
+            this.scene.events.emit('abstractEvent:launch', event);
+        }
     }
 
     showJsonModal(jsonData: string): void {

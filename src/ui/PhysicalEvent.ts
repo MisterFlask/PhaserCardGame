@@ -1,5 +1,5 @@
 import { Scene } from 'phaser';
-import { AbstractChoice, AbstractEvent } from '../events/AbstractEvent';
+import { AbstractChoice, AbstractEvent, FinishChoice } from '../events/AbstractEvent';
 import { TextBoxButton } from './Button';
 import { DepthManager } from './DepthManager';
 import { TextBox } from './TextBox';
@@ -96,6 +96,12 @@ export class PhysicalEvent extends Phaser.GameObjects.Container {
         // Add choice buttons at the bottom right
         const buttonStartY = height / 4; // Below the portrait
         const buttonSpacing = 60;
+
+        if (!event.choices){
+            console.error("Event has no choices: " + event.name);
+            event.choices = [new FinishChoice()];
+        }
+        
         event.choices.forEach((choice, index) => {
             const buttonX = width / 4; // Slightly into the right half
             const buttonY = buttonStartY + index * buttonSpacing;

@@ -76,6 +76,10 @@ class CombatInputHandler {
             card.container.off('pointerdown');
             card.container.on('pointerdown', () => {
                 console.log(`Attempting to handle click for card: ${card.data.name}`);
+                const event = card.data.onClickLaunchEvent();
+                if (event){
+                    this.scene.events.emit('abstractEvent:launch', event);
+                }
                 this.handleCardClick(card);
             });
 
