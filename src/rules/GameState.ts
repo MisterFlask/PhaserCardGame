@@ -32,7 +32,7 @@ export class GameState {
 
     private static instance: GameState;
     ledger: LedgerItem[] = [];
-
+    public currentAct: number = 1;
     public roster: PlayerCharacter[] = [];
     public currentRunCharacters: PlayerCharacter[] = [];
 

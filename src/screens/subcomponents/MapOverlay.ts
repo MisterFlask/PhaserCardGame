@@ -47,6 +47,11 @@ export class MapOverlay {
         // Initialize components
         ActionManagerFetcher.getActionManager();
         this.createOverlay();
+
+        // Listen for map regeneration event
+        this.scene.events.on('regenerateMap', (force: boolean) => {
+            this.regenerateMap(force);
+        });
     }
 
     private createOverlay(): void {
@@ -112,7 +117,7 @@ export class MapOverlay {
     }
 
     // Generate and place locations
-    private generateAndPlaceLocations(force: boolean = false) {
+    public generateAndPlaceLocations(force: boolean = false) {
         if (GameState.getInstance().mapInitialized && !force) {
             return;
         }
@@ -483,5 +488,18 @@ export class MapOverlay {
     private resetCameraPosition(): void {
         this.scene.cameras.main.scrollX = 0;
         this.scene.cameras.main.scrollY = 0;
+    }
+
+    private regenerateMap(force: boolean): void {
+        // Clear existing location cards
+        this.locationCards.forEach(card => {
+            card.container.destroy();
+        });
+        this.locationCards = [];
+
+        // Regenerate the map
+        this.generateAndPlaceLocations(force);
+        this.createPhysicalLocationCards();
+        this.createAdjacencyLines();
     }
 }

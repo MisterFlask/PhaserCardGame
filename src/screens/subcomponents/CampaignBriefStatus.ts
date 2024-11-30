@@ -4,6 +4,7 @@ import { TextBox } from "../../ui/TextBox";
 import { TooltipAttachment } from "../../ui/TooltipAttachment";
 
 export class CampaignBriefStatus extends Phaser.GameObjects.Container {
+    private actNumberText: TextBox;
     private surfaceCurrencyText: TextBox;
     private hellCurrencyText: TextBox;
     private brimstoneDistillateText: TextBox;
@@ -27,11 +28,27 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
             throw new Error("No scene provided to CampaignBriefStatus");
         }
 
-        // Create currency displays
-        this.surfaceCurrencyText = new TextBox({
+        // Add act number display
+        this.actNumberText = new TextBox({
             scene: this.scene,
             x: 10,
             y: 10,
+            width: this.CURRENCY_WIDTH,
+            height: 30,
+            text: `Act ${GameState.getInstance().currentAct}`,
+            style: {
+                fontSize: '18px',
+                color: '#ffd700', // Gold color for act number
+                fontFamily: 'Arial',
+                fontStyle: 'bold'
+            }
+        });
+
+        // Adjust y positions of existing elements to make room for act number
+        this.surfaceCurrencyText = new TextBox({
+            scene: this.scene,
+            x: 10,
+            y: 45, // Moved down
             width: this.CURRENCY_WIDTH,
             height: 30,
             text: `Surface Currency: ${GameState.getInstance().surfaceCurrency}`,
@@ -55,7 +72,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
         this.hellCurrencyText = new TextBox({
             scene: this.scene,
             x: 10,
-            y: 45,
+            y: 80, // Moved down
             width: this.CURRENCY_WIDTH,
             height: 30,
             text: `Hell Currency: ${GameState.getInstance().hellCurrency}`,
@@ -78,7 +95,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
         this.brimstoneDistillateText = new TextBox({
             scene: this.scene,
             x: 10,
-            y: 80,  // Position below hell currency
+            y: 115, // Moved down
             width: this.CURRENCY_WIDTH,
             height: 30,
             text: `Brimstone Distillate: ${GameState.getInstance().brimstoneDistillate}`,
@@ -104,6 +121,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
 
         // Add everything to this container
         this.add([
+            this.actNumberText,
             this.surfaceCurrencyText, 
             this.hellCurrencyText, 
             this.brimstoneDistillateText,
@@ -155,6 +173,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
 
     private updateCurrencyDisplay(): void {
         const gameState = GameState.getInstance();
+        this.actNumberText.setText(`Act ${gameState.currentAct}`);
         this.surfaceCurrencyText.setText(`Surface Currency: ${gameState.surfaceCurrency}`);
         this.hellCurrencyText.setText(`Hell Currency: ${gameState.hellCurrency}`);
         this.brimstoneDistillateText.setText(`Brimstone: ${gameState.brimstoneDistillate}`);

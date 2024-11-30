@@ -70,7 +70,7 @@ class CombatScene extends Phaser.Scene {
         this.load.setBaseURL('https://raw.githubusercontent.com/');
         new GameImageLoader().loadAllImages(this.load);
         this.load.plugin('rexbbcodetextplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbbcodetextplugin.min.js', true);
-        ActionManagerFetcher.initActionManagerAndGameState();
+        ActionManagerFetcher.initServicesAsync(this);
     }
 
     init(data: CombatSceneData): void {

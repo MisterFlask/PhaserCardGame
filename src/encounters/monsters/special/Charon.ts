@@ -1,6 +1,7 @@
 import { AbstractChoice, AbstractEvent } from "../../../events/AbstractEvent";
 import { AbstractIntent } from "../../../gamecharacters/AbstractIntent";
 import { AutomatedCharacter } from "../../../gamecharacters/AutomatedCharacter";
+import { ActionManagerFetcher } from "../../../utils/ActionManagerFetcher";
 
 export class Charon extends AutomatedCharacter {
     
@@ -36,7 +37,7 @@ export class MoveToNextActChoice extends AbstractChoice {
     }
 
     override effect(): void {
-        // TODO: Implement
+        ActionManagerFetcher.getActChanger().AdvanceAct();
     }
 }
 
