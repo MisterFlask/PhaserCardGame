@@ -7,6 +7,7 @@ import { BaseCharacter } from '../../gamecharacters/BaseCharacter';
 import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
 import { PlayableCard } from '../../gamecharacters/PlayableCard';
 import { GameState } from '../../rules/GameState';
+import { CardDragArrow } from '../../ui/CardDragArrow';
 import { DepthManager } from '../../ui/DepthManager';
 import CombatSceneLayoutUtils from '../../ui/LayoutUtils';
 import { PhysicalCard } from '../../ui/PhysicalCard';
@@ -22,6 +23,8 @@ class CombatInputHandler {
     private cardClickListeners: ((card: AbstractCard) => void)[] = [];
     private isInteractionEnabled: boolean = true;
     private transientUiState = TransientUiState.getInstance();
+    private cardDragArrow: CardDragArrow | null = null;
+    private dragStartPosition: { x: number, y: number } | null = null;
 
     constructor(scene: Phaser.Scene, cardManager: CombatCardManager) {
         this.scene = scene;
@@ -107,44 +110,48 @@ class CombatInputHandler {
         });
     }
 
-    private handleDragStart = (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject): void => {
+    private handleDragStart(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject): void {
         if (!UIContextManager.getInstance().isContext(UIContext.COMBAT)) return;
-        if ('physicalCard' in gameObject) {
-            const draggedCard = (gameObject as any).physicalCard as PhysicalCard;
-            if (draggedCard) {
-                // Kill any existing tweens on the card container
-                this.scene.tweens.killTweensOf(draggedCard.container);
-                
-                this.originalCardPosition = { 
-                    x: draggedCard.container.x, 
-                    y: draggedCard.container.y 
-                };
-                draggedCard.container.setDepth(DepthManager.getInstance().CARD_DRAGGING);
-                this.transientUiState.setDraggedCard(draggedCard);
-            }
-        } else {
-            console.warn('Dragged object is not a PhysicalCard');
-            this.transientUiState.setDraggedCard(null);
-            this.originalCardPosition = null;
+
+        const card = this.getCardFromGameObject(gameObject);
+        if (!card) return;
+
+        // Store the original position
+        this.dragStartPosition = {
+            x: card.container.x,
+            y: card.container.y
+        };
+
+        // Create the drag arrow if it doesn't exist
+        if (!this.cardDragArrow) {
+            this.cardDragArrow = new CardDragArrow(this.scene, 0, 0);
+            this.cardDragArrow.setDepth(DepthManager.getInstance().COMBAT_UI);
         }
+
+        // Set up the arrow
+        this.cardDragArrow.setStartPoint(card.container.x, card.container.y);
+        this.cardDragArrow.setEndPoint(pointer.x, pointer.y);
+        this.cardDragArrow.show();
+
+        // Set up the drag state
+        this.transientUiState.setDraggedCard(card);
     }
 
     private handleDrag(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject, dragX: number, dragY: number): void {
         if (!UIContextManager.getInstance().isContext(UIContext.COMBAT)) return;
-        if (this.transientUiState.draggedCard) {
-            this.transientUiState.draggedCard.container.x = dragX;
-            this.transientUiState.draggedCard.container.y = dragY;
-
+        if (this.transientUiState.draggedCard && this.cardDragArrow) {
+            // Update the arrow end point instead of moving the card
+            this.cardDragArrow.setEndPoint(pointer.x, pointer.y);
             this.checkCardUnderPointer(pointer);
         }
     }
 
-    
-
     private handleDragEnd(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject): void {
-        if (!UIContextManager.getInstance().isContext(UIContext.COMBAT)) {
-            console.log('handleDragEnd: Not in combat context, returning');
-            return;
+        if (!UIContextManager.getInstance().isContext(UIContext.COMBAT)) return;
+
+        // Hide and clean up the arrow
+        if (this.cardDragArrow) {
+            this.cardDragArrow.hide();
         }
 
         console.log('handleDragEnd: Starting drag end handling');
@@ -298,6 +305,11 @@ class CombatInputHandler {
     }
 
     private resetDragState(): void {
+        if (this.cardDragArrow) {
+            this.cardDragArrow.destroy();
+            this.cardDragArrow = null;
+        }
+        this.dragStartPosition = null;
         this.transientUiState.setDraggedCard(null);
         this.transientUiState.setHoveredCard(null);
         this.transientUiState.setHoveredIntent(null);
@@ -326,7 +338,12 @@ class CombatInputHandler {
         return null;
     }
 
-
+    private getCardFromGameObject(gameObject: Phaser.GameObjects.GameObject): PhysicalCard | null {
+        if (gameObject instanceof Phaser.GameObjects.Container && (gameObject as any).physicalCard instanceof PhysicalCard) {
+            return (gameObject as any).physicalCard as PhysicalCard;
+        }
+        return null;
+    }
 
     public addCardClickListener(listener: (card: AbstractCard) => void): void {
         this.cardClickListeners.push(listener);
