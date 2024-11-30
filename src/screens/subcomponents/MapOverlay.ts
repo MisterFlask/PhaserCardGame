@@ -33,6 +33,12 @@ export class MapOverlay {
     private moveDownButton: TextBoxButton | null = null;
     private closeButton: TextBoxButton | null = null;
 
+    background_by_act: Record<number, string> = {
+        1: 'styx_delta',
+        2: 'dis',
+        3: 'styx_delta'
+    } as const;
+
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
         this.overlay = this.scene.add.container(0, 0)
@@ -100,7 +106,9 @@ export class MapOverlay {
 
     // Background creation
     private createBackground() {
-        this.background = this.scene.add.image(this.scene.scale.width / 2, this.scene.scale.height / 2, 'styx_delta');
+        const currentAct = GameState.getInstance().currentAct;
+        const backgroundName = this.background_by_act[currentAct] ?? 'styx_delta';
+        this.background = this.scene.add.image(this.scene.scale.width / 2, this.scene.scale.height / 2, backgroundName);
         this.background.setOrigin(0.5, 0.2);
         this.background.setScrollFactor(1);
         
