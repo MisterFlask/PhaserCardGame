@@ -6,7 +6,7 @@ export class AdjacencyLineRenderer {
     private scene: Phaser.Scene;
     private container: Phaser.GameObjects.Container;
     private breadcrumbsPerLine: number = 25;
-    private breadcrumbsByConnection: Map<string, Phaser.GameObjects.Image[]> = new Map();
+    private breadcrumbsByConnection: Map<string, Phaser.GameObjects.Sprite[]> = new Map();
 
     // Color constants similar to CombatHighlightsManager
     private static readonly HIGHLIGHTED_COLOR = 0xffff00;  // Yellow
@@ -40,18 +40,16 @@ export class AdjacencyLineRenderer {
     private createBreadcrumbLine(fromId: string, toId: string, fromX: number, fromY: number, toX: number, toY: number): void {
         const distance = Phaser.Math.Distance.Between(fromX, fromY, toX, toY);
         const angle = Phaser.Math.Angle.Between(fromX, fromY, toX, toY);
-        const breadcrumbs: Phaser.GameObjects.Image[] = [];
+        const breadcrumbs: Phaser.GameObjects.Sprite[] = [];
 
         for (let i = 0; i < this.breadcrumbsPerLine; i++) {
             const progress = i / (this.breadcrumbsPerLine - 1);
             const x = fromX + (toX - fromX) * progress;
             const y = fromY + (toY - fromY) * progress;
 
-            const breadcrumb = this.scene.add.image(x, y, 'Circle');
-            breadcrumb.setName('breadcrumb');
+            // Create a sprite with a simple circle texture
+            const breadcrumb = this.scene.add.sprite(x, y, 'Circle');
             breadcrumb.setDisplaySize(10, 10);
-            breadcrumb.setRotation(angle);
-            breadcrumb.setTint(AdjacencyLineRenderer.DEFAULT_COLOR);
             breadcrumb.setDepth(DepthManager.getInstance().MAP_CONNECTIONS);
             
             this.container.add(breadcrumb);
@@ -86,8 +84,15 @@ export class AdjacencyLineRenderer {
     }
 
     private clearAllBreadcrumbs(): void {
-        this.container.list
-            .filter(child => child.name === 'breadcrumb')
-            .forEach(child => child.destroy());
+        this.breadcrumbsByConnection.forEach((breadcrumbs) => {
+            breadcrumbs.forEach(breadcrumb => {
+                breadcrumb.destroy();
+            });
+        });
+        this.breadcrumbsByConnection.clear();
+    }
+
+    public destroy(): void {
+        this.clearAllBreadcrumbs();
     }
 } 

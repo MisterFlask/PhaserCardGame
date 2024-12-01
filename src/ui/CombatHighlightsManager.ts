@@ -6,6 +6,7 @@ import { IncomingIntent } from "./IncomingIntent";
 import { PhysicalCard } from "./PhysicalCard";
 import { PhysicalIntent } from "./PhysicalIntent";
 import { TransientUiState } from "./TransientUiState";
+import { UIContext, UIContextManager } from "./UIContextManager";
 
 export class CombatHighlightsManager {
     private static instance: CombatHighlightsManager;
@@ -28,7 +29,9 @@ export class CombatHighlightsManager {
     }
 
     public update(allCharacters: BaseCharacterType[]): void {
-
+        if (UIContextManager.getInstance().isContext(UIContext.CARD_SELECTION_FROM_HAND)) {
+            return;
+        };
 
         // Clear all highlights first
         this.clearAllHighlights(allCharacters);

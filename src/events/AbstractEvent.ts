@@ -41,7 +41,7 @@ export class FinishChoice extends AbstractChoice {
 }
 
 export class AbstractEvent {
-    public portraitName: string = "";
+    public portraitName: string = "placeholder_event_background_1";
     public name: string = "";
     public description: string = "";
     public choices: AbstractChoice[] = [new FinishChoice()];

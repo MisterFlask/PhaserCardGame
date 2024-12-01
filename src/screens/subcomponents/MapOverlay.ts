@@ -27,7 +27,7 @@ export class MapOverlay {
     private spatialManager: SpatialManager;
     private adjacencyManager: AdjacencyManager;
 
-    private background: Phaser.GameObjects.Image | null = null;
+    private background: Phaser.GameObjects.Image  | null = null;
     private abortButton: TextBoxButton | null = null;
     private campaignStatusText: Phaser.GameObjects.Text | null = null;
     private moveUpButton: TextBoxButton | null = null;
@@ -113,16 +113,22 @@ export class MapOverlay {
     private createBackground() {
         const currentAct = GameState.getInstance().currentAct;
         const backgroundName = this.background_by_act[currentAct] ?? 'styx_delta';
-        this.background = this.scene.add.image(this.scene.scale.width / 2, this.scene.scale.height / 2, backgroundName);
-        this.background.setOrigin(0.5, 0.2);
+        const { width, height } = this.scene.scale;
+
+        // Create the background image
+        this.background = this.scene.add.image(width / 2, height / 2, backgroundName).setOrigin(0.5, 0.5);
         this.background.setScrollFactor(1);
-        
+
         // Calculate scaling to cover the screen while maintaining aspect ratio
-        const scaleX = this.scene.scale.width / this.background.width;
-        const scaleY = this.scene.scale.height / this.background.height;
+        const scaleX = width / this.background.width;
+        const scaleY = height / this.background.height;
         const scale = Math.max(scaleX, scaleY);
-        
         this.background.setScale(scale);
+
+        // Apply the grayscale post-processing pipeline
+        this.background.setPostPipeline('GrayscalePostFX');
+
+        // Add to overlay
         this.overlay.add(this.background);
     }
 
@@ -524,7 +530,6 @@ export class MapOverlay {
         });
         this.locationCards = [];
 
-        // Remove existing background
         if (this.background) {
             this.background.destroy();
             this.background = null;

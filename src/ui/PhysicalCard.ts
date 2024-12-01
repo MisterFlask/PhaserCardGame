@@ -379,6 +379,16 @@ export class PhysicalCard implements IPhysicalCardInterface {
         return this.container;
     }
 
+    public getShaderComponents(): Phaser.GameObjects.GameObject[] {
+        const components: Phaser.GameObjects.GameObject[] = [];
+        
+        if (this.cardBackground) components.push(this.cardBackground);
+        if (this.cardImage) components.push(this.cardImage);
+        if (this.nameBox) components.push(this.nameBox);
+        
+        return components;
+    }
+
     obliterate(): void {
         // Remove event listener
         this.scene.events.off('update', this.updateVisuals, this);

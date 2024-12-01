@@ -217,6 +217,10 @@ export default class GameImageLoader {
             prefix: 'Backgrounds/Act/',
             files: ['styx_delta.png', "dis.png"]
         },
+        placeholder_backgrounds: {
+            prefix: 'Backgrounds/Placeholder/',
+            files: ['placeholder_event_background_1.png', "placeholder_event_background_2.png"]
+        },
         enemies: {
             prefix: 'Sprites/Enemies/v2/',
             files: [

@@ -98,7 +98,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
             y: 115, // Moved down
             width: this.CURRENCY_WIDTH,
             height: 30,
-            text: `Brimstone Distillate: ${GameState.getInstance().brimstoneDistillate}`,
+            text: `Phlegethon Oil [equiv]: $${GameState.getInstance().hellExportCurrency}`,
             style: {
                 fontSize: '16px',
                 color: '#8B0000',  // Dark red color for brimstone
@@ -111,7 +111,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
         this.brimstoneTooltip = new TooltipAttachment({
             scene: this.scene,
             container: this.brimstoneDistillateText,
-            tooltipText: "Valuable on the surface, but not considered legal tender in Hell.",
+            tooltipText: "Valuable on the surface.  Not considered legal tender in Hell.",
             fillColor: 0x200000  // Optional dark red background
         });
 
@@ -176,7 +176,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
         this.actNumberText.setText(`Act ${gameState.currentAct}`);
         this.surfaceCurrencyText.setText(`Surface Currency: ${gameState.surfaceCurrency}`);
         this.hellCurrencyText.setText(`Hell Currency: ${gameState.hellCurrency}`);
-        this.brimstoneDistillateText.setText(`Brimstone: ${gameState.brimstoneDistillate}`);
+        this.brimstoneDistillateText.setText(`Phlegethon Oil [$ equivalent]: $${gameState.hellExportCurrency}`);
     }
 
     public destroy(fromScene?: boolean): void {

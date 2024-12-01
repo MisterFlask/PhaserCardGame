@@ -53,7 +53,7 @@ export class GameState {
 
     public surfaceCurrency: number = 200
     public hellCurrency: number = 0
-    public brimstoneDistillate: number = 0
+    public hellExportCurrency: number = 0
 
     public combatState: CombatState = new CombatState()
 
