@@ -300,10 +300,15 @@ export class TextBox extends Phaser.GameObjects.Container {
         // Calculate desired word wrap width
         const desiredWordWrapWidth = target.width - padding * 2;
     
+        try{
+            
         // Only update word wrap width if it has changed
         if (this.previousWordWrapWidth !== desiredWordWrapWidth) {
-            this.text.setWordWrapWidth(desiredWordWrapWidth);
-            this.previousWordWrapWidth = desiredWordWrapWidth;
+                this.text.setWordWrapWidth(desiredWordWrapWidth);
+                this.previousWordWrapWidth = desiredWordWrapWidth;
+            }
+        } catch (error) {
+            console.warn("Error adjusting text box size:", error);
         }
     
         // Measure text dimensions

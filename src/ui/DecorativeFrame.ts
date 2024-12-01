@@ -26,7 +26,7 @@ export class DecorativeFrame extends Phaser.GameObjects.Container {
         ];
 
         cornerPositions.forEach(pos => {
-            const corner = scene.add.image(pos.x, pos.y, 'Circle')
+            const corner = scene.add.image(pos.x, pos.y, 'abstract-001')
                 .setOrigin(0.5)
                 .setRotation(pos.rotation)
                 .setScale(0.5);

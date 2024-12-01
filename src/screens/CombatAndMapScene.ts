@@ -3,6 +3,7 @@
 import Phaser from 'phaser';
 import BBCodeTextPlugin from 'phaser3-rex-plugins/plugins/bbcodetext-plugin.js';
 import { EncounterData } from '../encounters/EncountersList';
+import { RestEvent } from '../encounters/events/RestEvent';
 import { AbstractEvent } from '../events/AbstractEvent';
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
 import { LocationCard, RestSiteCard } from '../maplogic/LocationCard';
@@ -26,7 +27,6 @@ import CombatUIManager from './subcomponents/CombatUiManager';
 import { DetailsScreenManager } from './subcomponents/DetailsScreenManager';
 import { MapOverlay } from './subcomponents/MapOverlay';
 import PerformanceMonitor from './subcomponents/PerformanceMonitor';
-import { RestOverlay } from './subcomponents/RestOverlay';
 import { ShopOverlay } from './subcomponents/ShopOverlay';
 import { TreasureOverlay } from './subcomponents/TreasureOverlay';
 
@@ -51,7 +51,6 @@ class CombatScene extends Phaser.Scene {
     private campaignBriefStatus!: CampaignBriefStatus;
     private characterDeckOverlay!: CharacterDeckOverlay;
     private treasureOverlay!: TreasureOverlay;
-    private restOverlay!: RestOverlay;
     private combatEndHandled: boolean = false;
 
     private eventToRunNext?: AbstractEvent;
@@ -104,10 +103,6 @@ class CombatScene extends Phaser.Scene {
         // Initialize ShopOverlay
         this.shopOverlay = new ShopOverlay(this);
         this.treasureOverlay = new TreasureOverlay(this);
-
-        // Initialize RestOverlay
-        this.restOverlay = new RestOverlay(this);
-        this.restOverlay.hide();
 
         // Set up the onCardClick handler
         this.inputHandler.addCardClickListener((card: AbstractCard) => {
@@ -174,7 +169,7 @@ class CombatScene extends Phaser.Scene {
         // Add event listener for location selection
         this.events.on('locationSelected', (location: LocationCard) => {
             if (location instanceof RestSiteCard) {
-                this.restOverlay.show();
+                this.handleRestNodeClick();
             }
         });
         this.setNewEvent(GameState.getInstance().currentLocation?.gameEvent);
@@ -323,6 +318,12 @@ class CombatScene extends Phaser.Scene {
                 });
             }
         });
+    }
+
+    private handleRestNodeClick(): void {
+        // Replace the RestOverlay with our new event
+        const restEvent = new RestEvent();
+        this.uiManager.showEvent(restEvent);
     }
 
 }
