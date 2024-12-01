@@ -9,9 +9,9 @@ import { TextBoxButton } from '../../ui/Button';
 import { CombatResourceDisplay } from '../../ui/CombatResourceDisplay';
 import { DebugMenu } from '../../ui/DebugMenu';
 import { DepthManager } from '../../ui/DepthManager';
+import { EventWindow } from '../../ui/EventWindow';
 import { default as CombatSceneLayoutUtils, default as LayoutUtils } from '../../ui/LayoutUtils';
 import Menu from '../../ui/Menu';
-import { PhysicalEvent } from '../../ui/PhysicalEvent';
 import { SubtitleManager } from '../../ui/SubtitleManager';
 import { TextBox } from '../../ui/TextBox';
 import { TransientUiState } from '../../ui/TransientUiState';
@@ -39,7 +39,7 @@ class CombatUIManager {
     private debugOverlay!: TextBox;
     public dropZoneHighlight!: Phaser.GameObjects.Image;
     private debugMenu!: DebugMenu;
-    private currentPhysicalEvent: PhysicalEvent | null = null;
+    private currentEvent: EventWindow | null = null;
 
     private constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -525,18 +525,18 @@ class CombatUIManager {
     }
 
     public showEvent(event: AbstractEvent): void {
-        if (this.currentPhysicalEvent) {
-            this.currentPhysicalEvent.destroy();
+        if (this.currentEvent) {
+            this.currentEvent.destroy();
         }
 
-        this.currentPhysicalEvent = new PhysicalEvent(
+        this.currentEvent = new EventWindow(
             this.scene,
             event,
             (nextEvent: AbstractEvent | null) => {
                 if (nextEvent) {
                     this.showEvent(nextEvent);
                 }else{
-                    this.currentPhysicalEvent?.destroy();
+                    this.currentEvent?.destroy();
                 }
             }
         );

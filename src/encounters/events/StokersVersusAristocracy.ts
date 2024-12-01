@@ -64,7 +64,6 @@ export class StokersVersusAristocracy extends AbstractEvent {
     constructor() {
         super();
         this.name = "Labor Dispute at the Furnace";
-        this.portraitName = "furnace_dispute";
         this.description = "You find yourself in the sweltering heart of Dis, where the great Furnace that keeps Hell from freezing stands silent. The Stoker's Union has called a strike, demanding better working conditions and protection from new Styx turbine technology. Members of the Cinder Court have arrived in their floating obsidian carriages, threatening to replace the workers with automated solutions from the Clockwork Wastes.\n\nThe air crackles with tension - and not just from the static discharge of idle Maxwell coils. Both sides eye you with interest, clearly hoping to sway you to their cause.";
         this.choices = []
         this.choices.push(new SupportStokersChoice());
