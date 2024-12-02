@@ -105,7 +105,7 @@ class CombatScene extends Phaser.Scene {
 
         // Reinitialize input handler with new card manager
         if (this.inputHandler) {
-            this.inputHandler.cleanup(); // Add this method to CombatInputHandler
+            this.inputHandler.cleanup();
             this.inputHandler = new CombatInputHandler(this, this.cardManager);
             
             // Re-add the card click listener
@@ -119,6 +119,11 @@ class CombatScene extends Phaser.Scene {
         // Start new combat
         ActionManager.getInstance().startCombat();
         ActionManager.beginTurn();
+
+        // Set up event if present in the encounter
+        if (data.encounter.event) {
+            this.setNewEvent(data.encounter.event);
+        }
 
         // Handle map overlay
         this.toggleMapOverlay(data.shouldStartWithMapOverlay);
