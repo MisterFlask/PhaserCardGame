@@ -1,3 +1,5 @@
+import { AbstractEvent } from '../events/AbstractEvent';
+import { EventsManager } from '../events/EventsManager';
 import { AbstractIntent, ApplyDebuffToRandomCharacterIntent, AttackIntent } from '../gamecharacters/AbstractIntent';
 import { AutomatedCharacter } from '../gamecharacters/AutomatedCharacter';
 import { Delicious } from '../gamecharacters/buffs/enemy_buffs/Delicious';
@@ -6,6 +8,7 @@ import { Lethality } from '../gamecharacters/buffs/standard/Strong';
 import { Terrifying } from '../gamecharacters/buffs/standard/Terrifying';
 import { AbstractRelic } from '../relics/AbstractRelic';
 import { RelicsLibrary } from '../relics/RelicsLibrary';
+import { RestEvent } from './events/RestEvent';
 import { FrenchBlindProphetess } from './monsters/act1_boss/FrenchBlindProphetess';
 import { FrenchChef } from './monsters/act1_segment1/FrenchChef';
 import { FrenchCrow } from './monsters/act1_segment1/FrenchCrow';
@@ -61,7 +64,7 @@ export class ActSegmentData {
         public readonly displayName: string,
         public readonly act: number,
         public readonly segment: number,
-        public readonly encounters: EncounterData[] = []
+        public readonly encounters: { enemies: AutomatedCharacter[] }[] = []
     ) {}
 }
 
@@ -119,19 +122,18 @@ export class ActSegment {
     ]);
 }
 
-export interface EncounterData {
-    enemies: AutomatedCharacter[];
-}
-
 export class Encounter {
-    data: EncounterData;
     peaceful: boolean = false;
     act: integer;
     segment: integer;
-    constructor(data: EncounterData, act: integer, segment: integer) {
-        this.data = data;
+    enemies: AutomatedCharacter[];
+    event?: AbstractEvent;
+
+    constructor(enemies: AutomatedCharacter[], act: integer, segment: integer, event?: AbstractEvent) {
+        this.enemies = enemies;
         this.act = act;
         this.segment = segment;
+        this.event = event;
     }
 }
 
@@ -162,11 +164,25 @@ export class TreasureChest extends AutomatedCharacter {
     }
 
     override generateNewIntents(): AbstractIntent[] {
-        return []; // Treasure chest doesn't attack or have intents
+        return []; // Treasure chest doesn't attack or   have intents
     }
 }
 
 export class EncounterManager {
+    public getBossEncounter(act: integer): Encounter {
+        const segmentData = getBossSegment(act)
+        if (!segmentData) {
+            throw new Error(`No boss segment found for act ${act}`);
+        }
+        const encounter = this.getRandomEnemiesListFromActSegmentNumbers(segmentData.act, segmentData.segment);
+        if (!encounter) {
+            throw new Error(`No boss encounters found for act ${act}`);
+        }
+        if (encounter.enemies.length == 0) {
+            throw new Error(`No enemies found for boss encounter for act ${act}`);
+        }
+        return new Encounter(encounter.enemies, segmentData.act, segmentData.segment);
+    }
     private static instance: EncounterManager;
 
     private constructor() {}
@@ -179,16 +195,27 @@ export class EncounterManager {
     }
 
     public getShopEncounter(): Encounter {
-        return new Encounter({
-            enemies: [new ShopGuy()]
-        }, 0, 0);
+        return new Encounter([new ShopGuy()], 0, 0);
     }
 
-    public getRandomEncounter(actSegment: ActSegmentData): EncounterData {
-        return this.getRandomEncounterFromActSegmentNumbers(actSegment.act, actSegment.segment);
+    getEventRoomEncounter(act: integer, segment: integer): Encounter {
+        var encounter=  new Encounter([], act, segment, EventsManager.getInstance().getRandomEvent());
+        encounter.peaceful = true;
+        return encounter;
+    }
+    
+    getRestEncounter(act: integer, segment: integer): Encounter {
+        var encounter=  new Encounter([], act, segment, new RestEvent());
+        encounter.peaceful = true;
+        return encounter;
+    }
+    
+
+    public getRandomCombatEncounter(actSegment: ActSegmentData): { enemies: AutomatedCharacter[] } {
+        return this.getRandomEnemiesListFromActSegmentNumbers(actSegment.act, actSegment.segment);
     }
 
-    public getRandomEncounterFromActSegmentNumbers(act: integer, segment: integer): EncounterData {
+    public getRandomEnemiesListFromActSegmentNumbers(act: integer, segment: integer): { enemies: AutomatedCharacter[] } {
         // Find the matching ActSegmentData
         const actSegment = Object.values(ActSegment).find(
             segmentData => segmentData.act === act && segmentData.segment === segment
@@ -199,23 +226,28 @@ export class EncounterManager {
         }
 
         const randomIndex = Math.floor(Math.random() * actSegment.encounters.length);
-        return this.CopyEncounterData(actSegment.encounters[randomIndex]);
+        return this.CopyEncounterEnemies(actSegment.encounters[randomIndex]);
     }
 
-    public CopyEncounterData(encounterData: EncounterData): EncounterData {
+    public CopyEncounterEnemies(encounterData: { enemies: AutomatedCharacter[] }): { enemies: AutomatedCharacter[] } {
         return {
             enemies: encounterData.enemies.map(e => e.Copy())
         };
     }
 
     public getTreasureEncounter(): Encounter {
-        return {
-            data: {
-                enemies: [new TreasureChest()],
-            },
-            peaceful: true,
-            act: 0,
-            segment: 0
-        };
+        return new Encounter([new TreasureChest()], 0, 0);
     }
 }
+function getBossSegment(act: number): ActSegmentData {
+
+    if (act == 1) {
+        return ActSegment.Boss_Act1;
+    } else if (act == 2) {
+        return ActSegment.Boss_Act2;
+    }else if (act == 3) {
+        // return ActSegment.Boss_Act3;
+    }
+    throw new Error(`No boss encounters found for act ${act}`);
+}
+

@@ -1,6 +1,6 @@
 // src/services/StateService.ts
 
-import { EncounterData } from "../../encounters/EncountersList";
+import { Encounter } from "../../encounters/EncountersList";
 import { PlayerCharacter } from "../../gamecharacters/BaseCharacterClass";
 import { DeckLogic } from "../../rules/DeckLogicHelper";
 import { GameState } from "../../rules/GameState";
@@ -16,7 +16,7 @@ class CombatStateService {
         return CombatStateService.instance;
     }
 
-    public initializeCombat(encounter: EncounterData, playerCharacters: PlayerCharacter[]): void {
+    public initializeCombat(encounter: Encounter, playerCharacters: PlayerCharacter[]): void {
         GameState.getInstance().combatState.enemies = encounter.enemies;
         GameState.getInstance().combatState.playerCharacters = playerCharacters;
         GameState.getInstance().combatState.drawPile = DeckLogic.getInstance().generateInitialCombatDeck();

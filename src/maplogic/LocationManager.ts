@@ -69,7 +69,6 @@ export class LocationManager {
         const charonRoom = new CharonRoomCard(charonFloor, 3);
         charonRoom.floor = charonFloor;
         charonRoom.roomNumber = 3;
-        charonRoom.initEncounter();
         locationData.push(charonRoom);
 
         const bossRoom = locationData.find(
@@ -78,7 +77,10 @@ export class LocationManager {
 
         if (bossRoom) {
             bossRoom.setAdjacent(charonRoom);
+            bossRoom.initEncounter();
+            
             charonRoom.setAdjacent(bossRoom);
+            charonRoom.initEncounter();
         }
         return locationData;
     }

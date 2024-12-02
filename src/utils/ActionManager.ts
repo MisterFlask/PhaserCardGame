@@ -21,6 +21,10 @@ import { SubtitleManager } from "../ui/SubtitleManager";
 import { UIContext, UIContextManager } from "../ui/UIContextManager";
 
 export class ActionManager {
+    emitEvent(eventName: string, args: any) {
+        this.scene.events.emit(eventName, args);
+    }
+    
     gainEnergy(amount: number) {
         this.actionQueue.addAction(new GenericAction(async () => {
             const gameState = GameState.getInstance();

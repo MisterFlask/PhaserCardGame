@@ -2,11 +2,9 @@
 
 import Phaser from 'phaser';
 import BBCodeTextPlugin from 'phaser3-rex-plugins/plugins/bbcodetext-plugin.js';
-import { EncounterData } from '../encounters/EncountersList';
-import { RestEvent } from '../encounters/events/RestEvent';
+import { Encounter } from '../encounters/EncountersList';
 import { AbstractEvent } from '../events/AbstractEvent';
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
-import { LocationCard, RestSiteCard } from '../maplogic/LocationCard';
 import { GameState } from '../rules/GameState';
 import { TextBoxButton } from '../ui/Button';
 import { CombatHighlightsManager } from '../ui/CombatHighlightsManager';
@@ -33,8 +31,9 @@ import { TreasureOverlay } from './subcomponents/TreasureOverlay';
 /**
  * Interface for initializing CombatScene with necessmorniary data.
  */
-export interface CombatSceneData {
-    encounter: EncounterData;
+export class CombatSceneData {
+    encounter: Encounter = new Encounter([], -1, -1);
+    shouldStartWithMapOverlay: boolean = false;
 }
 
 class CombatScene extends Phaser.Scene {
@@ -159,6 +158,10 @@ class CombatScene extends Phaser.Scene {
             }
         });
 
+        this.events.on("showMapOverlay", () => {
+            this.toggleMapOverlay(true);
+        });
+
         // Add new event listener for exhaust pile clicks
         this.events.on('exhaustPileClicked', () => {
             if (UIContextManager.getInstance().getContext() === UIContext.COMBAT) {
@@ -166,18 +169,13 @@ class CombatScene extends Phaser.Scene {
             }
         });
 
-        // Add event listener for location selection
-        this.events.on('locationSelected', (location: LocationCard) => {
-            if (location instanceof RestSiteCard) {
-                this.handleRestNodeClick();
-            }
-        });
         this.setNewEvent(GameState.getInstance().currentLocation?.gameEvent);
     }
 
     private obliterate(): void {
         this.events.off('shutdown', this.obliterate, this);
         this.events.off('destroy', this.obliterate, this);
+        this.events.off('showMapOverlay', this.toggleMapOverlay, this);
         // Remove resize event listener
         this.scale.off('resize', this.resize, this);
         if (this.campaignBriefStatus) {
@@ -319,13 +317,6 @@ class CombatScene extends Phaser.Scene {
             }
         });
     }
-
-    private handleRestNodeClick(): void {
-        // Replace the RestOverlay with our new event
-        const restEvent = new RestEvent();
-        this.uiManager.showEvent(restEvent);
-    }
-
 }
 
 /**

@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { EncounterData } from '../encounters/EncountersList';
+import { Encounter } from '../encounters/EncountersList';
 import { GameState } from '../rules/GameState';
 
 export class SceneChanger {
@@ -23,8 +23,8 @@ export class SceneChanger {
         SceneChanger.switchScene('Campaign');
     }
 
-    public static switchToCombatScene({ encounter }: { encounter: EncounterData }): void {
-        SceneChanger.switchScene('CombatScene', { encounter });
+    public static switchToCombatScene(encounter: Encounter, shouldStartWithMapOverlay: boolean = false): void {
+        SceneChanger.switchScene('CombatScene', { encounter, shouldStartWithMapOverlay });
     }
 
     public static setCurrentScene(scene: Phaser.Scene): void {

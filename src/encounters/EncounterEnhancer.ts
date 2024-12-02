@@ -1,6 +1,6 @@
 import { DrawOneFewerCardNextNTurns } from "../gamecharacters/buffs/standard/DrawOneFewerCardNextNTurns";
 import { Lethality } from "../gamecharacters/buffs/standard/Strong";
-import { EncounterData } from "./EncountersList";
+import { Encounter } from "./EncountersList";
 
 export abstract class EncounterEnhancer {
 
@@ -12,20 +12,19 @@ export abstract class EncounterEnhancer {
         return enhancers[Math.floor(Math.random() * enhancers.length)];
     }
 
-    public static enhanceEliteEncounter(encounter: EncounterData): EncounterData {
+    public static enhanceEliteEncounter(encounter: Encounter): Encounter {
         this.getRandomEnhancer().enhanceEncounter(encounter);
         return this.raiseMaxHp(encounter);
     }
 
-    public static raiseMaxHp(encounter: EncounterData, percent: number = 40): EncounterData {
+    public static raiseMaxHp(encounter: Encounter, percent: number = 40): Encounter {
         encounter.enemies.forEach(enemy => {
             enemy.maxHitpoints *= (1 + percent / 100);
-            enemy.hitpoints = enemy.maxHitpoints;
         });
         return encounter;
     }
 
-    public abstract enhanceEncounter(encounter: EncounterData): EncounterData;
+    public abstract enhanceEncounter(encounter: Encounter): Encounter;
 }
 
 export class StrongEncounterEnhancer extends EncounterEnhancer {
@@ -33,7 +32,7 @@ export class StrongEncounterEnhancer extends EncounterEnhancer {
         super();
     }
 
-    public enhanceEncounter(encounter: EncounterData): EncounterData {
+    public enhanceEncounter(encounter: Encounter): Encounter {
         encounter.enemies.forEach(enemy => {
             enemy.applyBuffs_useFromActionManager([new Lethality(this.stacks)]);
         });
@@ -47,7 +46,7 @@ export class DrawOneFewerCardNextNTurnsEncounterEnhancer extends EncounterEnhanc
         super();
     }
 
-    public enhanceEncounter(encounter: EncounterData): EncounterData {
+    public enhanceEncounter(encounter: Encounter): Encounter {
         if (encounter.enemies.length > 0) {
             encounter.enemies[0].applyBuffs_useFromActionManager([new DrawOneFewerCardNextNTurns(this.stacks)]);
         }

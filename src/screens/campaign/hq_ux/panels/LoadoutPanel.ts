@@ -112,7 +112,7 @@ export class LoadoutPanel extends AbstractHqPanel {
             });
 
             GameState.getInstance().initializeRun();
-            SceneChanger.switchToCombatScene({ encounter: EncounterManager.getInstance().getShopEncounter().data });
+            SceneChanger.switchToCombatScene(EncounterManager.getInstance().getShopEncounter(), true);
         }
     }
 

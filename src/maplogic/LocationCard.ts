@@ -2,10 +2,9 @@
 
 import Phaser from 'phaser';
 import { EncounterEnhancer } from '../encounters/EncounterEnhancer';
-import { ActSegment, EncounterData, EncounterManager } from '../encounters/EncountersList';
+import { Encounter, EncounterManager } from '../encounters/EncountersList';
 import { Charon } from '../encounters/monsters/special/Charon';
 import { AbstractEvent } from '../events/AbstractEvent';
-import { EventsManager } from '../events/EventsManager';
 import { AbstractCard } from '../gamecharacters/AbstractCard';
 import { CardSize, CardType } from '../gamecharacters/Primitives';
 import { AbstractReward } from '../rewards/AbstractReward';
@@ -19,7 +18,7 @@ import { Faction } from './Faction';
 
 export class LocationCard extends AbstractCard {
     override typeTag = "LocationCard";
-    encounter!: EncounterData;
+    encounter!: Encounter;
     controllingFaction: Faction = Faction.NEUTRAL;
     public adjacentLocations: LocationCard[] = []; // New property for adjacency
     public xPos: number = 0;
@@ -48,11 +47,11 @@ export class LocationCard extends AbstractCard {
     }
 
     initEncounter() {
-        const encounter = EncounterManager.getInstance().getRandomEncounterFromActSegmentNumbers(1, this.segment);
+        const encounter = EncounterManager.getInstance().getRandomEnemiesListFromActSegmentNumbers(GameState.getInstance().currentAct, this.segment);
         const encounterDescription = `Encounter: ${encounter.enemies.map(e => e.name).join(', ')}`;
         const fullDescription = `${encounterDescription}`;
         this.description = fullDescription;
-        this.encounter = encounter;
+        this.encounter = new Encounter(encounter.enemies, GameState.getInstance().currentAct, this.segment);
     }
 
     setAdjacent(location: LocationCard) {
@@ -108,12 +107,14 @@ export class BossRoomCard extends LocationCard {
         });
         this.portraitName = 'boss-icon';
         this.portraitTint = 0x800080;
-    }    
+    }
+
     override initEncounter(): void {
-        this.encounter = ActSegment.Boss_Act1.encounters[0];
-        const encounterDescription = `Encounter: ${this.encounter.enemies.map(e => e.name).join(', ')}`;
+        const encounter = EncounterManager.getInstance().getBossEncounter(GameState.getInstance().currentAct);
+        const encounterDescription = `Encounter: ${encounter.enemies.map(e => e.name).join(', ')}`;
         const fullDescription = `${encounterDescription}`;
         this.description = fullDescription;
+        this.encounter = encounter;
     }
 
     override determineRewards(): AbstractReward[] {
@@ -140,9 +141,13 @@ export class RestSiteCard extends LocationCard {
     }
 
     override OnLocationSelected(scene: Phaser.Scene): void {
-        console.log(`Rest site ${this.id} selected`);
-        scene.events.emit('locationSelected', this);
+        console.log(`Rest room ${this.id} selected`);
+        
+        const eventEncounter = EncounterManager.getInstance().getRestEncounter(GameState.getInstance().currentAct, this.segment);
+        SceneChanger.switchToCombatScene(eventEncounter);
+        this.gameEvent = eventEncounter.event;  
     }
+
 }
 
 
@@ -160,9 +165,7 @@ export class CharonRoomCard extends LocationCard {
     }
 
     override initEncounter(): void {
-        this.encounter = {
-            enemies: [new Charon()]
-        };
+        this.encounter = new Encounter([new Charon()], GameState.getInstance().currentAct, 3);
     }
 }
 
@@ -239,7 +242,7 @@ export class ShopCard extends LocationCard {
         
         GameState.getInstance().eliminatePhysicalCardsBetweenScenes();
         GameState.getInstance().rerollShop();
-        SceneChanger.switchToCombatScene({ encounter: EncounterManager.getInstance().getShopEncounter().data });
+        SceneChanger.switchToCombatScene(EncounterManager.getInstance().getShopEncounter());
     }
 }
 
@@ -260,9 +263,7 @@ export class TreasureRoomCard extends LocationCard {
         console.log(`Treasure room ${this.id} selected`);
         
         GameState.getInstance().eliminatePhysicalCardsBetweenScenes();
-        SceneChanger.switchToCombatScene({ 
-            encounter: EncounterManager.getInstance().getTreasureEncounter().data 
-        });
+        SceneChanger.switchToCombatScene(EncounterManager.getInstance().getTreasureEncounter());
     }
 }
 
@@ -279,11 +280,9 @@ export class EventRoomCard extends LocationCard {
     }
     override OnLocationSelected(scene: Phaser.Scene): void {
         console.log(`Event room ${this.id} selected`);
-        this.gameEvent = EventsManager.getInstance().getRandomEvent();  
-        SceneChanger.switchToCombatScene({ 
-            encounter: {
-                enemies: []
-            } 
-        });
+        const eventEncounter = EncounterManager.getInstance().getEventRoomEncounter(GameState.getInstance().currentAct, this.segment);
+        SceneChanger.switchToCombatScene(eventEncounter);
+        this.gameEvent = eventEncounter.event;  
+
     }
 }

@@ -37,6 +37,7 @@ export class FinishChoice extends AbstractChoice {
     }
 
     effect(): void {
+        this.actionManager().emitEvent("showMapOverlay", {});
     }
 }
 
@@ -62,6 +63,7 @@ export class AbstractEvent {
     protected addLedgerItem(ledgerItem: LedgerItem): void {
         this.actionManager().createLedgerItem(ledgerItem);
     }
+
 } 
 
 

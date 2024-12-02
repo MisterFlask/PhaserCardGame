@@ -39,7 +39,7 @@ class CombatUIManager {
     private debugOverlay!: TextBox;
     public dropZoneHighlight!: Phaser.GameObjects.Image;
     private debugMenu!: DebugMenu;
-    private currentEvent: EventWindow | null = null;
+    private eventWindow: EventWindow | null = null;
 
     private constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -525,21 +525,22 @@ class CombatUIManager {
     }
 
     public showEvent(event: AbstractEvent): void {
-        if (this.currentEvent) {
-            this.currentEvent.destroy();
+        if (this.eventWindow) {
+            this.eventWindow.destroy();
         }
 
-        this.currentEvent = new EventWindow(
+        this.eventWindow = new EventWindow(
             this.scene,
             event,
             (nextEvent: AbstractEvent | null) => {
                 if (nextEvent) {
                     this.showEvent(nextEvent);
                 }else{
-                    this.currentEvent?.destroy();
+                    this.eventWindow?.destroy();
                 }
             }
         );
+        this.eventWindow.setScrollFactor(0);
     }
 }
 

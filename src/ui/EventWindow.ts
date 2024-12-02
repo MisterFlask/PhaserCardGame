@@ -11,6 +11,7 @@ export class EventWindow extends Phaser.GameObjects.Container {
     private descriptionText: TextBox;
     private choices: EventButton[] = [];
     private contentContainer: Phaser.GameObjects.Container;
+    private backgroundBlocker: Phaser.GameObjects.Rectangle;
 
     constructor(
         scene: Scene,
@@ -22,6 +23,18 @@ export class EventWindow extends Phaser.GameObjects.Container {
 
         const windowWidth = scene.scale.width * 0.8;
         const windowHeight = scene.scale.height * 0.8;
+
+        // Add a full-screen transparent blocker that intercepts clicks
+        this.backgroundBlocker = scene.add.rectangle(
+            0,
+            0,
+            scene.scale.width * 2, // Make it extra large to ensure full coverage
+            scene.scale.height * 2,
+            0x000000,
+            0.01 // Nearly invisible but still interactive
+        );
+        this.backgroundBlocker.setInteractive();
+        this.add(this.backgroundBlocker);
 
         // Create the decorative frame
         this.frame = new DecorativeFrame(scene, windowWidth, windowHeight);
@@ -137,6 +150,7 @@ export class EventWindow extends Phaser.GameObjects.Container {
     }
 
     public destroy(): void {
+        this.backgroundBlocker.destroy();
         this.choices.forEach(button => button.destroy());
         this.frame.destroy();
         this.portrait.destroy();
