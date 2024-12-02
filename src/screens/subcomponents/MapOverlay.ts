@@ -49,7 +49,7 @@ export class MapOverlay {
         this.scene = scene;
         this.overlay = this.scene.add.container(0, 0)
             .setVisible(false)
-            .setDepth(DepthManager.getInstance().MAP_OVERLAY);
+            .setDepth(DepthManager.getInstance().MAP_OVERLAY + 1000);
 
         // Initialize Managers
         this.locationManager = new LocationManager();
@@ -187,14 +187,18 @@ export class MapOverlay {
         
         if (!targetCard) return;
 
-        // Create the icon if it doesn't exist
         if (!this.currentLocationIcon) {
             this.currentLocationIcon = this.scene.add.image(0, 0, 'old-wagon');
             const portraitWidth = targetCard.cardImage.displayWidth;
             const portraitHeight = targetCard.cardImage.displayHeight;
             this.currentLocationIcon.setDisplaySize(portraitWidth / 2, portraitHeight / 2);
-            this.currentLocationIcon.setDepth(DepthManager.getInstance().MAP_LOCATIONS + 1);
             this.overlay.add(this.currentLocationIcon);
+
+            // Set depth higher than MAP_LOCATIONS
+            this.currentLocationIcon.setDepth(DepthManager.getInstance().MAP_LOCATIONS + 1);
+
+            // Bring icon to top of the overlay container
+            this.overlay.bringToTop(this.currentLocationIcon);
             
             // Set initial position
             const targetPos = this.getIconPositionForCard(targetCard);
@@ -211,9 +215,18 @@ export class MapOverlay {
                 y: targetPos.y,
                 duration: 500,
                 ease: 'Power2',
+                onStart: () => {
+                    // Bring icon to top at the start of the tween
+                    if (this.currentLocationIcon) {
+                        this.overlay.bringToTop(this.currentLocationIcon);
+                    }
+                },
+                onUpdate: () => {
+                    // Ensure depth remains higher during the tween
+                    this.currentLocationIcon?.setDepth(DepthManager.getInstance().MAP_LOCATIONS + 1);
+                },
                 onComplete: () => {
                     this.isLocationTransitionInProgress = false;
-                    // Only trigger OnLocationSelected after the movement is complete
                     if (currentLocation) {
                         currentLocation.OnLocationSelected(this.scene);
                     }

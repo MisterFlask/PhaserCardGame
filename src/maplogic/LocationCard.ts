@@ -142,7 +142,7 @@ export class RestSiteCard extends LocationCard {
         console.log(`Rest room ${this.id} selected`);
         
         const eventEncounter = EncounterManager.getInstance().getRestEncounter(GameState.getInstance().currentAct, this.segment);
-        ActionManager.getInstance().cleanupAndRestartCombat({ encounter: eventEncounter, shouldStartWithMapOverlay: true });
+        ActionManager.getInstance().cleanupAndRestartCombat({ encounter: eventEncounter, shouldStartWithMapOverlay: false });
         this.gameEvent = eventEncounter.event;  
     }
 
