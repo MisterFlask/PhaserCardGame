@@ -12,7 +12,7 @@ import { CardReward } from '../rewards/CardReward';
 import { CurrencyReward } from '../rewards/CurrencyReward';
 import { CardRewardsGenerator } from '../rules/CardRewardsGenerator';
 import { GameState } from '../rules/GameState';
-import { SceneChanger } from '../screens/SceneChanger';
+import { ActionManager } from '../utils/ActionManager';
 import { Faction } from './Faction';
 
 
@@ -71,9 +71,7 @@ export class LocationCard extends AbstractCard {
     OnLocationSelected(scene: Phaser.Scene): void {
         console.log(`Location ${this.id} selected with encounter: ${this.encounter.enemies.map(e => e.name).join(', ')}`);
         
-
-        GameState.getInstance().eliminatePhysicalCardsBetweenScenes();
-        scene.scene.start('CombatScene', { encounter: this.encounter });
+        ActionManager.getInstance().cleanupAndRestartCombat({ encounter: this.encounter, shouldStartWithMapOverlay: false });
     }
 
     public determineRewards(): AbstractReward[] {
@@ -144,7 +142,7 @@ export class RestSiteCard extends LocationCard {
         console.log(`Rest room ${this.id} selected`);
         
         const eventEncounter = EncounterManager.getInstance().getRestEncounter(GameState.getInstance().currentAct, this.segment);
-        SceneChanger.switchToCombatScene(eventEncounter);
+        ActionManager.getInstance().cleanupAndRestartCombat({ encounter: eventEncounter, shouldStartWithMapOverlay: true });
         this.gameEvent = eventEncounter.event;  
     }
 
@@ -216,8 +214,7 @@ export class EliteRoomCard extends LocationCard {
         console.log(`Location ${this.id} selected with encounter: ${this.encounter.enemies.map(e => e.name).join(', ')}`);
         
         this.encounter = EncounterEnhancer.enhanceEliteEncounter(this.encounter);
-        GameState.getInstance().eliminatePhysicalCardsBetweenScenes();
-        scene.scene.start('CombatScene', { encounter: this.encounter });
+        ActionManager.getInstance().cleanupAndRestartCombat({ encounter: this.encounter, shouldStartWithMapOverlay: false });
     }
 }
 
@@ -240,9 +237,7 @@ export class ShopCard extends LocationCard {
     override OnLocationSelected(scene: Phaser.Scene): void {
         console.log(`Location ${this.id} selected with encounter: ${this.encounter.enemies.map(e => e.name).join(', ')}`);
         
-        GameState.getInstance().eliminatePhysicalCardsBetweenScenes();
-        GameState.getInstance().rerollShop();
-        SceneChanger.switchToCombatScene(EncounterManager.getInstance().getShopEncounter());
+        ActionManager.getInstance().cleanupAndRestartCombat({ encounter: EncounterManager.getInstance().getShopEncounter(), shouldStartWithMapOverlay: false });
     }
 }
 
@@ -262,8 +257,7 @@ export class TreasureRoomCard extends LocationCard {
     override OnLocationSelected(scene: Phaser.Scene): void {
         console.log(`Treasure room ${this.id} selected`);
         
-        GameState.getInstance().eliminatePhysicalCardsBetweenScenes();
-        SceneChanger.switchToCombatScene(EncounterManager.getInstance().getTreasureEncounter());
+        ActionManager.getInstance().cleanupAndRestartCombat({ encounter: EncounterManager.getInstance().getTreasureEncounter(), shouldStartWithMapOverlay: false });
     }
 }
 
@@ -281,7 +275,7 @@ export class EventRoomCard extends LocationCard {
     override OnLocationSelected(scene: Phaser.Scene): void {
         console.log(`Event room ${this.id} selected`);
         const eventEncounter = EncounterManager.getInstance().getEventRoomEncounter(GameState.getInstance().currentAct, this.segment);
-        SceneChanger.switchToCombatScene(eventEncounter);
+        ActionManager.getInstance().cleanupAndRestartCombat({ encounter: eventEncounter, shouldStartWithMapOverlay: false });
         this.gameEvent = eventEncounter.event;  
 
     }

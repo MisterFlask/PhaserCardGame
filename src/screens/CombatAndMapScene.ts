@@ -81,6 +81,49 @@ class CombatScene extends Phaser.Scene {
         this.combatEndHandled = false;
     }
 
+    cleanupAndRestartCombat(data: CombatSceneData): void {
+        console.log("cleanupAndRestartCombat called with ", data);
+        
+        // Clean up existing combat state
+        GameState.getInstance().eliminatePhysicalCardsBetweenScenes();
+        
+        // Reinitialize combat state with new encounter
+        const stateService = CombatStateService.getInstance();
+        stateService.initializeCombat(data.encounter, GameState.getInstance().currentRunCharacters);
+        
+        // Reset UI context
+        UIContextManager.getInstance().setContext(UIContext.COMBAT);
+        
+        // Reset combat flags
+        this.combatEndHandled = false;
+        
+        // Recreate all combat-related objects
+        if (this.cardManager) {
+            this.cardManager.cleanup();
+            this.cardManager = new CombatCardManager(this);
+        }
+
+        // Reinitialize input handler with new card manager
+        if (this.inputHandler) {
+            this.inputHandler.cleanup(); // Add this method to CombatInputHandler
+            this.inputHandler = new CombatInputHandler(this, this.cardManager);
+            
+            // Re-add the card click listener
+            this.inputHandler.addCardClickListener((card: AbstractCard) => {
+                if (UIContextManager.getInstance().getContext() !== UIContext.COMBAT) return;
+                this.shopOverlay.handleCardClick(card);
+                this.treasureOverlay.handleCardClickOnTreasureChest(card);
+            });
+        }
+        
+        // Start new combat
+        ActionManager.getInstance().startCombat();
+        ActionManager.beginTurn();
+
+        // Handle map overlay
+        this.toggleMapOverlay(data.shouldStartWithMapOverlay);
+    }
+
 
 
     create(): void {
@@ -160,6 +203,10 @@ class CombatScene extends Phaser.Scene {
 
         this.events.on("showMapOverlay", () => {
             this.toggleMapOverlay(true);
+        });
+
+        this.events.on("cleanupAndRestartCombat", (data: CombatSceneData) => {
+            this.cleanupAndRestartCombat(data);
         });
 
         // Add new event listener for exhaust pile clicks

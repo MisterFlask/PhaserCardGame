@@ -364,6 +364,25 @@ export class CombatCardManager {
         });
     }
 
+    public cleanup(): void {
+        // Clean up player hand
+        this.playerHand.forEach(card => card.obliterate());
+        this.playerHand = [];
+
+        // Clean up enemy units
+        this.enemyUnits.forEach(card => card.obliterate());
+        this.enemyUnits = [];
+
+        // Clean up player units
+        this.playerUnits.forEach(card => card.obliterate());
+        this.playerUnits = [];
+
+        // Clean up piles
+        if (this.drawPile) this.drawPile.obliterate();
+        if (this.discardPile) this.discardPile.obliterate();
+        if (this.exhaustPile) this.exhaustPile.obliterate();
+    }
+
 }
 
 export default CombatCardManager;

@@ -1,3 +1,4 @@
+import { Encounter } from '../encounters/EncountersList';
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
 import type { PlayerCharacter } from '../gamecharacters/BaseCharacterClass';
 import type { PlayableCard } from '../gamecharacters/PlayableCard';
@@ -95,6 +96,7 @@ export class GameState {
         this.obliteratePhysicalCardsForArray(this.roster);
         this.obliteratePhysicalCardsForArray(this.currentRunCharacters);
         this.obliteratePhysicalCardsForArray(this.combatState.playerCharacters);
+        this.obliteratePhysicalCardsForArray(this.combatState.enemies);
         
         // Note: Removed the enemyCharacters line as it doesn't exist on CombatState
         // If you need to handle enemy characters, ensure CombatState has this property
@@ -189,6 +191,22 @@ export class GameState {
         scene.events.emit('propagateGameStateChangesToUi');
     }
 
+    public initializeCombatState(encounter: Encounter): void {
+        // Reset combat state
+        this.combatState.reset();
+        
+        // Set up enemies from encounter
+        this.combatState.enemies = [...encounter.enemies];
+        
+        // Set up player characters
+        this.combatState.playerCharacters = [...this.currentRunCharacters];
+        
+        // Initialize draw pile with all available cards from player characters
+        this.combatState.drawPile = this.currentRunCharacters.flatMap(char => 
+            char.cardsInMasterDeck.map(card => card.Copy())
+        );
+    }
+
 }
 
 export class CombatState{
@@ -222,6 +240,17 @@ export class CombatState{
         if (this.currentDiscardPile.some(c => c.id === cardId)) return BattleCardLocation.DiscardPile
         if (this.currentHand.some(c => c.id === cardId)) return BattleCardLocation.Hand
         return BattleCardLocation.Unknown
+    }
+
+    public reset(): void {
+        this.drawPile = [];
+        this.currentDiscardPile = [];
+        this.currentHand = [];
+        this.currentExhaustPile = [];
+        this.enemies = [];
+        this.currentTurn = 0;
+        this.energyAvailable = this.maxEnergy;
+        this.combatResources = new CombatResources();
     }
 }
 

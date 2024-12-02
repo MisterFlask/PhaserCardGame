@@ -14,6 +14,7 @@ import { AbstractRelic } from "../relics/AbstractRelic";
 import { AbstractCombatEvent } from "../rules/AbstractCombatEvent";
 import { CombatRules, DamageCalculationResult } from "../rules/CombatRulesHelper";
 import { DeckLogic, PileName } from "../rules/DeckLogicHelper";
+import { CombatSceneData } from "../screens/CombatAndMapScene";
 import CombatUiManager from "../screens/subcomponents/CombatUiManager";
 import { AutomatedCharacterType, BaseCharacterType, PlayableCardType } from "../Types";
 import CardSelectionFromHandManager from '../ui/CardSelectionFromHandManager';
@@ -24,7 +25,12 @@ export class ActionManager {
     emitEvent(eventName: string, args: any) {
         this.scene.events.emit(eventName, args);
     }
-    
+
+    cleanupAndRestartCombat(data: CombatSceneData) {
+        console.log("ActionManager: cleanupAndRestartCombat emitted with ", data);
+        this.scene.events.emit("cleanupAndRestartCombat", data);
+    }
+
     gainEnergy(amount: number) {
         this.actionQueue.addAction(new GenericAction(async () => {
             const gameState = GameState.getInstance();

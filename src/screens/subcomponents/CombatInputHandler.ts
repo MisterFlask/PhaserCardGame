@@ -402,6 +402,12 @@ class CombatInputHandler {
             }
         });
     }
+
+    public cleanup(): void {
+        // Remove all existing listeners
+        this.cardClickListeners = [];
+        // Any other cleanup needed...
+    }
 }
 
 export default CombatInputHandler;
