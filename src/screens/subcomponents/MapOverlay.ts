@@ -36,6 +36,9 @@ export class MapOverlay {
 
     private adjacencyLineRenderer: AdjacencyLineRenderer;
 
+    private currentLocationIcon: Phaser.GameObjects.Image | null = null;
+    private isLocationTransitionInProgress: boolean = false;
+
     background_by_act: Record<number, string> = {
         1: 'styx_delta',
         2: 'dis',
@@ -180,23 +183,51 @@ export class MapOverlay {
     // Update Player Location Icon
     private updatePlayerLocationIcon() {
         const currentLocation = GameState.getInstance().getCurrentLocation();
-        const currentLocationCard = this.locationCards.find(card => (card.data as LocationCard).id === currentLocation?.id);
-        if (currentLocationCard) {
-            currentLocationCard.container.list.forEach(child => {
-                if (child.name === "currentLocationIcon") {
-                    child.destroy();
+        const targetCard = this.locationCards.find(card => (card.data as LocationCard).id === currentLocation?.id);
+        
+        if (!targetCard) return;
+
+        // Create the icon if it doesn't exist
+        if (!this.currentLocationIcon) {
+            this.currentLocationIcon = this.scene.add.image(0, 0, 'old-wagon');
+            const portraitWidth = targetCard.cardImage.displayWidth;
+            const portraitHeight = targetCard.cardImage.displayHeight;
+            this.currentLocationIcon.setDisplaySize(portraitWidth / 2, portraitHeight / 2);
+            this.currentLocationIcon.setDepth(DepthManager.getInstance().MAP_LOCATIONS + 1);
+            this.overlay.add(this.currentLocationIcon);
+            
+            // Set initial position
+            const targetPos = this.getIconPositionForCard(targetCard);
+            this.currentLocationIcon.setPosition(targetPos.x, targetPos.y);
+        } else {
+            // Get target position
+            const targetPos = this.getIconPositionForCard(targetCard);
+            
+            // Start lerp animation
+            this.isLocationTransitionInProgress = true;
+            this.scene.tweens.add({
+                targets: this.currentLocationIcon,
+                x: targetPos.x,
+                y: targetPos.y,
+                duration: 500,
+                ease: 'Power2',
+                onComplete: () => {
+                    this.isLocationTransitionInProgress = false;
+                    // Only trigger OnLocationSelected after the movement is complete
+                    if (currentLocation) {
+                        currentLocation.OnLocationSelected(this.scene);
+                    }
                 }
             });
-
-            const portraitWidth = currentLocationCard.cardImage.displayWidth;
-            const portraitHeight = currentLocationCard.cardImage.displayHeight;
-
-            const currentLocationIcon = this.scene.add.image(0, -currentLocationCard.cardBackground.displayHeight / 4, 'old-wagon');
-            currentLocationIcon.setDisplaySize(portraitWidth / 2, portraitHeight / 2);
-            currentLocationIcon.setDepth(1);
-            currentLocationIcon.setName("currentLocationIcon");
-            currentLocationCard.container.add(currentLocationIcon);
         }
+    }
+
+    private getIconPositionForCard(card: PhysicalCard): { x: number, y: number } {
+        const worldPos = card.container.getWorldTransformMatrix();
+        return {
+            x: worldPos.tx,
+            y: worldPos.ty - card.cardBackground.displayHeight / 4
+        };
     }
 
     // Create Character Cards
@@ -396,6 +427,8 @@ export class MapOverlay {
     private setupLocationCardEvents = (card: PhysicalCard) => {
         card.container.setInteractive();
         card.container.on('pointerdown', () => {
+            if (this.isLocationTransitionInProgress) return; // Early return if transition is in progress
+            
             if (card.data instanceof LocationCard) {
                 const gameState = GameState.getInstance();
                 gameState.setCurrentLocation(card.data);
@@ -404,7 +437,7 @@ export class MapOverlay {
                     relic.onLocationEntered(card.data as LocationCard)
                 });
 
-                card.data.OnLocationSelected(this.scene);
+                // OnLocationSelected is now called after the lerp completes
                 this.updatePlayerLocationIcon();
             }
         });
