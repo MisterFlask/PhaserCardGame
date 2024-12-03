@@ -39,6 +39,10 @@ export class MapOverlay {
     private currentLocationIcon: Phaser.GameObjects.Image | null = null;
     private isLocationTransitionInProgress: boolean = false;
 
+    private readonly TRANSITION_DURATION: number = 500;
+    private readonly SLIDE_DISTANCE: number = 2000;
+    private isTransitioning: boolean = false;
+
     background_by_act: Record<number, string> = {
         1: 'styx_delta',
         2: 'dis',
@@ -213,7 +217,7 @@ export class MapOverlay {
                 targets: this.currentLocationIcon,
                 x: targetPos.x,
                 y: targetPos.y,
-                duration: 500,
+                duration: 1500,
                 ease: 'Power2',
                 onStart: () => {
                     // Bring icon to top at the start of the tween
@@ -542,25 +546,55 @@ export class MapOverlay {
 
     // Public Methods to Control Overlay
     public show(): void {
+        if (this.isTransitioning || this.isVisible) return;
+        this.isTransitioning = true;
+        
+        // Make visible but start off-screen
         this.overlay.setVisible(true);
-        this.isVisible = true;
-        this.resetCameraPosition();
-        UIContextManager.getInstance().setContext(UIContext.MAP);
+        this.overlay.setPosition(this.SLIDE_DISTANCE, 0);
+        
+        // Tween into view
+        this.scene.tweens.add({
+            targets: this.overlay,
+            x: 0,
+            duration: this.TRANSITION_DURATION,
+            ease: 'Power2',
+            onComplete: () => {
+                this.isVisible = true;
+                this.isTransitioning = false;
+                this.resetCameraPosition();
+                UIContextManager.getInstance().setContext(UIContext.MAP);
+            }
+        });
     }
 
     public hide(): void {
-        this.overlay.setVisible(false);
-        this.isVisible = false;
-        this.resetCameraPosition();
-        UIContextManager.getInstance().setContext(UIContext.COMBAT);
+        if (this.isTransitioning || !this.isVisible) return;
+        this.isTransitioning = true;
         
-        // Ensure the campaign brief status is properly updated when hiding
-        if (this.campaignBriefStatus) {
-            this.scene.events.emit('propagateGameStateChangesToUi');
-        }
+        // Tween out of view
+        this.scene.tweens.add({
+            targets: this.overlay,
+            x: this.SLIDE_DISTANCE,
+            duration: this.TRANSITION_DURATION,
+            ease: 'Power2',
+            onComplete: () => {
+                this.overlay.setVisible(false);
+                this.isVisible = false;
+                this.isTransitioning = false;
+                this.resetCameraPosition();
+                UIContextManager.getInstance().setContext(UIContext.COMBAT);
+                
+                // Ensure the campaign brief status is properly updated when hiding
+                if (this.campaignBriefStatus) {
+                    this.scene.events.emit('propagateGameStateChangesToUi');
+                }
+            }
+        });
     }
 
     public toggle(): void {
+        if (this.isTransitioning) return;
         this.isVisible ? this.hide() : this.show();
     }
 
