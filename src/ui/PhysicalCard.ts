@@ -495,10 +495,6 @@ export class PhysicalCard implements IPhysicalCardInterface {
     }
 
     onPointerOver_PhysicalCard = (): void => {
-        // Bring the card to the top within its parent container
-        if (this.container.parentContainer) {
-            this.container.parentContainer.bringToTop(this.container);
-        }
 
         TransientUiState.getInstance().setHoveredCard(this);
 

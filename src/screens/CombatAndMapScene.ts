@@ -340,6 +340,8 @@ class CombatScene extends Phaser.Scene {
             this.uiManager.showEvent(this.eventToRunNext);
             this.hasEventBeenRun = true;
         }
+
+        this.mapOverlay.updateDisplay();
     }
 
     /**

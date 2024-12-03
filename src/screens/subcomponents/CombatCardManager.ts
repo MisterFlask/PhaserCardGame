@@ -200,6 +200,13 @@ export class CombatCardManager {
                 card.container.on('pointerdown', () => {
                     this.scene.events.emit('discardPileClicked');
                 });
+
+                card.container.on('pointerover', () => {
+                    // Bring the card to the top within its parent container
+                    if (card.container.parentContainer) {
+                        card.container.parentContainer.bringToTop(card.container);
+                    }
+                });
             }
         });
     }

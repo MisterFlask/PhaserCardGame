@@ -7,6 +7,7 @@ import { SpatialManager } from '../../maplogic/SpatialManager';
 import { GameState } from '../../rules/GameState';
 import { TextBoxButton } from '../../ui/Button';
 import { DepthManager } from '../../ui/DepthManager';
+import { MapDebugOverlay } from '../../ui/MapDebugOverlay';
 import { PhysicalCard } from '../../ui/PhysicalCard';
 import { TransientUiState } from '../../ui/TransientUiState';
 import { UIContext, UIContextManager } from '../../ui/UIContextManager';
@@ -49,6 +50,8 @@ export class MapOverlay {
         3: 'styx_delta'
     } as const;
 
+    private mapDebugOverlay?: MapDebugOverlay;
+
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
         this.overlay = this.scene.add.container(0, 0)
@@ -76,6 +79,23 @@ export class MapOverlay {
             console.log('showMapOverlay');
             this.show();
         });
+
+        this.setupKeyboardListeners();
+
+        // Create the MapDebugOverlay with getter functions
+        this.mapDebugOverlay = new MapDebugOverlay(
+            scene,
+            this.overlay,
+            () => this.locationCards,
+            () => this.currentLocationIcon ?? undefined
+        );
+    }
+
+
+    public updateDisplay(): void{
+        if (this.currentLocationIcon) {
+            this.overlay.bringToTop(this.currentLocationIcon);
+        }
     }
 
     private createOverlay(): void {
@@ -201,9 +221,6 @@ export class MapOverlay {
             // Set depth higher than MAP_LOCATIONS
             this.currentLocationIcon.setDepth(DepthManager.getInstance().MAP_LOCATIONS + 1);
 
-            // Bring icon to top of the overlay container
-            this.overlay.bringToTop(this.currentLocationIcon);
-            
             // Set initial position
             const targetPos = this.getIconPositionForCard(targetCard);
             this.currentLocationIcon.setPosition(targetPos.x, targetPos.y);
@@ -221,13 +238,10 @@ export class MapOverlay {
                 ease: 'Power2',
                 onStart: () => {
                     // Bring icon to top at the start of the tween
-                    if (this.currentLocationIcon) {
-                        this.overlay.bringToTop(this.currentLocationIcon);
-                    }
                 },
                 onUpdate: () => {
                     // Ensure depth remains higher during the tween
-                    this.currentLocationIcon?.setDepth(DepthManager.getInstance().MAP_LOCATIONS + 1);
+                    this.currentLocationIcon?.setDepth(DepthManager.getInstance().MAP_LOCATIONS + 10);
                 },
                 onComplete: () => {
                     this.isLocationTransitionInProgress = false;
@@ -656,5 +670,21 @@ export class MapOverlay {
         this.createAdjacencyLines();
         this.createPhysicalLocationCards();
     }
-    
+
+    // Ensure cleanup when the MapOverlay is destroyed
+    public destroy(): void {
+        // ... existing destroy logic ...
+        
+        // Destroy the MapDebugOverlay
+        this.mapDebugOverlay?.destroy();
+        this.mapDebugOverlay = undefined;
+    }
+
+    // Modify the scene setup to listen for the Control key
+    private setupKeyboardListeners(): void {
+        this.scene.input.keyboard?.on('keydown-CTRL', () => {
+            console.log("showLocationCardDepths");
+            this.mapDebugOverlay?.toggleLocationCardDepths();
+        });
+    }
 }
