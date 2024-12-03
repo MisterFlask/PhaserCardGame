@@ -18,6 +18,7 @@ export class FearEater extends AbstractBuff {
     }
 
     override getCombatDamageDealtModifier(target: BaseCharacter): number {
+        if (!target) return 0;
         const stressBuff = target.buffs.find(buff => buff instanceof Stress);
         const stressLevel = stressBuff ? stressBuff.stacks : 0;
         return this.stacks * stressLevel;

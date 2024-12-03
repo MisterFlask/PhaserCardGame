@@ -544,7 +544,32 @@ export class MapOverlay {
         // Implement abort mission logic here
     }
 
-    // Public Methods to Control Overlay
+    // Add new method to center camera on player location
+    private centerCameraOnPlayerLocation(): void {
+        const currentLocation = GameState.getInstance().getCurrentLocation();
+        const targetCard = this.locationCards.find(card => (card.data as LocationCard).id === currentLocation?.id);
+        
+        if (!targetCard) return;
+
+        // Get the world position of the target card
+        const worldPos = targetCard.container.getWorldTransformMatrix();
+        const { width, height } = this.scene.scale;
+
+        // Calculate the scroll position needed to center on the target
+        const scrollX = worldPos.tx - width / 2;
+        const scrollY = worldPos.ty - height / 2;
+
+        // Smoothly pan to the target position
+        this.scene.tweens.add({
+            targets: this.scene.cameras.main,
+            scrollX: scrollX,
+            scrollY: scrollY,
+            duration: 1000,
+            ease: 'Power2'
+        });
+    }
+
+    // Modify the show method to center on player after showing
     public show(): void {
         if (this.isTransitioning || this.isVisible) return;
         this.isTransitioning = true;
@@ -564,6 +589,10 @@ export class MapOverlay {
                 this.isTransitioning = false;
                 this.resetCameraPosition();
                 UIContextManager.getInstance().setContext(UIContext.MAP);
+                // Add slight delay before centering to ensure everything is properly positioned
+                this.scene.time.delayedCall(100, () => {
+                    this.centerCameraOnPlayerLocation();
+                });
             }
         });
     }
@@ -598,9 +627,13 @@ export class MapOverlay {
         this.isVisible ? this.hide() : this.show();
     }
 
+    // Modify resetCameraPosition to not interfere with our centering
     private resetCameraPosition(): void {
-        this.scene.cameras.main.scrollX = 0;
-        this.scene.cameras.main.scrollY = 0;
+        // Only reset camera when hiding the map
+        if (!this.isVisible) {
+            this.scene.cameras.main.scrollX = 0;
+            this.scene.cameras.main.scrollY = 0;
+        }
     }
 
     private regenerateMap(force: boolean): void {
@@ -623,4 +656,5 @@ export class MapOverlay {
         this.createAdjacencyLines();
         this.createPhysicalLocationCards();
     }
+    
 }
