@@ -576,7 +576,6 @@ export class MapOverlay {
         // Smoothly pan to the target position
         this.scene.tweens.add({
             targets: this.scene.cameras.main,
-            scrollX: scrollX,
             scrollY: scrollY,
             duration: 1000,
             ease: 'Power2'

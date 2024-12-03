@@ -54,6 +54,7 @@ class CombatScene extends Phaser.Scene {
 
     private eventToRunNext?: AbstractEvent;
     private hasEventBeenRun: boolean = false;
+    private sceneStartsWithMapOverlayUp: boolean = false;
 
     private setNewEvent(event?: AbstractEvent): void {
         this.eventToRunNext = event;
@@ -222,6 +223,7 @@ class CombatScene extends Phaser.Scene {
         });
 
         this.setNewEvent(GameState.getInstance().currentLocation?.gameEvent);
+        this.toggleMapOverlay(this.sceneStartsWithMapOverlayUp);
     }
 
     private obliterate(): void {

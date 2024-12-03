@@ -8,6 +8,7 @@ import { Lethality } from '../gamecharacters/buffs/standard/Strong';
 import { Terrifying } from '../gamecharacters/buffs/standard/Terrifying';
 import { AbstractRelic } from '../relics/AbstractRelic';
 import { RelicsLibrary } from '../relics/RelicsLibrary';
+import { GameState } from '../rules/GameState';
 import { RestEvent } from './events/RestEvent';
 import { FrenchBlindProphetess } from './monsters/act1_boss/FrenchBlindProphetess';
 import { FrenchChef } from './monsters/act1_segment1/FrenchChef';
@@ -204,8 +205,8 @@ export class EncounterManager {
         return encounter;
     }
     
-    getRestEncounter(act: integer, segment: integer): Encounter {
-        var encounter=  new Encounter([], act, segment, new RestEvent());
+    getRestEncounter(): Encounter {
+        var encounter=  new Encounter([], GameState.getInstance().currentAct, -1, new RestEvent());
         encounter.peaceful = true;
         return encounter;
     }

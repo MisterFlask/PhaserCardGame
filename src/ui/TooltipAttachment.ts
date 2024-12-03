@@ -58,6 +58,12 @@ export class TooltipAttachment {
         this.tooltip.setVisible(true);
         this.updateTooltipPosition();
         this.tooltip.setDepth(DepthManager.getInstance().TOOLTIP);
+        // Bring tooltip to top of display list
+        if (this.tooltip.parentContainer) {
+            this.tooltip.parentContainer.bringToTop(this.tooltip);
+        } else {
+            this.scene.children.bringToTop(this.tooltip);
+        }
 
         // Add update listener to scene
         this.scene.events.on('update', this.updateTooltipPosition, this);

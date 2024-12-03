@@ -141,13 +141,11 @@ export class RestSiteCard extends LocationCard {
     override OnLocationSelected(scene: Phaser.Scene): void {
         console.log(`Rest room ${this.id} selected`);
         
-        const eventEncounter = EncounterManager.getInstance().getRestEncounter(GameState.getInstance().currentAct, this.segment);
+        const eventEncounter = EncounterManager.getInstance().getRestEncounter();
         ActionManager.getInstance().cleanupAndRestartCombat({ encounter: eventEncounter, shouldStartWithMapOverlay: false });
         this.gameEvent = eventEncounter.event;  
     }
-
 }
-
 
 export class CharonRoomCard extends LocationCard {
     constructor(floor: number, index: number) {
