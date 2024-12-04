@@ -189,9 +189,9 @@ export class PhysicalCard implements IPhysicalCardInterface {
             const cardHeight = this.cardBackground.displayHeight;
             this.hpBox = new TextBox({
                 scene: this.scene,
-                x: cardWidth / 2 - 10,
+                x: cardWidth / 2 + 10,
                 y: -cardHeight / 2 + 10,
-                width: 160,
+                width: 66,
                 height: 30,
                 text: `${baseCharacter.hitpoints}/${baseCharacter.maxHitpoints}`,
                 style: { fontSize: '14px', color: '#ff0000', fontFamily: 'Arial' }
@@ -261,7 +261,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
             scene: this.scene,
             x: this.blockIcon.x + this.blockIcon.displayWidth / 2 + 5,
             y: 0,
-            width: 150,
+            width: 44,
             height: 30,
             text: `${this.data.block}`, // Assuming AbstractCard has a 'block' property
             style: { fontSize: '14px', color: '#ffffff', fontFamily: 'Arial' },

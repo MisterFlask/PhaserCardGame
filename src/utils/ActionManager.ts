@@ -24,7 +24,10 @@ import { UIContext, UIContextManager } from "../ui/UIContextManager";
 
 export class ActionManager {
     addMonsterToCombat(monsterToSummon: AutomatedCharacter) {
-        GameState.getInstance().combatState.enemies.push(monsterToSummon);
+        this.actionQueue.addAction(new GenericAction(async () => {
+            GameState.getInstance().combatState.enemies.push(monsterToSummon);
+            return [];
+        }));
     }
 
     emitEvent(eventName: string, args: any) {

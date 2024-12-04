@@ -6,6 +6,7 @@ import { AutomatedCharacter } from '../../gamecharacters/AutomatedCharacter';
 import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
 import { GameState } from '../../rules/GameState';
 import { DepthManager } from '../../ui/DepthManager';
+import { EnemyPositionManager } from '../../ui/EnemyPositionManager';
 import CombatSceneLayoutUtils from '../../ui/LayoutUtils';
 import { PhysicalCard } from '../../ui/PhysicalCard';
 import { CardGuiUtils } from '../../utils/CardGuiUtils';
@@ -49,9 +50,20 @@ export class CombatCardManager {
     public discardPile!: PhysicalCard;
     public exhaustPile!: PhysicalCard;
     private enemyPositions: Map<string, { x: number, y: number }> = new Map();
+    private enemyPositionManager: EnemyPositionManager;
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
+        
+        // Calculate battlefield bounds - adjust these values as needed
+        const battlefieldBounds = new Phaser.Geom.Rectangle(
+            300, // x position
+            CombatSceneLayoutUtils.getBattlefieldY(this.scene) - 200, // y position
+            this.scene.scale.width - 600, // width
+            400 // height
+        );
+        
+        this.enemyPositionManager = new EnemyPositionManager(battlefieldBounds);
         this.createDrawAndDiscardPiles();
         this.createPlayerHand();
         this.createPlayerUnits();
@@ -365,28 +377,18 @@ export class CombatCardManager {
         const existingEnemyCards = new Map(this.enemyUnits.map(card => [card.data.id, card]));
 
         // Create cards for new enemies
-        state.enemies.forEach((enemy, index) => {
+        state.enemies.forEach((enemy) => {
             if (!existingEnemyCards.has(enemy.id)) {
                 if (enemy.isDead()) {
                     return;
                 }
-                // If we don't have a position stored for this enemy, create one
-                if (!this.enemyPositions.has(enemy.id)) {
-                    // Find the first unused x position
-                    const cardWidth = 150;
-                    const usedPositions = new Set(Array.from(this.enemyPositions.values()).map(pos => pos.x));
-                    let x = 400;
-                    while (usedPositions.has(x)) {
-                        x += cardWidth * 2;
-                    }
-                    
-                    this.enemyPositions.set(enemy.id, {
-                        x: x,
-                        y: CombatSceneLayoutUtils.getBattlefieldY(this.scene)
-                    });
+
+                const position = this.enemyPositionManager.placeEnemyAtOpenPosition(enemy.id);
+                if (!position) {
+                    console.warn(`No position available for enemy ${enemy.id}`);
+                    return;
                 }
 
-                const position = this.enemyPositions.get(enemy.id)!;
                 const enemyCard = CardGuiUtils.getInstance().createCard({
                     scene: this.scene,
                     x: position.x,
@@ -437,6 +439,7 @@ export class CombatCardManager {
     }
 
     public removeEnemyCard(enemyCard: PhysicalCard): void {
+        this.enemyPositionManager.releasePosition(enemyCard.data.id);
         this.enemyUnits = this.enemyUnits.filter(card => card !== enemyCard);
         // Check if there are any active tweens on this card's container
         const activeTweens = this.scene.tweens.getTweensOf(enemyCard.container);
@@ -475,6 +478,8 @@ export class CombatCardManager {
         if (this.drawPile) this.drawPile.obliterate();
         if (this.discardPile) this.discardPile.obliterate();
         if (this.exhaustPile) this.exhaustPile.obliterate();
+
+        this.enemyPositionManager.reset();
     }
 
 }

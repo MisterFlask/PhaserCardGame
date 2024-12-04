@@ -78,7 +78,6 @@ export abstract class AbstractIntent implements JsonRepresentable {
         }
         if (this.isUsingPlaceholderImage()) {
             var placeholder = ImageUtils.getDeterministicAbstractPlaceholder(this.imageName);
-            console.warn(`Intent image '${this.imageName}' not found in texture cache, using placeholder ${placeholder}`);
             return placeholder;
         }
         return this.imageName;
@@ -342,15 +341,15 @@ export class ApplyDebuffToAllPlayerCharactersIntent extends AbstractIntent {
 }
 
 export class ApplyBuffToAllEnemyCharactersIntent extends AbstractIntent {
-    debuff: AbstractBuff;
+    buff: AbstractBuff;
 
     constructor({ debuff, owner }: { debuff: AbstractBuff, owner: BaseCharacter }) {
         super({ imageName: 'magic', target: undefined, owner: owner });
-        this.debuff = debuff;
+        this.buff = debuff;
     }
 
     tooltipText(): string {
-        return `Applying ${this.debuff.getDisplayName()} to all your foes.`;
+        return `Applying ${this.buff.getDisplayName()} to all your foes.`;
     }
 
     displayText(): string {
@@ -360,8 +359,8 @@ export class ApplyBuffToAllEnemyCharactersIntent extends AbstractIntent {
     act(): void {
         ActionManager.getInstance().tiltCharacter(this.owner);
         for (const target of TargetingUtils.getInstance().selectAllEnemyCharacters()) {
-            console.log(`Applying ${this.debuff.stacks} stack(s) of ${this.debuff.getDisplayName()} to ${target.name}`)
-            ActionManager.getInstance().applyBuffToCharacterOrCard(target, this.debuff);
+            console.log(`Applying ${this.buff.stacks} stack(s) of ${this.buff.getDisplayName()} to ${target.name}`)
+            ActionManager.getInstance().applyBuffToCharacterOrCard(target, this.buff);
         }
     }
 
@@ -370,8 +369,8 @@ export class ApplyBuffToAllEnemyCharactersIntent extends AbstractIntent {
         return JSON.stringify({
             ...baseRepresentation,
             className: this.constructor.name,
-            debuff: this.debuff.getDisplayName(),
-            stacks: this.debuff.stacks,
+            debuff: this.buff.getDisplayName(),
+            stacks: this.buff.stacks,
         }, null, 2);
     }
 }

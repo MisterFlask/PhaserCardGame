@@ -23,6 +23,7 @@ export class TextBox extends Phaser.GameObjects.Container {
     protected horizontalExpand: HorizontalExpand;
     private debugGraphics: Phaser.GameObjects.Graphics;
     protected fillColor: number;
+    protected assignedWidth: number;
 
     public strokeIsOn = false;
     // Add a method to determine if a color is light
@@ -78,7 +79,9 @@ export class TextBox extends Phaser.GameObjects.Container {
         this.verticalExpand = verticalExpand;
         this.horizontalExpand = horizontalExpand;
         
-        this.background = scene.add.rectangle(0, 0, width, height, fillColor)
+        this.assignedWidth = width;
+
+        this.background = scene.add.rectangle(0, 0, this.assignedWidth, height, fillColor)
             .setStrokeStyle(2, 0xffffff)
             // **Center the background rectangle**
             .setOrigin(0.5, 0.5);
@@ -160,7 +163,7 @@ export class TextBox extends Phaser.GameObjects.Container {
         // this.text.setShadowStroke(true);
         this.add(this.text);
 
-        // Adjust the text box size
+        // Adjust the text box size (ensure it starts with correct size)
         this.adjustTextBoxSize();
 
         // Add the container to the scene
@@ -297,8 +300,13 @@ export class TextBox extends Phaser.GameObjects.Container {
         const target = this.backgroundImage || this.background;
         if (!target) return;
     
-        // Calculate desired word wrap width
-        const desiredWordWrapWidth = target.width - padding * 2;
+        // Ensure the target's width is at least the assigned width
+        if (target.width < this.assignedWidth) {
+            target.width = this.assignedWidth;
+        }
+    
+        // Calculate desired word wrap width using assignedWidth
+        const desiredWordWrapWidth = this.assignedWidth - padding * 2;
     
         try{
             
@@ -320,7 +328,8 @@ export class TextBox extends Phaser.GameObjects.Container {
             const oldWidth = target.width;
             const oldHeight = target.height;
     
-            const newWidth = newTextWidth + padding * 2;
+            // Ensure the new width is at least the assignedWidth
+            const newWidth = Math.max(newTextWidth + padding * 2, this.assignedWidth);
             const newHeight = newTextHeight + padding * 2;
     
             // Set the new size of the background
