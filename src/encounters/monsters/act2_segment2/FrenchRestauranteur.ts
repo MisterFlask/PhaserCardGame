@@ -1,4 +1,4 @@
-import { AbstractIntent, AttackIntent, IntentListCreator, SummonIntent } from '../../../gamecharacters/AbstractIntent';
+import { AbstractIntent, AttackAllPlayerCharactersIntent, AttackIntent, IntentListCreator, SummonIntent } from '../../../gamecharacters/AbstractIntent';
 import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
 import { Desirous } from '../../../gamecharacters/buffs/enemy_buffs/Desirous';
 import { Idol } from '../../../gamecharacters/buffs/enemy_buffs/Idol';
@@ -29,20 +29,15 @@ export class FrenchRestauranteur extends AutomatedCharacter {
                     baseDamage: 4, 
                     owner: this,
                 }).withTitle("Taste Test"),
-
                 new AttackIntent({ 
-                    baseDamage: 15, 
+                    baseDamage: 4, 
                     owner: this,
-                }).withTitle("Culinary Critique"),
+                }).withTitle("Taste Test"),
+
             ],
             [
-                new AttackIntent({ 
+                new AttackAllPlayerCharactersIntent({ 
                     baseDamage: 11, 
-                    owner: this,
-                }).withTitle("Flambé"),
-
-                new AttackIntent({ 
-                    baseDamage: 25, 
                     owner: this,
                 }).withTitle("A La Morte")
             ]

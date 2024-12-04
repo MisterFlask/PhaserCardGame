@@ -4,59 +4,81 @@ import { GameState } from "../rules/GameState";
 import { BossRoomCard, CharonRoomCard, EliteRoomCard, EntranceCard, EventRoomCard, LocationCard, NormalRoomCard, RestSiteCard, ShopCard, TreasureRoomCard } from "./LocationCard";
 
 export class LocationManager {
+    private locationDeck: LocationCard[] = [];
+    private readonly numberOfFloors = 9;
+    private readonly nodesPerFloor = 5;
 
     constructor() {
+        this.initializeDeck();
     }
 
-    public initializeLocations() : LocationCard[]{
-        const numberOfFloors = 9;
+    private initializeDeck(): void {
+        // Define the composition of a single deck
+        const deckComposition = [
+            { type: NormalRoomCard, weight: 4 },
+            { type: RestSiteCard, weight: 1 },
+            { type: EliteRoomCard, weight: 1 },
+            { type: ShopCard, weight: 1 },
+            { type: TreasureRoomCard, weight: 1 },
+            { type: EventRoomCard, weight: 3 }
+        ];
+
+        // Create the deck based on weights
+        deckComposition.forEach(({ type, weight }) => {
+            for (let i = 0; i < weight; i++) {
+                this.locationDeck.push(new type(0, 0));
+            }
+        });
+
+        this.shuffleDeck();
+    }
+
+    private shuffleDeck(): void {
+        for (let i = this.locationDeck.length - 1; i > 0; i--) {
+            const j = Math.floor(Phaser.Math.FloatBetween(0, i + 1));
+            [this.locationDeck[i], this.locationDeck[j]] = [this.locationDeck[j], this.locationDeck[i]];
+        }
+    }
+
+    private drawCard(floor: number, roomNumber: number): LocationCard {
+        if (this.locationDeck.length === 0) {
+            this.initializeDeck();
+        }
+        const card = this.locationDeck.pop()!;
+        card.floor = floor;
+        card.roomNumber = roomNumber;
+        return card;
+    }
+
+    public initializeLocations(): LocationCard[] {
         const locationData: LocationCard[] = [];
 
-        for (let floor = 1; floor <= numberOfFloors; floor++) {
-            const numNodesOnThisFloor = 5;
+        for (let floor = 1; floor <= this.numberOfFloors; floor++) {
             let floorLocationData: LocationCard[] = [];
             let restSiteAssigned = false;
 
-            for (let i = 0; i < numNodesOnThisFloor; i++) {
+            for (let i = 0; i < this.nodesPerFloor; i++) {
                 let location: LocationCard;
 
+                // Handle special cases first
                 if (floor === 1 && i === 3) {
                     location = new EntranceCard(floor, i);
                     GameState.getInstance().setCurrentLocation(location);
-                } else if (floor === numberOfFloors && i === 3) {
+                } else if (floor === this.numberOfFloors && i === 3) {
                     location = new BossRoomCard(floor, i);
                 } else {
-                    const rand = Phaser.Math.FloatBetween(0, 1);
-                    if (!restSiteAssigned && i === numNodesOnThisFloor - 2) {
-                        location = new RestSiteCard(floor, i);
-                        restSiteAssigned = true;
-                    } else if (rand < 0.3) {
-                        location = new NormalRoomCard(floor, i);
-                    } else if (rand < 0.5) {
-                        location = new RestSiteCard(floor, i);
-                    } else if (rand < 0.6) {
-                        location = new EliteRoomCard(floor, i);
-                    } else if (rand < 0.8) {
-                        location = new ShopCard(floor, i);
-                    } else if (rand < 0.95) {
-                        location = new TreasureRoomCard(floor, i);
-                    } else {
-                        location = new EventRoomCard(floor, i);
-                    }
+                    // Draw from the deck for regular rooms
+                    location = this.drawCard(floor, i);
                 }
 
-                if (location.floor < 5) {
-                    location.segment = 1;
-                } else {
-                    location.segment = 2;
-                }
-                location.floor = floor;
-                location.roomNumber = i;
+                // Set segment based on floor number
+                location.segment = floor < 5 ? 1 : 2;
                 location.initEncounter();
                 floorLocationData.push(location);
             }
 
-            if (floor === numberOfFloors) {
+            // Filter special floors
+            if (floor === this.numberOfFloors) {
                 floorLocationData = floorLocationData.filter(card => card instanceof BossRoomCard);
             } else if (floor === 1) {
                 floorLocationData = floorLocationData.filter(card => card instanceof EntranceCard);
@@ -65,12 +87,14 @@ export class LocationManager {
             locationData.push(...floorLocationData);
         }
 
-        const charonFloor = numberOfFloors + 1;
+        // Add Charon's room
+        const charonFloor = this.numberOfFloors + 1;
         const charonRoom = new CharonRoomCard(charonFloor, 3);
         charonRoom.floor = charonFloor;
         charonRoom.roomNumber = 3;
         locationData.push(charonRoom);
 
+        // Connect boss room to Charon's room
         const bossRoom = locationData.find(
             location => location instanceof BossRoomCard
         );
@@ -82,6 +106,7 @@ export class LocationManager {
             charonRoom.setAdjacent(bossRoom);
             charonRoom.initEncounter();
         }
+
         return locationData;
     }
 

@@ -7,9 +7,9 @@ import { Weak } from '../../../gamecharacters/buffs/standard/Weak';
 export class FrenchPoliceman extends AutomatedCharacter {
     constructor() {
         super({
-            name: "L'Agent de l'Ordre",
+            name: "Ashwarden",
             portraitName: "Eldritch Policeman",
-            maxHitpoints: 75,
+            maxHitpoints: 175,
             description: "they're all that's keeping paris out of the Null Layer"
         });
         

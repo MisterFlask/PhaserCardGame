@@ -23,7 +23,6 @@ export class AccursedObelisk extends AutomatedCharacter {
         const intents: AbstractIntent[][] = [
             [
                 new AttackAllPlayerCharactersIntent({ baseDamage: 10, owner: this }).withTitle("BWEEEOOOOOW BWEEEEOOOW"),
-                
             ]
         ];
 

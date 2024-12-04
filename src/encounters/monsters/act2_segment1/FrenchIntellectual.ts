@@ -1,4 +1,4 @@
-import { AbstractIntent, ApplyBuffToSelfIntent, AttackIntent, IntentListCreator } from '../../../gamecharacters/AbstractIntent';
+import { AbstractIntent, AttackIntent, IntentListCreator } from '../../../gamecharacters/AbstractIntent';
 import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
 import { AbstractBuff } from '../../../gamecharacters/buffs/AbstractBuff';
 import { PlayableCard } from '../../../gamecharacters/PlayableCard';
@@ -41,10 +41,10 @@ class PhilosophicalShield extends AbstractBuff {
 export class FrenchIntellectual extends AutomatedCharacter {
     constructor() {
         super({
-            name: "L'Intellectuel Français",
+            name: "Lexiophage",
             portraitName: "Eldritch Intellectual",
             maxHitpoints: 120,
-            description: "the abstract weapon.  every weapon never made."
+            description: "every weapon never made."
         });
         
         // Apply initial Philosophical Shield buff
@@ -54,10 +54,7 @@ export class FrenchIntellectual extends AutomatedCharacter {
     override generateNewIntents(): AbstractIntent[] {
         const intents: AbstractIntent[][] = [
             [
-                new AttackIntent({ baseDamage: 15, owner: this }).withTitle("Dialectical Critique")
-            ],
-            [
-                new ApplyBuffToSelfIntent({ buff: new PhilosophicalShield(), owner: this }).withTitle("Rhetorical Defense")
+                new AttackIntent({ baseDamage: 10, owner: this }).withTitle("Dialectical Critique")
             ],
             [
                 new AttackIntent({ baseDamage: 20, owner: this }).withTitle("Existential Strike")

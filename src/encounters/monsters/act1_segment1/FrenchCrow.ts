@@ -11,7 +11,7 @@ import { Terrifying } from '../../../gamecharacters/buffs/standard/Terrifying';
 export class FrenchCrow extends AutomatedCharacter {
     constructor() {
         super({
-            name: "Crow",
+            name: "Chitterflock",
             portraitName: "Eldritch Corruption Crow",
             maxHitpoints: 10,
             description: "A pest that tends to materialize in the wake of the French cults."

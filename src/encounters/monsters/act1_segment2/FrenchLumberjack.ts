@@ -9,7 +9,7 @@ import { Regeneration } from '../../../gamecharacters/buffs/enemy_buffs/Regenera
 export class FrenchLumberjack extends AutomatedCharacter {
     constructor() {
         super({
-            name: "Le Bûcheron Robuste",
+            name: "Splinthewers",
             portraitName: "Eldritch Soldier Gunner",
             maxHitpoints: 60,
             description: "Many unsanctioned pine dimensions.  Culling necessary."
@@ -22,7 +22,7 @@ export class FrenchLumberjack extends AutomatedCharacter {
     override generateNewIntents(): AbstractIntent[] {
         const intents: AbstractIntent[][] = [
             [
-                new BlockForSelfIntent({ blockAmount: 20, owner: this }).withTitle("Lumbering Guard")
+                new BlockForSelfIntent({ blockAmount: 20, owner: this }).withTitle("Lumbering Defense")
             ],
             [
                 new AttackIntent({ baseDamage: 5, owner: this }).withTitle("UNSANCTIONED PINE DIMENSION"),

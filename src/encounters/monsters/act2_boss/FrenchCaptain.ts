@@ -10,7 +10,7 @@ import { CardSize } from '../../../gamecharacters/Primitives';
 export class FrenchCaptain extends AutomatedCharacter {
     constructor() {
         super({
-            name: "La Capitaine",
+            name: "Captain Elspeth",
             portraitName: "Eldritch Captain",
             maxHitpoints: 300,
             description: "fought in the battle of Les Eaux Silencieuses"

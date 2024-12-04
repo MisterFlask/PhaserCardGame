@@ -9,7 +9,7 @@ export class FrenchMime extends AutomatedCharacter {
 
     constructor() {
         super({
-            name: "Le Mime Explosif",
+            name: "Echoless",
             portraitName: "Eldritch Mime",
             maxHitpoints: 20,
             description: "the white face paint isn’t for show.  it's a seal.  a binding."
