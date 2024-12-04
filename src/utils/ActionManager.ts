@@ -2,6 +2,7 @@ import { CombatState, GameState } from "../rules/GameState";
 
 import Phaser, { Scene } from 'phaser';
 import { AbstractCard, IPhysicalCardInterface } from '../gamecharacters/AbstractCard';
+import { AutomatedCharacter } from "../gamecharacters/AutomatedCharacter";
 import type { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { AbstractBuff } from "../gamecharacters/buffs/AbstractBuff";
 import { Stress } from "../gamecharacters/buffs/standard/Stress";
@@ -22,6 +23,10 @@ import { SubtitleManager } from "../ui/SubtitleManager";
 import { UIContext, UIContextManager } from "../ui/UIContextManager";
 
 export class ActionManager {
+    addMonsterToCombat(monsterToSummon: AutomatedCharacter) {
+        GameState.getInstance().combatState.enemies.push(monsterToSummon);
+    }
+
     emitEvent(eventName: string, args: any) {
         this.scene.events.emit(eventName, args);
     }
@@ -233,7 +238,7 @@ export class ActionManager {
 
     private static instance: ActionManager;
     private actionQueue: ActionQueue;
-    private scene!: Scene;
+    public scene!: Scene;
 
     private constructor() { // Modified constructor
         this.actionQueue = new ActionQueue();

@@ -37,6 +37,9 @@ export class CombatCardManager {
                 }
             });
         });
+
+        // Clear stored enemy positions
+        this.enemyPositions.clear();
     }
     private scene: Phaser.Scene;
     public playerHand: PhysicalCard[] = [];
@@ -45,6 +48,7 @@ export class CombatCardManager {
     public drawPile!: PhysicalCard;
     public discardPile!: PhysicalCard;
     public exhaustPile!: PhysicalCard;
+    private enemyPositions: Map<string, { x: number, y: number }> = new Map();
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -347,28 +351,111 @@ export class CombatCardManager {
             }
         });
 
+        // Add new section to sync enemy cards with game state
+        this.syncEnemyCardsWithGameState();
+
         // Update draw and discard pile names to reflect current counts
         this.updateDrawPileCount();
         this.updateDiscardPileCount();
         this.updateExhaustPileCount();
     }
 
-    public removeEnemyCard(enemyCard: PhysicalCard): void {
-        // Remove from enemy units array
-        this.enemyUnits = this.enemyUnits.filter(card => card !== enemyCard);
+    private syncEnemyCardsWithGameState(): void {
+        const state = GameState.getInstance().combatState;
+        const existingEnemyCards = new Map(this.enemyUnits.map(card => [card.data.id, card]));
 
-        // Fade and scale down animation
-        this.scene.tweens.add({
-            targets: enemyCard.container,
-            alpha: 0,
-            scaleX: 0.1,
-            scaleY: 0.1,
-            duration: 800,
-            ease: 'Power2',
-            onComplete: () => {
-                enemyCard.obliterate();
+        // Create cards for new enemies
+        state.enemies.forEach((enemy, index) => {
+            if (!existingEnemyCards.has(enemy.id)) {
+                if (enemy.isDead()) {
+                    return;
+                }
+                // If we don't have a position stored for this enemy, create one
+                if (!this.enemyPositions.has(enemy.id)) {
+                    // Find the first unused x position
+                    const cardWidth = 150;
+                    const usedPositions = new Set(Array.from(this.enemyPositions.values()).map(pos => pos.x));
+                    let x = 400;
+                    while (usedPositions.has(x)) {
+                        x += cardWidth * 2;
+                    }
+                    
+                    this.enemyPositions.set(enemy.id, {
+                        x: x,
+                        y: CombatSceneLayoutUtils.getBattlefieldY(this.scene)
+                    });
+                }
+
+                const position = this.enemyPositions.get(enemy.id)!;
+                const enemyCard = CardGuiUtils.getInstance().createCard({
+                    scene: this.scene,
+                    x: position.x,
+                    y: position.y,
+                    data: enemy,
+                    onCardCreatedEventCallback: (card: PhysicalCard) => {
+                        card.container.setInteractive({
+                            hitArea: card.cardBackground,
+                            hitAreaCallback: Phaser.Geom.Rectangle.Contains,
+                            useHandCursor: true
+                        });
+                        this.scene.input.setDraggable(card.container);
+                    }
+                });
+
+                if (enemy instanceof AutomatedCharacter) {
+                    enemy.setNewIntents();
+                }
+
+                enemy.physicalCard = enemyCard;
+                enemy.team = Team.ENEMY;
+                enemyCard.container.setDepth(DepthManager.getInstance().CARD_BASE);
+                this.enemyUnits.push(enemyCard);
+
+                // Fade in animation for new enemy cards
+                enemyCard.container.setAlpha(0);
+                this.scene.tweens.add({
+                    targets: enemyCard.container,
+                    alpha: 1,
+                    duration: 500,
+                    ease: 'Power2'
+                });
+            } else {
+                // Check if existing enemy is dead and needs cleanup
+                const existingCard = existingEnemyCards.get(enemy.id);
+                if (existingCard && enemy.isDead()) {
+                    this.removeEnemyCard(existingCard);
+                }
             }
         });
+
+        // Remove cards for enemies that no longer exist
+        this.enemyUnits.forEach(card => {
+            if (!state.enemies.some(enemy => enemy.id === card.data.id)) {
+                this.removeEnemyCard(card);
+            }
+        });
+    }
+
+    public removeEnemyCard(enemyCard: PhysicalCard): void {
+        this.enemyUnits = this.enemyUnits.filter(card => card !== enemyCard);
+        // Check if there are any active tweens on this card's container
+        const activeTweens = this.scene.tweens.getTweensOf(enemyCard.container);
+        if (activeTweens.length === 0) {
+
+            // Fade and scale down animation
+            this.scene.tweens.add({
+                targets: enemyCard.container,
+                alpha: 0,
+                scaleX: 0.1,
+                scaleY: 0.1,
+                duration: 800,
+                ease: 'Power2',
+                onComplete: () => {
+                    enemyCard.obliterate();
+                    this.enemyUnits = this.enemyUnits.filter(card => card !== enemyCard);
+                }
+            });
+        }
     }
 
     public cleanup(): void {

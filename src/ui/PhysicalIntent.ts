@@ -3,6 +3,7 @@ import { AbstractIntent } from "../gamecharacters/AbstractIntent";
 import { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { JsonRepresentable } from "../interfaces/JsonRepresentable";
 import { IntentEmitter } from "../utils/IntentEmitter";
+import { ShadowedImage } from "./ShadowedImage";
 import { TooltipAttachment } from "./TooltipAttachment";
 import { TransientUiState } from './TransientUiState';
 
@@ -13,7 +14,7 @@ export class PhysicalIntent implements JsonRepresentable {
     private scene: Scene;
     public intent: AbstractIntent;
     private container: Phaser.GameObjects.Container;
-    private image: Phaser.GameObjects.Image;
+    private image: ShadowedImage;
     private alwaysDisplayedIntentText: Phaser.GameObjects.Text;
     private transientUiState = TransientUiState.getInstance();
     private tooltipAttachment: TooltipAttachment;
@@ -24,9 +25,13 @@ export class PhysicalIntent implements JsonRepresentable {
         
         this.container = this.scene.add.container(x, y);
         
-        this.image = this.scene.add.image(0, 0, intent.imageName);
-        this.image.setDisplaySize(PhysicalIntent.WIDTH, PhysicalIntent.HEIGHT);
-        this.image.setTint(intent.iconTint);
+        this.image = new ShadowedImage({
+            scene: this.scene,
+            texture: intent.getImageNameOrPlaceholderIfNoneExists(),
+            displaySize: PhysicalIntent.WIDTH,
+            tint: this.intent.generateSeededRandomColor() ?? intent.iconTint,
+            shadowOffset: 2
+        });
         
         this.alwaysDisplayedIntentText = this.scene.add.text(0, PhysicalIntent.HEIGHT / 2, 
             intent.displayText(), 
@@ -66,14 +71,16 @@ export class PhysicalIntent implements JsonRepresentable {
     }
 
     update(): void {
-        this.image.setTexture(this.intent.imageName);
+        this.image.mainImage.setTexture(this.intent.getImageNameOrPlaceholderIfNoneExists());
+        this.image.shadowImage.setTexture(this.intent.getImageNameOrPlaceholderIfNoneExists());
         this.alwaysDisplayedIntentText.setText(this.intent.displayText());
         this.tooltipAttachment.updateText(this.intent.tooltipText());
     }
 
     updateIntent(newIntent: AbstractIntent): void {
         this.intent = newIntent;
-        this.image.setTexture(this.intent.imageName);
+        this.image.mainImage.setTexture(this.intent.getImageNameOrPlaceholderIfNoneExists());
+        this.image.shadowImage.setTexture(this.intent.getImageNameOrPlaceholderIfNoneExists());
         this.alwaysDisplayedIntentText.setText(this.intent.displayText());
         this.tooltipAttachment.updateText(this.intent.tooltipText());
     }

@@ -49,3 +49,4 @@ export class MoveToNextActEvent extends AbstractEvent {
         this.choices = [new MoveToNextActChoice()];
     }
 }
+

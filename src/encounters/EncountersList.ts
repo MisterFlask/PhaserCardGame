@@ -14,7 +14,7 @@ import { FrenchBlindProphetess } from './monsters/act1_boss/FrenchBlindProphetes
 import { FrenchChef } from './monsters/act1_segment1/FrenchChef';
 import { FrenchCrow } from './monsters/act1_segment1/FrenchCrow';
 import { FrenchDeer } from './monsters/act1_segment1/FrenchDeer';
-import { FrenchTotem } from './monsters/act1_segment1/FrenchTotem';
+import { VeilCapacitor } from './monsters/act1_segment1/VeilCapacitor';
 import { FrenchLumberjack } from './monsters/act1_segment2/FrenchLumberjack';
 import { FrenchMime } from './monsters/act1_segment2/FrenchMime';
 import { FrenchCaptain } from './monsters/act2_boss/FrenchCaptain';
@@ -72,7 +72,7 @@ export class ActSegmentData {
 export class ActSegment {
     static readonly Act1_Segment1 = new ActSegmentData("Act 1 - Segment 1", 1, 1, [
         {
-            enemies: [new FrenchChef(), new FrenchChef(), new FrenchTotem()]
+            enemies: [new FrenchChef(), new FrenchChef(), new VeilCapacitor()]
         },
         {
             enemies: [new FrenchCrow(), new FrenchCrow()]
@@ -93,7 +93,7 @@ export class ActSegment {
 
     static readonly Boss_Act1 = new ActSegmentData("Boss Fight - Act 1", 1, 3, [
         {
-            enemies: [new FrenchBlindProphetess(), new FrenchTotem(), new FrenchTotem()]
+            enemies: [new FrenchBlindProphetess(), new VeilCapacitor(), new VeilCapacitor()]
         },
     ]);
 

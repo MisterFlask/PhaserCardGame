@@ -261,7 +261,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
             scene: this.scene,
             x: this.blockIcon.x + this.blockIcon.displayWidth / 2 + 5,
             y: 0,
-            width: 50,
+            width: 150,
             height: 30,
             text: `${this.data.block}`, // Assuming AbstractCard has a 'block' property
             style: { fontSize: '14px', color: '#ffffff', fontFamily: 'Arial' },

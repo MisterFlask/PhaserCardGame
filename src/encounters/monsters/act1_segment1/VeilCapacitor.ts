@@ -1,11 +1,12 @@
-import { AbstractIntent, AttackAllPlayerCharactersIntent, IntentListCreator } from '../../../gamecharacters/AbstractIntent';
+import { AbstractIntent, ApplyBuffToAllEnemyCharactersIntent, IntentListCreator } from '../../../gamecharacters/AbstractIntent';
 import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
+import { Lethality } from '../../../gamecharacters/buffs/standard/Strong';
 
-export class FrenchTotem extends AutomatedCharacter {
+export class VeilCapacitor extends AutomatedCharacter {
     constructor() {
         super({
             name: "Veil Capacitor",
-            portraitName: "Stress Totem",
+            portraitName: "totem",
             maxHitpoints: 5,
             description: "A small, unsettling totem.  Probably not worth worrying about."
         });
@@ -14,7 +15,7 @@ export class FrenchTotem extends AutomatedCharacter {
     override generateNewIntents(): AbstractIntent[] {
         const intents: AbstractIntent[][] = [
             [
-                new AttackAllPlayerCharactersIntent({ baseDamage: 1, owner: this }).withTitle("Hateful Aura")
+                new ApplyBuffToAllEnemyCharactersIntent({ debuff: new Lethality(2), owner: this }).withTitle("Gathering Eldritch Energy")
             ]
         ];
 

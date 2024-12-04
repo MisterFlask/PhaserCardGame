@@ -3,6 +3,7 @@ import { CombatRules } from '../rules/CombatRulesHelper';
 import { GameState } from '../rules/GameState';
 import { PhysicalCard } from '../ui/PhysicalCard';
 import { ActionManager } from "../utils/ActionManager";
+import ImageUtils from '../utils/ImageUtils';
 import { TargetingUtils } from "../utils/TargetingUtils";
 import { AbstractCard, generateWordGuid } from "./AbstractCard";
 import { AutomatedCharacter } from './AutomatedCharacter';
@@ -46,6 +47,42 @@ export abstract class AbstractIntent implements JsonRepresentable {
         this.title = title;
         return this;
     }
+
+    public generateSeededRandomColor(): number | undefined {
+        if (!this.isUsingPlaceholderImage()) {
+            return undefined;
+        }
+        let hash = 0;
+        for (let i = 0; i < this.imageName.length; i++) {
+            const char = this.imageName.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // Convert to 32bit integer
+        }
+
+        const r = (hash & 255);
+        const g = ((hash >> 8) & 255);
+        const b = ((hash >> 16) & 255);
+
+        return (r << 16) | (g << 8) | b;
+    }
+
+    public isUsingPlaceholderImage(): boolean {
+        return !this.imageName || !ActionManager.getInstance().scene.textures.exists(this.imageName);
+    }
+
+    public getImageNameOrPlaceholderIfNoneExists(): string {
+        // Check if the image exists in the texture cache
+        const scene = ActionManager.getInstance().scene
+        if (!scene) {
+            throw new Error('Scene not set; probably you changed scenes and messed up handling deletion of old actions.');
+        }
+        if (this.isUsingPlaceholderImage()) {
+            var placeholder = ImageUtils.getDeterministicAbstractPlaceholder(this.imageName);
+            console.warn(`Intent image '${this.imageName}' not found in texture cache, using placeholder ${placeholder}`);
+            return placeholder;
+        }
+        return this.imageName;
+    }
 }
 export class SummonIntent extends AbstractIntent {
     monsterToSummon: AutomatedCharacter;
@@ -68,9 +105,7 @@ export class SummonIntent extends AbstractIntent {
         const gameState = GameState.getInstance();
         const combatState = gameState.combatState;
 
-        // Create a new instance of the monster to summon
-        // Add the new monster to the combat state
-        combatState.enemies.push(this.monsterToSummon);
+        ActionManager.getInstance().addMonsterToCombat(this.monsterToSummon);
     }
 
     createJsonRepresentation(): string {
@@ -306,6 +341,40 @@ export class ApplyDebuffToAllPlayerCharactersIntent extends AbstractIntent {
     }
 }
 
+export class ApplyBuffToAllEnemyCharactersIntent extends AbstractIntent {
+    debuff: AbstractBuff;
+
+    constructor({ debuff, owner }: { debuff: AbstractBuff, owner: BaseCharacter }) {
+        super({ imageName: 'magic', target: undefined, owner: owner });
+        this.debuff = debuff;
+    }
+
+    tooltipText(): string {
+        return `Applying ${this.debuff.getDisplayName()} to all your foes.`;
+    }
+
+    displayText(): string {
+        return ``;
+    }
+
+    act(): void {
+        ActionManager.getInstance().tiltCharacter(this.owner);
+        for (const target of TargetingUtils.getInstance().selectAllEnemyCharacters()) {
+            console.log(`Applying ${this.debuff.stacks} stack(s) of ${this.debuff.getDisplayName()} to ${target.name}`)
+            ActionManager.getInstance().applyBuffToCharacterOrCard(target, this.debuff);
+        }
+    }
+
+    createJsonRepresentation(): string {
+        const baseRepresentation = JSON.parse(super.createJsonRepresentation());
+        return JSON.stringify({
+            ...baseRepresentation,
+            className: this.constructor.name,
+            debuff: this.debuff.getDisplayName(),
+            stacks: this.debuff.stacks,
+        }, null, 2);
+    }
+}
 export class ApplyDebuffToRandomCharacterIntent extends AbstractIntent {
     debuff: AbstractBuff;
 
