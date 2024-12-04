@@ -280,6 +280,7 @@ export class ActionManager {
     }
 
     public applyBuffToCharacterOrCard(card: AbstractCard, buff: AbstractBuff, sourceCharacter?: IBaseCharacter): void {
+        buff = buff.copy();
         if (card == null || buff == null) {
             return;
         }

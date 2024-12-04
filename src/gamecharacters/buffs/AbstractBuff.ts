@@ -12,6 +12,25 @@ import { IBaseCharacter } from '../IBaseCharacter';
 import type { PlayableCard } from "../PlayableCard";
 export abstract class AbstractBuff implements IAbstractBuff {
 
+    copy(): this {
+        // Create a new instance of the same buff type
+        const buffCopy = new (this.constructor as any)();
+        
+        // Copy over all the basic properties
+        buffCopy.imageName = this.imageName;
+        buffCopy.stackable = this.stackable;
+        buffCopy.stacks = this.stacks;
+        buffCopy.secondaryStacks = this.secondaryStacks;
+        buffCopy.showSecondaryStacks = this.showSecondaryStacks;
+        buffCopy.isDebuff = this.isDebuff;
+        buffCopy.canGoNegative = this.canGoNegative;
+        buffCopy.moveToMainDescription = this.moveToMainDescription;
+        // Generate a new unique ID
+        buffCopy.id = generateWordGuid();
+        
+        return buffCopy;
+    }
+
     // if this is a "standard" buff that is always on the card, it's added to the main description instead of the tooltip/icon.
     public moveToMainDescription: boolean = false;
 
@@ -120,6 +139,12 @@ export abstract class AbstractBuff implements IAbstractBuff {
     * Generally you'll want to use the ActionManager method for this since that allows game animations to play.
     */
     public static _applyBuffToCharacterOrCard(character: AbstractCard, buff: AbstractBuff) {
+        if (buff == null) {
+            console.warn("Attempted to apply null buff to character or card");
+            return;
+        }
+
+        buff = buff.copy();
         if (character == null) {
             return;
         }

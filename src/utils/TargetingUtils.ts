@@ -3,6 +3,7 @@ import { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { GameState } from "../rules/GameState";
 
 export class TargetingUtils {
+    
     selectAllEnemyCharacters() {
         const gameState = GameState.getInstance();
         return gameState.combatState.enemies;
