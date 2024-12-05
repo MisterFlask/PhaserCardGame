@@ -9,13 +9,13 @@ At the start of combat, apply X Cursed to each player character.
 Negates the next X debuff(s) applied to this card/character.
 
 ### BloodGod [playable_card, character]
-Whenever a sacrifice happens, this card/character gains X Strength.
+Whenever a sacrifice happens, this card/character gains X Lethality.
 
 ### Bloodprice [playable_card]
 If you lack sufficient energy, pay X health per unpaid energy to play this card.
 
 ### Bulwark [playable_card, character]
-Increase block applied by X.
+Increase block applied by X.  (Analogous to STS's dexterity.)
 
 ### Burning [character]
 At the end of turn, take (4 + Powder) damage for X turns.

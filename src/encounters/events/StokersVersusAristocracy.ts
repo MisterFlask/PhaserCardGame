@@ -18,6 +18,8 @@ class SupportStokersChoice extends AbstractChoice {
     effect(): void {
         this.addLedgerItem(new StokersUnionEsteem(1));
         this.addLedgerItem(new CinderCourtEsteem(-1));
+        this.addRelic(new StokerUnionRelic());
+
     }
 }
 
