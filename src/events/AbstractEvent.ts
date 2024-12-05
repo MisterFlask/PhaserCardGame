@@ -46,7 +46,7 @@ export class AbstractEvent {
     public name: string = "";
     public description: string = "";
     public choices: AbstractChoice[] = [new FinishChoice()];
-
+    public parentEvent?: AbstractEvent;
     public isEligible(): boolean {
         return true;
     }

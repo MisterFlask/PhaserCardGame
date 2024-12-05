@@ -534,6 +534,7 @@ class CombatUIManager {
             event,
             (nextEvent: AbstractEvent | null) => {
                 if (nextEvent) {
+                    nextEvent.parentEvent = event;
                     this.showEvent(nextEvent);
                 }else{
                     this.eventWindow?.destroy();
