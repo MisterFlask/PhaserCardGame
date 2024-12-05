@@ -129,7 +129,7 @@ class CombatUIManager {
 
     private getEnergyText(): string {
         const gameState = GameState.getInstance();
-        return `${gameState.combatState.energyAvailable}/${gameState.combatState.maxEnergy}`;
+        return `${gameState.combatState.energyAvailable}/${gameState.combatState.defaultMaxEnergy}`;
     }
 
     private updateEnergyDisplay(): void {

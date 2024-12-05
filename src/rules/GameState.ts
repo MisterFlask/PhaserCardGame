@@ -233,7 +233,7 @@ export class CombatState{
     combatResources: CombatResources = new CombatResources()
 
     public energyAvailable: number = 0
-    public maxEnergy: number = 3
+    public defaultMaxEnergy: number = 3
         
     getBattleCardLocation = (cardId: string): BattleCardLocation => {
         if (this.drawPile.some(c => c.id === cardId)) return BattleCardLocation.DrawPile
@@ -249,7 +249,7 @@ export class CombatState{
         this.currentExhaustPile = [];
         this.enemies = [];
         this.currentTurn = 0;
-        this.energyAvailable = this.maxEnergy;
+        this.energyAvailable = this.defaultMaxEnergy;
         this.combatResources = new CombatResources();
     }
 }

@@ -8,7 +8,7 @@ export class BasicEnergyRelic extends AbstractRelic {
         this.rarity = EntityRarity.BOSS;
     }
 
-    override onCombatStart(): void {
-        this.actionManager.modifyMaxEnergy(1);
+    override passivePerTurnEnergyModifier(): number {
+        return 1;
     }
 }

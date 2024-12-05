@@ -23,6 +23,13 @@ import { SubtitleManager } from "../ui/SubtitleManager";
 import { UIContext, UIContextManager } from "../ui/UIContextManager";
 
 export class ActionManager {
+    modifyEnergy(amount: number) {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            GameState.getInstance().combatState.energyAvailable += amount;
+            return [];
+        }));
+    }
+
     addMonsterToCombat(monsterToSummon: AutomatedCharacter) {
         this.actionQueue.addAction(new GenericAction(async () => {
             GameState.getInstance().combatState.enemies.push(monsterToSummon);
@@ -110,9 +117,6 @@ export class ActionManager {
         combatResources.modifyBlood(0 - combatResources.powder.value);
     }
 
-    modifyMaxEnergy(amount: number) {
-        GameState.getInstance().combatState.maxEnergy += amount;
-    }
 
     initializeCombatDeck(){
         const gameState = GameState.getInstance();
@@ -136,7 +140,7 @@ export class ActionManager {
             this.initializeCombatDeck();
 
             // Set max energy based on relics
-            GameState.getInstance().combatState.maxEnergy = 3; // Base energy
+            GameState.getInstance().combatState.defaultMaxEnergy = 3; // Base energy
 
             GameState.getInstance().relicsInventory.forEach(relic => {
                 relic.onCombatStart();
@@ -1096,7 +1100,7 @@ export class ActionManager {
                 });
             });
 
-            combatState.energyAvailable = combatState.maxEnergy;
+            combatState.energyAvailable = combatState.defaultMaxEnergy;
             UIContextManager.getInstance().setContext(UIContext.COMBAT);
             return [];
         }));

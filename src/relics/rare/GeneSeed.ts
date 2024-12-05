@@ -1,1 +1,0 @@
-// duplicate a character.  it comes out evil (don't worry about it)

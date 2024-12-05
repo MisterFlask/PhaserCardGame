@@ -5,7 +5,7 @@ export class VialOfBlood extends AbstractRelic {
     constructor() {
         super();
         this.name = "Vial of Blood";
-        this.description = "At the start of combat, increase your Powder by 2.";
+        this.description = "At the start of combat, increase your Blood by 2.";
         this.rarity = EntityRarity.COMMON;
     }
 

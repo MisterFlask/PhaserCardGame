@@ -43,11 +43,10 @@
 - Use single-sentence paragraphs sparingly
 - Avoid clichés (e.g., "diaphanous gowns", "black as pitch")
 
-## Dialogue
-- Follow Harrison Ford's advice: "You can write this shit, but you sure can't say it."
-
 ## The Player Viewpoint
 The player is the leader of the expeditionary force.  The mercenaries in your party are just some of the group; the rest are various kinds of camp-follower, who are going to be very nervous about what you're trekking through.  Don't introduce new named characters; just refer to them by their role.
+
+## 
 
 ## Tense and perspective
 Always use present-tense and second-person point of view ("you see a bird out the corner of your vision").

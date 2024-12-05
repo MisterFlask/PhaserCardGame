@@ -1,6 +1,7 @@
 import { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { EntityRarity, PlayableCard } from "../gamecharacters/PlayableCard";
 import { LocationCard } from "../maplogic/LocationCard";
+import { AbstractCombatEvent } from "../rules/AbstractCombatEvent";
 import { CombatState, GameState } from "../rules/GameState";
 import { ActionManager } from "../utils/ActionManager";
 import { ActionManagerFetcher } from "../utils/ActionManagerFetcher";
@@ -13,7 +14,8 @@ export abstract class AbstractRelic {
     price: number = -1;
     portraitName!: string
     tint!: number
-    
+    surfaceSellValue?: number;
+    stacks?: number;
 
     constructor() {
     }
@@ -73,6 +75,14 @@ export abstract class AbstractRelic {
     public onLocationEntered(location: LocationCard): void {}
 
     public onRelicClicked(): void {}
+
+    public passivePerTurnEnergyModifier(): number {
+        return 0;
+    }
+
+    public onCombatEvent(event: AbstractCombatEvent): void {
+        // override in specific relics
+    }
     
     
     // helpers

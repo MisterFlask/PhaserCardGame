@@ -1,0 +1,1 @@
+// gain 1 ash at beginning of combat.  Click: spend two ash to gain 1 energy.
