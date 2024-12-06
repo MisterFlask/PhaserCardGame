@@ -1,6 +1,7 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
 import { Vulnerable } from "../../../../buffs/standard/Vulnerable";
+import { Weak } from "../../../../buffs/standard/Weak";
 import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { BasicProcs } from "../../../../procs/BasicProcs";
@@ -15,7 +16,7 @@ export class HandCannon extends PlayableCard {
         });
         this.baseDamage = 8;
         this.baseEnergyCost = 1;
-        this.baseMagicNumber = 1; // Amount of Vulnerable applied
+        this.baseMagicNumber = 2; // Amount of Vulnerable and Weak applied
         this.resourceScalings.push({
             resource: this.mettle,
             attackScaling: 1,
@@ -29,12 +30,13 @@ export class HandCannon extends PlayableCard {
             BasicProcs.getInstance().Exert(this, 1, (energyExerted) => {
                 if (energyExerted > 0) {
                     this.actionManager.applyBuffToCharacterOrCard(targetCard, new Vulnerable(this.getBaseMagicNumberAfterResourceScaling()));
+                    this.actionManager.applyBuffToCharacterOrCard(targetCard, new Weak(this.getBaseMagicNumberAfterResourceScaling()));
                 }
             });
         }
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage. Exert 1: Apply ${this.getDisplayedMagicNumber()} Vulnerable to the target.`;
+        return `Deal ${this.getDisplayedDamage()} damage. Exert 1: Apply ${this.getDisplayedMagicNumber()} Vulnerable and Weak to the target.`;
     }
 }

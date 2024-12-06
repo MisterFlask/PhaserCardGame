@@ -917,7 +917,7 @@ export class ActionManager {
             return [];
         }));
     }
-    public modifyIron(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
+    public modifyMettle(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
         this.actionQueue.addAction(new GenericAction(async () => {
             GameState.getInstance().combatState.combatResources.modifyMettle(amount);
             return [];

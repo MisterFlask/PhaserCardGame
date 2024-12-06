@@ -2,7 +2,6 @@ import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
 import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
-import { Holy } from "../../../../buffs/standard/Holy";
 import { StressReliefFinisher } from "../../../../buffs/standard/StressReliefFinisher";
 import { BasicProcs } from "../../../../procs/BasicProcs";
 
@@ -15,12 +14,15 @@ export class Buzzsword extends PlayableCard {
             rarity: EntityRarity.COMMON,
         });
         this.baseEnergyCost = 2;
-        this.baseDamage = 8;
+        this.baseDamage = 12;
         this.buffs.push(new StressReliefFinisher());
-        this.buffs.push(new Holy());
         this.resourceScalings.push({
             resource: this.pluck,
-            attackScaling: 3,
+            attackScaling: 1,
+        });
+        this.resourceScalings.push({
+            resource: this.venture,
+            attackScaling: 1,
         });
     }
 
@@ -36,6 +38,6 @@ export class Buzzsword extends PlayableCard {
     }
 
     override get description(): string {
-        return `Deal 8 damage. Exert 1: Deal damage again.`;
+        return `Deal 8 damage. Exert 1: Do it again.`;
     }
 }

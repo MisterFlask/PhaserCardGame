@@ -2,7 +2,6 @@ import { DeckLogic, PileName } from "../../../../../rules/DeckLogicHelper";
 import { GameState } from "../../../../../rules/GameState";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { ExhaustBuff } from "../../../../buffs/playable_card/ExhaustBuff";
-import { Lethality } from "../../../../buffs/standard/Strong";
 import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { BasicProcs } from "../../../../procs/BasicProcs";
@@ -30,21 +29,17 @@ export class LastBastion extends PlayableCard {
                 baseBlockValue: this.baseBlock,
                 blockTargetCharacter: ally
             });
-
-            // Party members with >4 stress gain 2 Strength
-            if (ally.stress > 4) {
-                const strengthBuff = new Lethality(2);
-                ally.buffs.push(strengthBuff);
-            }
         });
 
         // Exhaust the card
         DeckLogic.moveCardToPile(this, PileName.Exhaust);
+
+        this.actionManager.modifyMettle(1)
         
         BasicProcs.getInstance().SacrificeACardOtherThan(this);
     }
 
     override get description(): string {
-        return `All party members gain ${this.getDisplayedBlock()} block. Sacrifice. Party members with >4 stress gain 2 Strength.`;
+        return `All party members gain ${this.getDisplayedBlock()} block. Gain 1 Mettle. Sacrifice.`;
     }
 }

@@ -26,7 +26,7 @@ Scaling Value: +3 damage per pluck
 Buffs/Modifiers:
 Holy (1 stack)
 ResourcefulFinisher (instead of stressrelieffinisher)
-Effect: Deal 8 damage. Exert 1: deal damage again. Gains +3 damage per Pluck. If this kills an enemy, gain 1 of each resource.
+Effect: Deal 8 damage. Exert 1: deal damage again. Gains +3 damage per Pluck. If this kills an enemy, gain 1 Blood.
 (retained scaling and finisher synergy)
 Hand Cannon
 

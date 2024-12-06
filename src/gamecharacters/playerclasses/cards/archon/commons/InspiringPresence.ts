@@ -1,7 +1,7 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
+import { IncreasePluckPerTurn } from "../../../../buffs/standard/combatresource/IncreasePluckPerTurn";
 import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
-import { Lethality } from "../../../../buffs/standard/Strong";
 
 export class InspiringPresence extends PlayableCard {
     constructor() {
@@ -12,20 +12,19 @@ export class InspiringPresence extends PlayableCard {
             rarity: EntityRarity.COMMON,
         });
         this.baseEnergyCost = 1;
-        this.baseMagicNumber = 2; // Amount of Pluck gained
+        this.baseMagicNumber = 1; // Amount of Pluck gained
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
+        if (!this.owningCharacter) {
+            console.error("InspiringPresence was invoked without an owning character.");
+            return;
+        }
         // Gain Pluck
-        this.actionManager.modifyPluck (this.getBaseMagicNumberAfterResourceScaling());
-
-        // Apply Strong to all allies
-        this.forEachAlly(ally => {
-            this.actionManager.applyBuffToCharacterOrCard(ally, new Lethality(1));
-        });
+        this.actionManager.applyBuffToCharacter(this.owningCharacter!, new IncreasePluckPerTurn(this.   getBaseMagicNumberAfterResourceScaling()));
     }
 
     override get description(): string {
-        return `Gain ${this.getDisplayedMagicNumber()} Pluck. All allies gain 1 Strength.`;
+        return `Gain ${this.getDisplayedMagicNumber()} Pluck each turn.`;
     }
 }

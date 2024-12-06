@@ -2,7 +2,7 @@ import { TextGlyphs } from "../../../../text/TextGlyphs";
 import { BaseCharacter } from "../../../BaseCharacter";
 import { AbstractBuff } from "../../AbstractBuff";
 
-export class IncreaseIron extends AbstractBuff {
+export class IncreaseMettlePerTurn extends AbstractBuff {
     constructor() {
         super();
         this.stackable = true;
@@ -10,14 +10,14 @@ export class IncreaseIron extends AbstractBuff {
     }
 
     getDisplayName(): string {
-        return "Increase Mettle";
+        return "Mettle Generation";
     }
 
     getDescription(): string {
-        return `When played, gain ${this.getStacksDisplayText()} ${TextGlyphs.getInstance().mettleIcon}.`;
+        return `At the start of your turn, gain ${this.getStacksDisplayText()} ${TextGlyphs.getInstance().mettleIcon}.`;
     }
 
-    public onThisCardInvoked(target?: BaseCharacter): void {
+    public onStartTurn(target?: BaseCharacter): void {
         this.actionManager.modifyMettle(this.stacks);
     }
 } 
