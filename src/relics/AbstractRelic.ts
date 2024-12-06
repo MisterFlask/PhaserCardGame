@@ -8,6 +8,27 @@ import { ActionManagerFetcher } from "../utils/ActionManagerFetcher";
 import ImageUtils from "../utils/ImageUtils";
 
 export abstract class AbstractRelic {
+
+    copy(): this {
+        // Create a new instance of the same relic type
+        const constructor = this.constructor as new () => AbstractRelic;
+        const copy = new constructor();
+        
+        // Copy over all properties
+        copy.name = this.name;
+        copy.description = this.description;
+        copy.rarity = this.rarity;
+        copy.price = this.price;
+        copy.portraitName = this.portraitName;
+        copy.tint = this.tint;
+        copy.surfaceSellValue = this.surfaceSellValue;
+        copy.stacks = this.stacks;
+        copy.isStacksVisible = this.isStacksVisible;
+        
+        copy.init();
+        return copy as this;
+    }
+    
     name!: string;
     description!: string;
     rarity!: EntityRarity;
@@ -15,7 +36,8 @@ export abstract class AbstractRelic {
     portraitName!: string
     tint!: number
     surfaceSellValue?: number;
-    stacks?: number;
+    stacks: number = 1;
+    isStacksVisible: boolean = false;
 
     constructor() {
     }

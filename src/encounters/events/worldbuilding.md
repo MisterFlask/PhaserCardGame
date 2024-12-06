@@ -1,7 +1,7 @@
 # BACKGROUND
  After James Maxwell mathematically derived the theoretical possibility of extraplanar travel in 1855, Queen Victoria authorized usage of the Empire's finest engineers and artistans for engineering the first trans-dimensional gateway to Hell.  After three decades of failed prototypes, the first stable such gateway (the so-called Buckingham Rift) was completed in 1885.
 
- The year, now, is 1890. The Third Circle Company, a joint venture between the British Trade Delegation and several prominent Brimstone Barons, has established a monopoly on trans-dimensional shipping between London and Dis. Their fleet of iron-clad land-crawlers, specially fitted with Maxwell coils and blessed hull plating, makes regular runs through the Buckingham Rift carrying cargo, colonists, and (if certain rumors are to be believed) more sinister passengers. The Company's meteoric rise has disrupted centuries of established trade relationships within Hell, much to the consternation of the Artisanal Guilds and certain members of the Cinder Court who find themselves increasingly marginalized in this new era of British-Infernal commerce.
+ The year, now, is 1890. The Third Circle Company, a joint venture between the British Trade Delegation and several prominent Brimstone Barons, has established a monopoly on trans-dimensional shipping between London and Dis. Their fleet of iron-clad land-crawlers, specially fitted with Maxwell coils and blessed hull plating, makes regular runs through the Buckingham Rift carrying cargo, colonists, and even important political dignitaries. The Company's meteoric rise has disrupted centuries of established trade relationships within Hell, much to the consternation of the Artisanal Guilds and certain members of the Cinder Court who find themselves increasingly marginalized in this new era of British-Infernal commerce.
 
  (Technically it is not really clear that Hell has any specific relationship to the Christian realm of punishment for sinners, but the aesthetic parallels were strong enough to overcome any academic screeching on this topic, and people simply started referring to it as Hell regardless.  Some academics still futilely insist that everyone call it "The Maxwell-Babbage Adiabatic Plane", which they certainly will not.)
 
@@ -31,7 +31,7 @@ Composed of ancient noble houses and powerful demonic lineages, the aristocracy 
 In terms of style and accent, the Court believes itself to be better and more refined than the common Devils, taking extreme inspiration from the highest of high british culture.  They wear porcelain masks, and each Devil has a collection of them which are swapped out to match specific emotional states or occasions.
 
 ### The Cult of the Invasion
-This fanatical group is dedicated to preparing for the final invasion of Heaven. They see the British as potential allies in their apocalyptic cause, hoping to acquire powerful new weapons and technologies. However, their fervor and single-minded focus on the impossible invasion make them unpredictable and dangerous partners.
+This fanatical group is dedicated to preparing for the final invasion of Heaven.  (This is not a feasible or realistic goal.) They see the British as potential allies in their apocalyptic cause, hoping to acquire powerful new weapons and technologies.
 
 In terms of style and accent, the Cult is a group of intellectuals convinced they alone understand the truth of Hell and reality.
 
@@ -70,7 +70,7 @@ A vast, unexplored region on the edge of Hell, where the infernal realms give wa
 # STYLE GUIDE
 In terms of flavor, please aim for lots of very dry corporate humor combined with lovecraftian horror. 
 
-## SETTING DETAILS
+## SETTING DETAILS AND SPECIFIC EVENTS
 
 THE THIRD CIRCLE COMPANY’S UNAUTHORIZED ALLOCATION OF “GATEWAY ACCESS PERMITS”
 In a recently recorded incident known internally as THE BRASS KEY INQUIRY, lower-level agents within THE BRITISH TRADE DELEGATION’s own accounting department (the so-called “Counters of Infernal Ledgers”) have discovered the quiet issuance of specialized, gilt-edged travel documents to a series of individuals operating under CINDER COURT patronage. These documents, intended to grant expedited passage through the BUCKINGHAM RIFT, seem to have bypassed the ARTISANAL GUILDS’ traditional vetting procedures for trans-dimensional cargo manifests. This small-scale administrative irregularity—apparently the result of senior managers at THE THIRD CIRCLE COMPANY negotiating side agreements in dimly-lit vaults beneath THE FURNACE OF DIS—has potentially undermined the painstakingly cultivated balance between old infernal craftsmanship traditions and new British mercantile influences. The GUILDS have begun covertly marking each questionable permit with an intricate wax seal rumored to contain micro-hexes designed to cause subtle mechanical failures in the Company’s next generation of land-crawlers.

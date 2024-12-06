@@ -1,10 +1,10 @@
 import { AbstractBuff } from "../AbstractBuff";
 
-export class TemporaryStrength extends AbstractBuff {
+export class TemporaryLethality extends AbstractBuff {
     
 
     override getDisplayName(): string {
-        return "Temporary Strength";
+        return "Temporary Lethality";
     }
 
     override getDescription(): string {

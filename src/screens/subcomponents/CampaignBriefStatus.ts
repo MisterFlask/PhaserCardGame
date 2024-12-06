@@ -131,6 +131,17 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
         // Set up update listener
         scene.events.on('update', this.updateCurrencyDisplay, this);
         scene.events.on('propagateGameStateChangesToUi', this.updateRelicDisplay, this);
+        scene.events.on('update', this.updateRelicStacksDisplay, this);
+
+    }
+    updateRelicStacksDisplay(arg0: string, updateRelicStacksDisplay: any, arg2: this) {
+        // Update stacks display for each physical relic
+        this.relicContainer.each((child: Phaser.GameObjects.GameObject) => {
+            if (child instanceof PhysicalRelic) {
+                child.updateStacksDisplay();
+            }
+        });
+
     }
 
     private updateRelicDisplay(): void {
@@ -166,7 +177,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
             physicalRelic.on('pointerout', () => {
                 physicalRelic.setDepth(this.BASE_RELIC_DEPTH);
             });
-            
+
             this.relicContainer.add(physicalRelic);
         });
     }

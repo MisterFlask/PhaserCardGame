@@ -495,7 +495,6 @@ export class PhysicalCard implements IPhysicalCardInterface {
     }
 
     onPointerOver_PhysicalCard = (): void => {
-
         TransientUiState.getInstance().setHoveredCard(this);
 
         if (this.obliterated) return;
@@ -512,32 +511,40 @@ export class PhysicalCard implements IPhysicalCardInterface {
         });
 
         this.descBox.setVisible(true);
-        this.tooltipBox.setVisible(true);
-        // this.container.setDepth(1000);
+        
+        // Get tooltip text
+        const tooltipText = CardTooltipGenerator.getInstance().generateTooltip(this.data);
+        
+        // Only show tooltip if it has meaningful content
+        if (tooltipText && tooltipText.trim() !== '') {
+            this.tooltipBox.setVisible(true);
+            
+            // Set tooltip text
+            this.tooltipBox.setText(tooltipText);
 
-        // Determine tooltip position based on card's position
-        const cardWidth = this.cardBackground.displayWidth * this.data.size.sizeModifier * 1.1; // Adjust for scaling
-        const gameWidth = this.scene.scale.width;
-        const cardCenterX = this.container.x;
+            // Calculate tooltip dimensions
+            const padding = 20;
+            const requiredTooltipWidth = this.tooltipBox.width + padding * 2;
+            const requiredTooltipHeight = this.tooltipBox.height + padding * 2;
 
-        // Set tooltip text
-        this.tooltipBox.setText(CardTooltipGenerator.getInstance().generateTooltip(this.data));
+            // Update tooltip size
+            this.tooltipBox.setSize(requiredTooltipWidth, requiredTooltipHeight);
 
-        // Calculate tooltip dimensions
-        const padding = 20;
-        const requiredTooltipWidth = this.tooltipBox.width + padding * 2;
-        const requiredTooltipHeight = this.tooltipBox.height + padding * 2;
+            // Determine tooltip position based on card's position
+            const cardWidth = this.cardBackground.displayWidth * this.data.size.sizeModifier * 1.1; // Adjust for scaling
+            const gameWidth = this.scene.scale.width;
+            const cardCenterX = this.container.x;
 
-        // Update tooltip size
-        this.tooltipBox.setSize(requiredTooltipWidth, requiredTooltipHeight);
-
-        // Position tooltip with offset
-        if (cardCenterX > gameWidth / 2) {
-            // Card is on the right side, show tooltip on the left
-            this.tooltipBox.setPosition(-cardWidth - requiredTooltipWidth / 2 - 10, 0);
+            // Position tooltip with offset
+            if (cardCenterX > gameWidth / 2) {
+                // Card is on the right side, show tooltip on the left
+                this.tooltipBox.setPosition(-cardWidth - requiredTooltipWidth / 2 - 10, 0);
+            } else {
+                // Card is on the left side, show tooltip on the right
+                this.tooltipBox.setPosition(cardWidth + requiredTooltipWidth / 2 + 10, 0);
+            }
         } else {
-            // Card is on the left side, show tooltip on the right
-            this.tooltipBox.setPosition(cardWidth + requiredTooltipWidth / 2 + 10, 0);
+            this.tooltipBox.setVisible(false);
         }
 
         // Play hover sound
@@ -556,7 +563,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
             });
         }
 
-        TransientUiState.getInstance().setHoveredCard(this); // Updated
+        TransientUiState.getInstance().setHoveredCard(this);
     }
 
     onPointerOut_PhysicalCard = (): void => {

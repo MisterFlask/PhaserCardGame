@@ -1,4 +1,3 @@
-import { TemporaryStrength } from '../../gamecharacters/buffs/standard/TemporaryStrength';
 import { TextGlyphs } from '../../text/TextGlyphs';
 import { ActionManager } from '../../utils/ActionManager';
 import { GameState } from '../GameState';
@@ -8,7 +7,7 @@ export class BloodResource extends AbstractCombatResource {
     constructor() {
         super(
             "Blood",
-            "Spend 1 Blood: all characters gain 2 Temporary Strength",
+            "Spend 2 Blood: gain 1 Energy.",
             'blood_icon',
             TextGlyphs.getInstance().bloodIcon
         );
@@ -17,15 +16,10 @@ export class BloodResource extends AbstractCombatResource {
 
     public onClick(): void {
         const gameState = GameState.getInstance();
-        if (this.value >= 1) {
-            ActionManager.getInstance().DoAThing("Powder Resource Click", () => {
-                gameState.combatState.allPlayerAndEnemyCharacters.forEach(character => {
-                    ActionManager.getInstance().applyBuffToCharacterOrCard(
-                        character, 
-                        new TemporaryStrength(2)
-                    );
-                });
-                this.value -= 1;
+        if (this.value >= 2) {
+            ActionManager.getInstance().DoAThing("Blood Resource Click", () => {
+                ActionManager.getInstance().gainEnergy(1);
+                this.value -= 2;
             });
         }
     }

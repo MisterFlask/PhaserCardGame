@@ -8,7 +8,7 @@ class SupportStokersChoice extends AbstractChoice {
             "Gain 1 Esteem with the Stoker's Union, lose 1 Esteem with the Cinder Court"
         );
         this.nextEvent = new DeadEndEvent();
-        this.nextEvent.description = "The Union representatives, their faces permanently etched with coal dust and metaphysical scorch marks, nod grimly. Their shop steward, a stocky figure whose brass-buckled overalls bear the marks of countless shifts in He'l's furnaces, grasps your hand. 'Right proper of you to stand with the workers,' he growls. 'When them fancy porcelain-faces need their next shipment rushed through, we'll remember who understood the true value of proper furnace-craft.' \n\nThe aristocrats depart in their obsidian vehicles, leaving behind only the acrid scent of brimstone wine and carefully worded threats about 'supply chain optimization.'";
+        this.nextEvent.description = "The Union representatives, their faces permanently etched with coal dust and metaphysical scorch marks, nod grimly. Their shop steward, a stocky figure whose brass-buckled overalls bear the marks of countless shifts in Hell's furnaces, grasps your hand. 'Right proper of you to stand with the workers,' he growls. 'The means of combustion belong in the hands of them what does the stoking. When them fancy porcelain-faces need their next shipment rushed through, we'll remember who understood the true value of proper furnace-craft.' \n\nThe aristocrats bitterly depart in their obsidian vehicles, leaving behind only the acrid scent of brimstone wine.";
     }
 
     canChoose(): boolean {

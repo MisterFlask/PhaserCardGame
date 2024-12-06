@@ -109,7 +109,7 @@ export class ActionManager {
         });
         // Reset all combat resources to 0
         const combatResources = GameState.getInstance().combatState.combatResources;
-        combatResources.modifyAshes(0 - combatResources.pages.value);
+        combatResources.modifyAshes(0 - combatResources.ashes.value);
         combatResources.modifyPluck(0 - combatResources.pluck.value);
         combatResources.modifyMettle(0 - combatResources.iron.value);
         combatResources.modifyVenture(0 - combatResources.venture.value);
@@ -1130,19 +1130,23 @@ export class ActionManager {
     }
 
 public chooseCardToDiscard(): void {
-    this.requireCardSelection({
-        name: "Discard",
-        instructions: "Choose a card to discard",
-        min: 1,
-        max: 1,
-        cancellable: false,
-        action: (selectedCards: PlayableCardType[]) => {
-            if (selectedCards.length > 0) {
-                this.activeDiscardCard(selectedCards[0]);
+    this.actionQueue.addAction(new GenericAction(async () => {
+        this.requireCardSelection({
+            name: "Discard",
+            instructions: "Choose a card to discard", 
+            min: 1,
+            max: 1,
+            cancellable: false,
+            action: (selectedCards: PlayableCardType[]) => {
+                if (selectedCards.length > 0) {
+                    this.activeDiscardCard(selectedCards[0]);
+                }
             }
-        }
-    });
-}
+            });
+            return [];
+        }));
+    }
+
     public requireCardSelection(params: {
         name: string;
         instructions: string;

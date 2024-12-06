@@ -1,6 +1,6 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
-import { TemporaryStrength } from "../../../../buffs/standard/TemporaryStrength";
+import { TemporaryLethality } from "../../../../buffs/standard/TemporaryLethality";
 import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 export class ForwardMaggots extends PlayableCard {
@@ -21,7 +21,7 @@ export class ForwardMaggots extends PlayableCard {
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         if (targetCard) {
-            this.actionManager.applyBuffToCharacter(targetCard as BaseCharacter, new TemporaryStrength(this.getBaseMagicNumberAfterResourceScaling()));
+            this.actionManager.applyBuffToCharacter(targetCard as BaseCharacter, new TemporaryLethality(this.getBaseMagicNumberAfterResourceScaling()));
         }
         this.actionManager.exhaustCard(this);
     }

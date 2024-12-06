@@ -14,6 +14,7 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
     private _isHighlighted: boolean = false;
     private obliterated: boolean = false;
     private baseSize: number;
+    stacksBox?: Phaser.GameObjects.Text;
 
     constructor({
         scene,
@@ -78,6 +79,22 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
         this.add(this.priceBox);
 
         this.priceBox.setDepth(1)
+
+        // Add stacks box if the relic has stacks
+        if (abstractRelic.isStacksVisible) {
+            this.stacksBox = scene.add.text(-this.baseSize / 2 + 10, -this.baseSize / 2 + 10, 
+                `${abstractRelic.stacks}`, 
+                {
+                    fontSize: '20px',
+                    padding: { x: 5, y: 5 },
+                    fixedWidth: 30,
+                    fixedHeight: 25,
+                    align: 'center'
+                }
+            );
+            this.add(this.stacksBox);
+            this.stacksBox.setDepth(1);
+        }
 
         this.setupInteractivity();
     }
@@ -165,6 +182,7 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
     // Add lifecycle logging for debugging
     destroy(): void {
         console.log(`Destroying PhysicalRelic for: ${this.abstractRelic.getName()}`);
+        this.stacksBox?.destroy();
         super.destroy();
     }
 
@@ -174,5 +192,12 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
 
     setAlpha(alpha: number): this {
         return super.setAlpha(alpha);
+    }
+
+    // Add method to update stacks display
+    updateStacksDisplay(): void {
+        if (this.stacksBox && this.abstractRelic.stacks !== undefined) {
+            this.stacksBox.setText(`${this.abstractRelic.stacks}`);
+        }
     }
 }

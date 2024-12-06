@@ -204,7 +204,7 @@ export abstract class PlayableCard extends AbstractCard {
     }
 
     get ashes(): Ashes {
-        return this.combatResources.pages;
+        return this.combatResources.ashes;
     }
 
     get mettle(): MettleResource {

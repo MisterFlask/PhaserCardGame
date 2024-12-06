@@ -18,7 +18,7 @@ class HolyBombardment extends PlayableCard {
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage. Holy.  Exhaust.  Sacrifice.`;
+        return `Deal ${this.getDisplayedDamage()} damage. Holy.  Exhaust. Sacrifice.`;
     }
 
     override InvokeCardEffects(): void {
@@ -34,9 +34,10 @@ export class GlassCross extends AbstractRelic {
     constructor() {
         super();
         this.name = "Glass Cross";
-        this.description = `Click: Manufacture a Holy Bombardment to your hand. ${this.stacks} uses left.`;
+        this.description = `[b]Click[/b]: Manufacture a Holy Bombardment to your hand.  Starts with 3 uses.`;
         this.rarity = EntityRarity.COMMON;
         this.stacks = 3;
+        this.isStacksVisible = true;
     }
 
     override onRelicClicked(): void {

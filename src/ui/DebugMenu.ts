@@ -158,13 +158,15 @@ export class DebugMenu {
         const totalPages = Math.ceil(allRelics.length / this.itemsPerPage);
         const startIdx = this.currentRelicPage * this.itemsPerPage;
         const endIdx = Math.min(startIdx + this.itemsPerPage, allRelics.length);
-
+        // Sort relics alphabetically by name
+        allRelics.sort((a, b) => a.name.localeCompare(b.name));
         const options: DebugMenuOption[] = allRelics
             .slice(startIdx, endIdx)
             .map(relic => ({
                 text: relic.name,
                 callback: () => {
                     const newRelic = new (relic.constructor as any)();
+                    newRelic.init();
                     ActionManager.getInstance().addRelicToInventory(newRelic);
                 }
             }));

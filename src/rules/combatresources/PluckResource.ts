@@ -1,4 +1,4 @@
-import { TemporaryStrength } from '../../gamecharacters/buffs/standard/TemporaryStrength';
+import { TemporaryLethality } from '../../gamecharacters/buffs/standard/TemporaryLethality';
 import { TextGlyphs } from '../../text/TextGlyphs';
 import { ActionManager } from '../../utils/ActionManager';
 import { GameState } from '../GameState';
@@ -8,7 +8,7 @@ export class PluckResource extends AbstractCombatResource {
     constructor() {
         super(
             "Pluck",
-            "Spend 1 Pluck: Gain 2 temporary strength to all allies.",
+            "Spend 1 Pluck: Grant 2 Temporary Lethality to all allies.",
             'feather_icon',
             TextGlyphs.getInstance().pluckIcon
         );
@@ -20,7 +20,7 @@ export class PluckResource extends AbstractCombatResource {
         if (this.value >= 1) {
             ActionManager.getInstance().DoAThing("Pluck Resource Click", () => {
                 GameState.getInstance().combatState.playerCharacters.forEach(character => {
-                    ActionManager.getInstance().applyBuffToCharacterOrCard(character, new TemporaryStrength(2));
+                    ActionManager.getInstance().applyBuffToCharacterOrCard(character, new TemporaryLethality(2));
                 });
                 this.value -= 1;
             });

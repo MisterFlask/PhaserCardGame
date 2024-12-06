@@ -162,7 +162,7 @@ export class CardRewardsGenerator {
 
     public generateCardRewardsForCombat(): PlayableCard[] {
         const gameState = GameState.getInstance();
-        const pagesValue = gameState.combatState.combatResources.pages.value;
+        const pagesValue = gameState.combatState.combatResources.ashes.value;
         const currentFloor = gameState.currentLocation?.floor ?? 1;
         
         let pagesCardsAdded = 0;
