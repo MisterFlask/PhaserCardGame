@@ -24,6 +24,6 @@ export class ToughItOut extends PlayableCard {
     }
 
     override get description(): string {
-        return `Apply ${this.getDisplayedBlock()} Block to target.  On play adds 1 more Painful stack.`;
+        return `Apply ${this.getDisplayedBlock()} Block to target.  Add 1 more Painful stack to this card.`;
     }
 }

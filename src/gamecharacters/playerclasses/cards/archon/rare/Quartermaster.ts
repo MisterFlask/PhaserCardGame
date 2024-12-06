@@ -14,7 +14,7 @@ export class Quartermaster extends PlayableCard {
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.RARE,
         });
-        this.baseEnergyCost = 2;
+        this.baseEnergyCost = 1;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
@@ -23,6 +23,9 @@ export class Quartermaster extends PlayableCard {
         const livingPartyMembers = combatState.playerCharacters.filter(character => !character.isDead());
 
         livingPartyMembers.forEach(member => {
+            if (member.isDead()) {
+                return;
+            }
             const buzzsword = new Buzzsword();
             buzzsword.baseEnergyCost -= 1;
             buzzsword.owningCharacter = member;
@@ -32,6 +35,6 @@ export class Quartermaster extends PlayableCard {
     }
 
     override get description(): string {
-        return `Manufacture a number of Buzzsword for each party member. Each costs 1 less and exhausts.`;
+        return `Manufacture a Buzzsword for each living party member. Each costs 1 less and exhausts.`;
     }
 }

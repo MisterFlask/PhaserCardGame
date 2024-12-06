@@ -18,6 +18,10 @@ export class TacticalManual extends PlayableCard {
             resource: this.ashes,
             magicNumberScaling: 1,
         });
+        this.resourceScalings.push({
+            resource: this.pluck,
+            magicNumberScaling: 1,
+        });
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
