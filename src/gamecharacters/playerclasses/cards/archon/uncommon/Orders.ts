@@ -15,7 +15,7 @@ export class Orders extends PlayableCard {
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         // Draw 2 cards
-        const drawnCards = this.actionManager.drawCards(2, (cards) =>{
+        const drawnCards = this.actionManager.drawCards(3, (cards) =>{
             // Apply additional effects to drawn cards
             cards.forEach(card => {
                 if (card.baseBlock > 0) {
@@ -29,6 +29,6 @@ export class Orders extends PlayableCard {
     }
 
     override get description(): string {
-        return `Draw 2 cards. If they gain Block, they gain 3 more Block. If they do Damage, they do 3 more Damage.`;
+        return `Draw 3 cards. If they gain Block, they gain 3 more Block. If they do Damage, they do 3 more Damage.`;
     }
 }

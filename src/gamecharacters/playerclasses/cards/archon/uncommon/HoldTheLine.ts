@@ -4,7 +4,7 @@ import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { Lethality } from "../../../../buffs/standard/Strong";
 
-export class CourageUnderFire extends PlayableCard {
+export class HoldTheLine extends PlayableCard {
     constructor() {
         super({
             name: "Hold The Line",
@@ -23,23 +23,17 @@ export class CourageUnderFire extends PlayableCard {
 
         allCharacters.forEach(character => {
             this.applyEffectsToCharacter(character);
-
-            if (character.stress > 5) {
-                this.applyEffectsToCharacter(character);
-            }
-
-            if (character.stress > 9) {
-                this.applyEffectsToCharacter(character);
-            }
         });
     }
 
     private applyEffectsToCharacter(character: BaseCharacter): void {
-        this.applyBlockToTarget(character);
-        this.actionManager.applyBuffToCharacterOrCard(character, new Lethality(this.getBaseMagicNumberAfterResourceScaling()));
+        for (let i = 0; i < character.getIntentsTargetingThisCharacter().length; i++) { 
+            this.applyBlockToTarget(character);
+            this.actionManager.applyBuffToCharacterOrCard(character, new Lethality(this.getBaseMagicNumberAfterResourceScaling()));
+        }
     }
 
     override get description(): string {
-        return `All characters gain ${this.getDisplayedBlock()} Block and ${this.getDisplayedMagicNumber()} Strength. For each character that has > 5 Stress, do this again. For each character with > 9 Stress, do it again.`;
+        return `All characters gain ${this.getDisplayedBlock()} Block and ${this.getDisplayedMagicNumber()} Lethality. For each intent aimed at that character, do it again.`;
     }
 }

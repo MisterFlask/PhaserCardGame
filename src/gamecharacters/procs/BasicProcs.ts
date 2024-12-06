@@ -21,20 +21,22 @@ export class BasicProcs {
     }
 
     public SacrificeACardOtherThan(triggeringCard?: PlayableCard): void {
-        const gameState = GameState.getInstance();
-        const combat = gameState.combatState;
-        // step one is get the hand minus the triggering card
-        let hand = combat.currentHand;
-        if (triggeringCard) {
-            hand = hand.filter(card => card !== triggeringCard);
-        }
-        if (hand.length > 0) {
-            const cardToExhaust = hand.pop(); // Remove the rightmost card
-            if (cardToExhaust) {
-                ActionManagerFetcher.getActionManager().exhaustCard(cardToExhaust as PlayableCard);
-                ProcBroadcaster.getInstance().broadcastCombatEvent(new SacrificeEvent(cardToExhaust as PlayableCard, triggeringCard as PlayableCard));
+        ActionManagerFetcher.getActionManager().DoAThing("SacrificeACardOtherThan", () => { 
+            const gameState = GameState.getInstance();
+            const combat = gameState.combatState;
+            // step one is get the hand minus the triggering card
+            let hand = combat.currentHand;
+            if (triggeringCard) {
+                hand = hand.filter(card => card !== triggeringCard);
+                if (hand.length > 0) {
+                    const cardToExhaust = hand.pop(); // Remove the rightmost card
+                    if (cardToExhaust) {
+                        ActionManagerFetcher.getActionManager().exhaustCard(cardToExhaust as PlayableCard);
+                        ProcBroadcaster.getInstance().broadcastCombatEvent(new SacrificeEvent(cardToExhaust as PlayableCard, triggeringCard as PlayableCard));
+                    }
+                }
             }
-        }
+        });
     }
 
     /**
@@ -88,8 +90,11 @@ export class BasicProcs {
     }
 
     public ManufactureCardToHand(card: PlayableCard): void {
-        GameState.getInstance().combatState.currentHand.push(card);
-        ProcBroadcaster.getInstance().broadcastCombatEvent(new ManufactureEvent(card));
+
+        ActionManagerFetcher.getActionManager().DoAThing("ManufactureCardToHand", () => {
+            GameState.getInstance().combatState.currentHand.push(card);
+            ProcBroadcaster.getInstance().broadcastCombatEvent(new ManufactureEvent(card));
+        });
     }
 }
 

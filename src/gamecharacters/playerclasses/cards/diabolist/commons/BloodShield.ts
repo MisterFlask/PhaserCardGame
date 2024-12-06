@@ -3,6 +3,7 @@
 
 import { TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
+import { BloodPriceBuff } from "../../../../buffs/standard/Bloodprice";
 import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { BasicProcs } from "../../../../procs/BasicProcs";
 
@@ -16,10 +17,15 @@ export class BloodShield extends PlayableCard {
         this.baseBlock = 13;
         this.baseEnergyCost = 2;
         this.rarity = EntityRarity.COMMON;
+        this.resourceScalings.push({
+            resource: this.blood,
+            blockScaling: 2
+        });
+        this.buffs.push(new BloodPriceBuff(2));
     }
 
     override get description(): string {
-        return `Block ${this.getDisplayedBlock()} damage. Sacrifice.`;
+        return `Block ${this.getDisplayedBlock()} damage.  Sacrifice.`;
     }
 
     override InvokeCardEffects(targetCard?: BaseCharacter): void {

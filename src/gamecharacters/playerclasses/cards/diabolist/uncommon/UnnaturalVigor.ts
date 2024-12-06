@@ -3,6 +3,8 @@ import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { SacrificeBuff } from "../../../../buffs/standard/SacrificeBuff";
 import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
+import { BasicProcs } from "../../../../procs/BasicProcs";
+import { EldritchSmoke } from "../tokens/EldritchSmoke";
 
 export class UnnaturalVigor extends PlayableCard {
     constructor() {
@@ -18,13 +20,14 @@ export class UnnaturalVigor extends PlayableCard {
     }
 
     override get description(): string {
-        return `Gain ${this.getDisplayedMagicNumber()} Blood.`; 
+        return `Gain ${this.getDisplayedMagicNumber()} Venture.  Manufacture an Eldritch Smoke to your hand.`; 
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         const gameState = GameState.getInstance();
         const combatState = gameState.combatState;
 
-        this.actionManager.modifyBlood(this.getBaseMagicNumberAfterResourceScaling());
+        this.actionManager.modifyVenture(this.getBaseMagicNumberAfterResourceScaling());
+        BasicProcs.getInstance().ManufactureCardToHand(new EldritchSmoke());
     }
 }

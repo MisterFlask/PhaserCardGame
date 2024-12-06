@@ -2,16 +2,18 @@ import ImageUtils from "../../utils/ImageUtils";
 import { Gender } from "../BaseCharacter";
 import { BaseCharacterClass } from "../BaseCharacterClass";
 import { CharacterClasses } from "../CharacterClasses";
+import { BloodShield } from "./cards/diabolist/commons/BloodShield";
 import { CursedStrike } from "./cards/diabolist/commons/CursedStrike";
 import { DarkWhisper } from "./cards/diabolist/commons/DarkWhisper";
 import { ObsidianCandles } from "./cards/diabolist/commons/ObsidianCandles";
 import { Balefire } from "./cards/diabolist/rares/Balefire";
+import { ExpertOccultist } from "./cards/diabolist/rares/ExpertOccultist";
 import { HorrificRegeneration } from "./cards/diabolist/rares/HorrificRegeneration";
 import { IllFatedBlade } from "./cards/diabolist/rares/IllFatedBlade";
-import { StrengthOfInsanity } from "./cards/diabolist/rares/StrengthOfInsanity";
+import { Soulsuck } from "./cards/diabolist/rares/Soulsuck";
 import { BurningSight } from "./cards/diabolist/uncommon/BurningSight";
 import { EldritchBlast } from "./cards/diabolist/uncommon/EldritchBlast";
-import { SoulTrap } from "./cards/diabolist/uncommon/SoulTrap";
+import { Shadowflame } from "./cards/diabolist/uncommon/Shadowflame";
 import { UnnaturalVigor } from "./cards/diabolist/uncommon/UnnaturalVigor";
 
 export class DiabolistClass extends BaseCharacterClass {
@@ -27,19 +29,19 @@ export class DiabolistClass extends BaseCharacterClass {
             new CursedStrike(),
             new DarkWhisper(),
             new ObsidianCandles(),
+            new BloodShield(),
             
             // rare
             new Balefire(),
             new IllFatedBlade(),
             new HorrificRegeneration(),
-            new StrengthOfInsanity(),
+            new ExpertOccultist(),
+            new Soulsuck(),
 
             //uncommon
             new BurningSight(),
             new EldritchBlast(),
-            new SoulTrap(),
+            new Shadowflame(),
             new UnnaturalVigor()]
-
-        
     }
 }

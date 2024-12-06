@@ -23,6 +23,14 @@ import { SubtitleManager } from "../ui/SubtitleManager";
 import { UIContext, UIContextManager } from "../ui/UIContextManager";
 
 export class ActionManager {
+    modifyHellCurrency(amount: number) {
+        GameState.getInstance().hellCurrency += amount;
+    }
+
+    modifyExportCurrency(amount: number) {
+        GameState.getInstance().hellExportCurrency += amount;
+    }
+
     modifyEnergy(amount: number) {
         this.actionQueue.addAction(new GenericAction(async () => {
             GameState.getInstance().combatState.energyAvailable += amount;

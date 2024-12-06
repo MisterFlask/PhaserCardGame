@@ -15,7 +15,7 @@ import { IronWill } from "./cards/archon/rare/IronWill";
 import { LastBastion } from "./cards/archon/rare/LastBastion";
 import { Quartermaster } from "./cards/archon/rare/Quartermaster";
 import { QueensMandate } from "./cards/archon/rare/QueensMandate";
-import { CourageUnderFire } from "./cards/archon/uncommon/CourageUnderFire";
+import { HoldTheLine } from "./cards/archon/uncommon/HoldTheLine";
 import { InspireFear } from "./cards/archon/uncommon/InspireFear";
 import { Orders } from "./cards/archon/uncommon/Orders";
 import { TheLaw } from "./cards/archon/uncommon/TheLaw";
@@ -42,7 +42,7 @@ export class ArchonClass extends BaseCharacterClass {
             new TheLash(),
 
             // uncommon
-            new CourageUnderFire(),
+            new HoldTheLine(),
             new InspireFear(),
             new Orders(),
             new TheLaw(),

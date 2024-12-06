@@ -1,9 +1,11 @@
 import { TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
+import { Burning } from "../../../../buffs/standard/Burning";
 import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
+import { BasicProcs } from "../../../../procs/BasicProcs";
 
-export class SoulTrap extends PlayableCard {
+export class Shadowflame extends PlayableCard {
     constructor() {
         super({
             name: "Soul Trap",
@@ -11,26 +13,22 @@ export class SoulTrap extends PlayableCard {
             targetingType: TargetingType.ENEMY,
             rarity: EntityRarity.UNCOMMON,
         });
-        this.baseDamage = 9;
+        this.baseDamage = 15;
         this.baseEnergyCost = 2;
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage. Fatal: gain 2 max HP and exhaust.`;
+        return `Deal ${this.getDisplayedDamage()} damage.  Apply 2 Burning.  Sacrifice.`;
     }
 
     override InvokeCardEffects(targetCard?: BaseCharacter): void {
         this.dealDamageToTarget(targetCard as BaseCharacter);
 
-        if (!this.owningCharacter) {
+        if (!targetCard) {
             return;
         }
 
-        if (targetCard && targetCard.hitpoints <= 0) {
-            this.owningCharacter.maxHitpoints += 2; // Gain 2 max HP
-            this.owningCharacter.hitpoints += 2;
-        }
-
-        this.actionManager.exhaustCard(this);
+        this.actionManager.applyBuffToCharacter(targetCard as BaseCharacter, new Burning(2), this.owningCharacter);
+        BasicProcs.getInstance().SacrificeACardOtherThan(this);
     }
 }
