@@ -17,7 +17,7 @@ export class FireAxe extends PlayableCard {
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage. Apply ${this.getDisplayedMagicNumber()} Burning.`;
+        return `Deal ${this.getDisplayedDamage()} damage. Apply ${this.getDisplayedMagicNumber()} Burning to the target.`;
     }
     
     override InvokeCardEffects(targetCard?: BaseCharacter): void {
