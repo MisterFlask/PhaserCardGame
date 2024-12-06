@@ -23,6 +23,6 @@ export class Incoming extends PlayableCard {
     }
 
     override get description(): string {
-        return `Add ${this.getDisplayedMagicNumber()} Take Cover to your hand.`;
+        return `Add 2 Take Cover to your hand.`;
     }
 }

@@ -25,6 +25,6 @@ export class Bolster extends PlayableCard {
     }
 
     override get description(): string {
-        return `Apply ${this.getDisplayedBlock()} Block to all allies.`;
+        return `Apply 5 Block to all allies.`;
     }
 }

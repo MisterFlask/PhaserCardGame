@@ -35,6 +35,6 @@ export class HandCannon extends PlayableCard {
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage. Exert 1: Apply ${this.getDisplayedMagicNumber()} Vulnerable to the target.`;
+        return `Deal 8 damage. Exert 1: Apply 1 Vulnerable to the target.`;
     }
 }

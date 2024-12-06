@@ -36,6 +36,6 @@ export class Buzzsword extends PlayableCard {
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage. Exert 1: then do it again.`;
+        return `Deal 8 damage. Exert 1: Deal damage again.`;
     }
 }
