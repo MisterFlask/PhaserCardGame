@@ -1,22 +1,5 @@
 # Card Effects Summary
 
-## Card Entry Format
-`[Card Name]`
-- **Type**: [Card Type: Attack/Skill/Power/Item]
-- **Energy Cost**: X
-- **Rarity**: Common/Uncommon/Rare
-- **Base Stats**: 
-  - Damage: X
-  - Block: X
-  - Magic Number: X
-- **Resource Scaling**: 
-  - Resource: [blood/pluck/mettle/etc]
-  - Scaling Type: [attackScaling/blockScaling/magicNumberScaling]
-  - Scaling Value: X
-- **Buffs/Modifiers**:
-  - [List of buffs with stacks]
-- **Effect Description**
-
 ## Archon Class Cards
 
 ### Commons
@@ -30,7 +13,6 @@
   - Resource: pluck
   - Scaling Type: blockScaling
   - Scaling Value: 1
-- **Buffs/Modifiers**: None
 - **Effect**: Apply 5 Block to all allies
 
 `Buzzsword`
@@ -38,7 +20,7 @@
 - **Energy Cost**: 2
 - **Rarity**: Common
 - **Base Stats**:
-  - Damage: 11
+  - Damage: 8
 - **Resource Scaling**:
   - Resource: pluck
   - Scaling Type: attackScaling
@@ -46,7 +28,7 @@
 - **Buffs/Modifiers**:
   - Holy (1 stack)
   - StressReliefFinisher
-- **Effect**: Deal 11 damage with Holy effect
+- **Effect**: Deal 8 damage. Exert 1: Deal damage again.
 
 `Hand Cannon`
 - **Type**: Attack
@@ -54,13 +36,12 @@
 - **Rarity**: Common
 - **Base Stats**:
   - Damage: 8
+  - Magic Number: 1
 - **Resource Scaling**:
   - Resource: mettle
   - Scaling Type: attackScaling
   - Scaling Value: 1
-- **Buffs/Modifiers**:
-  - Vulnerable (1 stack)
-- **Effect**: Deal 8 damage and apply 1 Vulnerable
+- **Effect**: Deal 8 damage. Exert 1: Apply 1 Vulnerable to the target.
 
 `Incoming`
 - **Type**: Skill
@@ -68,8 +49,7 @@
 - **Rarity**: Common
 - **Base Stats**:
   - Magic Number: 2
-- **Buffs/Modifiers**: None
-- **Effect**: Add 2 Take Cover cards to hand
+- **Effect**: Add 2 Take Cover to your hand.
 
 `Inspiring Presence`
 - **Type**: Power
@@ -77,12 +57,7 @@
 - **Rarity**: Common
 - **Base Stats**:
   - Magic Number: 2
-- **Resource Scaling**:
-  - Resource: pluck
-  - Scaling Type: magicNumberScaling
-  - Scaling Value: 1
-- **Buffs/Modifiers**: None
-- **Effect**: Gain 2 Pluck. All allies gain 1 Strength
+- **Effect**: Gain 2 Pluck. All allies gain 1 Strength.
 
 `Tactical Manual`
 - **Type**: Skill
@@ -90,12 +65,7 @@
 - **Rarity**: Common
 - **Base Stats**:
   - Magic Number: 1
-- **Resource Scaling**:
-  - Resource: pages
-  - Scaling Type: magicNumberScaling
-  - Scaling Value: 1
-- **Buffs/Modifiers**: None
-- **Effect**: Draw 2 cards. Discard a card. Target ally gains 1 Strength
+- **Effect**: Draw 2 cards. Discard a card. Target ally gains 1 Strength.
 
 `The Lash`
 - **Type**: Attack
@@ -104,8 +74,7 @@
 - **Base Stats**:
   - Damage: 8
   - Magic Number: 1
-- **Buffs/Modifiers**: None
-- **Effect**: Deal 8 damage. Apply 1 Weak to target
+- **Effect**: Deal 8 damage. Apply 1 Weak to the target.
 
 ### Uncommons
 `Courage Under Fire`
@@ -115,8 +84,7 @@
 - **Base Stats**:
   - Block: 5
   - Magic Number: 1
-- **Buffs/Modifiers**: None
-- **Effect**: All characters gain 5 Block and 1 Strength. Repeat for characters with >5 Stress, and again for characters with >9 Stress
+- **Effect**: All characters gain 5 Block and 1 Strength. For each character with >5 Stress, do this again. For each character with >9 Stress, do it again.
 
 `Inspire Fear`
 - **Type**: Attack
@@ -128,23 +96,19 @@
   - Resource: pluck
   - Scaling Type: magicNumberScaling
   - Scaling Value: 1
-- **Buffs/Modifiers**: None
-- **Effect**: Apply 2 Vulnerable and 2 Burning to all enemies. Apply 1 Vulnerable to all allies
+- **Effect**: Apply 2 Vulnerable and 2 Burning to ALL enemies. Apply 1 Vulnerable to all allies.
 
 `Orders`
 - **Type**: Skill
 - **Energy Cost**: 1
 - **Rarity**: Uncommon
-- **Buffs/Modifiers**: None
-- **Effect**: Draw 2 cards. If drawn cards have Block, increase Block by 3. If drawn cards do Damage, increase Damage by 3
+- **Effect**: Draw 2 cards. If drawn cards have Block, increase Block by 3. If drawn cards do Damage, increase Damage by 3.
 
 `The Law`
 - **Type**: Power
 - **Energy Cost**: 1
 - **Rarity**: Uncommon
-- **Buffs/Modifiers**: 
-  - At the beginning of each turn, add a Take Cover to hand
-- **Effect**: Add a Take Cover to hand at the beginning of each turn
+- **Effect**: At the beginning of each turn, add a Take Cover to your hand.
 
 `Tough It Out`
 - **Type**: Skill
@@ -154,7 +118,7 @@
   - Block: 13
 - **Buffs/Modifiers**:
   - Painful (1 stack)
-- **Effect**: Apply 13 Block to target. On play, adds 1 Painful stack
+- **Effect**: Apply 13 Block to target. On play, adds 1 more Painful stack.
 
 ### Rares
 `Chain of Command`
@@ -167,8 +131,7 @@
   - Resource: mettle
   - Scaling Type: attackScaling
   - Scaling Value: 1
-- **Buffs/Modifiers**: None
-- **Effect**: Deal 8 damage to ALL enemies. Gain 2 energy. Draw 2 cards. All party members take 1 Stress. Add a Take Cover to hand
+- **Effect**: Deal 8 damage to ALL enemies. Gain 2 energy. Draw 2 cards. All party members take 1 Stress. Add a Take Cover to hand.
 
 `Death or Glory`
 - **Type**: Attack
@@ -176,8 +139,7 @@
 - **Rarity**: Rare
 - **Buffs/Modifiers**:
   - Exhaust
-  - Vulnerable (1 stack)
-- **Effect**: Taunt all enemies. Apply 1 Vulnerable to self
+- **Effect**: Taunt all enemies. Apply 1 Vulnerable to self. Double your Pluck.
 
 `Iron Will`
 - **Type**: Skill
@@ -185,7 +147,7 @@
 - **Rarity**: Rare
 - **Buffs/Modifiers**:
   - Exhaust
-- **Effect**: Owner gains 2 Stress. For three turns, take half damage
+- **Effect**: Owner gains 2 stress. For three turns, this character takes half damage.
 
 `Last Bastion`
 - **Type**: Skill
@@ -195,21 +157,19 @@
   - Block: 20
 - **Buffs/Modifiers**:
   - Exhaust
-- **Effect**: All party members gain 20 Block. Party members with >4 Stress gain 2 Strength. Sacrifice a card
+- **Effect**: All party members gain 20 Block. Party members with >4 stress gain 2 Strength. Sacrifice a card.
 
 `Quartermaster`
 - **Type**: Skill
 - **Energy Cost**: 2
 - **Rarity**: Rare
-- **Buffs/Modifiers**: None
-- **Effect**: Manufacture a Buzzsword for each living party member. Each Buzzsword costs 1 less and exhausts
+- **Effect**: Manufacture a Buzzsword for each living party member. Each costs 1 less and exhausts.
 
 `Queen's Mandate`
 - **Type**: Skill
 - **Energy Cost**: 2
 - **Rarity**: Rare
-- **Buffs/Modifiers**: None
-- **Effect**: Increase Venture and Pages by 2. All cards in hand gain defense scaling from Pages and offense scaling from Venture
+- **Effect**: Increase Venture and Ashes by 2. All cards in your hand have defense scaling increased by 1 Ashes and offense scaling increased by 1 Venture.
 
 ## Blackhand Class Cards
 
@@ -221,8 +181,7 @@
 - **Base Stats**:
   - Damage: 8
   - Magic Number: 2
-- **Buffs/Modifiers**: None
-- **Effect**: Deal 8 damage. Apply 2 Burning
+- **Effect**: Deal 8 damage. Apply 2 Burning.
 
 `Flame Pistol`
 - **Type**: Attack
@@ -235,8 +194,7 @@
   - Resource: smog
   - Scaling Type: magicNumberScaling
   - Scaling Value: 1
-- **Buffs/Modifiers**: None
-- **Effect**: Deal 4 damage. Apply 2 Burning
+- **Effect**: Deal 4 damage and apply 2 Burning to the target.
 
 `Pocket Vial`
 - **Type**: Attack
@@ -245,9 +203,7 @@
 - **Base Stats**:
   - Damage: 5
   - Magic Number: 1
-- **Buffs/Modifiers**:
-  - Volatile
-- **Effect**: Deal 5 damage. Apply 1 Weak. Increase damage by 1 for each Burning on target
+- **Effect**: Deal 5 damage and apply 1 Weak to an enemy. If the enemy is Burning: draw a card.
 
 `Re-ignition`
 - **Type**: Skill
@@ -256,8 +212,7 @@
 - **Base Stats**:
   - Block: 5
   - Magic Number: 3
-- **Buffs/Modifiers**: None
-- **Effect**: Target ally gains 5 Block. Apply 3 Burning to all enemies
+- **Effect**: Target ally gains 5 Block. Apply 3 Burning to all enemies.
 
 `Storm Cloak`
 - **Type**: Skill
@@ -269,8 +224,7 @@
   - Resource: pluck
   - Scaling Type: blockScaling
   - Scaling Value: 2
-- **Buffs/Modifiers**: None
-- **Effect**: Grant 8 Block to the targeted character
+- **Effect**: Grant 8 Block to the targeted character.
 
 ### Uncommons
 `And Then He Exploded`
@@ -281,7 +235,7 @@
   - Damage: 8
 - **Buffs/Modifiers**:
   - Explosive Finish (10 stacks)
-- **Effect**: Deal 8 damage. If target has Burning, deal damage again
+- **Effect**: Deal 8 damage. If target has Burning, deal damage again.
 
 `Axe Me a Question`
 - **Type**: Attack
@@ -289,9 +243,7 @@
 - **Rarity**: Uncommon
 - **Base Stats**:
   - Damage: 11
-- **Buffs/Modifiers**:
-  - Axe Crit Buff
-- **Effect**: Deal 11 damage. Crits against Burning enemies
+- **Effect**: Deal 11 damage. Crits against Burning enemies.
 
 `Hazmat Specialist`
 - **Type**: Skill
@@ -300,8 +252,7 @@
 - **Base Stats**:
   - Block: 6
   - Magic Number: 3
-- **Buffs/Modifiers**: None
-- **Effect**: Grant 6 Block and 1 Ward to ALL party members. Apply 3 Burning to a random enemy
+- **Effect**: Grant 6 Block and 1 Ward to ALL party members. Apply 3 Burning to a random enemy.
 
 `Smokescreen`
 - **Type**: Skill
@@ -312,17 +263,22 @@
   - Magic Number: 2
 - **Buffs/Modifiers**:
   - Exhaust
-- **Effect**: All party members gain 6 Block. Apply 2 Burning to all enemies
+- **Effect**: All party members gain 6 Block, plus 1 for each Burning on the enemy. Gain 2 Smog.
 
 ### Rares
+`Axe Crazy`
+- **Type**: Power
+- **Energy Cost**: 1
+- **Rarity**: Rare
+- **Effect**: Whenever you play a card with "Axe" in its name, gain 2 Blood.
+
 `Infernalite Cache`
 - **Type**: Skill
 - **Energy Cost**: 1
 - **Rarity**: Rare
 - **Base Stats**:
-  - Magic Number: 6
-- **Buffs/Modifiers**: None
-- **Effect**: Gain 6 Pages
+  - Magic Number: 4
+- **Effect**: Gain 4 Ashes.
 
 `Pyrestarter`
 - **Type**: Skill
@@ -331,8 +287,7 @@
 - **Base Stats**:
   - Block: 6
   - Magic Number: 3
-- **Buffs/Modifiers**: None
-- **Effect**: Apply 6 Block to ALL party members. For the rest of the turn, party attacks apply 3 Burning per hit
+- **Effect**: Apply 6 Block to ALL party members. For the rest of the turn, party attacks apply 3 Burning per hit.
 
 `Toxic Spill`
 - **Type**: Skill
@@ -342,7 +297,7 @@
   - Magic Number: 6
 - **Buffs/Modifiers**:
   - Volatile
-- **Effect**: Apply 4 Burning, 6 Poison, and 1 Weak to an enemy
+- **Effect**: Apply 4 Burning, 6 Poison, and 1 Weak to an enemy.
 
 ## Diabolist Class Cards
 
@@ -354,8 +309,7 @@
 - **Base Stats**:
   - Damage: 7
   - Magic Number: 1
-- **Buffs/Modifiers**: None
-- **Effect**: Deal 7 damage. Apply 1 Cursed. If >3 Blood, apply 1 more Cursed
+- **Effect**: Deal 7 damage. Apply 1 Cursed. If target has Cursed, apply 1 more. Otherwise apply 2.
 
 `Dark Whisper`
 - **Type**: Skill
@@ -364,8 +318,7 @@
 - **Base Stats**:
   - Block: 4
   - Magic Number: 2
-- **Buffs/Modifiers**: None
-- **Effect**: Apply 2 Poisoned to all enemies. Apply 4 Block to all allies
+- **Effect**: Apply 2 Poisoned to all enemies and 4 Block to all allies.
 
 `Lifesteal`
 - **Type**: Attack
@@ -383,14 +336,13 @@
   - Scaling Value: 1
 - **Buffs/Modifiers**:
   - Sacrifice
-- **Effect**: Deal 4 damage. Restore 4 health
+- **Effect**: Deal 4 damage. Restore 4 health.
 
 `Obsidian Candles`
 - **Type**: Power
 - **Energy Cost**: 2
 - **Rarity**: Common
-- **Buffs/Modifiers**: None
-- **Effect**: Manufacture an Eldritch Smoke. Draw 2 cards. Whenever you Sacrifice, manufacture an Eldritch Smoke
+- **Effect**: Manufacture an Eldritch Smoke. Draw 2 cards. Whenever you Sacrifice, manufacture an Eldritch Smoke.
 
 ### Uncommons
 `Burning Sight`
@@ -401,7 +353,7 @@
   - Magic Number: 3
 - **Buffs/Modifiers**:
   - BloodPrice (2 stacks)
-- **Effect**: Exhaust the top 2 cards of your deck. Gain 3 Pages
+- **Effect**: Exhaust the top 2 cards of your deck. Gain 2 Pages.
 
 `Eldritch Blast`
 - **Type**: Attack
@@ -411,7 +363,7 @@
   - Damage: 12
 - **Buffs/Modifiers**:
   - BloodPrice (3 stacks)
-- **Effect**: Deal 12 damage. Add an Eldritch Smoke to your hand
+- **Effect**: Deal 12 damage. Add an Eldritch Smoke to your hand.
 
 `Soul Trap`
 - **Type**: Attack
@@ -419,8 +371,7 @@
 - **Rarity**: Uncommon
 - **Base Stats**:
   - Damage: 9
-- **Buffs/Modifiers**: None
-- **Effect**: Deal 9 damage. If Fatal: gain 2 max HP and exhaust
+- **Effect**: Deal 9 damage. Fatal: gain 2 max HP and exhaust.
 
 `Unnatural Vigor`
 - **Type**: Power
@@ -430,7 +381,7 @@
   - Magic Number: 2
 - **Buffs/Modifiers**:
   - Sacrifice
-- **Effect**: Gain 2 Blood
+- **Effect**: Gain 2 Blood.
 
 ### Rares
 `Balefire`
@@ -448,7 +399,7 @@
   - GiantKiller (1 stack)
   - Exhaust
   - DamageIncreaseOnKill (5 stacks)
-- **Effect**: Deal 12 damage 2 times, plus 1 time for each Curse the target has. Decreases max HP of owner by 3. If kills something, gain 3 max HP
+- **Effect**: Deal 12 damage 2 times, plus 1 time for each Curse the target has. Decreases max HP of owner by 3. If kills something, gain 3 max HP.
 
 `Cursed Blade`
 - **Type**: Attack
@@ -460,9 +411,7 @@
   - Resource: mettle
   - Scaling Type: attackScaling
   - Scaling Value: 1
-- **Buffs/Modifiers**:
-  - CursedBladeBuff (10 stacks)
-- **Effect**: Deal 14 damage. At combat start, apply We Thirst to owner
+- **Effect**: Deal 14 damage. At combat start, apply 10 We Thirst to owner. If this card kills someone, remove We Thirst.
 
 `Horrific Regeneration`
 - **Type**: Skill
@@ -472,7 +421,7 @@
   - Magic Number: 10
 - **Buffs/Modifiers**:
   - Exhaust
-- **Effect**: All party members heal 10 HP. They also gain 4 Stress
+- **Effect**: All party members heal 10 HP. They also gain 4 Stress.
 
 `Strength of Insanity`
 - **Type**: Power
@@ -482,7 +431,7 @@
   - Magic Number: 4
 - **Buffs/Modifiers**:
   - IncreasePluck (1 stack)
-- **Effect**: All allies gain 4 Lethality. If >10 stress, repeat. If >30 stress, repeat again
+- **Effect**: All allies gain 4 Lethality. If >4 stress, repeat. If >9 stress, repeat again.
 
 ## Cargo Cards
 
@@ -492,7 +441,7 @@
 - **Rarity**: Common
 - **Buffs/Modifiers**:
   - HellSellValue (40 stacks)
-- **Effect**: Decrease stress of all allies by 2. Decrease the HellSellValue buff on this card by 5
+- **Effect**: Decrease stress of all allies by 2. Decrease the HellSellValue buff on this card by 5.
 
 `Coal Cargo`
 - **Type**: Item
@@ -501,7 +450,7 @@
 - **Buffs/Modifiers**:
   - HellSellValue (85 stacks)
   - Heavy
-- **Effect**: Draw 1 card
+- **Effect**: Draw 1 card.
 
 `Coffee Cargo`
 - **Type**: Item
@@ -509,7 +458,7 @@
 - **Rarity**: Common
 - **Buffs/Modifiers**:
   - HellSellValue (50 stacks)
-- **Effect**: Draw 2 cards. Decrease the HellSellValue buff on this card by 10
+- **Effect**: Draw 2 cards. Decrease the HellSellValue buff on this card by 10.
 
 `Sacred Relics Cargo`
 - **Type**: Item
@@ -519,7 +468,7 @@
   - Damage: 15
 - **Buffs/Modifiers**:
   - HellSellValue (50 stacks)
-- **Effect**: Draw a card. All Devils take 15 damage. Decrease the HellSellValue buff on this card by 15
+- **Effect**: Draw a card. All Devils take 15 damage. Decrease the HellSellValue buff on this card by 15.
 
 `Spicy Literature Cargo`
 - **Type**: Item
@@ -527,5 +476,32 @@
 - **Rarity**: Common
 - **Buffs/Modifiers**:
   - HellSellValue (55 stacks)
-- **Effect**: Draw a card
-```
+- **Effect**: Draw a card.
+
+## Special Cards
+
+`Eldritch Smoke`
+- **Type**: Skill
+- **Energy Cost**: 0
+- **Rarity**: Special
+- **Base Stats**:
+  - Block: 4
+- **Resource Scaling**:
+  - Resource: smog
+  - Scaling Type: blockScaling
+  - Scaling Value: 1
+- **Effect**: Gain 4 Block and exhaust.
+
+`Take Cover`
+- **Type**: Skill
+- **Energy Cost**: 0
+- **Rarity**: Common
+- **Base Stats**:
+  - Block: 4
+- **Resource Scaling**:
+  - Resource: mettle
+  - Scaling Type: blockScaling
+  - Scaling Value: 1
+- **Buffs/Modifiers**:
+  - Exhaust
+- **Effect**: Apply 4 Block. Exhaust.
