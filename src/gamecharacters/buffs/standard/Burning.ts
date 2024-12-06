@@ -1,4 +1,5 @@
 import { GameState } from "../../../rules/GameState";
+import { TextGlyphs } from "../../../text/TextGlyphs";
 import { FlamesAmplifierBuff } from "../../playerclasses/cards/blackhand/rares/Pyronox";
 import { AbstractBuff } from "../AbstractBuff";
 
@@ -11,7 +12,7 @@ export class Burning extends AbstractBuff {
 
     override getDescription(): string {
         const totalDamage = this.baseDamage + GameState.getInstance().combatState.combatResources.powder.value;
-        return `At the end of turn, take ${totalDamage} damage for ${this.getStacksDisplayText()} turns. [damage increases with powder]`;
+        return `At the end of turn, take ${totalDamage} damage for ${this.getStacksDisplayText()} turns. Damage increases with ${TextGlyphs.getInstance().ashesIcon}`;
     }
 
     constructor(stacks: number = 1) {

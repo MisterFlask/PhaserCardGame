@@ -8,7 +8,7 @@ class SupportStokersChoice extends AbstractChoice {
             "Gain 1 Esteem with the Stoker's Union, lose 1 Esteem with the Cinder Court"
         );
         this.nextEvent = new DeadEndEvent();
-        this.nextEvent.description = "The Union representatives, their faces permanently etched with coal dust and metaphysical scorch marks, nod grimly. Their shop steward, a stocky figure whose brass-buckled overalls bear the marks of countless shifts, grasps your hand. 'Right proper of you to stand with the workers,' he growls. 'When them fancy porcelain-faces need their next shipment rushed through, we'll remember who understood the true value of proper furnace-craft.' The aristocrats depart in their obsidian vehicles, leaving behind only the acrid scent of brimstone wine and carefully worded threats about 'supply chain optimization.'";
+        this.nextEvent.description = "The Union representatives, their faces permanently etched with coal dust and metaphysical scorch marks, nod grimly. Their shop steward, a stocky figure whose brass-buckled overalls bear the marks of countless shifts in He'l's furnaces, grasps your hand. 'Right proper of you to stand with the workers,' he growls. 'When them fancy porcelain-faces need their next shipment rushed through, we'll remember who understood the true value of proper furnace-craft.' \n\nThe aristocrats depart in their obsidian vehicles, leaving behind only the acrid scent of brimstone wine and carefully worded threats about 'supply chain optimization.'";
     }
 
     canChoose(): boolean {
@@ -18,8 +18,6 @@ class SupportStokersChoice extends AbstractChoice {
     effect(): void {
         this.addLedgerItem(new StokersUnionEsteem(1));
         this.addLedgerItem(new CinderCourtEsteem(-1));
-        this.addRelic(new StokerUnionRelic());
-
     }
 }
 
@@ -30,7 +28,7 @@ class SupportAristocracyChoice extends AbstractChoice {
             "Lose 1 Esteem with the Stoker's Union, gain 1 Esteem with the Cinder Court"
         );
         this.nextEvent = new DeadEndEvent();
-        this.nextEvent.description = "The Cinder Court representatives adjust their immaculate porcelain masks, a subtle gesture that somehow conveys both approval and condescension. 'How gratifying to encounter an individual who comprehends the inevitability of progress,' purrs a minor Duchess, her voice harmonizing unsettlingly with your land-crawler's Maxwell coils. 'These... laborers... must learn that Hell's logistics network has evolved beyond their primitive loading techniques.' The striking workers depart, their muttered imprecations leaving geometric burn patterns in the iron floor that will take weeks to buff out.";
+        this.nextEvent.description = "The Cinder Court representatives adjust their immaculate porcelain masks, a subtle gesture that somehow conveys both approval and condescension. 'How gratifying to encounter an individual who comprehends the inevitability of progress,' purrs a minor Duchess, her voice harmonizing unsettlingly with your land-crawler's Maxwell coils. 'These... laborers... must learn that Hell's logistics network has evolved beyond their primitive loading techniques.' \n\n The striking workers depart, their muttered imprecations leaving geometric burn patterns in the iron floor that will take weeks to buff out.";
     }
 
     canChoose(): boolean {

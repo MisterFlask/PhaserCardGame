@@ -13,7 +13,7 @@ export class MainHubPanel extends AbstractHqPanel {
     private navigationButtons: Map<string, TextBoxButton>;
 
     constructor(scene: Scene) {
-        super(scene, `! Company HQ${TextGlyphs.getInstance().pagesIcon}! ${TextGlyphs.getInstance().pagesIcon}`);
+        super(scene, `! Company HQ${TextGlyphs.getInstance().ashesIcon}! ${TextGlyphs.getInstance().ashesIcon}`);
 
         const campaignState = CampaignState.getInstance();
 

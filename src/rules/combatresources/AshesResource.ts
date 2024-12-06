@@ -9,7 +9,7 @@ export class Ashes extends AbstractCombatResource {
             "Ashes",
             `Passive: If you win combat with at least 4 Ashes, gain an additional card reward option. At 10, get 2 instead.`,
             'ashes_icon',
-            TextGlyphs.getInstance().pagesIcon
+            TextGlyphs.getInstance().ashesIcon
         );
         this.tint = 0xF5F5DC;
     }

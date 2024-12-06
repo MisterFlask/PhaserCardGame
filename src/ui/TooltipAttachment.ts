@@ -15,12 +15,14 @@ export class TooltipAttachment {
         container: Phaser.GameObjects.Container | Phaser.GameObjects.Image,
         tooltipText: string,
         fillColor?: number,
+        disableAutomaticHoverListeners?: boolean,
     }) {
         const { 
             scene, 
             container, 
             tooltipText,
             fillColor = 0x000000,
+            disableAutomaticHoverListeners = false,
         } = params;
         
         this.scene = scene;
@@ -31,6 +33,7 @@ export class TooltipAttachment {
             scene,
             text: tooltipText,
             fillColor,
+            width: 350,
         });
         
         // Get the natural dimensions of the text
@@ -44,16 +47,22 @@ export class TooltipAttachment {
             height: bounds.height + this.padding * 2,
             text: tooltipText,
             fillColor,
+            style: {
+                fontSize: '18px',
+                fontFamily: 'verdana',
+            },
         });
         this.tooltip.setVisible(false);
         
         // Add hover listeners
         // assume it's interactive
-        this.gameObject.on('pointerover', this.showTooltip, this);
-        this.gameObject.on('pointerout', this.hideTooltip, this);
+        if (!disableAutomaticHoverListeners) {
+            this.gameObject.on('pointerover', this.showTooltip, this);
+            this.gameObject.on('pointerout', this.hideTooltip, this);
+        }
     }
 
-    private showTooltip(): void {
+    public showTooltip(): void {
         this.isVisible = true;
         this.tooltip.setVisible(true);
         this.updateTooltipPosition();
@@ -69,7 +78,7 @@ export class TooltipAttachment {
         this.scene.events.on('update', this.updateTooltipPosition, this);
     }
 
-    private hideTooltip(): void {
+    public hideTooltip(): void {
         this.isVisible = false;
         this.tooltip.setVisible(false);
         
@@ -77,38 +86,44 @@ export class TooltipAttachment {
         this.scene.events.off('update', this.updateTooltipPosition, this);
     }
 
-    private updateTooltipPosition = (): void => {
+    public updateTooltipPosition = (): void => {
         if (!this.isVisible) return;
-
-        const gameHeight = this.scene.scale.height;
-        const gameWidth = this.scene.scale.width;
         
-        // Get gameObject's world position and dimensions
-        const objectBounds = this.gameObject.getBounds();
-        const objectWidth = objectBounds.width;
-        const objectHeight = objectBounds.height;
+        // Get current mouse position in world coordinates
+        const pointer = this.scene.input.activePointer;
+        const mouseX = pointer.x;
+        const mouseY = pointer.y;
         
-        // Calculate tooltip dimensions
+        // Get tooltip dimensions
         const tooltipBounds = this.tooltip.getBounds();
         
-        // Determine vertical position
-        let yPos: number;
-        if (objectBounds.y > gameHeight / 2) {
-            // Container is in bottom half, show tooltip above with additional padding and container height
-            yPos = objectBounds.y - tooltipBounds.height - this.padding - objectHeight - 5;
-        } else {
-            // Container is in top half, show tooltip below with additional padding and container height
-            yPos = objectBounds.bottom + this.padding + objectHeight + 5;
+        // Position tooltip up and to the right of cursor
+        // Base offset that grows with tooltip height
+        const xOffset = 30;
+        const baseYOffset = -40;
+        const heightBasedOffset = -(tooltipBounds.height * 0.5); // Additional offset based on height
+        const yOffset = baseYOffset + heightBasedOffset;
+        
+        let xPos = mouseX + xOffset;
+        let yPos = mouseY + yOffset;
+
+        // Ensure tooltip stays within game bounds
+        const gameWidth = this.scene.scale.width;
+        const gameHeight = this.scene.scale.height;
+
+        // Adjust if tooltip would go off right edge
+        if (xPos + tooltipBounds.width > gameWidth) {
+            xPos = mouseX - tooltipBounds.width - xOffset;
         }
 
-        // Determine horizontal position
-        let xPos: number;
-        if (objectBounds.x > gameWidth / 2) {
-            // Container is in right half, show tooltip to the left with additional padding and container width
-            xPos = objectBounds.x - tooltipBounds.width - this.padding - objectWidth - 5;
-        } else {
-            // Container is in left half, show tooltip to the right with additional padding and container width
-            xPos = objectBounds.right + this.padding + objectWidth + 5;
+        // Adjust if tooltip would go off top edge
+        if (yPos < 0) {
+            yPos = mouseY + Math.abs(yOffset);
+        }
+
+        // Adjust if tooltip would go off bottom edge
+        if (yPos + tooltipBounds.height > gameHeight) {
+            yPos = mouseY - Math.abs(yOffset) - tooltipBounds.height;
         }
 
         // Update tooltip position

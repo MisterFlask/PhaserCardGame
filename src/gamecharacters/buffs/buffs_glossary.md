@@ -425,32 +425,33 @@ Reduces damage dealt by 33% for X turn(s).
 
 
 # RESOURCES NOTES
-Resources are present in each combat.  In general, resources can be either gained or used as a scaler by a card but never both. (Damage, block, and magic numbers are the types of resource scaling.)  "Relevant classes" refers to classes that can gain the resource from cards, but any class can use any resource as a scaler (though most scalers should actually be related to the class.)
+Resources are present in each combat. In general, resources can be either gained or used as a scaler by a card but never both. (Damage, block, and magic numbers are the types of resource scaling.) "Relevant classes" refers to classes that can gain the resource from cards, but any class can use any resource as a scaler.
 
 # TYPES OF RESOURCES
 
-## powder
- at the start of turn, if you have 2 powder, decrease it by 2 and a random ally gains 2 strength.
+## Blood (Powder)
+At the start of turn, if you have 2 Blood, decrease it by 2 and a random ally gains 2 strength.
 RELEVANT CLASS: Blackhand, Archon
 
-## iron
- at beginning of turn, gain 1 block for each iron value. decreases by 1 at end of turn.
+## Mettle (Iron)
+At beginning of turn, gain 1 block for each Mettle value. Decreases by 1 at end of turn.
 RELEVANT CLASS: Blackhand, Archon
 
-## pages
-if you obtain 4 pages in a combat, gain an additional card reward option. if you gain 10, get 2 instead.
+## Ashes (Pages)
+If you obtain 4 Ashes in a combat, gain an additional card reward option. If you gain 10, get 2 instead.
 RELEVANT CLASS: Cog, Diabolist
 
-## ice
- grant 1 stress block at beginning of turn for each 1 ice value.
-RELEVANT CLASS:  Archon, Diabolist
+## Pluck
+Grants additional effects to certain cards based on Pluck value.
+RELEVANT CLASS: Scavenger, Diabolist
 
-## fog
- if you have more than 4 fog at the beginning of turn, gain sneak attack to your hand and decrease fog by 4. [replays next card played by a character].
- RELEVANT CLASS: Scavenger, Cog
+## Smog
+At the start of turn, if you have more than 4 Smog, gain a special effect defined by the character.
+RELEVANT CLASS: Scavenger, Cog
 
-## venture
- at end of combat, gain a loot reward option for each 2 venture value. [this is distinct from ordinary card rewards].  RELEVANT CLASS:  Scavenger.
+## Venture
+At end of combat, gain a loot reward option for each 2 Venture value. [This is distinct from ordinary card rewards]
+RELEVANT CLASS: Scavenger
 
 
 # CARD KEYWORDED MECHANICS

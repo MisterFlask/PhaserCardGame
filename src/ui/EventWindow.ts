@@ -1,5 +1,6 @@
 import Phaser, { Scene } from 'phaser';
 import { AbstractEvent, FinishChoice } from '../events/AbstractEvent';
+import { MagicWords } from '../text/MagicWords';
 import { DecorativeFrame } from './DecorativeFrame';
 import { DepthManager } from './DepthManager';
 import { EventButton } from './EventButton';
@@ -14,6 +15,7 @@ export class EventWindow extends Phaser.GameObjects.Container {
     private tooltips: TooltipAttachment[] = [];
     private contentContainer: Phaser.GameObjects.Container;
     private backgroundBlocker: Phaser.GameObjects.Rectangle;
+    private magicWordTooltip?: TooltipAttachment;
 
     constructor(
         scene: Scene,
@@ -92,13 +94,16 @@ export class EventWindow extends Phaser.GameObjects.Container {
         });
         this.contentContainer.add(titleText);
 
+        // Process the description text for magic words
+        const magicWordsResult = MagicWords.getInstance().getFlavorMagicWordsResult(event.description);
+        
         // Add description text with improved styling
         this.descriptionText = new TextBox({
             scene,
             x: windowWidth * 0.3,
             y: -windowHeight * 0.25,
             width: windowWidth * 0.35,
-            text: event.description,
+            text: magicWordsResult.stringResult,
             style: {
                 fontSize: '22px',
                 color: '#e0d5c0',
@@ -107,8 +112,32 @@ export class EventWindow extends Phaser.GameObjects.Container {
                 align: 'left',
                 lineSpacing: 8
             },
+            interactive: true,
         });
         this.contentContainer.add(this.descriptionText);
+
+        // Create a single tooltip that will be reused
+        this.magicWordTooltip = new TooltipAttachment({
+            scene,
+            container: this.descriptionText,
+            tooltipText: '', // Will be updated when hovering over magic words
+            fillColor: 0x000000,
+            disableAutomaticHoverListeners: true, // we do this via textbox
+        });
+        this.magicWordTooltip.hideTooltip();
+
+        // Set up area handlers for magic words
+        this.descriptionText.onAreaOver((key: string) => {
+            const concept = magicWordsResult.concepts.find(c => c.name === key);
+            if (concept) {
+                this.magicWordTooltip?.updateText(concept.description);
+                this.magicWordTooltip?.showTooltip();
+            }
+        });
+
+        this.descriptionText.onAreaOut(() => {
+            this.magicWordTooltip?.hideTooltip();
+        });
 
         // Add choice buttons with better spacing
         if (!event.choices || event.choices.length === 0) {
@@ -159,6 +188,8 @@ export class EventWindow extends Phaser.GameObjects.Container {
         
         // Animate in
         this.animateIn();
+        this.scene.events.on('update', this.updateTooltipPosition, this);
+
     }
 
     private animateIn(): void {
@@ -191,10 +222,18 @@ export class EventWindow extends Phaser.GameObjects.Container {
         this.backgroundBlocker.destroy();
         this.choices.forEach(button => button.destroy());
         this.tooltips.forEach(tooltip => tooltip.destroy());
+        this.magicWordTooltip?.destroy();
         this.frame.destroy();
         this.portrait.destroy();
         this.descriptionText.destroy();
         this.contentContainer.destroy();
         super.destroy();
+    }
+
+    updateTooltipPosition(): void {
+        if (!this.scene) {
+            return;
+        }
+        this.magicWordTooltip?.updateTooltipPosition();
     }
 } 

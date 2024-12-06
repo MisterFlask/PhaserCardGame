@@ -112,6 +112,25 @@ export class MagicWords {
     private concepts: MagicConcept[] = [
         new MagicConcept("Exert", "Spend up to X energy after playing this card to activate an effect.")
     ];
+
+    private flavorConcepts: MagicConcept[] = [
+            new MagicConcept("Hell", "Some academics still insist that, no, there is no relationship to the Christian afterlife, and furthermore that everyone ought to call it 'The Maxwell-Babbage Adiabatic Plane', which they most certainly will not."),
+            new MagicConcept("Maxwell Coil", "Maxwell Coils are essential for maintaining the structural integrity of rifts, such as the Buckingham Rift, by counteracting the natural tendency of planar boundaries to collapse or destabilize under stress."),
+            new MagicConcept("Stoker's Union", "The Stoker's Union operates the Furnace of Dis, nominally under the control of the Cinder Court. They also maintain the lesser furnaces scattered throughout the Maxwell-Babbage Adiabatic Plane."),
+            new MagicConcept("British Trade Delegation", "The British Trade Delegation uses technology and diplomacy to exploit Hell's resources. They are central to the operation of the Buckingham Rift and their dominance disrupts traditional Infernal power dynamics."),
+            new MagicConcept("Artisanal Guilds", "Ancient craftsmen of Hell, the Artisanal Guilds are threatened by the influx of British goods and the disruption of their longstanding economic structures. They often resort to sabotage or alliances to protect their traditions."),
+            new MagicConcept("Brimstone Barons", "Wealthy industrialists who control brimstone mining and export, the Brimstone Barons are wary of the British circumventing their traditional business channels. They guard their monopolies with private militias and ruthless tactics."),
+            new MagicConcept("Cinder Court", "The ancient demonic noble houses of Hell.  They rule the Nine Circles by law and custom."),
+            new MagicConcept("Cult of the Invasion", "This faction, primarily filled with academics and madmen, is continually scheming for a final ill-advised invasion of Heaven."),
+            new MagicConcept("Underclass", "The weakest of the devils, the Underclass performs dangerous and degrading labor on behalf of the upper crust."),
+            new MagicConcept("City of Dis", "The sprawling industrial heart of Hell, Dis is a cacophonous metropolis of gothic architecture and endless labor. It houses the Furnace of Dis and serves as the center of Infernal politics and commerce."),
+            new MagicConcept("Furnace of Dis", "A colossal and ancient furnace that powers Hell's industry and possibly sustains its existence. The Stoker's Union tightly controls access."),
+            new MagicConcept("Styx Delta", "A swampy labyrinth where the River Styx splits into countless channels, the Delta is a hub for soul-trading outposts and factional intrigue.  Swimming not advised."),
+            new MagicConcept("Brimstone Badlands", "A volcanic wasteland dominated by brimstone mines and controlled by the Brimstone Barons.  The Phlegothon runs through it; valuable exports include Phlegothon Oil and Brimstone Distillate."),
+            new MagicConcept("Screaming Forests", "A primeval wilderness of sentient, wailing trees and dangerous creatures. Valuable exports include Screaming Timber and Sorrowvines."),
+            new MagicConcept("Clockwork Wastes", "A desolate expanse littered with ancient infernal machines and half-mechanical creatures. The British are drawn to this region in search of lost technologies to gain an edge over Hell's factions."),
+            new MagicConcept("Abyssal Frontier", "The edge of Hell, where its reality fades into infinite darkness and alien geometries.")
+        ]
     
 
     private static instance: MagicWords;
@@ -123,6 +142,8 @@ export class MagicWords {
         }
         return MagicWords.instance;
     }
+
+
 
     public getMagicWordsResult(input: string): MagicWordsResult {
         const result = new MagicWordsResult();
@@ -168,5 +189,23 @@ export class MagicWords {
             }
         }
         return modifiedString;
+    }
+
+    public getFlavorMagicWordsResult(input: string): MagicWordsResult {
+        const result = new MagicWordsResult();
+        let modifiedString = input;
+
+        // Check for flavor concepts
+        for (const concept of this.flavorConcepts) {
+            const conceptName = concept.name;
+            const regex = new RegExp(`\\b${conceptName}\\b`, 'gi');
+            if (regex.test(input)) {
+                result.concepts.push(concept);
+                modifiedString = modifiedString.replace(regex, `[color=yellow][area=${conceptName}]${conceptName}[/area][/color]`);
+            }
+        }
+
+        result.stringResult = modifiedString;
+        return result;
     }
 }

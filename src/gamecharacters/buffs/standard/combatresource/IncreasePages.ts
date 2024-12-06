@@ -14,7 +14,7 @@ export class IncreasePages extends AbstractBuff {
     }
 
     getDescription(): string {
-        return `When card is played, gain ${this.getStacksDisplayText()} ${TextGlyphs.getInstance().pagesIcon}.  Exhaust.`;
+        return `When card is played, gain ${this.getStacksDisplayText()} ${TextGlyphs.getInstance().ashesIcon}.  Exhaust.`;
     }
 
     public onThisCardInvoked(target?: BaseCharacter): void {

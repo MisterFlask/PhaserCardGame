@@ -7,6 +7,19 @@ import { DepthManager } from './DepthManager';
 
 export type VerticalExpand = 'up' | 'down';
 export type HorizontalExpand = 'left' | 'right'| 'center';
+export type AreaEventHandler = (key: string) => void;
+
+export interface TextBoxConfig {
+    scene: Phaser.Scene;
+    x?: number;
+    y?: number;
+    width?: number;
+    height?: number;
+    text: string;
+    style?: Phaser.Types.GameObjects.Text.TextStyle;
+    fillColor?: number;
+    parseAreaTags?: boolean;
+}
 
 export class TextBox extends Phaser.GameObjects.Container {
     public static readonly YELLOW = 0xFFFF00;
@@ -24,6 +37,7 @@ export class TextBox extends Phaser.GameObjects.Container {
     private debugGraphics: Phaser.GameObjects.Graphics;
     protected fillColor: number;
     protected assignedWidth: number;
+    private areaElements: Map<string, Phaser.GameObjects.Container> = new Map();
 
     public strokeIsOn = false;
     // Add a method to determine if a color is light
@@ -36,6 +50,14 @@ export class TextBox extends Phaser.GameObjects.Container {
         const brightness = (r * 299 + g * 587 + b * 114) / 1000;
         return brightness > 127;
     }
+
+    // Add new properties to store event handlers
+    private areaEventHandlers: {
+        click?: AreaEventHandler;
+        down?: AreaEventHandler;
+        over?: AreaEventHandler;
+        out?: AreaEventHandler;
+    } = {};
 
     constructor(params: {
         scene: Phaser.Scene,
@@ -51,7 +73,9 @@ export class TextBox extends Phaser.GameObjects.Container {
         verticalExpand?: VerticalExpand,
         horizontalExpand?: HorizontalExpand,
         bigTextOverVariableColors?: boolean,
-        strokeIsOn?: boolean
+        strokeIsOn?: boolean,
+        parseAreaTags?: boolean,
+        interactive?: boolean
     }) {
         const {
             scene,
@@ -68,6 +92,8 @@ export class TextBox extends Phaser.GameObjects.Container {
             horizontalExpand = 'right',
             bigTextOverVariableColors = false,
             strokeIsOn = true,
+            parseAreaTags = false,
+            interactive = false
         } = params;
 
         super(scene, x, y);
@@ -131,6 +157,7 @@ export class TextBox extends Phaser.GameObjects.Container {
                 thickness: 2,
                 offset: -8
             },
+            interactive: interactive,
             resolution: 4
         };
 
@@ -149,7 +176,7 @@ export class TextBox extends Phaser.GameObjects.Container {
             tintFill: true,
         }
         this.text.addImage(TextGlyphs.getInstance().METTLE_ICON_RAW, {...imageConfig, key: TextGlyphs.getInstance().METTLE_ICON_RAW});
-        this.text.addImage(TextGlyphs.getInstance().PAGES_ICON_RAW, {...imageConfig, key: TextGlyphs.getInstance().PAGES_ICON_RAW});
+        this.text.addImage(TextGlyphs.getInstance().ASHES_ICON_RAW, {...imageConfig, key: TextGlyphs.getInstance().ASHES_ICON_RAW});
         this.text.addImage(TextGlyphs.getInstance().VENTURE_ICON_RAW, {...imageConfig, key: TextGlyphs.getInstance().VENTURE_ICON_RAW});
         this.text.addImage(TextGlyphs.getInstance().PLUCK_ICON_RAW, {...imageConfig, key: TextGlyphs.getInstance().PLUCK_ICON_RAW});
         this.text.addImage(TextGlyphs.getInstance().BLOOD_ICON_RAW, {...imageConfig, key: TextGlyphs.getInstance().BLOOD_ICON_RAW});
@@ -173,6 +200,14 @@ export class TextBox extends Phaser.GameObjects.Container {
         this.debugGraphics = this.scene.add.graphics();
         this.debugGraphics.setVisible(true); // Set to false to hide debug hitboxes
         this.add(this.debugGraphics);
+
+        
+        this.text
+            .on('areadown', this.handleAreaDown, this)
+            .on('areaclick', this.handleAreaClick, this)
+            .on('areaover', this.handleAreaOver, this)
+            .on('areaout', this.handleAreaOut, this);
+
         
         // Set the background color after text is set
         try{
@@ -360,20 +395,6 @@ export class TextBox extends Phaser.GameObjects.Container {
     
     
     
-
-    destroy(): void {
-        if (this.background) {
-            this.background.destroy();
-        }
-        if (this.backgroundImage) {
-            this.backgroundImage.destroy();
-        }
-        this.text.destroy();
-        this.backgroundImage = null;
-        super.destroy();
-    }
-
-
     /**
      * Makes the TextBox interactive with a predefined hit area based on its size.
      * @param callback The function to call when the TextBox is interacted with.
@@ -418,5 +439,62 @@ export class TextBox extends Phaser.GameObjects.Container {
     setHorizontalExpand(direction: HorizontalExpand): void {
         this.horizontalExpand = direction;
         this.adjustTextBoxSize(); // Readjust size with new direction
+    }
+
+    // Add new public methods to set event handlers
+    public onAreaClick(handler: AreaEventHandler): void {
+        this.areaEventHandlers.click = handler;
+    }
+
+    public onAreaDown(handler: AreaEventHandler): void {
+        this.areaEventHandlers.down = handler;
+    }
+
+    public onAreaOver(handler: AreaEventHandler): void {
+        this.areaEventHandlers.over = handler;
+    }
+
+    public onAreaOut(handler: AreaEventHandler): void {
+        this.areaEventHandlers.out = handler;
+    }
+
+    // Add private handler methods
+    private handleAreaClick(key: string): void {
+        console.log("Area clicked: " + key);
+        this.areaEventHandlers.click?.(key);
+    }
+
+    private handleAreaDown(key: string): void {
+        console.log("Area down: " + key);   
+        this.areaEventHandlers.down?.(key);
+    }
+
+    private handleAreaOver(key: string): void {
+        console.log("Area over: " + key);
+        this.areaEventHandlers.over?.(key);
+    }
+
+    private handleAreaOut(key: string): void {
+        console.log("Area out: " + key);
+        this.areaEventHandlers.out?.(key);
+    }
+
+    // Modify the destroy method to remove event listeners
+    override destroy(): void {
+        if (this.text) {
+            this.text.off('areadown', this.handleAreaDown, this);
+            this.text.off('areaclick', this.handleAreaClick, this);
+            this.text.off('areaover', this.handleAreaOver, this);
+            this.text.off('areaout', this.handleAreaOut, this);
+        }
+        if (this.background) {
+            this.background.destroy();
+        }
+        if (this.backgroundImage) {
+            this.backgroundImage.destroy();
+        }
+        this.text.destroy();
+        this.backgroundImage = null;
+        super.destroy();
     }
 }

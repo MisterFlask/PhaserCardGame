@@ -7,7 +7,7 @@ export class Stress extends AbstractBuff {
     }
 
     override getDescription(): string {
-        return `For every 10 Stress stacks, enemies start combat with 1 more Lethality.`;
+        return `For every ${this.secondaryStacks} Stress stacks, enemies start combat with 1 more Lethality.`;
     }
 
     constructor(stacks: number = 0) {
@@ -21,6 +21,9 @@ export class Stress extends AbstractBuff {
     }
 
     override onCombatStart(): void {
+        if (this.stacks < this.secondaryStacks) {
+            return;
+        }
         this.forEachEnemy((enemy) => {
             this.actionManager.applyBuffToCharacterOrCard(enemy, new Lethality(Math.floor(this.stacks / 10)));
         });

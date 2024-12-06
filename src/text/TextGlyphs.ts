@@ -12,7 +12,7 @@ export class TextGlyphs {
     // Image names for resource icons
     public readonly VENTURE_ICON_RAW = "venture_icon";
     public readonly METTLE_ICON_RAW = "iron_icon";
-    public readonly PAGES_ICON_RAW = "ashes_icon";
+    public readonly ASHES_ICON_RAW = "ashes_icon";
     public readonly PLUCK_ICON_RAW = "feather_icon";
     public readonly BLOOD_ICON_RAW = "blood_icon";
     public readonly SMOG_ICON_RAW = "smog_icon";
@@ -26,8 +26,8 @@ export class TextGlyphs {
         return `[color=lightgrey][img=${this.METTLE_ICON_RAW}][/color]`; 
     }
 
-    public get pagesIcon(): string {
-        return `[color=beige][img=${this.PAGES_ICON_RAW}][/color]`;
+    public get ashesIcon(): string {
+        return `[color=beige][img=${this.ASHES_ICON_RAW}][/color]`;
     }
 
     public get pluckIcon(): string {

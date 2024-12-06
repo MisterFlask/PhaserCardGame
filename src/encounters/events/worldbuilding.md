@@ -8,9 +8,9 @@
 # FACTIONS
 
 ### The Stoker's Union
-These grim-faced laborers toil endlessly to keep the infernal fires of the Furnace of Dis burning. Without their backbreaking work, Hell would freeze over, quite literally. They hold immense power due to their indispensable role but face threats from new technologies like the River Styx turbine. Expect strikes, protests, and perhaps even sabotage as they fight to maintain their monopoly over Hell's energy production.
+Born from a peculiar twist of fate when a crate of smuggled Marxist literature found its way through the Buckingham Rift, these grim-faced laborers discovered a new way to articulate their ancient grievances. The pamphlets spread like wildfire through Hell's working class, with the stokers of the great Furnace of Dis being particularly receptive to concepts of worker solidarity and means of production. Without their backbreaking work, Hell would freeze over, quite literally - a fact that gave them considerable leverage in organizing. They hold immense power but face threats from new technocapital developments, like the River Styx turbine.
 
-In terms of style and accent, the Stoker's Union members are loyal to the Cause but not particularly bright, and speak with a strong cockney accent.
+In terms of style and accent, the Stoker's Union members are loyal to the Cause but not particularly bright, and speak with a strong cockney accent liberally peppered with misunderstood Marxist terminology.
 
 ### The British Trade Delegation
 Led by shrewd diplomats and backed by the technological marvels of James Maxwell, the British seek to exploit Hell's resources and cheap labor. The construction of the Buckingham Rift has given them an unprecedented foothold in this alien realm. They navigate the treacherous political landscape with a mix of cunning, bribery, and the occasional threat of angelic intervention.
