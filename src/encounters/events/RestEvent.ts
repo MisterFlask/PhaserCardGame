@@ -23,6 +23,22 @@ class RestChoice extends AbstractChoice {
     }
 }
 
+class UpgradeChoice extends AbstractChoice {
+    constructor() {
+        super("Upgrade Deck", "Upgrade a card in your deck");
+        this.nextEvent = new DeadEndEvent();
+        this.nextEvent.description = "Better weapon.  Cool.";
+    }
+
+    canChoose(): boolean {
+        return true;
+    }
+
+    effect(): void {
+        // I DON'T KNOW PLEASE HELP
+    }
+}
+
 class ScavengeChoice extends AbstractChoice {
     constructor() {
         super(

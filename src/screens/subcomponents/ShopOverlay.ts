@@ -372,7 +372,6 @@ export class ShopOverlay {
         }   
         this.refreshShop();
         this.toggle();
-
     }
 
     private toggleDebugOutlines(): void {
