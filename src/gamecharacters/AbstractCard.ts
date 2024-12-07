@@ -103,6 +103,7 @@ export abstract class AbstractCard implements IAbstractCard {
         }
         return null;
     }
+    public transientUiFlag_disableStandardDiscardAfterPlay: boolean = false;
 
     public typeTag: string = "AbstractCard"
     

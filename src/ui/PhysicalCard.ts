@@ -3,6 +3,7 @@ import Phaser from 'phaser';
 import { AutomatedCharacterType, BaseCharacterType, PlayableCardType } from '../Types';
 import { AbstractCard, IPhysicalCardInterface, PriceContext } from '../gamecharacters/AbstractCard';
 import { AbstractIntent } from '../gamecharacters/AbstractIntent';
+import { BurnEffect } from '../shaders/BurnEffect';
 import { CardDescriptionGenerator } from '../text/CardDescriptionGenerator';
 import { CardTooltipGenerator } from '../text/CardTooltipGenerator';
 import { ResourceDisplayGenerator } from '../text/ResourceDisplayGenerator';
@@ -1106,4 +1107,32 @@ export class PhysicalCard implements IPhysicalCardInterface {
             this.glowEffect.setTint(color);
         }
     }
+
+    public burnUp(onComplete?: () => void): void {
+        // Create burn effect
+        const burnEffect = new BurnEffect(this.scene);
+        burnEffect.setBurnAmount(0);
+        burnEffect.apply(this.container);
+
+        // Create tween to animate burn effect
+        this.scene.tweens.add({
+            targets: { amt: 0 },
+            amt: 1,
+            duration: 1000,
+            ease: 'Linear',
+            onUpdate: (tween) => {
+                burnEffect.setBurnAmount(tween.getValue() as number);
+            },
+            onComplete: () => {
+                // Clean up
+                this.container.setVisible(false);
+                burnEffect.destroy();
+                if (onComplete) {
+                    onComplete();
+                }
+            }
+        });
+    }
+    
 }
+

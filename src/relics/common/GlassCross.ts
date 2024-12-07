@@ -18,7 +18,7 @@ class HolyBombardment extends PlayableCard {
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage. Holy.  Exhaust. Sacrifice.`;
+        return `Deal ${this.getDisplayedDamage()} damage to a random enemy. Holy.  Exhaust. Sacrifice.`;
     }
 
     override InvokeCardEffects(): void {

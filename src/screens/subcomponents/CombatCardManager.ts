@@ -238,7 +238,9 @@ export class CombatCardManager {
         // Remove cards no longer in hand
         existingCards.forEach((physicalCard, id) => {
             if (!state.currentHand.some(c => c.id === id)) {
-                this.discardCardAnimation(physicalCard);
+                if (!physicalCard.data.transientUiFlag_disableStandardDiscardAfterPlay){ 
+                    this.discardCardAnimation(physicalCard);
+                }
             }
         });
 
@@ -247,6 +249,7 @@ export class CombatCardManager {
             if (!existingCards.has(abstractCard.id)) {
                 const newCard = this.animateCardDraw(abstractCard as IAbstractCard);
                 this.playerHand.push(newCard);
+                newCard.data.transientUiFlag_disableStandardDiscardAfterPlay = false;
             }
         });
 

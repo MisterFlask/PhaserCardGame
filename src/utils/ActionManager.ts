@@ -431,14 +431,18 @@ export class ActionManager {
             });
 
 
-            if (gameState.combatState.currentExhaustPile.includes(playableCard)){
+            if (card.data.transientUiFlag_disableStandardDiscardAfterPlay){
+                // do nothing, don't move it back
+            }else if (gameState.combatState.currentExhaustPile.includes(playableCard)){
                 // do nothing, don't move it back
             }else if (playableCard.cardType == CardType.POWER){
                 DeckLogic.moveCardToPile(card.data as PlayableCard, PileName.Exhaust);
             }else{
                 DeckLogic.moveCardToPile(card.data as PlayableCard, PileName.Discard);
             }
-            await this.animateDiscardCard(card);
+            if (!card.data.transientUiFlag_disableStandardDiscardAfterPlay){
+                await this.animateDiscardCard(card);
+            }
             return [];
         }));
 
@@ -1039,19 +1043,22 @@ export class ActionManager {
     }
 
     public exhaustCard(card: PlayableCardType): void {
+        card.transientUiFlag_disableStandardDiscardAfterPlay = true;
         this.actionQueue.addAction(new GenericAction(async () => {
-            DeckLogic.moveCardToPile(card, PileName.Exhaust);
-            console.log(`Exhausted card ${card.name}`);
-            await new WaitAction(20).playAction(); // Short delay for visual feedback
-            for (const buff of card.buffs) {
-                buff.onExhaust();
-            }
+            card.physicalCard?.burnUp(async ()=>{
+                await new WaitAction(100).playAction(); // Short delay for visual feedback
+                DeckLogic.moveCardToPile(card, PileName.Exhaust);
+                console.log(`Exhausted card ${card.name}`);
+                for (const buff of card.buffs) {
+                    buff.onExhaust();
+                }
 
-            GameState.getInstance().relicsInventory.forEach(relic => {
-                relic.onCardExhausted(card);
+                GameState.getInstance().relicsInventory.forEach(relic => {
+                    relic.onCardExhausted(card);
+                });
+                ProcBroadcaster.getInstance().broadcastCombatEvent(new ExhaustEvent(card));
             });
-            ProcBroadcaster.getInstance().broadcastCombatEvent(new ExhaustEvent(card));
-
+            
             return [];
         }));
     }
