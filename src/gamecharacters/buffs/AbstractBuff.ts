@@ -5,6 +5,7 @@ import type { ActionManager } from "../../utils/ActionManager";
 import { ActionManagerFetcher } from "../../utils/ActionManagerFetcher";
 import type { AbstractCard } from "../AbstractCard";
 import { generateWordGuid } from "../AbstractCard";
+import { AbstractIntent } from "../AbstractIntent";
 import type { BaseCharacter } from "../BaseCharacter";
 import { PlayerCharacter } from "../BaseCharacterClass";
 import type { IAbstractBuff } from '../IAbstractBuff';
@@ -409,6 +410,10 @@ export abstract class AbstractBuff implements IAbstractBuff {
         return 0;
     }
 
+    public incomingAttackIntentValue(): AbstractIntent[] {
+        return [];
+    }
+
     public clone(): this {
         const clonedBuff = Object.create(Object.getPrototypeOf(this));
         Object.assign(clonedBuff, this);
@@ -422,4 +427,20 @@ export abstract class AbstractBuff implements IAbstractBuff {
 export class BuffApplicationResult {
     newChangeInStacks: number = 0;
     logicTriggered: boolean = false;
+}
+
+export class IncomingIntentInformation{
+    public comingFrom?: PlayableCard;
+    public targetingCharacter: BaseCharacter;
+    public amountOfDamage: number;
+
+    constructor(targetingCharacter: BaseCharacter, amountOfDamage: number, comingFrom?: PlayableCard) {
+        this.comingFrom = comingFrom;
+        this.targetingCharacter = targetingCharacter;
+        this.amountOfDamage = amountOfDamage;
+    }
+
+    public get id(): string {
+        return this.comingFrom?.id + "#" + this.targetingCharacter.id + "#" + this.amountOfDamage;
+    }
 }

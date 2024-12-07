@@ -235,10 +235,11 @@ export class CombatState{
     public energyAvailable: number = 0
     public defaultMaxEnergy: number = 3
         
-    getBattleCardLocation = (cardId: string): BattleCardLocation => {
+    getBattleCardLocation (cardId: string): BattleCardLocation{
         if (this.drawPile.some(c => c.id === cardId)) return BattleCardLocation.DrawPile
         if (this.currentDiscardPile.some(c => c.id === cardId)) return BattleCardLocation.DiscardPile
         if (this.currentHand.some(c => c.id === cardId)) return BattleCardLocation.Hand
+        if (this.currentExhaustPile.some(c => c.id === cardId)) return BattleCardLocation.Exhaust
         return BattleCardLocation.Unknown
     }
 
@@ -258,6 +259,7 @@ export enum BattleCardLocation {
     DrawPile,
     DiscardPile,
     Hand,
+    Exhaust,
     Unknown
 }
 

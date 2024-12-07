@@ -1,3 +1,4 @@
+import { CombatRules } from '../rules/CombatRulesHelper';
 import { GameState } from '../rules/GameState';
 import { AbstractCard, Team } from './AbstractCard';
 import { AbstractIntent } from './AbstractIntent';
@@ -20,6 +21,7 @@ export class BaseCharacter extends AbstractCard implements IBaseCharacter {
     isDead(): boolean {
         return this.hitpoints <= 0;
     }
+
     getIntentsTargetingThisCharacter(): AbstractIntent[] {
 
         const gameState = GameState.getInstance();
@@ -34,6 +36,9 @@ export class BaseCharacter extends AbstractCard implements IBaseCharacter {
                 }
             }
         }
+
+        const nonEnemyIntents = CombatRules.retrieveIncomingNonEnemyIntentInformationForCharacter(this);
+        targetingIntents.push(...nonEnemyIntents);
 
         return targetingIntents;
     }

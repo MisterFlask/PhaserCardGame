@@ -6,21 +6,21 @@ import { ActionManager } from "../utils/ActionManager";
 import ImageUtils from '../utils/ImageUtils';
 import { TargetingUtils } from "../utils/TargetingUtils";
 import { AbstractCard, generateWordGuid } from "./AbstractCard";
-import { AutomatedCharacter } from './AutomatedCharacter';
-import { BaseCharacter } from "./BaseCharacter";
-import { AbstractBuff } from './buffs/AbstractBuff';
-import { PlayableCard } from './PlayableCard';
+import type { AutomatedCharacter } from './AutomatedCharacter';
+import type { BaseCharacter } from "./BaseCharacter";
+import type { AbstractBuff } from './buffs/AbstractBuff';
+import type { PlayableCard } from './PlayableCard';
 
 export abstract class AbstractIntent implements JsonRepresentable {
     id: string;
     imageName: string;
     target?: BaseCharacter;
-    owner: BaseCharacter;
+    owner?: BaseCharacter;
     title: string;
     targetsAllPlayers: boolean = false;
     iconTint: number = 0xffffff;
 
-    constructor({imageName, target, owner }: {imageName: string, target: BaseCharacter | undefined, owner: BaseCharacter }) {
+    constructor({imageName, target, owner }: {imageName: string, target: BaseCharacter | undefined, owner?: BaseCharacter }) {
         this.imageName = imageName;
         this.target = target;
         this.owner = owner;
@@ -39,7 +39,7 @@ export abstract class AbstractIntent implements JsonRepresentable {
             id: this.id,
             imageName: this.imageName,
             target: this.target ? this.target.name : 'No target',
-            owner: this.owner.name,
+            owner: this.owner?.name,
         }, null, 2);
     }
 
@@ -66,6 +66,7 @@ export abstract class AbstractIntent implements JsonRepresentable {
         return (r << 16) | (g << 8) | b;
     }
 
+
     public isUsingPlaceholderImage(): boolean {
         return !this.imageName || !ActionManager.getInstance().scene.textures.exists(this.imageName);
     }
@@ -83,6 +84,49 @@ export abstract class AbstractIntent implements JsonRepresentable {
         return this.imageName;
     }
 }
+
+export class CosmeticCharacterBuffIntent extends AbstractIntent {
+    tooltipText(): string {
+        return "Incoming damage from buff: " + this.buff.getDisplayName();
+    }
+    displayText(): string {
+        return this.damage?.toString();
+    }
+    act(): void {
+        // no op intentionally because this handled by card buff
+    }
+
+    damage: number;
+    buff: AbstractBuff;
+    constructor({ buff, target, damage }: { buff: AbstractBuff, target: BaseCharacter, damage: number }) {
+        super({ imageName: 'uncertainty', target: target, owner: undefined });
+        this.buff = buff;
+        this.damage = damage;
+        this.id = buff.id + '-' + target.id;
+    }
+}
+
+export class CosmeticPlayableCardIntent extends AbstractIntent {
+    tooltipText(): string {
+        return "Incoming damage from your card: " + this.playableCard.name;
+    }
+    displayText(): string {
+        return this.damage.toString();
+    }
+    act(): void {
+        // no op intentionally because this handled by card buff
+    }
+
+    damage: number;
+    playableCard: PlayableCard;
+    constructor({ playableCard, target, damage }: { playableCard: PlayableCard, target: BaseCharacter, damage: number }) {
+        super({ imageName: 'uncertainty', target: target, owner: undefined });
+        this.playableCard = playableCard;
+        this.damage = damage;
+        this.id = playableCard.id + '-' + target.id;
+    }
+}
+
 export class SummonIntent extends AbstractIntent {
     monsterToSummon: AutomatedCharacter;
 
@@ -193,7 +237,7 @@ export class AttackIntent extends AbstractIntent {
             throw new Error('Target cannot be null');
         }
         console.log('Attacking ' + this.target.name);
-        ActionManager.getInstance().tiltCharacter(this.owner);
+        ActionManager.getInstance().tiltCharacter(this.owner!);
 
         ActionManager.getInstance().dealDamage({ baseDamageAmount: this.baseDamage, target: this.target, sourceCharacter: this.owner });
 
@@ -287,7 +331,7 @@ export class AttackAllPlayerCharactersIntent extends AbstractIntent {
 
     act(): void {
         console.log('Attacking all allied characters');
-        ActionManager.getInstance().tiltCharacter(this.owner);
+        ActionManager.getInstance().tiltCharacter(this.owner!);
 
         const playerCharacters = TargetingUtils.getInstance().selectAllPlayerCharacters();
         for (const target of playerCharacters) {
@@ -324,7 +368,7 @@ export class ApplyDebuffToAllPlayerCharactersIntent extends AbstractIntent {
     act(): void {
         for (const target of TargetingUtils.getInstance().selectAllPlayerCharacters()) {
             console.log(`Applying ${this.debuff.stacks} stack(s) of ${this.debuff.getDisplayName()} to ${target.name}`)
-            ActionManager.getInstance().tiltCharacter(this.owner);
+            ActionManager.getInstance().tiltCharacter(this.owner!);
             ActionManager.getInstance().applyBuffToCharacterOrCard(target, this.debuff);
         }
     }
@@ -357,7 +401,7 @@ export class ApplyBuffToAllEnemyCharactersIntent extends AbstractIntent {
     }
 
     act(): void {
-        ActionManager.getInstance().tiltCharacter(this.owner);
+        ActionManager.getInstance().tiltCharacter(this.owner!);
         for (const target of TargetingUtils.getInstance().selectAllEnemyCharacters()) {
             console.log(`Applying ${this.buff.stacks} stack(s) of ${this.buff.getDisplayName()} to ${target.name}`)
             ActionManager.getInstance().applyBuffToCharacterOrCard(target, this.buff);
@@ -395,7 +439,7 @@ export class ApplyDebuffToRandomCharacterIntent extends AbstractIntent {
         if (!this.target) {
             throw new Error('Target cannot be null');
         }
-        ActionManager.getInstance().tiltCharacter(this.owner);
+        ActionManager.getInstance().tiltCharacter(this.owner!);
 
         console.log(`Applying ${this.debuff.stacks} stack(s) of ${this.debuff.getDisplayName()} to ${this.target.name}`);
         ActionManager.getInstance().applyBuffToCharacterOrCard(this.target, this.debuff);
@@ -429,8 +473,8 @@ export class BlockForSelfIntent extends AbstractIntent {
     }
 
     act(): void {
-        ActionManager.getInstance().tiltCharacter(this.owner);
-        console.log(`${this.owner.name} is gaining ${this.blockAmount} Block`);
+        ActionManager.getInstance().tiltCharacter(this.owner!);
+        console.log(`${this.owner!.name} is gaining ${this.blockAmount} Block`);
         ActionManager.getInstance().applyBlock({ baseBlockValue: this.blockAmount, blockSourceCharacter: this.owner, blockTargetCharacter: this.owner });
     }
 
@@ -462,9 +506,9 @@ export class ApplyBuffToSelfIntent extends AbstractIntent {
     }
 
     act(): void {
-        ActionManager.getInstance().tiltCharacter(this.owner);
+        ActionManager.getInstance().tiltCharacter(this.owner!);
         console.log(`Applying ${this.buff.stacks} stack(s) of ${this.buff.getDisplayName()} to allies`);
-        ActionManager.getInstance().applyBuffToCharacterOrCard(this.owner, this.buff);
+        ActionManager.getInstance().applyBuffToCharacterOrCard(this.owner!, this.buff);
     }
 
     createJsonRepresentation(): string {

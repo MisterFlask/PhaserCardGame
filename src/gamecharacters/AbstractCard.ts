@@ -1,5 +1,6 @@
 import { Scene } from 'phaser';
 import { AbstractEvent } from '../events/AbstractEvent';
+import { BattleCardLocation, GameState } from '../rules/GameState';
 import type { PhysicalCard } from '../ui/PhysicalCard';
 import { ShadowedImage } from '../ui/ShadowedImage';
 import { TextBox } from '../ui/TextBox';
@@ -102,6 +103,11 @@ export abstract class AbstractCard implements IAbstractCard {
             return this as unknown as PlayerCharacter;
         }
         return null;
+    }
+
+    
+    public getPile() : BattleCardLocation {
+        return GameState.getInstance().combatState.getBattleCardLocation(this.id);
     }
     public transientUiFlag_disableStandardDiscardAfterPlay: boolean = false;
 

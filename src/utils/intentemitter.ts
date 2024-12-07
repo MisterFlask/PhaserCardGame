@@ -31,12 +31,12 @@ export class IntentEmitter extends Phaser.Events.EventEmitter {
         this.emit(IntentEmitter.EVENT_INTENT_HOVER_END, intent);
     }
 
-    public emitIncomingIntentHover(incomingPhysicalIntent: IncomingIntent, owner: BaseCharacter): void {
+    public emitIncomingIntentHover(incomingPhysicalIntent: IncomingIntent, owner?: BaseCharacter): void {
         TransientUiState.getInstance().setHoveredIncomingIntent(incomingPhysicalIntent);
         this.emit(IntentEmitter.EVENT_INCOMING_INTENT_HOVER, owner);
     }
 
-    public emitIncomingIntentHoverEnd(incomingPhysicalIntent: IncomingIntent, owner: BaseCharacter): void {
+    public emitIncomingIntentHoverEnd(incomingPhysicalIntent: IncomingIntent, owner?: BaseCharacter): void {
         TransientUiState.getInstance().setHoveredIncomingIntent(null);
         this.emit(IntentEmitter.EVENT_INCOMING_INTENT_HOVER_END, owner);
     }

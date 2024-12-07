@@ -1,5 +1,6 @@
 import { GameState } from "../../../rules/GameState";
 import { TextGlyphs } from "../../../text/TextGlyphs";
+import { AbstractIntent, CosmeticCharacterBuffIntent } from "../../AbstractIntent";
 import { FlamesAmplifierBuff } from "../../playerclasses/cards/blackhand/rares/Pyronox";
 import { AbstractBuff } from "../AbstractBuff";
 
@@ -21,30 +22,31 @@ export class Burning extends AbstractBuff {
         this.stacks = stacks;
         this.stackable = true;
     }
+
+    override incomingAttackIntentValue(): AbstractIntent[] {
+        const powderAmount = GameState.getInstance().combatState.combatResources.powder.value;
+        var totalDamage = this.baseDamage + powderAmount;
+        // Check for FlamesAmplifier buff and increase damage
+        const flamesAmplifierBuff = this.getOwnerAsCharacter()?.buffs?.find((buff: AbstractBuff) => buff instanceof FlamesAmplifierBuff);
+        if (flamesAmplifierBuff) {
+            const amplifierAmount = flamesAmplifierBuff.stacks;
+            totalDamage += amplifierAmount;
+            console.log(`Burning damage increased by ${amplifierAmount} due to Flames Amplifier`);
+        }
+        return [new CosmeticCharacterBuffIntent({ buff: this, target: this.getOwnerAsCharacter()!, damage: totalDamage })];
+    }
     
     override onTurnEnd(): void {
         const owner = this.getOwnerAsCharacter();
         if (owner) {
-            const powderAmount = GameState.getInstance().combatState.combatResources.powder.value;
-            var totalDamage = this.baseDamage + powderAmount;
-
-            // Check for FlamesAmplifier buff and increase damage
-            const flamesAmplifierBuff = owner.buffs.find(buff => buff instanceof FlamesAmplifierBuff);
-            if (flamesAmplifierBuff) {
-                const amplifierAmount = flamesAmplifierBuff.stacks;
-                totalDamage += amplifierAmount;
-                console.log(`Burning damage increased by ${amplifierAmount} due to Flames Amplifier`);
-            }
+            var totalDamage = (this.incomingAttackIntentValue()[0] as CosmeticCharacterBuffIntent).damage;
 
             // Apply burning damage
             this.pulseBuff();
             this.actionManager.dealDamage({ baseDamageAmount: totalDamage, target: owner, fromAttack: false });
-            console.log(`${owner.name} took ${totalDamage} burning damage (${this.baseDamage} base + ${powderAmount} Powder)`);
 
             // Reduce stacks by 1
             this.stacks--;
-
-
         }
     }
 }

@@ -3,6 +3,7 @@ import { GameState } from "./GameState";
 
 
 import { AutomatedCharacterType, BaseCharacterType, PlayableCardType } from "../Types";
+import { AbstractIntent } from "../gamecharacters/AbstractIntent";
 
 export class DamageCalculationResult {
     totalDamage: number;
@@ -123,4 +124,41 @@ export class CombatRules {
 
         return new DamageCalculationResult(totalDamage, blockedDamage, unblockedDamage);
     };
+
+
+    public static retrieveIncomingNonEnemyIntentInformationForCharacter(target: IBaseCharacter): AbstractIntent[] {
+        const gameState = GameState.getInstance();
+        const targetingIntents: AbstractIntent[] = [];
+        // Get intents from buffs on all characters
+        const allCharacters = gameState.combatState.allPlayerAndEnemyCharacters;
+        for (const character of allCharacters) {
+            for (const buff of character.buffs) {
+                const buffIntents = buff.incomingAttackIntentValue();
+                if (buffIntents.length > 0) {
+                    // Only add intents that target this character
+                    const relevantIntents = buffIntents.filter(intent => 
+                        intent.target === target
+                    )
+                    targetingIntents.push(...relevantIntents);
+                }
+            }
+        }
+
+        // Get intents from buffs on all cards in all piles
+        const allCards = gameState.combatState.allCardsInAllPilesExceptExhaust;
+        for (const card of allCards) {
+            for (const buff of card.buffs) {
+                const buffIntents = buff.incomingAttackIntentValue();
+                if (buffIntents.length > 0) {
+                    // Only add intents that target this character
+                    const relevantIntents = buffIntents.filter(intent =>
+                        intent.target === target
+                    );
+                    targetingIntents.push(...relevantIntents);
+                }
+            }
+        }
+
+        return targetingIntents;
+    }
 }

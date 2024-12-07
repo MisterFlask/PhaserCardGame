@@ -976,6 +976,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
                 intentUI.destroy();
                 this.incomingIntents.delete(id);
             }
+            console.log("Removed incoming intent: " + id + " " + intentUI.intent.tooltipText());
         });
 
         // Add new intents
@@ -988,6 +989,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
                 this.incomingIntents.get(intent.id)?.updateIntent(intent);
             }
         });
+
+        
 
         this.layoutTargetingIntents();
     }

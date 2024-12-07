@@ -1,3 +1,5 @@
+import { BattleCardLocation } from "../../../rules/GameState";
+import { AbstractIntent, CosmeticCharacterBuffIntent } from "../../AbstractIntent";
 import { IBaseCharacter } from "../../IBaseCharacter";
 import { AbstractBuff } from "../AbstractBuff";
 
@@ -15,6 +17,26 @@ export class Hazardous extends AbstractBuff {
 
     override getDescription(): string {
         return `At the end of turn, deal ${this.getStacksDisplayText()} damage to you.`;
+    }
+
+    override incomingAttackIntentValue(): AbstractIntent[] {
+        if (this.stacks <= 0) {
+            return [];
+        }
+
+        const pile = this.getPileOfAttachedCard();
+        if (pile == BattleCardLocation.Hand) {
+            return [new CosmeticCharacterBuffIntent({ buff: this, target: this.getOwnerAsCharacter()!, damage: this.stacks })];
+        }
+        
+        return [];
+    }
+    getPileOfAttachedCard() : BattleCardLocation {
+        const owner = this.getOwnerAsPlayableCard();
+        if (owner) {
+            return owner.getPile();
+        }
+        return BattleCardLocation.Unknown;
     }
 
     override onInHandAtEndOfTurn(): void {
