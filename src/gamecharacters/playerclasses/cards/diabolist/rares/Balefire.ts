@@ -2,10 +2,11 @@
 
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
+import { Buster } from "../../../../buffs/playable_card/Buster";
 import { ExhaustBuff } from "../../../../buffs/playable_card/ExhaustBuff";
 import { BloodPriceBuff } from "../../../../buffs/standard/Bloodprice";
+import { Cursed } from "../../../../buffs/standard/Cursed";
 import { DamageIncreaseOnKill } from "../../../../buffs/standard/DamageIncreaseOnKill";
-import { GiantKiller } from "../../../../buffs/standard/GiantKiller";
 import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
@@ -20,7 +21,7 @@ export class Balefire extends PlayableCard {
         this.baseEnergyCost = 4;
         this.baseDamage = 12;
         this.buffs.push(new BloodPriceBuff(3));
-        this.buffs.push(new GiantKiller(1));
+        this.buffs.push(new Buster(1));
         this.buffs.push(new ExhaustBuff())
         this.buffs.push(new DamageIncreaseOnKill(5));
         this.resourceScalings.push({
@@ -30,21 +31,18 @@ export class Balefire extends PlayableCard {
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage 2 times, plus 1 time for each Curse the target has.`;
+        return `Deal ${this.getDisplayedDamage()} damage 2 times, plus 1 time for each Cursed the target has.`;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         const target = targetCard as BaseCharacter;
         if (!target) return;
 
-        for (let i = 0; i < this.getBaseMagicNumberAfterResourceScaling(); i++) {
-            this.dealDamageToTarget(target);
-        }
+        var timesApplied = this.getBaseMagicNumberAfterResourceScaling() + target.getBuffStacks(
+            new Cursed().getBuffCanonicalName());
 
-        const owner = this.owningCharacter as BaseCharacter;
-        if (owner) {
-            owner.maxHitpoints -= 3;
-            owner.hitpoints = Math.min(owner.hitpoints, owner.maxHitpoints);
+        for (let i = 0; i < timesApplied; i++) {
+            this.dealDamageToTarget(target);
         }
     }
 

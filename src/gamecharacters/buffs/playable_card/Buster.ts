@@ -1,8 +1,7 @@
 import { IBaseCharacter } from "../../IBaseCharacter";
 import { AbstractBuff } from "../AbstractBuff";
-import { Titan } from "./Titan";
 
-export class GiantKiller extends AbstractBuff {
+export class Buster extends AbstractBuff {
     constructor(stacks: number = 1) {
         super();
         this.stacks = stacks;
@@ -11,15 +10,15 @@ export class GiantKiller extends AbstractBuff {
     }
 
     override getDisplayName(): string {
-        return "Giant Killer";
+        return "Buster";
     }
 
     override getDescription(): string {
-        return `Increases damage dealt to enemies with Titan by 50% × ${this.getStacksDisplayText()}.`;
+        return `Increases damage dealt to enemies with block by 50% × ${this.getStacksDisplayText()}.`;
     }
 
     override getAdditionalPercentCombatDamageDealtModifier(target?: IBaseCharacter): number {
-        if (target && target.buffs.some(buff => buff instanceof Titan)) {
+        if (target && target.block > 0) {
             return 50 * this.stacks;
         }
         return 0;

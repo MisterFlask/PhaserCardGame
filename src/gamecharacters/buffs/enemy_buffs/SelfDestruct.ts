@@ -28,7 +28,7 @@ export class SelfDestruct extends AbstractBuff {
         return `After ${this.secondaryStacks} ${turnText}, deals 999 damage to self and ${this.getStacksDisplayText()} damage to all player characters.${explosionWarning}`;
     }
 
-    override onTurnEnd_CharacterBuff(): void {
+    override onTurnEnd(): void {
         this.secondaryStacks--;
         if (this.secondaryStacks <= 0) {
             this.explode();

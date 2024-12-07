@@ -16,7 +16,7 @@ export class Regeneration extends AbstractBuff {
         return `Heals ${this.getStacksDisplayText()} HP at the end of each turn.`;
     }
 
-    override onTurnEnd_CharacterBuff(): void {
+    override onTurnEnd(): void {
         const owner = this.getOwnerAsCharacter();
         if (owner) {
             this.actionManager.heal(owner, this.stacks);

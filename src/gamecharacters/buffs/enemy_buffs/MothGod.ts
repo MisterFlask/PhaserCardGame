@@ -1,10 +1,10 @@
 import { GameState } from "../../../rules/GameState";
 import { TargetingType } from "../../AbstractCard";
-import { IBaseCharacter } from "../../IBaseCharacter";
 import { EntityRarity, PlayableCard } from "../../PlayableCard";
 import { CardType } from "../../Primitives";
 import { AbstractBuff } from "../AbstractBuff";
 import { ExhaustBuff } from "../playable_card/ExhaustBuff";
+import { Hazardous } from "../playable_card/Hazardous";
 
 export class MothGod extends AbstractBuff {
     constructor(stacks: number = 1) {
@@ -82,31 +82,3 @@ class Moth extends PlayableCard {
     }
 }
 
-class Hazardous extends AbstractBuff {
-    constructor(stacks: number = 1) {
-        super();
-        this.stacks = stacks;
-        this.stackable = true;
-    }
-
-    override getDisplayName(): string {
-        return "Hazardous";
-    }
-
-    override getDescription(): string {
-        return `At the end of turn, deal ${this.getStacksDisplayText()} damage to you.`;
-    }
-
-    override onInHandAtEndOfTurn(): void {
-        const owner = this.getOwnerAsPlayableCard();
-        if (owner?.owningCharacter) {
-            this.actionManager.dealDamage({
-                baseDamageAmount: this.stacks,
-                target: owner.owningCharacter as IBaseCharacter,
-                sourceCharacter: owner.owningCharacter,
-                fromAttack: false,
-                sourceCard: owner
-            });
-        }
-    }
-}

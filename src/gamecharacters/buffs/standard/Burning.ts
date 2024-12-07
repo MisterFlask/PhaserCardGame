@@ -22,7 +22,7 @@ export class Burning extends AbstractBuff {
         this.stackable = true;
     }
     
-    override onTurnEnd_CharacterBuff(): void {
+    override onTurnEnd(): void {
         const owner = this.getOwnerAsCharacter();
         if (owner) {
             const powderAmount = GameState.getInstance().combatState.combatResources.powder.value;

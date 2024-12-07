@@ -9,6 +9,13 @@ export enum PileName {
   Hand = "hand",
   Exhaust = "exhaust"
 }
+
+export enum PilePosition {
+  TOP = "top",
+  BOTTOM = "bottom",
+  RANDOM = "random"
+}
+
 export class DeckLogic {
   private static instance: DeckLogic;
 
@@ -73,30 +80,42 @@ export class DeckLogic {
     return drawnCards;
   }
 
-  public static moveCardToPile(card: PlayableCard, pile: PileName): void {
-      const gameState = GameState.getInstance();
-      const combatState = gameState.combatState;
-
+  public static moveCardToPile(
+    card: PlayableCard, 
+    pile: PileName, 
+    position: PilePosition = PilePosition.BOTTOM
+  ): void {
+    const gameState = GameState.getInstance();
+    const combatState = gameState.combatState;
+    
+    this.removeCardFromAllPiles(card);
+    
+    const targetPile = (() => {
       switch (pile) {
-          case PileName.Draw:
-              this.removeCardFromAllPiles(card);
-              combatState.drawPile.push(card);
-              break;
-          case PileName.Discard:
-              this.removeCardFromAllPiles(card);
-              combatState.currentDiscardPile.push(card);
-              break;
-          case PileName.Hand:
-              this.removeCardFromAllPiles(card);
-              combatState.currentHand.push(card);
-              break;
-          case PileName.Exhaust:
-              this.removeCardFromAllPiles(card);
-              combatState.currentExhaustPile.push(card);
-              break;
-          default:
-              console.warn(`Unknown pile: ${pile}`);
+        case PileName.Draw: return combatState.drawPile;
+        case PileName.Discard: return combatState.currentDiscardPile;
+        case PileName.Hand: return combatState.currentHand;
+        case PileName.Exhaust: return combatState.currentExhaustPile;
+        default:
+          console.warn(`Unknown pile: ${pile}`);
+          return null;
       }
+    })();
+
+    if (!targetPile) return;
+
+    switch (position) {
+      case PilePosition.TOP:
+        targetPile.push(card);
+        break;
+      case PilePosition.BOTTOM:
+        targetPile.unshift(card);
+        break;
+      case PilePosition.RANDOM:
+        const randomIndex = Math.floor(Math.random() * (targetPile.length + 1));
+        targetPile.splice(randomIndex, 0, card);
+        break;
+    }
   }
 
   private static removeCardFromAllPiles(card: IAbstractCard): void {

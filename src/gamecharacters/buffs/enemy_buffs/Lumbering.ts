@@ -27,7 +27,7 @@ export class Lumbering extends AbstractBuff {
         return this.secondaryStacks;
     }
 
-    override onTurnEnd_CharacterBuff(): void {
+    override onTurnEnd(): void {
         this.secondaryStacks = 0;
     }
 }

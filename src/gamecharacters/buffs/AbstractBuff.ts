@@ -307,7 +307,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
     }
 
-    onTurnEnd_CharacterBuff() {
+    onTurnEnd() {
 
     }
 

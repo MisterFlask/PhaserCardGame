@@ -979,7 +979,7 @@ export class ActionManager {
         // end turn buffs
         combatState.allPlayerAndEnemyCharacters.forEach(character => {
             character.buffs.forEach(buff => {
-                buff.onTurnEnd_CharacterBuff();
+                buff.onTurnEnd();
             });
         });
 

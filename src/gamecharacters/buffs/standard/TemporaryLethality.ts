@@ -21,7 +21,7 @@ export class TemporaryLethality extends AbstractBuff {
         return this.stacks;
     }
 
-    override onTurnEnd_CharacterBuff(): void {
+    override onTurnEnd(): void {
         this.stacks = 0;
     }
 }

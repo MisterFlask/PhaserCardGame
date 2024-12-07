@@ -1,4 +1,5 @@
 import { AbstractBuff } from "../gamecharacters/buffs/AbstractBuff";
+import { Buster } from "../gamecharacters/buffs/playable_card/Buster";
 import { ErodingValue } from "../gamecharacters/buffs/playable_card/ErodingValue";
 import { ExhaustBuff } from "../gamecharacters/buffs/playable_card/ExhaustBuff";
 import { Figment } from "../gamecharacters/buffs/playable_card/Figment";
@@ -20,7 +21,6 @@ import { ExplosiveFinishCardBuff } from "../gamecharacters/buffs/standard/Explos
 import { FearGod } from "../gamecharacters/buffs/standard/FearGod";
 import { Fearless } from "../gamecharacters/buffs/standard/Fearless";
 import { Flying } from "../gamecharacters/buffs/standard/Flying";
-import { GiantKiller } from "../gamecharacters/buffs/standard/GiantKiller";
 import { GrowingPowerBuff } from "../gamecharacters/buffs/standard/GrowingPower";
 import { HellSellValue } from "../gamecharacters/buffs/standard/HellSellValue";
 import { Holy } from "../gamecharacters/buffs/standard/Holy";
@@ -90,7 +90,7 @@ export class MagicWords {
         new FearGod(),
         new Fearless(),
         new Flying(),
-        new GiantKiller(),
+        new Buster(),
         new GrowingPowerBuff(),
         new HellSellValue(),
         new Holy(),

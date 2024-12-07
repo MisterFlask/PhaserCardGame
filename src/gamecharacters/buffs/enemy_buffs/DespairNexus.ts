@@ -16,7 +16,7 @@ export class DespairNexus extends AbstractBuff {
         return `At the end of each turn, decrease all resource counts by ${this.getStacksDisplayText()}.`;
     }
 
-    override onTurnEnd_CharacterBuff(): void {
+    override onTurnEnd(): void {
         const gameState = GameState.getInstance();
         const combatResources = gameState.combatState.combatResources;
         combatResources.resources().forEach((resource) => {

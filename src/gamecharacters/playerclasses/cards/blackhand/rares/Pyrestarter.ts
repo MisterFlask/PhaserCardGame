@@ -58,7 +58,7 @@ export class PyrestarterBuff extends AbstractBuff {
         }
     }
 
-    override onTurnEnd_CharacterBuff(): void {
+    override onTurnEnd(): void {
         this.stacks = 0;
     }
 }
