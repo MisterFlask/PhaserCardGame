@@ -98,13 +98,15 @@ export enum PriceContext {
 }
 
 export abstract class AbstractCard implements IAbstractCard {
+
+    tags: string[] = [];
+    
     asPlayerCharacter() : PlayerCharacter | null {
         if (this.hasOwnProperty("characterClass")) {
             return this as unknown as PlayerCharacter;
         }
         return null;
     }
-
     
     public getPile() : BattleCardLocation {
         return GameState.getInstance().combatState.getBattleCardLocation(this.id);

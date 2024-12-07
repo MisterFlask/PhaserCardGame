@@ -1,11 +1,9 @@
 import Phaser from 'phaser';
-import { ShopGuy } from '../../encounters/EncountersList';
 import { AbstractCard, PriceContext } from '../../gamecharacters/AbstractCard';
-import { BaseCharacter } from '../../gamecharacters/BaseCharacter';
 import { PlayerCharacter } from '../../gamecharacters/BaseCharacterClass';
 import { PlayableCard } from '../../gamecharacters/PlayableCard';
 import { AbstractRelic } from '../../relics/AbstractRelic';
-import { GameState } from '../../rules/GameState';
+import { GameState, ShopContents } from '../../rules/GameState';
 import { DepthManager } from '../../ui/DepthManager';
 import { ShopCardPanel } from '../../ui/ShopCardPanel';
 import { ShopRelicPanel } from '../../ui/ShopRelicPanel';
@@ -32,6 +30,7 @@ export class ShopOverlay {
     private debugOutlinesVisible: boolean = false;
     private readonly SHOP_BASE_DEPTH = DepthManager.getInstance().SHOP_OVERLAY;
     private readonly HOVER_DEPTH_BOOST = 1000;
+    private currentShop: ShopContents = GameState.getInstance().combatShopContents;
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -119,7 +118,7 @@ export class ShopOverlay {
         const startX = width - 400;
         const startY = height / 2 - (verticalSpacing * (gridColumns - 1) / 2);
 
-        GameState.getInstance().shopRelicsForSale.forEach((relic, index) => {
+        this.currentShop.shopRelicsForSale.forEach((relic, index) => {
             const row = Math.floor(index / gridColumns);
             const col = index % gridColumns;
             
@@ -142,9 +141,9 @@ export class ShopOverlay {
         console.log(`Buying relic ${relic.name}`);
         if (ActionManagerFetcher.getActionManager().buyRelicForHellCurrency(relic, relic.price)) {
             // Remove the purchased relic from the shop relics array
-            const relicIndex = GameState.getInstance().shopRelicsForSale.findIndex(shopRelic => shopRelic.name === relic.name);
+            const relicIndex = this.currentShop.shopRelicsForSale.findIndex(shopRelic => shopRelic.name === relic.name);
             if (relicIndex !== -1) {
-                GameState.getInstance().shopRelicsForSale.splice(relicIndex, 1);
+                this.currentShop.shopRelicsForSale.splice(relicIndex, 1);
             }
             
             this.refreshShop();
@@ -257,7 +256,7 @@ export class ShopOverlay {
     }
 
     private getShopItems(): PlayableCard[] {
-        var cards = GameState.getInstance().shopCardsForSale;
+        var cards = this.currentShop.shopCardsForSale;
 
         // assign each card to a random character of the appropriate class, or if no such character exists, assign it to a random player character
         cards.forEach(card => {
@@ -276,9 +275,9 @@ export class ShopOverlay {
         // remove from shop
         if (ActionManagerFetcher.getActionManager().buyItemForHellCurrency(item)) { 
             // Remove the purchased item from the shop items array
-            const itemIndex = GameState.getInstance().shopCardsForSale.findIndex(shopItem => shopItem.id === item.id);
+            const itemIndex = this.currentShop.shopCardsForSale.findIndex(shopItem => shopItem.id === item.id);
             if (itemIndex !== -1) {
-                GameState.getInstance().shopCardsForSale.splice(itemIndex, 1);
+                this.currentShop.shopCardsForSale.splice(itemIndex, 1);
             }
 
             this.populatePurchasableShopCards()
@@ -359,10 +358,21 @@ export class ShopOverlay {
 
     public handleCardClick(card: AbstractCard): void {
         console.log('Card clicked (shop handler)');
-        if (card instanceof BaseCharacter && card.name == new ShopGuy().name) {
+        if (card.tags.includes("shop_combat")) {
             console.log('Shop clicked');
-            this.toggle();
+            this.currentShop = GameState.getInstance().combatShopContents;
         }
+        if (card.tags.includes("shop_sell_imports")) {
+            console.log('Import shop clicked');
+            this.currentShop = GameState.getInstance().importShopContents;
+        }
+        if (card.tags.includes("shop_buy_exports")) {
+            console.log('Cursed goods shop clicked');
+            this.currentShop = GameState.getInstance().cursedGoodsShopContents;
+        }   
+        this.refreshShop();
+        this.toggle();
+
     }
 
     private toggleDebugOutlines(): void {

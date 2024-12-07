@@ -10,6 +10,7 @@ import { IncreaseSmog } from '../gamecharacters/buffs/standard/combatresource/In
 import { IncreaseVenture } from '../gamecharacters/buffs/standard/combatresource/IncreaseVenture';
 import { Lethality } from '../gamecharacters/buffs/standard/Strong';
 import { EntityRarity, PlayableCard } from '../gamecharacters/PlayableCard';
+import { Rummage } from '../gamecharacters/playerclasses/cards/basic/Rummage';
 import { CardLibrary } from '../gamecharacters/playerclasses/cards/CardLibrary';
 import { AbstractRelic } from '../relics/AbstractRelic';
 import { RelicsLibrary } from '../relics/RelicsLibrary';
@@ -103,7 +104,7 @@ export class ShopPopulator {
         return availableCards.slice(0, count);
     }
 
-    public getShopCards(): PlayableCard[] {
+    public getCombatShopCards(): PlayableCard[] {
         const cards = this.getRandomCardsFromPlayerCharacterCardPools(ShopPopulator.NUM_CARDS_PER_SHOP);
         cards.forEach(card => {
             this.generateRandomCardModificationIfAny(card);
@@ -112,7 +113,7 @@ export class ShopPopulator {
         return cards;
     }
 
-    public getShopRelics(): AbstractRelic[] {
+    public getCombatShopRelics(): AbstractRelic[] {
         const items: AbstractRelic[] = [];
         const relics = RelicsLibrary.getInstance().getRandomRelics(ShopPopulator.NUM_RELICS_PER_SHOP);
         relics.forEach(relic => {
@@ -120,6 +121,10 @@ export class ShopPopulator {
             relic.price = this.getRelicPrice(relic);
         });
         return items;
+    }
+
+    public getCursedGoodsCards(): PlayableCard[]{
+        return [new Rummage()]; //todo: add more cursed goods cards
     }
 }
 function getRandomEnhancementBuff(): AbstractBuff {
@@ -136,4 +141,5 @@ function getRandomEnhancementBuff(): AbstractBuff {
     ]
     return buffs[Math.floor(Math.random() * buffs.length)];
 }
+
 

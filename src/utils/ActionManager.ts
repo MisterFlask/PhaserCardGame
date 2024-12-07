@@ -1,4 +1,4 @@
-import { CombatState, GameState } from "../rules/GameState";
+import { CombatState, GameState, ShopContents } from "../rules/GameState";
 
 import Phaser, { Scene } from 'phaser';
 import { AbstractCard, IPhysicalCardInterface } from '../gamecharacters/AbstractCard';
@@ -892,10 +892,10 @@ export class ActionManager {
         }));
     }
 
-    public purchaseShopItem(item: PlayableCardType): void {
+    public purchaseShopItem(shop: ShopContents, item: PlayableCardType): void {
         item.OnPurchase();
         this.addCardToMasterDeck(item);
-        GameState.getInstance().shopCardsForSale = GameState.getInstance().shopCardsForSale.filter(i => i !== item);
+        shop.shopCardsForSale = shop.shopCardsForSale.filter(i => i !== item);
     }
 
     public async resolveActions(): Promise<void> {

@@ -141,10 +141,34 @@ export class Encounter {
 export class ShopGuy extends AutomatedCharacter {
     constructor() {
         super({ name: 'Shop Guy', portraitName: 'ShopGuy', maxHitpoints: 10, description: 'this aint a charity' });
+        this.tags.push("shop_combat");
     }
 
     override generateNewIntents(): AbstractIntent[] {
         return [ new AttackIntent({ baseDamage: 10, owner: this }).withTitle("rapture") ]
+    }
+}
+
+export class CommoditiesGuy extends AutomatedCharacter {
+    constructor() {
+        super({ name: 'Commodities Guy', portraitName: 'CommoditiesGuy', maxHitpoints: 10, description: 'you got me the goods, I got you the phlegothon oil' });
+        this.tags.push("shop_sell_imports");
+    }
+
+    override generateNewIntents(): AbstractIntent[] {
+        return [ new AttackIntent({ baseDamage: 10, owner: this }).withTitle("joy") ]
+    }
+}
+
+
+export class CursedGoodsTrader extends AutomatedCharacter {
+    constructor() {
+        super({ name: 'Cursed Goods Trader', portraitName: 'CursedGoodsTrader', maxHitpoints: 10, description: 'they fell off the back of a wagon, you want em or not' });
+        this.tags.push("shop_buy_exports");
+    }
+
+    override generateNewIntents(): AbstractIntent[] {
+        return [ new AttackIntent({ baseDamage: 10, owner: this }).withTitle("joy") ]
     }
 }
 
@@ -196,7 +220,13 @@ export class EncounterManager {
     }
 
     public getShopEncounter(): Encounter {
-        return new Encounter([new ShopGuy()], 0, 0);
+        
+        // todo: differentiate between acts
+        var shopGuys = [new ShopGuy()];
+        shopGuys.push(new CommoditiesGuy());
+        shopGuys.push(new CursedGoodsTrader());
+
+        return new Encounter(shopGuys, GameState.getInstance().currentAct, 0);
     }
 
     getEventRoomEncounter(act: integer, segment: integer): Encounter {

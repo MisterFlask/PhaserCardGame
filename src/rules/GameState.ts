@@ -37,9 +37,9 @@ export class GameState {
     public roster: PlayerCharacter[] = [];
     public currentRunCharacters: PlayerCharacter[] = [];
 
-    // shop stuff
-    public shopCardsForSale: PlayableCard[] = [];
-    public shopRelicsForSale: AbstractRelic[] = [];
+    combatShopContents: ShopContents = new ShopContents();
+    cursedGoodsShopContents: ShopContents = new ShopContents();
+    importShopContents: ShopContents = new ShopContents();
 
     // player's stuff
     public get masterDeckAllCharacters(): readonly PlayableCard[] {
@@ -133,19 +133,29 @@ export class GameState {
 
     public rerollShop(): void {
         console.log('rerolling shop')
-        const shopCards = ShopPopulator.getInstance().getShopCards();
-        const shopRelics = ShopPopulator.getInstance().getShopRelics();
+        const shopCards = ShopPopulator.getInstance().getCombatShopCards();
+        const shopRelics = ShopPopulator.getInstance().getCombatShopRelics();
         console.log('shop cards after reroll', shopCards)
         console.log('shop relics after reroll', shopRelics)
-        this.shopCardsForSale = shopCards;
-        this.shopRelicsForSale = shopRelics;
+        this.combatShopContents.shopCardsForSale = shopCards;
+        this.combatShopContents.shopRelicsForSale = shopRelics;
+        this.combatShopContents.interestInPurchasingImports = false;
+
+        // todo: other shops
+        this.cursedGoodsShopContents.shopCardsForSale = ShopPopulator.getInstance().getCursedGoodsCards();
+        this.cursedGoodsShopContents.shopRelicsForSale = [];
+        this.cursedGoodsShopContents.interestInPurchasingImports = false;
+        
+        this.importShopContents.interestInPurchasingImports = true;
+        this.importShopContents.shopCardsForSale = [];
+        this.importShopContents.shopRelicsForSale = [];
     }
 
     // Reset method
     public reset(): void {
         this.roster = [];
         this.currentRunCharacters = [];
-        this.shopCardsForSale = [];
+        this.combatShopContents = new ShopContents();
     }
 
     // Serializer function
@@ -159,7 +169,7 @@ export class GameState {
                 type: char.constructor.name,
                 ...char
             })),
-            shopItems: this.shopCardsForSale,
+            shopItems: this.combatShopContents.shopCardsForSale,
             inventory: this.masterDeckAllCharacters
         };
         return JSON.stringify(serializableState);
@@ -253,6 +263,15 @@ export class CombatState{
         this.energyAvailable = this.defaultMaxEnergy;
         this.combatResources = new CombatResources();
     }
+}
+
+export class ShopContents{
+    
+
+    // shop stuff
+    public shopCardsForSale: PlayableCard[] = [];
+    public shopRelicsForSale: AbstractRelic[] = [];
+    public interestInPurchasingImports: boolean = false;
 }
 
 export enum BattleCardLocation {
