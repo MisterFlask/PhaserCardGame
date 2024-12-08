@@ -1,6 +1,6 @@
 import { AbstractChoice, AbstractEvent, DeadEndEvent } from "../../events/AbstractEvent";
-import { Lethality } from "../../gamecharacters/buffs/standard/Strong";
 import { PlayableCard } from "../../gamecharacters/PlayableCard";
+import { RestSiteCardUpgradeModifier } from "../../rules/RestSiteUpgradeOption";
 import { UpgradePreviewOverlay } from "../../screens/subcomponents/CharacterDeckUpgradeOverlay";
 import { DepthManager } from "../../ui/DepthManager";
 
@@ -28,10 +28,12 @@ class RestChoice extends AbstractChoice {
 }
 
 export class UpgradeChoice extends AbstractChoice {
-    constructor() {
+    restSiteUpgradeOptions: RestSiteCardUpgradeModifier[];
+    constructor(restSiteUpgradeOptions: RestSiteCardUpgradeModifier[]) {
         super("Upgrade Deck", "Upgrade a card in your deck");
         this.nextEvent = new DeadEndEvent();
         this.nextEvent.description = "Better weapon. Cool.";
+        this.restSiteUpgradeOptions = restSiteUpgradeOptions;
     }
 
     canChoose(): boolean {
@@ -46,11 +48,18 @@ export class UpgradeChoice extends AbstractChoice {
 
         const upgradeFunction = (card: PlayableCard): PlayableCard[] => {
             // Return the available upgrades for `card`
-            var newCard =card.Copy()
-            newCard.buffs.push(new Lethality(2))
+            const upgrades: PlayableCard[] = [];
+            
+            // Add each rest site upgrade option that's valid for this card
+            for (const upgradeOption of this.restSiteUpgradeOptions) {
+                if (upgradeOption.eligible(card)) {
+                    const upgradedCard = card.Copy();
+                    upgradeOption.modifier(upgradedCard);
+                    upgrades.push(upgradedCard);
+                }
+            }
 
-            var newCard2 = card.upgrade()
-            return [newCard, newCard2]
+            return upgrades;
         };
 
         const overlay = new UpgradePreviewOverlay(scene, candidateCards, upgradeFunction);
@@ -100,15 +109,17 @@ class ScavengeChoice extends AbstractChoice {
 }
 
 export class RestEvent extends AbstractEvent {
-    constructor() {
+    restSiteUpgradeOptions: RestSiteCardUpgradeModifier[];
+    constructor(restSiteUpgradeOptions: RestSiteCardUpgradeModifier[]) {
         super();
         this.name = "Rest Site";
+        this.restSiteUpgradeOptions = restSiteUpgradeOptions;
         this.portraitName = "placeholder_event_background_2";
         this.description = "You've found a relatively safe spot to rest. The ambient heat from nearby hellfire provides a strange comfort. You could take this opportunity to recover, or search the area for resources.";
         this.choices = [
             new RestChoice(),
             new ScavengeChoice(),
-            new UpgradeChoice()
+            new UpgradeChoice(this.restSiteUpgradeOptions)
         ];
     }
 } 

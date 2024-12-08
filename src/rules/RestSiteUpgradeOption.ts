@@ -14,7 +14,7 @@ export class RestSiteCardUpgradeModifier {
     constructor(
         public readonly weight: number,
         public readonly modifier: (card: PlayableCard) => void,
-        public readonly requires: (card: PlayableCard) => boolean = () => true
+        public readonly eligible: (card: PlayableCard) => boolean = () => true
     ) {}
 }
 

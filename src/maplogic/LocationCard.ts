@@ -12,6 +12,7 @@ import { CardReward } from '../rewards/CardReward';
 import { CurrencyReward } from '../rewards/CurrencyReward';
 import { CardRewardsGenerator } from '../rules/CardRewardsGenerator';
 import { GameState } from '../rules/GameState';
+import { RestSiteCardUpgradeModifier, RestSiteUpgradeOptionManager } from '../rules/RestSiteUpgradeOption';
 import { ActionManager } from '../utils/ActionManager';
 import { Faction } from './Faction';
 
@@ -126,6 +127,7 @@ export class BossRoomCard extends LocationCard {
 
 export class RestSiteCard extends LocationCard {
 
+    public restSiteUpgradeOptions: RestSiteCardUpgradeModifier[] = [];
     constructor(floor: number, index: number) {
         super({
             name: 'Rest Site',
@@ -136,12 +138,14 @@ export class RestSiteCard extends LocationCard {
         });
         this.portraitName = 'rest-icon';
         this.portraitTint = 0xffa500;
+        this.restSiteUpgradeOptions = RestSiteUpgradeOptionManager.getInstance().getRandomSetOfUpgradeOptions(3);
+
     }
 
     override OnLocationSelected(scene: Phaser.Scene): void {
         console.log(`Rest room ${this.id} selected`);
         
-        const eventEncounter = EncounterManager.getInstance().getRestEncounter();
+        const eventEncounter = EncounterManager.getInstance().getRestEncounter(this.restSiteUpgradeOptions);
         ActionManager.getInstance().cleanupAndRestartCombat({ encounter: eventEncounter, shouldStartWithMapOverlay: false });
         this.gameEvent = eventEncounter.event;  
     }

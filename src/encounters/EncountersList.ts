@@ -9,6 +9,7 @@ import { Terrifying } from '../gamecharacters/buffs/standard/Terrifying';
 import { AbstractRelic } from '../relics/AbstractRelic';
 import { RelicsLibrary } from '../relics/RelicsLibrary';
 import { GameState } from '../rules/GameState';
+import { RestSiteCardUpgradeModifier } from '../rules/RestSiteUpgradeOption';
 import { RestEvent } from './events/RestEvent';
 import { FrenchBlindProphetess } from './monsters/act1_boss/FrenchBlindProphetess';
 import { FrenchChef } from './monsters/act1_segment1/FrenchChef';
@@ -235,8 +236,8 @@ export class EncounterManager {
         return encounter;
     }
     
-    getRestEncounter(): Encounter {
-        var encounter=  new Encounter([], GameState.getInstance().currentAct, -1, new RestEvent());
+    getRestEncounter(restSiteUpgradeOptions: RestSiteCardUpgradeModifier[]): Encounter {
+        var encounter=  new Encounter([], GameState.getInstance().currentAct, -1, new RestEvent(restSiteUpgradeOptions));
         encounter.peaceful = true;
         return encounter;
     }
