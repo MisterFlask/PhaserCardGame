@@ -1,5 +1,6 @@
 import { Buster } from "../gamecharacters/buffs/playable_card/Buster";
 import { Doubled } from "../gamecharacters/buffs/playable_card/Doubled";
+import { Lightweight } from "../gamecharacters/buffs/playable_card/Lightweight";
 import { BloodPriceBuff } from "../gamecharacters/buffs/standard/Bloodprice";
 import { GrowingPowerBuff } from "../gamecharacters/buffs/standard/GrowingPower";
 import { HellSellValue } from "../gamecharacters/buffs/standard/HellSellValue";
@@ -112,6 +113,13 @@ export class RestSiteUpgradeOptionManager {
             card.name = card.name + "🌱";
         },
         (card: PlayableCard) => card.baseDamage > 0),
+
+        /// Lightweight
+        new RestSiteCardUpgradeModifier(1, (card: PlayableCard) => {
+            card.buffs.push(new Lightweight(1));
+            card.name = card.name + "🪶";
+        },
+        (card: PlayableCard) => true),
     ];
 
     private standardUpgrade = new RestSiteCardUpgradeModifier(1, (card: PlayableCard) => {

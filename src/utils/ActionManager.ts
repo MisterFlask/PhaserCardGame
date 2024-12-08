@@ -406,30 +406,35 @@ export class ActionManager {
             
             // Handle missing energy using buffs
             let missingEnergy = playableCard.energyCost - combatState.energyAvailable;
-            let missingEnergyBuffs: AbstractBuff[] = [];
+            const coverageDetails: {buff: AbstractBuff, amount: number}[] = [];
 
-            // Collect buffs that will pay for missing energy
             for (const buff of card.data.buffs) {
                 if (missingEnergy <= 0) break;
-
-                const maxProvidedIfWePayAltCost = buff.canPayThisMuchMissingEnergy(missingEnergy);
-                if (maxProvidedIfWePayAltCost > 0) {
-                    const energyToCover = Math.min(missingEnergy, maxProvidedIfWePayAltCost);
-                    missingEnergy -= energyToCover;
-                    missingEnergyBuffs.push(buff);
+                const canCover = buff.canPayThisMuchMissingEnergy(missingEnergy);
+                if (canCover > 0) {
+                    const coverNow = Math.min(missingEnergy, canCover);
+                    missingEnergy -= coverNow;
+                    coverageDetails.push({buff, amount: coverNow});
                 }
             }
-
-            combatState.energyAvailable -= playableCard.energyCost;
+            
+            if (missingEnergy > 0) {
+                // still can't pay all costs, bail
+                return false;
+            }
+            
+            // deduct energy first
+            const usedFromPool = Math.min(combatState.energyAvailable, playableCard.energyCost);
+            combatState.energyAvailable -= usedFromPool;
+            
             playableCard.InvokeCardEffects(target);
-
             this.InvokeSecondaryEffectsOfPlayingCard(playableCard, target);
-
-            // Pay the missing energy through buffs
-            missingEnergyBuffs.forEach(buff => {
-                buff.provideMissingEnergy_returnsAmountProvided(missingEnergy);
-            });
-
+            
+            // now pay with buffs
+            for (const {buff, amount} of coverageDetails) {
+                console.log(`Paying ${amount} missing energy with ${buff.getDisplayName()}`);
+                buff.provideMissingEnergy_returnsAmountProvided(amount);
+            }
 
             if (card.data.transientUiFlag_disableStandardDiscardAfterPlay){
                 // do nothing, don't move it back
