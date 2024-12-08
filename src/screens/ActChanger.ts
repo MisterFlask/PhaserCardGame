@@ -29,7 +29,7 @@ export class ActChanger {
         if (locations.length > 0) {
             gameState.setCurrentLocation(locations[0]);
         }
-        SceneChanger.switchToCombatScene(EncounterManager.getInstance().getRestEncounter(), true);
+        SceneChanger.switchToCombatScene(EncounterManager.getInstance().getShopEncounter(), true);
 
         // Emit event to show map overlay
         this.scene.events.emit('showMapOverlay');

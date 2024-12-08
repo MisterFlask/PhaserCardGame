@@ -44,7 +44,7 @@ export class FrenchIntellectual extends AutomatedCharacter {
             name: "Lexiophage",
             portraitName: "Eldritch Intellectual",
             maxHitpoints: 120,
-            description: "every weapon never made."
+            description: "responsible for three out of four paperwork errors"
         });
         
         // Apply initial Philosophical Shield buff

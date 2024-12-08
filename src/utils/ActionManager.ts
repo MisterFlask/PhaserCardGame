@@ -398,12 +398,27 @@ export class ActionManager {
             }
             return false;
         }
+        const playableCard = card.data as PlayableCardType;
+        const gameState = GameState.getInstance();
+        const combatState = gameState.combatState;
 
-        this.actionQueue.addAction(new GenericAction(async () => {
-            const playableCard = card.data as PlayableCardType;
-            const gameState = GameState.getInstance();
-            const combatState = gameState.combatState;
-            
+        let missingEnergy = playableCard.energyCost - combatState.energyAvailable;
+
+        for (const buff of card.data.buffs) {
+            if (missingEnergy <= 0) break;
+            const canCover = buff.canPayThisMuchMissingEnergy(missingEnergy);
+            if (canCover > 0) {
+                const coverNow = Math.min(missingEnergy, canCover);
+                missingEnergy -= coverNow;
+            }
+        }
+        
+        if (missingEnergy > 0) {
+            // still can't pay all costs, bail
+            return false;
+        }
+
+        this.actionQueue.addAction(new GenericAction(async (): Promise<GameAction[]> => {
             // Handle missing energy using buffs
             let missingEnergy = playableCard.energyCost - combatState.energyAvailable;
             const coverageDetails: {buff: AbstractBuff, amount: number}[] = [];
@@ -414,13 +429,12 @@ export class ActionManager {
                 if (canCover > 0) {
                     const coverNow = Math.min(missingEnergy, canCover);
                     missingEnergy -= coverNow;
-                    coverageDetails.push({buff, amount: coverNow});
                 }
             }
             
             if (missingEnergy > 0) {
                 // still can't pay all costs, bail
-                return false;
+                return [];
             }
             
             // deduct energy first
@@ -744,8 +758,10 @@ export class ActionManager {
         ignoresBlock?: boolean
     }): void => {
         this.actionQueue.addAction(new GenericAction(async () => {
-            const physicalCardOfTarget = target.physicalCard;
+            const physicalCardOfTarget = target?.physicalCard;
+
             if (!physicalCardOfTarget) {
+                console.warn("No physical card found for " + target);
                 return [];
             }
 
@@ -999,6 +1015,11 @@ export class ActionManager {
             });
         });
 
+        combatState.allCardsInAllPilesExceptExhaust
+            .flatMap(card => card.buffs)
+            .forEach(buff => {
+                buff.onTurnEnd();
+            });
         // Queue discard actions instead of direct discard
         this.basicDiscardCards(combatState.currentHand);
 
@@ -1119,6 +1140,12 @@ export class ActionManager {
                     buff.onTurnStart();
                 });
             });
+
+            combatState.allCardsInAllPilesExceptExhaust
+                .flatMap(card => card.buffs)
+                .forEach(buff => {
+                    buff.onTurnStart();
+                });
 
             combatState.energyAvailable = combatState.defaultMaxEnergy;
             UIContextManager.getInstance().setContext(UIContext.COMBAT);

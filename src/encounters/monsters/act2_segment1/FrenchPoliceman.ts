@@ -7,10 +7,10 @@ import { Weak } from '../../../gamecharacters/buffs/standard/Weak';
 export class FrenchPoliceman extends AutomatedCharacter {
     constructor() {
         super({
-            name: "Ashwarden",
+            name: "Ashcop",
             portraitName: "Eldritch Policeman",
             maxHitpoints: 175,
-            description: "they're all that's keeping paris out of the Null Layer"
+            description: "keeping paris out of the Null Layer"
         });
         
         // Apply initial Penance and Guilt buffs

@@ -242,7 +242,6 @@ export class EncounterManager {
         return encounter;
     }
     
-
     public getRandomCombatEncounter(actSegment: ActSegmentData): { enemies: AutomatedCharacter[] } {
         return this.getRandomEnemiesListFromActSegmentNumbers(actSegment.act, actSegment.segment);
     }

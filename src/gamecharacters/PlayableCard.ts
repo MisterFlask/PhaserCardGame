@@ -438,25 +438,40 @@ export abstract class PlayableCard extends AbstractCard {
         this.buffs.forEach(buff => buff.moveToMainDescription = true);
     }
 
-    public upgrade(): this{
-        var newCard = this.Copy();
+    public override Copy(): this {
+        const copy = super.Copy();
+        copy.baseDamage = this.baseDamage;
+        copy.baseBlock = this.baseBlock;
+        copy.baseMagicNumber = this.baseMagicNumber;
+
+        copy.resourceScalings = this.resourceScalings.slice().map(item => this.copyResourceScaling(item));
+        return copy;
+    }
+
+    public standardUpgrade(inPlace: boolean = true): this{
+        if (inPlace){
+            var newCard = this;
+        }
+        else{
+            var newCard = this.Copy();
+        }
 
         if (newCard.baseDamage > 0){
-            newCard.baseDamage *= 1.2;
+            newCard.baseDamage *= 1.4;
             newCard.baseDamage = Math.round(newCard.baseDamage);
             if (newCard.baseDamage == this.baseDamage){
                 newCard.baseDamage += 1;
             }
         }
         else if (newCard.baseBlock > 0){
-            newCard.baseBlock *= 1.2;
+            newCard.baseBlock *= 1.4;
             newCard.baseBlock = Math.round(newCard.baseBlock);
             if (newCard.baseBlock == this.baseBlock){
                 newCard.baseBlock += 1;
             }
         }
         else if (newCard.baseMagicNumber > 0){
-            newCard.baseMagicNumber *= 1.2;
+            newCard.baseMagicNumber *= 1.4;
             newCard.baseMagicNumber = Math.round(newCard.baseMagicNumber);
             if (newCard.baseMagicNumber == this.baseMagicNumber){
                 newCard.baseMagicNumber += 1;
@@ -468,6 +483,15 @@ export abstract class PlayableCard extends AbstractCard {
         newCard.name = this.name + "+"
         newCard.id = this.id
         return newCard;
+    }
+
+    private copyResourceScaling(scaling: CardResourceScaling): CardResourceScaling {
+        return {
+            resource: scaling.resource,
+            attackScaling: scaling.attackScaling,
+            blockScaling: scaling.blockScaling,
+            magicNumberScaling: scaling.magicNumberScaling
+        };
     }
 }
 

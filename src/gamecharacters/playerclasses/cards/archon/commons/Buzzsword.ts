@@ -30,6 +30,7 @@ export class Buzzsword extends PlayableCard {
         if (targetCard instanceof BaseCharacter) {
             this.dealDamageToTarget(targetCard);
         }
+        
         BasicProcs.getInstance().Exert(this, 1, (energyExerted) => {
             if (energyExerted > 0) {
                 this.dealDamageToTarget(targetCard);

@@ -5,7 +5,7 @@ import { Delicious } from '../../../gamecharacters/buffs/enemy_buffs/Delicious';
 export class FrenchChef extends AutomatedCharacter {
     constructor() {
         super({
-            name: "Sous-Chef Tormenta",
+            name: "Seasoner",
             portraitName: "Eldritch Slime Spawn",
             maxHitpoints: 25,
             description: "you will be baked, and then there will be cake"

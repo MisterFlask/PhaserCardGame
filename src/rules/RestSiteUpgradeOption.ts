@@ -26,19 +26,6 @@ export class RestSiteUpgradeOptionManager {
     private constructor() {}
 
     private modifiers: RestSiteCardUpgradeModifier[] = [
-        // lethality for attacks
-        new RestSiteCardUpgradeModifier(2, (card: PlayableCard) => {
-            card.baseDamage += 3;
-            card.name = card.name + "💥";
-        },
-        (card: PlayableCard) => card.baseDamage > 0),
-        
-        // bulwark for block cards
-        new RestSiteCardUpgradeModifier(2, (card: PlayableCard) => {
-            card.baseBlock += 3;
-            card.name = card.name + "🛡️";
-        },
-        (card: PlayableCard) => card.baseBlock > 0),
 
         // decrease cost for cards that cost more than 1
         new RestSiteCardUpgradeModifier(2, (card: PlayableCard) => {
@@ -116,14 +103,14 @@ export class RestSiteUpgradeOptionManager {
 
         /// Lightweight
         new RestSiteCardUpgradeModifier(1, (card: PlayableCard) => {
-            card.buffs.push(new Lightweight(1));
+            card.buffs.push(new Lightweight(3));
             card.name = card.name + "🪶";
         },
         (card: PlayableCard) => true),
     ];
 
     private standardUpgrade = new RestSiteCardUpgradeModifier(1, (card: PlayableCard) => {
-        return card.upgrade();
+        return card.standardUpgrade(true);
     }, (card: PlayableCard) => true);
 
     public static getInstance(): RestSiteUpgradeOptionManager {
