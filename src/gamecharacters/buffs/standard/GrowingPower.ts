@@ -14,7 +14,7 @@ export class GrowingPowerBuff extends AbstractBuff {
     }
 
     override getDescription(): string {
-        return `At the beginning of each turn, gain ${this.getStacksDisplayText()} Strength.`;
+        return `At the beginning of each turn, gain ${this.getStacksDisplayText()} Lethality.`;
     }
 
 
@@ -22,6 +22,11 @@ export class GrowingPowerBuff extends AbstractBuff {
         const owner = this.getOwnerAsCharacter();
         if (owner) {
             this.actionManager.applyBuffToCharacterOrCard(owner, new Lethality(this.stacks));
+        }
+
+        const ownerCard = this.getOwnerAsPlayableCard();
+        if (ownerCard) {
+            ownerCard.baseDamage += this.stacks;
         }
     }   
 }

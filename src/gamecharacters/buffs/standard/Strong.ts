@@ -1,5 +1,9 @@
 import { AbstractBuff } from "../AbstractBuff";
 export class Lethality extends AbstractBuff {
+    with (callback: (item: this) => void): this {
+        callback(this);
+        return this;
+    }
     override getDisplayName(): string {
         return "Lethality"
     }

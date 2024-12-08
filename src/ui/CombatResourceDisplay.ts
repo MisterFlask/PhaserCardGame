@@ -9,10 +9,12 @@ export class CombatResourceDisplay extends Phaser.GameObjects.Container {
     private valueText: Phaser.GameObjects.Text;
     private tooltipAttachment: TooltipAttachment;
     private resource: AbstractCombatResource;
+    private previousValue: number;
 
     constructor(scene: Scene, x: number, y: number, resource: AbstractCombatResource) {
         super(scene, x, y);
         this.resource = resource;
+        this.previousValue = resource.value;
 
         // Create icon using ShadowedImage
         this.icon = new ShadowedImage({
@@ -64,8 +66,32 @@ export class CombatResourceDisplay extends Phaser.GameObjects.Container {
         }
     }
 
+    private pulseIcon(): void {
+        // Stop any existing tweens on the icon
+        this.scene.tweens.killTweensOf(this.icon);
+
+        // Create a pulse animation
+        this.scene.tweens.add({
+            targets: this.icon,
+            scaleX: 1.2,
+            scaleY: 1.2,
+            duration: 100,
+            yoyo: true,
+            ease: 'Quad.easeInOut',
+            onComplete: () => {
+                // Ensure the icon returns to its original scale
+                this.icon.setScale(1);
+            }
+        });
+    }
+
     public updateValue(): void {
-        this.valueText.setText(`${this.resource.name}: ${this.resource.value}`);
+        const newValue = this.resource.value;
+        if (newValue !== this.previousValue) {
+            this.pulseIcon();
+            this.previousValue = newValue;
+        }
+        this.valueText.setText(`${this.resource.name}: ${newValue}`);
     }
 
     public destroy(): void {

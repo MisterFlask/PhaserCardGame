@@ -35,11 +35,13 @@ This fanatical group is dedicated to preparing for the final invasion of Heaven.
 
 In terms of style and accent, the Cult is a group of intellectuals convinced they alone understand the truth of Hell and reality.
 
-
 ### The Underclass
 The lowest rung of Hell's social ladder, these wretched souls are the descendants of damned humans who have lived in Hell for generations. They work the most dangerous and degrading jobs, from cleaning the toxic sludge pits to testing experimental British machinery. Many live in sprawling shanty towns built from scavenged industrial waste and broken dreams.
 
 In terms of style and accent, the Underclass speaks with a mix of cockney and various regional British accents, heavily corrupted by infernal slang. Their dialogue should reflect desperation and dark humor about their circumstances.
+
+### Heaven
+The Angels are alien and incomprehensible, beautiful and terrifying.  They don't involve themselves much with Hell or Earth, though Spain has managed to open diplomatic channels through which they receive blessed equipment of various kinds.  They speak in [color=white]ALL CAPS[/color].
 
 
 # LOCATIONS
