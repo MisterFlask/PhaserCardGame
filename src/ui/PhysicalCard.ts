@@ -508,6 +508,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
             duration: 200,
             ease: 'Power2',
             onUpdate: () => {
+                
             }
         });
 
@@ -564,6 +565,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
             });
         }
 
+        this.scene.events.emit("card:pointerover", this)
+
         TransientUiState.getInstance().setHoveredCard(this);
     }
 
@@ -597,6 +600,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
         }
 
         this.transientUiState.setHoveredCard(null); // Updated
+        this.scene.events.emit("card:pointerout", this)
     }
 
     onPointerDown_PhysicalCard = (): void => {
@@ -609,6 +613,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
         if (event){
             this.scene.events.emit('abstractEvent:launch', event);
         }
+        this.scene.events.emit("card:pointerdown", this)
+
     }
 
     showJsonModal(jsonData: string): void {
@@ -989,8 +995,6 @@ export class PhysicalCard implements IPhysicalCardInterface {
                 this.incomingIntents.get(intent.id)?.updateIntent(intent);
             }
         });
-
-        
 
         this.layoutTargetingIntents();
     }

@@ -26,6 +26,7 @@ export abstract class AbstractIntent implements JsonRepresentable {
         this.owner = owner;
         this.id = generateWordGuid(this.displayText());
         this.title = '';
+        console.log('Created intent with id: ' + this.id + ' and tooltip text: ' + this.tooltipText());
     }
 
     abstract tooltipText(): string;
@@ -428,7 +429,7 @@ export class ApplyDebuffToRandomCharacterIntent extends AbstractIntent {
     }
 
     tooltipText(): string {
-        return `Applying ${this.debuff.getDisplayName()} to a random player`;
+        return `Applying ${this.debuff?.getDisplayName()} to a random player`;
     }
 
     displayText(): string {

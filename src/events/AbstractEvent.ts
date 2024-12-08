@@ -12,6 +12,7 @@ export abstract class AbstractChoice {
     abstract canChoose(): boolean;
     abstract effect(): void;
     public nextEvent: AbstractEvent | null = null;
+    public parentEvent?: AbstractEvent;
 
     // helper functions
     protected actionManager(): ActionManager {

@@ -1,97 +1,257 @@
 import { Scene } from 'phaser';
 import { AbstractCard } from '../../gamecharacters/AbstractCard';
+import { PlayableCard } from '../../gamecharacters/PlayableCard';
 import { TextBoxButton } from '../../ui/Button';
-import { CharacterDeckOverlay } from './CharacterDeckOverlay';
+import { PhysicalCard } from '../../ui/PhysicalCard';
+import { UIContext, UIContextManager } from '../../ui/UIContextManager';
+import { CardGuiUtils } from '../../utils/CardGuiUtils';
 
 enum ViewState {
     SHOWING_CANDIDATES,
     SHOWING_UPGRADES
 }
 
-export class UpgradeCardOverlay extends CharacterDeckOverlay {
-    private candidateCards: AbstractCard[] = [];
-    private upgradeFunction: (card: AbstractCard) => AbstractCard[];
+/**
+ * A standalone overlay for selecting a card to upgrade and then choosing an upgrade option.
+ * 
+ * Flow:
+ * 1. showCandidates() -> displays a grid of candidate cards.
+ *    - Clicking on a candidate immediately transitions to an upgrade preview screen.
+ * 
+ * 2. Upgrade preview screen -> shows candidate card on the left, upgrade options on the right.
+ *    - Clicking on an upgrade finalizes the upgrade (calls onUpgradeSelected).
+ *    - Clicking "Nevermind" returns to the candidate list or closes the overlay if already at candidates.
+ */
+export class UpgradePreviewOverlay extends Phaser.GameObjects.Container {
+    private background: Phaser.GameObjects.Rectangle;
+    private staticContainer: Phaser.GameObjects.Container;
+    private scrollableArea: Phaser.GameObjects.Container;
+    private maskGraphics: Phaser.GameObjects.Graphics;
     private neverMindButton: TextBoxButton | null = null;
+    private cards: PhysicalCard[] = [];
 
-    private selectedUpgradableCard: AbstractCard | null = null;
-    private upgrades: AbstractCard[] = [];
+    private readonly CARDS_PER_ROW = 8;
+    private readonly CARD_SPACING = 220;
+    private readonly CARD_SCALE = 1.2;
 
+    private candidateCards: readonly PlayableCard[] = [];
+    private upgradeFunction: (card: PlayableCard) => PlayableCard[];
+    private selectedCard: PlayableCard | null = null;
+    private upgrades: PlayableCard[] = [];
     private viewState: ViewState = ViewState.SHOWING_CANDIDATES;
 
-    constructor(scene: Scene, candidateCards: AbstractCard[], upgradeFunction: (card: AbstractCard) => AbstractCard[]) {
-        super(scene);
+    public onUpgradeSelected: ((oldCard: PlayableCard, newCard: PlayableCard) => void) | null = null;
+    public onNeverMind: (() => void) | null = null;
+
+    constructor(scene: Scene, candidateCards: readonly PlayableCard[], upgradeFunction: (card: PlayableCard) => PlayableCard[]) {
+        super(scene, scene.scale.width / 2, scene.scale.height / 2);
+        scene.add.existing(this);
+
+        this.setDepth(1000);
+
         this.candidateCards = candidateCards;
         this.upgradeFunction = upgradeFunction;
+
+        // Create static container for background and buttons
+        this.staticContainer = scene.add.container(0, 0);
+        this.add(this.staticContainer);
+
+        // Semi-transparent background
+        this.background = scene.add.rectangle(
+            0, 0,
+            scene.scale.width,
+            scene.scale.height,
+            0x000000,
+            0.8
+        );
+        this.background.setOrigin(0.5);
+        this.staticContainer.add(this.background);
+
+        // Scrollable area
+        this.scrollableArea = scene.add.container(0, 0);
+        this.add(this.scrollableArea);
+
+        // Mask for scrollable area
+        this.maskGraphics = scene.add.graphics();
+        this.updateMask();
+        this.maskGraphics.setVisible(false);
+        this.staticContainer.add(this.maskGraphics);
+
+        // Hide by default
+        this.setVisible(false);
+
+        // Scroll wheel listener
+        this.scene.input.on('wheel', (pointer: Phaser.Input.Pointer, gameObjects: any, deltaX: number, deltaY: number) => {
+            if (this.visible) {
+                pointer.event.preventDefault();
+                pointer.event.stopPropagation();
+
+                this.scrollableArea.y -= deltaY;
+                this.clampScroll();
+            }
+        });
+    }
+
+    private updateMask(): void {
+        this.maskGraphics.clear();
+        this.maskGraphics.fillStyle(0xffffff);
+        this.maskGraphics.fillRect(
+            100,
+            100,
+            this.scene.scale.width - 200,
+            this.scene.scale.height - 200
+        );
+
+        const mask = new Phaser.Display.Masks.GeometryMask(this.scene, this.maskGraphics);
+        this.scrollableArea.setMask(mask);
+    }
+
+    private clampScroll(): void {
+        const maxScroll = Math.max(0, this.scrollableArea.height - (this.scene.scale.height - 200));
+        this.scrollableArea.y = Phaser.Math.Clamp(
+            this.scrollableArea.y,
+            -maxScroll,
+            0
+        );
     }
 
     /**
-     * Show the initial candidate cards along with a nevermind button.
+     * Show the candidate cards in a grid. Clicking one immediately shows the upgrade preview.
      */
     public showCandidates(): void {
         this.viewState = ViewState.SHOWING_CANDIDATES;
-        this.selectedUpgradableCard = null;
+        this.selectedCard = null;
         this.upgrades = [];
 
-        this.showCardsWithSelection(
-            this.candidateCards,
-            (selectedCard: AbstractCard) => {
-                this.handleCandidateSelected(selectedCard);
-            }
-        );
+        UIContextManager.getInstance().setContext(UIContext.CHARACTER_DECK_SHOWN);
+
+        this.clearNeverMindButton();
+        this.clearCards();
+        this.scrollableArea.setPosition(0, 0);
+
+        const marginX = -this.background.width / 2 + 50;
+        const marginY = -this.background.height / 2 + 150;
+
+        this.candidateCards.forEach((card: AbstractCard, index: number) => {
+            const row = Math.floor(index / this.CARDS_PER_ROW);
+            const col = index % this.CARDS_PER_ROW;
+
+            const x = marginX + col * this.CARD_SPACING + this.CARD_SPACING / 2;
+            const y = marginY + row * this.CARD_SPACING + this.CARD_SPACING / 2;
+
+            const physicalCard = CardGuiUtils.getInstance().createCard({
+                scene: this.scene,
+                x: x,
+                y: y,
+                data: card,
+                onCardCreatedEventCallback: (c: PhysicalCard) => {
+                    c.container.scale = this.CARD_SCALE;
+                    c.container.setInteractive({ useHandCursor: true });
+                    c.container.on('pointerdown', () => {
+                        this.handleCandidateSelected(card as PlayableCard);
+                    });
+                    this.scrollableArea.add(c.container);
+                }
+            });
+
+            this.cards.push(physicalCard);
+        });
 
         this.showNeverMindButton(() => {
-            // If we press nevermind while showing candidates, just close the overlay
-            this.hide();
+            // User clicked nevermind at candidates => close overlay.
+            this.handleNeverMind();
         }, 'Nevermind');
+
+        this.setVisible(true);
     }
 
     /**
-     * When a candidate is selected, show that candidate card along with its upgrade options.
+     * Candidate card selected, now show that card on left and its upgrades on the right.
      */
-    private handleCandidateSelected(card: AbstractCard): void {
-        this.selectedUpgradableCard = card;
+    private handleCandidateSelected(card: PlayableCard): void {
+        this.selectedCard = card;
         this.upgrades = this.upgradeFunction(card);
         this.showUpgradesForSelectedCard();
     }
 
     /**
-     * Show the selected card and its upgrade options.
+     * Show the selected card on the left and its upgrade options on the right.
+     * Clicking on an upgrade finalizes it, "Nevermind" returns to candidate view.
      */
     private showUpgradesForSelectedCard(): void {
-        if (!this.selectedUpgradableCard) return;
+        if (!this.selectedCard) return;
 
         this.viewState = ViewState.SHOWING_UPGRADES;
-        this.hideSubmitButton(); // We won't use the submit button logic from the parent here
-        this.clearNeverMindButton();
+        UIContextManager.getInstance().setContext(UIContext.CHARACTER_DECK_SHOWN);
 
-        // We'll show the selected card plus its upgrade options as a new set of cards.
-        const allCards = [this.selectedUpgradableCard, ...this.upgrades];
+        this.clearCards();
+        this.scrollableArea.setPosition(0, 0);
 
-        this.showCardsWithSelection(
-            allCards,
-            (selectedUpgradeCard: AbstractCard) => {
-                // Here you'd probably have a final step like applying the upgrade.
-                // For now, let's just close after selecting an upgrade.
-                // This is where you'd implement the actual upgrade logic if desired.
-                this.hide();
+        // Candidate card on the left
+        const leftX = - (this.background.width / 4);
+        const centerY = 0;
+        const candidatePhysicalCard = CardGuiUtils.getInstance().createCard({
+            scene: this.scene,
+            x: leftX,
+            y: centerY,
+            data: this.selectedCard,
+            onCardCreatedEventCallback: (c: PhysicalCard) => {
+                c.container.scale = this.CARD_SCALE;
+                this.scrollableArea.add(c.container);
             }
-        );
+        });
+        this.cards.push(candidatePhysicalCard);
 
-        // This "Nevermind" in upgrade view goes back to the candidate list.
+        // Upgrades on the right side, laid out vertically
+        const rightX = (this.background.width / 4);
+        const verticalSpacing = 250;
+        const startY = centerY - ((this.upgrades.length - 1) * verticalSpacing) / 2;
+
+        this.upgrades.forEach((upgradeCard: PlayableCard, index: number) => {
+            const y = startY + index * verticalSpacing;
+            const upgradePhysicalCard = CardGuiUtils.getInstance().createCard({
+                scene: this.scene,
+                x: rightX,
+                y: y,
+                data: upgradeCard,
+                onCardCreatedEventCallback: (c: PhysicalCard) => {
+                    c.container.scale = this.CARD_SCALE;
+                    c.container.setInteractive({ useHandCursor: true });
+                    c.container.on('pointerdown', () => {
+                        this.finalizeUpgradeSelection(upgradeCard);
+                    });
+                    this.scrollableArea.add(c.container);
+                }
+            });
+            this.cards.push(upgradePhysicalCard);
+        });
+
         this.showNeverMindButton(() => {
-            // Return to candidates
             this.showCandidates();
         }, 'Nevermind');
+
+        this.setVisible(true);
     }
 
-    /**
-     * Utility: Show the nevermind button and wire its callback.
-     */
+    private finalizeUpgradeSelection(chosenCard: PlayableCard): void {
+        if (this.onUpgradeSelected) {
+            this.onUpgradeSelected(this.selectedCard!, chosenCard);
+        }
+        this.hide();
+    }
+
+    private handleNeverMind(): void {
+        if (this.onNeverMind) {
+            this.onNeverMind();
+        }
+        this.hide();
+    }
+
     private showNeverMindButton(callback: () => void, text: string): void {
         if (!this.neverMindButton) {
             this.neverMindButton = new TextBoxButton({
                 scene: this.scene,
-                x: (this.background.width / 2) - 300, // Adjust position as needed
+                x: (this.background.width / 2) - 300,
                 y: -(this.background.height / 2) + 50,
                 width: 120,
                 height: 40,
@@ -110,35 +270,38 @@ export class UpgradeCardOverlay extends CharacterDeckOverlay {
         }
     }
 
-    /**
-     * Utility: Clear the nevermind button.
-     */
     private clearNeverMindButton(): void {
         if (this.neverMindButton) {
             this.neverMindButton.setVisible(false);
         }
     }
 
-    /**
-     * Override hide to ensure state resets.
-     */
+    private clearCards(): void {
+        this.cards.forEach(card => card.obliterate());
+        this.cards = [];
+    }
+
     public hide(): void {
-        super.hide();
+        UIContextManager.getInstance().setContext(UIContext.COMBAT);
+        this.setVisible(false);
         this.viewState = ViewState.SHOWING_CANDIDATES;
-        this.selectedUpgradableCard = null;
+        this.selectedCard = null;
         this.clearNeverMindButton();
     }
 
-    /**
-     * Override resize to also reposition the nevermind button if needed.
-     */
     public resize(): void {
-        super.resize();
+        // Update position and sizes
+        this.setPosition(this.scene.scale.width / 2, this.scene.scale.height / 2);
+        this.background.setSize(this.scene.scale.width, this.scene.scale.height);
+
         if (this.neverMindButton) {
             this.neverMindButton.setPosition(
                 (this.background.width / 2) - 300,
                 -(this.background.height / 2) + 50
             );
         }
+
+        this.scrollableArea.setPosition(0, 0);
+        this.updateMask();
     }
 }

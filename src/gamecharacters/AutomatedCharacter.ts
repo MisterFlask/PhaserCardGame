@@ -1,7 +1,7 @@
 
-import { BaseCharacter } from "./BaseCharacter";
 import { JsonRepresentable } from '../interfaces/JsonRepresentable';
 import { AbstractIntent } from "./AbstractIntent";
+import { BaseCharacter } from "./BaseCharacter";
 
 export abstract class AutomatedCharacter extends BaseCharacter implements JsonRepresentable {
     

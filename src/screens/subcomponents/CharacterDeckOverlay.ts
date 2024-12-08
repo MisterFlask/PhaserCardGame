@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import { AbstractCard } from '../../gamecharacters/AbstractCard';
 import { PlayerCharacter } from '../../gamecharacters/BaseCharacterClass';
+import { PlayableCard } from '../../gamecharacters/PlayableCard';
 import { GameState } from '../../rules/GameState';
 import { TextBoxButton } from '../../ui/Button';
 import { PhysicalCard } from '../../ui/PhysicalCard';
@@ -13,17 +14,17 @@ export class CharacterDeckOverlay extends Phaser.GameObjects.Container {
     protected cards: PhysicalCard[] = [];
     protected closeButton: TextBoxButton;
     protected submitButton: TextBoxButton | null = null;
-    private scrollableArea: Phaser.GameObjects.Container;
-    private maskGraphics: Phaser.GameObjects.Graphics;
+    protected scrollableArea: Phaser.GameObjects.Container;
+    protected maskGraphics: Phaser.GameObjects.Graphics;
 
-    private readonly CARDS_PER_ROW = 8;
-    private readonly CARD_SPACING = 220;
-    private readonly CARD_SCALE = 1.2;
+    protected readonly CARDS_PER_ROW = 8;
+    protected readonly CARD_SPACING = 220;
+    protected readonly CARD_SCALE = 1.2;
 
     // New fields for selection mode
-    private selectionMode: boolean = false;
-    private selectedCard: PhysicalCard | null = null;
-    private selectionCallback: ((card: AbstractCard) => void) | null = null;
+    protected selectionMode: boolean = false;
+    protected selectedCard: PhysicalCard | null = null;
+    protected selectionCallback: ((card: PlayableCard) => void) | null = null;
 
     constructor(scene: Scene) {
         super(scene, scene.scale.width / 2, scene.scale.height / 2);
@@ -141,14 +142,14 @@ export class CharacterDeckOverlay extends Phaser.GameObjects.Container {
      * @param cards The cards to display
      * @param callback A callback that receives the selected card once the user submits
      */
-    public showCardsWithSelection(cards: AbstractCard[], callback: (card: AbstractCard) => void): void {
+    public showCardsWithSelection(cards: readonly PlayableCard[], callback: (card: PlayableCard) => void): void {
         this.selectionMode = true;
         this.selectionCallback = callback;
-        this.showCards(cards);
+        this.showCards(cards.slice());
         this.showSubmitButton();
     }
 
-    public showCards(cards: AbstractCard[]): void {
+    public showCards(cards: PlayableCard[]): void {
         UIContextManager.getInstance().setContext(UIContext.CHARACTER_DECK_SHOWN);
         this.cards.forEach(card => card.obliterate());
         this.cards = [];
@@ -286,7 +287,7 @@ export class CharacterDeckOverlay extends Phaser.GameObjects.Container {
     protected handleSubmit(): void {
         if (this.selectionMode && this.selectedCard && this.selectionCallback) {
             // Invoke the callback with the selected card data
-            this.selectionCallback(this.selectedCard.data);
+            this.selectionCallback(this.selectedCard.data as PlayableCard);
             this.selectionMode = false;
             this.hideSubmitButton();
             this.hide();

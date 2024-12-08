@@ -1,4 +1,8 @@
 import { AbstractChoice, AbstractEvent, DeadEndEvent } from "../../events/AbstractEvent";
+import { Lethality } from "../../gamecharacters/buffs/standard/Strong";
+import { PlayableCard } from "../../gamecharacters/PlayableCard";
+import { UpgradePreviewOverlay } from "../../screens/subcomponents/CharacterDeckUpgradeOverlay";
+import { DepthManager } from "../../ui/DepthManager";
 
 class RestChoice extends AbstractChoice {
     constructor() {
@@ -23,11 +27,11 @@ class RestChoice extends AbstractChoice {
     }
 }
 
-class UpgradeChoice extends AbstractChoice {
+export class UpgradeChoice extends AbstractChoice {
     constructor() {
         super("Upgrade Deck", "Upgrade a card in your deck");
         this.nextEvent = new DeadEndEvent();
-        this.nextEvent.description = "Better weapon.  Cool.";
+        this.nextEvent.description = "Better weapon. Cool.";
     }
 
     canChoose(): boolean {
@@ -35,9 +39,46 @@ class UpgradeChoice extends AbstractChoice {
     }
 
     effect(): void {
-        // I DON'T KNOW PLEASE HELP
+        // Instead of finishing immediately, show the upgrade overlay.
+        const scene = this.actionManager().scene; 
+        const candidateCards = this.gameState().masterDeckAllCharacters
+        // `getAllUpgradableCards()` is an example function. Use whatever logic you have.
+
+        const upgradeFunction = (card: PlayableCard): PlayableCard[] => {
+            // Return the available upgrades for `card`
+            var newCard =card.Copy()
+            newCard.buffs.push(new Lethality(2))
+
+            var newCard2 = card.Copy()
+            newCard2.buffs.push(new Lethality(3))
+            return [newCard, newCard2]
+        };
+
+        const overlay = new UpgradePreviewOverlay(scene, candidateCards, upgradeFunction);
+        overlay.setDepth(DepthManager.getInstance().MAP_OVERLAY + 60);
+
+        overlay.showCandidates();
+
+        // When user chooses an upgrade
+        overlay.onUpgradeSelected = (oldCard: PlayableCard, newCard: PlayableCard) => {
+            // Apply the upgrade (example logic)
+            // remove old card
+            oldCard.owningCharacter?.removeCard(oldCard)
+            // add new card
+            oldCard.owningCharacter?.addCard(newCard)
+
+            // Now proceed to the next event
+            scene.events.emit('abstractEvent:launch', this.nextEvent);
+        };
+
+        // When user clicks "nevermind"
+        overlay.onNeverMind = () => {
+            // The user can now pick another option from the same event
+            scene.events.emit('abstractEvent:launch', this.parentEvent);
+        };
     }
 }
+
 
 class ScavengeChoice extends AbstractChoice {
     constructor() {
@@ -68,6 +109,7 @@ export class RestEvent extends AbstractEvent {
         this.choices = [
             new RestChoice(),
             new ScavengeChoice(),
+            new UpgradeChoice()
         ];
     }
 } 

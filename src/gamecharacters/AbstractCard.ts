@@ -100,7 +100,7 @@ export enum PriceContext {
 export abstract class AbstractCard implements IAbstractCard {
 
     tags: string[] = [];
-    
+
     asPlayerCharacter() : PlayerCharacter | null {
         if (this.hasOwnProperty("characterClass")) {
             return this as unknown as PlayerCharacter;
@@ -292,6 +292,7 @@ export abstract class AbstractCard implements IAbstractCard {
         copy.owner = this.owningCharacter;
         // Deep copy the buffs array
         copy.buffs = this.buffs.map(buff => buff.clone());
+        copy.tags = this.tags.slice();
         return copy;
     }
 

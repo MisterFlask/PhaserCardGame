@@ -5,11 +5,13 @@ import BBCodeTextPlugin from 'phaser3-rex-plugins/plugins/bbcodetext-plugin.js';
 import { Encounter } from '../encounters/EncountersList';
 import { AbstractEvent } from '../events/AbstractEvent';
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
+import { PlayerCharacter } from '../gamecharacters/BaseCharacterClass';
 import { GameState } from '../rules/GameState';
 import { TextBoxButton } from '../ui/Button';
 import { CombatHighlightsManager } from '../ui/CombatHighlightsManager';
 import InventoryPanel from '../ui/InventoryPanel';
 import CombatSceneLayoutUtils from '../ui/LayoutUtils';
+import { PhysicalCard } from '../ui/PhysicalCard';
 import { UIContext, UIContextManager } from '../ui/UIContextManager';
 import { ActionManager } from '../utils/ActionManager';
 import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
@@ -110,10 +112,8 @@ class CombatScene extends Phaser.Scene {
             this.inputHandler = new CombatInputHandler(this, this.cardManager);
             
             // Re-add the card click listener
-            this.inputHandler.addCardClickListener((card: AbstractCard) => {
-                if (UIContextManager.getInstance().getContext() !== UIContext.COMBAT) return;
-                this.shopOverlay.handleCardClick(card);
-                this.treasureOverlay.handleCardClickOnTreasureChest(card);
+            this.events.on("card:pointerdown", (card: PhysicalCard) => {
+                this.onCardPointerDown(card);
             });
         }
         
@@ -128,6 +128,11 @@ class CombatScene extends Phaser.Scene {
 
         // Handle map overlay
         this.toggleMapOverlay(data.shouldStartWithMapOverlay);
+    }
+    onCardPointerDown(card: PhysicalCard) {
+        if (UIContextManager.getInstance().getContext() !== UIContext.COMBAT) return;
+        this.shopOverlay.handleCardClick(card.data as AbstractCard);
+        this.treasureOverlay.handleCardClickOnTreasureChest(card.data as AbstractCard);
     }
 
 
@@ -153,10 +158,8 @@ class CombatScene extends Phaser.Scene {
         this.treasureOverlay = new TreasureOverlay(this);
 
         // Set up the onCardClick handler
-        this.inputHandler.addCardClickListener((card: AbstractCard) => {
-            if (UIContextManager.getInstance().getContext() !== UIContext.COMBAT) return;
-            this.shopOverlay.handleCardClick(card);
-            this.treasureOverlay.handleCardClickOnTreasureChest(card);
+        this.events.on("card:pointerdown", (card: PhysicalCard) => {
+            this.onCardPointerDown(card);
         });
 
         this.setupResizeHandler();
@@ -241,6 +244,7 @@ class CombatScene extends Phaser.Scene {
         this.events.off('discardPileClicked');
         this.events.off('exhaustPileClicked');
         this.events.off('locationSelected');
+        this.events.off('card:pointerdown');
     }
 
     private createBackground(): void {
@@ -362,15 +366,9 @@ class CombatScene extends Phaser.Scene {
     }
 
     private setupCharacterClickHandlers(): void {
-        GameState.getInstance().combatState.playerCharacters.forEach(character => {
-            if (character.physicalCard) {
-                character.physicalCard.container.setInteractive();
-                character.physicalCard.container.on('pointerdown', () => {
-                    if (UIContextManager.getInstance().getContext() === UIContext.COMBAT) {
-                        this.characterDeckOverlay.show(character);
-                    }
-                });
-            }
+        this.events.on("card:pointerdown", (card: PhysicalCard) => {
+            console.log("card:pointerdown event received for " + card.data.name);
+            this.characterDeckOverlay.show(card.data as PlayerCharacter);
         });
     }
 }

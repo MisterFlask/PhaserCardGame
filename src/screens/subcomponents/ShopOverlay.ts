@@ -358,20 +358,26 @@ export class ShopOverlay {
 
     public handleCardClick(card: AbstractCard): void {
         console.log('Card clicked (shop handler)');
+        var shopIsOn = false;
         if (card.tags.includes("shop_combat")) {
             console.log('Shop clicked');
             this.currentShop = GameState.getInstance().combatShopContents;
+            shopIsOn = true;
         }
         if (card.tags.includes("shop_sell_imports")) {
             console.log('Import shop clicked');
             this.currentShop = GameState.getInstance().importShopContents;
+            shopIsOn = true;
         }
         if (card.tags.includes("shop_buy_exports")) {
             console.log('Cursed goods shop clicked');
             this.currentShop = GameState.getInstance().cursedGoodsShopContents;
+            shopIsOn = true;
         }   
-        this.refreshShop();
-        this.toggle();
+        if (shopIsOn) {
+            this.refreshShop();
+            this.toggle();
+        }
     }
 
     private toggleDebugOutlines(): void {

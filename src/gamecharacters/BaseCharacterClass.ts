@@ -44,5 +44,14 @@ export class PlayerCharacter extends BaseCharacter {
         this.maxHitpoints = characterClass.startingMaxHp;
         this.characterClass = characterClass;
     }
+
+    removeCard(card: PlayableCard) {
+        this.cardsInMasterDeck = this.cardsInMasterDeck.filter(c => c?.id !== card?.id);
+    }
+
+    addCard(card: PlayableCard) {
+        card.owningCharacter = this;
+        this.cardsInMasterDeck.push(card);
+    }
 }
 

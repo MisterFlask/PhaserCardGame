@@ -154,7 +154,9 @@ export class CombatCardManager {
                     this.scene.input.setDraggable(card.container);
                 }
             });
-            if (enemy instanceof AutomatedCharacter) {
+            if (enemy instanceof AutomatedCharacter
+                && enemy.intents.length === 0
+            ) {
                 enemy.setNewIntents();
             }
             enemyCard.container.setDepth(depthManager.CARD_BASE);
@@ -407,7 +409,7 @@ export class CombatCardManager {
                     }
                 });
 
-                if (enemy instanceof AutomatedCharacter) {
+                if (enemy instanceof AutomatedCharacter && enemy.intents.length === 0) {
                     enemy.setNewIntents();
                 }
 
