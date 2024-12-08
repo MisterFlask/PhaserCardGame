@@ -368,7 +368,9 @@ class CombatScene extends Phaser.Scene {
     private setupCharacterClickHandlers(): void {
         this.events.on("card:pointerdown", (card: PhysicalCard) => {
             console.log("card:pointerdown event received for " + card.data.name);
-            this.characterDeckOverlay.show(card.data as PlayerCharacter);
+            if (card.data.isPlayerCharacter()) {
+                this.characterDeckOverlay.show(card.data as PlayerCharacter);
+            }
         });
     }
 }

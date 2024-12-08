@@ -437,6 +437,38 @@ export abstract class PlayableCard extends AbstractCard {
     initialize(): void {
         this.buffs.forEach(buff => buff.moveToMainDescription = true);
     }
+
+    public upgrade(): this{
+        var newCard = this.Copy();
+
+        if (newCard.baseDamage > 0){
+            newCard.baseDamage *= 1.2;
+            newCard.baseDamage = Math.round(newCard.baseDamage);
+            if (newCard.baseDamage == this.baseDamage){
+                newCard.baseDamage += 1;
+            }
+        }
+        else if (newCard.baseBlock > 0){
+            newCard.baseBlock *= 1.2;
+            newCard.baseBlock = Math.round(newCard.baseBlock);
+            if (newCard.baseBlock == this.baseBlock){
+                newCard.baseBlock += 1;
+            }
+        }
+        else if (newCard.baseMagicNumber > 0){
+            newCard.baseMagicNumber *= 1.2;
+            newCard.baseMagicNumber = Math.round(newCard.baseMagicNumber);
+            if (newCard.baseMagicNumber == this.baseMagicNumber){
+                newCard.baseMagicNumber += 1;
+            }
+        }
+        else{
+            newCard.baseEnergyCost -= 1;
+        }
+        newCard.name = this.name + "+"
+        newCard.id = this.id
+        return newCard;
+    }
 }
 
 export interface CardResourceScaling {

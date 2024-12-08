@@ -98,11 +98,14 @@ export enum PriceContext {
 }
 
 export abstract class AbstractCard implements IAbstractCard {
+    isPlayerCharacter(): boolean {
+        return this.hasOwnProperty("characterClass");
+    }
 
     tags: string[] = [];
 
     asPlayerCharacter() : PlayerCharacter | null {
-        if (this.hasOwnProperty("characterClass")) {
+        if (this.isPlayerCharacter()) {
             return this as unknown as PlayerCharacter;
         }
         return null;

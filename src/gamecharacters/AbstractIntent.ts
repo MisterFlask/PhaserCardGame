@@ -26,7 +26,6 @@ export abstract class AbstractIntent implements JsonRepresentable {
         this.owner = owner;
         this.id = generateWordGuid(this.displayText());
         this.title = '';
-        console.log('Created intent with id: ' + this.id + ' and tooltip text: ' + this.tooltipText());
     }
 
     abstract tooltipText(): string;
@@ -102,6 +101,9 @@ export class CosmeticCharacterBuffIntent extends AbstractIntent {
     constructor({ buff, target, damage }: { buff: AbstractBuff, target: BaseCharacter, damage: number }) {
         super({ imageName: 'uncertainty', target: target, owner: undefined });
         this.buff = buff;
+        if (!buff) {
+            throw new Error('Buff cannot be null');
+        }
         this.damage = damage;
         this.id = buff.id + '-' + target.id;
     }

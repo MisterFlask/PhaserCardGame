@@ -508,7 +508,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
             duration: 200,
             ease: 'Power2',
             onUpdate: () => {
-                
+
             }
         });
 
@@ -981,8 +981,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
             if (!currentIntentIds.has(id)) {
                 intentUI.destroy();
                 this.incomingIntents.delete(id);
+                console.log("Removed incoming intent: " + id + " " + intentUI.intent.tooltipText());
             }
-            console.log("Removed incoming intent: " + id + " " + intentUI.intent.tooltipText());
         });
 
         // Add new intents

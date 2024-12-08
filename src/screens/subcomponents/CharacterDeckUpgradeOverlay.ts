@@ -90,6 +90,17 @@ export class UpgradePreviewOverlay extends Phaser.GameObjects.Container {
                 this.clampScroll();
             }
         });
+
+        this.scene.events.on('card:pointerover', (card: PhysicalCard) => {
+            if (this.cards.includes(card)) {
+                card.setDepth(20);
+            }
+        });
+        this.scene.events.on('card:pointerout', (card: PhysicalCard) => {
+            if (this.cards.includes(card)) {
+                card.setDepth(10);
+            }
+        });
     }
 
     private updateMask(): void {
@@ -220,6 +231,7 @@ export class UpgradePreviewOverlay extends Phaser.GameObjects.Container {
                     c.container.on('pointerdown', () => {
                         this.finalizeUpgradeSelection(upgradeCard);
                     });
+                   
                     this.scrollableArea.add(c.container);
                 }
             });

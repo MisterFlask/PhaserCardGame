@@ -49,8 +49,7 @@ export class UpgradeChoice extends AbstractChoice {
             var newCard =card.Copy()
             newCard.buffs.push(new Lethality(2))
 
-            var newCard2 = card.Copy()
-            newCard2.buffs.push(new Lethality(3))
+            var newCard2 = card.upgrade()
             return [newCard, newCard2]
         };
 
