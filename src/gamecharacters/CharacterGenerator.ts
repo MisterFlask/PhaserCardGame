@@ -22,6 +22,7 @@ import { EntityRarity, PlayableCard } from "./PlayableCard";
 import { ArchonClass } from "./playerclasses/ArchonClass";
 import { BlackhandClass } from "./playerclasses/BlackhandClass";
 import { Defend } from "./playerclasses/cards/basic/Defend";
+import { Rummage } from "./playerclasses/cards/basic/Rummage";
 import { Shoot as FireRevolver } from "./playerclasses/cards/basic/Shoot";
 import { DiabolistClass } from "./playerclasses/DiabolistClass";
 
@@ -81,8 +82,8 @@ export class CharacterGenerator {
     private getRandomCommonCard(characterClass: BaseCharacterClass): PlayableCard {
         return characterClass.availableCards
             .filter(card => card.rarity === EntityRarity.COMMON)
-            .sort(() => Math.random() - 0.5)[0] ?? new FireRevolver().withBuffs([new Lethality(2)])
-                .Copy();
+            .sort(() => Math.random() - 0.5)[0] ?? new Rummage()
+            .Copy();
     }
 
     generateStartingPersonaTraits(): AbstractBuff {
@@ -113,7 +114,7 @@ export class CharacterGenerator {
     }
 
     private getRandomStartingAttackBuff(): AbstractBuff {
-        const buffs = [new IncreaseAshes(), new IncreaseIron(), new IncreaseVenture(), new IncreaseSmog(), new IncreaseBlood(), new Lethality(2)]
+        const buffs = [new IncreaseAshes(), new IncreaseIron(), new IncreaseVenture(), new IncreaseSmog(), new IncreaseBlood(), new Lethality(4)]
         return buffs[Math.floor(Math.random() * buffs.length)]
     }
 }

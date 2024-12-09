@@ -1,6 +1,7 @@
 import { EntityRarity, PlayableCard } from "../gamecharacters/PlayableCard";
 import { CardLibrary } from "../gamecharacters/playerclasses/cards/CardLibrary";
 import { GameState } from "./GameState";
+import { ModifierContext } from "./modifiers/AbstractCardModifier";
 import { CardModifierRegistry } from "./modifiers/CardModifierRegistry";
 
 export class CardRewardsGenerator {
@@ -55,7 +56,10 @@ export class CardRewardsGenerator {
                     card = library.getRandomSelectionOfRelevantClassCards(1, EntityRarity.COMMON)[0];
                 } else {
                     card = library.getRandomSelectionOfRelevantClassCards(1, EntityRarity.UNCOMMON)[0];
-                    registry.getRandomPositiveModifier().applyModification(card);
+                    const positiveModifiers = registry.positiveModifiers
+                        .filter(mod => mod.isApplicableInContext(ModifierContext.CARD_REWARD));
+                    const randomModifier = positiveModifiers[Math.floor(Math.random() * positiveModifiers.length)];
+                    randomModifier.applyModification(card);
                 }
                 break;
 
@@ -66,10 +70,16 @@ export class CardRewardsGenerator {
                     card = library.getRandomSelectionOfRelevantClassCards(1, EntityRarity.UNCOMMON)[0];
                 } else if (roll < 0.8) {
                     card = library.getRandomSelectionOfRelevantClassCards(1, EntityRarity.COMMON)[0];
-                    registry.getRandomPositiveModifier().applyModification(card);
+                    const positiveModifiers = registry.positiveModifiers
+                        .filter(mod => mod.isApplicableInContext(ModifierContext.CARD_REWARD));
+                    const randomModifier = positiveModifiers[Math.floor(Math.random() * positiveModifiers.length)];
+                    randomModifier.applyModification(card);
                 } else {
                     card = library.getRandomSelectionOfRelevantClassCards(1, EntityRarity.RARE)[0];
-                    registry.getRandomNegativeModifier().applyModification(card);
+                    const negativeModifiers = registry.negativeModifiers
+                        .filter(mod => mod.isApplicableInContext(ModifierContext.CARD_REWARD));
+                    const randomModifier = negativeModifiers[Math.floor(Math.random() * negativeModifiers.length)];
+                    randomModifier.applyModification(card);
                 }
                 break;
 

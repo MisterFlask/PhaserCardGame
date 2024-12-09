@@ -4,6 +4,7 @@ import { CardLibrary } from '../gamecharacters/playerclasses/cards/CardLibrary';
 import { AbstractRelic } from '../relics/AbstractRelic';
 import { RelicsLibrary } from '../relics/RelicsLibrary';
 import { GameState } from './GameState';
+import { ModifierContext } from './modifiers/AbstractCardModifier';
 import { CardModifierRegistry } from './modifiers/CardModifierRegistry';
 
 export class ShopPopulator {
@@ -34,7 +35,8 @@ export class ShopPopulator {
 
     private generateRandomCardModificationIfAny(card: PlayableCard) {
         const registry = CardModifierRegistry.getInstance();
-        const modifiers = registry.negativeModifiers;
+        const modifiers = registry.negativeModifiers
+            .filter(mod => mod.isApplicableInContext(ModifierContext.SHOP));
         
         for (const modifier of modifiers) {
             if (modifier.eligible(card) && Math.random() < modifier.probability) {

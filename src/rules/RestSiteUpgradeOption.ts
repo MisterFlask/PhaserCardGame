@@ -1,5 +1,5 @@
 import { PlayableCard } from "../gamecharacters/PlayableCard";
-import { CardModifier } from './modifiers/AbstractCardModifier';
+import { CardModifier, ModifierContext } from './modifiers/AbstractCardModifier';
 import { CardModifierRegistry } from './modifiers/CardModifierRegistry';
 
 export class RestSiteUpgradeOptionManager {
@@ -28,7 +28,9 @@ export class RestSiteUpgradeOptionManager {
         options.push(this.standardUpgrade);
         
         // Create a pool of available modifiers based on their probabilities
-        const modifierPool = [...registry.positiveModifiers];
+        const modifierPool = registry.positiveModifiers
+            .filter(mod => mod.isApplicableInContext(ModifierContext.REST_SITE_UPGRADE))
+            .filter(mod => mod.powerLevelChange > 0);
 
         // Fisher-Yates shuffle
         for (let i = modifierPool.length - 1; i > 0; i--) {

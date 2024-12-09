@@ -155,7 +155,6 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
 
     private onPointerDown = (): void => {
         if (this.obliterated) return;
-        this.abstractRelic.onRelicClicked();
         console.log('PhysicalRelic: onPointerDown');
         
         // Emit the event to parent

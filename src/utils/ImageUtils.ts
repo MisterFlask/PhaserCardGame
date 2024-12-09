@@ -13,13 +13,13 @@ export default class GameImageLoader {
         },
         backgrounds: {
             prefix: 'Backgrounds/',
-            files: ['greyscale.png', 'mapbackground1.png', 'vintage_brown.png', 'battleback1.png', 'hell-oil-painting.png'
+            files: ['greyscale.png', 'mapbackground1.png', 'vintage_brown.png', 'battleback1.png'
             ]
         },
         location_backgrounds: {
             prefix: 'Backgrounds/Location/',
             files: ['forest-battle-background-1.png',
-                'shop-background-1.png',
+                'shop-background-1.png', 'hell-oil-painting.png',
             ]
         },
         portraits_blackhand_female: {

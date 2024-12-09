@@ -16,7 +16,7 @@ import { HellSellValue } from "../../gamecharacters/buffs/standard/HellSellValue
 import { SacrificeBuff } from "../../gamecharacters/buffs/standard/SacrificeBuff";
 import { SurfaceSellValue } from "../../gamecharacters/buffs/standard/SurfaceSellValue";
 import { EntityRarity } from "../../gamecharacters/PlayableCard";
-import { CardModifier } from "./AbstractCardModifier";
+import { CardModifier, ModifierContext } from "./AbstractCardModifier";
 
 export class CardModifierRegistry {
     private static instance: CardModifierRegistry;
@@ -30,14 +30,15 @@ export class CardModifierRegistry {
 
     // Positive modifiers (powerLevelChange > 0)
     public readonly positiveModifiers: CardModifier[] = [
-        // Resource gain modifiers
+        // Resource gain modifiers - these make sense in rest sites and rewards
         new CardModifier({
             name: "Iron Gain",
             modifier: card => {
                 card.buffs.push(new IncreaseIron());
-                card.name += "⚔️";
+                card.name += "💎";
             },
-            powerLevelChange: 1
+            powerLevelChange: 1,
+            contextsApplicable: [ModifierContext.SHOP, ModifierContext.CARD_REWARD, ModifierContext.REST_SITE_UPGRADE]
         }),
         new CardModifier({
             name: "Blood Gain",
@@ -45,7 +46,8 @@ export class CardModifierRegistry {
                 card.buffs.push(new IncreaseBlood());
                 card.name += "🩸";
             },
-            powerLevelChange: 1
+            powerLevelChange: 1,
+            contextsApplicable: [ModifierContext.SHOP, ModifierContext.CARD_REWARD, ModifierContext.REST_SITE_UPGRADE]
         }),
         new CardModifier({
             name: "Pluck Gain",
@@ -53,7 +55,8 @@ export class CardModifierRegistry {
                 card.buffs.push(new IncreasePluck(1));
                 card.name += "🎭";
             },
-            powerLevelChange: 1
+            powerLevelChange: 1,
+            contextsApplicable: [ModifierContext.REST_SITE_UPGRADE, ModifierContext.CARD_REWARD]
         }),
         new CardModifier({
             name: "Smog Gain",
@@ -61,7 +64,8 @@ export class CardModifierRegistry {
                 card.buffs.push(new IncreaseSmog());
                 card.name += "💨";
             },
-            powerLevelChange: 1
+            powerLevelChange: 1,
+            contextsApplicable: [ModifierContext.REST_SITE_UPGRADE, ModifierContext.CARD_REWARD]
         }),
         new CardModifier({
             name: "Venture Gain",
@@ -69,9 +73,10 @@ export class CardModifierRegistry {
                 card.buffs.push(new IncreaseVenture());
                 card.name += "🎲";
             },
-            powerLevelChange: 1
+            powerLevelChange: 1,
+            contextsApplicable: [ModifierContext.REST_SITE_UPGRADE, ModifierContext.CARD_REWARD]
         }),
-        // Upgrade modifiers
+        // Upgrade modifiers - these make sense everywhere
         new CardModifier({
             name: "Cost Reduction",
             modifier: card => {
@@ -80,7 +85,8 @@ export class CardModifierRegistry {
             },
             eligible: card => card.baseEnergyCost > 1,
             weight: 2,
-            powerLevelChange: 1
+            powerLevelChange: 1,
+            contextsApplicable: [ModifierContext.REST_SITE_UPGRADE, ModifierContext.CARD_REWARD]
         }),
         new CardModifier({
             name: "Magic Number Up",
@@ -90,7 +96,8 @@ export class CardModifierRegistry {
             },
             eligible: card => card.baseMagicNumber != 0,
             weight: 2,
-            powerLevelChange: 1
+            powerLevelChange: 1,
+            contextsApplicable: [ModifierContext.REST_SITE_UPGRADE, ModifierContext.CARD_REWARD]
         }),
         new CardModifier({
             name: "Double Cast",
@@ -99,7 +106,8 @@ export class CardModifierRegistry {
                 card.baseEnergyCost += 1;
                 card.name += "🔄🔄";
             },
-            powerLevelChange: 1
+            powerLevelChange: 1,
+            contextsApplicable: [ModifierContext.REST_SITE_UPGRADE, ModifierContext.CARD_REWARD]
         }),
         new CardModifier({
             name: "Lightweight",
@@ -107,7 +115,8 @@ export class CardModifierRegistry {
                 card.buffs.push(new Lightweight(3));
                 card.name += "🪶";
             },
-            powerLevelChange: 1
+            powerLevelChange: 1,
+            contextsApplicable: [ModifierContext.REST_SITE_UPGRADE, ModifierContext.CARD_REWARD]
         }),
         new CardModifier({
             name: "Growing Power",
@@ -116,7 +125,8 @@ export class CardModifierRegistry {
                 card.name += "🌱";
             },
             eligible: card => card.baseDamage > 0,
-            powerLevelChange: 1
+            powerLevelChange: 1,
+            contextsApplicable: [ModifierContext.REST_SITE_UPGRADE, ModifierContext.CARD_REWARD]
         }),
         new CardModifier({
             name: "Buster",
@@ -125,7 +135,8 @@ export class CardModifierRegistry {
                 card.name += "🔪";
             },
             eligible: card => card.baseDamage > 0,
-            powerLevelChange: 1
+            powerLevelChange: 1,
+            contextsApplicable: [ModifierContext.REST_SITE_UPGRADE, ModifierContext.CARD_REWARD]
         }),
         new CardModifier({
             name: "Surface Value",
@@ -133,7 +144,8 @@ export class CardModifierRegistry {
                 card.buffs.push(new SurfaceSellValue(30));
                 card.name += "💰";
             },
-            powerLevelChange: 1
+            powerLevelChange: 1,
+            contextsApplicable: [ModifierContext.SHOP, ModifierContext.CARD_REWARD, ModifierContext.REST_SITE_UPGRADE]
         }),
     ];
 
@@ -148,7 +160,8 @@ export class CardModifierRegistry {
             },
             eligible: card => card.rarity.isAtLeastAsRareAs(EntityRarity.RARE),
             powerLevelChange: -1,
-            probability: 0.2
+            probability: 0.2,
+            contextsApplicable: [ModifierContext.SHOP, ModifierContext.CARD_REWARD, ModifierContext.REST_SITE_UPGRADE]
         }),
         new CardModifier({
             name: "Heavy",
@@ -159,7 +172,8 @@ export class CardModifierRegistry {
             },
             eligible: card => card.rarity.isAtLeastAsRareAs(EntityRarity.UNCOMMON),
             powerLevelChange: -1,
-            probability: 0.2
+            probability: 0.2,
+            contextsApplicable: [ModifierContext.SHOP] // Shop-specific modifier
         }),
         new CardModifier({
             name: "Painful",
@@ -167,7 +181,8 @@ export class CardModifierRegistry {
                 card.buffs.push(new Painful(1));
                 card.name += "🙃";
             },
-            powerLevelChange: -1
+            powerLevelChange: -1,
+            contextsApplicable: [ModifierContext.CARD_REWARD] // Makes more sense as a reward modifier
         }),
         new CardModifier({
             name: "Blood Price",
@@ -177,7 +192,8 @@ export class CardModifierRegistry {
                 card.name += "🖤";
             },
             eligible: card => card.baseEnergyCost > 0,
-            powerLevelChange: -1
+            powerLevelChange: -1,
+            contextsApplicable: [ModifierContext.CARD_REWARD, ModifierContext.SHOP] // Makes sense in both shop and rewards
         }),
         new CardModifier({
             name: "Hell Value",
@@ -185,7 +201,8 @@ export class CardModifierRegistry {
                 card.buffs.push(new HellSellValue(10));
                 card.name += "🔥";
             },
-            powerLevelChange: -1
+            powerLevelChange: -1,
+            contextsApplicable: [ModifierContext.SHOP, ModifierContext.CARD_REWARD, ModifierContext.REST_SITE_UPGRADE]
         }),
     ];
 

@@ -20,7 +20,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
     private readonly BASE_RELIC_DEPTH = 100;
     private readonly HOVER_RELIC_DEPTH = 1000;
 
-    constructor(scene: Phaser.Scene) {
+    constructor(scene: Phaser.Scene, areRelicsActivatable: boolean) {
         super(scene, 10, 10);
 
         if (!this.scene){
@@ -132,8 +132,17 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
         scene.events.on('update', this.updateCurrencyDisplay, this);
         scene.events.on('propagateGameStateChangesToUi', this.updateRelicDisplay, this);
         scene.events.on('update', this.updateRelicStacksDisplay, this);
+        if (areRelicsActivatable) {
+            scene.events.on('relic_pointerdown', this.handleRelicPointerDown, this);
+        }
 
     }
+
+    private handleRelicPointerDown(relic: PhysicalRelic): void {
+        console.log('Relic pointer down event received');
+        relic.abstractRelic.onRelicClicked();
+    }
+
     updateRelicStacksDisplay(arg0: string, updateRelicStacksDisplay: any, arg2: this) {
         // Update stacks display for each physical relic
         this.relicContainer.each((child: Phaser.GameObjects.GameObject) => {

@@ -1,5 +1,12 @@
 import { PlayableCard } from "../../gamecharacters/PlayableCard";
 
+export enum ModifierContext {
+    SHOP = "SHOP",
+    REST_SITE_UPGRADE = "REST_SITE_UPGRADE",
+    CARD_REWARD = "CARD_REWARD",
+    // Add any future contexts here
+}
+
 export interface CardModifierArgs {
     name: string;
     modifier: (card: PlayableCard) => void;
@@ -7,6 +14,7 @@ export interface CardModifierArgs {
     weight?: number;
     powerLevelChange?: number;
     probability?: number;
+    contextsApplicable?: ModifierContext[];
 }
 
 export class CardModifier {
@@ -16,6 +24,13 @@ export class CardModifier {
     public readonly weight: number;
     public readonly powerLevelChange: number;
     public readonly probability: number;
+    public readonly contextsApplicable: ModifierContext[];
+
+    private static readonly DEFAULT_CONTEXTS = [
+        ModifierContext.SHOP,
+        ModifierContext.REST_SITE_UPGRADE,
+        ModifierContext.CARD_REWARD
+    ];
 
     constructor(args: CardModifierArgs) {
         this.name = args.name;
@@ -24,6 +39,7 @@ export class CardModifier {
         this.weight = args.weight ?? 1;
         this.powerLevelChange = args.powerLevelChange ?? 0;
         this.probability = args.probability ?? 1;
+        this.contextsApplicable = args.contextsApplicable ?? CardModifier.DEFAULT_CONTEXTS;
     }
 
     public applyModification(card: PlayableCard): void {
@@ -31,5 +47,9 @@ export class CardModifier {
             throw new Error("Card modifier is not eligible for this card");
         }
         this.modifier(card);
+    }
+
+    public isApplicableInContext(context: ModifierContext): boolean {
+        return this.contextsApplicable.includes(context);
     }
 } 
