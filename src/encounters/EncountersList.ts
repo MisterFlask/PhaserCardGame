@@ -167,7 +167,7 @@ export class Encounter {
 
 export class ShopGuy extends AutomatedCharacter {
     constructor() {
-        super({ name: 'Blaire', portraitName: 'shopkeeper-spooky', maxHitpoints: 10, description: 'please buy something' });
+        super({ name: 'Arms Dealer', portraitName: 'shopkeeper-spooky', maxHitpoints: 10, description: 'please buy something' });
         this.tags.push("shop_combat");
     }
 
@@ -178,7 +178,7 @@ export class ShopGuy extends AutomatedCharacter {
 
 export class CommoditiesGuy extends AutomatedCharacter {
     constructor() {
-        super({ name: 'Gigulsgrun the Merciful', portraitName: 'shopkeeper-professional', maxHitpoints: 10, description: "i'm serious, and i'm a professional"});
+        super({ name: 'Commodities Trader', portraitName: 'shopkeeper-professional', maxHitpoints: 10, description: "i'm serious, and i'm a professional"});
         this.tags.push("shop_sell_imports");
     }
 
@@ -190,7 +190,7 @@ export class CommoditiesGuy extends AutomatedCharacter {
 
 export class CursedGoodsTrader extends AutomatedCharacter {
     constructor() {
-        super({ name: 'Nick', portraitName: 'shopkeeper-shady', maxHitpoints: 10, description: 'they fell off the back of a wagon!' });
+        super({ name: 'Artifacts Salesman', portraitName: 'shopkeeper-shady', maxHitpoints: 10, description: 'they fell off the back of a wagon!' });
         this.tags.push("shop_buy_exports");
     }
 
