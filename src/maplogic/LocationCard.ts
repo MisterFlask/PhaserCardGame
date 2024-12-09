@@ -14,7 +14,8 @@ import { CurrencyReward } from '../rewards/CurrencyReward';
 import { RelicReward } from '../rewards/RelicReward';
 import { CardRewardsGenerator } from '../rules/CardRewardsGenerator';
 import { GameState } from '../rules/GameState';
-import { RestSiteCardUpgradeModifier, RestSiteUpgradeOptionManager } from '../rules/RestSiteUpgradeOption';
+import { CardModifier } from '../rules/modifiers/AbstractCardModifier';
+import { RestSiteUpgradeOptionManager } from '../rules/RestSiteUpgradeOption';
 import { ActionManager } from '../utils/ActionManager';
 import { Faction } from './Faction';
 
@@ -129,7 +130,7 @@ export class BossRoomCard extends LocationCard {
 
 export class RestSiteCard extends LocationCard {
 
-    public restSiteUpgradeOptions: RestSiteCardUpgradeModifier[] = [];
+    public restSiteUpgradeOptions: CardModifier[] = [];
     constructor(floor: number, index: number) {
         super({
             name: 'Rest Site',

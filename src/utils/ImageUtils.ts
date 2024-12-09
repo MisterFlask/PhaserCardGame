@@ -13,7 +13,7 @@ export default class GameImageLoader {
         },
         backgrounds: {
             prefix: 'Backgrounds/',
-            files: ['greyscale.png', 'mapbackground1.png', 'vintage_brown.png', 'battleback1.png'
+            files: ['greyscale.png', 'mapbackground1.png', 'vintage_brown.png', 'battleback1.png', 'hell-oil-painting.png'
             ]
         },
         location_backgrounds: {

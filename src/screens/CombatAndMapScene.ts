@@ -249,7 +249,7 @@ class CombatScene extends Phaser.Scene {
     }
 
     private createBackground(): void {
-        const backgroundName = GameState.getInstance().currentLocation?.backgroundName || "battleback1";
+        const backgroundName = GameState.getInstance().currentLocation?.backgroundName || "hell-oil-painting";
 
         this.background = this.add.image(this.scale.width / 2, this.scale.height / 2, backgroundName)
             .setOrigin(0.5)

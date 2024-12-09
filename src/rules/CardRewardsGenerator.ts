@@ -1,39 +1,7 @@
-import { Painful } from "../gamecharacters/buffs/playable_card/Painful";
-import { IncreaseBlood } from "../gamecharacters/buffs/standard/combatresource/IncreaseBlood";
-import { IncreaseIron } from "../gamecharacters/buffs/standard/combatresource/IncreaseMetal";
-import { IncreasePages } from "../gamecharacters/buffs/standard/combatresource/IncreasePages";
-import { IncreasePluck } from "../gamecharacters/buffs/standard/combatresource/IncreasePluck";
-import { IncreaseSmog } from "../gamecharacters/buffs/standard/combatresource/IncreaseSmog";
-import { IncreaseVenture } from "../gamecharacters/buffs/standard/combatresource/IncreaseVenture";
 import { EntityRarity, PlayableCard } from "../gamecharacters/PlayableCard";
 import { CardLibrary } from "../gamecharacters/playerclasses/cards/CardLibrary";
-import { CardType } from "../gamecharacters/Primitives";
 import { GameState } from "./GameState";
-
-class CardAlteration {
-    private alterationFunction: (card: PlayableCard) => void;
-    private qualifierFunction: (card: PlayableCard) => boolean;
-    changeInPowerLevel: number;
-    name: string;
-
-    constructor(
-        name: string, 
-        alterationFunction: (card: PlayableCard) => void,
-        qualifierFunction: (card: PlayableCard) => boolean,
-        changeInPowerLevel: number
-    ) {
-        this.alterationFunction = alterationFunction;
-        this.qualifierFunction = qualifierFunction;
-        this.changeInPowerLevel = changeInPowerLevel;
-        this.name = name;
-    }
-
-    applyAlteration(card: PlayableCard): void {
-        if (this.qualifierFunction(card)) {
-            this.alterationFunction(card);
-        }
-    }
-}
+import { CardModifierRegistry } from "./modifiers/CardModifierRegistry";
 
 export class CardRewardsGenerator {
     private static instance: CardRewardsGenerator;
@@ -48,47 +16,6 @@ export class CardRewardsGenerator {
     private constructor() {
         // Private constructor for singleton
     }
-
-    private alterations = [
-        new CardAlteration("Stronger", (card: PlayableCard) => {
-            card.baseDamage += card.baseDamage * 0.3;
-            card.name += "+"
-        }, (card: PlayableCard) => {
-            return card.baseDamage > 0;
-        }, 1),
-        new CardAlteration("Weaker", (card: PlayableCard) => {
-            card.baseDamage -= card.baseDamage * 0.5;
-            card.name += "-"
-        }, (card: PlayableCard) => {
-            return card.baseDamage > 0;
-        }, -1),
-        new CardAlteration("Painful", (card: PlayableCard) => {
-            if (card.cardType == CardType.POWER) {
-                card.buffs.push(new Painful(3));
-            }else{
-                card.buffs.push(new Painful(1));
-            }
-            card.name += "🙃";
-        }, (card: PlayableCard) => {
-            return true;
-        }, -1),
-        new CardAlteration("Resource Gain", (card: PlayableCard) => {
-            const randomBuff = this.resourceGainBuffs[Math.floor(Math.random() * this.resourceGainBuffs.length)];
-            card.buffs.push(randomBuff);
-            card.name = card.name + "💎";
-        }, (card: PlayableCard) => {
-            return true;
-        }, 1),
-    ]
-
-    private resourceGainBuffs = [
-        new IncreaseIron(),
-        new IncreasePages(),
-        new IncreasePluck(1),
-        new IncreaseBlood(),
-        new IncreaseVenture(),
-        new IncreaseSmog(),
-    ]
 
     private calculatePowerLevelDistribution(currentFloor: number): number[] {
         // At floor 50, we want [0.33, 0.33, 0.33]
@@ -118,6 +45,7 @@ export class CardRewardsGenerator {
 
     private getCardRewardOfSpecifiedPowerLevel(powerLevel: number): PlayableCard {
         const library = CardLibrary.getInstance();
+        const registry = CardModifierRegistry.getInstance();
         let card: PlayableCard;
 
         switch (powerLevel) {
@@ -127,9 +55,7 @@ export class CardRewardsGenerator {
                     card = library.getRandomSelectionOfRelevantClassCards(1, EntityRarity.COMMON)[0];
                 } else {
                     card = library.getRandomSelectionOfRelevantClassCards(1, EntityRarity.UNCOMMON)[0];
-                    const positiveAlterations = this.alterations.filter(a => a.changeInPowerLevel > 0);
-                    const randomAlteration = positiveAlterations[Math.floor(Math.random() * positiveAlterations.length)];
-                    randomAlteration.applyAlteration(card);
+                    registry.getRandomPositiveModifier().applyModification(card);
                 }
                 break;
 
@@ -140,14 +66,10 @@ export class CardRewardsGenerator {
                     card = library.getRandomSelectionOfRelevantClassCards(1, EntityRarity.UNCOMMON)[0];
                 } else if (roll < 0.8) {
                     card = library.getRandomSelectionOfRelevantClassCards(1, EntityRarity.COMMON)[0];
-                    const positiveAlterations = this.alterations.filter(a => a.changeInPowerLevel > 0);
-                    const randomAlteration = positiveAlterations[Math.floor(Math.random() * positiveAlterations.length)];
-                    randomAlteration.applyAlteration(card);
+                    registry.getRandomPositiveModifier().applyModification(card);
                 } else {
                     card = library.getRandomSelectionOfRelevantClassCards(1, EntityRarity.RARE)[0];
-                    const negativeAlterations = this.alterations.filter(a => a.changeInPowerLevel < 0);
-                    const randomAlteration = negativeAlterations[Math.floor(Math.random() * negativeAlterations.length)];
-                    randomAlteration.applyAlteration(card);
+                    registry.getRandomNegativeModifier().applyModification(card);
                 }
                 break;
 

@@ -1,117 +1,11 @@
-import { Buster } from "../gamecharacters/buffs/playable_card/Buster";
-import { Doubled } from "../gamecharacters/buffs/playable_card/Doubled";
-import { Lightweight } from "../gamecharacters/buffs/playable_card/Lightweight";
-import { BloodPriceBuff } from "../gamecharacters/buffs/standard/Bloodprice";
-import { GrowingPowerBuff } from "../gamecharacters/buffs/standard/GrowingPower";
-import { HellSellValue } from "../gamecharacters/buffs/standard/HellSellValue";
-import { SacrificeBuff } from "../gamecharacters/buffs/standard/SacrificeBuff";
-import { StressReliefFinisher } from "../gamecharacters/buffs/standard/StressReliefFinisher";
-import { SurfaceSellValue } from "../gamecharacters/buffs/standard/SurfaceSellValue";
 import { PlayableCard } from "../gamecharacters/PlayableCard";
-
-
-
-export class RestSiteCardUpgradeModifier {
-    constructor(
-        public readonly weight: number,
-        public readonly modifier: (card: PlayableCard) => void,
-        public readonly eligible: (card: PlayableCard) => boolean = () => true
-    ) {}
-}
-
+import { CardModifier } from './modifiers/AbstractCardModifier';
+import { CardModifierRegistry } from './modifiers/CardModifierRegistry';
 
 export class RestSiteUpgradeOptionManager {
     private static instance: RestSiteUpgradeOptionManager;
 
     private constructor() {}
-
-    private modifiers: RestSiteCardUpgradeModifier[] = [
-
-        // decrease cost for cards that cost more than 1
-        new RestSiteCardUpgradeModifier(2, (card: PlayableCard) => {
-            card.baseEnergyCost -= 1;
-            card.name = card.name + "💧";
-        },
-        (card: PlayableCard) => card.baseEnergyCost > 1),
-
-        // magic number for cards that are not 0
-        new RestSiteCardUpgradeModifier(2, (card: PlayableCard) => {
-            card.baseMagicNumber += 1;
-            card.name = card.name + "🔮";
-        },
-        (card: PlayableCard) => card.baseMagicNumber != 0),
-
-        // double invoke card
-        new RestSiteCardUpgradeModifier(1, (card: PlayableCard) => {
-            card.buffs.push(new Doubled());
-            card.baseEnergyCost += 1;
-            card.name = card.name + "🔄";
-        },
-        (card: PlayableCard) => true),
-        
-        // bloodprice and sacrifice
-        new RestSiteCardUpgradeModifier(1,
-            (card: PlayableCard) => {
-                card.buffs.push(new BloodPriceBuff(3));
-                card.buffs.push(new SacrificeBuff());
-                card.name = card.name + "🖤";
-            },
-            (card: PlayableCard) => card.baseEnergyCost > 0
-        ),
-        
-        // surface sell value
-        new RestSiteCardUpgradeModifier(1, (card: PlayableCard) => {
-            card.buffs.push(new SurfaceSellValue(30));
-            card.name = card.name + "💰";
-        },
-        (card: PlayableCard) => true),
-
-        // hell sell value
-        new RestSiteCardUpgradeModifier(1, (card: PlayableCard) => {
-            card.buffs.push(new HellSellValue(10));
-            card.name = card.name + "🔥";
-        },
-        (card: PlayableCard) => true),
-
-        // buster for attacks
-        new RestSiteCardUpgradeModifier(1, (card: PlayableCard) => {
-            card.buffs.push(new Buster(1));
-            card.name = card.name + "🔪";
-        },
-        (card: PlayableCard) => card.baseDamage > 0),
-
-        // stress relief finisher
-        new RestSiteCardUpgradeModifier(1, (card: PlayableCard) => {
-            card.buffs.push(new StressReliefFinisher());
-            card.name = card.name + "💆";
-        },
-        (card: PlayableCard) => card.baseDamage > 0),
-
-
-        // stress relief finisher
-        new RestSiteCardUpgradeModifier(1, (card: PlayableCard) => {
-            card.buffs.push(new StressReliefFinisher());
-            card.name = card.name + "🧘‍♂️";
-        },
-        (card: PlayableCard) => card.baseDamage > 0),
-
-        new RestSiteCardUpgradeModifier(1, (card: PlayableCard) => {
-            card.buffs.push(new GrowingPowerBuff(1));
-            card.name = card.name + "🌱";
-        },
-        (card: PlayableCard) => card.baseDamage > 0),
-
-        /// Lightweight
-        new RestSiteCardUpgradeModifier(1, (card: PlayableCard) => {
-            card.buffs.push(new Lightweight(3));
-            card.name = card.name + "🪶";
-        },
-        (card: PlayableCard) => true),
-    ];
-
-    private standardUpgrade = new RestSiteCardUpgradeModifier(1, (card: PlayableCard) => {
-        return card.standardUpgrade(true);
-    }, (card: PlayableCard) => true);
 
     public static getInstance(): RestSiteUpgradeOptionManager {
         if (!RestSiteUpgradeOptionManager.instance) {
@@ -120,19 +14,21 @@ export class RestSiteUpgradeOptionManager {
         return RestSiteUpgradeOptionManager.instance;
     }
 
-    public getRandomSetOfUpgradeOptions(quantityOptions: number): RestSiteCardUpgradeModifier[] {
-        const options: RestSiteCardUpgradeModifier[] = [];
+    private standardUpgrade = new CardModifier({
+        name: "Standard Upgrade",
+        modifier: (card: PlayableCard) => card.standardUpgrade(true),
+        weight: 1,
+        powerLevelChange: 1
+    });
+
+    public getRandomSetOfUpgradeOptions(quantityOptions: number): CardModifier[] {
+        const options: CardModifier[] = [];
+        const registry = CardModifierRegistry.getInstance();
 
         options.push(this.standardUpgrade);
         
         // Create a pool of available modifiers based on their probabilities
-        const modifierPool: RestSiteCardUpgradeModifier[] = [];
-        this.modifiers.forEach(modifier => {
-            // Add each modifier to the pool based on its probability weight
-            for (let i = 0; i < modifier.weight; i++) {
-                modifierPool.push(modifier);
-            }
-        });
+        const modifierPool = [...registry.positiveModifiers];
 
         // Fisher-Yates shuffle
         for (let i = modifierPool.length - 1; i > 0; i--) {
@@ -155,7 +51,4 @@ export class RestSiteUpgradeOptionManager {
 
         return options;
     }
-
-    
-    
 }

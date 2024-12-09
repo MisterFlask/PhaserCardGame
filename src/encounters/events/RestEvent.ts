@@ -1,6 +1,6 @@
 import { AbstractChoice, AbstractEvent, DeadEndEvent } from "../../events/AbstractEvent";
 import { PlayableCard } from "../../gamecharacters/PlayableCard";
-import { RestSiteCardUpgradeModifier } from "../../rules/RestSiteUpgradeOption";
+import { CardModifier } from "../../rules/modifiers/AbstractCardModifier";
 import { UpgradePreviewOverlay } from "../../screens/subcomponents/CharacterDeckUpgradeOverlay";
 import { DepthManager } from "../../ui/DepthManager";
 
@@ -28,8 +28,8 @@ class RestChoice extends AbstractChoice {
 }
 
 export class UpgradeChoice extends AbstractChoice {
-    restSiteUpgradeOptions: RestSiteCardUpgradeModifier[];
-    constructor(restSiteUpgradeOptions: RestSiteCardUpgradeModifier[]) {
+    restSiteUpgradeOptions: CardModifier[];
+    constructor(restSiteUpgradeOptions: CardModifier[]) {
         super("Upgrade Deck", "Upgrade a card in your deck");
         this.nextEvent = new DeadEndEvent();
         this.nextEvent.description = "Better weapon. Cool.";
@@ -109,8 +109,8 @@ class ScavengeChoice extends AbstractChoice {
 }
 
 export class RestEvent extends AbstractEvent {
-    restSiteUpgradeOptions: RestSiteCardUpgradeModifier[];
-    constructor(restSiteUpgradeOptions: RestSiteCardUpgradeModifier[]) {
+    restSiteUpgradeOptions: CardModifier[];
+    constructor(restSiteUpgradeOptions: CardModifier[]) {
         super();
         this.name = "Rest Site";
         this.restSiteUpgradeOptions = restSiteUpgradeOptions;
