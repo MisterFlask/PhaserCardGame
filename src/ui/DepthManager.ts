@@ -39,6 +39,11 @@ export class DepthManager {
     public readonly MAP_CONNECTIONS = 1000;  // Lower depth for connections
     public readonly MAP_LOCATIONS = 1100;    // Higher depth for location cards
     
+    public readonly EVENT_WINDOW = 1200;
+    public readonly REST_UPGRADE_OVERLAY = 1300;
+    public readonly REST_UPGRADE_WATCHED_CARD = 1310;
+    
+    
     private constructor() {}
 
     public static getInstance(): DepthManager {

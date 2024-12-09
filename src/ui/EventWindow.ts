@@ -185,7 +185,7 @@ export class EventWindow extends Phaser.GameObjects.Container {
             this.contentContainer.add(button);
         });
 
-        this.setDepth(DepthManager.getInstance().MAP_OVERLAY + 30);
+        this.setDepth(DepthManager.getInstance().EVENT_WINDOW);
         
         // Animate in
         this.animateIn();
