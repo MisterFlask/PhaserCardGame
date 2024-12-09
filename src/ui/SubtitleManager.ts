@@ -4,6 +4,7 @@ export class SubtitleManager {
     private static instance: SubtitleManager;
     private scene: Phaser.Scene;
     private subtitleTextBox?: TextBox;
+    private portraitImage?: Phaser.GameObjects.Image;
 
     private constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -23,29 +24,52 @@ export class SubtitleManager {
         return SubtitleManager.instance;
     }
 
-    public async showSubtitle(text: string): Promise<void> {
+    public async showSubtitle(text: string, portraitKey?: string): Promise<void> {
+        const centerX = this.scene.scale.width / 2;
+        const subtitleWidth = 400;
+        const portraitSize = 50; // adjust as needed
+        const padding = 10;
+
+        // if a portrait is specified and not yet created, create it.
+        // if not specified, ensure no portrait is visible.
+        if (portraitKey) {
+            if (!this.portraitImage) {
+                this.portraitImage = this.scene.add.image(centerX - (subtitleWidth / 2) - portraitSize - padding, 50, portraitKey)
+                    .setOrigin(0.5)
+                    .setScale(portraitSize / 100); // scale accordingly
+                this.portraitImage.setDepth(100);
+            } else {
+                this.portraitImage.setTexture(portraitKey);
+                this.portraitImage.setVisible(true);
+                this.portraitImage.setPosition(centerX - (subtitleWidth / 2) - portraitSize - padding, 50);
+            }
+        } else {
+            if (this.portraitImage) {
+                this.portraitImage.setVisible(false);
+            }
+        }
+
         if (!this.subtitleTextBox) {
             this.subtitleTextBox = new TextBox({
                 scene: this.scene,
-                x: this.scene.scale.width / 2,
+                x: centerX,
                 y: 50,
-                width: 400,
+                width: subtitleWidth,
                 height: 50,
                 text: text,
                 style: { fontSize: '24px', color: '#ffffff' },
                 verticalExpand: 'down',
                 horizontalExpand: 'right'
             });
-            this.subtitleTextBox.setDepth(100); // Ensure it's on top
+            this.subtitleTextBox.setDepth(100);
         } else {
             this.subtitleTextBox.setText(text);
             this.subtitleTextBox.setVisible(true);
+            this.subtitleTextBox.setPosition(centerX, 50);
         }
 
-        // Reset scale before playing new pulse animation
         this.subtitleTextBox.setScale(1);
-        
-        // Play pulse animation
+
         this.scene.tweens.add({
             targets: this.subtitleTextBox,
             scaleX: 1.1,
@@ -60,11 +84,23 @@ export class SubtitleManager {
         if (this.subtitleTextBox) {
             this.subtitleTextBox.setVisible(false);
         }
+        if (this.portraitImage) {
+            this.portraitImage.setVisible(false);
+        }
     }
 
     public updateLayout(width: number): void {
         if (this.subtitleTextBox) {
-            this.subtitleTextBox.setPosition(width / 2, 50);
+            const centerX = width / 2;
+            this.subtitleTextBox.setPosition(centerX, 50);
+
+            // re-position portrait if visible
+            if (this.portraitImage && this.portraitImage.visible) {
+                const subtitleWidth = 400;
+                const portraitSize = this.portraitImage.displayWidth || 50;
+                const padding = 10;
+                this.portraitImage.setPosition(centerX - (subtitleWidth / 2) - portraitSize - padding, 50);
+            }
         }
     }
 }

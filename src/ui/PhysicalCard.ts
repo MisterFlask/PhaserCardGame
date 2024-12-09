@@ -783,7 +783,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
             if (baseCharacter.hitpoints <= 0) {
                 this.cardImage.setTint(0x808080);
             } else {
-                this.cardImage.clearTint();
+                this.cardImage.setTint(effectivePortraitTint);
             }
         }
 

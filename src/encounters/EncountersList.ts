@@ -10,6 +10,7 @@ import { AbstractRelic } from '../relics/AbstractRelic';
 import { RelicsLibrary } from '../relics/RelicsLibrary';
 import { GameState } from '../rules/GameState';
 import { CardModifier } from '../rules/modifiers/AbstractCardModifier';
+import GameImageLoader from '../utils/ImageUtils';
 import { RestEvent } from './events/RestEvent';
 import { FrenchBlindProphetess } from './monsters/act1_boss/FrenchBlindProphetess';
 import { FrenchChef } from './monsters/act1_segment1/FrenchChef';
@@ -125,17 +126,28 @@ export class ActSegment {
 }
 
 export class Encounter {
+
+    getBackgroundName() {
+        if (this.backgroundNameOverride) {
+            return this.backgroundNameOverride;
+        }
+        var background = GameImageLoader.getRandomImageNameFromCategory("location_backgrounds");
+        return background;
+    }
+
     peaceful: boolean = false;
     act: integer;
     segment: integer;
     enemies: AutomatedCharacter[];
     event?: AbstractEvent;
+    backgroundNameOverride?: string;
 
-    constructor(enemies: AutomatedCharacter[], act: integer, segment: integer, event?: AbstractEvent) {
+    constructor(enemies: AutomatedCharacter[], act: integer, segment: integer, event?: AbstractEvent, backgroundNameOverride?: string) {
         this.enemies = enemies;
         this.act = act;
         this.segment = segment;
         this.event = event;
+        this.backgroundNameOverride = backgroundNameOverride;
     }
 }
 

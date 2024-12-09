@@ -97,6 +97,8 @@ class CombatScene extends Phaser.Scene {
         
         // Reset UI context
         UIContextManager.getInstance().setContext(UIContext.COMBAT);
+
+        this.changeBackground(data.encounter.getBackgroundName());
         
         // Reset combat flags
         this.combatEndHandled = false;
@@ -266,6 +268,9 @@ class CombatScene extends Phaser.Scene {
 
     public changeBackground(backgroundName: string): void {
         this.background.setTexture(backgroundName);
+        // Stretch the background to fill the scene while maintaining aspect ratio
+        this.background.setDisplaySize(this.scale.width, this.scale.height)
+
     }
 
     private setupResizeHandler(): void {
