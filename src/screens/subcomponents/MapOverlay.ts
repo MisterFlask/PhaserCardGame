@@ -246,6 +246,7 @@ export class MapOverlay {
                 onComplete: () => {
                     this.isLocationTransitionInProgress = false;
                     if (currentLocation) {
+                        GameState.getInstance().currentLocation = currentLocation;
                         currentLocation.OnLocationSelected(this.scene);
                     }
                 }

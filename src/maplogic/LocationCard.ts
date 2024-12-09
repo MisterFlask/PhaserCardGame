@@ -7,9 +7,11 @@ import { Charon } from '../encounters/monsters/special/Charon';
 import { AbstractEvent } from '../events/AbstractEvent';
 import { AbstractCard } from '../gamecharacters/AbstractCard';
 import { CardSize, CardType } from '../gamecharacters/Primitives';
+import { RelicsLibrary } from '../relics/RelicsLibrary';
 import { AbstractReward } from '../rewards/AbstractReward';
 import { CardReward } from '../rewards/CardReward';
 import { CurrencyReward } from '../rewards/CurrencyReward';
+import { RelicReward } from '../rewards/RelicReward';
 import { CardRewardsGenerator } from '../rules/CardRewardsGenerator';
 import { GameState } from '../rules/GameState';
 import { RestSiteCardUpgradeModifier, RestSiteUpgradeOptionManager } from '../rules/RestSiteUpgradeOption';
@@ -208,7 +210,8 @@ export class EliteRoomCard extends LocationCard {
         const rewards: AbstractReward[] = [];
         const cardRewards = CardRewardsGenerator.getInstance().generateCardRewardsForCombat();
         rewards.push(new CardReward(cardRewards));
-        rewards.push(new CurrencyReward(150)); // Elite rooms give more currency
+        rewards.push(new CurrencyReward(55)); // Elite rooms give more currency
+        rewards.push(new RelicReward(RelicsLibrary.getInstance().getRandomRelics(1)[0]));
         return rewards;
     }
 

@@ -406,12 +406,19 @@ class CombatUIManager {
         }
     }
 
+    public onCombatStart(): void {
+        this.combatEnded = false;
+        this.generalRewardScreen?.hide();
+    }
+
     public onCombatEnd(): void {
         if (this.combatEnded) return;
+        console.log("Combat ended");
         this.combatEnded = true;
 
         const rewards = this.determineRewards();
-        if (rewards.length > 0) {       
+        if (rewards.length > 0) {
+            console.log("Showing rewards for room: " + GameState.getInstance().currentLocation?.name);       
             this.generalRewardScreen = new GeneralRewardScreen(this.scene, rewards);
             this.generalRewardScreen.show();
             UIContextManager.getInstance().setContext(UIContext.REWARD_SCREEN);
@@ -424,6 +431,7 @@ class CombatUIManager {
         const gameState = GameState.getInstance();
         const currentLocation = gameState.currentLocation;
         if (!currentLocation) {
+            console.log("No location to determine rewards for");
             return []; // No rewards if no location
         }
         return currentLocation.determineRewards();

@@ -85,6 +85,7 @@ class CombatScene extends Phaser.Scene {
     }
 
     cleanupAndRestartCombat(data: CombatSceneData): void {
+        this.uiManager.onCombatStart();
         console.log("cleanupAndRestartCombat called with ", data);
         
         // Clean up existing combat state

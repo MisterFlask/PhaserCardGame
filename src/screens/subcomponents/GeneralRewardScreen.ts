@@ -1,3 +1,4 @@
+// GeneralRewardScreen.ts
 import Phaser from 'phaser';
 import { PlayableCard } from '../../gamecharacters/PlayableCard';
 import { AbstractReward } from '../../rewards/AbstractReward';
@@ -28,24 +29,37 @@ const CONSTANTS = {
     }
 } as const;
 
-class GeneralRewardScreen extends Phaser.GameObjects.Container {
+class GeneralRewardScreen {
+    private scene: Phaser.Scene;
     private rewards: AbstractReward[];
-    private rewardElements: Phaser.GameObjects.Container[] = [];
     private shouldShow: boolean = false;
-    private doneButton?: TextBoxButton;
     private onDoneCallback?: () => void;
     private background!: Phaser.GameObjects.Rectangle;
+    private doneButton?: TextBoxButton;
     private activeCardRewardScreen?: CardRewardScreen;
 
+    // We'll store references to all created objects so we can manage them without containers
+    private rewardObjects: {
+        iconBackground: Phaser.GameObjects.Rectangle,
+        icon: Phaser.GameObjects.Image,
+        text: Phaser.GameObjects.Text,
+        tooltipBackground: Phaser.GameObjects.Rectangle,
+        tooltipText: Phaser.GameObjects.Text,
+        reward: AbstractReward
+    }[] = [];
+
+    private centerX: number;
+    private centerY: number;
+
     constructor(scene: Phaser.Scene, rewards: AbstractReward[]) {
-        super(scene, scene.scale.width / 2, scene.scale.height / 2);
-        scene.add.existing(this);
-        
+        this.scene = scene;
         this.rewards = rewards;
+        this.centerX = this.scene.scale.width / 2;
+        this.centerY = this.scene.scale.height / 2;
+
         this.createBackground();
         this.displayRewards();
-        this.setDepth(CONSTANTS.UI_DEPTH.BACKGROUND);
-        this.hide(); // Initially hidden
+        this.hide();
     }
 
     public setOnDoneCallback(callback: () => void): void {
@@ -54,21 +68,22 @@ class GeneralRewardScreen extends Phaser.GameObjects.Container {
 
     private createBackground(): void {
         this.background = this.scene.add.rectangle(
-            0, 
-            0, 
-            CONSTANTS.BACKGROUND_WIDTH, 
-            CONSTANTS.BACKGROUND_HEIGHT, 
-            0x000000, 
+            this.centerX,
+            this.centerY,
+            CONSTANTS.BACKGROUND_WIDTH,
+            CONSTANTS.BACKGROUND_HEIGHT,
+            0x000000,
             0.8
         )
         .setOrigin(0.5)
-        .setStrokeStyle(4, 0xffffff);
-        this.add(this.background);
+        .setStrokeStyle(4, 0xffffff)
+        .setDepth(CONSTANTS.UI_DEPTH.BACKGROUND)
+        .setVisible(false);
 
         this.doneButton = new TextBoxButton({
             scene: this.scene,
-            x: 0,
-            y: CONSTANTS.BUTTON_Y,
+            x: this.centerX,
+            y: this.centerY + CONSTANTS.BUTTON_Y,
             width: CONSTANTS.BUTTON_WIDTH,
             height: CONSTANTS.BUTTON_HEIGHT,
             text: 'Done',
@@ -82,18 +97,18 @@ class GeneralRewardScreen extends Phaser.GameObjects.Container {
             textBoxName: 'doneButton'
         });
 
+        this.doneButton.setDepth(CONSTANTS.UI_DEPTH.REWARDS);
+        this.doneButton.setVisible(false);
+
         this.doneButton.onClick(() => {
             if (this.onDoneCallback) {
                 this.onDoneCallback();
             }
             this.hide();
         });
-
-        this.add(this.doneButton);
     }
 
     private showCardRewardScreen(cardReward: CardReward): void {
-        // Clean up any existing card reward screen
         if (this.activeCardRewardScreen) {
             this.activeCardRewardScreen.destroy();
             this.activeCardRewardScreen = undefined;
@@ -116,12 +131,11 @@ class GeneralRewardScreen extends Phaser.GameObjects.Container {
             }
         });
 
-        // Listen for card selection event
         this.scene.events.once('cardReward:selected', () => {
-            // Find and remove the reward element associated with this card reward
-            const rewardElement = this.rewardElements[this.rewards.indexOf(cardReward)];
-            if (rewardElement) {
-                this.removeRewardElement(rewardElement, cardReward);
+            const idx = this.rewards.indexOf(cardReward);
+            if (idx >= 0) {
+                const ro = this.rewardObjects[idx];
+                this.removeRewardElement(ro, cardReward);
             }
         });
 
@@ -130,22 +144,64 @@ class GeneralRewardScreen extends Phaser.GameObjects.Container {
     }
 
     private displayRewards(): void {
-        const startX = -((this.rewards.length - 1) * CONSTANTS.REWARD_SPACING) / 2;
-
+        const startX = this.centerX - ((this.rewards.length - 1) * CONSTANTS.REWARD_SPACING) / 2;
         this.rewards.forEach((reward, index) => {
             const xPosition = startX + index * CONSTANTS.REWARD_SPACING;
-            const rewardElement = this.scene.add.container(xPosition, 0);
+            const yPosition = this.centerY;
 
             const iconBackground = this.scene.add.rectangle(
-                0, 
-                0, 
+                xPosition, 
+                yPosition,
                 CONSTANTS.ICON_SIZE, 
                 CONSTANTS.ICON_SIZE, 
                 0x333333
             )
             .setStrokeStyle(2, 0xffffff)
             .setInteractive()
-            .on(Phaser.Input.Events.GAMEOBJECT_POINTER_OVER, () => {
+            .setDepth(CONSTANTS.UI_DEPTH.REWARDS)
+            .setVisible(false);
+
+            const icon = this.scene.add.image(xPosition, yPosition, reward.getIconTexture())
+                .setDisplaySize(CONSTANTS.ICON_INNER_SIZE, CONSTANTS.ICON_INNER_SIZE)
+                .setDepth(CONSTANTS.UI_DEPTH.REWARDS)
+                .setVisible(false);
+
+            const text = this.scene.add.text(xPosition, yPosition + 60, reward.getDisplayText(), {
+                fontSize: '16px',
+                color: '#ffffff',
+                align: 'center'
+            })
+            .setOrigin(0.5)
+            .setDepth(CONSTANTS.UI_DEPTH.REWARDS)
+            .setVisible(false);
+
+            const tooltipBackground = this.scene.add.rectangle(
+                xPosition, 
+                yPosition + CONSTANTS.TOOLTIP_Y_OFFSET, 
+                CONSTANTS.TOOLTIP_WIDTH, 
+                CONSTANTS.TOOLTIP_HEIGHT, 
+                0x000000, 
+                0.8
+            )
+            .setStrokeStyle(1, 0xffffff)
+            .setDepth(CONSTANTS.UI_DEPTH.TOOLTIPS)
+            .setVisible(false);
+
+            const tooltipText = this.scene.add.text(
+                xPosition,
+                yPosition + CONSTANTS.TOOLTIP_Y_OFFSET,
+                reward.getTooltipText(),
+                {
+                    fontSize: '14px',
+                    color: '#ffffff',
+                    align: 'center'
+                }
+            )
+            .setOrigin(0.5)
+            .setDepth(CONSTANTS.UI_DEPTH.TOOLTIPS)
+            .setVisible(false);
+
+            iconBackground.on(Phaser.Input.Events.GAMEOBJECT_POINTER_OVER, () => {
                 tooltipBackground.setVisible(true);
                 tooltipText.setVisible(true);
             })
@@ -154,68 +210,53 @@ class GeneralRewardScreen extends Phaser.GameObjects.Container {
                 tooltipText.setVisible(false);
             })
             .on(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, () => {
-                this.handleRewardClick(rewardElement, reward);
+                this.handleRewardClick(index, reward);
             });
-            
-            const icon = this.scene.add.image(0, 0, reward.getIconTexture())
-                .setDisplaySize(CONSTANTS.ICON_INNER_SIZE, CONSTANTS.ICON_INNER_SIZE);
 
-            const text = this.scene.add.text(0, 60, reward.getDisplayText(), {
-                fontSize: '16px',
-                color: '#ffffff',
-                align: 'center'
-            }).setOrigin(0.5);
-
-            const tooltipBackground = this.scene.add.rectangle(
-                0, 
-                CONSTANTS.TOOLTIP_Y_OFFSET, 
-                CONSTANTS.TOOLTIP_WIDTH, 
-                CONSTANTS.TOOLTIP_HEIGHT, 
-                0x000000, 
-                0.8
-            ).setStrokeStyle(1, 0xffffff);
-
-            const tooltipText = this.scene.add.text(
-                0, 
-                CONSTANTS.TOOLTIP_Y_OFFSET, 
-                reward.getTooltipText(), 
-                {
-                    fontSize: '14px',
-                    color: '#ffffff',
-                    align: 'center'
-                }
-            ).setOrigin(0.5);
-
-            tooltipBackground.setVisible(false);
-            tooltipText.setVisible(false);
-
-            rewardElement.add([iconBackground, icon, text, tooltipBackground, tooltipText]);
-
-            this.add(rewardElement);
-            this.rewardElements.push(rewardElement);
+            this.rewardObjects.push({
+                iconBackground, 
+                icon, 
+                text, 
+                tooltipBackground, 
+                tooltipText,
+                reward
+            });
         });
     }
 
-    private handleRewardClick(rewardElement: Phaser.GameObjects.Container, reward: AbstractReward): void {
-        console.log('handleRewardClick', reward);
+    private handleRewardClick(index: number, reward: AbstractReward): void {
         if (reward instanceof CardReward) {
             this.showCardRewardScreen(reward);
             return;
         }
 
-        // For all other rewards, collect immediately
         reward.collect(this.scene);
-        this.removeRewardElement(rewardElement, reward);
+        this.removeRewardElement(this.rewardObjects[index], reward);
     }
 
     private removeRewardElement(
-        rewardElement: Phaser.GameObjects.Container,
+        ro: {
+            iconBackground: Phaser.GameObjects.Rectangle,
+            icon: Phaser.GameObjects.Image,
+            text: Phaser.GameObjects.Text,
+            tooltipBackground: Phaser.GameObjects.Rectangle,
+            tooltipText: Phaser.GameObjects.Text,
+            reward: AbstractReward
+        },
         reward: AbstractReward
     ): void {
-        this.remove(rewardElement);
-        rewardElement.destroy();
-        this.rewards.splice(this.rewards.indexOf(reward), 1);
-        
+        ro.iconBackground.destroy();
+        ro.icon.destroy();
+        ro.text.destroy();
+        ro.tooltipBackground.destroy();
+        ro.tooltipText.destroy();
+
+        const idx = this.rewards.indexOf(reward);
+        if (idx >= 0) {
+            this.rewards.splice(idx, 1);
+            this.rewardObjects.splice(idx, 1);
+        }
+
         if (this.rewards.length === 0 && this.onDoneCallback) {
             this.onDoneCallback();
             this.hide();
@@ -224,51 +265,65 @@ class GeneralRewardScreen extends Phaser.GameObjects.Container {
 
     public show(): void {
         this.shouldShow = true;
-        this.setVisible(true);
-        this.alpha = 0;
+        this.background.setVisible(true);
+        this.doneButton?.setVisible(true);
 
-        this.list.forEach(child => {
+        this.rewardObjects.forEach(ro => {
+            ro.iconBackground.setVisible(true);
+            ro.icon.setVisible(true);
+            ro.text.setVisible(true);
         });
 
         this.scene.tweens.add({
-            targets: this,
-            alpha: 1,
+            targets: [this.background, this.doneButton, ...this.rewardObjects.map(ro => ro.iconBackground), ...this.rewardObjects.map(ro => ro.icon), ...this.rewardObjects.map(ro => ro.text)],
+            alpha: { from: 0, to: 1 },
             duration: CONSTANTS.FADE_DURATION,
-            ease: 'Power2',
-            onComplete: () => {
-            }
+            ease: 'Power2'
         });
     }
 
     public hide(): void {
         this.shouldShow = false;
-        
+
         this.scene.tweens.add({
-            targets: this,
-            alpha: { from: this.alpha, to: 0 },
+            targets: [this.background, this.doneButton, ...this.rewardObjects.map(ro => ro.iconBackground), ...this.rewardObjects.map(ro => ro.icon), ...this.rewardObjects.map(ro => ro.text), ...this.rewardObjects.map(ro => ro.tooltipBackground), ...this.rewardObjects.map(ro => ro.tooltipText)],
+            alpha: { from: 1, to: 0 },
             duration: CONSTANTS.FADE_DURATION,
             ease: 'Power2',
             onComplete: () => {
                 if (!this.shouldShow) {
-                    this.setVisible(false);
+                    this.background.setVisible(false);
+                    this.doneButton?.setVisible(false);
+                    this.rewardObjects.forEach(ro => {
+                        ro.iconBackground.setVisible(false);
+                        ro.icon.setVisible(false);
+                        ro.text.setVisible(false);
+                        ro.tooltipBackground.setVisible(false);
+                        ro.tooltipText.setVisible(false);
+                    });
                 }
             }
         });
     }
 
-    public destroy(fromScene?: boolean): void {
-        // Clean up active card reward screen if it exists
+    public destroy(): void {
         if (this.activeCardRewardScreen) {
             this.activeCardRewardScreen.destroy();
             this.activeCardRewardScreen = undefined;
         }
 
-        // Clean up reward elements
-        this.rewardElements.forEach(element => element.destroy());
-        this.rewardElements = [];
+        this.background.destroy();
+        this.doneButton?.destroy();
 
-        super.destroy(fromScene);
+        this.rewardObjects.forEach(ro => {
+            ro.iconBackground.destroy();
+            ro.icon.destroy();
+            ro.text.destroy();
+            ro.tooltipBackground.destroy();
+            ro.tooltipText.destroy();
+        });
+        this.rewardObjects = [];
     }
 }
 
-export default GeneralRewardScreen; 
+export default GeneralRewardScreen;

@@ -1,13 +1,12 @@
+// CardRewardScreen.ts
 import Phaser from 'phaser';
 import { PlayableCard } from '../../gamecharacters/PlayableCard';
 import { CardRuleUtils } from '../../rules/CardRuleUtils';
 import { TextBoxButton } from '../../ui/Button';
+import { DepthManager } from '../../ui/DepthManager';
 import { PhysicalCard } from '../../ui/PhysicalCard';
 import { CardGuiUtils } from '../../utils/CardGuiUtils';
 
-/**
- * Interface for initializing CardRewardScreen with necessary data.
- */
 export interface CardRewardScreenData {
     rewards: PlayableCard[];
     scene: Phaser.Scene;
@@ -16,17 +15,28 @@ export interface CardRewardScreenData {
     onReroll?: () => void;
 }
 
+const CARD_REWARD_DEPTH = DepthManager.getInstance().REWARD_SCREEN + 2000; // ensure above GeneralRewardScreen
+const CARD_REWARD_HOVERED_DEPTH = CARD_REWARD_DEPTH + 1000; // New depth for hovered cards
+
 class CardRewardScreen {
     private scene: Phaser.Scene;
-    public container: Phaser.GameObjects.Container;
     public rewards: PlayableCard[];
     private onSelect: (selectedCard: PlayableCard) => void;
     private onSkip: () => void;
-    private goToMapButton!: TextBoxButton;
-    private isCardSelected: boolean = false;
-    private rerollButton!: TextBoxButton;
     private onReroll?: () => void;
     private shouldShow: boolean = false;
+    
+    // Instead of a container, we'll track all objects individually.
+    private background!: Phaser.GameObjects.Rectangle;
+    private goToMapButton!: TextBoxButton;
+    private rerollButton!: TextBoxButton;
+    private cardElements: {
+        physicalCard: PhysicalCard,
+        ownerText: Phaser.GameObjects.Text
+    }[] = [];
+
+    private centerX: number;
+    private centerY: number;
 
     constructor(params: CardRewardScreenData) {
         this.scene = params.scene;
@@ -35,67 +45,90 @@ class CardRewardScreen {
         this.onSkip = params.onSkip;
         this.onReroll = params.onReroll;
 
-        this.container = this.scene.add.container(this.scene.scale.width / 2, this.scene.scale.height / 2);
-        this.container.setDepth(1000);
+        this.centerX = this.scene.scale.width / 2;
+        this.centerY = this.scene.scale.height / 2;
+
         this.createBackground();
         this.displayRewardCards();
         this.createActionButtons();
-        this.hide(); // Initially hidden
+        this.hide();
     }
 
     private createBackground(): void {
-        const background = this.scene.add.rectangle(0, 0, 800, 600, 0x000000, 0.8)
+        this.background = this.scene.add.rectangle(this.centerX, this.centerY, 800, 600, 0x000000, 0.8)
             .setOrigin(0.5)
-            .setStrokeStyle(4, 0xffffff);
-        this.container.add(background);
+            .setStrokeStyle(4, 0xffffff)
+            .setDepth(CARD_REWARD_DEPTH)
+            .setVisible(false);
     }
 
     private handleCardSelection(selectedCard: PlayableCard): void {
-        console.log("Card clicked:", selectedCard.name);
-        this.isCardSelected = true;
         this.onSelect(selectedCard);
         this.scene.events.emit('cardReward:selected');
         this.hide();
     }
 
     public displayRewardCards(): void {
-        const cardSpacing = 220;
-        const startX = -cardSpacing;
-        const yPosition = -100;
+        this.cardElements.forEach(el => {
+            el.physicalCard.container.destroy();
+            el.ownerText.destroy();
+        });
+        this.cardElements = [];
 
+        const cardSpacing = 220;
+        const startX = this.centerX - cardSpacing;
+        const yPosition = this.centerY - 100;
         const cardGuiUtils = CardGuiUtils.getInstance();
 
         this.rewards.forEach((cardReward, index) => {
+            const cardX = startX + index * cardSpacing;
+            const cardY = yPosition;
+
             const physicalCard = cardGuiUtils.createCard({
                 scene: this.scene,
-                x: startX + index * cardSpacing,
-                y: yPosition,
+                x: cardX,
+                y: cardY,
                 data: cardReward,
                 onCardCreatedEventCallback: (cardInstance: PhysicalCard) => {
                     cardInstance.setupInteractivity();
+                    cardInstance.container.setDepth(CARD_REWARD_DEPTH + 1).setVisible(false);
+                    
+                    // Add hover events
+                    cardInstance.container.on('pointerover', () => {
+                        cardInstance.container.setDepth(CARD_REWARD_HOVERED_DEPTH);
+                        this.scene.events.emit('card:pointerover', cardInstance);
+                    });
+
+                    cardInstance.container.on('pointerout', () => {
+                        cardInstance.container.setDepth(CARD_REWARD_DEPTH + 1);
+                        this.scene.events.emit('card:pointerout', cardInstance);
+                    });
+
                     cardInstance.container.on('pointerdown', () => {
                         this.handleCardSelection(cardReward);
                     });
                 }
             });
 
-            // Add the physical card to the container
-            this.container.add(physicalCard.container);
-
-            // Add owner's name text under the card
-            const ownerNameText = this.scene.add.text(
-                physicalCard.container.x,
-                physicalCard.container.y + physicalCard.container.height / 2 + 20,
-                CardRuleUtils.getInstance().deriveOwnerFromCardNativeClass(cardReward).name,
+            const ownerName = CardRuleUtils.getInstance().deriveOwnerFromCardNativeClass(cardReward).name;
+            const ownerText = this.scene.add.text(
+                cardX,
+                cardY + (physicalCard.container.height / 2) + 20,
+                ownerName,
                 {
                     fontSize: '16px',
                     color: '#ffffff',
                     fontFamily: 'Arial',
                     align: 'center'
                 }
-            ).setOrigin(0.5, 0);
+            ).setOrigin(0.5, 0)
+             .setDepth(CARD_REWARD_DEPTH + 1)
+             .setVisible(false);
 
-            this.container.add(ownerNameText);
+            this.cardElements.push({
+                physicalCard,
+                ownerText
+            });
         });
     }
 
@@ -103,8 +136,8 @@ class CardRewardScreen {
         const buttonText = "Perhaps not";
         this.goToMapButton = new TextBoxButton({
             scene: this.scene,
-            x: -100,
-            y: 250,
+            x: this.centerX - 100,
+            y: this.centerY + 250,
             width: 300,
             height: 50,
             text: buttonText,
@@ -113,18 +146,16 @@ class CardRewardScreen {
             textBoxName: 'goToMapButton'
         });
 
-        this.goToMapButton
-            .onClick(() => {
-                console.log("Skip card reward button clicked.");
-
-                this.onSkip();
-                this.hide();
-            });
+        this.goToMapButton.setDepth(CARD_REWARD_DEPTH + 1).setVisible(false);
+        this.goToMapButton.onClick(() => {
+            this.onSkip();
+            this.hide();
+        });
 
         this.rerollButton = new TextBoxButton({
             scene: this.scene,
-            x: 100,
-            y: 150,
+            x: this.centerX + 100,
+            y: this.centerY + 150,
             width: 300,
             height: 50,
             text: "DEBUG: Reroll",
@@ -133,73 +164,73 @@ class CardRewardScreen {
             textBoxName: 'rerollButton'
         });
 
-        this.rerollButton
-            .onClick(() => {
-                console.log("Reroll button clicked");
-                if (this.onReroll) {
-                    this.onReroll(); // actual gameplay logic, not UI logic (which is below)
-                    
-                    // Clear existing UI elements before displaying new ones
-                    this.container.removeAll();
-                    this.createBackground(); // Re-create background since we removed it
-                    this.displayRewardCards()
-                    this.createActionButtons();
-                }
-            });
-
-        this.container.add([this.goToMapButton, this.rerollButton]);
+        this.rerollButton.setDepth(CARD_REWARD_DEPTH + 1).setVisible(false);
+        this.rerollButton.onClick(() => {
+            if (this.onReroll) {
+                this.onReroll();
+                // recreate visuals
+                this.background.setVisible(true);
+                this.goToMapButton.setVisible(true);
+                this.rerollButton.setVisible(true);
+                this.displayRewardCards();
+                this.show();
+            }
+        });
     }
 
     public show(): void {
         this.shouldShow = true;
-        this.container.setVisible(true);
+        this.background.setVisible(true);
+        this.goToMapButton.setVisible(true);
+        this.rerollButton.setVisible(true);
+        this.cardElements.forEach(el => {
+            el.physicalCard.container.setVisible(true);
+            el.ownerText.setVisible(true);
+        });
+
         this.scene.tweens.add({
-            targets: this.container,
+            targets: [this.background, this.goToMapButton, this.rerollButton, ...this.cardElements.map(el => el.physicalCard.container), ...this.cardElements.map(el => el.ownerText)],
             alpha: { from: 0, to: 1 },
             duration: 500,
-            ease: 'Power2',
-            onComplete: () => {
-                if (!this.shouldShow) {
-                    this.container.setVisible(false);
-                    this.container.alpha = 0;
-                }
-            }
+            ease: 'Power2'
         });
     }
 
     public hide(): void {
         this.shouldShow = false;
+        const targets = [this.background, this.goToMapButton, this.rerollButton, ...this.cardElements.map(el => el.physicalCard.container), ...this.cardElements.map(el => el.ownerText)];
         this.scene.tweens.add({
-            targets: this.container,
-            alpha: { from: this.container.alpha, to: 0 },
+            targets,
+            alpha: { from: 1, to: 0 },
             duration: 500,
             ease: 'Power2',
             onComplete: () => {
-                if (!this.shouldShow) {  // Only hide if we still should be hidden
-                    this.container.setVisible(false);
+                if (!this.shouldShow) {
+                    targets.forEach(t => t.setVisible(false));
                 }
             }
         });
     }
 
     public destroy(): void {
-        // Clean up buttons
         this.goToMapButton?.destroy();
         this.rerollButton?.destroy();
+        this.background?.destroy();
 
-        // Clean up container and all its contents
-        this.container.destroy();
+        this.cardElements.forEach(el => {
+            el.physicalCard.container.destroy();
+            el.ownerText.destroy();
+        });
+        this.cardElements = [];
 
-        // Obliterate all physical cards
         if (this.rewards) {
             this.rewards.forEach(card => {
-                if (card) {
-                    card.physicalCard?.obliterate();
+                if (card && card.physicalCard) {
+                    card.physicalCard.obliterate();
                 }
             });
         }
 
-        // Clear references
         this.rewards = [];
         this.onSelect = () => {};
         this.onSkip = () => {};

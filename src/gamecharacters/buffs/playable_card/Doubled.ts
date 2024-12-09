@@ -8,7 +8,7 @@ export class Doubled extends AbstractBuff {
     }
 
     override getDisplayName(): string {
-        return "Doubled";
+        return "Then, do it again.";
     }
 
     override getDescription(): string {

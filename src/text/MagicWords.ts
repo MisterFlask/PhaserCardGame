@@ -158,6 +158,7 @@ export class MagicWords {
     private colorizeAndRecordBuffs(input: string, result: MagicWordsResult, modifiedString: string) {
         for (const buff of this.allBuffsThatCouldPossiblyExist) {
             const buffName = buff.getDisplayName();
+            buff.helpMode = true;
             // Case insensitive search with word boundaries
             const regex = new RegExp(`\\b${buffName}\\b`, 'gi');
             // If the buff name exists in the string
