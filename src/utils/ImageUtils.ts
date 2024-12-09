@@ -32,7 +32,11 @@ export default class GameImageLoader {
                 "ruined-city-oil-painting.png",
                 "shop-background-1-original.png",
                 "shop-background-1.png",
-                "shop-background-oil-painting.png"
+                "shop-background-oil-painting.png",
+                "green-facility-oil-painting.png",
+                "eldritch-jungle-oil-painting.png",
+                "planar-gate-oil-painting.png",
+                "planar-gate-oil-painting-2.png"
               ]
         },
         portraits_npcs: {

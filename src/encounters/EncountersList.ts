@@ -140,7 +140,11 @@ export class Encounter {
             "hell-oil-painting-foundry.png",
             "hell-oil-painting.png",
             "ruined-city-oil-painting.png",
-            "shop-background-oil-painting.png"
+            "shop-background-oil-painting.png",
+            "green-facility-oil-painting.png",
+            "eldritch-jungle-oil-painting.png",
+            "planar-gate-oil-painting.png",
+            "planar-gate-oil-painting-2.png"
         ]
         return backgroundsPossible[Math.floor(Math.random() * backgroundsPossible.length)];
     }
