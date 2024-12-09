@@ -429,6 +429,7 @@ export class ActionManager {
                 if (canCover > 0) {
                     const coverNow = Math.min(missingEnergy, canCover);
                     missingEnergy -= coverNow;
+                    coverageDetails.push({buff, amount: coverNow});
                 }
             }
             
@@ -760,12 +761,19 @@ export class ActionManager {
         this.actionQueue.addAction(new GenericAction(async () => {
             const physicalCardOfTarget = target?.physicalCard;
 
+            if (!target){
+                console.warn("No target found for damage!");
+                throw new Error("No target found for damage!");
+            }
+
             if (!physicalCardOfTarget) {
                 console.warn("No physical card found for " + target);
                 return [];
             }
 
-            fromAttack = fromAttack || true;
+            if (fromAttack === undefined){
+                fromAttack = true;
+            }
 
             const damageResult: DamageCalculationResult = CombatRules.calculateDamage({
                 baseDamageAmount,

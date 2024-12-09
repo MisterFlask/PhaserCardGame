@@ -22,11 +22,13 @@ export class BloodPriceBuff extends AbstractBuff {
 
 
     override provideMissingEnergy_returnsAmountProvided(energyNeeded: number): number {
+        console.log("Providing missing energy for Bloodprice, requiring expenditure of " + energyNeeded * this.stacks + " health.");
         this.actionManager.dealDamage(
             {
                 baseDamageAmount: energyNeeded * this.stacks, 
-                target: this.getOwnerAsCharacter() as BaseCharacter, 
-                fromAttack: false
+                target: this.getOwnerAsPlayableCard()?.owningCharacter as BaseCharacter, 
+                fromAttack: false,
+                ignoresBlock: true
             });
         return energyNeeded;
     }

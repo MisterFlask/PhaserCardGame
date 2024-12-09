@@ -117,7 +117,8 @@ export class DebugMenu {
             .map(card => ({
                 text: card.name,
                 callback: () => {
-                    const newCard = new (card.constructor as any)();
+                    const newCard = card.Copy();
+                    newCard.owningCharacter = GameState.getInstance().combatState.playerCharacters[0];
                     ActionManager.getInstance().createCardToHand(newCard);
                 }
             }));

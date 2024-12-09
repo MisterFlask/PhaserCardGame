@@ -17,6 +17,7 @@ export class EldritchBlast extends PlayableCard {
             rarity: EntityRarity.UNCOMMON,
         });
         this.baseDamage = 12;
+        this.baseEnergyCost = 2;
         this.baseBlock = 0; // Assuming no block is needed
         this.baseMagicNumber = 3; // Bloodprice value
         this.buffs.push(new BloodPriceBuff(3));
