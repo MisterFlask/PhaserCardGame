@@ -190,7 +190,7 @@ class CombatScene extends Phaser.Scene {
             });
         this.add.existing(this.mapButton);
 
-        this.campaignBriefStatus = new CampaignBriefStatus(this);
+        this.campaignBriefStatus = new CampaignBriefStatus(this, true);
         this.add.existing(this.campaignBriefStatus);
         this.campaignBriefStatus.depth = 100;
 
@@ -228,6 +228,11 @@ class CombatScene extends Phaser.Scene {
 
         this.setNewEvent(GameState.getInstance().currentLocation?.gameEvent);
         this.toggleMapOverlay(this.sceneStartsWithMapOverlayUp);
+
+        // Add event listener for background changes
+        this.events.on('changeBackground', (backgroundName: string) => {
+            this.changeBackground(backgroundName);
+        });
     }
 
     private obliterate(): void {
@@ -246,6 +251,7 @@ class CombatScene extends Phaser.Scene {
         this.events.off('exhaustPileClicked');
         this.events.off('locationSelected');
         this.events.off('card:pointerdown');
+        this.events.off('changeBackground');
     }
 
     private createBackground(): void {
@@ -256,6 +262,10 @@ class CombatScene extends Phaser.Scene {
             .setDisplaySize(this.scale.width, this.scale.height)
             .setDepth(-10)
             .setName('background');
+    }
+
+    public changeBackground(backgroundName: string): void {
+        this.background.setTexture(backgroundName);
     }
 
     private setupResizeHandler(): void {

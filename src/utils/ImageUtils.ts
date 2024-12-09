@@ -1,6 +1,6 @@
 export default class GameImageLoader {
     // Nested object containing categories with file prefix and an array of image filenames
-    private static readonly images = {
+    public static readonly images = {
         map_backgrounds: {
             prefix: 'Sprites/MapBackgrounds/',
             files: [

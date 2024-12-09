@@ -39,7 +39,7 @@ export class ShopOverlay {
             .setDepth(DepthManager.getInstance().SHOP_OVERLAY);
         
         // Create the campaign brief status
-        this.campaignBriefStatus = new CampaignBriefStatus(scene);
+        this.campaignBriefStatus = new CampaignBriefStatus(scene, false);
         
         this.createOverlay();
         

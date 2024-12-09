@@ -3,6 +3,7 @@ import { CardLibrary } from '../gamecharacters/playerclasses/cards/CardLibrary';
 import { RelicsLibrary } from '../relics/RelicsLibrary';
 import { GameState } from '../rules/GameState';
 import { ActionManager } from '../utils/ActionManager';
+import GameImageLoader from '../utils/ImageUtils';
 import { DepthManager } from './DepthManager';
 import Menu from './Menu';
 import { TextBox } from './TextBox';
@@ -15,10 +16,11 @@ interface DebugMenuOption {
 export class DebugMenu {
     private scene: Scene;
     private menu!: Menu;
-    private currentPage: 'main' | 'cards' | 'relics' = 'main';
+    private currentPage: 'main' | 'cards' | 'relics' | 'backgrounds' = 'main';
     private itemsPerPage = 8;
     private currentCardPage = 0;
     private currentRelicPage = 0;
+    private currentBackgroundPage = 0;
     private pageDisplay!: TextBox;
 
     constructor(scene: Scene) {
@@ -78,6 +80,10 @@ export class DebugMenu {
                 callback: () => this.showRelicsMenu()
             },
             {
+                text: 'Change Background',
+                callback: () => this.showBackgroundsMenu()
+            },
+            {
                 text: 'Add Resources (+4 each)',
                 callback: () => {
                     const combatResources = GameState.getInstance().combatState.combatResources;
@@ -104,6 +110,11 @@ export class DebugMenu {
     private showRelicsMenu(): void {
         this.currentPage = 'relics';
         this.updateRelicMenuPage();
+    }
+
+    private showBackgroundsMenu(): void {
+        this.currentPage = 'backgrounds';
+        this.updateBackgroundMenuPage();
     }
 
     private updateCardMenuPage(): void {
@@ -200,6 +211,65 @@ export class DebugMenu {
 
         this.menu.updateOptions(options);
         this.pageDisplay.setText(`Page ${this.currentRelicPage + 1}/${totalPages}`);
+        this.pageDisplay.setVisible(true);
+    }
+
+    private updateBackgroundMenuPage(): void {
+        // Collect all background images from relevant categories
+        const backgroundCategories = [
+            'location_backgrounds'
+        ] as const;
+
+        const allBackgrounds: string[] = [];
+        backgroundCategories.forEach(category => {
+            const categoryData = GameImageLoader.images[category];
+            categoryData.files.forEach(file => {
+                allBackgrounds.push(file.replace(/\.(png|svg)$/, ''));
+            });
+        });
+
+        const totalPages = Math.ceil(allBackgrounds.length / this.itemsPerPage);
+        const startIdx = this.currentBackgroundPage * this.itemsPerPage;
+        const endIdx = Math.min(startIdx + this.itemsPerPage, allBackgrounds.length);
+
+        const options: DebugMenuOption[] = allBackgrounds
+            .slice(startIdx, endIdx)
+            .map(background => ({
+                text: background,
+                callback: () => {
+                    // Emit an event that CombatScene will listen for
+                    this.scene.events.emit('changeBackground', background);
+                }
+            }));
+
+        // Add navigation options
+        options.push(
+            {
+                text: '← Previous Page',
+                callback: () => {
+                    this.currentBackgroundPage = (this.currentBackgroundPage - 1 + totalPages) % totalPages;
+                    this.updateBackgroundMenuPage();
+                }
+            },
+            {
+                text: 'Next Page →',
+                callback: () => {
+                    this.currentBackgroundPage = (this.currentBackgroundPage + 1) % totalPages;
+                    this.updateBackgroundMenuPage();
+                }
+            },
+            {
+                text: 'Back to Main',
+                callback: () => {
+                    this.currentPage = 'main';
+                    this.menu.updateOptions(this.getMainMenuOptions());
+                    this.pageDisplay.setVisible(false);
+                }
+            }
+        );
+
+        this.menu.updateOptions(options);
+        this.pageDisplay.setText(`Page ${this.currentBackgroundPage + 1}/${totalPages}`);
         this.pageDisplay.setVisible(true);
     }
 

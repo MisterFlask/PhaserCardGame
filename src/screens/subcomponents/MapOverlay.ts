@@ -161,7 +161,7 @@ export class MapOverlay {
 
     // Campaign Brief Status
     private createCampaignBriefStatus() {
-        this.campaignBriefStatus = new CampaignBriefStatus(this.scene);
+        this.campaignBriefStatus = new CampaignBriefStatus(this.scene, false);
         this.campaignBriefStatus.setScrollFactor(0);
         this.campaignBriefStatus.setDepth(DepthManager.getInstance().UI_BASE);
         this.overlay.add(this.campaignBriefStatus);

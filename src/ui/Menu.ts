@@ -14,7 +14,7 @@ interface MenuConfig {
 
 interface MenuOption {
     text: string;
-    iconKey?: string; // Key for the icon image
+    iconKey?: string;
     callback: () => void;
 }
 
@@ -24,31 +24,27 @@ export default class Menu {
     private background: Phaser.GameObjects.Rectangle;
     private options: MenuOption[];
     private optionContainers: Phaser.GameObjects.Container[] = [];
+    private buttonHeight: number = 50;
     private buttonSpacing: number = 60;
 
     constructor(config: MenuConfig) {
         this.scene = config.scene;
         this.options = config.options;
 
-        // Create a container for the menu
         this.container = this.scene.add.container(config.x, config.y);
 
-        // Add a semi-transparent background with rounded corners
-        this.background = this.scene.add.rectangle(0, 0, config.width, config.height, 0x000000, 0.8)
+        this.background = this.scene.add.rectangle(0, 0, config.width, config.height, 0x111111, 0.9)
             .setOrigin(0.5)
             .setStrokeStyle(2, 0xffffff);
         this.container.add(this.background);
 
-        // Add the "Deck Contents" option
         this.options.push({
             text: 'Deck Contents',
             callback: () => this.showDeckContents()
         });
 
-        // Create menu options with icons
-        this.createOptions();
+        this.createOptions(config.width);
 
-        // Initially hide the menu
         this.container.setVisible(false);
         this.container.setAlpha(0);
         this.container.setScrollFactor(0);
@@ -58,38 +54,33 @@ export default class Menu {
         this.container.setPosition(x, y);
     }
 
-    /**
-     * Creates the menu options as interactive containers with icons and text.
-     */
-    private createOptions(): void {
-        this.options.forEach((option, index) => {
-            // Create a container for each option
-            const optionContainer = this.scene.add.container(0, (index - this.options.length / 2) * this.buttonSpacing);
+    private createOptions(menuWidth: number): void {
+        const totalHeight = this.options.length * this.buttonSpacing;
+        let startY = -(totalHeight - this.buttonSpacing) / 2;
 
-            // Add icon
-            const icon = this.scene.add.image(-100, 0, option.iconKey ?? "NO_ICON")
-                .setDisplaySize(40, 40); // Adjust icon size as needed
-            optionContainer.add(icon);
+        this.options.forEach((option) => {
+            const optionContainer = this.scene.add.container(0, startY);
 
-            // Add text
-            const optionText = this.scene.add.text(0, 0, option.text, {
+            const icon = this.scene.add.image(0,0, option.iconKey ?? "NO_ICON")
+                .setDisplaySize(40, 40);
+
+            const optionText = this.scene.add.text(0,0, option.text, {
                 fontSize: '24px',
-                color: '#ffffff',
-                backgroundColor: '#333333',
-                padding: { x: 10, y: 10 },
-                align: 'left'
-            })
-                .setOrigin(0, 0.5);
-            optionContainer.add(optionText);
+                color: '#ffffff'
+            }).setOrigin(0.5);
 
-            // Set interactive area
-            optionContainer.setSize(200, 50);
+            // measure width
+            const totalWidth = icon.displayWidth + 10 + optionText.width;
+            icon.setX(-totalWidth/2 + icon.displayWidth/2);
+            optionText.setX(icon.x + icon.displayWidth/2 + 10 + optionText.width/2);
+
+            optionContainer.add([icon, optionText]);
+            optionContainer.setSize(menuWidth * 0.8, this.buttonHeight);
             optionContainer.setInteractive({ useHandCursor: true })
                 .on('pointerover', () => this.onHover(optionContainer))
                 .on('pointerout', () => this.onHoverOut(optionContainer))
                 .on('pointerdown', () => option.callback());
 
-            // Add hover animations
             optionContainer.on('pointerover', () => {
                 this.scene.tweens.add({
                     targets: optionContainer,
@@ -103,8 +94,8 @@ export default class Menu {
             optionContainer.on('pointerout', () => {
                 this.scene.tweens.add({
                     targets: optionContainer,
-                    scaleX: 1.0,
-                    scaleY: 1.0,
+                    scaleX: 1,
+                    scaleY: 1,
                     duration: 200,
                     ease: 'Power2'
                 });
@@ -112,28 +103,20 @@ export default class Menu {
 
             this.container.add(optionContainer);
             this.optionContainers.push(optionContainer);
+            startY += this.buttonSpacing;
         });
     }
 
-    /**
-     * Handles hover effect when the mouse is over a menu option.
-     * @param container - The container being hovered.
-     */
     private onHover(container: Phaser.GameObjects.Container): void {
-        // Check if hover background already exists to prevent stacking
         let background = container.getByName('hoverBackground') as Phaser.GameObjects.Rectangle;
         if (!background) {
-            background = this.scene.add.rectangle(0, 0, 200, 50, 0x555555, 0.5)
+            background = this.scene.add.rectangle(0, 0, container.width, container.height, 0xffffff, 0.2)
                 .setOrigin(0.5)
-                .setName('hoverBackground'); // Assign a name for easy retrieval
-            container.addAt(background, 0); // Add background at the bottom
+                .setName('hoverBackground');
+            container.addAt(background, 0);
         }
     }
 
-    /**
-     * Removes hover effect when the mouse is out of a menu option.
-     * @param container - The container being hovered out.
-     */
     private onHoverOut(container: Phaser.GameObjects.Container): void {
         const background = container.getByName('hoverBackground');
         if (background) {
@@ -141,9 +124,6 @@ export default class Menu {
         }
     }
 
-    /**
-     * Toggles the visibility of the menu with a fade transition.
-     */
     public toggle(): void {
         if (this.container.visible) {
             this.hide();
@@ -152,9 +132,6 @@ export default class Menu {
         }
     }
 
-    /**
-     * Shows the menu with a fade-in transition.
-     */
     public show(): void {
         this.container.setVisible(true);
         this.scene.tweens.add({
@@ -165,9 +142,6 @@ export default class Menu {
         });
     }
 
-    /**
-     * Hides the menu with a fade-out transition.
-     */
     public hide(): void {
         this.scene.tweens.add({
             targets: this.container,
@@ -180,9 +154,6 @@ export default class Menu {
         });
     }
 
-    /**
-     * Shows the deck contents in a modal window.
-     */
     private showDeckContents(): void {
         const gameState = GameState.getInstance();
         const deckContents = {
@@ -231,11 +202,9 @@ export default class Menu {
 
     public updateOptions(newOptions: MenuOption[]): void {
         this.options = newOptions;
-        // Clear existing options
         this.optionContainers.forEach(container => container.destroy());
         this.optionContainers = [];
-        // Create new options
-        this.createOptions();
+        this.createOptions(this.background.width);
     }
 
     public isVisible(): boolean {
