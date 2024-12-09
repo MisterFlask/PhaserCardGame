@@ -13,263 +13,197 @@ interface DebugMenuOption {
     callback: () => void;
 }
 
+type PageType = 'main' | 'cards' | 'relics' | 'backgrounds';
+
 export class DebugMenu {
     private scene: Scene;
-    private menu!: Menu;
-    private currentPage: 'main' | 'cards' | 'relics' | 'backgrounds' = 'main';
+    private menu: Menu;
+    private pageDisplay: TextBox;
+
+    private currentPage: PageType = 'main';
     private itemsPerPage = 8;
     private currentCardPage = 0;
     private currentRelicPage = 0;
     private currentBackgroundPage = 0;
-    private pageDisplay!: TextBox;
+
+    private allCards = CardLibrary.getInstance().getAllCards();
+    private allRelics = RelicsLibrary.getInstance().getAllRelics();
+    private allBackgrounds: string[] = [];
 
     constructor(scene: Scene) {
         this.scene = scene;
-        this.createMenu();
+        this.preloadData();
+        this.menu = this.createMenu();
+        this.pageDisplay = this.createPageDisplay();
         this.hide();
+        this.addKeyboardListener();
+    }
 
-        // Add keyboard listener for 'Z' key
-        const zKey = this.scene.input.keyboard?.addKey('Z');
-        zKey?.on('down', () => {
-            this.toggle();
+    private preloadData(): void {
+        // sort data once
+        this.allRelics.sort((a, b) => a.name.localeCompare(b.name));
+
+        const categories = ['location_backgrounds'] as const;
+        categories.forEach(cat => {
+            const data = GameImageLoader.images[cat].files;
+            data.forEach(file => this.allBackgrounds.push(file.replace(/\.(png|svg)$/, '')));
         });
     }
 
-    private createMenu(): void {
-        const gameWidth = this.scene.scale.width;
-        const gameHeight = this.scene.scale.height;
+    private addKeyboardListener(): void {
+        const zKey = this.scene.input.keyboard?.addKey('Z');
+        zKey?.on('down', () => this.toggle());
+    }
 
-        this.menu = new Menu({
+    private createMenu(): Menu {
+        const { width, height } = this.scene.scale;
+        return new Menu({
             scene: this.scene,
-            x: gameWidth / 2,
-            y: gameHeight / 2,
+            x: width / 2,
+            y: height / 2,
             width: 400,
             height: 500,
             options: this.getMainMenuOptions()
         });
+    }
 
-        this.menu.container.setDepth(DepthManager.getInstance().OVERLAY_BASE + 1000);
-
-        // Create page display
-        this.pageDisplay = new TextBox({
+    private createPageDisplay(): TextBox {
+        const { width, height } = this.scene.scale;
+        const pageDisplay = new TextBox({
             scene: this.scene,
-            x: gameWidth / 2,
-            y: gameHeight / 2 - 230,
+            x: width / 2,
+            y: height / 2 - 230,
             width: 200,
             height: 40,
             text: '',
-            style: {
-                fontSize: '18px',
-                color: '#ffffff'
-            },
+            style: { fontSize: '18px', color: '#ffffff' },
             fillColor: 0x000000,
             textBoxName: 'DebugMenuPageDisplay'
         });
-        this.pageDisplay.setDepth(DepthManager.getInstance().OVERLAY_BASE + 1001);
-        this.pageDisplay.setVisible(false);
+
+        pageDisplay.setDepth(DepthManager.getInstance().OVERLAY_BASE + 1001);
+        pageDisplay.setVisible(false);
+
+        this.menu.container.setDepth(DepthManager.getInstance().OVERLAY_BASE + 1000);
+        return pageDisplay;
     }
 
     private getMainMenuOptions(): DebugMenuOption[] {
         return [
-            {
-                text: 'Add Cards',
-                callback: () => this.showCardsMenu()
-            },
-            {
-                text: 'Add Relics',
-                callback: () => this.showRelicsMenu()
-            },
-            {
-                text: 'Change Background',
-                callback: () => this.showBackgroundsMenu()
-            },
+            { text: 'Add Cards', callback: () => this.goToPage('cards') },
+            { text: 'Add Relics', callback: () => this.goToPage('relics') },
+            { text: 'Change Background', callback: () => this.goToPage('backgrounds') },
             {
                 text: 'Add Resources (+4 each)',
                 callback: () => {
-                    const combatResources = GameState.getInstance().combatState.combatResources;
-                    combatResources.modifyPluck(4);
-                    combatResources.modifyAshes(4);
-                    combatResources.modifyMettle(4);
-                    combatResources.modifyVenture(4);
-                    combatResources.modifySmog(4);
-                    combatResources.modifyBlood(4);
+                    const cState = GameState.getInstance().combatState.combatResources;
+                    cState.modifyAshes(4);
+                    cState.modifyMettle(4);
+                    cState.modifyVenture(4);
+                    cState.modifySmog(4);
+                    cState.modifyBlood(4);
+                    cState.modifyPluck(4);
                 }
             },
-            {
-                text: 'Close',
-                callback: () => this.hide()
-            }
+            { text: 'Close', callback: () => this.hide() }
         ];
     }
 
-    private showCardsMenu(): void {
-        this.currentPage = 'cards';
-        this.updateCardMenuPage();
+    private goToPage(page: PageType): void {
+        this.currentPage = page;
+        switch (page) {
+            case 'cards':
+                this.updatePaginatedMenu(
+                    this.allCards.map(c => ({ name: c.name, onClick: () => this.addCard(c) })),
+                    this.currentCardPage,
+                    i => (this.currentCardPage = i),
+                    () => this.backToMain()
+                );
+                break;
+            case 'relics':
+                this.updatePaginatedMenu(
+                    this.allRelics.map(r => ({ name: r.name, onClick: () => this.addRelic(r) })),
+                    this.currentRelicPage,
+                    i => (this.currentRelicPage = i),
+                    () => this.backToMain()
+                );
+                break;
+            case 'backgrounds':
+                this.updatePaginatedMenu(
+                    this.allBackgrounds.map(b => ({ name: b, onClick: () => this.changeBackground(b) })),
+                    this.currentBackgroundPage,
+                    i => (this.currentBackgroundPage = i),
+                    () => this.backToMain()
+                );
+                break;
+            default:
+                this.menu.updateOptions(this.getMainMenuOptions());
+                this.pageDisplay.setVisible(false);
+        }
     }
 
-    private showRelicsMenu(): void {
-        this.currentPage = 'relics';
-        this.updateRelicMenuPage();
+    private addCard(card: any): void {
+        const newCard = card.Copy();
+        newCard.owningCharacter = GameState.getInstance().combatState.playerCharacters[0];
+        ActionManager.getInstance().createCardToHand(newCard);
     }
 
-    private showBackgroundsMenu(): void {
-        this.currentPage = 'backgrounds';
-        this.updateBackgroundMenuPage();
+    private addRelic(relic: any): void {
+        const newRelic = new (relic.constructor as any)();
+        newRelic.init();
+        ActionManager.getInstance().addRelicToInventory(newRelic);
     }
 
-    private updateCardMenuPage(): void {
-        const allCards = CardLibrary.getInstance().getAllCards();
-        const totalPages = Math.ceil(allCards.length / this.itemsPerPage);
-        const startIdx = this.currentCardPage * this.itemsPerPage;
-        const endIdx = Math.min(startIdx + this.itemsPerPage, allCards.length);
+    private changeBackground(bg: string): void {
+        this.scene.events.emit('changeBackground', bg);
+    }
 
-        const options: DebugMenuOption[] = allCards
-            .slice(startIdx, endIdx)
-            .map(card => ({
-                text: card.name,
-                callback: () => {
-                    const newCard = card.Copy();
-                    newCard.owningCharacter = GameState.getInstance().combatState.playerCharacters[0];
-                    ActionManager.getInstance().createCardToHand(newCard);
-                }
-            }));
+    private backToMain(): void {
+        this.currentPage = 'main';
+        this.menu.updateOptions(this.getMainMenuOptions());
+        this.pageDisplay.setVisible(false);
+    }
 
-        // Add navigation options
-        options.push(
+    private updatePaginatedMenu(
+        items: { name: string; onClick: () => void }[],
+        currentPage: number,
+        setPage: (val: number) => void,
+        onBack: () => void
+    ): void {
+        const totalPages = Math.max(1, Math.ceil(items.length / this.itemsPerPage));
+        const pageIndex = Math.min(currentPage, totalPages - 1);
+        setPage(pageIndex);
+
+        const startIdx = pageIndex * this.itemsPerPage;
+        const endIdx = Math.min(startIdx + this.itemsPerPage, items.length);
+
+        const pageItems = items.slice(startIdx, endIdx).map(i => ({
+            text: i.name,
+            callback: i.onClick
+        }));
+
+        pageItems.push(
             {
                 text: '← Previous Page',
                 callback: () => {
-                    this.currentCardPage = (this.currentCardPage - 1 + totalPages) % totalPages;
-                    this.updateCardMenuPage();
+                    const prevPage = (pageIndex - 1 + totalPages) % totalPages;
+                    setPage(prevPage);
+                    this.updatePaginatedMenu(items, prevPage, setPage, onBack);
                 }
             },
             {
                 text: 'Next Page →',
                 callback: () => {
-                    this.currentCardPage = (this.currentCardPage + 1) % totalPages;
-                    this.updateCardMenuPage();
+                    const nextPage = (pageIndex + 1) % totalPages;
+                    setPage(nextPage);
+                    this.updatePaginatedMenu(items, nextPage, setPage, onBack);
                 }
             },
-            {
-                text: 'Back to Main',
-                callback: () => {
-                    this.currentPage = 'main';
-                    this.menu.updateOptions(this.getMainMenuOptions());
-                    this.pageDisplay.setVisible(false);
-                }
-            }
+            { text: 'Back to Main', callback: () => onBack() }
         );
 
-        this.menu.updateOptions(options);
-        this.pageDisplay.setText(`Page ${this.currentCardPage + 1}/${totalPages}`);
-        this.pageDisplay.setVisible(true);
-    }
-
-    private updateRelicMenuPage(): void {
-        const allRelics = RelicsLibrary.getInstance().getAllRelics();
-        const totalPages = Math.ceil(allRelics.length / this.itemsPerPage);
-        const startIdx = this.currentRelicPage * this.itemsPerPage;
-        const endIdx = Math.min(startIdx + this.itemsPerPage, allRelics.length);
-        // Sort relics alphabetically by name
-        allRelics.sort((a, b) => a.name.localeCompare(b.name));
-        const options: DebugMenuOption[] = allRelics
-            .slice(startIdx, endIdx)
-            .map(relic => ({
-                text: relic.name,
-                callback: () => {
-                    const newRelic = new (relic.constructor as any)();
-                    newRelic.init();
-                    ActionManager.getInstance().addRelicToInventory(newRelic);
-                }
-            }));
-
-        // Add navigation options
-        options.push(
-            {
-                text: '← Previous Page',
-                callback: () => {
-                    this.currentRelicPage = (this.currentRelicPage - 1 + totalPages) % totalPages;
-                    this.updateRelicMenuPage();
-                }
-            },
-            {
-                text: 'Next Page →',
-                callback: () => {
-                    this.currentRelicPage = (this.currentRelicPage + 1) % totalPages;
-                    this.updateRelicMenuPage();
-                }
-            },
-            {
-                text: 'Back to Main',
-                callback: () => {
-                    this.currentPage = 'main';
-                    this.menu.updateOptions(this.getMainMenuOptions());
-                    this.pageDisplay.setVisible(false);
-                }
-            }
-        );
-
-        this.menu.updateOptions(options);
-        this.pageDisplay.setText(`Page ${this.currentRelicPage + 1}/${totalPages}`);
-        this.pageDisplay.setVisible(true);
-    }
-
-    private updateBackgroundMenuPage(): void {
-        // Collect all background images from relevant categories
-        const backgroundCategories = [
-            'location_backgrounds'
-        ] as const;
-
-        const allBackgrounds: string[] = [];
-        backgroundCategories.forEach(category => {
-            const categoryData = GameImageLoader.images[category];
-            categoryData.files.forEach(file => {
-                allBackgrounds.push(file.replace(/\.(png|svg)$/, ''));
-            });
-        });
-
-        const totalPages = Math.ceil(allBackgrounds.length / this.itemsPerPage);
-        const startIdx = this.currentBackgroundPage * this.itemsPerPage;
-        const endIdx = Math.min(startIdx + this.itemsPerPage, allBackgrounds.length);
-
-        const options: DebugMenuOption[] = allBackgrounds
-            .slice(startIdx, endIdx)
-            .map(background => ({
-                text: background,
-                callback: () => {
-                    // Emit an event that CombatScene will listen for
-                    this.scene.events.emit('changeBackground', background);
-                }
-            }));
-
-        // Add navigation options
-        options.push(
-            {
-                text: '← Previous Page',
-                callback: () => {
-                    this.currentBackgroundPage = (this.currentBackgroundPage - 1 + totalPages) % totalPages;
-                    this.updateBackgroundMenuPage();
-                }
-            },
-            {
-                text: 'Next Page →',
-                callback: () => {
-                    this.currentBackgroundPage = (this.currentBackgroundPage + 1) % totalPages;
-                    this.updateBackgroundMenuPage();
-                }
-            },
-            {
-                text: 'Back to Main',
-                callback: () => {
-                    this.currentPage = 'main';
-                    this.menu.updateOptions(this.getMainMenuOptions());
-                    this.pageDisplay.setVisible(false);
-                }
-            }
-        );
-
-        this.menu.updateOptions(options);
-        this.pageDisplay.setText(`Page ${this.currentBackgroundPage + 1}/${totalPages}`);
+        this.menu.updateOptions(pageItems);
+        this.pageDisplay.setText(`Page ${pageIndex + 1}/${totalPages}`);
         this.pageDisplay.setVisible(true);
     }
 
@@ -283,15 +217,11 @@ export class DebugMenu {
     }
 
     public toggle(): void {
-        if (this.menu.isVisible()) {
-            this.hide();
-        } else {
-            this.show();
-        }
+        if (this.menu.isVisible()) this.hide(); else this.show();
     }
 
     public destroy(): void {
         this.menu.destroy();
         this.pageDisplay.destroy();
     }
-} 
+}

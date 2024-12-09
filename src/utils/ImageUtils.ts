@@ -19,8 +19,17 @@ export default class GameImageLoader {
         location_backgrounds: {
             prefix: 'Backgrounds/Location/',
             files: ['forest-battle-background-1.png',
-                'shop-background-1.png', 'hell-oil-painting.png',
+                'shop-background-1.png', 'hell-oil-painting.png', 'hell-oil-painting-dimmer.png', 'shop-background-oil-painting.png'
             ]
+        },
+        portraits_npcs: {
+            prefix: 'Portraits/NpcPortraits/',
+            files: [
+                "shopkeeper-professional.png",
+                "shopkeeper-shady.png",
+                "shopkeeper-shady-2.png",
+                "shopkeeper-spooky.png",
+              ]
         },
         portraits_blackhand_female: {
             prefix: 'Portraits/BlackhandPortraits/female/',

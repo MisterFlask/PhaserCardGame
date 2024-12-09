@@ -43,7 +43,7 @@ export default class Menu {
             callback: () => this.showDeckContents()
         });
 
-        this.createOptions(config.width);
+        this.createOptions();
 
         this.container.setVisible(false);
         this.container.setAlpha(0);
@@ -53,34 +53,33 @@ export default class Menu {
     public updatePosition(x: number, y: number): void {
         this.container.setPosition(x, y);
     }
-
-    private createOptions(menuWidth: number): void {
+    private createOptions(): void {
+        let maxWidth = 0;
         const totalHeight = this.options.length * this.buttonSpacing;
         let startY = -(totalHeight - this.buttonSpacing) / 2;
-
+    
         this.options.forEach((option) => {
             const optionContainer = this.scene.add.container(0, startY);
-
+    
             const icon = this.scene.add.image(0,0, option.iconKey ?? "NO_ICON")
                 .setDisplaySize(40, 40);
-
+    
             const optionText = this.scene.add.text(0,0, option.text, {
                 fontSize: '24px',
                 color: '#ffffff'
             }).setOrigin(0.5);
-
-            // measure width
+    
             const totalWidth = icon.displayWidth + 10 + optionText.width;
             icon.setX(-totalWidth/2 + icon.displayWidth/2);
             optionText.setX(icon.x + icon.displayWidth/2 + 10 + optionText.width/2);
-
+    
             optionContainer.add([icon, optionText]);
-            optionContainer.setSize(menuWidth * 0.8, this.buttonHeight);
+            optionContainer.setSize(totalWidth, 50);
             optionContainer.setInteractive({ useHandCursor: true })
                 .on('pointerover', () => this.onHover(optionContainer))
                 .on('pointerout', () => this.onHoverOut(optionContainer))
                 .on('pointerdown', () => option.callback());
-
+    
             optionContainer.on('pointerover', () => {
                 this.scene.tweens.add({
                     targets: optionContainer,
@@ -90,7 +89,7 @@ export default class Menu {
                     ease: 'Power2'
                 });
             });
-
+    
             optionContainer.on('pointerout', () => {
                 this.scene.tweens.add({
                     targets: optionContainer,
@@ -100,12 +99,22 @@ export default class Menu {
                     ease: 'Power2'
                 });
             });
-
+    
             this.container.add(optionContainer);
             this.optionContainers.push(optionContainer);
+    
+            if (totalWidth > maxWidth) maxWidth = totalWidth;
             startY += this.buttonSpacing;
         });
+    
+        // pad the background a bit
+        const padding = 40;
+        const neededWidth = maxWidth + padding;
+        const neededHeight = this.options.length * this.buttonSpacing;
+        this.background.width = Math.max(this.background.width, neededWidth);
+        this.background.height = Math.max(this.background.height, neededHeight + padding);
     }
+    
 
     private onHover(container: Phaser.GameObjects.Container): void {
         let background = container.getByName('hoverBackground') as Phaser.GameObjects.Rectangle;
@@ -204,7 +213,7 @@ export default class Menu {
         this.options = newOptions;
         this.optionContainers.forEach(container => container.destroy());
         this.optionContainers = [];
-        this.createOptions(this.background.width);
+        this.createOptions();
     }
 
     public isVisible(): boolean {
