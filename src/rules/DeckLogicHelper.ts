@@ -34,7 +34,7 @@ export class DeckLogic {
     let initialDeck: IAbstractCard[] = [];
 
     for (const character of selectedCharacters) {
-      initialDeck = initialDeck.concat(character.cardsInMasterDeck);
+      initialDeck = initialDeck.concat(character.cardsInMasterDeck.map(c => c.Copy()));
     }
 
     return initialDeck as PlayableCard[];

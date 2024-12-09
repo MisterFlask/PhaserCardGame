@@ -9,7 +9,7 @@ import { Regeneration } from '../../../gamecharacters/buffs/enemy_buffs/Regenera
 export class FrenchLumberjack extends AutomatedCharacter {
     constructor() {
         super({
-            name: "Splinthewers",
+            name: "Tree Clearer",
             portraitName: "Eldritch Soldier Gunner",
             maxHitpoints: 60,
             description: "Many unsanctioned pine dimensions.  Culling necessary."

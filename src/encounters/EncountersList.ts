@@ -10,7 +10,6 @@ import { AbstractRelic } from '../relics/AbstractRelic';
 import { RelicsLibrary } from '../relics/RelicsLibrary';
 import { GameState } from '../rules/GameState';
 import { CardModifier } from '../rules/modifiers/AbstractCardModifier';
-import GameImageLoader from '../utils/ImageUtils';
 import { RestEvent } from './events/RestEvent';
 import { FrenchBlindProphetess } from './monsters/act1_boss/FrenchBlindProphetess';
 import { FrenchChef } from './monsters/act1_segment1/FrenchChef';
@@ -131,8 +130,19 @@ export class Encounter {
         if (this.backgroundNameOverride) {
             return this.backgroundNameOverride;
         }
-        var background = GameImageLoader.getRandomImageNameFromCategory("location_backgrounds");
-        return background;
+        var backgroundsPossible = [
+            "backrooms-oil-painting.png",
+            "canyon-oil-painting.png",
+            "facility-oil-painting.png",
+            "forest-oil-painting.png",
+            "heaven-oil-painting.png",
+            "hell-oil-painting-cold.png",
+            "hell-oil-painting-foundry.png",
+            "hell-oil-painting.png",
+            "ruined-city-oil-painting.png",
+            "shop-background-oil-painting.png"
+        ]
+        return backgroundsPossible[Math.floor(Math.random() * backgroundsPossible.length)];
     }
 
     peaceful: boolean = false;
