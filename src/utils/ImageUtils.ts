@@ -18,9 +18,22 @@ export default class GameImageLoader {
         },
         location_backgrounds: {
             prefix: 'Backgrounds/Location/',
-            files: ['forest-battle-background-1.png',
-                'shop-background-1.png', 'hell-oil-painting.png', 'hell-oil-painting-dimmer.png', 'shop-background-oil-painting.png'
-            ]
+            files: [
+                "backrooms-oil-painting.png",
+                "canyon-oil-painting.png",
+                "facility-oil-painting.png",
+                "forest-battle-background-1.png",
+                "forest-oil-painting.png",
+                "heaven-oil-painting.png",
+                "hell-oil-painting-cold.png",
+                "hell-oil-painting-dimmer.png",
+                "hell-oil-painting-foundry.png",
+                "hell-oil-painting.png",
+                "ruined-city-oil-painting.png",
+                "shop-background-1-original.png",
+                "shop-background-1.png",
+                "shop-background-oil-painting.png"
+              ]
         },
         portraits_npcs: {
             prefix: 'Portraits/NpcPortraits/',
