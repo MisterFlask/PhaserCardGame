@@ -103,6 +103,11 @@ export abstract class AbstractBuff implements IAbstractBuff {
         this.actionManager.displaySubtitle(this.getDisplayName(), 500);
     }
 
+
+    public getOwnerOfCardThisBuffIsAttachedTo(): PlayerCharacter | null {
+        return this.getOwnerAsPlayableCard()?.owningCharacter ?? null;
+    }
+
     public getOwnerAsPlayableCard(): PlayableCard | null {
         // Import GameState if not already imported at the top of the file
 

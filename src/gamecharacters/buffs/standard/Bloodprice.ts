@@ -1,4 +1,3 @@
-import { BaseCharacter } from "../../BaseCharacter";
 import { AbstractBuff } from "../AbstractBuff";
 
 export class BloodPriceBuff extends AbstractBuff {
@@ -23,10 +22,15 @@ export class BloodPriceBuff extends AbstractBuff {
 
     override provideMissingEnergy_returnsAmountProvided(energyNeeded: number): number {
         console.log("Providing missing energy for Bloodprice, requiring expenditure of " + energyNeeded * this.stacks + " health.");
+        var owner = this.getOwnerOfCardThisBuffIsAttachedTo();
+        if (!owner){
+            console.warn("No owner found for Bloodprice!");
+            throw new Error("No owner found for Bloodprice!");
+        }
         this.actionManager.dealDamage(
             {
                 baseDamageAmount: energyNeeded * this.stacks, 
-                target: this.getOwnerAsPlayableCard()?.owningCharacter as BaseCharacter, 
+                target: owner, 
                 fromAttack: false,
                 ignoresBlock: true
             });
