@@ -6,6 +6,7 @@ import { Delicious } from '../gamecharacters/buffs/enemy_buffs/Delicious';
 import { Stress } from '../gamecharacters/buffs/standard/Stress';
 import { Lethality } from '../gamecharacters/buffs/standard/Strong';
 import { Terrifying } from '../gamecharacters/buffs/standard/Terrifying';
+import { CardSize } from '../gamecharacters/Primitives';
 import { AbstractRelic } from '../relics/AbstractRelic';
 import { RelicsLibrary } from '../relics/RelicsLibrary';
 import { GameState } from '../rules/GameState';
@@ -168,6 +169,7 @@ export class Encounter {
 export class ShopGuy extends AutomatedCharacter {
     constructor() {
         super({ name: 'Arms Dealer', portraitName: 'shopkeeper-spooky', maxHitpoints: 10, description: 'please buy something' });
+        this.size = CardSize.LARGE;
         this.tags.push("shop_combat");
     }
 
@@ -180,6 +182,7 @@ export class CommoditiesGuy extends AutomatedCharacter {
     constructor() {
         super({ name: 'Commodities Trader', portraitName: 'shopkeeper-professional', maxHitpoints: 10, description: "i'm serious, and i'm a professional"});
         this.tags.push("shop_sell_imports");
+        this.size = CardSize.LARGE;
     }
 
     override generateNewIntents(): AbstractIntent[] {
@@ -190,8 +193,9 @@ export class CommoditiesGuy extends AutomatedCharacter {
 
 export class CursedGoodsTrader extends AutomatedCharacter {
     constructor() {
-        super({ name: 'Artifacts Salesman', portraitName: 'shopkeeper-shady', maxHitpoints: 10, description: 'they fell off the back of a wagon!' });
+        super({ name: 'Artifact Salesman', portraitName: 'shopkeeper-shady', maxHitpoints: 10, description: 'they fell off the back of a wagon!' });
         this.tags.push("shop_buy_exports");
+        this.size = CardSize.LARGE;
     }
 
     override generateNewIntents(): AbstractIntent[] {

@@ -42,7 +42,6 @@ export class ShopCardPanel extends Phaser.GameObjects.Container {
     public destroy(): void {
         if (this.physicalCard) {
             this.physicalCard.obliterate();
-            this.physicalCard.destroy();
         }
 
         this.removeAll(true);

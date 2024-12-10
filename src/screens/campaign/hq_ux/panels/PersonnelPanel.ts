@@ -35,7 +35,7 @@ export class PersonnelPanel extends AbstractHqPanel {
 
     private displayRoster(): void {
         // Clear existing character cards
-        this.characterCards.forEach(card => card.destroy());
+        this.characterCards.forEach(card => card.obliterate());
         this.characterCards = [];
 
         const campaignState = CampaignState.getInstance();

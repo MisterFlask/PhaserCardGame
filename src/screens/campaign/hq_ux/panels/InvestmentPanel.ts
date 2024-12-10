@@ -16,7 +16,7 @@ export class InvestmentPanel extends AbstractHqPanel {
 
     private clearCards(): void {
         [...this.availableFactories, ...this.ownedFactories].forEach(card => {
-            card.destroy();
+            card.obliterate();
         });
         this.availableFactories = [];
         this.ownedFactories = [];

@@ -18,7 +18,7 @@ export class FrenchBlindProphetess extends AutomatedCharacter {
         this.portraitTargetLargestDimension = 600;
         this.portraitOffsetXOverride = -100
         this.portraitOffsetYOverride = 0
-        this.size = CardSize.SMALL;
+        this.size = CardSize.LARGE;
         // Apply initial MothGod buff
         this.buffs.push(new MothGod(2));
         this.buffs.push(new Titan(2))

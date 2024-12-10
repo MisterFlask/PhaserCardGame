@@ -23,7 +23,7 @@ export class TradeRouteSelectionPanel extends AbstractHqPanel {
 
     private displayTradeRoutes(): void {
         // Clear existing trade route cards
-        this.tradeRouteCards.forEach(card => card.destroy());
+        this.tradeRouteCards.forEach(card => card.obliterate());
         this.tradeRouteCards = [];
 
         const campaignState = CampaignState.getInstance();

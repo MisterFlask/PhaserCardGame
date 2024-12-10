@@ -190,13 +190,12 @@ export class LoadoutPanel extends AbstractHqPanel {
                 y: this.scene.scale.height * 0.8,
                 data: campaignState.selectedTradeRoute,
                 onCardCreatedEventCallback: (card) => {
-                    card.container.setScale(0.8);
                     this.add(card.container);
                 }
             });
         } else if (this.tradeRouteCard && !campaignState.selectedTradeRoute) {
             // Remove the card if we have no route
-            this.tradeRouteCard.container.destroy();
+            this.tradeRouteCard.obliterate();
             this.tradeRouteCard = null;
         } else if (this.tradeRouteCard && campaignState.selectedTradeRoute) {
             // Update existing card's data
@@ -265,7 +264,7 @@ class RosterPanel extends Phaser.GameObjects.Container {
     removeCharacter(character: PlayerCharacter): void {
         const card = this.characterCards.get(character);
         if (card) {
-            card.container.destroy();
+            card.obliterate();
             this.characterCards.delete(character);
             this.repositionCards();
         }
@@ -276,13 +275,6 @@ class RosterPanel extends Phaser.GameObjects.Container {
             .on('pointerdown', () => {
                 this.loadoutPanel.rosterPanel.emit('characterSelected', card.data);
             })
-            .on('pointerover', () => {
-                card.container.setScale(1.1);
-                
-            })
-            .on('pointerout', () => {
-                card.container.setScale(1.0);
-            });
     }
 
     private repositionCards(): void {
@@ -357,18 +349,12 @@ class CaravanPartyPanel extends Phaser.GameObjects.Container {
                 this.loadoutPanel.partyPanel.removeCharacter(card.data as PlayerCharacter);
                 this.loadoutPanel.partyPanel.emit('characterRemoved', card.data);
             })
-            .on('pointerover', () => {
-                card.container.setScale(1.1);
-            })
-            .on('pointerout', () => {
-                card.container.setScale(1.0);
-            });
     }
 
     removeCharacter(character: PlayerCharacter): void {
         const card = this.characterCards.get(character);
         if (card) {
-            card.container.destroy();
+            card.obliterate();
             this.characterCards.delete(character);
             this.repositionCards();
             
@@ -439,7 +425,7 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
     private refreshGrid(): void {
         // Clear existing grid
         this.equipmentSlots.forEach(card => {
-            card.container.destroy();
+            card.obliterate();
         });
         this.equipmentSlots = [];
         this.gridContainer.removeAll();
@@ -518,12 +504,6 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
             .on('pointerdown', () => {
                 this.rotateTradeGoodAssignment(card);
             })
-            .on('pointerover', () => {
-                card.container.setScale(1.1);
-            })
-            .on('pointerout', () => {
-                card.container.setScale(1.0);
-            });
     }
 
     private rotateTradeGoodAssignment(card: PhysicalCard): void {

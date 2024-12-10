@@ -90,7 +90,6 @@ class CardRewardScreen {
                 y: cardY,
                 data: cardReward,
                 onCardCreatedEventCallback: (cardInstance: PhysicalCard) => {
-                    cardInstance.setupInteractivity();
                     cardInstance.container.setDepth(CARD_REWARD_DEPTH + 1).setVisible(false);
                     
                     // Add hover events

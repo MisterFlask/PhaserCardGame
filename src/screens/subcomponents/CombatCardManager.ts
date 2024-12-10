@@ -144,12 +144,6 @@ export class CombatCardManager {
                 y: CombatSceneLayoutUtils.getBattlefieldY(this.scene),
                 data: enemy,
                 onCardCreatedEventCallback: (card: PhysicalCard) => {
-                    // Make enemy cards interactive if needed
-                    card.container.setInteractive({
-                        hitArea: card.cardBackground,
-                        hitAreaCallback: Phaser.Geom.Rectangle.Contains,
-                        useHandCursor: true
-                    });
                     // If enemy cards should be draggable
                     this.scene.input.setDraggable(card.container);
                 }
@@ -174,11 +168,7 @@ export class CombatCardManager {
             y: pileY - 180,
             data: new UiCard({ name: 'Exhaust Pile (0)', description: 'Exhausted cards', portraitName: "exhaustpile" }),
             onCardCreatedEventCallback: (card: PhysicalCard) => {
-                card.container.setInteractive({
-                    hitArea: card.cardBackground,
-                    hitAreaCallback: Phaser.Geom.Rectangle.Contains,
-                    useHandCursor: true
-                });
+                card.container.setInteractive();
                 card.container.on('pointerdown', () => {
                     this.scene.events.emit('exhaustPileClicked');
                 });
@@ -192,11 +182,8 @@ export class CombatCardManager {
             data: new UiCard({ name: 'Draw Pile (0)', description: 'Cards to draw', portraitName: "drawpile-todo" }),
             onCardCreatedEventCallback: (card: PhysicalCard) => {
                 // Make draw pile interactive
-                card.container.setInteractive({
-                    hitArea: card.cardBackground,
-                    hitAreaCallback: Phaser.Geom.Rectangle.Contains,
-                    useHandCursor: true
-                });
+                card.container.setInteractive();
+
                 card.container.on('pointerdown', () => {
                     this.scene.events.emit('drawPileClicked');
                 });
@@ -210,11 +197,8 @@ export class CombatCardManager {
             data: new UiCard({ name: 'Discard Pile (0)', description: 'Discarded cards', portraitName: "discardpile-todo" }),
             onCardCreatedEventCallback: (card: PhysicalCard) => {
                 // Make discard pile interactive
-                card.container.setInteractive({
-                    hitArea: card.cardBackground,
-                    hitAreaCallback: Phaser.Geom.Rectangle.Contains,
-                    useHandCursor: true
-                });
+                card.container.setInteractive();
+
                 card.container.on('pointerdown', () => {
                     this.scene.events.emit('discardPileClicked');
                 });

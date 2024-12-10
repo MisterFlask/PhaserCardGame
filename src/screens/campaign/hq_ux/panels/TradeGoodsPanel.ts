@@ -106,8 +106,8 @@ export class TradeGoodsPanel extends AbstractHqPanel {
         const cardsPerRow = 4;
 
         // Clear existing cards
-        this.tradeGoods.forEach(card => card.destroy());
-        this.ownedTradeGoods.forEach(card => card.destroy());
+        this.tradeGoods.forEach(card => card.obliterate());
+        this.ownedTradeGoods.forEach(card => card.obliterate());
         this.tradeGoods = [];
         this.ownedTradeGoods = [];
 
