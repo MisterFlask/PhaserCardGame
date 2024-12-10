@@ -193,7 +193,7 @@ export class CommoditiesGuy extends AutomatedCharacter {
 
 export class CursedGoodsTrader extends AutomatedCharacter {
     constructor() {
-        super({ name: 'Artifact Salesman', portraitName: 'shopkeeper-shady', maxHitpoints: 10, description: 'they fell off the back of a wagon!' });
+        super({ name: 'Artifact Salesman', portraitName: 'shopkeeper-shady', maxHitpoints: 10, description: 'they fell off the back of a wagon' });
         this.tags.push("shop_buy_exports");
         this.size = CardSize.LARGE;
     }

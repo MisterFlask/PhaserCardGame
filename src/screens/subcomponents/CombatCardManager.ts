@@ -172,6 +172,8 @@ export class CombatCardManager {
                 card.container.on('pointerdown', () => {
                     this.scene.events.emit('exhaustPileClicked');
                 });
+                card.data.portraitName = "abstract-049"
+                card.data.portraitTint = 0x800080;
             }
         });
 
@@ -183,6 +185,8 @@ export class CombatCardManager {
             onCardCreatedEventCallback: (card: PhysicalCard) => {
                 // Make draw pile interactive
                 card.container.setInteractive();
+                card.data.portraitName = "abstract-059"
+                card.data.portraitTint = 0x008000;
 
                 card.container.on('pointerdown', () => {
                     this.scene.events.emit('drawPileClicked');
@@ -198,7 +202,8 @@ export class CombatCardManager {
             onCardCreatedEventCallback: (card: PhysicalCard) => {
                 // Make discard pile interactive
                 card.container.setInteractive();
-
+                card.data.portraitName = "abstract-069"
+                card.data.portraitTint = 0xFF0000;
                 card.container.on('pointerdown', () => {
                     this.scene.events.emit('discardPileClicked');
                 });
