@@ -132,9 +132,6 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
         // glow effect (behind card)
         this.glowEffect = new CheapGlowEffect(scene);
-        const scaledWidth = this.cardBackground.displayWidth * PhysicalCard.GLOW_SCALE_MULTIPLIER;
-        const scaledHeight = this.cardBackground.displayHeight * PhysicalCard.GLOW_SCALE_MULTIPLIER;
-        this.glowEffect.setDisplaySize(scaledWidth, scaledHeight);
         this.visualContainer.addAt(this.glowEffect, 0);
 
         // border
@@ -282,6 +279,13 @@ export class PhysicalCard implements IPhysicalCardInterface {
             this.cardImage.setDisplaySize(newWidth, newHeight);
         }
 
+        const scaledWidth = newWidth * PhysicalCard.GLOW_SCALE_MULTIPLIER;
+        const scaledHeight = newHeight * PhysicalCard.GLOW_SCALE_MULTIPLIER;
+        // scale highlight if it exists
+        if (this.glowEffect) {
+            this.glowEffect.setDisplaySize(scaledWidth + 8, scaledHeight + 8);
+        }
+
         // update container dimensions & hitarea
         this.container.setSize(newWidth + 4, newHeight + 4);
 
@@ -297,6 +301,17 @@ export class PhysicalCard implements IPhysicalCardInterface {
         // update card content
         this.applyVisualScaling();
 
+        const scale = this.data.size.sizeModifier;
+        const newWidth = this.cardConfig.cardWidth * scale;
+        const newHeight = this.cardConfig.cardHeight * scale;
+    
+        // ensure hpBox always stays at top-right corner:
+        if (this.hpBox) {
+            this.hpBox.setPosition(newWidth / 2 + 10, -newHeight / 2 + 10);
+        }
+    
+        // ensure intents stay at top-center:
+        this.intentsContainer.setPosition(0, -newHeight / 2 - 40);
         // name debug info
         if (this.depthDebug) {
             this.nameBox.setText(`${this.data.name} depth=[${this.container.depth}]`);
