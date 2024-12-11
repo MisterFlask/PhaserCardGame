@@ -35,7 +35,7 @@ export default class GameImageLoader {
                 "shop-background-oil-painting.png",
                 "green-facility-oil-painting.png",
                 "eldritch-jungle-oil-painting.png",
-                "planar-gate-oil-painting.png",
+                "planar-gate-oil-painting-1.png",
                 "planar-gate-oil-painting-2.png"
               ]
         },

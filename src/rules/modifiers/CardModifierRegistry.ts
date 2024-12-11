@@ -7,7 +7,7 @@ import { Damaged } from "../../gamecharacters/buffs/playable_card/SaleTags/Damag
 import { OnSale } from "../../gamecharacters/buffs/playable_card/SaleTags/OnSale";
 import { BloodPriceBuff } from "../../gamecharacters/buffs/standard/Bloodprice";
 import { IncreaseBlood } from "../../gamecharacters/buffs/standard/combatresource/IncreaseBlood";
-import { IncreaseIron } from "../../gamecharacters/buffs/standard/combatresource/IncreaseMetal";
+import { IncreaseIron as IncreaseMettle } from "../../gamecharacters/buffs/standard/combatresource/IncreaseMetal";
 import { IncreasePluck } from "../../gamecharacters/buffs/standard/combatresource/IncreasePluck";
 import { IncreaseSmog } from "../../gamecharacters/buffs/standard/combatresource/IncreaseSmog";
 import { IncreaseVenture } from "../../gamecharacters/buffs/standard/combatresource/IncreaseVenture";
@@ -32,10 +32,10 @@ export class CardModifierRegistry {
     public readonly positiveModifiers: CardModifier[] = [
         // Resource gain modifiers - these make sense in rest sites and rewards
         new CardModifier({
-            name: "Iron Gain",
+            name: "Mettle Gain",
             modifier: card => {
-                card.buffs.push(new IncreaseIron());
-                card.name += "💎";
+                card.buffs.push(new IncreaseMettle().withoutShowingUpInBuffs());
+                card.name += "⚔️";
             },
             powerLevelChange: 1,
             contextsApplicable: [ModifierContext.SHOP, ModifierContext.CARD_REWARD, ModifierContext.REST_SITE_UPGRADE]
@@ -43,7 +43,7 @@ export class CardModifierRegistry {
         new CardModifier({
             name: "Blood Gain",
             modifier: card => {
-                card.buffs.push(new IncreaseBlood());
+                card.buffs.push(new IncreaseBlood().withoutShowingUpInBuffs());
                 card.name += "🩸";
             },
             powerLevelChange: 1,
@@ -52,7 +52,7 @@ export class CardModifierRegistry {
         new CardModifier({
             name: "Pluck Gain",
             modifier: card => {
-                card.buffs.push(new IncreasePluck(1));
+                card.buffs.push(new IncreasePluck(1).withoutShowingUpInBuffs());
                 card.name += "🎭";
             },
             powerLevelChange: 1,
@@ -61,7 +61,7 @@ export class CardModifierRegistry {
         new CardModifier({
             name: "Smog Gain",
             modifier: card => {
-                card.buffs.push(new IncreaseSmog());
+                card.buffs.push(new IncreaseSmog().withoutShowingUpInBuffs());
                 card.name += "💨";
             },
             powerLevelChange: 1,
@@ -70,7 +70,7 @@ export class CardModifierRegistry {
         new CardModifier({
             name: "Venture Gain",
             modifier: card => {
-                card.buffs.push(new IncreaseVenture());
+                card.buffs.push(new IncreaseVenture().withoutShowingUpInBuffs());
                 card.name += "🎲";
             },
             powerLevelChange: 1,
@@ -102,7 +102,7 @@ export class CardModifierRegistry {
         new CardModifier({
             name: "Double Cast",
             modifier: card => {
-                card.buffs.push(new Doubled());
+                card.buffs.push(new Doubled().withoutShowingUpInBuffs());
                 card.baseEnergyCost += 1;
                 card.name += "🔄🔄";
             },
@@ -112,7 +112,7 @@ export class CardModifierRegistry {
         new CardModifier({
             name: "Lightweight",
             modifier: card => {
-                card.buffs.push(new Lightweight(3));
+                card.buffs.push(new Lightweight(3).withoutShowingUpInBuffs());
                 card.name += "🪶";
             },
             powerLevelChange: 1,
@@ -121,7 +121,7 @@ export class CardModifierRegistry {
         new CardModifier({
             name: "Growing Power",
             modifier: card => {
-                card.buffs.push(new GrowingPowerBuff(1));
+                card.buffs.push(new GrowingPowerBuff(1).withoutShowingUpInBuffs());
                 card.name += "🌱";
             },
             eligible: card => card.baseDamage > 0,
@@ -131,7 +131,7 @@ export class CardModifierRegistry {
         new CardModifier({
             name: "Buster",
             modifier: card => {
-                card.buffs.push(new Buster(1));
+                card.buffs.push(new Buster(1).withoutShowingUpInBuffs());
                 card.name += "🔪";
             },
             eligible: card => card.baseDamage > 0,
@@ -141,7 +141,7 @@ export class CardModifierRegistry {
         new CardModifier({
             name: "Surface Value",
             modifier: card => {
-                card.buffs.push(new SurfaceSellValue(30));
+                card.buffs.push(new SurfaceSellValue(30).withoutShowingUpInBuffs());
                 card.name += "💰";
             },
             powerLevelChange: 1,
@@ -154,7 +154,7 @@ export class CardModifierRegistry {
         new CardModifier({
             name: "Damaged Sale",
             modifier: card => {
-                card.applyBuffs_useFromActionManager([new Damaged(1)]);
+                card.applyBuffs_useFromActionManager([new Damaged(1).withoutShowingUpInBuffs()]);
                 card.applyBuffs_useFromActionManager([new OnSale(90)]);
                 card.name += "?";
             },
@@ -166,7 +166,7 @@ export class CardModifierRegistry {
         new CardModifier({
             name: "Heavy",
             modifier: card => {
-                card.applyBuffs_useFromActionManager([new Heavy()]);
+                card.applyBuffs_useFromActionManager([new Heavy().withoutShowingUpInBuffs()]);
                 card.applyBuffs_useFromActionManager([new OnSale(90)]);
                 card.name += "?";
             },
@@ -178,7 +178,7 @@ export class CardModifierRegistry {
         new CardModifier({
             name: "Painful",
             modifier: card => {
-                card.buffs.push(new Painful(1));
+                card.buffs.push(new Painful(1).withoutShowingUpInBuffs());
                 card.name += "🙃";
             },
             powerLevelChange: -1,
@@ -198,7 +198,7 @@ export class CardModifierRegistry {
         new CardModifier({
             name: "Hell Value",
             modifier: card => {
-                card.buffs.push(new HellSellValue(10));
+                card.buffs.push(new HellSellValue(10).withoutShowingUpInBuffs());
                 card.name += "🔥";
             },
             powerLevelChange: -1,

@@ -28,6 +28,7 @@ export class CardSize {
         this.sizeModifier = sizeModifier;
     }
 
+    static TINY = new CardSize({ sizeModifier: 0.5 });
     static SMALL = new CardSize({ sizeModifier: 1 });
     static MEDIUM = new CardSize({ sizeModifier: 1.5 });
     static LARGE = new CardSize({ sizeModifier: 2 });

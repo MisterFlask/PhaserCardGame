@@ -59,6 +59,12 @@ export class ShadowedImage extends Phaser.GameObjects.Container {
         return this;
     }
 
+    setImage(name: string): this {
+        this.mainImage.setTexture(name);
+        this.shadowImage.setTexture(name);
+        return this;
+    }
+
     setTint(tint: number): this {
         this.mainImage.setTint(tint);
         return this;

@@ -236,7 +236,7 @@ export abstract class AbstractCard implements IAbstractCard {
         }
     }
 
-    constructor({ name, description, portraitName, cardType, tooltip, characterData, size, team }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: AbstractCard, size?: CardSize, team?: Team }) {
+    constructor({ name, description, portraitName, cardType, tooltip, characterData, size, team, tint }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, characterData?: AbstractCard, size?: CardSize, team?: Team, tint?: number }) {
         this._name = name
         this.id = generateWordGuid(name)
         this._description = description
@@ -246,6 +246,7 @@ export abstract class AbstractCard implements IAbstractCard {
         this.owningCharacter = characterData as unknown as PlayerCharacter || undefined
         this.size = size || CardSize.SMALL
         this.team = team || Team.ENEMY
+        this.portraitTint = tint || 0xFFFFFF
     }
 
     mirrorChangeToCanonicalCard(changeFunction: (card: this) => void): void {
@@ -393,8 +394,8 @@ export abstract class AbstractCard implements IAbstractCard {
 // dummy card implementation for ui elements that look like cards but are not playable
 export class UiCard extends AbstractCard{
 
-    constructor({ name, description, portraitName, cardType, tooltip, size }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, size?: CardSize }) {
-        super({ name:name, description:description, portraitName:portraitName, cardType:cardType, tooltip:tooltip, size:size });
+    constructor({ name, description, portraitName, cardType, tooltip, size, tint }: { name: string; description: string; portraitName?: string, cardType?: CardType, tooltip?: string, size?: CardSize , tint?: number}) {
+        super({ name:name, description:description, portraitName:portraitName, cardType:cardType, tooltip:tooltip, size:size , tint: tint});
     }
 }
 

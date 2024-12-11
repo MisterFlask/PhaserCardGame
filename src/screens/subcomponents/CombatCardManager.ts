@@ -4,6 +4,7 @@ import Phaser from 'phaser';
 import { AbstractCard, Team, UiCard } from '../../gamecharacters/AbstractCard';
 import { AutomatedCharacter } from '../../gamecharacters/AutomatedCharacter';
 import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
+import { CardSize } from '../../gamecharacters/Primitives';
 import { GameState } from '../../rules/GameState';
 import { DepthManager } from '../../ui/DepthManager';
 import { EnemyPositionManager } from '../../ui/EnemyPositionManager';
@@ -166,14 +167,13 @@ export class CombatCardManager {
             scene: this.scene,
             x: gameWidth * 0.1,
             y: pileY - 180,
-            data: new UiCard({ name: 'Exhaust Pile (0)', description: 'Exhausted cards', portraitName: "exhaustpile" }),
+            data: new UiCard({ name: 'Exhaust Pile (0)', description: 'Exhausted cards', portraitName: "exhaustpile",tint:0x800080,size:CardSize.TINY }),
             onCardCreatedEventCallback: (card: PhysicalCard) => {
                 card.container.setInteractive();
                 card.container.on('pointerdown', () => {
                     this.scene.events.emit('exhaustPileClicked');
                 });
-                card.data.portraitName = "abstract-049"
-                card.data.portraitTint = 0x800080;
+                card.data.size = CardSize.TINY;
             }
         });
 
@@ -181,12 +181,11 @@ export class CombatCardManager {
             scene: this.scene,
             x: gameWidth * 0.1,
             y: pileY,
-            data: new UiCard({ name: 'Draw Pile (0)', description: 'Cards to draw', portraitName: "drawpile-todo" }),
+            data: new UiCard({ name: 'Draw Pile (0)', description: 'Cards to draw', portraitName: "abstract-059" , tint:0x008000,size:CardSize.TINY }),
             onCardCreatedEventCallback: (card: PhysicalCard) => {
                 // Make draw pile interactive
                 card.container.setInteractive();
-                card.data.portraitName = "abstract-059"
-                card.data.portraitTint = 0x008000;
+                card.data.size = CardSize.TINY;
 
                 card.container.on('pointerdown', () => {
                     this.scene.events.emit('drawPileClicked');
@@ -198,15 +197,14 @@ export class CombatCardManager {
             scene: this.scene,
             x: gameWidth * 0.2,
             y: pileY,
-            data: new UiCard({ name: 'Discard Pile (0)', description: 'Discarded cards', portraitName: "discardpile-todo" }),
+            data: new UiCard({ name: 'Discard Pile (0)', description: 'Discarded cards',     portraitName: "abstract-069" , tint:0xFF0000,size:CardSize.TINY  }),
             onCardCreatedEventCallback: (card: PhysicalCard) => {
                 // Make discard pile interactive
                 card.container.setInteractive();
-                card.data.portraitName = "abstract-069"
-                card.data.portraitTint = 0xFF0000;
                 card.container.on('pointerdown', () => {
                     this.scene.events.emit('discardPileClicked');
                 });
+                card.data.size = CardSize.TINY;
 
                 card.container.on('pointerover', () => {
                     // Bring the card to the top within its parent container

@@ -26,6 +26,7 @@ import { UIContext } from './UIContextManager';
  * only the visualContainer is scaled according to card scaling, keeping text and other ui at a consistent size.
  */
 export class PhysicalCard implements IPhysicalCardInterface {
+
     private static readonly GLOW_SCALE_MULTIPLIER = 1.7;
     contextRelevant?: UIContext;
 

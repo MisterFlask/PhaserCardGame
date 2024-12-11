@@ -32,6 +32,11 @@ export abstract class AbstractBuff implements IAbstractBuff {
         return buffCopy;
     }
 
+    public withoutShowingUpInBuffs(): this {
+        this.moveToMainDescription = true;
+        return this;
+    }
+
     // if this is a "standard" buff that is always on the card, it's added to the main description instead of the tooltip/icon.
     public moveToMainDescription: boolean = false;
 
