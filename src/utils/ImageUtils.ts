@@ -270,7 +270,7 @@ export default class GameImageLoader {
                 // french
                 "Eldritch Corruption Deer.png", "Eldritch Soldier Gunner.png", "Eldritch Corruption Crow.png",
 
-                "veil-capacitor.png"
+                "veil-capacitor.png", "doris-smith.png"
             ]
         },
         attributes_and_augments: {
