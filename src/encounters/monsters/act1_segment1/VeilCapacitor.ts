@@ -6,7 +6,7 @@ export class VeilCapacitor extends AutomatedCharacter {
     constructor() {
         super({
             name: "Veil Capacitor",
-            portraitName: "totem",
+            portraitName: "veil-capacitor",
             maxHitpoints: 5,
             description: "A small, unsettling totem.  Probably not worth worrying about."
         });

@@ -98,7 +98,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
             y: 115, // Moved down
             width: this.CURRENCY_WIDTH,
             height: 30,
-            text: `Phlegethon Oil [equiv]: $${GameState.getInstance().hellExportCurrency}`,
+            text: `Promissory Notes: $${GameState.getInstance().hellExportCurrency}`,
             style: {
                 fontSize: '16px',
                 color: '#8B0000',  // Dark red color for brimstone
@@ -196,7 +196,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
         this.actNumberText.setText(`Act ${gameState.currentAct}`);
         this.surfaceCurrencyText.setText(`Surface Currency: ${gameState.surfaceCurrency}`);
         this.hellCurrencyText.setText(`Hell Currency: ${gameState.hellCurrency}`);
-        this.brimstoneDistillateText.setText(`Phlegethon Oil [$ equivalent]: $${gameState.hellExportCurrency}`);
+        this.brimstoneDistillateText.setText(`Promissory Notes: : $${gameState.hellExportCurrency}`);
     }
 
     public destroy(fromScene?: boolean): void {

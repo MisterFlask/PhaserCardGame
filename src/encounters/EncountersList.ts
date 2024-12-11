@@ -132,20 +132,20 @@ export class Encounter {
             return this.backgroundNameOverride;
         }
         var backgroundsPossible = [
-            "backrooms-oil-painting.png",
-            "canyon-oil-painting.png",
-            "facility-oil-painting.png",
-            "forest-oil-painting.png",
-            "heaven-oil-painting.png",
-            "hell-oil-painting-cold.png",
-            "hell-oil-painting-foundry.png",
-            "hell-oil-painting.png",
-            "ruined-city-oil-painting.png",
-            "shop-background-oil-painting.png",
-            "green-facility-oil-painting.png",
-            "eldritch-jungle-oil-painting.png",
-            "planar-gate-oil-painting-1.png",
-            "planar-gate-oil-painting-2.png"
+            "backrooms-oil-painting",
+            "canyon-oil-painting",
+            "facility-oil-painting",
+            "forest-oil-painting",
+            "heaven-oil-painting",
+            "hell-oil-painting-cold",
+            "hell-oil-painting-foundry",
+            "hell-oil-painting",
+            "ruined-city-oil-painting",
+            "shop-background-oil-painting",
+            "green-facility-oil-painting",
+            "eldritch-jungle-oil-painting",
+            "planar-gate-oil-painting-1",
+            "planar-gate-oil-painting-2"
         ]
         return backgroundsPossible[Math.floor(Math.random() * backgroundsPossible.length)];
     }

@@ -268,7 +268,9 @@ export default class GameImageLoader {
                 'Slime Iceii.png', 'Slime RPG Basic.png', 'Boss Harbinger.png',
 
                 // french
-                "Eldritch Corruption Deer.png", "Eldritch Soldier Gunner.png", "Eldritch Corruption Crow.png"
+                "Eldritch Corruption Deer.png", "Eldritch Soldier Gunner.png", "Eldritch Corruption Crow.png",
+
+                "veil-capacitor.png"
             ]
         },
         attributes_and_augments: {
