@@ -895,60 +895,6 @@ export class PhysicalCard implements IPhysicalCardInterface {
         }
     }
 
-    showJsonModal(jsonData: string): void {
-        if (this.jsonModal) {
-            this.jsonModal.destroy();
-        }
-
-        const modalWidth = this.scene.scale.width * 0.8;
-        const modalHeight = this.scene.scale.height * 0.8;
-
-        const background = this.scene.add.rectangle(0, 0, modalWidth, modalHeight, 0x000000, 0.85).setOrigin(0.5);
-        background.setStrokeStyle(2, 0xffffff);
-
-        const text = this.scene.add.text(0, 0, jsonData, {
-            fontSize: '16px',
-            color: '#ffffff',
-            fontFamily: 'Courier',
-            wordWrap: { width: modalWidth - 40 },
-            resolution: 2,
-        });
-        text.setPosition(-modalWidth / 2 + 20, -modalHeight / 2 + 20);
-        text.setOrigin(0, 0);
-
-        const closeButton = this.scene.add.text(modalWidth / 2 - 70, modalHeight / 2 - 40, 'Close', {
-            fontSize: '20px',
-            color: '#ff5555',
-            fontFamily: 'Arial',
-            backgroundColor: '#333333',
-            padding: { x: 10, y: 5 },
-            fixedWidth: 80,
-            fixedHeight: 30,
-            resolution: 2,
-        }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-
-        closeButton.on('pointerover', () => {
-            closeButton.setStyle({ backgroundColor: '#555555' });
-        });
-
-        closeButton.on('pointerout', () => {
-            closeButton.setStyle({ backgroundColor: '#333333' });
-        });
-
-        closeButton.on('pointerdown', () => {
-            if (this.jsonModal) {
-                this.jsonModal.destroy();
-                this.jsonModal = null;
-            }
-        });
-
-        this.jsonModal = this.scene.add.container(
-            this.scene.scale.width / 2,
-            this.scene.scale.height / 2,
-            [background, text, closeButton]
-        );
-    }
-
 
     public addGrowAndShrinkAnimationOnHoverLerps(): this {
         this.container.setInteractive({

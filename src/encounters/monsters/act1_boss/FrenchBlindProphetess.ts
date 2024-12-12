@@ -15,9 +15,9 @@ export class FrenchBlindProphetess extends AutomatedCharacter {
             maxHitpoints: 200,
             description: "whispers of the Final Argument"
         });
-        this.portraitTargetLargestDimension = 600;
-        this.portraitOffsetXOverride = -100
-        this.portraitOffsetYOverride = 0
+        //this.portraitTargetLargestDimension = 600;
+        //this.portraitOffsetXOverride = -100
+        //this.portraitOffsetYOverride = 0
         this.size = CardSize.LARGE;
         // Apply initial MothGod buff
         this.buffs.push(new MothGod(2));

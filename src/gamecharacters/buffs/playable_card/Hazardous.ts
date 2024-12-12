@@ -26,9 +26,9 @@ export class Hazardous extends AbstractBuff {
 
         const pile = this.getPileOfAttachedCard();
         if (pile == BattleCardLocation.Hand) {
-            return [new CosmeticCharacterBuffIntent({ buff: this, target: this.getOwnerAsCharacter()!, damage: this.stacks })];
+            return [new CosmeticCharacterBuffIntent({ buff: this, target: this.getOwnerOfCardThisBuffIsAttachedTo()!, damage: this.stacks })];
         }
-        
+
         return [];
     }
     getPileOfAttachedCard() : BattleCardLocation {
