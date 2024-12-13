@@ -6,7 +6,7 @@ export class SoulSuckingModifier extends AbstractBuff {
     }
 
     getDescription(): string {
-        return `At the start of the act, reduce the max HP of all characters by ${this.getStacksDisplayText()}.`;
+        return `At the start of the run, reduce the max HP of all characters by ${this.getStacksDisplayText()} PERMANENTLY.`;
     }
 
     onActStart(): void {

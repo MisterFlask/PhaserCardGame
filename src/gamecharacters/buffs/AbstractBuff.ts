@@ -69,11 +69,11 @@ export abstract class AbstractBuff implements IAbstractBuff {
         return this.combatState.combatResources;
     }
 
-    constructor() {
+    constructor(stacks: number = 1) {
         this.imageName = "PLACEHOLDER_IMAGE";
         this.id = generateWordGuid();
         this.stackable = true;
-        this.stacks = 1;
+        this.stacks = stacks;
         this.secondaryStacks = -1;
         this.showSecondaryStacks = false;
         this.isDebuff = false;
