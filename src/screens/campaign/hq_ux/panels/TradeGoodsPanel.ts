@@ -4,7 +4,7 @@ import { PlayableCard } from '../../../../gamecharacters/PlayableCard';
 import { GameState } from '../../../../rules/GameState';
 import { PhysicalCard } from '../../../../ui/PhysicalCard';
 import { CardGuiUtils } from '../../../../utils/CardGuiUtils';
-import { CampaignState as CampaignUiState } from '../CampaignState';
+import { CampaignUiState } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
 
 export class TradeGoodsPanel extends AbstractHqPanel {

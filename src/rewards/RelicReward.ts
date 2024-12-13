@@ -11,11 +11,11 @@ export class RelicReward extends AbstractReward {
     }
 
     getDisplayText(): string {
-        return `${this.relic.name}`;
+        return `${this.relic.getDisplayName()}`;
     }
 
     getTooltipText(): string {
-        return `Gain ${this.relic.name}`;
+        return `Gain ${this.relic.getDisplayName()}`;
     }
 
     getIconTexture(): string {

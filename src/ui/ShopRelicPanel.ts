@@ -28,7 +28,7 @@ export class ShopRelicPanel extends Phaser.GameObjects.Container {
         this.scene.add.existing(this);
 
         this.setSize(64, 64);
-        console.log(`Relic Panel for ${this.relic.getName()}:`, {
+        console.log(`Relic Panel for ${this.relic.getDisplayName()}:`, {
             x: this.x, 
             y: this.y, 
             width: this.width, 
@@ -105,14 +105,14 @@ export class ShopRelicPanel extends Phaser.GameObjects.Container {
     }
 
     private setupInteractivity(onPurchase: (relic: AbstractRelic) => void): void {
-        console.log(`setting up interactivity for ${this.relic.getName()}'s shop item panel`);
+        console.log(`setting up interactivity for ${this.relic.getDisplayName()}'s shop item panel`);
         this.setInteractive()
             .on('pointerdown', () => {
-                console.log(`pointerdown on ${this.relic.getName()}'s shop item panel`);
+                console.log(`pointerdown on ${this.relic.getDisplayName()}'s shop item panel`);
                 onPurchase(this.relic);
             })
             .on('pointerover', () => {                
-                console.log(`pointerover on ${this.relic.getName()}'s shop item panel`);
+                console.log(`pointerover on ${this.relic.getDisplayName()}'s shop item panel`);
                 this.setToTop();
                 this.setRelicHoverDepth(DepthManager.getInstance().SHOP_CARD_HOVER);
             })

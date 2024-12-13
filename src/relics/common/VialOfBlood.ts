@@ -4,9 +4,15 @@ import { AbstractRelic } from "../AbstractRelic";
 export class VialOfBlood extends AbstractRelic {
     constructor() {
         super();
-        this.name = "Vial of Blood";
-        this.description = "At the start of combat, increase your Blood by 2.";
         this.rarity = EntityRarity.COMMON;
+    }
+
+    getDisplayName(): string {
+        return "Vial of Blood";
+    }
+
+    getDescription(): string {
+        return "At the start of combat, increase your Blood by 2.";
     }
 
     onCombatStart(): void {

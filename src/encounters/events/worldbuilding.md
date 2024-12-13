@@ -44,6 +44,13 @@ In terms of style and accent, the Underclass speaks with a mix of cockney and va
 The Angels are alien and incomprehensible, beautiful and terrifying.  They don't involve themselves much with Hell or Earth, though Spain has managed to open diplomatic channels through which they receive blessed equipment of various kinds.  They speak in [color=white]ALL CAPS[/color].
 
 
+### La Compagnie Générale des Voies Infernales
+A French competitor to the Third Circle Company, the CGVI has recently established its own gateway in Marseilles. While their technology is less refined than the British Buckingham Rift, they make up for it with Gallic flair and a willingness to cut corners on safety protocols. The company specializes in luxury goods and "cultural exports," running regular shipments of fine wines, controversial literature, and other items that might raise eyebrows at British customs.
+
+The company not-infrequently attempts to claim sovereignty over various infernal trade routes, and often uses violence to enforce said claim.
+
+
+
 # LOCATIONS
 
 ### The City of Dis

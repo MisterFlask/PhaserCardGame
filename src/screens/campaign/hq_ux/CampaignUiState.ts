@@ -9,8 +9,8 @@ import { GameState } from '../../../rules/GameState';
 import { AbstractTradeRoute, StandardTradeRoute } from './AbstractTradeRoute';
 import { StrategicImprovementCard } from './StrategicImprovementCard';
 
-export class CampaignState {
-    private static instance: CampaignState;
+export class CampaignUiState {
+    private static instance: CampaignUiState;
 
     public currentYear: number = 1;
     public shareholderExpectation: number = 1000;
@@ -25,11 +25,11 @@ export class CampaignState {
     
     private constructor() {}
 
-    public static getInstance(): CampaignState {
-        if (!CampaignState.instance) {
-            CampaignState.instance = new CampaignState();
+    public static getInstance(): CampaignUiState {
+        if (!CampaignUiState.instance) {
+            CampaignUiState.instance = new CampaignUiState();
         }
-        return CampaignState.instance;
+        return CampaignUiState.instance;
     }
 
     public getCurrentFunds(): number {

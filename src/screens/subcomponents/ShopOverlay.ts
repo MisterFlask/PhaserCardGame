@@ -138,10 +138,10 @@ export class ShopOverlay {
     }
 
     private buyRelic(relic: AbstractRelic): void {
-        console.log(`Buying relic ${relic.name}`);
+        console.log(`Buying relic ${relic.getDisplayName()}`);
         if (ActionManagerFetcher.getActionManager().buyRelicForHellCurrency(relic, relic.price)) {
             // Remove the purchased relic from the shop relics array
-            const relicIndex = this.currentShop.shopRelicsForSale.findIndex(shopRelic => shopRelic.name === relic.name);
+            const relicIndex = this.currentShop.shopRelicsForSale.findIndex(shopRelic => shopRelic.getDisplayName() === relic.getDisplayName());
             if (relicIndex !== -1) {
                 this.currentShop.shopRelicsForSale.splice(relicIndex, 1);
             }

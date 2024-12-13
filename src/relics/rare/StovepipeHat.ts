@@ -6,12 +6,18 @@ import { AbstractRelic } from '../AbstractRelic';
 export class StovepipeHat extends AbstractRelic {
     constructor() {
         super();
-        this.name = 'Smog Manufacturer';
-        this.description = 'Whenever you manufacture a card, gain 1 Smog.';
         this.rarity = EntityRarity.RARE;
     }
 
-    override onCombatEvent(event: AbstractCombatEvent): void {
+    getDisplayName(): string {
+        return 'Smog Manufacturer';
+    }
+
+    getDescription(): string {
+        return 'Whenever you manufacture a card, gain 1 Smog.';
+    }
+
+    override onEvent(event: AbstractCombatEvent): void {
         if (event instanceof ManufactureEvent) {
             this.actionManager.modifySmog(1);
         }

@@ -16,7 +16,6 @@ class SlaughterbotCard extends PlayableCard {
         this.baseDamage = 12;
     }
 
-
     override get description(): string {
         return `Deal ${this.getDisplayedDamage()} damage.`;
     }
@@ -31,9 +30,15 @@ class SlaughterbotCard extends PlayableCard {
 export class Slaughterbots extends AbstractRelic {
     constructor() {
         super();
-        this.name = "Slaughterbots";
-        this.description = "At the start of combat, add two Slaughterbots to your hand.";
         this.rarity = EntityRarity.UNCOMMON;
+    }
+
+    getDisplayName(): string {
+        return "Slaughterbots";
+    }
+
+    getDescription(): string {
+        return "At the start of combat, add two Slaughterbots to your hand.";
     }
 
     override onCombatStart(): void {

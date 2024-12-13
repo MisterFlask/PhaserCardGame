@@ -3,7 +3,7 @@ import { PlayerCharacter } from '../../../../gamecharacters/BaseCharacterClass';
 import { PhysicalCard } from '../../../../ui/PhysicalCard';
 import { TextBox } from '../../../../ui/TextBox';
 import { CardGuiUtils } from '../../../../utils/CardGuiUtils';
-import { CampaignState } from '../CampaignState';
+import { CampaignUiState } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
 
 export class PersonnelPanel extends AbstractHqPanel {
@@ -38,7 +38,7 @@ export class PersonnelPanel extends AbstractHqPanel {
         this.characterCards.forEach(card => card.obliterate());
         this.characterCards = [];
 
-        const campaignState = CampaignState.getInstance();
+        const campaignState = CampaignUiState.getInstance();
         const roster = campaignState.roster;
 
         // Create grid layout

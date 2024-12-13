@@ -1,10 +1,11 @@
 import { Scene } from 'phaser';
+import { GameState } from '../../../../rules/GameState';
 import { TextBoxButton } from '../../../../ui/Button';
 import { PhysicalCard } from '../../../../ui/PhysicalCard';
 import { UIContext } from '../../../../ui/UIContextManager';
 import { CardGuiUtils } from '../../../../utils/CardGuiUtils';
 import { AbstractTradeRoute } from '../AbstractTradeRoute';
-import { CampaignState } from '../CampaignState';
+import { CampaignUiState } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
 
 export class TradeRouteSelectionPanel extends AbstractHqPanel {
@@ -26,7 +27,7 @@ export class TradeRouteSelectionPanel extends AbstractHqPanel {
         this.tradeRouteCards.forEach(card => card.obliterate());
         this.tradeRouteCards = [];
 
-        const campaignState = CampaignState.getInstance();
+        const campaignState = CampaignUiState.getInstance();
         const routes = campaignState.availableTradeRoutes;
 
         // Display 3 routes side by side
@@ -62,14 +63,15 @@ export class TradeRouteSelectionPanel extends AbstractHqPanel {
             .on('pointerover', () => {
                 card.setGlow(true);
                 this.showRouteDetails(card);
-                CampaignState.getInstance().selectedTradeRoute = card.data as AbstractTradeRoute;
+                CampaignUiState.getInstance().selectedTradeRoute = card.data as AbstractTradeRoute;
             })
             .on('pointerout', () => {
                 card.setGlow(false);
                 this.hideRouteDetails();
             })
             .on('pointerdown', () => {
-                const campaignState = CampaignState.getInstance();
+                CampaignUiState.getInstance().selectedTradeRoute = card.data as AbstractTradeRoute;
+                GameState.getInstance().currentRoute = card.data as AbstractTradeRoute;
                 this.scene.events.emit('routeSelected', card.data);
                 this.returnToHub();
             });

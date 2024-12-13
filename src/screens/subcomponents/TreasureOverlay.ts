@@ -119,7 +119,7 @@ export class TreasureOverlay extends Phaser.GameObjects.Container {
             
             // Verify that a relic was retrieved successfully
             if (this.chest) {
-                console.log(`Selected relic: ${this.chest.relic?.name}`);
+                console.log(`Selected relic: ${this.chest.relic?.getDisplayName()}`);
                 this.show();
             } else {
                 console.log('Failed to retrieve a relic');

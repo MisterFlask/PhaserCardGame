@@ -140,7 +140,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
 
     private handleRelicPointerDown(relic: PhysicalRelic): void {
         console.log('Relic pointer down event received');
-        relic.abstractRelic.onRelicClicked();
+        relic.abstractRelic.onClicked();
     }
 
     updateRelicStacksDisplay(arg0: string, updateRelicStacksDisplay: any, arg2: this) {

@@ -85,5 +85,14 @@ export class BaseCharacter extends AbstractCard implements IBaseCharacter {
             damageModifier: this.getDamageModifier()
         }, null, 2);
     }
+
+    public adjustMaxHitpoints(value: number): void {
+        this.maxHitpoints += value;
+        this.hitpoints = Math.min(this.hitpoints, this.maxHitpoints);
+    }
+
+    public healFully(): void {
+        this.hitpoints = this.maxHitpoints;
+    }
 }
 

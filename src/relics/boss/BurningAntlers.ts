@@ -5,12 +5,18 @@ import { AbstractRelic } from "../AbstractRelic";
 export class BurningAntlers extends AbstractRelic {
     constructor() {
         super();
-        this.name = "Burning Antlers";
-        this.description = "At the beginning of each turn, subtract one of a random combat resource and gain 1 energy.";
         this.rarity = EntityRarity.BOSS;
     }
 
-    onTurnStart(): void {
+    override getDisplayName(): string {
+        return "Burning Antlers";
+    }
+
+    override getDescription(): string {
+        return "At the beginning of each turn, subtract one of a random combat resource and gain 1 energy.";
+    }
+
+    override onTurnStart(): void {
         const gameState = GameState.getInstance();
         const resources = gameState.combatState.combatResources.resources();
         

@@ -3,7 +3,7 @@ import { GameState } from '../../../rules/GameState';
 import { ActionManagerFetcher } from '../../../utils/ActionManagerFetcher';
 import GameImageLoader from '../../../utils/ImageUtils';
 import { SceneChanger } from '../../SceneChanger';
-import { CampaignState } from './CampaignState';
+import { CampaignUiState } from './CampaignUiState';
 import { InvestmentPanel } from './panels/InvestmentPanel';
 import { LoadoutPanel } from './panels/LoadoutPanel';
 import { MainHubPanel } from './panels/MainHubPanel';
@@ -163,7 +163,7 @@ export class HqScene extends Scene {
 
     private validateExpeditionRequirements(): boolean {
         const gameState = GameState.getInstance();
-        const campaignState = CampaignState.getInstance();
+        const campaignState = CampaignUiState.getInstance();
 
         // Check for selected party members
         if (campaignState.selectedParty.length !== 3) {

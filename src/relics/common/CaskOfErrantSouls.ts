@@ -4,9 +4,15 @@ import { AbstractRelic } from "../AbstractRelic";
 export class CaskOfErrantSouls extends AbstractRelic {
     constructor() {
         super();
-        this.name = "Cask of Errant Souls";
-        this.description = "Each time you enter a rest site, gain 10 Hell Currency.";
         this.rarity = EntityRarity.COMMON;
+    }
+
+    override getDisplayName(): string {
+        return "Cask of Errant Souls";
+    }
+
+    override getDescription(): string {
+        return "Each time you enter a rest site, gain 10 Hell Currency.";
     }
 
     override onLocationEntered(location: LocationCard): void {

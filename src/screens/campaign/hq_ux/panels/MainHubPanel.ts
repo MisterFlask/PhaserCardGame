@@ -2,7 +2,7 @@ import { Scene } from 'phaser';
 import { TextGlyphs } from '../../../../text/TextGlyphs';
 import { TextBoxButton } from '../../../../ui/Button';
 import { TextBox } from '../../../../ui/TextBox';
-import { CampaignState } from '../CampaignState';
+import { CampaignUiState } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
 
 export class MainHubPanel extends AbstractHqPanel {
@@ -15,7 +15,7 @@ export class MainHubPanel extends AbstractHqPanel {
     constructor(scene: Scene) {
         super(scene, `! Company HQ${TextGlyphs.getInstance().ashesIcon}! ${TextGlyphs.getInstance().ashesIcon}`);
 
-        const campaignState = CampaignState.getInstance();
+        const campaignState = CampaignUiState.getInstance();
 
         // Create displays
         this.fundsDisplay = this.createInfoDisplay(
@@ -114,7 +114,7 @@ export class MainHubPanel extends AbstractHqPanel {
     }
 
     private updateWarnings(): void {
-        const campaignState = CampaignState.getInstance();
+        const campaignState = CampaignUiState.getInstance();
         const warnings: string[] = [];
 
         if (campaignState.getShareholderSatisfaction() < 0.5) {
@@ -130,7 +130,7 @@ export class MainHubPanel extends AbstractHqPanel {
     }
 
     private updateTradeRouteButton(): void {
-        const campaignState = CampaignState.getInstance();
+        const campaignState = CampaignUiState.getInstance();
         const tradeButton = this.navigationButtons.get('Trade Routes');
         
         if (!tradeButton) return;
@@ -145,7 +145,7 @@ export class MainHubPanel extends AbstractHqPanel {
     }
 
     update(): void {
-        const campaignState = CampaignState.getInstance();
+        const campaignState = CampaignUiState.getInstance();
         this.fundsDisplay.setText(`Funds: £${campaignState.getCurrentFunds()}`);
         this.yearDisplay.setText(`Year: ${campaignState.currentYear}`);
         this.expectationsDisplay.setText(`Expected Profit: £${campaignState.shareholderExpectation}`);

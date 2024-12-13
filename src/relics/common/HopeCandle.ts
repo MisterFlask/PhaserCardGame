@@ -1,17 +1,27 @@
 import { EntityRarity } from "../../gamecharacters/PlayableCard";
+import { LocationCard, RestSiteCard } from "../../maplogic/LocationCard";
 import { AbstractRelic } from "../AbstractRelic";
 
 export class HopeCandle extends AbstractRelic {
     constructor() {
         super();
-        this.name = "Hope Candle";
-        this.description = "At the end of combat, decrease your Stress by 1.";
         this.rarity = EntityRarity.COMMON;
     }
+    
+    getDisplayName(): string {
+        return "Hope Candle";
+    }
 
-    onCombatEnd(): void {
-        this.gameState.combatState.playerCharacters.forEach(character => {
-            this.actionManager.relieveStressFromCharacter(character, 1);
-        });
+    getDescription(): string {
+        return "At rest sites, decrease your Stress by 1.";
+    }
+
+
+    onLocationEntered(location: LocationCard): void {
+        if (location instanceof RestSiteCard) {
+            for (const character of this.gameState.combatState.playerCharacters) {
+                this.actionManager.relieveStressFromCharacter(character, 1);
+            }
+        }
     }
 }

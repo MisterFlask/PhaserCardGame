@@ -5,8 +5,10 @@ import type { PlayableCard } from '../gamecharacters/PlayableCard';
 import { LedgerItem } from '../ledger/LedgerItem';
 import type { LocationCard } from '../maplogic/LocationCard';
 import { AbstractRelic } from '../relics/AbstractRelic';
+import { AbstractTradeRoute } from '../screens/campaign/hq_ux/AbstractTradeRoute';
 import type { AutomatedCharacterType, BaseCharacterType } from '../Types';
 import type { PhysicalCard } from '../ui/PhysicalCard';
+import { ActRegion } from './acts/ActRegion';
 import { AbstractCombatResource } from './combatresources/AbstractCombatResource';
 import { Ashes } from './combatresources/AshesResource';
 import { BloodResource } from './combatresources/BloodResource';
@@ -32,10 +34,17 @@ export class GameState {
     }
 
     private static instance: GameState;
+    currentRoute: AbstractTradeRoute | null = null;
     ledger: LedgerItem[] = [];
     public currentAct: number = 1;
+    public actRegion : ActRegion = ActRegion.STYX_DELTA;
+
     public roster: PlayerCharacter[] = [];
     public currentRunCharacters: PlayerCharacter[] = [];
+
+    public getRandomAllyCharacter(): PlayerCharacter {
+        return this.currentRunCharacters[Math.floor(Math.random() * this.currentRunCharacters.length)];
+    }
 
     combatShopContents: ShopContents = new ShopContents();
     cursedGoodsShopContents: ShopContents = new ShopContents();
@@ -266,8 +275,6 @@ export class CombatState{
 }
 
 export class ShopContents{
-    
-
     // shop stuff
     public shopCardsForSale: PlayableCard[] = [];
     public shopRelicsForSale: AbstractRelic[] = [];

@@ -98,14 +98,8 @@ export class ActionManager {
     endCombat() {
         this.actionQueue.addAction(new GenericAction(async () => {
 
-            GameState.getInstance().relicsInventory.forEach(relic => {
-                relic.onCombatEnd();
-            });
-
-            GameState.getInstance().combatState.allPlayerAndEnemyCharacters.forEach(character => {
-                character.buffs.forEach(buff => {
-                    buff.onCombatEnd();
-                });
+            ProcBroadcaster.getInstance().retrieveAllRelevantBuffsForProcs(true).forEach(buff => {
+                buff.onCombatEnd();
             });
             return [];
         }));
@@ -150,15 +144,10 @@ export class ActionManager {
             // Set max energy based on relics
             GameState.getInstance().combatState.defaultMaxEnergy = 3; // Base energy
 
-            GameState.getInstance().relicsInventory.forEach(relic => {
-                relic.onCombatStart();
+            ProcBroadcaster.getInstance().retrieveAllRelevantBuffsForProcs(true).forEach(buff => {
+                buff.onCombatStart();
             });
-
-            GameState.getInstance().combatState.allPlayerAndEnemyCharacters.forEach(character => {
-                character.buffs.forEach(buff => {
-                    buff.onCombatStart();
-                });
-            });
+            
             return [];
         }));
     }
@@ -209,6 +198,7 @@ export class ActionManager {
             return [];
         }));
     }
+
     public createCardToDrawPile(card: PlayableCard) {
         this.actionQueue.addAction(new GenericAction(async () => {
             const gameState = GameState.getInstance();
@@ -474,15 +464,9 @@ export class ActionManager {
             buff.onThisCardInvoked(target);
         });    
 
-        GameState.getInstance().combatState.allPlayerAndEnemyCharacters.forEach(character => {
-            character.buffs.forEach(buff => {
-                buff.onAnyCardPlayedByAnyone(playableCard, target);
-            });
-        });
-
         
-        GameState.getInstance().relicsInventory.forEach(relic => {
-            relic.onCardPlayed(playableCard, target);
+        ProcBroadcaster.getInstance().retrieveAllRelevantBuffsForProcs(true).forEach(buff => {
+            buff.onAnyCardPlayedByAnyone(playableCard, target);
         });
 
     }
@@ -651,7 +635,7 @@ export class ActionManager {
                 });
                 
                 GameState.getInstance().relicsInventory.forEach(relic => {
-                    relic.onCardDrawn(drawnCard);
+                    relic.onAnyCardDrawn(drawnCard);
                 });
 
                 await this.animateDrawCard(drawnCard);
@@ -1009,13 +993,6 @@ export class ActionManager {
             }
         });
 
-        // end turn buffs
-        combatState.allPlayerAndEnemyCharacters.forEach(character => {
-            character.buffs.forEach(buff => {
-                buff.onTurnEnd();
-            });
-        });
-
         // end turn buffs on cards in hand
         combatState.currentHand.forEach(card => {
             card.buffs.forEach(buff => {
@@ -1023,11 +1000,11 @@ export class ActionManager {
             });
         });
 
-        combatState.allCardsInAllPilesExceptExhaust
-            .flatMap(card => card.buffs)
-            .forEach(buff => {
-                buff.onTurnEnd();
-            });
+        ProcBroadcaster.getInstance().retrieveAllRelevantBuffsForProcs(true).forEach(buff => {
+            buff.onTurnEnd();
+        });
+
+
         // Queue discard actions instead of direct discard
         this.basicDiscardCards(combatState.currentHand);
 
@@ -1065,8 +1042,9 @@ export class ActionManager {
             for (const buff of card.buffs) {
                 buff.onActiveDiscard();
             }
-            GameState.getInstance().relicsInventory.forEach(relic => {
-                relic.onCardDiscarded(card);
+            
+            ProcBroadcaster.getInstance().retrieveAllRelevantBuffsForProcs(true).forEach(buff => {
+                buff.onAnyCardDiscarded(card);
             });
             return [];
         }));
@@ -1087,8 +1065,8 @@ export class ActionManager {
                     buff.onExhaust();
                 }
 
-                GameState.getInstance().relicsInventory.forEach(relic => {
-                    relic.onCardExhausted(card);
+                ProcBroadcaster.getInstance().retrieveAllRelevantBuffsForProcs(true).forEach(buff => {
+                    buff.onAnyCardExhausted(card);
                 });
                 ProcBroadcaster.getInstance().broadcastCombatEvent(new ExhaustEvent(card));
             });
@@ -1143,18 +1121,9 @@ export class ActionManager {
             // Queue draw action instead of direct draw
             ActionManager.getInstance().drawHandForNewTurn();
 
-            combatState.allPlayerAndEnemyCharacters.forEach(character => {
-                character.buffs.forEach(buff => {
-                    buff.onTurnStart();
-                });
+            ProcBroadcaster.getInstance().retrieveAllRelevantBuffsForProcs(true).forEach(buff => {
+                buff.onTurnStart();
             });
-
-            combatState.allCardsInAllPilesExceptExhaust
-                .flatMap(card => card.buffs)
-                .forEach(buff => {
-                    buff.onTurnStart();
-                });
-
             combatState.energyAvailable = combatState.defaultMaxEnergy;
             UIContextManager.getInstance().setContext(UIContext.COMBAT);
             return [];

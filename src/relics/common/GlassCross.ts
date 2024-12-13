@@ -33,14 +33,19 @@ class HolyBombardment extends PlayableCard {
 export class GlassCross extends AbstractRelic {
     constructor() {
         super();
-        this.name = "Glass Cross";
-        this.description = `[b]Click[/b]: Manufacture a Holy Bombardment to your hand.  Starts with 3 uses.`;
         this.rarity = EntityRarity.COMMON;
         this.stacks = 3;
-        this.isStacksVisible = true;
     }
 
-    override onRelicClicked(): void {
+    override getDisplayName(): string {
+        return "Glass Cross";
+    }
+
+    override getDescription(): string {
+        return `[b]Click[/b]: Manufacture a Holy Bombardment to your hand.  Starts with 3 uses.`;
+    }
+
+    override onClicked(): void {
         if (this.stacks === 0) {    
             return;
         }

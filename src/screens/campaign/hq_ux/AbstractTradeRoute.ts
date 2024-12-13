@@ -1,17 +1,20 @@
 import { AbstractCard } from '../../../gamecharacters/AbstractCard';
 import { CardType } from '../../../gamecharacters/Primitives';
-import { EnemyUpgradeTradeRouteModifier } from './modifiers/EnemyUpgradeTradeRouteModifier';
+import { ActRegion } from '../../../rules/acts/ActRegion';
+import { EnemyUpgradeTradeRouteModifier } from '../../../rules/acts/location/EnemyUpgradeTradeRouteModifier';
 
 export class AbstractTradeRoute extends AbstractCard {
-
+    startingActRegion: ActRegion;
     constructor({ 
         name, 
         description, 
         portraitName,
+        startingActRegion: startingActRegion,
     }: { 
         name: string; 
         description: string; 
         portraitName?: string;
+        startingActRegion: ActRegion;
     }) {
         super({ 
             name,
@@ -20,6 +23,7 @@ export class AbstractTradeRoute extends AbstractCard {
             cardType: CardType.SKILL,
             tooltip: `A trade route `
         });
+        this.startingActRegion = startingActRegion;
     }
 } 
 
@@ -47,8 +51,9 @@ export class StandardTradeRoute extends AbstractTradeRoute {
         super({
             name: tradeRouteNames[Math.floor(Math.random() * tradeRouteNames.length)],
             description: "A lucrative trade route connecting distant markets.",
+            startingActRegion: ActRegion.getRandomRegion(),
         });
         this.buffs = [new EnemyUpgradeTradeRouteModifier()];
+        this.description = "A lucrative trade route connecting distant markets. Starts in " + this.startingActRegion.name;
     }
 }
-

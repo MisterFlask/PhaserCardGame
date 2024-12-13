@@ -37,13 +37,13 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
             console.error("No scene provided to PhysicalRelic");
             throw new Error("No scene provided to PhysicalRelic");
         }
-        console.log(`Initializing PhysicalRelic for: ${abstractRelic.getName()} at (${x}, ${y})`);
+        console.log(`Initializing PhysicalRelic for: ${abstractRelic.getDisplayName()} at (${x}, ${y})`);
 
         this.abstractRelic = abstractRelic;
         
         this.baseSize = baseSize;
 
-        const textureName = abstractRelic.portraitName ?? "placeholder";
+        const textureName = abstractRelic.imageName ?? "placeholder";
         if (!scene.textures.exists(textureName)) {
             console.error(`Texture not found for key: ${textureName}`);
         }
@@ -63,7 +63,7 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
         // Create tooltip without specifying y position yet
         this.tooltipBox = new TextBox({
             scene,
-            text: `${abstractRelic.getName()}\n${abstractRelic.getDescription()}`,
+            text: `${abstractRelic.getDisplayName()}\n${abstractRelic.getDescription()}`,
             width: 200
         });
         this.tooltipBox.setVisible(false);
@@ -81,7 +81,7 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
         this.priceBox.setDepth(1)
 
         // Add stacks box if the relic has stacks
-        if (abstractRelic.isStacksVisible) {
+        if (abstractRelic.stackable) {
             this.stacksBox = scene.add.text(-this.baseSize / 2 + 10, -this.baseSize / 2 + 10, 
                 `${abstractRelic.stacks}`, 
                 {
@@ -180,7 +180,7 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
 
     // Add lifecycle logging for debugging
     destroy(): void {
-        console.log(`Destroying PhysicalRelic for: ${this.abstractRelic.getName()}`);
+        console.log(`Destroying PhysicalRelic for: ${this.abstractRelic.getDisplayName()}`);
         this.stacksBox?.destroy();
         super.destroy();
     }

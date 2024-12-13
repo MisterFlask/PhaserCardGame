@@ -44,12 +44,6 @@ export class MapOverlay {
     private readonly SLIDE_DISTANCE: number = 2000;
     private isTransitioning: boolean = false;
 
-    background_by_act: Record<number, string> = {
-        1: 'styx_delta',
-        2: 'dis',
-        3: 'styx_delta'
-    } as const;
-
     private mapDebugOverlay?: MapDebugOverlay;
 
     constructor(scene: Phaser.Scene) {
@@ -139,7 +133,7 @@ export class MapOverlay {
     // Background creation
     private createBackground() {
         const currentAct = GameState.getInstance().currentAct;
-        const backgroundName = this.background_by_act[currentAct] ?? 'styx_delta';
+        const backgroundName = GameState.getInstance().actRegion.background;
         const { width, height } = this.scene.scale;
 
         // Create the background image

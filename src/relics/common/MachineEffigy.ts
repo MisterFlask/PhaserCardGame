@@ -6,9 +6,15 @@ import { AbstractRelic } from "../AbstractRelic";
 export class MachineEffigy extends AbstractRelic {
     constructor() {
         super();
-        this.name = "Machine Effigy";
-        this.description = "If any enemies have the Robotic buff, your whole party gets 2 Strength.";
         this.rarity = EntityRarity.COMMON;
+    }
+
+    getDisplayName(): string {
+        return "Machine Effigy";
+    }
+
+    getDescription(): string {
+        return "If any enemies have the Robotic buff, your whole party gets 2 Strength.";
     }
 
     onCombatStart(): void {

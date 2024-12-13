@@ -11,9 +11,9 @@ export enum PileName {
 }
 
 export enum PilePosition {
-  TOP = "top",
-  BOTTOM = "bottom",
-  RANDOM = "random"
+  Top = "top",
+  Bottom = "bottom",
+  Random = "random"
 }
 
 export class DeckLogic {
@@ -83,7 +83,7 @@ export class DeckLogic {
   public static moveCardToPile(
     card: PlayableCard, 
     pile: PileName, 
-    position: PilePosition = PilePosition.BOTTOM
+    position: PilePosition = PilePosition.Bottom
   ): void {
     const gameState = GameState.getInstance();
     const combatState = gameState.combatState;
@@ -105,13 +105,13 @@ export class DeckLogic {
     if (!targetPile) return;
 
     switch (position) {
-      case PilePosition.TOP:
+      case PilePosition.Top:
         targetPile.push(card);
         break;
-      case PilePosition.BOTTOM:
+      case PilePosition.Bottom:
         targetPile.unshift(card);
         break;
-      case PilePosition.RANDOM:
+      case PilePosition.Random:
         const randomIndex = Math.floor(Math.random() * (targetPile.length + 1));
         targetPile.splice(randomIndex, 0, card);
         break;

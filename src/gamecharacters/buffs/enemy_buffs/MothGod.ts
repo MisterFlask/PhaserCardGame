@@ -37,7 +37,7 @@ export class MothGod extends AbstractBuff {
     }
 }
 
-class EggsBuff extends AbstractBuff {
+export class EggsBuff extends AbstractBuff {
     override getDisplayName(): string {
         return "Eggs";
     }
@@ -60,7 +60,7 @@ class EggsBuff extends AbstractBuff {
     }
 }
 
-class Moth extends PlayableCard {
+export class Moth extends PlayableCard {
     constructor() {
         super({
             name: "Moth",

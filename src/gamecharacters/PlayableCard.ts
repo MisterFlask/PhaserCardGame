@@ -45,6 +45,8 @@ export class EntityRarity {
     public readonly basePrice: number;
     public readonly basePowerLevel: number;
     
+    static readonly MENACE = new EntityRarity({ id: "MENACE", weight: 9, color: 0xFF4500, basePrice: 0, baseCardLevel: 0 });
+
     static readonly TOKEN = new EntityRarity({ id: "TOKEN", weight: 0, color: 0xA0A0A0, basePrice: 25, baseCardLevel: 0 });
     static readonly BASIC = new EntityRarity({ id: "BASIC", weight: 1, color: 0xA0A0A0, basePrice: 25, baseCardLevel: 0 });
     static readonly COMMON = new EntityRarity({ id: "COMMON", weight: 2, color: 0xA0A0A0, basePrice: 50, baseCardLevel: 1 });

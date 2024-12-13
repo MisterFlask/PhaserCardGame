@@ -241,7 +241,7 @@ export default class GameImageLoader {
         },
         maps: {
             prefix: 'Backgrounds/Act/',
-            files: ['styx_delta.png', "dis.png"]
+            files: ['styx_delta.png', "dis.png", "caves.png", "jungle.png", "city.png"]
         },
         placeholder_backgrounds: {
             prefix: 'Backgrounds/Placeholder/',

@@ -4,9 +4,15 @@ import { AbstractRelic } from "../AbstractRelic";
 export class FancyHat extends AbstractRelic {
     constructor() {
         super();
-        this.name = "Fancy Hat";
-        this.description = "At the start of combat, gain 3 Venture.";
         this.rarity = EntityRarity.BOSS;
+    }
+
+    override getDisplayName(): string {
+        return "Fancy Hat";
+    }
+
+    override getDescription(): string {
+        return "At the start of combat, gain 3 Venture.";
     }
 
     override onCombatStart(): void {

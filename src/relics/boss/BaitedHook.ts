@@ -5,9 +5,15 @@ import { AbstractRelic } from "../AbstractRelic";
 export class BaitedHook extends AbstractRelic {
     constructor() {
         super();
-        this.name = "Baited Hook";
-        this.description = "Gain 1 Energy at the start of each turn. All future treasure chests are mimics.";
         this.rarity = EntityRarity.BOSS;
+    }
+
+    override getDisplayName(): string {
+        return "Baited Hook";
+    }
+
+    override getDescription(): string {
+        return "Gain 1 Energy at the start of each turn. All future treasure chests are mimics.";
     }
 
     override passivePerTurnEnergyModifier(): number {

@@ -41,7 +41,7 @@ export class DebugMenu {
 
     private preloadData(): void {
         // sort data once
-        this.allRelics.sort((a, b) => a.name.localeCompare(b.name));
+        this.allRelics.sort((a, b) => a.getDisplayName().localeCompare(b.getDisplayName()));
 
         const categories = ['location_backgrounds'] as const;
         categories.forEach(cat => {
@@ -122,7 +122,7 @@ export class DebugMenu {
                 break;
             case 'relics':
                 this.updatePaginatedMenu(
-                    this.allRelics.map(r => ({ name: r.name, onClick: () => this.addRelic(r) })),
+                    this.allRelics.map(r => ({ name: r.getDisplayName(), onClick: () => this.addRelic(r) })),
                     this.currentRelicPage,
                     i => (this.currentRelicPage = i),
                     () => this.backToMain()

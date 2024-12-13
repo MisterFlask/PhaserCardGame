@@ -6,8 +6,14 @@ export class CharonPrice extends AbstractRelic {
 
     constructor() {
         super();
-        this.name = "Charon's Price";
-        this.description = `At the end of your run, you must pay ${this.PRICE} Hell Currency or face Charon's wrath.`;
         this.rarity = EntityRarity.BOSS;
+    }
+
+    override getDisplayName(): string {
+        return "Charon's Price";
+    }
+
+    override getDescription(): string {
+        return `At the end of your run, you must pay ${this.PRICE} Hell Currency or face Charon's wrath.`;
     }
 }

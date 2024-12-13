@@ -1,6 +1,7 @@
+import { LocationCard } from "../../maplogic/LocationCard";
 import type { AbstractCombatEvent } from "../../rules/AbstractCombatEvent";
 import type { DamageInfo } from "../../rules/DamageInfo";
-import type { CombatResources, CombatState, GameState } from "../../rules/GameState";
+import type { CombatResources, CombatState, GameState, ShopContents } from "../../rules/GameState";
 import type { ActionManager } from "../../utils/ActionManager";
 import { ActionManagerFetcher } from "../../utils/ActionManagerFetcher";
 import type { AbstractCard } from "../AbstractCard";
@@ -9,7 +10,7 @@ import { AbstractIntent } from "../AbstractIntent";
 import type { BaseCharacter } from "../BaseCharacter";
 import { PlayerCharacter } from "../BaseCharacterClass";
 import type { IAbstractBuff } from '../IAbstractBuff';
-import { IBaseCharacter } from '../IBaseCharacter';
+import { IBaseCharacter } from "../IBaseCharacter";
 import type { PlayableCard } from "../PlayableCard";
 export abstract class AbstractBuff implements IAbstractBuff {
 
@@ -219,6 +220,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
     valueMod: number = 0;
     public helpMode: boolean = false;
     private _stacks: number = 1;
+    tint: number = 0xFFFFFF;
 
     get stacks(): number {
         return this._stacks;
@@ -254,12 +256,48 @@ export abstract class AbstractBuff implements IAbstractBuff {
     abstract getDescription(): string;
 
 
+    onActStart(): void {
+
+    }
+
+    onAnyCardDiscarded(card: PlayableCard) {
+
+    }
+
+    public onAnyCardDrawn(card: PlayableCard): void {
+        
+    }
+
     onRunStart(): void {
 
     }
 
+    onCardUpgraded(card: PlayableCard): void {
+
+    }
+
+    onRest(card: PlayableCard): void {
+
+    }
+    onAnyCardExhausted(card: PlayableCard) {
+    }
+
+
+    public onClicked(): void {}
+
+    public passivePerTurnEnergyModifier(): number {
+        return 0;
+    }
+    
+    public onShopInitialized(shopContents: ShopContents): void {
+    }
+
     energyCostModifier(): number {
         return 0;
+    }
+
+    onLocationEntered(location: LocationCard): void {
+
     }
 
     // this is a FLAT modifier on top of damage taken, not percentage-based.
@@ -387,7 +425,6 @@ export abstract class AbstractBuff implements IAbstractBuff {
     public onGainingThisCard(){
 
     }
-
 
     // 
     public onFatal(killedUnit: BaseCharacter){

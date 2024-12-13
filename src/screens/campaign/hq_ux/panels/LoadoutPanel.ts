@@ -7,7 +7,7 @@ import { PhysicalCard } from '../../../../ui/PhysicalCard';
 import { TextBox } from '../../../../ui/TextBox';
 import { CardGuiUtils } from '../../../../utils/CardGuiUtils';
 import { SceneChanger } from '../../../SceneChanger';
-import { CampaignState } from '../CampaignState';
+import { CampaignUiState } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
 
 export class LoadoutPanel extends AbstractHqPanel {
@@ -100,10 +100,10 @@ export class LoadoutPanel extends AbstractHqPanel {
     private handleLaunch(): void {
         if (this.isReadyToLaunch()) {
             this.scene.events.emit('launchExpedition');
-            GameState.getInstance().currentRunCharacters = CampaignState.getInstance().selectedParty;
+            GameState.getInstance().currentRunCharacters = CampaignUiState.getInstance().selectedParty;
             
             // Add cargo cards to characters' master decks
-            const campaignState = CampaignState.getInstance();
+            const campaignState = CampaignUiState.getInstance();
             campaignState.selectedParty.forEach(character => {
                 const assignedTradeGoods = campaignState.ownedTradeGoods.filter(
                     good => good.owningCharacter === character
@@ -117,7 +117,7 @@ export class LoadoutPanel extends AbstractHqPanel {
     }
 
     private isReadyToLaunch(): boolean {
-        const campaignState = CampaignState.getInstance();
+        const campaignState = CampaignUiState.getInstance();
         return (
             campaignState.selectedParty.length === 3 &&
             campaignState.selectedTradeRoute !== null &&
@@ -127,7 +127,7 @@ export class LoadoutPanel extends AbstractHqPanel {
 
     private hasValidEquipment(): boolean {
         // Check if all party members have necessary equipment
-        const campaignState = CampaignState.getInstance();
+        const campaignState = CampaignUiState.getInstance();
         return campaignState.selectedParty.every(character => {
             // Add your equipment validation logic here
             return true; // Placeholder
@@ -135,7 +135,7 @@ export class LoadoutPanel extends AbstractHqPanel {
     }
 
     private getReadinessStatus(): { ready: boolean; reasons: string[] } {
-        const campaignState = CampaignState.getInstance();
+        const campaignState = CampaignUiState.getInstance();
         const reasons: string[] = [];
 
         // Check party size
@@ -180,7 +180,7 @@ export class LoadoutPanel extends AbstractHqPanel {
     }
 
     private updateTradeRouteCard(): void {
-        const campaignState = CampaignState.getInstance();
+        const campaignState = CampaignUiState.getInstance();
         
         if (!this.tradeRouteCard && campaignState.selectedTradeRoute) {
             // Create the card if it doesn't exist and we have a route
@@ -238,7 +238,7 @@ class RosterPanel extends Phaser.GameObjects.Container {
     }
 
     private refreshRoster(): void {
-        const campaignState = CampaignState.getInstance();
+        const campaignState = CampaignUiState.getInstance();
         const roster = campaignState.roster;
 
         roster.forEach((character, index) => {
@@ -327,10 +327,10 @@ class CaravanPartyPanel extends Phaser.GameObjects.Container {
         
         this.characterCards.set(character, card);
         this.add(card.container);
-        CampaignState.getInstance().selectedParty.push(character);
+        CampaignUiState.getInstance().selectedParty.push(character);
         
         // Assign all unowned cargo to this character
-        const campaignState = CampaignState.getInstance();
+        const campaignState = CampaignUiState.getInstance();
         campaignState.ownedTradeGoods.forEach(good => {
             if (!good.owningCharacter) {
                 good.owningCharacter = character;
@@ -359,8 +359,8 @@ class CaravanPartyPanel extends Phaser.GameObjects.Container {
             this.repositionCards();
             
             // Remove character from selected party
-            CampaignState.getInstance().selectedParty = 
-                CampaignState.getInstance().selectedParty.filter(c => c !== character);
+            CampaignUiState.getInstance().selectedParty = 
+                CampaignUiState.getInstance().selectedParty.filter(c => c !== character);
             
             // Reassign their cargo
             this.reassignCargo(character);
@@ -369,7 +369,7 @@ class CaravanPartyPanel extends Phaser.GameObjects.Container {
     }
 
     private reassignCargo(formerOwner: PlayerCharacter): void {
-        const campaignState = CampaignState.getInstance();
+        const campaignState = CampaignUiState.getInstance();
         const remainingParty = campaignState.selectedParty.filter(c => c !== formerOwner);
         
         campaignState.ownedTradeGoods.forEach(good => {
@@ -448,7 +448,7 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
     }
 
     private createAssignableCardsGrid(): void {
-        const campaignState = CampaignState.getInstance();
+        const campaignState = CampaignUiState.getInstance();
         const GRID_ROWS = 3;
         const CARD_WIDTH = 100;
         const CARD_HEIGHT = 140;
@@ -507,7 +507,7 @@ class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
     }
 
     private rotateTradeGoodAssignment(card: PhysicalCard): void {
-        const campaignState = CampaignState.getInstance();
+        const campaignState = CampaignUiState.getInstance();
         const partyMembers = campaignState.selectedParty;
         
         if (!card.data.owningCharacter) {
@@ -640,7 +640,7 @@ class ExpeditionSummaryPanel extends Phaser.GameObjects.Container {
     }
 
     update(): void {
-        const campaignState = CampaignState.getInstance();
+        const campaignState = CampaignUiState.getInstance();
         
         // Update cargo value
         const totalValue = campaignState.ownedTradeGoods.reduce((total, good) => 
