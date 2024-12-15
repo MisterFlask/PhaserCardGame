@@ -5,6 +5,63 @@
 
  (Technically it is not really clear that Hell has any specific relationship to the Christian realm of punishment for sinners, but the aesthetic parallels were strong enough to overcome any academic screeching on this topic, and people simply started referring to it as Hell regardless.  Some academics still futilely insist that everyone call it "The Maxwell-Levi Adiabatic Plane", which they certainly will not.)
 
+ # The British Land Crawlers
+The British Land Crawlers are massive iron-clad vehicles, resembling a cross between a Victorian battleship and a steam locomotive mounted on enormous caterpillar tracks. Their hulls are covered in blessed steel plating and intricate Maxwell coils that generate protective fields against Hell's more metaphysical hazards. The largest models can be up to 300 feet long, with multiple decks and compartments.
+
+## External Features
+The exterior is bristling with defensive features:
+- Blessed water cannons to repel lesser demons
+- Retractable bridges and loading ramps
+- Observation cupolas with reinforced glass
+- Emergency exits sealed with holy symbols
+- Massive headlamps that pierce the infernal gloom
+- Deployable grounding rods to safely discharge hellfire strikes
+
+## Internal Layout
+The interior is arranged in a strict hierarchy:
+- Bridge Deck: Command center and navigation
+- Passenger Decks: Segregated by class, from luxurious first-class cabins to crowded steerage
+- Cargo Holds: Reinforced compartments for various goods
+- Engineering Decks: Housing the massive steam engines and Maxwell generators
+- Crew Quarters: Spartan but secure accommodations
+- Chapel: Required by company policy for crew morale
+
+## Crew Composition
+A typical crew includes:
+- Captain and Officers (usually ex-Royal Navy)
+- Engineers (specially trained in Maxwell field maintenance)
+- Chaplain (for blessing equipment and crew counseling)
+- Security Detail (armed with blessed weapons)
+- Medical Staff (trained in both mundane and supernatural ailments)
+- Stokers and General Crew (often recruited from Hell's underclass)
+
+## Navigation and Safety
+Land Crawlers navigate using a combination of:
+- Blessed compasses that point toward the nearest planar gate
+- Barometric instruments that detect dimensional instabilities
+- Maxwell field sensors to avoid dangerous anomalies
+- Traditional maps supplemented with demonic intelligence
+
+Safety protocols are rigorous:
+- Regular blessing of critical systems
+- Constant monitoring of hull integrity
+- Strict quarantine procedures for contaminated cargo
+- Emergency protocols for various supernatural threats
+- Regular drills for demon attacks and dimensional anomalies
+
+## Life Aboard
+Life aboard a Land Crawler is a unique blend of Victorian maritime tradition and infernal adaptation. The constant rumble of engines mixes with the distant screams of the damned. Crew members wear protective amulets and carry personal blessing kits. The air is filtered through sanctified scrubbers but still carries a hint of brimstone.
+
+The rhythm of shipboard life is marked by:
+- Watch changes announced by blessed bells
+- Daily prayer services in the chapel
+- Regular maintenance of protective wards
+- Careful rationing of blessed water
+- Constant vigilance against supernatural threats
+
+Despite the dangers, many crew members develop a fierce pride in their vessels and their ability to safely traverse Hell's treacherous landscapes. The Land Crawlers represent humanity's triumph over supernatural obstacles through the application of industry and ingenuity, even if that triumph requires constant maintenance and eternal vigilance.
+
+
 # FACTIONS
 
 ### The Stoker's Union
@@ -44,10 +101,26 @@ In terms of style and accent, the Underclass speaks with a mix of cockney and va
 The Angels are alien and incomprehensible, beautiful and terrifying.  They don't involve themselves much with Hell or Earth, though Spain has managed to open diplomatic channels through which they receive blessed equipment of various kinds.  They speak in [color=white]ALL CAPS[/color].
 
 ### La Compagnie Générale des Voies Infernales
-A French competitor to the Third Circle Company, the CGVI has recently established its own gateway in Marseilles. While their technology is less refined than the British Buckingham Rift, they make up for it with Gallic flair and a willingness to cut corners on safety protocols. The company specializes in luxury goods and "cultural exports," running regular shipments of fine wines, controversial literature, and other items that might raise eyebrows at British customs.
+A French competitor to the Third Circle Company, the CGVI has recently established its own gateway in Marseilles. While their technology appears less refined than the British Buckingham Rift, they have augmented their engineering with eldritch pacts and forbidden geometries. The company maintains a particular interest in The Abyssal Frontier, establishing research outposts at the very edge of known reality where their scientists commune with entities from beyond space and time. Their trade routes deliberately pass through regions of dimensional instability, allowing their vessels to harvest exotic energies that conventional British land-crawlers actively avoid.
 
-The company not-infrequently attempts to claim sovereignty over various infernal trade routes, and often uses violence to enforce said claim.
+The company specializes in "cultural exports" - fine wines, controversial literature, and artifacts of questionable origin that pulse with an inner light. Their crews are known for their distinctive obsidian masks which protect them from the psychological effects of their cargo. While British engineers rely on Maxwell's equations, CGVI's success stems from their willingness to embrace more esoteric sciences, coming at cost in both their blood and their humanity.
 
+The company aggressively claims sovereignty over various infernal trade routes, particularly those that skirt the edges of the Abyss. Their enforcers employ both conventional violence and reality-warping abilities gained through their otherworldly partnerships.
+
+
+### De Helrader Maatschappij
+In collaboration with the Dutch occult organization De Bloedmolen, the Helrader Maatschappij has established a gateway in Rotterdam.  They specialize in the collection of infernal flora and fauna, and the study of infernal geology.  They are particularly interested in the strange creatures that dwell in The Screaming Forests and The Clockwork Wastes.
+
+#### The Dutch Aesthetic and Cultural Notes
+Unlike the rigid formality of the British Trade Delegation or the esoteric mysticism of the CGVI, the Dutch presence in Hell takes on a more naturalist-academic approach. Their representatives wear practical field gear adapted for infernal conditions - reinforced leather coats treated with protective alchemical compounds, brass-framed goggles with interchangeable lenses for different environmental conditions, and specimen collection gear that would look at home in a natural history museum.
+
+Their facilities tend to be well-organized research stations rather than industrial complexes, featuring extensive specimen preservation chambers, geological sample storage, and detailed taxonomic archives. The architecture combines practical Dutch colonial style with necessary infernal adaptations - high ceilings to vent toxic fumes, reinforced foundations to withstand geological instability, and specialized containment areas for live specimens.
+
+Where British operations focus on industrial exploitation and French expeditions seek metaphysical secrets, Dutch researchers methodically catalog and classify Hell's natural phenomena with scientific precision. Their approach sometimes appears coldly academic to other factions - they're as likely to carefully document a demon's dying moments as they are to help it, all in the name of scientific observation.
+
+The members of De Helrader Maatschappij speak with educated Dutch accents and tend to pepper their speech with Latin taxonomic terms and scientific jargon. They maintain a professional detachment even in the face of cosmic horror, treating encounters with eldritch entities as opportunities for scientific documentation rather than cause for existential dread.
+
+Their bases are notable for their extensive greenhouses where they attempt to cultivate infernal flora under controlled conditions, and their specimen halls filled with preserved creatures floating in jars of alchemically-treated formaldehyde. The walls are typically lined with detailed technical drawings and taxonomic charts attempting to classify Hell's chaotic ecosystem into orderly scientific categories.
 
 
 # LOCATIONS
@@ -84,10 +157,10 @@ THE THIRD CIRCLE COMPANY’S UNAUTHORIZED ALLOCATION OF “GATEWAY ACCESS PERMIT
 In a recently recorded incident known internally as THE BRASS KEY INQUIRY, lower-level agents within THE BRITISH TRADE DELEGATION’s own accounting department (the so-called “Counters of Infernal Ledgers”) have discovered the quiet issuance of specialized, gilt-edged travel documents to a series of individuals operating under CINDER COURT patronage. These documents, intended to grant expedited passage through the BUCKINGHAM RIFT, seem to have bypassed the ARTISANAL GUILDS’ traditional vetting procedures for trans-dimensional cargo manifests. This small-scale administrative irregularity—apparently the result of senior managers at THE THIRD CIRCLE COMPANY negotiating side agreements in dimly-lit vaults beneath THE FURNACE OF DIS—has potentially undermined the painstakingly cultivated balance between old infernal craftsmanship traditions and new British mercantile influences. The GUILDS have begun covertly marking each questionable permit with an intricate wax seal rumored to contain micro-hexes designed to cause subtle mechanical failures in the Company’s next generation of land-crawlers.
 
 THE STOKER’S UNION INTERNAL DISSENSION OVER THE RIVER STYX TURBINE
-Within the STOKER’S UNION itself, the recent, ill-omened unveiling of the RIVER STYX TURBINE—a device allegedly procured from THE CLOCKWORK WASTES and quietly tested by a subdivision of THE BRITISH TRADE DELEGATION—has sown discord. A faction of younger STOKERS (calling themselves “THE SHADOWED HEAT COLLECTIVE”) has advocated replacing traditional coal-lashers with these whispering turbines, which they claim to have witnessed during a forbidden midnight meeting with unnamed British engineers. Meanwhile, the UNION’s conservative leadership, supposedly advised by an unnamed member of the CINDER COURT with historical ties to the oldest infernal furnaces, insists that adopting such technology would be tantamount to surrendering their sacred duty. Tension within the UNION has grown so severe that union members from rival forges have begun sabotaging one another’s fire grates, culminating in the so-called “SEARED PLENUM INCIDENT,” a still-confidential matter in which several foremen were found trapped inside heat-lock chambers, ranting incoherently about metallic angels.
+Within the STOKER’S UNION itself, the unveiling of the RIVER STYX TURBINE—a device recovered from THE CLOCKWORK WASTES and tested by a subdivision of THE BRITISH TRADE DELEGATION—has sown discord. A faction of younger STOKERS (THE SHADOWED HEAT COLLECTIVE) advocates replacing traditional coal-lashers with these whispering turbines, which they witnessed during a midnight meeting with British engineers. The UNION’s conservative leadership, acting on advice from a CINDER COURT member with historical ties to the oldest infernal furnaces, maintains that adopting such technology surrenders their sacred duty. Tension within the UNION has escalated to open sabotage between rival forges, culminating in the SEARED PLENUM INCIDENT, where several foremen were found trapped inside heat-lock chambers, speaking of metallic angels.
 
 THE BRIMSTONE BARONS’ DISTRUST OF NEW BRITISH PROCUREMENT STANDARDS
-In the BRIMSTONE BADLANDS, where the BARONS rule over extraction and refinement, a subtle but increasing animosity has emerged between the BARONS’ established syndicates and a small cadre of British-appointed “Resource Inspection Liaison Officers.” Said officers, introduced after the outcome of the unfortunate “MCALLISTER SURVEY,” have begun applying Earth-based safety and quality metrics to brimstone production. The BARONS view these new regulations as laughably terrestrial and an attempt to curb their age-old monopolies. A particular point of conflict has been over “WHITE-FLAME DISTILLATE,” a newly discovered variant of brimstone rumored to burn with an ineffable shriek. Although exact details remain classified, certain BARONS claim that the British have secret designs on this rare product for unspecified “Heaven-Ward Operations.” In response, the BARONS have stationed private militias at critical extraction sites and initiated a silent embargo on exports deemed “substandard” by British inspectors—thus ensuring that nothing meeting British criteria can leave the mines without first passing through the BARONS’ own alchemical labs, where certain “improvements” are introduced.
+In the BRIMSTONE BADLANDS, a growing animosity exists between the BARONS’ established syndicates and British-appointed “Resource Inspection Liaison Officers.” These officers, introduced after the MCALLISTER SURVEY, apply Earth-based safety and quality metrics to brimstone production. The BARONS consider these regulations an attempt to curb their age-old monopolies. The conflict centers on “WHITE-FLAME DISTILLATE,” a variant of brimstone that burns with an ineffable shriek. The British have plans for this rare product in their “Heaven-Ward Operations.” In response, the BARONS have stationed private militias at critical extraction sites and initiated an embargo on exports deemed “substandard” by British inspectors. All shipments now pass through the BARONS’ alchemical labs for “improvements” before export.
 
 THE ARTISANAL GUILDS’ INCREASING COLLABORATION WITH UNDERCLASS SABOTEURS
 As the GUILDS struggle to maintain their influence over the shaping of trans-dimensional gateways, they have begun to discreetly arm certain bands of the UNDERCLASS with specialized tools: sharpened alloy files, resonance wrenches infused with infernal carapace shards, and encrypted instructions for destabilizing Maxwell coils. These clandestine instructions, linked by rumor to the elusive “FOURTH KEYMASTER OF THE OLD IRON PORTAL,” detail subtle ways to induce harmonic imbalances in the land-crawlers used by THE THIRD CIRCLE COMPANY. The UNDERCLASS participants, desperate for any opportunity to strike against exploitive labor conditions, have already initiated several small-scale sabotage operations near THE STYX DELTA outposts. This secret alliance has placed the GUILDS at odds with THE CULT OF THE INVASION, who had also been courting UNDERCLASS allies to construct a grand weapon rumored to be hidden deep in THE SCREAMING FORESTS. Now the CULT looks upon the GUILDS with suspicion, believing them to be part of an elaborate British subterfuge aimed at diverting attention from whatever it is that truly lies beyond THE ABYSSAL FRONTIER.
@@ -116,8 +189,8 @@ Participants are said to have conducted the RITUAL in a sealed chamber not unlik
 
 
 # APPENDIX A: EXAMPLES OF EVENTS (for style purposes)
-## "Form HR-778: Unauthorized Work Stoppage at Primary Thermal Exchange";
-You encounter a situation requiring immediate managerial intervention at the Third Circle Company's primary power generation facility (colloquially: 'The Furnace of Dis'). Local representatives of the Stoker's Union (ref. Labor Contract 666-B) have initiated an unauthorized cessation of coal-lashing activities, citing concerns regarding the implementation of experimental Styx turbine technology (British Patent Pending).\n\nMembers of the Cinder Court have arrived via gravity-defying obsidian transport, brandishing both injunctions and prototype automata sourced from the Clockwork Wastes. The ambient temperature has dropped to concerning levels, and Maxwell coils throughout the facility are emitting discordant harmonics that suggest imminent metaphysical instability.\n\nYour immediate attention to this matter is required, as per Company Policy regarding potential thermal-political incidents.";
+.. todo.
+
 
 # APPENDIX B: FORMATTING TIPS
 We use BBCode for formatting, which means [b][/b] for bold, [i][/i] for italics, [u][/u] for underline, [s][/s] for strike-through, [color=yellow][/color] (for example).

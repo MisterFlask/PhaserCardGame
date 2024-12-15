@@ -2,7 +2,7 @@
 
 ## Act 1 - Segment 1
 
-### French Crow
+###  Crow
 - **Name**: Crow
 - **Portrait**: Eldritch Corruption Crow
 - **HP**: 10
@@ -12,7 +12,7 @@
   - 40% chance: Void Strike (6 damage)
   - 30% chance: Eldritch Empowerment (Apply 2 Lethality to self)
 
-### French Deer
+###  Deer
 - **Name**: Deer
 - **Portrait**: Eldritch Corruption Deer
 - **HP**: 30
@@ -21,7 +21,7 @@
   - Apply Burning (2) to a random character
   - Inferno Charge (4 damage to all players)
 
-### French Chef
+###  Chef
 - **Name**: Seasoner
 - **Portrait**: Eldritch Slime Spawn
 - **HP**: 25
@@ -38,7 +38,7 @@
 - **Intents**:
   - Gathering Eldritch Energy (Apply Lethality (2) to all enemies)
 
-### French Mime
+###  Mime
 - **Name**: ... (Unnamed)
 - **Portrait**: Eldritch Mime
 - **HP**: 15
@@ -51,7 +51,7 @@
 
 ## Act 1 - Segment 2
 
-### French Lumberjack
+###  Lumberjack
 - **Name**: Tree Clearer
 - **Portrait**: Eldritch Soldier Gunner
 - **HP**: 60
@@ -70,7 +70,7 @@
 
 ## Act 1 - Boss
 
-### French Blind Prophetess
+###  Blind Prophetess
 - **Name**: Doris Smith
 - **Portrait**: doris-smith
 - **HP**: 200
@@ -87,7 +87,7 @@
 
 ## Act 2 - Segment 1
 
-### French Intellectual
+###  Intellectual
 - **Name**: Lexiophage
 - **Portrait**: Eldritch Intellectual
 - **HP**: 120
@@ -97,7 +97,7 @@
   - Dialectical Critique (10 damage)
   - Existential Strike (20 damage)
 
-### French Policeman
+###  Policeman
 - **Name**: Ashcop
 - **Portrait**: Eldritch Policeman
 - **HP**: 175
@@ -119,7 +119,7 @@
   - Avant-Garde Vision (Apply Painful (1) to all players)
   - Penetration (36 damage attack)
 
-### French Restaurateur
+###  Restaurateur
 - **Name**: Le Restaurateur
 - **Portrait**: Eldritch Restaurateur
 - **HP**: 150
@@ -127,13 +127,13 @@
   - Idol (1)
   - Desirous (1)
 - **Intents**:
-  - Summon French Chef
+  - Summon  Chef
   - Two Taste Test attacks (4 damage each)
   - A La Morte (11 damage to all players)
 
 ## Act 2 - Boss
 
-### French Captain
+###  Captain
 - **Name**: Captain Elspeth
 - **Portrait**: Eldritch Captain
 - **HP**: 300

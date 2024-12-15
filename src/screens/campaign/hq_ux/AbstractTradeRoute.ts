@@ -65,35 +65,63 @@ export class AbstractTradeRoute extends AbstractCard {
     }
 } 
 
-const tradeRouteNames = [
-    "the brimstone corridor",
-    "perdition’s pass",
-    "the charred vein",
-    "the ashen byway",
-    "gehenna crossroad",
-    "the infernal lattice",
-    "the sulphur strand",
-    "hellgate concourse",
-    "the abyssal exchange",
-    "diabolus circuit",
-    "the molten traverse",
-    "pandemonium pike",
-    "the obsidian spur",
-    "mephisto's thoroughfare",
-    "tartarus relay"
-]
-
+const tradeRouteNamesByRegion: Record<string, string[]> = {
+    "Dis": [
+        "the imperial highway",
+        "brass citadel bypass",
+        "the iron boulevard",
+        "magistrate's march",
+        "the devil's promenade"
+    ],
+    "Styx Delta": [
+        "the river road",
+        "ferryman's way",
+        "the drowned path",
+        "forgotten ferry route",
+        "the mist-shrouded trail"
+    ],
+    "Brimstone Badlands": [
+        "the brimstone corridor",
+        "sulfur canyon pass",
+        "the charred vein",
+        "ashfall highway",
+        "the molten traverse"
+    ],
+    "Screaming Forests": [
+        "whispering way",
+        "the howling path",
+        "echoing timber trail",
+        "the wailing road",
+        "tormented tree line"
+    ],
+    "Clockwork Wastes": [
+        "the gear grind path",
+        "cogwork causeway",
+        "the mechanical mile",
+        "automaton alley",
+        "the brass bypass"
+    ],
+    "Abyssal Frontier": [
+        "void walker's way",
+        "the dark descent",
+        "bottomless bypass",
+        "the endless road",
+        "chasm crawler's path"
+    ]
+};
 
 export class StandardTradeRoute extends AbstractTradeRoute {
-
-
     constructor() {
+        const startingRegion = ActRegion.getRandomRegion();
+        const regionNames = tradeRouteNamesByRegion[startingRegion.name];
+        const routeName = regionNames[Math.floor(Math.random() * regionNames.length)];
+        
         super({
-            name: tradeRouteNames[Math.floor(Math.random() * tradeRouteNames.length)],
-            description: "A lucrative trade route connecting distant markets.",
-            startingActRegion: ActRegion.getRandomRegion(),
+            name: routeName,
+            description: "[placeholder]",
+            startingActRegion: startingRegion,
         });
         this.buffs = [AbstractTradeRoute.randomNegativeRouteModifier(), AbstractTradeRoute.randomPositiveRouteModifier()];
-        this.description = "A lucrative trade route connecting distant markets. Starts in " + this.startingActRegion.name;
+        this.description = "Starts in " + this.startingActRegion.name;
     }
 }

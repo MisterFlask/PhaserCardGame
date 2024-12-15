@@ -36,7 +36,8 @@ export default class GameImageLoader {
                 "green-facility-oil-painting.png",
                 "eldritch-jungle-oil-painting.png",
                 "planar-gate-oil-painting-1.png",
-                "planar-gate-oil-painting-2.png"
+                "planar-gate-oil-painting-2.png",
+                "british-office-1.png",
               ]
         },
         portraits_npcs: {
