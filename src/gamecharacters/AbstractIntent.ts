@@ -421,6 +421,8 @@ export class ApplyBuffToAllEnemyCharactersIntent extends AbstractIntent {
         }, null, 2);
     }
 }
+
+
 export class ApplyDebuffToRandomCharacterIntent extends AbstractIntent {
     debuff: AbstractBuff;
 
@@ -567,10 +569,11 @@ export class IntentListCreator {
 
 export class DoSomethingIntent extends AbstractIntent {
     action: () => void;
-    constructor({ owner, action, imageName }: { owner: BaseCharacter, action: () => void, imageName?: string }) {
+    constructor({ owner, action, imageName, title }: { owner: BaseCharacter, action: () => void, imageName?: string, title?: string }) {
         super({ imageName: imageName ?? 'uncertainty', target: undefined, owner: owner });
         ActionManager.getInstance().animateAttackerTilt(owner.physicalCard as PhysicalCard);
         this.action = action;
+        this.title = title ?? 'Do Something';
     }
 
     tooltipText(): string {

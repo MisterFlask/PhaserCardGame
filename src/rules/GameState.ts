@@ -295,8 +295,8 @@ export class MissionDetails{
 }
 
 export class CombatResources {
-    powder: BloodResource = new BloodResource();
-    iron: MettleResource = new MettleResource();
+    blood: BloodResource = new BloodResource();
+    mettle: MettleResource = new MettleResource();
     ashes: Ashes = new Ashes();
     pluck: PluckResource = new PluckResource();
     smog: SmogResource = new SmogResource();
@@ -311,8 +311,8 @@ export class CombatResources {
         console.log(`Modified Ashes by ${byAmount}. New value: ${this.ashes.value}`);
     }
     modifyMettle(byAmount: number) {
-        this.iron.value += byAmount;
-        console.log(`Modified Iron by ${byAmount}. New value: ${this.iron.value}`);
+        this.mettle.value += byAmount;
+        console.log(`Modified Iron by ${byAmount}. New value: ${this.mettle.value}`);
     }
     modifyVenture(byAmount: number) {
         this.venture.value += byAmount;
@@ -323,8 +323,8 @@ export class CombatResources {
         console.log(`Modified Smog by ${byAmount}. New value: ${this.smog.value}`);
     }
     modifyBlood(byAmount: number) {
-        this.powder.value += byAmount;
-        console.log(`Modified Blood by ${byAmount}. New value: ${this.powder.value}`);
+        this.blood.value += byAmount;
+        console.log(`Modified Blood by ${byAmount}. New value: ${this.blood.value}`);
     }
 
     getCombatResource(resource: AbstractCombatResource): AbstractCombatResource {
@@ -332,6 +332,6 @@ export class CombatResources {
     }
 
     resources(): AbstractCombatResource[] {
-        return [this.powder, this.pluck, this.ashes, this.iron, this.venture, this.smog];
+        return [this.blood, this.pluck, this.ashes, this.mettle, this.venture, this.smog];
     }
 }

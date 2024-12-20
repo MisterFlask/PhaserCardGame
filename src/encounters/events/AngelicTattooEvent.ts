@@ -10,7 +10,7 @@ class BasicTattooChoice extends AbstractChoice {
             "Your soldier gains some kind of buff permanently and 2 Stress."
         );
         this.nextEvent = new DeadEndEvent();
-        this.nextEvent.description = "The needle pierces your soldier's flesh with impossible geometries. Their mind recoils from the sensation as the angel's many-limbed form weaves patterns that shouldn't exist into their skin. When it's done, they stand stronger, though their dreams may never be the same.";
+        this.nextEvent.description = "The angel begins. Its needles move with measured precision, tracing forms that suggest the infinite while coiling in finite space. Fractal curves weave into geometric sequences, shifting in ways that cannot be fully apprehended. When the work is complete, the tattoo glows faintly before settling into the skin, its lines seeming to grow deeper and more intricate when not directly observed.";
     }
 
     canChoose(): boolean {
@@ -35,7 +35,7 @@ class ElaborateTattooChoice extends AbstractChoice {
             "Your soldier gains some kind of buff permanently and 2 Stress."
         );
         this.nextEvent = new DeadEndEvent();
-        this.nextEvent.description = "Time becomes meaningless as the angel's impossible hands work. Your soldier glimpses things no mortal was meant to see in the patterns being etched into their flesh. The resulting tattoo seems to shift and move when not directly observed. They emerge immensely stronger, though you suspect they've lost something ineffable in return.";
+        this.nextEvent.description = "Payment is rendered, and time begins to warp. The angel's tools blur into movement too rapid and complex to follow, its arms appearing to occupy multiple positions simultaneously. Patterns form not only on the skin but beyond it, extending into dimensions that do not intersect with known reality. The design remains active, faintly shimmering in a rhythm unbound by ordinary perception.";
     }
 
     canChoose(): boolean {
@@ -60,7 +60,7 @@ class DeclineChoice extends AbstractChoice {
             "Leave without a tattoo."
         );
         this.nextEvent = new DeadEndEvent();
-        this.nextEvent.description = "You make your excuses and back away with your soldier. The angel's impossible geometry seems to fold in on itself as you leave, and your soldier spends the next hour trying to convince themselves that what they saw was real.";
+        this.nextEvent.description = "The angel's limbs pause, and its tools vanish into the silence. The parlor collapses in on itself, folding along axes that do not seem to exist, leaving only bare slag behind. Nothing remains to suggest it had ever been there at all.";
     }
 
     canChoose(): boolean {
@@ -75,11 +75,10 @@ export class AngelicTattooEvent extends AbstractEvent {
         super();
         this.name = "The Impossible Tattoo Parlor";
         this.portraitName = "placeholder_event_background_2";
-        this.description = "[color=yellow]In the twisted metal wastes, you and your soldier encounter what appears to be a tattoo parlor housed in a structure that defies euclidean geometry.[/color]\n\n" +
-            "Inside, an [color=white]ANGEL[/color] tends to their tools - a being of such geometric complexity that your eyes water trying to comprehend its form. " +
-            "Their many-limbed silhouette seems to fold through dimensions that shouldn't exist, each movement leaving trailing afterimages that burn themselves into your retinas.\n\n" +
-            "The entity turns what might be its attention toward your soldier, and they feel a pressure behind their eyes as it communicates in frequencies that bypass their ears entirely: " +
-            "[i]'YOUR FLESH IS AN ACCEPTABLE CANVAS FOR EXPRESSIONS OF THE DIVINE. SHALL WE BEGIN?'[/i]";
+        this.description = "In the slag marches, wedged between collapsing pylons of molten scrap and steel bones half-melted into abstract sculpture, stands a structure: a tattoo parlor whose walls bend at contradictory angles, as if a cathedral had been folded into a cramped shipping crate. The air inside is taut with a pressure that hums, but no sound reaches the ear. The floor appears motionless yet shifts in subtle ways that cannot be followed.\n\n" +
+            "Inside, an [color=white]ANGEL[/color] operates a suspended array of instruments. Its form is a lattice of refracted light and twisted geometry, impossible to map fully in the mind. Multiple limbs, each wielding a needle-like stylus, carve the air in perfect arcs. The afterimages left by its movements coalesce briefly into intricate glyphs before dissolving, suggesting patterns larger than language.\n\n" +
+            "Its voice is not heard but understood, as if the words bypass the senses entirely:\n" +
+            "[color=white]\"YOUR FLESH. A CANVAS. SHALL WE INSCRIBE HIGHER ORDER?\"[/color]";
         
         this.choices = [
             new BasicTattooChoice(),

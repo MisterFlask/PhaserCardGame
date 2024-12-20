@@ -7,7 +7,7 @@ export class VeilCapacitor extends AutomatedCharacter {
         super({
             name: "Veil Capacitor",
             portraitName: "veil-capacitor",
-            maxHitpoints: 5,
+            maxHitpoints: 14,
             description: "A small, unsettling totem.  Probably not worth worrying about."
         });
     }

@@ -122,6 +122,7 @@ export class StandardTradeRoute extends AbstractTradeRoute {
             startingActRegion: startingRegion,
         });
         this.buffs = [AbstractTradeRoute.randomNegativeRouteModifier(), AbstractTradeRoute.randomPositiveRouteModifier()];
-        this.description = "Starts in " + this.startingActRegion.name;
+        this.description = "";
+        this.name = this.startingActRegion.name;
     }
 }

@@ -25,7 +25,7 @@ export class ProcBroadcaster {
         });
         GameState.getInstance().combatState.allCardsInAllPilesExceptExhaust.forEach(card => {
                 card.buffs.forEach(buff => {
-                    buff.onEvent(event);
+                buff.onEvent(event);
             });
         });
     }   

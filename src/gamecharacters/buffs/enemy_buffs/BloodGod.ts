@@ -18,12 +18,13 @@ export class BloodGod extends AbstractBuff {
         return `Whenever a sacrifice happens, gain ${this.getStacksDisplayText()} Strength.`;
     }
 
-    override onEvent(event: AbstractCombatEvent): void {
+    override onEvent(event: AbstractCombatEvent){
         if (event instanceof SacrificeEvent) {
             const owner = this.getOwnerAsCharacter();
             if (owner) {
                 this.actionManager.applyBuffToCharacterOrCard(owner, new Lethality(this.stacks));
             }
         }
+        return undefined;
     }
 }

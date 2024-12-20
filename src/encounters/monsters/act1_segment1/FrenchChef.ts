@@ -1,4 +1,4 @@
-import { AbstractIntent, ApplyDebuffToRandomCharacterIntent, AttackIntent, IntentListCreator } from '../../../gamecharacters/AbstractIntent';
+import { AbstractIntent, ApplyDebuffToRandomCharacterIntent, AttackAllPlayerCharactersIntent, AttackIntent, IntentListCreator } from '../../../gamecharacters/AbstractIntent';
 import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
 import { Delicious } from '../../../gamecharacters/buffs/enemy_buffs/Delicious';
 
@@ -14,6 +14,9 @@ export class FrenchChef extends AutomatedCharacter {
 
     override generateNewIntents(): AbstractIntent[] {
         const intents: AbstractIntent[][] = [
+            [
+                new AttackAllPlayerCharactersIntent({ baseDamage: 3, owner: this }).withTitle("Gorge Self")
+            ],
             [
                 new AttackIntent({ baseDamage: 8, owner: this }).withTitle("Cleaver Slash")
             ],

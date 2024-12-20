@@ -2,6 +2,8 @@ import { BaseCharacter } from "../../BaseCharacter";
 import { AbstractBuff } from "../AbstractBuff";
 
 export class Doubled extends AbstractBuff {
+    private hasTriggered: boolean = false;
+
     constructor() {
         super();
         this.imageName = "doubled";
@@ -16,13 +18,15 @@ export class Doubled extends AbstractBuff {
     }
 
     override onThisCardInvoked(target?: BaseCharacter): void {
+        // Prevent infinite recursion
+        if (this.hasTriggered) {
+            this.hasTriggered = false;
+            return;
+        }
+
+        this.hasTriggered = true;
         // Invoke the card's effects a second time
         this.getOwnerAsPlayableCard()!.InvokeCardEffects(target);
-        // now do it for the cards' OTHER buffs
-        this.getOwnerAsPlayableCard()!.buffs.forEach(buff => {
-            if (buff !instanceof Doubled){
-                buff.onThisCardInvoked(target);
-            }
-        });
+        this.hasTriggered = false;
     }
 }

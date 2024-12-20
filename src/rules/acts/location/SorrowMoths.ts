@@ -1,5 +1,5 @@
 import { AbstractBuff } from '../../../gamecharacters/buffs/AbstractBuff';
-import { EggsBuff } from '../../../gamecharacters/buffs/enemy_buffs/MothGod';
+import { EggsBuff } from '../../../gamecharacters/buffs/enemy_buffs/EggLayer';
 
 export class SorrowMothsModifier extends AbstractBuff {
     getDisplayName(): string {

@@ -17,9 +17,10 @@ export class StovepipeHat extends AbstractRelic {
         return 'Whenever you manufacture a card, gain 1 Smog.';
     }
 
-    override onEvent(event: AbstractCombatEvent): void {
+    override onEvent(event: AbstractCombatEvent) {
         if (event instanceof ManufactureEvent) {
             this.actionManager.modifySmog(1);
         }
+        return undefined;
     }
 }

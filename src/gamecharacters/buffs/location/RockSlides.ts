@@ -1,7 +1,7 @@
 import { BaseCharacter } from "../../BaseCharacter";
-import { LocationCardBuff } from "../LocationCardBuff";
+import { AbstractBuff } from "../AbstractBuff";
 
-export class RockSlides extends LocationCardBuff {
+export class RockSlides extends AbstractBuff {
     constructor() {
         super();
         this.stackable = true;

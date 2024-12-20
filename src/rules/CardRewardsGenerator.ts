@@ -57,7 +57,7 @@ export class CardRewardsGenerator {
                 } else {
                     card = library.getRandomSelectionOfRelevantClassCards(1, EntityRarity.UNCOMMON)[0];
                     const positiveModifiers = registry.positiveModifiers
-                        .filter(mod => mod.isApplicableInContext(ModifierContext.CARD_REWARD));
+                        .filter(mod => mod.isApplicableInContext(ModifierContext.CARD_REWARD) && mod.eligible(card));
                     const randomModifier = positiveModifiers[Math.floor(Math.random() * positiveModifiers.length)];
                     randomModifier.applyModification(card);
                 }
@@ -71,13 +71,13 @@ export class CardRewardsGenerator {
                 } else if (roll < 0.8) {
                     card = library.getRandomSelectionOfRelevantClassCards(1, EntityRarity.COMMON)[0];
                     const positiveModifiers = registry.positiveModifiers
-                        .filter(mod => mod.isApplicableInContext(ModifierContext.CARD_REWARD));
+                        .filter(mod => mod.isApplicableInContext(ModifierContext.CARD_REWARD) && mod.eligible(card));
                     const randomModifier = positiveModifiers[Math.floor(Math.random() * positiveModifiers.length)];
                     randomModifier.applyModification(card);
                 } else {
                     card = library.getRandomSelectionOfRelevantClassCards(1, EntityRarity.RARE)[0];
                     const negativeModifiers = registry.negativeModifiers
-                        .filter(mod => mod.isApplicableInContext(ModifierContext.CARD_REWARD));
+                        .filter(mod => mod.isApplicableInContext(ModifierContext.CARD_REWARD) && mod.eligible(card));
                     const randomModifier = negativeModifiers[Math.floor(Math.random() * negativeModifiers.length)];
                     randomModifier.applyModification(card);
                 }

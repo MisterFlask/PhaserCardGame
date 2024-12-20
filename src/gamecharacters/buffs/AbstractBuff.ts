@@ -1,4 +1,5 @@
 import { LocationCard } from "../../maplogic/LocationCard";
+import { AbstractReward } from "../../rewards/AbstractReward";
 import type { AbstractCombatEvent } from "../../rules/AbstractCombatEvent";
 import type { DamageInfo } from "../../rules/DamageInfo";
 import type { CombatResources, CombatState, GameState, ShopContents } from "../../rules/GameState";
@@ -368,7 +369,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
         return {logicTriggered: false, newChangeInStacks: changeInStacks};
     }
 
-    onEvent(item: AbstractCombatEvent) {
+    onEvent(item: AbstractCombatEvent): void {
 
     }
 
@@ -431,6 +432,14 @@ export abstract class AbstractBuff implements IAbstractBuff {
         
     }
 
+    public modifyDescription(description: string): string {
+        return description;
+    }   
+
+    public modifyName(name: string): string {
+        return name;
+    }
+
 
     public shouldRetainAfterTurnEnds(): boolean {
         return false;
@@ -466,6 +475,11 @@ export abstract class AbstractBuff implements IAbstractBuff {
         Object.assign(clonedBuff, this);
         clonedBuff.id = generateWordGuid(); // Generate new unique ID for clone
         return clonedBuff;
+    }
+
+    // allows you to modify or add to the rewards given at end of combat.
+    public alterRewards(currentRewards: AbstractReward[]): AbstractReward[] {
+        return currentRewards;
     }
     
 }

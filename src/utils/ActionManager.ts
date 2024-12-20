@@ -13,6 +13,7 @@ import { ProcBroadcaster } from "../gamecharacters/procs/ProcBroadcaster";
 import { LedgerItem } from "../ledger/LedgerItem";
 import { AbstractRelic } from "../relics/AbstractRelic";
 import { AbstractCombatEvent } from "../rules/AbstractCombatEvent";
+import { AbstractCombatResource } from "../rules/combatresources/AbstractCombatResource";
 import { CombatRules, DamageCalculationResult } from "../rules/CombatRulesHelper";
 import { DeckLogic, PileName } from "../rules/DeckLogicHelper";
 import { CombatSceneData } from "../screens/CombatAndMapScene";
@@ -23,12 +24,24 @@ import { SubtitleManager } from "../ui/SubtitleManager";
 import { UIContext, UIContextManager } from "../ui/UIContextManager";
 
 export class ActionManager {
+    modifyCombatResource(resource: AbstractCombatResource, amount: number) {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            resource.value += amount;
+            return [];
+        }));
+    }
     modifyHellCurrency(amount: number) {
-        GameState.getInstance().hellCurrency += amount;
+        this.actionQueue.addAction(new GenericAction(async () => {
+            GameState.getInstance().hellCurrency += amount;
+            return [];
+        }));
     }
 
     modifyExportCurrency(amount: number) {
-        GameState.getInstance().hellExportCurrency += amount;
+        this.actionQueue.addAction(new GenericAction(async () => {
+            GameState.getInstance().hellExportCurrency += amount;
+            return [];
+        }));
     }
 
     modifyEnergy(amount: number) {
@@ -113,10 +126,10 @@ export class ActionManager {
         const combatResources = GameState.getInstance().combatState.combatResources;
         combatResources.modifyAshes(0 - combatResources.ashes.value);
         combatResources.modifyPluck(0 - combatResources.pluck.value);
-        combatResources.modifyMettle(0 - combatResources.iron.value);
+        combatResources.modifyMettle(0 - combatResources.mettle.value);
         combatResources.modifyVenture(0 - combatResources.venture.value);
         combatResources.modifySmog(0 - combatResources.smog.value);
-        combatResources.modifyBlood(0 - combatResources.powder.value);
+        combatResources.modifyBlood(0 - combatResources.blood.value);
     }
 
 
@@ -1328,6 +1341,18 @@ export class WaitAction extends GameAction {
     async playAction(): Promise<GameAction[]> {
         await new Promise(resolve => setTimeout(resolve, this.milliseconds));
         return [];
+    }
+}
+
+export class SpentCombatResourceEvent extends AbstractCombatEvent {
+    printJson(): void {
+        console.log(`{"event": "SpentCombatResourceEvent", "resource": "${this.resourceAfterSpending.name}", "spent": ${this.spent}}`);
+    }
+    constructor(
+        public resourceAfterSpending: AbstractCombatResource,
+        public spent: number
+    ) {
+        super();
     }
 }
 

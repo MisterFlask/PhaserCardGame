@@ -12,7 +12,7 @@ export class Burning extends AbstractBuff {
     }
 
     override getDescription(): string {
-        const totalDamage = this.baseDamage + GameState.getInstance().combatState.combatResources.powder.value;
+        const totalDamage = this.baseDamage + GameState.getInstance().combatState.combatResources.blood.value;
         return `At the end of turn, take ${totalDamage} damage for ${this.getStacksDisplayText()} turns. Damage increases with ${TextGlyphs.getInstance().ashesIcon}`;
     }
 
@@ -24,7 +24,7 @@ export class Burning extends AbstractBuff {
     }
 
     override incomingAttackIntentValue(): AbstractIntent[] {
-        const powderAmount = GameState.getInstance().combatState.combatResources.powder.value;
+        const powderAmount = GameState.getInstance().combatState.combatResources.blood.value;
         var totalDamage = this.baseDamage + powderAmount;
         // Check for FlamesAmplifier buff and increase damage
         const flamesAmplifierBuff = this.getOwnerAsCharacter()?.buffs?.find((buff: AbstractBuff) => buff instanceof FlamesAmplifierBuff);

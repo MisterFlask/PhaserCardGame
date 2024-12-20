@@ -13,9 +13,9 @@ import { IncreaseSmog } from "../../gamecharacters/buffs/standard/combatresource
 import { IncreaseVenture } from "../../gamecharacters/buffs/standard/combatresource/IncreaseVenture";
 import { GrowingPowerBuff } from "../../gamecharacters/buffs/standard/GrowingPower";
 import { HellSellValue } from "../../gamecharacters/buffs/standard/HellSellValue";
-import { SacrificeBuff } from "../../gamecharacters/buffs/standard/SacrificeBuff";
 import { SurfaceSellValue } from "../../gamecharacters/buffs/standard/SurfaceSellValue";
 import { EntityRarity } from "../../gamecharacters/PlayableCard";
+import { TextGlyphs } from "../../text/TextGlyphs";
 import { CardModifier, ModifierContext } from "./AbstractCardModifier";
 
 export class CardModifierRegistry {
@@ -35,7 +35,7 @@ export class CardModifierRegistry {
             name: "Mettle Gain",
             modifier: card => {
                 card.buffs.push(new IncreaseMettle().withoutShowingUpInBuffs());
-                card.name += "⚔️";
+                card.name += TextGlyphs.getInstance().mettleIcon;
             },
             powerLevelChange: 1,
             contextsApplicable: [ModifierContext.SHOP, ModifierContext.CARD_REWARD, ModifierContext.REST_SITE_UPGRADE]
@@ -44,7 +44,7 @@ export class CardModifierRegistry {
             name: "Blood Gain",
             modifier: card => {
                 card.buffs.push(new IncreaseBlood().withoutShowingUpInBuffs());
-                card.name += "🩸";
+                card.name += TextGlyphs.getInstance().bloodIcon;
             },
             powerLevelChange: 1,
             contextsApplicable: [ModifierContext.SHOP, ModifierContext.CARD_REWARD, ModifierContext.REST_SITE_UPGRADE]
@@ -53,7 +53,7 @@ export class CardModifierRegistry {
             name: "Pluck Gain",
             modifier: card => {
                 card.buffs.push(new IncreasePluck(1).withoutShowingUpInBuffs());
-                card.name += "🎭";
+                card.name += TextGlyphs.getInstance().pluckIcon;
             },
             powerLevelChange: 1,
             contextsApplicable: [ModifierContext.REST_SITE_UPGRADE, ModifierContext.CARD_REWARD]
@@ -62,7 +62,7 @@ export class CardModifierRegistry {
             name: "Smog Gain",
             modifier: card => {
                 card.buffs.push(new IncreaseSmog().withoutShowingUpInBuffs());
-                card.name += "💨";
+                card.name += TextGlyphs.getInstance().smogIcon;
             },
             powerLevelChange: 1,
             contextsApplicable: [ModifierContext.REST_SITE_UPGRADE, ModifierContext.CARD_REWARD]
@@ -71,7 +71,7 @@ export class CardModifierRegistry {
             name: "Venture Gain",
             modifier: card => {
                 card.buffs.push(new IncreaseVenture().withoutShowingUpInBuffs());
-                card.name += "🎲";
+                card.name += TextGlyphs.getInstance().ventureIcon;
             },
             powerLevelChange: 1,
             contextsApplicable: [ModifierContext.REST_SITE_UPGRADE, ModifierContext.CARD_REWARD]
@@ -147,6 +147,25 @@ export class CardModifierRegistry {
             powerLevelChange: 1,
             contextsApplicable: [ModifierContext.SHOP, ModifierContext.CARD_REWARD, ModifierContext.REST_SITE_UPGRADE]
         }),
+        new CardModifier({
+            name: "Hell Value",
+            modifier: card => {
+                card.buffs.push(new HellSellValue(10).withoutShowingUpInBuffs());
+                card.name += "🔥";
+            },
+            powerLevelChange: 0,
+            contextsApplicable: [ModifierContext.SHOP, ModifierContext.CARD_REWARD, ModifierContext.REST_SITE_UPGRADE]
+        }),
+        new CardModifier({
+            name: "Blood Price",
+            modifier: card => {
+                card.buffs.push(new BloodPriceBuff(3).withoutShowingUpInBuffs());
+                card.name += "🖤";
+            },
+            eligible: card => card.baseEnergyCost > 0,
+            powerLevelChange: +1,
+            contextsApplicable: [ModifierContext.CARD_REWARD, ModifierContext.SHOP] // Makes sense in both shop and rewards
+        }),
     ];
 
     // Negative modifiers (powerLevelChange < 0)
@@ -183,26 +202,6 @@ export class CardModifierRegistry {
             },
             powerLevelChange: -1,
             contextsApplicable: [ModifierContext.CARD_REWARD] // Makes more sense as a reward modifier
-        }),
-        new CardModifier({
-            name: "Blood Price",
-            modifier: card => {
-                card.buffs.push(new BloodPriceBuff(3));
-                card.buffs.push(new SacrificeBuff());
-                card.name += "🖤";
-            },
-            eligible: card => card.baseEnergyCost > 0,
-            powerLevelChange: -1,
-            contextsApplicable: [ModifierContext.CARD_REWARD, ModifierContext.SHOP] // Makes sense in both shop and rewards
-        }),
-        new CardModifier({
-            name: "Hell Value",
-            modifier: card => {
-                card.buffs.push(new HellSellValue(10).withoutShowingUpInBuffs());
-                card.name += "🔥";
-            },
-            powerLevelChange: -1,
-            contextsApplicable: [ModifierContext.SHOP, ModifierContext.CARD_REWARD, ModifierContext.REST_SITE_UPGRADE]
         }),
     ];
 

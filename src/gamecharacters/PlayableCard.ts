@@ -210,7 +210,7 @@ export abstract class PlayableCard extends AbstractCard {
     }
 
     get mettle(): MettleResource {
-        return this.combatResources.iron;
+        return this.combatResources.mettle;
     }
 
     get venture(): VentureResource {
@@ -222,7 +222,7 @@ export abstract class PlayableCard extends AbstractCard {
     }
 
     get blood(): BloodResource {
-        return this.combatResources.powder;
+        return this.combatResources.blood;
     }
 
     /**

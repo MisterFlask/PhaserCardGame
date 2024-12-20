@@ -160,6 +160,10 @@ export abstract class AbstractCard implements IAbstractCard {
 
     public _actionManager!: ActionManager;
 
+    public get gameState(): GameState{
+        return ActionManagerFetcher.getGameState();
+    }
+
     public get actionManager(): ActionManager{
         return ActionManagerFetcher.getActionManager();
     }

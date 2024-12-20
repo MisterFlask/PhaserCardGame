@@ -6,7 +6,7 @@ import { AbstractBuff } from "../AbstractBuff";
 import { ExhaustBuff } from "../playable_card/ExhaustBuff";
 import { Hazardous } from "../playable_card/Hazardous";
 
-export class MothGod extends AbstractBuff {
+export class EggLayer extends AbstractBuff {
     constructor(stacks: number = 1) {
         super();
         this.stacks = stacks;
@@ -14,7 +14,7 @@ export class MothGod extends AbstractBuff {
     }
 
     override getDisplayName(): string {
-        return "Moth God";
+        return "Egg Layer";
     }
 
     override getDescription(): string {

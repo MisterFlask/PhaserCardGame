@@ -46,6 +46,8 @@ export class MapOverlay {
 
     private mapDebugOverlay?: MapDebugOverlay;
 
+    private tradeRouteCard: PhysicalCard | null = null;
+
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
         this.overlay = this.scene.add.container(0, 0)
@@ -106,6 +108,7 @@ export class MapOverlay {
         this.createAbortButton();
         this.createCampaignStatusText();
         this.createCameraButtons();
+        this.createTradeRouteCard();
 
         this.scene.scale.on('resize', this.resize, this);
         this.resize();
@@ -533,11 +536,21 @@ export class MapOverlay {
     }
 
     private positionCameraButtons(width: number, height: number) {
+        const buttonPadding = 20;
+        const buttonWidth = 100;
+        const buttonHeight = 50;
+
         if (this.moveUpButton) {
-            this.moveUpButton.setPosition(20 + this.moveUpButton.width / 2, 20 + this.moveUpButton.height / 2);
+            this.moveUpButton.setPosition(buttonPadding + buttonWidth / 2, buttonPadding + buttonHeight / 2);
         }
         if (this.moveDownButton) {
-            this.moveDownButton.setPosition(20 + this.moveDownButton.width / 2, 20 + this.moveDownButton.height * 1.5 + 10);
+            this.moveDownButton.setPosition(buttonPadding + buttonWidth / 2, buttonPadding + buttonHeight * 1.5 + 10);
+        }
+
+        // Position trade route card below the move buttons
+        if (this.tradeRouteCard) {
+            const tradeRouteY = buttonPadding + buttonHeight * 3;
+            this.tradeRouteCard.container.setPosition(buttonPadding + buttonWidth / 2, tradeRouteY);
         }
     }
 
@@ -672,6 +685,11 @@ export class MapOverlay {
         // Destroy the MapDebugOverlay
         this.mapDebugOverlay?.destroy();
         this.mapDebugOverlay = undefined;
+
+        if (this.tradeRouteCard) {
+            this.tradeRouteCard.obliterate();
+            this.tradeRouteCard = null;
+        }
     }
 
     // Modify the scene setup to listen for the Control key
@@ -680,5 +698,29 @@ export class MapOverlay {
             console.log("showLocationCardDepths");
             this.mapDebugOverlay?.toggleLocationCardDepths();
         });
+    }
+
+    private createTradeRouteCard() {
+        // Clean up any existing trade route card
+        if (this.tradeRouteCard) {
+            this.tradeRouteCard.obliterate();
+            this.tradeRouteCard = null;
+        }
+
+        const currentRoute = GameState.getInstance().currentRoute;
+        if (!currentRoute) return;
+
+        // Create the physical card for the trade route
+        this.tradeRouteCard = CardGuiUtils.getInstance().createCard({
+            scene: this.scene,
+            x: 0,
+            y: 0,
+            data: currentRoute,
+        });
+
+        if (this.tradeRouteCard) {
+            this.tradeRouteCard.container.setScrollFactor(0);
+            this.overlay.add(this.tradeRouteCard.container);
+        }
     }
 }

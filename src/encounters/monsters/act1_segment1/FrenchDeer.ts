@@ -1,4 +1,4 @@
-import { AbstractIntent, ApplyDebuffToRandomCharacterIntent, AttackAllPlayerCharactersIntent, IntentListCreator } from '../../../gamecharacters/AbstractIntent';
+import { AbstractIntent, ApplyDebuffToRandomCharacterIntent, AttackAllPlayerCharactersIntent, AttackIntent, IntentListCreator } from '../../../gamecharacters/AbstractIntent';
 import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
 import { Burning } from '../../../gamecharacters/buffs/standard/Burning';
 
@@ -19,9 +19,12 @@ export class FrenchDeer extends AutomatedCharacter {
             ],
             [
                 new AttackAllPlayerCharactersIntent({ baseDamage: 4, owner: this }).withTitle("Inferno Charge")
+            ],
+            [
+                new AttackIntent({ baseDamage: 10, owner: this }).withTitle("Horn Charge")
             ]
         ];
 
-        return IntentListCreator.iterateIntents(intents);
+        return IntentListCreator.selectRandomIntents(intents);
     }
 }

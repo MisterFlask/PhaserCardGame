@@ -24,14 +24,12 @@ export class FrenchCrow extends AutomatedCharacter {
         const randomChoice = Math.random();
         
         if (randomChoice < 0.3) {
-            // Attack twice for 4
             return [
-                new AttackIntent({ baseDamage: 4, owner: this }).withTitle("Peck"),
-                new AttackIntent({ baseDamage: 4, owner: this }).withTitle("Peck")
+                new AttackIntent({ baseDamage: 4, owner: this }).withTitle("Stab"),
+                new AttackIntent({ baseDamage: 5, owner: this }).withTitle("Bite")
             ];
         } else if (randomChoice < 0.7) {
-            // Attack once for 6
-            return [new AttackIntent({ baseDamage: 6, owner: this }).withTitle("Void Strike")];
+            return [new AttackIntent({ baseDamage: 12, owner: this }).withTitle("Void Strike")];
         } else {
             // Buff itself with 2 strength
             return [new ApplyBuffToSelfIntent({ buff: new Lethality(2), owner: this }).withTitle("Eldritch Empowerment")];

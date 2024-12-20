@@ -32,19 +32,48 @@ export class ShopPopulator {
         });
         return Math.floor(price);
     }
-
     private generateRandomCardModificationIfAny(card: PlayableCard) {
         const registry = CardModifierRegistry.getInstance();
-        const modifiers = registry.negativeModifiers
-            .filter(mod => mod.isApplicableInContext(ModifierContext.SHOP));
         
-        for (const modifier of modifiers) {
-            if (modifier.eligible(card) && Math.random() < modifier.probability) {
-                modifier.applyModification(card);
-                return;
+        // First try positive modifiers (30% chance)
+        if (Math.random() < 0.3) {
+            const positiveModifiers = registry.positiveModifiers
+                .filter(mod => mod.isApplicableInContext(ModifierContext.SHOP))
+                .filter(mod => mod.eligible(card));
+
+            if (positiveModifiers.length > 0) {
+                const totalProb = positiveModifiers.reduce((sum, mod) => sum + (mod.probability ?? 1), 0);
+                const r = Math.random() * totalProb;
+                let cumulative = 0;
+                for (const mod of positiveModifiers) {
+                    cumulative += mod.probability ?? 1;
+                    if (r < cumulative) {
+                        mod.applyModification(card);
+                        return;
+                    }
+                }
+            }
+        }
+
+        // Then try negative modifiers
+        const negativeModifiers = registry.negativeModifiers
+            .filter(mod => mod.isApplicableInContext(ModifierContext.SHOP))
+            .filter(mod => mod.eligible(card));
+    
+        if (negativeModifiers.length === 0) return;
+    
+        const totalProb = negativeModifiers.reduce((sum, mod) => sum + (mod.probability ?? 0), 0);
+        const r = Math.random() * totalProb;
+        let cumulative = 0;
+        for (const mod of negativeModifiers) {
+            cumulative += mod.probability ?? 0;
+            if (r < cumulative) {
+                mod.applyModification(card);
+                break;
             }
         }
     }
+    
 
     private getRelicPrice(relic: AbstractRelic): number {
         var basePrice = Math.floor(relic.rarity.basePrice);

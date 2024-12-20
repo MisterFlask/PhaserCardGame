@@ -45,7 +45,6 @@ export class LocationCard extends AbstractCard {
             size // Pass the size parameter
         });
 
-
         this.floor = floor;
         this.roomNumber = index;       
     }
@@ -242,7 +241,9 @@ export class ShopCard extends LocationCard {
 
     override OnLocationSelected(scene: Phaser.Scene): void {
         console.log(`Location ${this.id} selected with encounter: ${this.encounter.enemies.map(e => e.name).join(', ')}`);
-        
+
+        GameState.getInstance().rerollShop();
+
         ActionManager.getInstance().cleanupAndRestartCombat({ encounter: EncounterManager.getInstance().getShopEncounter(), shouldStartWithMapOverlay: false });
     }
 }

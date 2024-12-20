@@ -1,7 +1,7 @@
 import { BaseCharacter } from "../../BaseCharacter";
-import { LocationCardBuff } from "../LocationCardBuff";
+import { AbstractBuff } from "../AbstractBuff";
 
-export class TougherEnemies extends LocationCardBuff {
+export class TougherEnemies extends AbstractBuff {
     constructor() {
         super();
     }

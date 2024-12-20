@@ -1,8 +1,8 @@
 import { BaseCharacter } from "../../BaseCharacter";
-import { LocationCardBuff } from "../LocationCardBuff";
+import { AbstractBuff } from "../AbstractBuff";
 import { EldritchHorror } from "../standard/EldritchHorror";
 
-export class EldritchFoes extends LocationCardBuff {
+export class EldritchFoes extends AbstractBuff {
     constructor() {
         super();
     }

@@ -1,6 +1,6 @@
 import { AbstractIntent, ApplyDebuffToAllPlayerCharactersIntent, AttackAllPlayerCharactersIntent, AttackIntent, IntentListCreator, SummonIntent } from '../../../gamecharacters/AbstractIntent';
 import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
-import { MothGod } from '../../../gamecharacters/buffs/enemy_buffs/MothGod';
+import { EggLayer } from '../../../gamecharacters/buffs/enemy_buffs/EggLayer';
 import { Stress } from '../../../gamecharacters/buffs/standard/Stress';
 import { Titan } from '../../../gamecharacters/buffs/standard/Titan';
 import { Vulnerable } from '../../../gamecharacters/buffs/standard/Vulnerable';
@@ -20,7 +20,7 @@ export class FrenchBlindProphetess extends AutomatedCharacter {
         //this.portraitOffsetYOverride = 0
         this.size = CardSize.LARGE;
         // Apply initial MothGod buff
-        this.buffs.push(new MothGod(2));
+        this.buffs.push(new EggLayer(2));
         this.buffs.push(new Titan(2))
     }
 
