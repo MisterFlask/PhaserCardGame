@@ -1,0 +1,1 @@
+// Relic which, when clicked, flees the combat.

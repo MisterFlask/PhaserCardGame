@@ -7,19 +7,18 @@ import { Charon } from '../encounters/monsters/special/Charon';
 import { AbstractEvent } from '../events/AbstractEvent';
 import { AbstractCard } from '../gamecharacters/AbstractCard';
 import { CardSize, CardType } from '../gamecharacters/Primitives';
-import { ProcBroadcaster } from '../gamecharacters/procs/ProcBroadcaster';
 import { RelicsLibrary } from '../relics/RelicsLibrary';
 import { AbstractReward } from '../rewards/AbstractReward';
 import { CardReward } from '../rewards/CardReward';
 import { CurrencyReward } from '../rewards/CurrencyReward';
 import { RelicReward } from '../rewards/RelicReward';
 import { CardRewardsGenerator } from '../rules/CardRewardsGenerator';
+import { CombatRules } from '../rules/CombatRulesHelper';
 import { GameState } from '../rules/GameState';
 import { CardModifier } from '../rules/modifiers/AbstractCardModifier';
 import { RestSiteUpgradeOptionManager } from '../rules/RestSiteUpgradeOption';
 import { ActionManager } from '../utils/ActionManager';
 import { Faction } from './Faction';
-import { CombatRules } from '../rules/CombatRulesHelper';
 
 
 export class LocationCard extends AbstractCard {
@@ -34,6 +33,7 @@ export class LocationCard extends AbstractCard {
     public segment: number = 0;
     public backgroundName?: string;
     public gameEvent?: AbstractEvent;
+    public currentExpectedRewards: AbstractReward[] = [];
 
     constructor({ name, description, portraitName, tooltip, size, floor, index }: { name: string; description: string; portraitName?: string; tooltip?: string; size: CardSize; floor: number; index: number }) { 
         const fullName = `${name} ${floor}-${index + 1}`;
@@ -79,7 +79,7 @@ export class LocationCard extends AbstractCard {
         ActionManager.getInstance().cleanupAndRestartCombat({ encounter: this.encounter, shouldStartWithMapOverlay: false });
     }
 
-    public determineRewards(): AbstractReward[] {
+    public determineBaseRewards(): AbstractReward[] {
         return []; // Base location cards yield no rewards by default
     }
 }
@@ -120,7 +120,7 @@ export class BossRoomCard extends LocationCard {
         this.encounter = encounter;
     }
 
-    override determineRewards(): AbstractReward[] {
+    override determineBaseRewards(): AbstractReward[] {
         const rewards: AbstractReward[] = [];
         const cardRewards = CardRewardsGenerator.getInstance().generateCardRewardsForCombat();
         rewards.push(new CardReward(cardRewards));
@@ -188,7 +188,7 @@ export class NormalRoomCard extends LocationCard {
         this.portraitTint = 0xff0000;
     }
 
-    override determineRewards(): AbstractReward[] {
+    override determineBaseRewards(): AbstractReward[] {
         const rewards: AbstractReward[] = [];
         const cardRewards = CardRewardsGenerator.getInstance().generateCardRewardsForCombat();
         rewards.push(new CardReward(cardRewards));
@@ -210,7 +210,7 @@ export class EliteRoomCard extends LocationCard {
         this.portraitTint = 0x8B0000;
     }
 
-    override determineRewards(): AbstractReward[] {
+    override determineBaseRewards(): AbstractReward[] {
         const rewards: AbstractReward[] = [];
         const cardRewards = CardRewardsGenerator.getInstance().generateCardRewardsForCombat();
         rewards.push(new CardReward(cardRewards));

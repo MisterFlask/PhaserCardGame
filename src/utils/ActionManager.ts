@@ -22,6 +22,7 @@ import { AutomatedCharacterType, BaseCharacterType, PlayableCardType } from "../
 import CardSelectionFromHandManager from '../ui/CardSelectionFromHandManager';
 import { SubtitleManager } from "../ui/SubtitleManager";
 import { UIContext, UIContextManager } from "../ui/UIContextManager";
+import { FleeCombatAction } from "./actions/FleeCombatAction";
 
 export class ActionManager {
     modifyCombatResource(resource: AbstractCombatResource, amount: number) {
@@ -181,6 +182,10 @@ export class ActionManager {
         GameState.getInstance().hellCurrency -= price;
         return true;
     }
+
+    fleeCombatAction() {
+        this.actionQueue.addAction(new FleeCombatAction());
+    }   
 
     addRelicToInventory(relic: AbstractRelic) {
         GameState.getInstance().addRelic(relic, this.scene);

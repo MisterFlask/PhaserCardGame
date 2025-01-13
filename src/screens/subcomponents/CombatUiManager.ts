@@ -409,6 +409,9 @@ class CombatUIManager {
     public onCombatStart(): void {
         this.combatEnded = false;
         this.generalRewardScreen?.hide();
+        if (GameState.getInstance().currentLocation) {
+            GameState.getInstance().currentLocation!.currentExpectedRewards = GameState.getInstance().currentLocation!.determineBaseRewards();
+        }
     }
 
     public onCombatEnd(): void {
@@ -434,7 +437,7 @@ class CombatUIManager {
             console.log("No location to determine rewards for");
             return []; // No rewards if no location
         }
-        return currentLocation.determineRewards();
+        return currentLocation.currentExpectedRewards;
     }
 
     public disableInteractions(): void {
