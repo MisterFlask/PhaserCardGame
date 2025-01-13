@@ -4,8 +4,6 @@ import { GameState } from "./GameState";
 
 import { AutomatedCharacterType, BaseCharacterType, PlayableCardType } from "../Types";
 import { AbstractIntent } from "../gamecharacters/AbstractIntent";
-import { LocationCard } from "../maplogic/LocationCard";
-import { AbstractReward } from "../rewards/AbstractReward";
 
 export class DamageCalculationResult {
     totalDamage: number;
@@ -20,9 +18,6 @@ export class DamageCalculationResult {
 }
 
 export class CombatRules {
-    static getCardRewardsForLocation(location: LocationCard): AbstractReward[] {
-        throw new Error('Method not implemented.');
-    }
 
     public static calculateBlockSentToCharacterByCard(card: PlayableCardType, sourceCharacter: IBaseCharacter, targetCharacter: IBaseCharacter): number{
         let totalBlock = card.getBaseBlockAfterResourceScaling();

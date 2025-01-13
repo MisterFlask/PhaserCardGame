@@ -13,7 +13,6 @@ import { CardReward } from '../rewards/CardReward';
 import { CurrencyReward } from '../rewards/CurrencyReward';
 import { RelicReward } from '../rewards/RelicReward';
 import { CardRewardsGenerator } from '../rules/CardRewardsGenerator';
-import { CombatRules } from '../rules/CombatRulesHelper';
 import { GameState } from '../rules/GameState';
 import { CardModifier } from '../rules/modifiers/AbstractCardModifier';
 import { RestSiteUpgradeOptionManager } from '../rules/RestSiteUpgradeOption';
@@ -126,7 +125,6 @@ export class BossRoomCard extends LocationCard {
         rewards.push(new CardReward(cardRewards));
         rewards.push(new CurrencyReward(200)); // Boss rooms give the most currency
 
-        const buffs = CombatRules.getCardRewardsForLocation(this);
         return rewards;
     }
 }

@@ -4,22 +4,23 @@
 // mark combat as "ended"
 
 import { GameState } from "../../rules/GameState";
-import { GenericAction } from "../ActionManager";
+import { GameAction } from "./GameAction";
 
-export class FleeCombatAction extends GenericAction {
+export class FleeCombatAction extends GameAction {
     public constructor() {
-        super(async () => {
+        super();
+    }
 
-            const gameState = GameState.getInstance();
-            gameState.combatState.enemies.forEach(enemy => {
-                enemy.hitpoints = 0;
-            });
-
-            if (gameState.currentLocation) {
-                gameState.currentLocation!.currentExpectedRewards = []
-            }
-
-            return [];
+    async playAction(): Promise<GameAction[]> {
+        const gameState = GameState.getInstance();
+        gameState.combatState.enemies.forEach(enemy => {
+            enemy.hitpoints = 0;
         });
+
+        if (gameState.currentLocation) {
+            gameState.currentLocation!.currentExpectedRewards = []
+        }
+
+        return [];
     }
 }

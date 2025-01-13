@@ -5,24 +5,42 @@ import { AbstractCard, IPhysicalCardInterface } from '../gamecharacters/Abstract
 import { AutomatedCharacter } from "../gamecharacters/AutomatedCharacter";
 import type { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { AbstractBuff } from "../gamecharacters/buffs/AbstractBuff";
-import { Stress } from "../gamecharacters/buffs/standard/Stress";
 import { IBaseCharacter } from "../gamecharacters/IBaseCharacter";
 import { CardResourceScaling, PlayableCard } from "../gamecharacters/PlayableCard";
 import { CardType } from "../gamecharacters/Primitives";
 import { ProcBroadcaster } from "../gamecharacters/procs/ProcBroadcaster";
 import { LedgerItem } from "../ledger/LedgerItem";
 import { AbstractRelic } from "../relics/AbstractRelic";
-import { AbstractCombatEvent } from "../rules/AbstractCombatEvent";
 import { AbstractCombatResource } from "../rules/combatresources/AbstractCombatResource";
 import { CombatRules, DamageCalculationResult } from "../rules/CombatRulesHelper";
 import { DeckLogic, PileName } from "../rules/DeckLogicHelper";
 import { CombatSceneData } from "../screens/CombatAndMapScene";
-import CombatUiManager from "../screens/subcomponents/CombatUiManager";
 import { AutomatedCharacterType, BaseCharacterType, PlayableCardType } from "../Types";
-import CardSelectionFromHandManager from '../ui/CardSelectionFromHandManager';
 import { SubtitleManager } from "../ui/SubtitleManager";
-import { UIContext, UIContextManager } from "../ui/UIContextManager";
 import { FleeCombatAction } from "./actions/FleeCombatAction";
+import { GameAction } from "./actions/GameAction";
+import { GenericAction } from "./actions/GenericAction";
+import { ActiveDiscardCardAction } from "./actions/specific/ActiveDiscardCardAction";
+import { AddStressAction } from "./actions/specific/AddStressAction";
+import { BasicDiscardCardsAction } from "./actions/specific/BasicDiscardCardsAction";
+import { BeginTurnAction } from "./actions/specific/BeginTurnAction";
+import { DisplaySubtitleAction } from "./actions/specific/DisplaySubtitleAction";
+import { DrawCardsAction } from "./actions/specific/DrawCardsAction";
+import { EndCombatAction } from "./actions/specific/EndCombatAction";
+import { EndTurnAction } from "./actions/specific/EndTurnAction";
+import { ExhaustCardAction } from "./actions/specific/ExhaustCardAction";
+import {
+    ModifyAshesAction,
+    ModifyBloodAction,
+    ModifyMettleAction,
+    ModifyPluckAction,
+    ModifySmogAction,
+    ModifyVentureAction
+} from "./actions/specific/ModifyCombatResourceAction";
+import { RelieveStressAction } from "./actions/specific/RelieveStressAction";
+import { RequireCardSelectionAction } from "./actions/specific/RequireCardSelectionAction";
+import { StartCombatAction } from "./actions/specific/StartCombatAction";
+import { WaitAction } from "./actions/WaitAction";
 
 export class ActionManager {
     modifyCombatResource(resource: AbstractCombatResource, amount: number) {
@@ -110,27 +128,7 @@ export class ActionManager {
     }
 
     endCombat() {
-        this.actionQueue.addAction(new GenericAction(async () => {
-
-            ProcBroadcaster.getInstance().retrieveAllRelevantBuffsForProcs(true).forEach(buff => {
-                buff.onCombatEnd();
-            });
-            return [];
-        }));
-
-        // clear out all the buffs on the player characters
-        GameState.getInstance().combatState.allPlayerAndEnemyCharacters.forEach(character => {
-            // Only clear non-persona buffs
-            character.buffs = character.buffs.filter(buff => buff.isPersonaTrait || buff.isPersistentBetweenCombats);
-        });
-        // Reset all combat resources to 0
-        const combatResources = GameState.getInstance().combatState.combatResources;
-        combatResources.modifyAshes(0 - combatResources.ashes.value);
-        combatResources.modifyPluck(0 - combatResources.pluck.value);
-        combatResources.modifyMettle(0 - combatResources.mettle.value);
-        combatResources.modifyVenture(0 - combatResources.venture.value);
-        combatResources.modifySmog(0 - combatResources.smog.value);
-        combatResources.modifyBlood(0 - combatResources.blood.value);
+        this.actionQueue.addAction(new EndCombatAction());
     }
 
 
@@ -151,19 +149,7 @@ export class ActionManager {
     }
 
     startCombat() {
-        this.actionQueue.addAction(new GenericAction(async () => {
-            
-            this.initializeCombatDeck();
-
-            // Set max energy based on relics
-            GameState.getInstance().combatState.defaultMaxEnergy = 3; // Base energy
-
-            ProcBroadcaster.getInstance().retrieveAllRelevantBuffsForProcs(true).forEach(buff => {
-                buff.onCombatStart();
-            });
-            
-            return [];
-        }));
+        this.actionQueue.addAction(new StartCombatAction());
     }
 
     sellItemForBrimstoneDistillate(item: PlayableCard) {
@@ -612,67 +598,8 @@ export class ActionManager {
         }));
     }
 
-    public drawHandForNewTurn(): void {
-        console.log('Drawing hand for new turn');
-        const gameState = GameState.getInstance();
-        const combatState = gameState.combatState;
-        const handSize = 5;
-
-        // Check each character's buffs at start of turn
-        const allCharacters = [...combatState.playerCharacters, ...combatState.enemies];
-        var cardModifier = 0;
-        allCharacters.forEach(character => {
-            character.buffs.forEach(buff => {
-                cardModifier += buff.getCardsDrawnAtStartOfTurnModifier();
-            });
-        });
-
-        this.drawCards(handSize + cardModifier);
-
-        console.log('State of all piles:');
-        console.log('Draw Pile:', combatState.drawPile.map(card => card.name));
-        console.log('Discard Pile:', combatState.currentDiscardPile.map(card => card.name));
-        console.log('Hand:', combatState.currentHand.map(card => card.name));
-    }
-
     public drawCards(count: number, callback?: (cards: PlayableCard[]) => void): void {
-        this.actionQueue.addAction(new GenericAction(async () => {
-            const deckLogic = DeckLogic.getInstance();
-            const drawnCards: PlayableCard[] = [];
-            // Add a small delay after drawing each card
-            for (let i = 0; i < count; i++) {
-                const drawnCard = deckLogic.drawCards(1)[0];
-                
-                if (!drawnCard) {
-                    console.warn("No card drawn");
-                    break;
-                }
-                
-                drawnCard.buffs.forEach(buff => {
-                    buff.onCardDrawn();
-                });
-                
-                GameState.getInstance().relicsInventory.forEach(relic => {
-                    relic.onAnyCardDrawn(drawnCard);
-                });
-
-                await this.animateDrawCard(drawnCard);
-                await new WaitAction(50).playAction();
-                drawnCards.push(drawnCard);
-            }
-
-            const gameState = GameState.getInstance();
-            const combatState = gameState.combatState;
-
-
-
-            console.log('Cards drawn:', drawnCards.map(card => card.name));
-            console.log('Updated hand:', combatState.currentHand.map(card => card.name));
-
-            callback?.(drawnCards);
-
-            return [];
-        }));
+        this.actionQueue.addAction(new DrawCardsAction(count, callback));
     }
 
 
@@ -933,60 +860,30 @@ export class ActionManager {
         await this.actionQueue.resolveActions();
     }
     public basicDiscardCards(cards: AbstractCard[]): void {
-        // Queue discarding multiple cards
-        this.actionQueue.addAction(new GenericAction(async () => {
-            cards.forEach(card => {
-                this.basicDiscardCard(card as PlayableCard);
-            });
-            return [];
-        }));
+        this.actionQueue.addAction(new BasicDiscardCardsAction(cards));
     }
 
     public modifySmog(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
-        this.actionQueue.addAction(new GenericAction(async () => {
-            GameState.getInstance().combatState.combatResources.modifySmog(amount);
-            return [];
-        }));
+        this.actionQueue.addAction(new ModifySmogAction(amount, sourceCharacterIfAny));
     }
     public modifyPluck(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
-        this.actionQueue.addAction(new GenericAction(async () => {
-            GameState.getInstance().combatState.combatResources.modifyPluck(amount);
-            return [];
-        }));
+        this.actionQueue.addAction(new ModifyPluckAction(amount, sourceCharacterIfAny));
     }
     public modifyAshes(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
-        this.actionQueue.addAction(new GenericAction(async () => {
-            GameState.getInstance().combatState.combatResources.modifyAshes(amount);
-            return [];
-        }));
+        this.actionQueue.addAction(new ModifyAshesAction(amount, sourceCharacterIfAny));
     }
     public modifyMettle(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
-        this.actionQueue.addAction(new GenericAction(async () => {
-            GameState.getInstance().combatState.combatResources.modifyMettle(amount);
-            return [];
-        }));
+        this.actionQueue.addAction(new ModifyMettleAction(amount, sourceCharacterIfAny));
     }
     public modifyVenture(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
-        this.actionQueue.addAction(new GenericAction(async () => {
-            GameState.getInstance().combatState.combatResources.modifyVenture(amount);
-            return [];
-        }));
+        this.actionQueue.addAction(new ModifyVentureAction(amount, sourceCharacterIfAny));
     }
     public modifyBlood(amount: number, sourceCharacterIfAny?: BaseCharacterType): void {
-        this.actionQueue.addAction(new GenericAction(async () => {
-            GameState.getInstance().combatState.combatResources.modifyBlood(amount);
-            return [];
-        }));
+        this.actionQueue.addAction(new ModifyBloodAction(amount, sourceCharacterIfAny));
     }
 
     public displaySubtitle(text: string, durationMs: number = 1000): void {
-        this.actionQueue.addAction(new GenericAction(async () => {
-            await SubtitleManager.getInstance().showSubtitle(text);
-            // Wait for the specified duration
-            await new WaitAction(durationMs).playAction();
-            await SubtitleManager.getInstance().hideSubtitle();
-            return [];
-        }));
+        this.actionQueue.addAction(new DisplaySubtitleAction(text, durationMs));
     }
 
     public async displaySubtitle_NoQueue(text: string, durationMs: number = 1000): Promise<void> {
@@ -997,75 +894,12 @@ export class ActionManager {
     }
 
     public endTurn(): void {
-        UIContextManager.getInstance().setContext(UIContext.COMBAT_BUT_NOT_YOUR_TURN);
-        console.log('Ending turn');
-        const gameState = GameState.getInstance();
-        const combatState = gameState.combatState;
-
-
-
-        // Remove intents from dead enemies
-        combatState.enemies.forEach(enemy => {
-            if (enemy.hitpoints <= 0) {
-                enemy.intents = [];
-            }
-        });
-
-        // end turn buffs on cards in hand
-        combatState.currentHand.forEach(card => {
-            card.buffs.forEach(buff => {
-                buff.onInHandAtEndOfTurn();
-            });
-        });
-
-        ProcBroadcaster.getInstance().retrieveAllRelevantBuffsForProcs(true).forEach(buff => {
-            buff.onTurnEnd();
-        });
-
-
-        // Queue discard actions instead of direct discard
-        this.basicDiscardCards(combatState.currentHand);
-
-        combatState.enemies.forEach(character => {
-            character.block = 0;
-        });
-
-        combatState.enemies.forEach(enemy => {
-            for (const intent of [...enemy.intents]) {
-                // Display the intent's title or tooltip text
-                this.displaySubtitle(intent.title || intent.tooltipText());
-
-                
-                // Queue the intent's action
-                intent.act();
-
-                // Hide the subtitle after the action completes
-                this.hideSubtitle();
-
-                // Set new intents for the enemy
-                this.performAsyncronously(async () => {
-                    await enemy.removeIntent(intent);
-                });
-            }
-        });
-        
-        combatState.currentTurn++;
-        ActionManager.beginTurn();
+        this.actionQueue.addAction(new EndTurnAction());
     }
 
 
     public activeDiscardCard(card: PlayableCardType): void {
-        this.actionQueue.addAction(new GenericAction(async () => {
-            this.basicDiscardCard(card);
-            for (const buff of card.buffs) {
-                buff.onActiveDiscard();
-            }
-            
-            ProcBroadcaster.getInstance().retrieveAllRelevantBuffsForProcs(true).forEach(buff => {
-                buff.onAnyCardDiscarded(card);
-            });
-            return [];
-        }));
+        this.actionQueue.addAction(new ActiveDiscardCardAction(card));
     }
 
     public createLedgerItem(item: LedgerItem): void {
@@ -1073,42 +907,15 @@ export class ActionManager {
     }
 
     public exhaustCard(card: PlayableCardType): void {
-        card.transientUiFlag_disableStandardDiscardAfterPlay = true;
-        this.actionQueue.addAction(new GenericAction(async () => {
-            card.physicalCard?.burnUp(async ()=>{
-                await new WaitAction(100).playAction(); // Short delay for visual feedback
-                DeckLogic.moveCardToPile(card, PileName.Exhaust);
-                console.log(`Exhausted card ${card.name}`);
-                for (const buff of card.buffs) {
-                    buff.onExhaust();
-                }
-
-                ProcBroadcaster.getInstance().retrieveAllRelevantBuffsForProcs(true).forEach(buff => {
-                    buff.onAnyCardExhausted(card);
-                });
-                ProcBroadcaster.getInstance().broadcastCombatEvent(new ExhaustEvent(card));
-            });
-            
-            return [];
-        }));
+        this.actionQueue.addAction(new ExhaustCardAction(card));
     }
 
     public addStressToCharacter(character: BaseCharacter, amount: number): void {
-        this.actionQueue.addAction(new GenericAction(async () => {
-            const stressBuff = new Stress(amount);
-            this.applyBuffToCharacter(character, stressBuff);
-            console.log(`Added ${amount} Stress to ${character.name}`);
-            return [];
-        }));
+        this.actionQueue.addAction(new AddStressAction(character, amount));
     }
 
     public relieveStressFromCharacter(character: BaseCharacter, amount: number): void {
-        this.actionQueue.addAction(new GenericAction(async () => {
-            const reliefBuff = new Stress(amount);
-            this.removeBuffFromCharacter(character, reliefBuff.getDisplayName(), amount);
-            console.log(`Relieved ${amount} Stress from ${character.name}`);
-            return [];
-        }));
+        this.actionQueue.addAction(new RelieveStressAction(character, amount));
     }
 
     public DoAThing(debugName: string, action: () => void): void {
@@ -1120,32 +927,7 @@ export class ActionManager {
     }
 
     public static beginTurn(): void {
-        ActionManager.getInstance().actionQueue.addAction(new GenericAction(async () => {
-            const gameState = GameState.getInstance();
-            const combatState = gameState.combatState;
-
-            // erase block from all player characters
-            combatState.playerCharacters.forEach(character => {
-                character.block = 0;
-            });
-
-            // Prevent dead enemies from gaining new intents
-            combatState.enemies.forEach(enemy => {
-                if (enemy.hitpoints > 0) {
-                    enemy.setNewIntents();
-                }
-            });
-
-            // Queue draw action instead of direct draw
-            ActionManager.getInstance().drawHandForNewTurn();
-
-            ProcBroadcaster.getInstance().retrieveAllRelevantBuffsForProcs(true).forEach(buff => {
-                buff.onTurnStart();
-            });
-            combatState.energyAvailable = combatState.defaultMaxEnergy;
-            UIContextManager.getInstance().setContext(UIContext.COMBAT);
-            return [];
-        }));
+        ActionManager.getInstance().actionQueue.addAction(new BeginTurnAction());
     }
 
     public static ExecuteIntents(): void {
@@ -1197,27 +979,7 @@ public chooseCardToDiscard(): void {
         cancellable: boolean;
         action: (selectedCards: PlayableCardType[]) => void;
     }): void {
-        const combatUiManager = CombatUiManager.getInstance();
-        const scene = combatUiManager.scene; // Assuming CombatUiManager can provide the current scene
-
-
-        // if the min number of cards is greater than the current hand size, just perform the action on the set of cards that are in the player's hand.
-        if (params.min > GameState.getInstance().combatState.currentHand.length) {
-            params.action(GameState.getInstance().combatState.currentHand as PlayableCardType[]);
-            return;
-        }
-
-        const selectionManager = new CardSelectionFromHandManager({
-            scene: scene,
-            action: params.action,
-            name: params.name,
-            instructions: params.instructions,
-            min: params.min,
-            max: params.max,
-            cancellable: params.cancellable
-        });
-
-        selectionManager.start();
+        this.actionQueue.addAction(new RequireCardSelectionAction(params));
     }
 
     private displayDamageNumber(params: {
@@ -1263,7 +1025,6 @@ public chooseCardToDiscard(): void {
     }
 }
 
-// {{ edit_1 }}
 // Define ActionNode class outside of ActionManager to ensure proper scope
 class ActionNode {
     constructor(public action: GameAction) { }
@@ -1321,51 +1082,5 @@ export class ActionQueue {
 
         ActionManager.getInstance().stateBasedEffects();
         this.isResolving = false;
-    }
-}
-
-export abstract class GameAction {
-    abstract playAction(): Promise<GameAction[]>;
-}
-
-export class GenericAction extends GameAction {
-    constructor(private actionFunction: () => Promise<GameAction[]>) {
-        super();
-    }
-
-    async playAction(): Promise<GameAction[]> {
-        return await this.actionFunction();
-    }
-}
-
-export class WaitAction extends GameAction {
-    constructor(private milliseconds: number) {
-        super();
-    }
-
-    async playAction(): Promise<GameAction[]> {
-        await new Promise(resolve => setTimeout(resolve, this.milliseconds));
-        return [];
-    }
-}
-
-export class SpentCombatResourceEvent extends AbstractCombatEvent {
-    printJson(): void {
-        console.log(`{"event": "SpentCombatResourceEvent", "resource": "${this.resourceAfterSpending.name}", "spent": ${this.spent}}`);
-    }
-    constructor(
-        public resourceAfterSpending: AbstractCombatResource,
-        public spent: number
-    ) {
-        super();
-    }
-}
-
-export class ExhaustEvent extends AbstractCombatEvent {
-    printJson(): void {
-        console.log(`{"event": "ExhaustEvent", "card": "${this.card.name}"}`);
-    }
-    constructor(public card: PlayableCard) {
-        super();
     }
 }

@@ -27,4 +27,8 @@ LIBRARY OF RUINA ENEMIES CONCEPTS
 *  Chopping Block: loads a card on it and, if the card remains, it is destroyed permanently (removed from master deck).
 * Troll: fake cards, pushed into your deck.
 *  Enemy puts a card continually into your hand, which if not played grants everyone a randomized but known status effect.
-* 
+*  Enemy binds last card played each turn.
+*  Enemy w lifesteal i g
+*  Enemy w temporary thorns
+* Enemy that loses value on death each turn.  (How to flavor?)
+
