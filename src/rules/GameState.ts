@@ -5,6 +5,7 @@ import type { PlayableCard } from '../gamecharacters/PlayableCard';
 import { LedgerItem } from '../ledger/LedgerItem';
 import type { LocationCard } from '../maplogic/LocationCard';
 import { AbstractRelic } from '../relics/AbstractRelic';
+import { EmergencyTeleporter } from '../relics/special/EmergencyTeleporter';
 import { AbstractTradeRoute } from '../screens/campaign/hq_ux/AbstractTradeRoute';
 import type { AutomatedCharacterType, BaseCharacterType } from '../Types';
 import type { PhysicalCard } from '../ui/PhysicalCard';
@@ -24,6 +25,8 @@ export class GameState {
         console.log('initializing run')
         this.rerollShop();
         this.combatState.playerCharacters = this.currentRunCharacters
+
+        this.relicsInventory.push(new EmergencyTeleporter())
 
         // Run onRunStart for each buff on each character
         this.currentRunCharacters.forEach(character => {

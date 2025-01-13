@@ -12,6 +12,7 @@ export class PhysicalBuff {
     tooltipAttachment: TooltipAttachment;
     scene: Phaser.Scene;
     shadowImage!: Phaser.GameObjects.Image;
+    selectOverlay!: Phaser.GameObjects.Image;
 
     constructor(scene: Phaser.Scene, x: number, y: number, abstractBuff: AbstractBuff) {
         this.scene = scene;
@@ -20,6 +21,11 @@ export class PhysicalBuff {
         const containerSize = 40;
 
         this.setBuffImage(scene, abstractBuff, containerSize);
+        
+        this.selectOverlay = scene.add.image(0, 0, 'select');
+        this.selectOverlay.setDisplaySize(containerSize, containerSize);
+        this.selectOverlay.setVisible(abstractBuff.clickable);
+        this.container.add(this.selectOverlay);
         
         this.stacksText = scene.add.text(0, 0, `${abstractBuff.stacks}`, {
             fontSize: '19px',
@@ -114,6 +120,7 @@ export class PhysicalBuff {
     destroy() {
         this.scene.events.off('pulseBuff', this.handlePulseEvent, this);
         this.tooltipAttachment.destroy();
+        this.selectOverlay.destroy();
         this.container.destroy();
     }
 

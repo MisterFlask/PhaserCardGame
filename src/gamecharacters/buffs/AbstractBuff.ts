@@ -223,6 +223,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
     public helpMode: boolean = false;
     private _stacks: number = 1;
     tint: number = 0xFFFFFF;
+    public clickable: boolean =  false
 
     get stacks(): number {
         return this._stacks;
