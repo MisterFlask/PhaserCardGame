@@ -15,7 +15,7 @@ export class SmogResource extends AbstractCombatResource {
         this.tint = 0x8B4513;
     }
 
-    public onClick(): void {
+    public onClick(): boolean {
         const gameState = GameState.getInstance();
         if (this.value >= 2) {
             if (gameState.combatState.currentDiscardPile.length > 0) {
@@ -36,6 +36,8 @@ export class SmogResource extends AbstractCombatResource {
                     }
                 });
             }
+            return true;
         }
+        return false;
     }
 } 

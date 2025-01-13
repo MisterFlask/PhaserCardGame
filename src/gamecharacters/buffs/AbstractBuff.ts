@@ -1,6 +1,7 @@
 import { LocationCard } from "../../maplogic/LocationCard";
 import { AbstractReward } from "../../rewards/AbstractReward";
 import type { AbstractCombatEvent } from "../../rules/AbstractCombatEvent";
+import { AbstractCombatResource } from "../../rules/combatresources/AbstractCombatResource";
 import type { DamageInfo } from "../../rules/DamageInfo";
 import type { CombatResources, CombatState, GameState, ShopContents } from "../../rules/GameState";
 import type { ActionManager } from "../../utils/ActionManager";
@@ -438,6 +439,10 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
     public modifyName(name: string): string {
         return name;
+    }
+
+    public afterCombatResourceSpent(resourceWithNewQuantity: AbstractCombatResource, amountSpent: number){
+
     }
 
 

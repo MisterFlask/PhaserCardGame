@@ -1,3 +1,5 @@
+import { AbstractCombatEvent } from "../AbstractCombatEvent";
+
 export abstract class AbstractCombatResource {
     name: string;
     description: string;
@@ -13,5 +15,40 @@ export abstract class AbstractCombatResource {
         this.glyph = glyph;
     }
 
-    public abstract onClick(): void;
+    // returns true if the resource was used, false if it was not used
+    public abstract onClick(): boolean;
 } 
+
+export class ResourceUsedEvent extends AbstractCombatEvent {
+    resource: AbstractCombatResource;
+    
+    printJson(): string {
+        return JSON.stringify({
+            type: "ResourceUsedEvent",
+            resource: this.resource
+        });
+    }
+    constructor(resource: AbstractCombatResource) {
+        super();
+        this.resource = resource;
+    }
+
+    public isAshes(): boolean {
+        return this.resource.name === "Ashes";
+    }
+    public isBlood(): boolean {
+        return this.resource.name === "Blood";
+    }
+    public isPluck(): boolean {
+        return this.resource.name === "Pluck";
+    }
+    public isMettle(): boolean {
+        return this.resource.name === "Mettle";
+    }
+    public isSmog(): boolean {
+        return this.resource.name === "Smog";
+    }
+    public isVenture(): boolean {
+        return this.resource.name === "Venture";
+    }
+}

@@ -4,9 +4,13 @@ import { Shoot } from "../../gamecharacters/playerclasses/cards/basic/Shoot";
 import { AbstractRelic } from "../AbstractRelic";
 
 export class Catspaw extends AbstractRelic {
+    private readonly BASE_DAMAGE = 2;
+
     constructor() {
         super();
         this.rarity = EntityRarity.COMMON;
+        this.stackable = true;
+        this.stacks = 1;
     }
 
     getDisplayName(): string {
@@ -14,12 +18,12 @@ export class Catspaw extends AbstractRelic {
     }
 
     getDescription(): string {
-        return "Shoot cards deal 2 more damage.";
+        return `Shoot cards deal ${this.BASE_DAMAGE * this.stacks} more damage.`;
     }
 
     public getCombatDamageDealtModifier(target: BaseCharacter, card: PlayableCard): number {
         if (card instanceof Shoot) {
-            return 2;
+            return this.BASE_DAMAGE * this.stacks;
         }
         return 0;
     }

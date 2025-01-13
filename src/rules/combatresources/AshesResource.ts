@@ -14,7 +14,7 @@ export class Ashes extends AbstractCombatResource {
         this.tint = 0xF5F5DC;
     }
 
-    public onClick(): void {
+    public onClick(): boolean {
         const gameState = GameState.getInstance();
         if (this.value >= 2) {
             ActionManager.getInstance().DoAThing("Ashes Resource Click", () => {
@@ -40,7 +40,8 @@ export class Ashes extends AbstractCombatResource {
                     this.value -= 2;
                 }
             });
+            return true;
         }
-
+        return false;
     } 
 } 

@@ -2,9 +2,13 @@ import { EntityRarity } from "../../gamecharacters/PlayableCard";
 import { AbstractRelic } from "../AbstractRelic";
 
 export class IronFilings extends AbstractRelic {
+    private readonly BASE_METTLE = 2;
+
     constructor() {
         super();
         this.rarity = EntityRarity.COMMON;
+        this.stackable = true;
+        this.stacks = 1;
     }
 
     getDisplayName(): string {
@@ -12,10 +16,10 @@ export class IronFilings extends AbstractRelic {
     }
 
     getDescription(): string {
-        return "At the start of combat, increase your Mettle by 2.";
+        return `At the start of combat, increase your Mettle by ${this.BASE_METTLE * this.stacks}.`;
     }
 
     onCombatStart(): void {
-        this.combatState.combatResources.modifyMettle(2);
+        this.combatState.combatResources.modifyMettle(this.BASE_METTLE * this.stacks);
     }
 }

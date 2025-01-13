@@ -2,9 +2,13 @@ import { EntityRarity } from "../../gamecharacters/PlayableCard";
 import { AbstractRelic } from "../AbstractRelic";
 
 export class TornPage extends AbstractRelic {
+    private readonly BASE_ASHES = 2;
+
     constructor() {
         super();
         this.rarity = EntityRarity.COMMON;
+        this.stackable = true;
+        this.stacks = 1;
     }
 
     getDisplayName(): string {
@@ -12,10 +16,10 @@ export class TornPage extends AbstractRelic {
     }
 
     getDescription(): string {
-        return "At the start of combat, increase your Pages by 2.";
+        return `At the start of combat, increase your Ashes by ${this.BASE_ASHES * this.stacks}.`;
     }
 
     onCombatStart(): void {
-        this.combatState.combatResources.modifyAshes(2);
+        this.combatState.combatResources.modifyAshes(this.BASE_ASHES * this.stacks);
     }
 }

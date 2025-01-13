@@ -13,12 +13,14 @@ export class VentureResource extends AbstractCombatResource {
         this.tint = 0xFFD700;
     }
 
-    public onClick(): void {
+    public onClick(): boolean {
         if (this.value >= 1) {
             ActionManager.getInstance().DoAThing("Venture Resource Click", () => {
                 ActionManager.getInstance().drawCards(1);
                 this.value -= 1;
             });
+            return true;
         }
+        return false;
     }
 } 

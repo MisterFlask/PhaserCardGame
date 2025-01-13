@@ -7,6 +7,7 @@ import { Charon } from '../encounters/monsters/special/Charon';
 import { AbstractEvent } from '../events/AbstractEvent';
 import { AbstractCard } from '../gamecharacters/AbstractCard';
 import { CardSize, CardType } from '../gamecharacters/Primitives';
+import { ProcBroadcaster } from '../gamecharacters/procs/ProcBroadcaster';
 import { RelicsLibrary } from '../relics/RelicsLibrary';
 import { AbstractReward } from '../rewards/AbstractReward';
 import { CardReward } from '../rewards/CardReward';
@@ -18,6 +19,7 @@ import { CardModifier } from '../rules/modifiers/AbstractCardModifier';
 import { RestSiteUpgradeOptionManager } from '../rules/RestSiteUpgradeOption';
 import { ActionManager } from '../utils/ActionManager';
 import { Faction } from './Faction';
+import { CombatRules } from '../rules/CombatRulesHelper';
 
 
 export class LocationCard extends AbstractCard {
@@ -123,6 +125,8 @@ export class BossRoomCard extends LocationCard {
         const cardRewards = CardRewardsGenerator.getInstance().generateCardRewardsForCombat();
         rewards.push(new CardReward(cardRewards));
         rewards.push(new CurrencyReward(200)); // Boss rooms give the most currency
+
+        const buffs = CombatRules.getCardRewardsForLocation(this);
         return rewards;
     }
 }

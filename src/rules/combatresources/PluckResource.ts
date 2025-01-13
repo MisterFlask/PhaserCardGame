@@ -15,7 +15,7 @@ export class PluckResource extends AbstractCombatResource {
         this.tint = 0x00ff00;
     }
 
-    public onClick(): void {
+    public onClick(): boolean {
         const gameState = GameState.getInstance();
         if (this.value >= 1) {
             ActionManager.getInstance().DoAThing("Pluck Resource Click", () => {
@@ -24,6 +24,8 @@ export class PluckResource extends AbstractCombatResource {
                 });
                 this.value -= 1;
             });
+            return true;
         }
+        return false;
     }
 } 

@@ -31,9 +31,13 @@ export class ProcBroadcaster {
     }   
 
 
-    public retrieveAllRelevantBuffsForProcs(inCombat: boolean): AbstractBuff[] {
+
+    public retrieveAllRelevantBuffsForProcs(inCombat: boolean, includeDeadEnemies: boolean = false): AbstractBuff[] {
         const buffs: AbstractBuff[] = [];
         GameState.getInstance().combatState.allPlayerAndEnemyCharacters.forEach(character => {
+            if (character.hitpoints <= 0 && !includeDeadEnemies) {
+                return;
+            }
             character.buffs.forEach(buff => {
                 buffs.push(buff);
             });
@@ -48,6 +52,9 @@ export class ProcBroadcaster {
         }else{
             // use master deck instead
             GameState.getInstance().masterDeckAllCharacters.forEach(card => {
+                if (card.owningCharacter && card.owningCharacter.hitpoints <= 0) {
+                    return;
+                }
                 card.buffs.forEach(buff => {
                     buffs.push(buff);
                 });

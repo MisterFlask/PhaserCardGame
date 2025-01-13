@@ -228,6 +228,8 @@ export class GameState {
 
 }
 
+
+
 export class CombatState{
 
     // Removed direct property, now using TransientUiState
@@ -238,6 +240,17 @@ export class CombatState{
 
     enemies: AutomatedCharacterType[] = []
     playerCharacters: PlayerCharacter[] = []
+
+    public getRightmostCardInHand(): PlayableCard | null {
+        return this.currentHand.length > 0 ? this.currentHand[this.currentHand.length - 1] : null;
+    }
+    public getLeftmostCardInHand(): PlayableCard | null {
+        return this.currentHand.length > 0 ? this.currentHand[0] : null;
+    }
+
+    public getTopNCardsInPile(pile: PlayableCard[], n: number): PlayableCard[] {
+        return pile.slice(-n);
+    }
 
     currentTurn: number = 0
 

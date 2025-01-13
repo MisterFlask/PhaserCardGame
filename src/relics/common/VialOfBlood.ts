@@ -2,9 +2,13 @@ import { EntityRarity } from "../../gamecharacters/PlayableCard";
 import { AbstractRelic } from "../AbstractRelic";
 
 export class VialOfBlood extends AbstractRelic {
+    private readonly BASE_BLOOD = 2;
+
     constructor() {
         super();
         this.rarity = EntityRarity.COMMON;
+        this.stackable = true;
+        this.stacks = 1;
     }
 
     getDisplayName(): string {
@@ -12,10 +16,10 @@ export class VialOfBlood extends AbstractRelic {
     }
 
     getDescription(): string {
-        return "At the start of combat, increase your Blood by 2.";
+        return `At the start of combat, increase your Blood by ${this.BASE_BLOOD * this.stacks}.`;
     }
 
     onCombatStart(): void {
-        this.combatState.combatResources.modifyBlood(2);
+        this.combatState.combatResources.modifyBlood(this.BASE_BLOOD * this.stacks);
     }
 }

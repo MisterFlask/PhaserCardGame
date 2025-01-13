@@ -14,7 +14,7 @@ export class MettleResource extends AbstractCombatResource {
         this.tint = 0x808080;
     }
 
-    public onClick(): void {
+    public onClick(): boolean {
         const gameState = GameState.getInstance();
         if (this.value >= 1) {
             ActionManager.getInstance().DoAThing("Iron Resource Click", () => {
@@ -26,6 +26,8 @@ export class MettleResource extends AbstractCombatResource {
                 });
                 this.value -= 1;
             });
+            return true;
         }
+        return false;
     }
 } 

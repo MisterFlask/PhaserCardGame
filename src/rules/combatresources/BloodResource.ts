@@ -14,13 +14,15 @@ export class BloodResource extends AbstractCombatResource {
         this.tint = 0xff0000;
     }
 
-    public onClick(): void {
+    public onClick(): boolean {
         const gameState = GameState.getInstance();
         if (this.value >= 2) {
             ActionManager.getInstance().DoAThing("Blood Resource Click", () => {
                 ActionManager.getInstance().gainEnergy(1);
                 this.value -= 2;
             });
+            return true;
         }
+        return false;
     }
 } 

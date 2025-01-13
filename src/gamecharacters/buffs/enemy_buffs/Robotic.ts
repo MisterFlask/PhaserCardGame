@@ -15,13 +15,20 @@ export class Robotic extends AbstractBuff {
     }
 
     override getDescription(): string {
-        return `Negates all Burning or Poison applied.`;
+        return `Negates every other debuff applied.`;
     }
 
     override interceptBuffApplication(character: AbstractCard, buffApplied: AbstractBuff, previousStacks: number, changeInStacks: number): BuffApplicationResult {
-        if (buffApplied.getDisplayName() === "Burning" || buffApplied.getDisplayName() === "Poison") {
-            return { logicTriggered: true, newChangeInStacks: 0 };
+        if (buffApplied.isDebuff && this.stacks > 0) {
+            this.stacks--;
+            return {
+                logicTriggered: false,
+                newChangeInStacks: 0
+            }
         }
-        return { logicTriggered: false, newChangeInStacks: changeInStacks };
+        return {
+            logicTriggered: true,
+            newChangeInStacks: changeInStacks
+        }
     }
 }
