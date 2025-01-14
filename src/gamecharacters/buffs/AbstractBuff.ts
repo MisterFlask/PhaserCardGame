@@ -72,7 +72,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
     }
 
     constructor(stacks: number = 1) {
-        this.imageName = "PLACEHOLDER_IMAGE";
+        this.imageName = "";
         this.id = generateWordGuid();
         this.stackable = true;
         this.stacks = stacks;
@@ -212,7 +212,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
     }
     
     canGoNegative: boolean = false;
-    imageName: string = "PLACEHOLDER_IMAGE";
+    imageName: string = "";
     id: string = generateWordGuid();
     stackable: boolean = true;
     // Note we have a different subsystem responsible for removing the buff once stacks is at 0.  That is not the responsibility of Invoke()

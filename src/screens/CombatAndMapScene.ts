@@ -9,6 +9,7 @@ import { PlayerCharacter } from '../gamecharacters/BaseCharacterClass';
 import { GameState } from '../rules/GameState';
 import { TextBoxButton } from '../ui/Button';
 import { CombatHighlightsManager } from '../ui/CombatHighlightsManager';
+import { DepthManager } from '../ui/DepthManager';
 import InventoryPanel from '../ui/InventoryPanel';
 import CombatSceneLayoutUtils from '../ui/LayoutUtils';
 import { PhysicalCard } from '../ui/PhysicalCard';
@@ -194,7 +195,7 @@ class CombatScene extends Phaser.Scene {
 
         this.campaignBriefStatus = new CampaignBriefStatus(this, true);
         this.add.existing(this.campaignBriefStatus);
-        this.campaignBriefStatus.depth = 100;
+        this.campaignBriefStatus.depth = DepthManager.getInstance().COMBAT_UI;
 
         this.characterDeckOverlay = new CharacterDeckOverlay(this);
         this.characterDeckOverlay.hide();

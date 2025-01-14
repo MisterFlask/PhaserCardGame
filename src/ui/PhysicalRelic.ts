@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { AbstractRelic } from '../relics/AbstractRelic';
+import ImageUtils from '../utils/ImageUtils';
 import { ShadowedImage } from './ShadowedImage';
 import { TextBox } from './TextBox';
 import { UIContext } from './UIContextManager';
@@ -15,6 +16,7 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
     private obliterated: boolean = false;
     private baseSize: number;
     stacksBox?: Phaser.GameObjects.Text;
+    private selectOverlay!: Phaser.GameObjects.Image;
 
     constructor({
         scene,
@@ -43,7 +45,7 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
         
         this.baseSize = baseSize;
 
-        const textureName = abstractRelic.imageName ?? "placeholder";
+        const textureName = abstractRelic.imageName.length > 0 ? abstractRelic.imageName : this.getAbstractIcon(abstractRelic);
         if (!scene.textures.exists(textureName)) {
             console.error(`Texture not found for key: ${textureName}`);
         }
@@ -59,6 +61,12 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
         
         this.relicImage = shadowedImage.mainImage;
         this.shadowImage = shadowedImage.shadowImage;
+
+        // Add select overlay
+        this.selectOverlay = scene.add.image(0, 0, 'select');
+        this.selectOverlay.setDisplaySize(baseSize, baseSize);
+        this.selectOverlay.setVisible(abstractRelic.clickable);
+        this.add(this.selectOverlay);
 
         // Create tooltip without specifying y position yet
         this.tooltipBox = new TextBox({
@@ -98,7 +106,11 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
 
         this.setupInteractivity();
     }
+    private getAbstractIcon(abstractBuff: AbstractRelic) : string{
+        return ImageUtils.getDeterministicAbstractPlaceholder(abstractBuff.getDisplayName());
+    }
 
+    
     setupInteractivity(): void {
         // Remove the container's interactivity and set it on the shadowed image's main image instead
         this.relicImage.setInteractive()
@@ -184,6 +196,7 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
     destroy(): void {
         console.log(`Destroying PhysicalRelic for: ${this.abstractRelic.getDisplayName()}`);
         this.stacksBox?.destroy();
+        this.selectOverlay?.destroy();
         super.destroy();
     }
 
