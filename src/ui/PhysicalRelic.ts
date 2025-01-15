@@ -63,10 +63,23 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
         this.shadowImage = shadowedImage.shadowImage;
 
         // Add select overlay
-        this.selectOverlay = scene.add.image(0, 0, 'select');
+        this.selectOverlay = scene.add.image(0, 0, 'square');
         this.selectOverlay.setDisplaySize(baseSize, baseSize);
         this.selectOverlay.setVisible(abstractRelic.clickable);
         this.add(this.selectOverlay);
+
+        // Add glow animation to select overlay
+        if (abstractRelic.clickable) {
+            scene.tweens.add({
+                targets: this.selectOverlay,
+                tint: { from: 0xffffff, to: 0xffa500 },
+                alpha: { from: 0.8, to: 1 },
+                duration: 1500,
+                yoyo: true,
+                repeat: -1,
+                ease: 'Sine.easeInOut'
+            });
+        }
 
         // Create tooltip without specifying y position yet
         this.tooltipBox = new TextBox({

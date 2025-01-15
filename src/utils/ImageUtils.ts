@@ -81,7 +81,7 @@ export default class GameImageLoader {
         },
         ui: {
             prefix: 'UI/',
-            files: ['drawpile.svg', 'discardpile.svg', 'placeholder.png', 'oops_image.webp', 'select.svg']
+            files: ['drawpile.svg', 'discardpile.svg', 'placeholder.png', 'oops_image.webp', 'select.svg', 'square.svg']
         },
         card_backgrounds: {
             prefix: 'Sprites/CardBackgrounds/',
