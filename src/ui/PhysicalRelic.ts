@@ -103,18 +103,22 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
 
         // Add stacks box if the relic has stacks
         if (abstractRelic.stackable) {
-            this.stacksBox = scene.add.text(-this.baseSize / 2 + 10, -this.baseSize / 2 + 10, 
+            this.stacksBox = scene.add.text(-this.baseSize / 2 + 10, -this.baseSize / 2 + 50, 
                 `${abstractRelic.stacks}`, 
                 {
-                    fontSize: '20px',
-                    padding: { x: 5, y: 5 },
+                    fontSize: '19px',
+                    color: '#ffffff',
+                    fontFamily: 'Arial',
+                    align: 'left',
+                    stroke: '#000000',
+                    strokeThickness: 3,
                     fixedWidth: 30,
-                    fixedHeight: 25,
-                    align: 'center'
+                    fixedHeight: 25
                 }
             );
+            this.stacksBox.setOrigin(0, 1);
             this.add(this.stacksBox);
-            this.stacksBox.setDepth(1);
+            this.stacksBox.setDepth(2);
         }
 
         this.setupInteractivity();
@@ -226,5 +230,6 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
         if (this.stacksBox && this.abstractRelic.stacks !== undefined) {
             this.stacksBox.setText(`${this.abstractRelic.stacks}`);
         }
+        this.tooltipBox.setText(`${this.abstractRelic.getDisplayName()}\n${this.abstractRelic.getDescription()}`);
     }
 }

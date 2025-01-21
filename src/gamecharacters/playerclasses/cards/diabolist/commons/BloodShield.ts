@@ -12,7 +12,7 @@ export class BloodShield extends PlayableCard {
         super({
             name: "Blood Shield",
             portraitName: "blood-shield",
-            targetingType: TargetingType.NO_TARGETING,
+            targetingType: TargetingType.ALLY,
         });
         this.baseBlock = 13;
         this.baseEnergyCost = 2;
@@ -29,7 +29,7 @@ export class BloodShield extends PlayableCard {
     }
 
     override InvokeCardEffects(targetCard?: BaseCharacter): void {
-        this.applyBlockToTarget(this.owningCharacter);
+        this.applyBlockToTarget(targetCard);
         BasicProcs.getInstance().SacrificeACardOtherThan(this);
     }
 }

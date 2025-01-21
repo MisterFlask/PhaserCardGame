@@ -445,6 +445,10 @@ export abstract class AbstractBuff implements IAbstractBuff {
     public afterCombatResourceSpent(resourceWithNewQuantity: AbstractCombatResource, amountSpent: number){
 
     }
+    
+    public modifyCombatResourceGained(resourceWithOldQuantity: AbstractCombatResource, amountToBeGained: number): CombatResourceGainedResult{
+        return {newAmountToBeGained: amountToBeGained, logicTriggered: false, preventGaining: false};
+    }
 
 
     public shouldRetainAfterTurnEnds(): boolean {
@@ -510,4 +514,10 @@ export class IncomingIntentInformation{
     public get id(): string {
         return this.comingFrom?.id + "#" + this.targetingCharacter.id + "#" + this.amountOfDamage;
     }
+}
+
+export class CombatResourceGainedResult{
+    newAmountToBeGained: number = 0;
+    logicTriggered: boolean = false;
+    preventGaining: boolean = false;
 }

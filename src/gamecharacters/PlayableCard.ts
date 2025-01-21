@@ -142,6 +142,22 @@ export abstract class PlayableCard extends AbstractCard {
         }
     }
 
+    performActionOnRandomAlly(callback: (ally: BaseCharacter) => void) {
+        const randomAlly = this.randomAlly();
+        if (randomAlly){
+            callback(randomAlly);
+        }
+    }
+
+    randomAlly(): BaseCharacter | undefined {
+        const allies = this.combatState.playerCharacters.filter(char => char.team === Team.ALLY && char.hitpoints > 0);
+        if (allies.length === 0) {
+            return undefined;
+        }
+        const randomIndex = Math.floor(Math.random() * allies.length);
+        return allies[randomIndex];
+    }
+
     OnPurchase(): void {
         console.log('Item purchased');
     }
@@ -159,8 +175,6 @@ export abstract class PlayableCard extends AbstractCard {
     allEnemies(): BaseCharacter[] {
         return [...this.combatState.enemies];
     }
-
-    
 
     /**
      * DO NOT OVERRIDE.

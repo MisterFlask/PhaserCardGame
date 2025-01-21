@@ -175,6 +175,7 @@ export class ActionManager {
 
     addRelicToInventory(relic: AbstractRelic) {
         GameState.getInstance().addRelic(relic, this.scene);
+        relic.init();
     }
 
 
@@ -668,6 +669,14 @@ export class ActionManager {
             }, 300);
 
         });
+    }
+
+    public loseHealth(
+        baseDamageAmount: number,
+        target: IBaseCharacter,
+        sourceCharacter?: IBaseCharacter,
+        sourceCard?: PlayableCardType,): void {
+        target.hitpoints = Math.max(0, target.hitpoints - baseDamageAmount);
     }
 
     public dealDamage = ({

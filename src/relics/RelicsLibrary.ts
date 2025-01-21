@@ -8,6 +8,7 @@ import { IronFilings } from './common/IronFilings';
 import { MistBottle } from './common/MistBottle';
 import { TornPage } from './common/TornPage';
 import { VialOfBlood } from './common/VialOfBlood';
+import { WraithInABottle } from './cursedcargo/WraithInABottle';
 
 export class RelicsLibrary {
     private static instance: RelicsLibrary;
@@ -23,7 +24,8 @@ export class RelicsLibrary {
             new IronFilings(),
             new GlassCross(),
             new CaskOfErrantSouls(),
-            new VialOfBlood()
+            new VialOfBlood(),
+            new WraithInABottle()
         ];
     }
 
