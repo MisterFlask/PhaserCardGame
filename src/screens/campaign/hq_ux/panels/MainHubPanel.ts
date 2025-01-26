@@ -89,7 +89,8 @@ export class MainHubPanel extends AbstractHqPanel {
             { text: 'Trade Routes', x: 0.4, y: 0.6, special: true },
             { text: 'Trade Goods', x: 0.6, y: 0.6 },
             { text: 'Personnel', x: 0.8, y: 0.6 },
-            { text: 'Expedition Loadout', x: 0.5, y: 0.75 }
+            { text: 'Expedition Loadout', x: 0.5, y: 0.75 },
+            { text: 'Liquidation', x: 0.5, y: 0.85 }
         ];
 
         buttons.forEach(({ text, x, y, special }) => {

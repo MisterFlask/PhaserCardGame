@@ -63,7 +63,7 @@ export class CharacterGenerator {
         return character;
     }
 
-    generateStartingDeck(characterClass: BaseCharacterClass): PlayableCard[] {
+    public generateStartingDeck(characterClass: BaseCharacterClass): PlayableCard[] {
         return [
             new FireRevolver(), 
             this.generateImprovedShoot(),

@@ -1,14 +1,14 @@
 import { EntityRarity } from "../../gamecharacters/PlayableCard";
 import { AbstractRelic } from "../AbstractRelic";
 
-export class DissonantMonument extends AbstractRelic {
+export class AkashicNewspaper extends AbstractRelic {
     constructor() {
         super();
         this.rarity = EntityRarity.RARE;
     }
 
     override getDisplayName(): string {
-        return "Dissonant Monument";
+        return "Akashic Newspaper";
     }
 
     override getDescription(): string {

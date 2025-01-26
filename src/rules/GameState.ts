@@ -1,6 +1,7 @@
 import { Encounter } from '../encounters/EncountersList';
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
 import type { PlayerCharacter } from '../gamecharacters/BaseCharacterClass';
+import { CharacterGenerator } from '../gamecharacters/CharacterGenerator';
 import type { PlayableCard } from '../gamecharacters/PlayableCard';
 import { LedgerItem } from '../ledger/LedgerItem';
 import type { LocationCard } from '../maplogic/LocationCard';
@@ -26,6 +27,7 @@ export class GameState {
         this.rerollShop();
         this.combatState.playerCharacters = this.currentRunCharacters
 
+        this.relicsInventory = []
         this.relicsInventory.push(new EmergencyTeleporter())
 
         // Run onRunStart for each buff on each character
@@ -34,6 +36,19 @@ export class GameState {
                 buff.onRunStart();
             });
         });
+    }
+
+    public cleanUpAfterLiquidation(){
+        this.relicsInventory = []
+        this.currentRunCharacters.forEach(character => {
+            character.buffs = character.buffs.filter(buff => buff.isPersonaTrait);
+            character.cardsInMasterDeck = CharacterGenerator.getInstance().generateStartingDeck(character.characterClass)
+        });
+        this.currentRunCharacters = []
+        this.roster = []
+        this.currentLocation = null
+        this.locations = []
+        this.mapInitialized = false
     }
 
     private static instance: GameState;
@@ -155,7 +170,7 @@ export class GameState {
 
         // todo: other shops
         this.cursedGoodsShopContents.shopCardsForSale = ShopPopulator.getInstance().getCursedGoodsCards();
-        this.cursedGoodsShopContents.shopRelicsForSale = [];
+        this.cursedGoodsShopContents.shopRelicsForSale = ShopPopulator.getInstance().getCursedGoodsRelics();
         this.cursedGoodsShopContents.interestInPurchasingImports = false;
         
         this.importShopContents.interestInPurchasingImports = true;
@@ -168,6 +183,8 @@ export class GameState {
         this.roster = [];
         this.currentRunCharacters = [];
         this.combatShopContents = new ShopContents();
+        this.cursedGoodsShopContents = new ShopContents();
+        this.importShopContents = new ShopContents();
     }
 
     // Serializer function

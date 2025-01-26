@@ -20,7 +20,7 @@ export class BurningCommissar extends PlayableCard {
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage. Ambient: At the end of combat, if you did NOT spend Mettle, every ally takes 2 Stress.  (You have spent this much Mettle: ${this.mettleSpentThisCombat})`;
+        return `Deal ${this.getDisplayedDamage()} damage. At the end of combat, if you did NOT spend Mettle, every ally takes 2 Stress.`;
     }
 
     OnCombatStart(): void {

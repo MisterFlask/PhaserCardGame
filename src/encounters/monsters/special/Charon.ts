@@ -44,9 +44,26 @@ export class MoveToNextActChoice extends AbstractChoice {
 export class MoveToNextActEvent extends AbstractEvent {
     constructor() {
         super();
-        this.description = "Move to the next act";
-        this.name = "Move to Next Act";
-        this.choices = [new MoveToNextActChoice()];
+        this.description = "Continue, or go back?";
+        this.name = "Region Complete!";
+        this.choices = [new MoveToNextActChoice(), new FinishExpeditionChoice()];
     }
 }
+
+export class FinishExpeditionChoice extends AbstractChoice {
+    constructor() {
+        super("Finish Expedition");
+        this.nextEvent = null;
+    }
+
+    override canChoose(): boolean {
+        return true;
+    }
+
+    override effect(): void {
+        ActionManagerFetcher.getActChanger().FinishExpedition();
+    }
+}
+
+
 

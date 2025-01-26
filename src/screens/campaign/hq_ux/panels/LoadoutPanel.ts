@@ -117,12 +117,11 @@ export class LoadoutPanel extends AbstractHqPanel {
     }
 
     private isReadyToLaunch(): boolean {
-        const campaignState = CampaignUiState.getInstance();
-        return (
-            campaignState.selectedParty.length === 3 &&
-            campaignState.selectedTradeRoute !== null &&
-            this.hasValidEquipment()
-        );
+        var readinessState = this.getReadinessStatus()
+        if (!readinessState.ready) {
+            console.log("LoadoutPanel is not ready to launch: ", readinessState.reasons);
+        }
+        return readinessState.ready;
     }
 
     private hasValidEquipment(): boolean {

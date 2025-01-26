@@ -245,11 +245,11 @@ class GeneralRewardScreen {
         },
         reward: AbstractReward
     ): void {
-        ro.iconBackground.destroy();
-        ro.icon.destroy();
-        ro.text.destroy();
-        ro.tooltipBackground.destroy();
-        ro.tooltipText.destroy();
+        ro.iconBackground?.destroy();
+        ro.icon?.destroy();
+        ro.text?.destroy();
+        ro.tooltipBackground?.destroy();
+        ro.tooltipText?.destroy();
 
         const idx = this.rewards.indexOf(reward);
         if (idx >= 0) {

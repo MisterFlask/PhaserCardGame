@@ -1,10 +1,10 @@
-import { GameState } from "../../../../rules/GameState";
-import { TargetingType } from "../../../AbstractCard";
-import { EntityRarity, PlayableCard } from "../../../PlayableCard";
-import { CardType } from "../../../Primitives";
-import { ExhaustBuff } from "../../../buffs/playable_card/ExhaustBuff";
-import { RetainBuff } from "../../../buffs/playable_card/Retain";
-import { CoinOnTheGround } from "./CoinOnTheGround";
+import { GameState } from "../../../rules/GameState";
+import { TargetingType } from "../../../gamecharacters/AbstractCard";
+import { EntityRarity, PlayableCard } from "../../../gamecharacters/PlayableCard";
+import { CardType } from "../../../gamecharacters/Primitives";
+import { ExhaustBuff } from "../../../gamecharacters/buffs/playable_card/ExhaustBuff";
+import { RetainBuff } from "../../../gamecharacters/buffs/playable_card/Retain";
+import { CoinOnTheGround } from "../../../gamecharacters/playerclasses/cards/other/CoinOnTheGround";
 
 export class TomeOfAvarice extends PlayableCard {
     constructor() {

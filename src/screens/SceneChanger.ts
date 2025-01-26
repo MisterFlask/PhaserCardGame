@@ -1,8 +1,11 @@
 import Phaser from 'phaser';
 import { Encounter } from '../encounters/EncountersList';
 import { GameState } from '../rules/GameState';
+import { TransientUiState } from '../ui/TransientUiState';
 
 export class SceneChanger {
+    
+    
     private static currentScene: Phaser.Scene | null = null;
 
     private static switchScene(sceneName: string, params?: object): void {
@@ -20,7 +23,13 @@ export class SceneChanger {
     // }
 
     public static switchToCampaignScene(): void {
-        SceneChanger.switchScene('Campaign');
+        SceneChanger.switchScene('HqScene');
+    }
+
+    public static switchToExpeditionFinishedScene(): void {
+        TransientUiState.getInstance().showLiquidationPanel = true;
+        SceneChanger.switchScene('HqScene');
+
     }
 
     public static switchToCombatScene(encounter: Encounter, shouldStartWithMapOverlay: boolean = false): void {

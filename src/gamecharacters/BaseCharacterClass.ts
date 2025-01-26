@@ -9,9 +9,8 @@ export abstract class BaseCharacterClass {
         this.availableCards = []
         this.id = id
         this.startingMaxHp = startingMaxHp
-
-        
     }
+    
     id: string;
     name: string
     iconName: string
@@ -24,6 +23,11 @@ export abstract class BaseCharacterClass {
 
     initialize() {
         this.availableCards.forEach(card => card.nativeToCharacterClass = this)
+    }
+
+
+    public getUniqueStartingCards(): PlayableCard[] {
+        return []
     }
 
 

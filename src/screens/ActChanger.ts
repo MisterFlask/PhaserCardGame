@@ -13,6 +13,9 @@ export class ActChanger {
     public static getInitialInstance(scene: Phaser.Scene): ActChanger {
         return new ActChanger(scene);
     }
+    public FinishExpedition() {
+        SceneChanger.switchToExpeditionFinishedScene();
+    }
 
     public AdvanceAct(): void {
         const gameState = GameState.getInstance();
@@ -29,6 +32,7 @@ export class ActChanger {
         if (locations.length > 0) {
             gameState.setCurrentLocation(locations[0]);
         }
+
         SceneChanger.switchToCombatScene(EncounterManager.getInstance().getShopEncounter(), true);
 
         // Emit event to show map overlay

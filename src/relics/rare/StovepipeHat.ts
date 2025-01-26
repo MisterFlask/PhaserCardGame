@@ -10,7 +10,7 @@ export class StovepipeHat extends AbstractRelic {
     }
 
     getDisplayName(): string {
-        return 'Smog Manufacturer';
+        return 'Stovepipe Hat';
     }
 
     getDescription(): string {

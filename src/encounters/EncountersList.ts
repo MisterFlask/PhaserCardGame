@@ -213,7 +213,7 @@ export class TreasureChest extends AutomatedCharacter {
             maxHitpoints: 1, 
             description: 'Contains valuable treasures' 
         });
-        this.relic = RelicsLibrary.getInstance().getRandomRelics(1)[0];
+        this.relic = RelicsLibrary.getInstance().getRandomBeneficialRelics(1)[0];
         if (!this.relic) {
             throw new Error("Failed to retrieve a relic");
         }

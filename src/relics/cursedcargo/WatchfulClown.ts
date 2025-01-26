@@ -1,8 +1,8 @@
-import { TargetingType } from "../../../AbstractCard";
-import { EntityRarity, PlayableCard } from "../../../PlayableCard";
-import { CardType } from "../../../Primitives";
-import { AbstractBuff } from "../../../buffs/AbstractBuff";
-import { Jumpscare } from "./Jumpscare";
+import { TargetingType } from "../../gamecharacters/AbstractCard";
+import { EntityRarity, PlayableCard } from "../../gamecharacters/PlayableCard";
+import { CardType } from "../../gamecharacters/Primitives";
+import { AbstractBuff } from "../../gamecharacters/buffs/AbstractBuff";
+import { Jumpscare } from "../../gamecharacters/playerclasses/cards/curse/Jumpscare";
 
 class AmbientJumpscareBuff extends AbstractBuff {
     constructor() {
@@ -40,10 +40,10 @@ class AmbientJumpscareBuff extends AbstractBuff {
     }
 }
 
-export class AmbientJumpscare extends PlayableCard {
+export class WatchfulClown extends PlayableCard {
     constructor() {
         super({
-            name: "Ambient Jumpscare",
+            name: "Watchful Clown",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.SPECIAL,

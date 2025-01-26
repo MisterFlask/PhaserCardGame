@@ -27,7 +27,7 @@ export class DebugMenu {
     private currentBackgroundPage = 0;
 
     private allCards = CardLibrary.getInstance().getAllCards();
-    private allRelics = RelicsLibrary.getInstance().getAllRelics();
+    private allRelics = RelicsLibrary.getInstance().getAllBeneficialRelics();
     private allBackgrounds: string[] = [];
 
     constructor(scene: Scene) {
@@ -103,6 +103,18 @@ export class DebugMenu {
                     cState.modifySmog(4);
                     cState.modifyBlood(4);
                     cState.modifyPluck(4);
+                }
+            },
+            {
+                text: 'Add Surface Currency (+1000)',
+                callback: () => {
+                    GameState.getInstance().surfaceCurrency += 1000;
+                }
+            },
+            {
+                text: 'Add Hell Currency (+1000)',
+                callback: () => {
+                    GameState.getInstance().hellCurrency += 1000;
                 }
             },
             { text: 'Close', callback: () => this.hide() }

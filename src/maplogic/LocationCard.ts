@@ -213,7 +213,7 @@ export class EliteRoomCard extends LocationCard {
         const cardRewards = CardRewardsGenerator.getInstance().generateCardRewardsForCombat();
         rewards.push(new CardReward(cardRewards));
         rewards.push(new CurrencyReward(55)); // Elite rooms give more currency
-        rewards.push(new RelicReward(RelicsLibrary.getInstance().getRandomRelics(1)[0]));
+        rewards.push(new RelicReward(RelicsLibrary.getInstance().getRandomBeneficialRelics(1)[0]));
         return rewards;
     }
 

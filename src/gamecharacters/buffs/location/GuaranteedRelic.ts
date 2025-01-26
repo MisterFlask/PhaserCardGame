@@ -18,7 +18,7 @@ export class GuaranteedRelic extends AbstractBuff {
     }
 
     override alterRewards(currentRewards: AbstractReward[]): AbstractReward[] {
-        const relic = RelicsLibrary.getInstance().getRandomRelics(1)[0];
+        const relic = RelicsLibrary.getInstance().getRandomBeneficialRelics(1)[0];
         currentRewards.push(new RelicReward(relic));
         return currentRewards;
     }

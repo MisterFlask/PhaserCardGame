@@ -1,10 +1,13 @@
 import { Scene } from 'phaser';
 import { GameState } from '../../../rules/GameState';
+import { TransientUiState } from '../../../ui/TransientUiState';
 import { ActionManagerFetcher } from '../../../utils/ActionManagerFetcher';
 import GameImageLoader from '../../../utils/ImageUtils';
 import { SceneChanger } from '../../SceneChanger';
 import { CampaignUiState } from './CampaignUiState';
+import { AbstractHqPanel } from './panels/AbstractHqPanel';
 import { InvestmentPanel } from './panels/InvestmentPanel';
+import { LiquidationPanel } from './panels/LiquidationPanel';
 import { LoadoutPanel } from './panels/LoadoutPanel';
 import { MainHubPanel } from './panels/MainHubPanel';
 import { PersonnelPanel } from './panels/PersonnelPanel';
@@ -12,13 +15,14 @@ import { TradeGoodsPanel } from './panels/TradeGoodsPanel';
 import { TradeRouteSelectionPanel } from './panels/TradeRouteSelectionPanel';
 
 export class HqScene extends Scene {
-    private currentPanel?: Phaser.GameObjects.Container;
+    private currentPanel?: AbstractHqPanel;
     private mainHubPanel!: MainHubPanel;
     private investmentPanel!: InvestmentPanel;
     private tradePanel!: TradeRouteSelectionPanel;
     private personnelPanel!: PersonnelPanel;
     private loadoutPanel!: LoadoutPanel;
     private tradeGoodsPanel!: TradeGoodsPanel;
+    private liquidationPanel!: LiquidationPanel;
 
     constructor() {
         super({ key: 'HqScene' });
@@ -58,7 +62,6 @@ export class HqScene extends Scene {
     }
 
     create(): void {
-
         // Initialize all panels
         this.mainHubPanel = new MainHubPanel(this);
         this.investmentPanel = new InvestmentPanel(this);
@@ -66,6 +69,7 @@ export class HqScene extends Scene {
         this.personnelPanel = new PersonnelPanel(this);
         this.loadoutPanel = new LoadoutPanel(this);
         this.tradeGoodsPanel = new TradeGoodsPanel(this);
+        this.liquidationPanel = new LiquidationPanel(this);
 
         // Hide all panels initially
         [
@@ -73,7 +77,8 @@ export class HqScene extends Scene {
             this.tradePanel,
             this.personnelPanel,
             this.loadoutPanel,
-            this.tradeGoodsPanel
+            this.tradeGoodsPanel,
+            this.liquidationPanel
         ].forEach(panel => panel.hide());
 
         // Show main hub initially
@@ -92,13 +97,16 @@ export class HqScene extends Scene {
         });
     }
 
-    private showPanel(panelKey: 'main' | 'investment' | 'trade' | 'personnel' | 'loadout' | 'tradegoods'): void {
-        // Hide current panel
+    private showPanel(
+        panelKey: 'main' | 'investment' | 'trade' | 'personnel' | 'loadout' | 'tradegoods' | 'liquidation'
+    ): void {
         if (this.currentPanel) {
             this.currentPanel.setVisible(false);
+            this.currentPanel.hide();
+            // optionally set a lower depth for the old panel
+            this.currentPanel.setDepth(0);
         }
 
-        // Show requested panel
         switch (panelKey) {
             case 'main':
                 this.currentPanel = this.mainHubPanel;
@@ -118,9 +126,16 @@ export class HqScene extends Scene {
             case 'tradegoods':
                 this.currentPanel = this.tradeGoodsPanel;
                 break;
+            case 'liquidation':
+                console.log('selected liquidation panel');
+                this.currentPanel = this.liquidationPanel;
+                break;
         }
-
+        
         this.currentPanel?.setVisible(true);
+        this.currentPanel?.show();
+        // Force it to a large depth
+        this.currentPanel?.setDepth(999);
     }
 
     private handleNavigation(destination: string): void {
@@ -139,6 +154,9 @@ export class HqScene extends Scene {
                 break;
             case 'trade goods':
                 this.showPanel('tradegoods');
+                break;
+            case 'liquidation':
+                this.showPanel('liquidation');
                 break;
             default:
                 console.warn(`Unknown destination: ${destination}`);
@@ -185,6 +203,11 @@ export class HqScene extends Scene {
         // Update current panel
         if (this.currentPanel && 'update' in this.currentPanel) {
             (this.currentPanel as any).update(time, delta);
+        }
+
+        if (TransientUiState.getInstance().showLiquidationPanel) {
+            this.showPanel('liquidation');
+            TransientUiState.getInstance().showLiquidationPanel = false;
         }
     }
 

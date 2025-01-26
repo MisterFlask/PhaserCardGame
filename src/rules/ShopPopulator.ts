@@ -1,5 +1,5 @@
+import { SurfaceSellValue } from '../gamecharacters/buffs/standard/SurfaceSellValue';
 import { PlayableCard } from '../gamecharacters/PlayableCard';
-import { Rummage } from '../gamecharacters/playerclasses/cards/basic/Rummage';
 import { CardLibrary } from '../gamecharacters/playerclasses/cards/CardLibrary';
 import { AbstractRelic } from '../relics/AbstractRelic';
 import { RelicsLibrary } from '../relics/RelicsLibrary';
@@ -106,7 +106,7 @@ export class ShopPopulator {
 
     public getCombatShopRelics(): AbstractRelic[] {
         const items: AbstractRelic[] = [];
-        const relics = RelicsLibrary.getInstance().getRandomRelics(ShopPopulator.NUM_RELICS_PER_SHOP);
+        const relics = RelicsLibrary.getInstance().getRandomBeneficialRelics(ShopPopulator.NUM_RELICS_PER_SHOP);
         relics.forEach(relic => {
             items.push(relic);
             relic.price = this.getRelicPrice(relic);
@@ -115,7 +115,22 @@ export class ShopPopulator {
     }
 
     public getCursedGoodsCards(): PlayableCard[]{
-        return [new Rummage()]; //todo: add more cursed goods cards
+        // take a random 2 cards from the relics library
+        const cards = RelicsLibrary.getInstance().getRandomCursedCards(ShopPopulator.NUM_CARDS_PER_SHOP);
+        cards.forEach(card => {
+            card.applyBuffs_useFromActionManager([new SurfaceSellValue(Math.floor(Math.random() * 200) + 1)])
+            card.hellPurchaseValue = this.getCardPrice(card) / 2;
+        });
+        return cards;
+    }
+
+    public getCursedGoodsRelics(): AbstractRelic[] {
+        const relics = RelicsLibrary.getInstance().getRandomCursedRelics(ShopPopulator.NUM_RELICS_PER_SHOP);
+        relics.forEach(relic => {
+            relic.price = this.getRelicPrice(relic) / 2;
+            relic.surfaceSellValue = Math.floor(Math.random() * 200) + 1;
+        });
+        return relics;
     }
 }
 
