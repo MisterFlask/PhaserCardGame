@@ -104,23 +104,28 @@ export class LiquidationPanel extends AbstractHqPanel {
 
         // Display values for each character's cards
         gameState.currentRunCharacters.forEach((character: PlayerCharacter) => {
-            // Add character name
-            const characterNameText = new TextBox({
-                scene: this.scene,
-                x: this.scene.scale.width / 2,
-                y: yOffset,
-                width: 400,
-                height: 30,
-                text: `${character.name}'s Cards:`,
-                style: { fontSize: '20px', color: '#ffffff' }
-            });
-            this.contentContainer.add(characterNameText);
-            yOffset += 40;
+            // Filter out cards that have a surfaceSellValue
+            const sellableCards = gameState
+                .getCardsOwnedByCharacter(character)
+                .filter(card => card.surfaceSellValue > 0);
 
-            // Get character's cards
-            const characterCards = gameState.getCardsOwnedByCharacter(character);
-            characterCards.forEach((card: PlayableCard) => {
-                if (card.surfaceSellValue > 0) {
+            // Only display if the character actually has cargo
+            if (sellableCards.length > 0) {
+                // Add character name
+                const characterNameText = new TextBox({
+                    scene: this.scene,
+                    x: this.scene.scale.width / 2,
+                    y: yOffset,
+                    width: 400,
+                    height: 30,
+                    text: `${character.name}'s Cards:`,
+                    style: { fontSize: '20px', color: '#ffffff' }
+                });
+                this.contentContainer.add(characterNameText);
+                yOffset += 40;
+
+                // Display the sellable cards
+                sellableCards.forEach((card: PlayableCard) => {
                     this.createItemRow(
                         card.getEffectivePortraitName(this.scene),
                         `${card.name}: $${card.surfaceSellValue}`,
@@ -132,9 +137,10 @@ export class LiquidationPanel extends AbstractHqPanel {
                     yOffset += 50;
                     totalValue += card.surfaceSellValue;
                     hasItems = true;
-                }
-            });
-            yOffset += 20;
+                });
+
+                yOffset += 20;
+            }
         });
 
         // Display values for relics
@@ -166,6 +172,33 @@ export class LiquidationPanel extends AbstractHqPanel {
                     hasItems = true;
                 }
             });
+        }
+
+        // After relics section, add promissory notes section
+        const promissoryValue = gameState.hellExportCurrency || 0;
+        if (promissoryValue > 0) {
+            const promissoryHeaderText = new TextBox({
+                scene: this.scene,
+                x: this.scene.scale.width / 2,
+                y: yOffset,
+                width: 400,
+                height: 30,
+                text: 'Promissory Notes:',
+                style: { fontSize: '20px', color: '#ffffff' }
+            });
+            this.contentContainer.add(promissoryHeaderText);
+            yOffset += 40;
+
+            this.createItemRow(
+                'promissory_note', // Make sure this texture exists
+                `Promissory Notes: $${promissoryValue}`,
+                promissoryValue,
+                this.scene.scale.width / 2 - 200,
+                yOffset
+            );
+            yOffset += 50;
+            totalValue += promissoryValue;
+            hasItems = hasItems || promissoryValue > 0;
         }
 
         // Show/hide the "no items" message and profit button
@@ -235,8 +268,14 @@ export class LiquidationPanel extends AbstractHqPanel {
             totalValue += relic.surfaceSellValue;
         });
 
+        // Add promissory notes value
+        totalValue += (gameState.hellExportCurrency || 0);
+
         // Add value to surface currency
         gameState.surfaceCurrency += totalValue;
+        
+        // Clear promissory notes after converting to surface currency
+        gameState.hellExportCurrency = 0;
 
         // Return to hub
         gameState.cleanUpAfterLiquidation();
@@ -245,7 +284,8 @@ export class LiquidationPanel extends AbstractHqPanel {
     }
 
     update(): void {
-        this.displayValues();
+        // this.displayValues(); 
+        // (no need to re-render every frame)
     }
 
     // Override the hide method to ensure proper cleanup
