@@ -4,7 +4,6 @@ import { PlayableCard } from '../../../../gamecharacters/PlayableCard';
 import { AbstractRelic } from '../../../../relics/AbstractRelic';
 import { GameState } from '../../../../rules/GameState';
 import { TextBoxButton } from '../../../../ui/Button';
-import { DepthManager } from '../../../../ui/DepthManager';
 import { ShadowedImage } from '../../../../ui/ShadowedImage';
 import { TextBox } from '../../../../ui/TextBox';
 import { AbstractHqPanel } from './AbstractHqPanel';
@@ -122,37 +121,20 @@ export class LiquidationPanel extends AbstractHqPanel {
             const characterCards = gameState.getCardsOwnedByCharacter(character);
             characterCards.forEach((card: PlayableCard) => {
                 if (card.surfaceSellValue > 0) {
-                    // Create a container for this item row
-                    const rowContainer = this.scene.add.container(this.scene.scale.width / 2 - 200, yOffset);
-                    
-                    // Add card image
-                    const cardImage = new ShadowedImage({
-                        scene: this.scene,
-                        texture: card.getEffectivePortraitName(this.scene),
-                        displaySize: 64,
-                        tint: card.getEffectivePortraitTint(this.scene)
-                    });
-                    cardImage.setScale(0.4); // Adjust scale as needed
-                    rowContainer.add(cardImage);
-
-                    const cardValueText = new TextBox({
-                        scene: this.scene,
-                        x: 100, // Offset from image
-                        y: 0,
-                        width: 300,
-                        height: 25,
-                        text: `${card.name}: $${card.surfaceSellValue}`,
-                        style: { fontSize: '16px', color: '#ffffff' }
-                    });
-                    rowContainer.add(cardValueText);
-                    
-                    this.contentContainer.add(rowContainer);
-                    yOffset += 50; // Increased spacing for rows with images
+                    this.createItemRow(
+                        card.getEffectivePortraitName(this.scene),
+                        `${card.name}: $${card.surfaceSellValue}`,
+                        card.surfaceSellValue,
+                        this.scene.scale.width / 2 - 200,
+                        yOffset,
+                        card.getEffectivePortraitTint(this.scene)
+                    );
+                    yOffset += 50;
                     totalValue += card.surfaceSellValue;
                     hasItems = true;
                 }
             });
-            yOffset += 20; // Add some space between characters
+            yOffset += 20;
         });
 
         // Display values for relics
@@ -171,47 +153,69 @@ export class LiquidationPanel extends AbstractHqPanel {
 
             gameState.relicsInventory.forEach((relic: AbstractRelic) => {
                 if (relic.surfaceSellValue > 0) {
-                    // Create a container for this item row
-                    const rowContainer = this.scene.add.container(this.scene.scale.width / 2 - 200, yOffset);
-                    
-                    // Add relic image
-                    const relicImage = new ShadowedImage({
-                        scene: this.scene,
-                        texture: relic.imageName,
-                        displaySize: 64,
-                        tint: relic.tint
-                    });
-                    relicImage.setScale(0.8); // Adjust scale as needed
-                    rowContainer.add(relicImage);
-
-                    const relicValueText = new TextBox({
-                        scene: this.scene,
-                        x: 100, // Offset from image
-                        y: 0,
-                        width: 300,
-                        height: 25,
-                        text: `${relic.getDisplayName()}: $${relic.surfaceSellValue}`,
-                        style: { fontSize: '16px', color: '#ffffff' }
-                    });
-                    rowContainer.add(relicValueText);
-                    
-                    this.contentContainer.add(rowContainer);
-                    yOffset += 50; // Increased spacing for rows with images
+                    this.createItemRow(
+                        relic.imageName,
+                        `${relic.getDisplayName()}: $${relic.surfaceSellValue}`,
+                        relic.surfaceSellValue,
+                        this.scene.scale.width / 2 - 200,
+                        yOffset,
+                        relic.tint
+                    );
+                    yOffset += 50;
                     totalValue += relic.surfaceSellValue;
                     hasItems = true;
                 }
             });
         }
 
-        // Show/hide the "no items" message and profit button based on whether we have items
+        // Show/hide the "no items" message and profit button
         this.noItemsText.setVisible(!hasItems);
         this.profitButton.setVisible(hasItems);
 
         // Update total value display
         this.totalValueText.setText(`Total Value: $${totalValue}`);
-        
-        // Ensure proper depth
-        this.contentContainer.setDepth(DepthManager.getInstance().UI_BASE);
+
+        // Ensure the content container is above the overlay
+        this.contentContainer.setDepth(999);
+    }
+
+    // Slightly adjusted helper method to ensure icons appear on top of text
+    private createItemRow(
+        texture: string,
+        displayText: string,
+        value: number,
+        xPos: number,
+        yPos: number,
+        tint?: number
+    ): void {
+        const rowContainer = this.scene.add.container(xPos, yPos);
+        // Let the container itself have depth 999
+        rowContainer.setDepth(999);
+
+        // Add the label text first
+        const itemLabel = new TextBox({
+            scene: this.scene,
+            x: 100,
+            y: 0,
+            width: 300,
+            height: 25,
+            text: displayText,
+            style: { fontSize: '16px', color: '#ffffff' }
+        });
+        rowContainer.add(itemLabel);
+
+        // Add the icon last so it appears above
+        const itemImage = new ShadowedImage({
+            scene: this.scene,
+            texture,
+            displaySize: 64,
+            tint
+        });
+        // Slight scale if needed
+        itemImage.setScale(0.8);
+        rowContainer.add(itemImage);
+
+        this.contentContainer.add(rowContainer);
     }
 
     private handleProfit(): void {
