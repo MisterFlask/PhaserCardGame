@@ -6,6 +6,7 @@ import { GameState } from '../../../../rules/GameState';
 import { TextBoxButton } from '../../../../ui/Button';
 import { ShadowedImage } from '../../../../ui/ShadowedImage';
 import { TextBox } from '../../../../ui/TextBox';
+import { CampaignUiState } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
 
 export class LiquidationPanel extends AbstractHqPanel {
@@ -175,7 +176,7 @@ export class LiquidationPanel extends AbstractHqPanel {
         }
 
         // After relics section, add promissory notes section
-        const promissoryValue = gameState.hellExportCurrency || 0;
+        const promissoryValue = gameState.promissoryNotes || 0;
         if (promissoryValue > 0) {
             const promissoryHeaderText = new TextBox({
                 scene: this.scene,
@@ -269,17 +270,17 @@ export class LiquidationPanel extends AbstractHqPanel {
         });
 
         // Add promissory notes value
-        totalValue += (gameState.hellExportCurrency || 0);
+        totalValue += (gameState.promissoryNotes || 0);
 
         // Add value to surface currency
-        gameState.surfaceCurrency += totalValue;
+        gameState.moneyInVault += totalValue;
         
         // Clear promissory notes after converting to surface currency
-        gameState.hellExportCurrency = 0;
+        gameState.promissoryNotes = 0;
 
         // Return to hub
         gameState.cleanUpAfterLiquidation();
-        
+        CampaignUiState.getInstance().reinitializeCampaignUiStateAfterRun();
         this.returnToHub();
     }
 

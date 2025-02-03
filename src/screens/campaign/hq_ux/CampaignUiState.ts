@@ -32,8 +32,16 @@ export class CampaignUiState {
         return CampaignUiState.instance;
     }
 
+    public reinitializeCampaignUiStateAfterRun(): void {
+        this.availableTradeRoutes = [new StandardTradeRoute(),new StandardTradeRoute(),new StandardTradeRoute()];
+        this.availableFactories = [];
+        this.selectedTradeRoute = null;
+        this.selectedParty = [];
+        this.ownedTradeGoods = [];
+    }
+
     public getCurrentFunds(): number {
-        return GameState.getInstance().surfaceCurrency;
+        return GameState.getInstance().moneyInVault;
     }
 
     public getShareholderSatisfaction(): number {

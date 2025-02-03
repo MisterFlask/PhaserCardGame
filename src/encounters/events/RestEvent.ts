@@ -104,7 +104,7 @@ class ScavengeChoice extends AbstractChoice {
 
     effect(): void {
         const gameState = this.gameState();
-        gameState.hellCurrency += 30;
+        gameState.denarians += 30;
     }
 }
 

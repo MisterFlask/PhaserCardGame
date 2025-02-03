@@ -44,6 +44,7 @@ export class EntityRarity {
     public readonly color: number;
     public readonly basePrice: number;
     public readonly basePowerLevel: number;
+
     
     static readonly MENACE = new EntityRarity({ id: "MENACE", weight: 9, color: 0xFF4500, basePrice: 0, baseCardLevel: 0 });
 

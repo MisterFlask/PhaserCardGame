@@ -51,7 +51,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
             y: 45, // Moved down
             width: this.CURRENCY_WIDTH,
             height: 30,
-            text: `Surface Currency: ${GameState.getInstance().surfaceCurrency}`,
+            text: `Surface Currency: ${GameState.getInstance().moneyInVault}`,
             style: { 
                 fontSize: '16px',
                 color: '#ffffff',
@@ -75,7 +75,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
             y: 80, // Moved down
             width: this.CURRENCY_WIDTH,
             height: 30,
-            text: `Hell Currency: ${GameState.getInstance().hellCurrency}`,
+            text: `Hell Currency: ${GameState.getInstance().denarians}`,
             style: {
                 fontSize: '16px',
                 color: '#ff4444',
@@ -98,7 +98,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
             y: 115, // Moved down
             width: this.CURRENCY_WIDTH,
             height: 30,
-            text: `Promissory Notes: $${GameState.getInstance().hellExportCurrency}`,
+            text: `Promissory Notes: $${GameState.getInstance().promissoryNotes}`,
             style: {
                 fontSize: '16px',
                 color: '#8B0000',  // Dark red color for brimstone
@@ -194,9 +194,9 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
     private updateCurrencyDisplay(): void {
         const gameState = GameState.getInstance();
         this.actNumberText.setText(`Act ${gameState.currentAct}`);
-        this.surfaceCurrencyText.setText(`Surface Currency: ${gameState.surfaceCurrency}`);
-        this.hellCurrencyText.setText(`Hell Currency: ${gameState.hellCurrency}`);
-        this.brimstoneDistillateText.setText(`Promissory Notes: : $${gameState.hellExportCurrency}`);
+        this.surfaceCurrencyText.setText(`Surface Currency: ${gameState.moneyInVault}`);
+        this.hellCurrencyText.setText(`Hell Currency: ${gameState.denarians}`);
+        this.brimstoneDistillateText.setText(`Promissory Notes: : $${gameState.promissoryNotes}`);
     }
 
     public destroy(fromScene?: boolean): void {

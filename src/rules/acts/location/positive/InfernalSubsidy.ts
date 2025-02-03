@@ -10,6 +10,6 @@ export class InfernalSubsidyModifier extends AbstractBuff {
     }
 
     override onActStart(): void {
-        this.gameState.hellCurrency += 30;
+        this.gameState.denarians += 30;
     }
 }

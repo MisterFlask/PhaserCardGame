@@ -22,7 +22,7 @@ export class CaskOfErrantSouls extends AbstractRelic {
 
     override onLocationEntered(location: LocationCard): void {
         if (location instanceof RestSiteCard) {
-            this.gameState.hellCurrency += this.BASE_CURRENCY * this.stacks;
+            this.gameState.denarians += this.BASE_CURRENCY * this.stacks;
             console.log(`Gained ${this.BASE_CURRENCY * this.stacks} Hell Currency from Cask of Errant Souls.`);
         }
     }

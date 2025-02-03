@@ -49,16 +49,16 @@ export class ActionManager {
             return [];
         }));
     }
-    modifyHellCurrency(amount: number) {
+    modifyDenarians(amount: number) {
         this.actionQueue.addAction(new GenericAction(async () => {
-            GameState.getInstance().hellCurrency += amount;
+            GameState.getInstance().denarians += amount;
             return [];
         }));
     }
 
-    modifyExportCurrency(amount: number) {
+    modifyPromissoryNotes(amount: number) {
         this.actionQueue.addAction(new GenericAction(async () => {
-            GameState.getInstance().hellExportCurrency += amount;
+            GameState.getInstance().promissoryNotes += amount;
             return [];
         }));
     }
@@ -155,17 +155,17 @@ export class ActionManager {
     sellItemForBrimstoneDistillate(item: PlayableCard) {
         this.removeCardFromMasterDeck(item);
 
-        GameState.getInstance().hellExportCurrency += item.hellSellValue;
+        GameState.getInstance().promissoryNotes += item.hellSellValue;
     }
     
     buyRelicForHellCurrency(relic: AbstractRelic, price: number) : boolean {
-        if (GameState.getInstance().hellCurrency < price) {
+        if (GameState.getInstance().denarians < price) {
             return false;
         }
         const inventory = GameState.getInstance().relicsInventory;
         inventory.push(relic);
         
-        GameState.getInstance().hellCurrency -= price;
+        GameState.getInstance().denarians -= price;
         return true;
     }
 
@@ -180,7 +180,7 @@ export class ActionManager {
 
 
     buyItemForHellCurrency(item: PlayableCard) : boolean {
-        if (GameState.getInstance().hellCurrency < item.hellPurchaseValue) {
+        if (GameState.getInstance().denarians < item.hellPurchaseValue) {
             return false;
         }
 
@@ -188,7 +188,7 @@ export class ActionManager {
         item.buffs.forEach(buff => {
             buff.onGainingThisCard();
         });
-        GameState.getInstance().hellCurrency -= item.hellPurchaseValue;
+        GameState.getInstance().denarians -= item.hellPurchaseValue;
         return true;
     }
 
@@ -278,13 +278,35 @@ export class ActionManager {
         return ActionManager.instance;
     }
 
+    public getAllValuableCargoCards(): PlayableCard[] {
+        const gameState = GameState.getInstance();
+        return gameState.cargoHolder.cardsInMasterDeck.filter(card => {
+            const hellSellBuff = card.buffs.find(buff => buff.getBuffCanonicalName() === "HELL_SELL_VALUE");
+            return hellSellBuff && hellSellBuff.stacks > 0;
+        });
+    }
+
+    public removeRandomValuableCargo() {
+        const gameState = GameState.getInstance();
+        const hellboundCards = this.getAllValuableCargoCards();
+
+        if (hellboundCards.length > 0) {
+            const randomIndex = Phaser.Math.Between(0, hellboundCards.length - 1);
+            const cardToRemove = hellboundCards[randomIndex];
+            gameState.cargoHolder.cardsInMasterDeck = gameState.cargoHolder.cardsInMasterDeck.filter(card => card !== cardToRemove);
+        }
+    }
+
     public tiltCharacter(character: BaseCharacterType){
         this.animateAttackerTilt(character.physicalCard!);
     }
 
+
     public applyBuffToCard(card: AbstractCard, buff: AbstractBuff, sourceCharacter?: IBaseCharacter): void {
        this.applyBuffToCharacterOrCard(card, buff, sourceCharacter);
     }
+
+
 
     public applyBuffToCharacterOrCard(card: AbstractCard, buff: AbstractBuff, sourceCharacter?: IBaseCharacter): void {
         buff = buff.copy();

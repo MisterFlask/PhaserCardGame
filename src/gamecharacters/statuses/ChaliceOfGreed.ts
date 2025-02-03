@@ -43,7 +43,7 @@ export class ChaliceOfGreed extends PlayableCard {
     }
 
     override InvokeCardEffects(): void {
-        this.actionManager.modifyHellCurrency(4);
+        this.actionManager.modifyDenarians(4);
         if (this.owningCharacter) {
             this.actionManager.applyBuffToCharacter(this.owningCharacter, new LoseEnergyNextTurnBuff());
         }

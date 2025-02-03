@@ -108,13 +108,13 @@ export class DebugMenu {
             {
                 text: 'Add Surface Currency (+1000)',
                 callback: () => {
-                    GameState.getInstance().surfaceCurrency += 1000;
+                    GameState.getInstance().moneyInVault += 1000;
                 }
             },
             {
                 text: 'Add Hell Currency (+1000)',
                 callback: () => {
-                    GameState.getInstance().hellCurrency += 1000;
+                    GameState.getInstance().denarians += 1000;
                 }
             },
             { text: 'Close', callback: () => this.hide() }

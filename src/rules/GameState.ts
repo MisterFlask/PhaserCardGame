@@ -3,6 +3,7 @@ import type { AbstractCard } from '../gamecharacters/AbstractCard';
 import type { PlayerCharacter } from '../gamecharacters/BaseCharacterClass';
 import { CharacterGenerator } from '../gamecharacters/CharacterGenerator';
 import type { PlayableCard } from '../gamecharacters/PlayableCard';
+import { PlayerCargoHolder } from '../gamecharacters/playerclasses/cards/cargo/PlayerCargoHolder';
 import { LedgerItem } from '../ledger/LedgerItem';
 import type { LocationCard } from '../maplogic/LocationCard';
 import { AbstractRelic } from '../relics/AbstractRelic';
@@ -45,7 +46,6 @@ export class GameState {
             character.cardsInMasterDeck = CharacterGenerator.getInstance().generateStartingDeck(character.characterClass)
         });
         this.currentRunCharacters = []
-        this.roster = []
         this.currentLocation = null
         this.locations = []
         this.mapInitialized = false
@@ -59,6 +59,8 @@ export class GameState {
 
     public roster: PlayerCharacter[] = [];
     public currentRunCharacters: PlayerCharacter[] = [];
+
+    public cargoHolder: PlayerCargoHolder = new PlayerCargoHolder();
 
     public getRandomAllyCharacter(): PlayerCharacter {
         return this.currentRunCharacters[Math.floor(Math.random() * this.currentRunCharacters.length)];
@@ -79,9 +81,9 @@ export class GameState {
     
     public relicsInventory: AbstractRelic[] = [];
 
-    public surfaceCurrency: number = 200
-    public hellCurrency: number = 0
-    public hellExportCurrency: number = 0
+    public moneyInVault: number = 200
+    public denarians: number = 0
+    public promissoryNotes: number = 0
 
     public combatState: CombatState = new CombatState()
 

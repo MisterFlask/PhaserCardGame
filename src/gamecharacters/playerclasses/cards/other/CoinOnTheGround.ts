@@ -17,7 +17,7 @@ export class CoinOnTheGround extends PlayableCard {
     }
 
     override InvokeCardEffects(): void {
-        GameState.getInstance().hellExportCurrency += 4;
+        GameState.getInstance().promissoryNotes += 4;
     }
 
     override get description(): string {

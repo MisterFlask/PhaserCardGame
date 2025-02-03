@@ -39,7 +39,7 @@ class ElaborateTattooChoice extends AbstractChoice {
     }
 
     canChoose(): boolean {
-        return this.gameState().hellCurrency >= 75;
+        return this.gameState().denarians >= 75;
     }
 
     effect(): void {
@@ -47,7 +47,7 @@ class ElaborateTattooChoice extends AbstractChoice {
         const character = gameState.currentRunCharacters[0];
         const actionManager = ActionManager.getInstance();
         
-        actionManager.modifyHellCurrency(-75);
+        actionManager.modifyDenarians(-75);
         actionManager.applyBuffToCharacter(character, new Lethality(2));
         actionManager.applyBuffToCharacter(character, new Stress(2));
     }

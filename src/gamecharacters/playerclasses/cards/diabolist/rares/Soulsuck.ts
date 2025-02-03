@@ -20,7 +20,7 @@ class SoulsuckBuff extends AbstractBuff {
     }
 
     override onFatal(killedUnit: BaseCharacter): void {
-        this.actionManager.modifyHellCurrency(15);
+        this.actionManager.modifyDenarians(15);
     }
 }
 

@@ -1,10 +1,10 @@
-import { GameState } from "../../../rules/GameState";
 import { TargetingType } from "../../../gamecharacters/AbstractCard";
 import { EntityRarity, PlayableCard } from "../../../gamecharacters/PlayableCard";
 import { CardType } from "../../../gamecharacters/Primitives";
 import { ExhaustBuff } from "../../../gamecharacters/buffs/playable_card/ExhaustBuff";
 import { RetainBuff } from "../../../gamecharacters/buffs/playable_card/Retain";
 import { CoinOnTheGround } from "../../../gamecharacters/playerclasses/cards/other/CoinOnTheGround";
+import { GameState } from "../../../rules/GameState";
 
 export class TomeOfAvarice extends PlayableCard {
     constructor() {
@@ -22,21 +22,16 @@ export class TomeOfAvarice extends PlayableCard {
     override InvokeCardEffects(): void {
         const gameState = GameState.getInstance();
         const combatState = gameState.combatState;
-        const livingAllies = combatState.playerCharacters.filter(char => !char.isDead());
-        
-        if (livingAllies.length > 0) {
-            const randomAlly = livingAllies[Math.floor(Math.random() * livingAllies.length)];
-            const coinCard = new CoinOnTheGround();
-            coinCard.owningCharacter = randomAlly;
-            randomAlly.cardsInMasterDeck.push(coinCard);
-        }
+        const cargo = gameState.cargoHolder;
+        cargo.addCargoCard(new CoinOnTheGround());
     }
 
+
     override get description(): string {
-        return `Add a Coin On The Ground to a random ally's master deck. Exhaust. Retain: lose 4 Denarians.`;
+        return `Add a Coin On The Ground to your cargo. Exhaust. Retain: lose 4 Denarians.`;
     }
 
     OnRetain(): void {
-        GameState.getInstance().hellExportCurrency -= 4;
+        GameState.getInstance().promissoryNotes -= 4;
     }
 } 

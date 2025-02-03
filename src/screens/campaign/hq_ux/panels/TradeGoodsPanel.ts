@@ -92,7 +92,7 @@ export class TradeGoodsPanel extends AbstractHqPanel {
             campaignState.availableTradeGoods = campaignState.availableTradeGoods
                 .filter(g => g !== good);
             campaignState.ownedTradeGoods.push(good);
-            GameState.getInstance().surfaceCurrency -= (good.surfacePurchaseValue);
+            GameState.getInstance().moneyInVault -= (good.surfacePurchaseValue);
             this.scene.events.emit("tradeGoodsChanged");
             this.scene.events.emit("fundsChanged");
             this.displayTradeGoods();
