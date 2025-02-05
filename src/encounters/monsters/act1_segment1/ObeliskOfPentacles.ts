@@ -5,7 +5,7 @@ import { Lethality } from '../../../gamecharacters/buffs/standard/Strong';
 export class VeilCapacitor extends AutomatedCharacter {
     constructor() {
         super({
-            name: "Veil Capacitor",
+            name: "Obelisk of Pentacles",
             portraitName: "veil-capacitor",
             maxHitpoints: 14,
             description: "A small, unsettling totem.  Probably not worth worrying about."

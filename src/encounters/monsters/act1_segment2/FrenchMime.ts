@@ -4,7 +4,7 @@ import { DoNotLookAtMe } from '../../../gamecharacters/buffs/enemy_buffs/DoNotLo
 import { SelfDestruct } from '../../../gamecharacters/buffs/enemy_buffs/SelfDestruct';
 import { TargetingUtils } from '../../../utils/TargetingUtils';
 
-export class FrenchMime extends AutomatedCharacter {
+export class EldritchMime extends AutomatedCharacter {
     private turnsUntilSelfDestruct: number = 2;
 
     constructor() {

@@ -8,7 +8,7 @@ export class SmogResource extends AbstractCombatResource {
     constructor() {
         super(
             "Smog",
-            "Spend 2 Smog: Return a card from your discard pile to your hand",
+            "Spend 3 Smog: Return a card from your discard pile to your hand",
             'smog_icon',
             TextGlyphs.getInstance().smogIcon
         );

@@ -7,13 +7,13 @@ import { Terrifying } from '../../../gamecharacters/buffs/standard/Terrifying';
 import { CardSize } from '../../../gamecharacters/Primitives';
 
 
-export class FrenchCaptain extends AutomatedCharacter {
+export class LuridAutarch extends AutomatedCharacter {
     constructor() {
         super({
-            name: "Captain Elspeth",
+            name: "Lurid Autarch",
             portraitName: "Eldritch Captain",
             maxHitpoints: 300,
-            description: "fought in the battle of Les Eaux Silencieuses"
+            description: "its reign is eternal and jawless"
         });
         
         this.buffs.push(new FearEater(1));
@@ -33,7 +33,7 @@ export class FrenchCaptain extends AutomatedCharacter {
                 new ApplyDebuffToAllPlayerCharactersIntent({ 
                     debuff: new Stress(1), 
                     owner: this 
-                }).withTitle("Dread Command")
+                }).withTitle("Black Speech")
             ],
             [
                 new AttackIntent({ 

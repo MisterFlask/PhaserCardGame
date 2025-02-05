@@ -1,5 +1,6 @@
 import { AbstractIntent, ApplyBuffToSelfIntent, AttackAllPlayerCharactersIntent, IntentListCreator } from "../../../gamecharacters/AbstractIntent";
 import { AutomatedCharacter } from "../../../gamecharacters/AutomatedCharacter";
+import { GrowingPowerBuff } from "../../../gamecharacters/buffs/standard/GrowingPower";
 import { Lethality } from "../../../gamecharacters/buffs/standard/Strong";
 import { Swarm } from "../../../gamecharacters/buffs/standard/Swarm";
 
@@ -14,6 +15,7 @@ export class CrawlingInfestation extends AutomatedCharacter {
         });
         // swarm buff caps damage from any single attack
         this.buffs.push(new Swarm(10));
+        this.buffs.push(new GrowingPowerBuff(1));
     }
 
     override generateNewIntents(): AbstractIntent[] {
@@ -23,7 +25,7 @@ export class CrawlingInfestation extends AutomatedCharacter {
                 new AttackAllPlayerCharactersIntent({ baseDamage: 3, owner: this }).withTitle("Skitter And Bite")
             ],
             [
-                new ApplyBuffToSelfIntent({ buff: new Lethality(2), owner: this }).withTitle("Recruit")
+                new ApplyBuffToSelfIntent({ buff: new Lethality(3), owner: this }).withTitle("Recruit")
             ]
         ]);
     }

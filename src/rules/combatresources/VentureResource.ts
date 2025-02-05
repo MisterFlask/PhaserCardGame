@@ -6,7 +6,7 @@ export class VentureResource extends AbstractCombatResource {
     constructor() {
         super(
             "Venture",
-            "Spend 1 Venture: Draw a card",
+            "Spend 2 Venture: Draw a card",
             'venture_icon',
             TextGlyphs.getInstance().ventureIcon
         );
@@ -14,10 +14,11 @@ export class VentureResource extends AbstractCombatResource {
     }
 
     public onClick(): boolean {
-        if (this.value >= 1) {
+        if (this.value >= 2) {
             ActionManager.getInstance().DoAThing("Venture Resource Click", () => {
                 ActionManager.getInstance().drawCards(1);
-                this.value -= 1;
+                this.value -= 2;
+
             });
             return true;
         }

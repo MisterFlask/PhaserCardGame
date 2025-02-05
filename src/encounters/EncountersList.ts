@@ -13,15 +13,19 @@ import { GameState } from '../rules/GameState';
 import { CardModifier } from '../rules/modifiers/AbstractCardModifier';
 import { RestEvent } from './events/RestEvent';
 import { FrenchBlindProphetess } from './monsters/act1_boss/FrenchBlindProphetess';
-import { FrenchChef } from './monsters/act1_segment1/FrenchChef';
-import { FrenchCrow } from './monsters/act1_segment1/FrenchCrow';
-import { FrenchDeer } from './monsters/act1_segment1/FrenchDeer';
-import { VeilCapacitor } from './monsters/act1_segment1/VeilCapacitor';
-import { FrenchLumberjack } from './monsters/act1_segment2/FrenchLumberjack';
-import { FrenchMime } from './monsters/act1_segment2/FrenchMime';
-import { FrenchCaptain } from './monsters/act2_boss/FrenchCaptain';
+import { Cacophagist } from './monsters/act1_segment1/Cacophagist';
+import { SorrowmothSwarm } from './monsters/act1_segment1/CaulMoth';
+import { FrenchCrow } from './monsters/act1_segment1/HymnalOfMeat';
+import { VeilCapacitor } from './monsters/act1_segment1/ObeliskOfPentacles';
+import { VesperOfMeat } from './monsters/act1_segment1/VesperOfMeat';
+import { EldritchMime } from './monsters/act1_segment2/FrenchMime';
+import { AccursedObelisk } from './monsters/act1_segment2/ObeliskOfCups';
+import { RuminantOfSwords } from './monsters/act1_segment2/RuminantOfSwords';
+import { LuridAutarch } from './monsters/act2_boss/LuridAutarch';
+import { CrawlingInfestation } from './monsters/act2_segment1/CrawlingInfestation';
 import { FrenchIntellectual } from './monsters/act2_segment1/FrenchIntellectual';
 import { FrenchPoliceman } from './monsters/act2_segment1/FrenchPoliceman';
+import { HiveBroodmother } from './monsters/act2_segment1/HiveBroodmother';
 import { Artiste } from './monsters/act2_segment2/Artiste';
 import { FrenchRestauranteur } from './monsters/act2_segment2/FrenchRestauranteur';
 
@@ -74,22 +78,28 @@ export class ActSegmentData {
 export class ActSegment {
     static readonly Act1_Segment1 = new ActSegmentData("Act 1 - Segment 1", 1, 1, [
         {
-            enemies: [new FrenchChef(), new FrenchChef(), new VeilCapacitor()]
+            enemies: [new VesperOfMeat(), new VesperOfMeat(), new VeilCapacitor()]
         },
         {
             enemies: [new FrenchCrow(), new FrenchCrow()]
         },
         {
-            enemies: [new FrenchDeer(), new FrenchDeer()]
+            enemies: [new Cacophagist(), new Cacophagist()]
+        },
+        {
+            enemies: [new SorrowmothSwarm(), new SorrowmothSwarm()]
         }
     ]);
 
     static readonly Act1_Segment2 = new ActSegmentData("Act 1 - Segment 2", 1, 2, [
         {
-            enemies: [new FrenchMime(), new FrenchMime()]
+            enemies: [new EldritchMime(), new EldritchMime()]
         },
         {
-            enemies: [new FrenchLumberjack(), new FrenchLumberjack()]
+            enemies: [new RuminantOfSwords(), new RuminantOfSwords()]
+        },
+        {
+            enemies: [new AccursedObelisk()]
         }
     ]);
 
@@ -105,6 +115,15 @@ export class ActSegment {
         },
         {
             enemies: [new FrenchIntellectual(), new FrenchIntellectual()]
+        },
+        {
+            enemies: [new CrawlingInfestation()]
+        },
+        {
+            enemies: [new HiveBroodmother()]
+        },
+        {
+            enemies: [new SorrowmothSwarm(), new SorrowmothSwarm()]
         }
     ]);
 
@@ -113,14 +132,14 @@ export class ActSegment {
             enemies: [new FrenchIntellectual(), new FrenchIntellectual(), new Artiste()]
         },
         {
-            enemies: [new FrenchChef(), new FrenchChef(), new FrenchRestauranteur()]
+            enemies: [new VesperOfMeat(), new VesperOfMeat(), new FrenchRestauranteur()]
         }
     ]);
     
     
     static readonly Boss_Act2 = new ActSegmentData("Boss Fight - Act 2", 2, 3, [
         {
-            enemies: [new FrenchCaptain()]
+            enemies: [new LuridAutarch()]
         }
     ]);
 }

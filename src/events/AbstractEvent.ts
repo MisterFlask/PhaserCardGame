@@ -1,4 +1,4 @@
-import { LedgerItem } from "../ledger/LedgerItem";
+import { AbstractRelic } from "../relics/AbstractRelic";
 import { GameState } from "../rules/GameState";
 import { ActionManager } from "../utils/ActionManager";
 import { ActionManagerFetcher } from "../utils/ActionManagerFetcher";
@@ -23,9 +23,10 @@ export abstract class AbstractChoice {
         return ActionManagerFetcher.getGameState();
     }
 
-    protected addLedgerItem(ledgerItem: LedgerItem): void {
+    protected addLedgerItem(ledgerItem: AbstractRelic): void {
         this.actionManager().createLedgerItem(ledgerItem);
     }
+
 }
 export class FinishChoice extends AbstractChoice {
     constructor() {
@@ -61,7 +62,7 @@ export class AbstractEvent {
         return ActionManagerFetcher.getGameState();
     }
 
-    protected addLedgerItem(ledgerItem: LedgerItem): void {
+    protected addLedgerItem(ledgerItem: AbstractRelic): void {
         this.actionManager().createLedgerItem(ledgerItem);
     }
 

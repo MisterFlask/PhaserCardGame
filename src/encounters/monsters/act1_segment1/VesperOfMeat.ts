@@ -2,10 +2,10 @@ import { AbstractIntent, ApplyDebuffToRandomCharacterIntent, AttackAllPlayerChar
 import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
 import { Delicious } from '../../../gamecharacters/buffs/enemy_buffs/Delicious';
 
-export class FrenchChef extends AutomatedCharacter {
+export class VesperOfMeat extends AutomatedCharacter {
     constructor() {
         super({
-            name: "Seasoner",
+            name: "Vesper of Meat",
             portraitName: "Eldritch Slime Spawn",
             maxHitpoints: 25,
             description: "you will be baked, and then there will be cake"

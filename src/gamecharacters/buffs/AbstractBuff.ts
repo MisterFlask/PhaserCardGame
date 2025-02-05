@@ -363,7 +363,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
     }
 
-    onBuffApplied(character: IBaseCharacter, buffApplied: AbstractBuff, previousStacks: number, changeInStacks: number) {
+    onBuffApplied(sourceOfBuff: IBaseCharacter, buffApplied: AbstractBuff, previousStacks: number, changeInStacks: number) {
 
     }
 

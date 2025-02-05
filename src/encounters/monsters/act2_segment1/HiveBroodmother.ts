@@ -31,7 +31,7 @@ class InfestationEgg extends PlayableCard {
 export class HiveBroodmother extends AutomatedCharacter {
     constructor() {
         super({
-            name: "Hive Broodmother",
+            name: "Psalter-Louse",
             portraitName: "chitinous maelstrom",
             maxHitpoints: 50,
             description: "a pulsating mass of carapace and ooze, surrounded by countless larvae. each strike feels muffled, as if absorbed by a living swarm."

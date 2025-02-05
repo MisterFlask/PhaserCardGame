@@ -2,10 +2,10 @@ import { AbstractIntent, ApplyDebuffToRandomCharacterIntent, AttackAllPlayerChar
 import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
 import { Burning } from '../../../gamecharacters/buffs/standard/Burning';
 
-export class FrenchDeer extends AutomatedCharacter {
+export class Cacophagist extends AutomatedCharacter {
     constructor() {
         super({
-            name: "Deer",
+            name: "Cacophagist",
             portraitName: "Eldritch Corruption Deer",
             maxHitpoints: 30,
             description: "Antlers sharp as philosophy, refracting light into spectral halos that contain glimpses of forgotten monarchies"
@@ -18,7 +18,7 @@ export class FrenchDeer extends AutomatedCharacter {
                 new ApplyDebuffToRandomCharacterIntent({ debuff: new Burning(2), owner: this }).withTitle("Ignite")
             ],
             [
-                new AttackAllPlayerCharactersIntent({ baseDamage: 4, owner: this }).withTitle("Inferno Charge")
+                new AttackAllPlayerCharactersIntent({ baseDamage: 4, owner: this }).withTitle("Charge")
             ],
             [
                 new AttackIntent({ baseDamage: 10, owner: this }).withTitle("Horn Charge")

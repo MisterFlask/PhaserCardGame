@@ -6,7 +6,7 @@ import { Titan } from '../../../gamecharacters/buffs/standard/Titan';
 import { Vulnerable } from '../../../gamecharacters/buffs/standard/Vulnerable';
 import { CardSize } from '../../../gamecharacters/Primitives';
 import { GameState } from '../../../rules/GameState';
-import { VeilCapacitor } from '../act1_segment1/VeilCapacitor';
+import { VeilCapacitor } from '../act1_segment1/ObeliskOfPentacles';
 export class FrenchBlindProphetess extends AutomatedCharacter {
     constructor() {
         super({

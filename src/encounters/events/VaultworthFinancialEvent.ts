@@ -1,15 +1,24 @@
 import { AbstractChoice, AbstractEvent, DeadEndEvent } from "../../events/AbstractEvent";
-import { LedgerItem } from "../../ledger/LedgerItem";
+import { AbstractRelic } from "../../relics/AbstractRelic";
 import { ActionManager } from "../../utils/ActionManager";
 
-class DepositedDenarians extends LedgerItem {
+class DepositedDenarians extends AbstractRelic {
     constructor() {
         super()
         this.id = "DEPOSITED_DENARIANS";
-        this.description = "Deposited Denarians";
         this.stacks = 0;
+
+    }
+
+    getDisplayName(): string {
+        return "Deposited Denarians";
+    }
+
+    getDescription(): string {
+        return "You have some durians deposited with the Vaultworth Financial Group.";
     }
 }
+
 
 
 class DenarianExchangeChoice extends AbstractChoice {

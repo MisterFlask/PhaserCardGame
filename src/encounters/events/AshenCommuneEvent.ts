@@ -1,6 +1,6 @@
+import { AbstractChoice, AbstractEvent, DeadEndEvent } from "../../events/AbstractEvent";
 import { RelicsLibrary } from "../../relics/RelicsLibrary";
 import { ActionManager } from "../../utils/ActionManager";
-import { AbstractChoice, AbstractEvent, DeadEndEvent } from "../AbstractEvent";
 
 class CargoDonationChoice extends AbstractChoice {
     constructor() {
@@ -13,12 +13,13 @@ class CargoDonationChoice extends AbstractChoice {
     }
 
     canChoose(): boolean {
-        return this.gameState().cargoInventory.length > 0;
+        return this.gameState().cargoHolder.cardsInMasterDeck.length > 0;
     }
+
 
     effect(): void {
         const actionManager = ActionManager.getInstance();
-        actionManager.removeCargo(1);
+        actionManager.removeRandomValuableCargo();
         const relic = RelicsLibrary.getInstance().getRandomBeneficialRelics(1)[0];
         actionManager.addRelicToInventory(relic);
         // TODO IMPLEMENT: Add reputation
@@ -36,13 +37,16 @@ class TribunalChoice extends AbstractChoice {
     }
 
     canChoose(): boolean {
-        return this.gameState().reputation < 0;
+        //todo
+        return true;
     }
 
     effect(): void {
         const actionManager = ActionManager.getInstance();
-        // TODO IMPLEMENT: Add Collectivized Suffering relic
+        const relic = RelicsLibrary.getInstance().getRandomBeneficialRelics(1)[0];
+        actionManager.addRelicToInventory(relic);
     }
+
 }
 
 export class AshenCommuneEvent extends AbstractEvent {

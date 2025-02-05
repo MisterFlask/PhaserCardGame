@@ -2,7 +2,7 @@ import { AbstractIntent, AttackAllPlayerCharactersIntent, AttackIntent, IntentLi
 import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
 import { Desirous } from '../../../gamecharacters/buffs/enemy_buffs/Desirous';
 import { Idol } from '../../../gamecharacters/buffs/enemy_buffs/Idol';
-import { FrenchChef } from '../act1_segment1/FrenchChef';
+import { VesperOfMeat } from '../act1_segment1/VesperOfMeat';
 
 export class FrenchRestauranteur extends AutomatedCharacter {
     constructor() {
@@ -21,7 +21,7 @@ export class FrenchRestauranteur extends AutomatedCharacter {
         const intents: AbstractIntent[][] = [
             [
                 new SummonIntent({ 
-                    monsterToSummon: new FrenchChef(),
+                    monsterToSummon: new VesperOfMeat(),
                     owner: this 
                 }).withTitle("ON ME!"),
 

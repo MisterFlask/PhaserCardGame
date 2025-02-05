@@ -7,7 +7,7 @@ export class BloodResource extends AbstractCombatResource {
     constructor() {
         super(
             "Blood",
-            "Spend 2 Blood: gain 1 Energy.",
+            "Spend 3 Blood: gain 1 Energy.",
             'blood_icon',
             TextGlyphs.getInstance().bloodIcon
         );
@@ -16,10 +16,10 @@ export class BloodResource extends AbstractCombatResource {
 
     public onClick(): boolean {
         const gameState = GameState.getInstance();
-        if (this.value >= 2) {
+        if (this.value >= 3) {
             ActionManager.getInstance().DoAThing("Blood Resource Click", () => {
                 ActionManager.getInstance().gainEnergy(1);
-                this.value -= 2;
+                this.value -= 3;
             });
             return true;
         }

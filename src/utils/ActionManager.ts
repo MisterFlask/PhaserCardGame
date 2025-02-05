@@ -9,7 +9,6 @@ import { IBaseCharacter } from "../gamecharacters/IBaseCharacter";
 import { CardResourceScaling, PlayableCard } from "../gamecharacters/PlayableCard";
 import { CardType } from "../gamecharacters/Primitives";
 import { ProcBroadcaster } from "../gamecharacters/procs/ProcBroadcaster";
-import { LedgerItem } from "../ledger/LedgerItem";
 import { AbstractRelic } from "../relics/AbstractRelic";
 import { AbstractCombatResource } from "../rules/combatresources/AbstractCombatResource";
 import { CombatRules, DamageCalculationResult } from "../rules/CombatRulesHelper";
@@ -933,7 +932,7 @@ export class ActionManager {
         this.actionQueue.addAction(new ActiveDiscardCardAction(card));
     }
 
-    public createLedgerItem(item: LedgerItem): void {
+    public createLedgerItem(item: AbstractRelic): void {
         GameState.getInstance().ledger.push(item);
     }
 

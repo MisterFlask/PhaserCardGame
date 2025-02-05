@@ -22,7 +22,7 @@ import { DeckLogic, PileName, PilePosition } from '../../DeckLogicHelper';
 export class DamnedFlies extends PlayableCard {
     constructor() {
         super({
-            name: "Damned Flies",
+            name: "D___d Flies",
             cardType: CardType.ATTACK,
             rarity: EntityRarity.MENACE,
         });

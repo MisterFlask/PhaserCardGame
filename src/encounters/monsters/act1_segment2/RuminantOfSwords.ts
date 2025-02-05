@@ -6,10 +6,10 @@ import { AbstractIntent, AttackIntent, BlockForSelfIntent, IntentListCreator } f
 import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
 import { Regeneration } from '../../../gamecharacters/buffs/enemy_buffs/Regeneration';
 
-export class FrenchLumberjack extends AutomatedCharacter {
+export class RuminantOfSwords extends AutomatedCharacter {
     constructor() {
         super({
-            name: "Tree Clearer",
+            name: "Ruminant of Swords",
             portraitName: "Eldritch Soldier Gunner",
             maxHitpoints: 60,
             description: "Many unsanctioned pine dimensions.  Culling necessary."

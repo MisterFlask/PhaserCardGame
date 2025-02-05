@@ -7,7 +7,7 @@ export class MettleResource extends AbstractCombatResource {
     constructor() {
         super(
             "Mettle",
-            "Spend 1 Mettle: all characters gain 3 Block.",
+            "Spend 1 Mettle: all characters gain 2 Block.",
             'iron_icon',
             TextGlyphs.getInstance().mettleIcon
         );
@@ -20,7 +20,7 @@ export class MettleResource extends AbstractCombatResource {
             ActionManager.getInstance().DoAThing("Iron Resource Click", () => {
                 gameState.combatState.allPlayerAndEnemyCharacters.forEach(character => {
                     ActionManager.getInstance().applyBlock({
-                        baseBlockValue: 3,
+                        baseBlockValue: 2,
                         blockTargetCharacter: character
                     });
                 });

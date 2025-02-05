@@ -9,7 +9,7 @@ import { Regeneration } from '../../../gamecharacters/buffs/enemy_buffs/Regenera
 export class AccursedObelisk extends AutomatedCharacter {
     constructor() {
         super({
-            name: "Accursed Obelisk",
+            name: "Obelisk of Cups",
             portraitName: "obelisk_portrait",
             maxHitpoints: 40,
             description: "An ancient obelisk radiating dark energy."

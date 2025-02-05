@@ -8,10 +8,10 @@ import { StingingInsects } from '../../../gamecharacters/statuses/StingingInsect
 export class SorrowmothSwarm extends AutomatedCharacter {
     constructor() {
         super({
-            name: "Sorrowmoth Swarm",
+            name: "Caul-Moth",
             portraitName: "Sorrowmoth Swarm",
             maxHitpoints: 35,
-            description: "A writhing mass of moths that lay eggs in your deck."
+            description: "a noble thing, unwound and draped over too many dimensions."
         });
         this.buffs.push(new Swarm(10));
         this.buffs.push(new EggLayer(2));
