@@ -1,5 +1,5 @@
 import { AbstractBuff } from '../../../gamecharacters/buffs/AbstractBuff';
-import { Lethality } from '../../../gamecharacters/buffs/standard/Strong';
+import { Lethality } from '../../../gamecharacters/buffs/standard/Lethality';
 
 export class StrongEnemiesModifier extends AbstractBuff {
     getDisplayName(): string {

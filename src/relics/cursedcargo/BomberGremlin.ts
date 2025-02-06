@@ -2,7 +2,7 @@
 // At the start of the seventh turn of combat, deal 40 damage to all enemies.  
 
 import { Hazardous } from "../../gamecharacters/buffs/playable_card/Hazardous";
-import { EntityRarity } from "../../gamecharacters/PlayableCard";
+import { EntityRarity } from "../../gamecharacters/EntityRarity";
 import { GameState } from "../../rules/GameState";
 import { ActionManager } from "../../utils/ActionManager";
 import { AbstractRelic } from "../AbstractRelic";

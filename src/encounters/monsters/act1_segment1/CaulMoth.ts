@@ -1,7 +1,7 @@
 import { AbstractIntent, AddCardToPileIntent, AttackIntent, DoSomethingIntent } from '../../../gamecharacters/AbstractIntent';
 import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
 import { EggLayer } from '../../../gamecharacters/buffs/enemy_buffs/EggLayer';
-import { Lethality } from '../../../gamecharacters/buffs/standard/Strong';
+import { Lethality } from '../../../gamecharacters/buffs/standard/Lethality';
 import { Swarm } from '../../../gamecharacters/buffs/standard/Swarm';
 import { StingingInsects } from '../../../gamecharacters/statuses/StingingInsects';
 

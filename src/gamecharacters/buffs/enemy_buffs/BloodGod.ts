@@ -1,7 +1,7 @@
 import { AbstractCombatEvent } from "../../../rules/AbstractCombatEvent";
 import { SacrificeEvent } from "../../procs/BasicProcs";
 import { AbstractBuff } from "../AbstractBuff";
-import { Lethality } from "../standard/Strong";
+import { Lethality } from "../standard/Lethality";
 
 export class BloodGod extends AbstractBuff {
     constructor(stacks: number = 1) {

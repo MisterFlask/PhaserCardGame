@@ -3,8 +3,8 @@ import { EventsManager } from '../events/EventsManager';
 import { AbstractIntent, ApplyDebuffToRandomCharacterIntent, AttackIntent } from '../gamecharacters/AbstractIntent';
 import { AutomatedCharacter } from '../gamecharacters/AutomatedCharacter';
 import { Delicious } from '../gamecharacters/buffs/enemy_buffs/Delicious';
+import { Lethality } from '../gamecharacters/buffs/standard/Lethality';
 import { Stress } from '../gamecharacters/buffs/standard/Stress';
-import { Lethality } from '../gamecharacters/buffs/standard/Strong';
 import { Terrifying } from '../gamecharacters/buffs/standard/Terrifying';
 import { CardSize } from '../gamecharacters/Primitives';
 import { AbstractRelic } from '../relics/AbstractRelic';
@@ -13,7 +13,7 @@ import { GameState } from '../rules/GameState';
 import { CardModifier } from '../rules/modifiers/AbstractCardModifier';
 import { RestEvent } from './events/RestEvent';
 import { FrenchBlindProphetess } from './monsters/act1_boss/FrenchBlindProphetess';
-import { Cacophagist } from './monsters/act1_segment1/Cacophagist';
+import { Echophagist } from './monsters/act1_segment1/Cacophagist';
 import { SorrowmothSwarm } from './monsters/act1_segment1/CaulMoth';
 import { FrenchCrow } from './monsters/act1_segment1/HymnalOfMeat';
 import { VeilCapacitor } from './monsters/act1_segment1/ObeliskOfPentacles';
@@ -84,7 +84,7 @@ export class ActSegment {
             enemies: [new FrenchCrow(), new FrenchCrow()]
         },
         {
-            enemies: [new Cacophagist(), new Cacophagist()]
+            enemies: [new Echophagist(), new Echophagist()]
         },
         {
             enemies: [new SorrowmothSwarm(), new SorrowmothSwarm()]

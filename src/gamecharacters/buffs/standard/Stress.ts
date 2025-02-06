@@ -1,5 +1,4 @@
 import { AbstractBuff } from "../AbstractBuff";
-import { Lethality } from "./Strong";
 
 export class Stress extends AbstractBuff {
     override getDisplayName(): string {
@@ -10,6 +9,7 @@ export class Stress extends AbstractBuff {
         return `For every ${this.secondaryStacks} Stress stacks, enemies start combat with 1 more Lethality.`;
     }
 
+    override id: string = "stress";
     constructor(stacks: number = 0) {
         super();
         this.imageName = "shattered-heart"; // Replace with actual icon name
@@ -24,9 +24,8 @@ export class Stress extends AbstractBuff {
         if (this.stacks < this.secondaryStacks) {
             return;
         }
-        this.forEachEnemy((enemy) => {
-            this.actionManager.applyBuffToCharacterOrCard(enemy, new Lethality(Math.floor(this.stacks / 10)));
-        });
+
+        // todo
     }
 
 }

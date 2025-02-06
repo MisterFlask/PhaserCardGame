@@ -1,7 +1,8 @@
 import { GameState } from "../../../../../rules/GameState";
 import { ActionManagerFetcher } from "../../../../../utils/ActionManagerFetcher";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
-import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity } from "../../../../EntityRarity";
+import { PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { ExhaustBuff } from "../../../../buffs/playable_card/ExhaustBuff";
 import { Vulnerable } from "../../../../buffs/standard/Vulnerable";

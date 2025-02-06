@@ -5,7 +5,7 @@
 import { AbstractIntent, ApplyBuffToSelfIntent, AttackIntent } from '../../../gamecharacters/AbstractIntent';
 import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
 import { Flying } from '../../../gamecharacters/buffs/standard/Flying';
-import { Lethality } from '../../../gamecharacters/buffs/standard/Strong';
+import { Lethality } from '../../../gamecharacters/buffs/standard/Lethality';
 import { Terrifying } from '../../../gamecharacters/buffs/standard/Terrifying';
 
 export class FrenchCrow extends AutomatedCharacter {

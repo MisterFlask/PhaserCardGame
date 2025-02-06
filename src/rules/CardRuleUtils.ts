@@ -1,5 +1,5 @@
-import { PlayerCharacter } from "../gamecharacters/BaseCharacterClass";
 import { PlayableCard } from "../gamecharacters/PlayableCard";
+import { PlayerCharacter } from "../gamecharacters/PlayerCharacter";
 import { CardReward } from "../rewards/CardReward";
 import { CardRewardsGenerator } from "./CardRewardsGenerator";
 import { GameState } from "./GameState";

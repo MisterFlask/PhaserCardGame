@@ -1,7 +1,8 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { Burning } from "../../../../buffs/standard/Burning";
 import { Vulnerable } from "../../../../buffs/standard/Vulnerable";
-import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity } from "../../../../EntityRarity";
+import { PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
 export class InspireFear extends PlayableCard {

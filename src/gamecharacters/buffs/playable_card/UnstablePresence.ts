@@ -2,7 +2,7 @@ import { DamageInfo } from "../../../rules/DamageInfo";
 import { IBaseCharacter } from "../../IBaseCharacter";
 import { PlayableCard } from "../../PlayableCard";
 import { AbstractBuff } from "../AbstractBuff";
-import { Lethality } from "../standard/Strong";
+import { Lethality } from "../standard/Lethality";
 
 export class UnstablePresence extends AbstractBuff {
     constructor(stacks: number = 1, secondaryStacks: number = 1) {

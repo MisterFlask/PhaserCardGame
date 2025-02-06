@@ -1,5 +1,5 @@
-import { PlayerCharacter } from '../gamecharacters/BaseCharacterClass';
 import { CharacterGenerator } from '../gamecharacters/CharacterGenerator';
+import { PlayerCharacter } from '../gamecharacters/PlayerCharacter';
 
 export class CampaignRules {
     private static instance: CampaignRules;

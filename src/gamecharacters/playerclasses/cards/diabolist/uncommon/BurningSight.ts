@@ -1,7 +1,8 @@
 import { GameState } from "../../../../../rules/GameState";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BloodPriceBuff } from "../../../../buffs/standard/Bloodprice";
-import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity } from "../../../../EntityRarity";
+import { PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
 export class BurningSight extends PlayableCard {

@@ -1,8 +1,9 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
-import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity } from "../../../../EntityRarity";
+import { PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
-import { Lethality } from "../../../../buffs/standard/Strong";
+import { Lethality } from "../../../../buffs/standard/Lethality";
 
 export class HoldTheLine extends PlayableCard {
     constructor() {

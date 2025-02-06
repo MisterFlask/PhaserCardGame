@@ -1,7 +1,8 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
 import { Painful } from "../../../../buffs/playable_card/Painful";
-import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity } from "../../../../EntityRarity";
+import { PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 export class ToughItOut extends PlayableCard {
     constructor() {

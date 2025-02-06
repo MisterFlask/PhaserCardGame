@@ -1,7 +1,8 @@
 import { PileName } from "../../../../rules/DeckLogicHelper";
 import { AbstractCard, TargetingType } from "../../../AbstractCard";
 import { BaseCharacter } from "../../../BaseCharacter";
-import { EntityRarity, PlayableCard } from "../../../PlayableCard";
+import { EntityRarity } from "../../../EntityRarity";
+import { PlayableCard } from "../../../PlayableCard";
 import { CardType } from "../../../Primitives";
 
 export class FirstIncantation extends PlayableCard {

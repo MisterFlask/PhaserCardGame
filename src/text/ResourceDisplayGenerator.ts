@@ -1,4 +1,4 @@
-import { CardResourceScaling } from "../gamecharacters/PlayableCard";
+import { CardResourceScaling } from "../gamecharacters/CardResourceScaling";
 import { TextGlyphs } from "./TextGlyphs";
 
 export class ResourceDisplayGenerator {

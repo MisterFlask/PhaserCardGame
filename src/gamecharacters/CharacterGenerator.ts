@@ -1,5 +1,5 @@
 import { Gender } from "./BaseCharacter";
-import { BaseCharacterClass, PlayerCharacter } from "./BaseCharacterClass";
+import { BaseCharacterClass } from "./BaseCharacterClass";
 import { AbstractBuff } from "./buffs/AbstractBuff";
 import { Badass } from "./buffs/persona/Badass";
 import { BloodKnight } from "./buffs/persona/BloodKnight";
@@ -16,9 +16,11 @@ import { IncreaseIron } from "./buffs/standard/combatresource/IncreaseMetal";
 import { IncreasePages as IncreaseAshes } from "./buffs/standard/combatresource/IncreasePages";
 import { IncreaseSmog } from "./buffs/standard/combatresource/IncreaseSmog";
 import { IncreaseVenture } from "./buffs/standard/combatresource/IncreaseVenture";
-import { Lethality } from "./buffs/standard/Strong";
+import { Lethality } from "./buffs/standard/Lethality";
 import { CharacterNameGenerator } from "./CharacterNameGenerator";
-import { EntityRarity, PlayableCard } from "./PlayableCard";
+import { EntityRarity } from "./EntityRarity";
+import { PlayableCard } from "./PlayableCard";
+import { PlayerCharacter } from "./PlayerCharacter";
 import { ArchonClass } from "./playerclasses/ArchonClass";
 import { BlackhandClass } from "./playerclasses/BlackhandClass";
 import { Defend } from "./playerclasses/cards/basic/Defend";
@@ -105,6 +107,7 @@ export class CharacterGenerator {
     createCharacterFromClass(characterClass: BaseCharacterClass){
         var character = new PlayerCharacter({ name: characterClass.name, portraitName: characterClass.iconName, characterClass: characterClass })
         character.cardsInMasterDeck = CharacterGenerator.getInstance().generateStartingDeck(characterClass)
+        character.startingDeck = character.cardsInMasterDeck.slice().map(card => card.Copy())
         for (const card of character.cardsInMasterDeck) {
             card.owningCharacter = character;
         }

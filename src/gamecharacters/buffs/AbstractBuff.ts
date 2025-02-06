@@ -10,10 +10,10 @@ import type { AbstractCard } from "../AbstractCard";
 import { generateWordGuid } from "../AbstractCard";
 import { AbstractIntent } from "../AbstractIntent";
 import type { BaseCharacter } from "../BaseCharacter";
-import { PlayerCharacter } from "../BaseCharacterClass";
 import type { IAbstractBuff } from '../IAbstractBuff';
 import { IBaseCharacter } from "../IBaseCharacter";
 import type { PlayableCard } from "../PlayableCard";
+import { PlayerCharacter } from "../PlayerCharacter";
 export abstract class AbstractBuff implements IAbstractBuff {
 
     copy(): this {

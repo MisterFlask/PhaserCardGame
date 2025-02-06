@@ -1,8 +1,8 @@
 // marrowspike
 //Whenever you spend Blood, all allies gain 1 Lethality
 
-import { Lethality } from "../../gamecharacters/buffs/standard/Strong";
-import { EntityRarity } from "../../gamecharacters/PlayableCard";
+import { Lethality } from "../../gamecharacters/buffs/standard/Lethality";
+import { EntityRarity } from "../../gamecharacters/EntityRarity";
 import { AbstractRelic } from "../../relics/AbstractRelic";
 import { ResourceUsedEvent } from "../../rules/combatresources/AbstractCombatResource";
 import { GameState } from "../../rules/GameState";

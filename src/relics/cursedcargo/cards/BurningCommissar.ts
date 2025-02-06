@@ -1,7 +1,8 @@
 import { TargetingType } from "../../../gamecharacters/AbstractCard";
 import { BaseCharacter } from "../../../gamecharacters/BaseCharacter";
 import { Stress } from "../../../gamecharacters/buffs/standard/Stress";
-import { EntityRarity, PlayableCard } from "../../../gamecharacters/PlayableCard";
+import { EntityRarity } from "../../../gamecharacters/EntityRarity";
+import { PlayableCard } from "../../../gamecharacters/PlayableCard";
 import { CardType } from "../../../gamecharacters/Primitives";
 import { ResourceUsedEvent } from "../../../rules/combatresources/AbstractCombatResource";
 

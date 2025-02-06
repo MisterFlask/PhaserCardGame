@@ -1,6 +1,6 @@
 import { AbstractCard, TargetingType } from '../../../../AbstractCard';
+import { EntityRarity } from "../../../../EntityRarity";
 import { IBaseCharacter } from '../../../../IBaseCharacter';
-import { EntityRarity } from '../../../../PlayableCard';
 import { PlayableCardWithHelpers } from '../../../../PlayableCardWithHelpers';
 import { CardType } from '../../../../Primitives';
 import { Burning } from '../../../../buffs/standard/Burning';

@@ -1,6 +1,7 @@
 import { TargetingType } from "../../../AbstractCard";
 import { BaseCharacter } from "../../../BaseCharacter";
-import { EntityRarity, PlayableCard } from "../../../PlayableCard";
+import { EntityRarity } from "../../../EntityRarity";
+import { PlayableCard } from "../../../PlayableCard";
 import { CardType } from "../../../Primitives";
 import { HellSellValue } from "../../../buffs/standard/HellSellValue";
 

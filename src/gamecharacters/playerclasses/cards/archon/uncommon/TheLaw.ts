@@ -1,6 +1,7 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { AbstractBuff } from "../../../../buffs/AbstractBuff";
-import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity } from "../../../../EntityRarity";
+import { PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { BasicProcs } from "../../../../procs/BasicProcs";
 import { TakeCover } from "../tokens/TakeCover";

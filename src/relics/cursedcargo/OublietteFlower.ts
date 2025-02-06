@@ -1,5 +1,5 @@
 import { Bastion } from "../../gamecharacters/buffs/persona/Bastion";
-import { EntityRarity } from "../../gamecharacters/PlayableCard";
+import { EntityRarity } from "../../gamecharacters/EntityRarity";
 import { AbstractRelic } from "../AbstractRelic";
 
 export class OublietteFlower extends AbstractRelic {

@@ -1,5 +1,5 @@
 import { CombatResourceGainedResult } from "../../gamecharacters/buffs/AbstractBuff";
-import { EntityRarity } from "../../gamecharacters/PlayableCard";
+import { EntityRarity } from "../../gamecharacters/EntityRarity";
 import { AbstractCombatResource } from "../../rules/combatresources/AbstractCombatResource";
 import { GameState } from "../../rules/GameState";
 import { AbstractRelic } from "../AbstractRelic";

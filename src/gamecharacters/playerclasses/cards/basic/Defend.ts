@@ -2,7 +2,7 @@
 
 import { BaseCharacterType } from "../../../../Types";
 import { AbstractCard, TargetingType } from "../../../AbstractCard";
-import { EntityRarity } from "../../../PlayableCard";
+import { EntityRarity } from "../../../EntityRarity";
 import { PlayableCardWithHelpers } from "../../../PlayableCardWithHelpers";
 
 export class Defend extends PlayableCardWithHelpers {

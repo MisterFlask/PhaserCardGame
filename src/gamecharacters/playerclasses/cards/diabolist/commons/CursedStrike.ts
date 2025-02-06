@@ -3,8 +3,9 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import type { BaseCharacter } from "../../../../BaseCharacter";
 import { Cursed } from "../../../../buffs/standard/Cursed";
-import { Lethality } from "../../../../buffs/standard/Strong";
-import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
+import { Lethality } from "../../../../buffs/standard/Lethality";
+import { EntityRarity } from "../../../../EntityRarity";
+import { PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
 export class CursedStrike extends PlayableCard {

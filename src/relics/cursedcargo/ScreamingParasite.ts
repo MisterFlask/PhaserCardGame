@@ -1,5 +1,5 @@
 import { Stress } from "../../gamecharacters/buffs/standard/Stress";
-import { EntityRarity } from "../../gamecharacters/PlayableCard";
+import { EntityRarity } from "../../gamecharacters/EntityRarity";
 import { AbstractCombatResource } from "../../rules/combatresources/AbstractCombatResource";
 import { GameState } from "../../rules/GameState";
 import { AbstractRelic } from "../AbstractRelic";

@@ -1,4 +1,5 @@
-import { EntityRarity, PlayableCard } from "../../gamecharacters/PlayableCard";
+import { EntityRarity } from "../../gamecharacters/EntityRarity";
+import { PlayableCard } from "../../gamecharacters/PlayableCard";
 import { BasicProcs } from "../../gamecharacters/procs/BasicProcs";
 import { AbstractRelic } from "../AbstractRelic";
 

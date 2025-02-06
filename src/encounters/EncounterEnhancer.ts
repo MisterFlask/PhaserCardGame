@@ -1,5 +1,5 @@
 import { DrawOneFewerCardNextNTurns } from "../gamecharacters/buffs/standard/DrawOneFewerCardNextNTurns";
-import { Lethality } from "../gamecharacters/buffs/standard/Strong";
+import { Lethality } from "../gamecharacters/buffs/standard/Lethality";
 import { Encounter } from "./EncountersList";
 
 export abstract class EncounterEnhancer {

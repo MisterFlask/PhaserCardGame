@@ -1,6 +1,7 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { IncreasePluckPerTurn } from "../../../../buffs/standard/combatresource/IncreasePluckPerTurn";
-import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity } from "../../../../EntityRarity";
+import { PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
 export class InspiringPresence extends PlayableCard {

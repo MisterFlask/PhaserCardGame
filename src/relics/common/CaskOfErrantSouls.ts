@@ -1,4 +1,4 @@
-import { EntityRarity } from "../../gamecharacters/PlayableCard";
+import { EntityRarity } from "../../gamecharacters/EntityRarity";
 import { LocationCard, RestSiteCard } from "../../maplogic/LocationCard";
 import { AbstractRelic } from "../AbstractRelic";
 

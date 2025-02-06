@@ -14,7 +14,7 @@ import { IncreaseVenture } from "../../gamecharacters/buffs/standard/combatresou
 import { GrowingPowerBuff } from "../../gamecharacters/buffs/standard/GrowingPower";
 import { HellSellValue } from "../../gamecharacters/buffs/standard/HellSellValue";
 import { SurfaceSellValue } from "../../gamecharacters/buffs/standard/SurfaceSellValue";
-import { EntityRarity } from "../../gamecharacters/PlayableCard";
+import { EntityRarity } from "../../gamecharacters/EntityRarity";
 import { TextGlyphs } from "../../text/TextGlyphs";
 import { CardModifier, ModifierContext } from "./AbstractCardModifier";
 

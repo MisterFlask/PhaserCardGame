@@ -7,7 +7,8 @@ import { ExhaustBuff } from "../../../../buffs/playable_card/ExhaustBuff";
 import { BloodPriceBuff } from "../../../../buffs/standard/Bloodprice";
 import { Cursed } from "../../../../buffs/standard/Cursed";
 import { DamageIncreaseOnKill } from "../../../../buffs/standard/DamageIncreaseOnKill";
-import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity } from "../../../../EntityRarity";
+import { PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
 export class Balefire extends PlayableCard {

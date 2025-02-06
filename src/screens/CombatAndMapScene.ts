@@ -5,7 +5,7 @@ import BBCodeTextPlugin from 'phaser3-rex-plugins/plugins/bbcodetext-plugin.js';
 import { Encounter } from '../encounters/EncountersList';
 import { AbstractEvent } from '../events/AbstractEvent';
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
-import { PlayerCharacter } from '../gamecharacters/BaseCharacterClass';
+import { PlayerCharacter } from '../gamecharacters/PlayerCharacter';
 import { GameState } from '../rules/GameState';
 import { TextBoxButton } from '../ui/Button';
 import { CombatHighlightsManager } from '../ui/CombatHighlightsManager';

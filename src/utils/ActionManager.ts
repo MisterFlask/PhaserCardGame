@@ -5,8 +5,9 @@ import { AbstractCard, IPhysicalCardInterface } from '../gamecharacters/Abstract
 import { AutomatedCharacter } from "../gamecharacters/AutomatedCharacter";
 import type { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { AbstractBuff } from "../gamecharacters/buffs/AbstractBuff";
+import { CardResourceScaling } from "../gamecharacters/CardResourceScaling";
 import { IBaseCharacter } from "../gamecharacters/IBaseCharacter";
-import { CardResourceScaling, PlayableCard } from "../gamecharacters/PlayableCard";
+import { PlayableCard } from "../gamecharacters/PlayableCard";
 import { CardType } from "../gamecharacters/Primitives";
 import { ProcBroadcaster } from "../gamecharacters/procs/ProcBroadcaster";
 import { AbstractRelic } from "../relics/AbstractRelic";

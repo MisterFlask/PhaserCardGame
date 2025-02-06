@@ -1,4 +1,4 @@
-import { EntityRarity } from "../../gamecharacters/PlayableCard";
+import { EntityRarity } from "../../gamecharacters/EntityRarity";
 import { GameState } from "../../rules/GameState";
 import { AbstractRelic } from "../AbstractRelic";
 

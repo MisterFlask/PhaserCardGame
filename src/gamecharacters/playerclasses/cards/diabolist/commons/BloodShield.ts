@@ -4,7 +4,8 @@
 import { TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
 import { BloodPriceBuff } from "../../../../buffs/standard/Bloodprice";
-import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity } from "../../../../EntityRarity";
+import { PlayableCard } from "../../../../PlayableCard";
 import { BasicProcs } from "../../../../procs/BasicProcs";
 
 export class BloodShield extends PlayableCard {

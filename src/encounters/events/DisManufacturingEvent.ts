@@ -1,5 +1,5 @@
 import { AbstractChoice, AbstractEvent, DeadEndEvent } from "../../events/AbstractEvent";
-import { EntityRarity } from "../../gamecharacters/PlayableCard";
+import { EntityRarity } from "../../gamecharacters/EntityRarity";
 import { RelicsLibrary } from "../../relics/RelicsLibrary";
 import { ActionManager } from "../../utils/ActionManager";
 

@@ -1,5 +1,5 @@
-import { Lethality } from "../../gamecharacters/buffs/standard/Strong";
-import { EntityRarity } from "../../gamecharacters/PlayableCard";
+import { Lethality } from "../../gamecharacters/buffs/standard/Lethality";
+import { EntityRarity } from "../../gamecharacters/EntityRarity";
 import { GameState } from "../../rules/GameState";
 import { AbstractRelic } from "../AbstractRelic";
 

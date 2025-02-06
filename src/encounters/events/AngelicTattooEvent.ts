@@ -1,6 +1,6 @@
 import { AbstractChoice, AbstractEvent, DeadEndEvent } from "../../events/AbstractEvent";
+import { Lethality } from "../../gamecharacters/buffs/standard/Lethality";
 import { Stress } from "../../gamecharacters/buffs/standard/Stress";
-import { Lethality } from "../../gamecharacters/buffs/standard/Strong";
 import { ActionManager } from "../../utils/ActionManager";
 
 class BasicTattooChoice extends AbstractChoice {

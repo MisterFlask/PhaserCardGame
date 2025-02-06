@@ -1,6 +1,6 @@
 import { PlayableCard } from "../../PlayableCard";
 import { AbstractBuff } from "../AbstractBuff";
-import { Lethality } from "../standard/Strong";
+import { Lethality } from "../standard/Lethality";
 
 export class Muse extends AbstractBuff {
     constructor(stacks: number = 1) {

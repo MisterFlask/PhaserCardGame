@@ -1,8 +1,9 @@
 import { AbstractCard, TargetingType } from './AbstractCard';
 import { BaseCharacter } from './BaseCharacter';
 import { AbstractBuff } from './buffs/AbstractBuff';
+import { EntityRarity } from "./EntityRarity";
 import { IBaseCharacter } from './IBaseCharacter';
-import { EntityRarity, PlayableCard, } from './PlayableCard';
+import { PlayableCard, } from './PlayableCard';
 import { CardSize, CardType } from './Primitives';
 
 export abstract class PlayableCardWithHelpers extends PlayableCard {

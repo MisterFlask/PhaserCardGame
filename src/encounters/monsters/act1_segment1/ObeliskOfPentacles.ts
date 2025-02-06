@@ -1,6 +1,6 @@
 import { AbstractIntent, ApplyBuffToAllEnemyCharactersIntent, IntentListCreator } from '../../../gamecharacters/AbstractIntent';
 import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
-import { Lethality } from '../../../gamecharacters/buffs/standard/Strong';
+import { Lethality } from '../../../gamecharacters/buffs/standard/Lethality';
 
 export class VeilCapacitor extends AutomatedCharacter {
     constructor() {

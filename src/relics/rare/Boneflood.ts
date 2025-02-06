@@ -1,4 +1,5 @@
-import { EntityRarity, PlayableCard } from "../../gamecharacters/PlayableCard";
+import { EntityRarity } from "../../gamecharacters/EntityRarity";
+import { PlayableCard } from "../../gamecharacters/PlayableCard";
 import { GameState } from "../../rules/GameState";
 import { ActionManager } from "../../utils/ActionManager";
 import { AbstractRelic } from "../AbstractRelic";

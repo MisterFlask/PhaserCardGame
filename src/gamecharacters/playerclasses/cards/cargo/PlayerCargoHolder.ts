@@ -1,14 +1,32 @@
-import { PlayerCharacter } from "../../../BaseCharacterClass";
+import { Gender } from "../../../BaseCharacter";
+import { BaseCharacterClass } from "../../../BaseCharacterClass";
 import { PlayableCard } from "../../../PlayableCard";
-import { DiabolistClass } from "../../DiabolistClass";
+import { PlayerCharacter } from "../../../PlayerCharacter";
+
+class DummyCharacterClass extends BaseCharacterClass {
+    constructor() {
+        super({
+            name: "Dummy Character",
+            iconName: "placeholder_character_background_1",
+            startingMaxHp: 100,
+            id: "dummy_character_class"
+        });
+    }
+
+    getPortraitNameAtRandom(gender: Gender): string {
+        return "placeholder_character_background_1";
+    }
+}
+
 
 export class PlayerCargoHolder extends PlayerCharacter {
     constructor() { 
         super({
             name: "Cargo Holder",
             description: "A dummy character used to hold cargo.",
+
             portraitName: "placeholder_character_background_1",
-            characterClass: new DiabolistClass(), //doesn't actually matter here
+            characterClass: new DummyCharacterClass(), //doesn't actually matter here
         });
     }
 

@@ -1,6 +1,7 @@
 import { TargetingType } from "../../gamecharacters/AbstractCard";
 import { ExhaustBuff } from "../../gamecharacters/buffs/playable_card/ExhaustBuff";
-import { EntityRarity, PlayableCard } from "../../gamecharacters/PlayableCard";
+import { EntityRarity } from "../../gamecharacters/EntityRarity";
+import { PlayableCard } from "../../gamecharacters/PlayableCard";
 import { CardType, } from "../../gamecharacters/Primitives";
 import { BasicProcs } from "../../gamecharacters/procs/BasicProcs";
 import { AbstractRelic } from "../AbstractRelic";

@@ -15,7 +15,8 @@ export class InfestedModifier extends AbstractBuff {
     }
 }
 
-import { EntityRarity, PlayableCard } from '../../../gamecharacters/PlayableCard';
+import { EntityRarity } from "../../../gamecharacters/EntityRarity";
+import { PlayableCard } from '../../../gamecharacters/PlayableCard';
 import { CardType } from '../../../gamecharacters/Primitives';
 import { DeckLogic, PileName, PilePosition } from '../../DeckLogicHelper';
 

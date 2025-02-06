@@ -1,7 +1,8 @@
 import { AbstractCombatEvent } from "../../../../../rules/AbstractCombatEvent";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { AbstractBuff } from "../../../../buffs/AbstractBuff";
-import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity } from "../../../../EntityRarity";
+import { PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { SacrificeEvent } from "../../../../procs/BasicProcs";
 

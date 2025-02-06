@@ -3,7 +3,8 @@ import { GameState } from "../../../../../rules/GameState";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { HellSellValue } from "../../../../buffs/standard/HellSellValue";
 import { SurfaceSellValue } from "../../../../buffs/standard/SurfaceSellValue";
-import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity } from "../../../../EntityRarity";
+import { PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
 export class SoulJar extends PlayableCard {

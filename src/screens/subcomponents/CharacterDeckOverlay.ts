@@ -1,7 +1,7 @@
 import { Scene } from 'phaser';
 import { AbstractCard } from '../../gamecharacters/AbstractCard';
-import { PlayerCharacter } from '../../gamecharacters/BaseCharacterClass';
 import { PlayableCard } from '../../gamecharacters/PlayableCard';
+import { PlayerCharacter } from '../../gamecharacters/PlayerCharacter';
 import { GameState } from '../../rules/GameState';
 import { TextBoxButton } from '../../ui/Button';
 import { PhysicalCard } from '../../ui/PhysicalCard';

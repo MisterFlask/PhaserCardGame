@@ -1,18 +1,20 @@
 import { Scene } from 'phaser';
 import { AbstractEvent } from '../events/AbstractEvent';
-import { BattleCardLocation, GameState } from '../rules/GameState';
+import type { GameState } from '../rules/GameState';
+import { BattleCardLocation } from '../rules/GameState';
 import type { PhysicalCard } from '../ui/PhysicalCard';
 import { ShadowedImage } from '../ui/ShadowedImage';
 import { TextBox } from '../ui/TextBox';
 import type { ActionManager } from '../utils/ActionManager';
 import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
+
 import ImageUtils from '../utils/ImageUtils';
 import { AbstractPeriodicBark } from './AbstractPeriodicBark';
 import type { BaseCharacter } from './BaseCharacter';
-import type { PlayerCharacter } from './BaseCharacterClass';
 import { AbstractBuff } from './buffs/AbstractBuff';
 import { IAbstractCard } from './IAbstractCard';
 import type { PlayableCard } from './PlayableCard';
+import type { PlayerCharacter } from './PlayerCharacter';
 import { CardSize, CardType } from './Primitives'; // Ensure enums are imported from Primitives
 
 export interface IPhysicalCardInterface {
@@ -112,7 +114,7 @@ export abstract class AbstractCard implements IAbstractCard {
     }
     
     public getPile() : BattleCardLocation {
-        return GameState.getInstance().combatState.getBattleCardLocation(this.id);
+        return ActionManagerFetcher.getGameState().combatState.getBattleCardLocation(this.id);
     }
     public transientUiFlag_disableStandardDiscardAfterPlay: boolean = false;
 

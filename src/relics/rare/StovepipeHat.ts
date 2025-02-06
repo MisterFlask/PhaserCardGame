@@ -1,4 +1,4 @@
-import { EntityRarity } from '../../gamecharacters/PlayableCard';
+import { EntityRarity } from "../../gamecharacters/EntityRarity";
 import { ManufactureEvent } from '../../gamecharacters/procs/BasicProcs';
 import { AbstractCombatEvent } from '../../rules/AbstractCombatEvent';
 import { AbstractRelic } from '../AbstractRelic';

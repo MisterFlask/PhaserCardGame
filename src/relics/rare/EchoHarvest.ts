@@ -1,4 +1,4 @@
-import { EntityRarity } from "../../gamecharacters/PlayableCard";
+import { EntityRarity } from "../../gamecharacters/EntityRarity";
 import { ResourceUsedEvent } from "../../rules/combatresources/AbstractCombatResource";
 import { GameState } from "../../rules/GameState";
 import { ActionManager } from "../../utils/ActionManager";

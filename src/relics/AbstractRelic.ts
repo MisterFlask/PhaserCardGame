@@ -1,5 +1,5 @@
 import { AbstractBuff } from "../gamecharacters/buffs/AbstractBuff";
-import { EntityRarity } from "../gamecharacters/PlayableCard";
+import { EntityRarity } from "../gamecharacters/EntityRarity";
 import ImageUtils from "../utils/ImageUtils";
 
 export abstract class AbstractRelic extends AbstractBuff {
@@ -9,8 +9,6 @@ export abstract class AbstractRelic extends AbstractBuff {
     rarity: EntityRarity = EntityRarity.COMMON;
     price: number = this.rarity.basePrice * 2;
     surfaceSellValue: number = this.price;
-
-
 
     constructor() {
         super();

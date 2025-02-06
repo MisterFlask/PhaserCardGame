@@ -1,5 +1,6 @@
 import { BaseCharacter } from "../../gamecharacters/BaseCharacter";
-import { EntityRarity, PlayableCard } from "../../gamecharacters/PlayableCard";
+import { EntityRarity } from "../../gamecharacters/EntityRarity";
+import { PlayableCard } from "../../gamecharacters/PlayableCard";
 import { Shoot } from "../../gamecharacters/playerclasses/cards/basic/Shoot";
 import { AbstractRelic } from "../AbstractRelic";
 

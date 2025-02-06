@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { AbstractCard, PriceContext } from '../../gamecharacters/AbstractCard';
-import { PlayerCharacter } from '../../gamecharacters/BaseCharacterClass';
 import { PlayableCard } from '../../gamecharacters/PlayableCard';
+import { PlayerCharacter } from '../../gamecharacters/PlayerCharacter';
 import { AbstractRelic } from '../../relics/AbstractRelic';
 import { GameState, ShopContents } from '../../rules/GameState';
 import { DepthManager } from '../../ui/DepthManager';

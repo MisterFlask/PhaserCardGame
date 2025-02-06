@@ -1,7 +1,7 @@
 // At the start of combat, two random cards in your draw pile are granted Bloodprice 2.
 
 import { BloodPriceBuff } from "../../gamecharacters/buffs/standard/Bloodprice";
-import { EntityRarity } from "../../gamecharacters/PlayableCard";
+import { EntityRarity } from "../../gamecharacters/EntityRarity";
 import { GameState } from "../../rules/GameState";
 import { ActionManager } from "../../utils/ActionManager";
 import { AbstractRelic } from "../AbstractRelic";

@@ -1,6 +1,7 @@
 import { GameState } from "../../../rules/GameState";
 import { TargetingType } from "../../AbstractCard";
-import { EntityRarity, PlayableCard } from "../../PlayableCard";
+import { EntityRarity } from "../../EntityRarity";
+import { PlayableCard } from "../../PlayableCard";
 import { CardType } from "../../Primitives";
 import { AbstractBuff } from "../AbstractBuff";
 import { ExhaustBuff } from "../playable_card/ExhaustBuff";

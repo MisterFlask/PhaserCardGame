@@ -1,6 +1,6 @@
 import { Scene } from 'phaser';
-import { PlayerCharacter } from '../../../../gamecharacters/BaseCharacterClass';
 import { PlayableCard } from '../../../../gamecharacters/PlayableCard';
+import { PlayerCharacter } from '../../../../gamecharacters/PlayerCharacter';
 import { AbstractRelic } from '../../../../relics/AbstractRelic';
 import { GameState } from '../../../../rules/GameState';
 import { TextBoxButton } from '../../../../ui/Button';

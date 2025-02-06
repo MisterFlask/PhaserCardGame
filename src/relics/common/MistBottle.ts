@@ -1,4 +1,4 @@
-import { EntityRarity } from "../../gamecharacters/PlayableCard";
+import { EntityRarity } from "../../gamecharacters/EntityRarity";
 import { AbstractRelic } from "../AbstractRelic";
 
 export class MistBottle extends AbstractRelic {

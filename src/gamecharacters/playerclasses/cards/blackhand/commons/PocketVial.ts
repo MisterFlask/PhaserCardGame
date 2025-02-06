@@ -2,7 +2,7 @@ import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
 import { Burning } from "../../../../buffs/standard/Burning";
 import { Weak } from "../../../../buffs/standard/Weak";
-import { EntityRarity } from "../../../../PlayableCard";
+import { EntityRarity } from "../../../../EntityRarity";
 import { PlayableCardWithHelpers } from "../../../../PlayableCardWithHelpers";
 import { CardType } from "../../../../Primitives";
 

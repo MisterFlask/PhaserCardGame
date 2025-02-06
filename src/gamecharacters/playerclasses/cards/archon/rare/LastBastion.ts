@@ -2,7 +2,8 @@ import { DeckLogic, PileName } from "../../../../../rules/DeckLogicHelper";
 import { GameState } from "../../../../../rules/GameState";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { ExhaustBuff } from "../../../../buffs/playable_card/ExhaustBuff";
-import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity } from "../../../../EntityRarity";
+import { PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { BasicProcs } from "../../../../procs/BasicProcs";
 

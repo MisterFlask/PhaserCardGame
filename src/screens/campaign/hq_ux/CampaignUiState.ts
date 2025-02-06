@@ -1,6 +1,6 @@
 import { Scene } from 'phaser';
-import { PlayerCharacter } from '../../../gamecharacters/BaseCharacterClass';
 import { PlayableCard } from '../../../gamecharacters/PlayableCard';
+import { PlayerCharacter } from '../../../gamecharacters/PlayerCharacter';
 import { CoalCargo } from '../../../gamecharacters/playerclasses/cards/cargo/CoalCargo';
 import { CoffeeCargo } from '../../../gamecharacters/playerclasses/cards/cargo/CoffeeCargo';
 import { SpicyLiteratureCargo } from '../../../gamecharacters/playerclasses/cards/cargo/SpicyLiteratureCargo';

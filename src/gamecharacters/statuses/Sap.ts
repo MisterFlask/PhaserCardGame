@@ -1,6 +1,7 @@
 import { ActionManager } from "../../utils/ActionManager";
 import { TargetingType } from "../AbstractCard";
-import { EntityRarity, PlayableCard } from "../PlayableCard";
+import { EntityRarity } from "../EntityRarity";
+import { PlayableCard } from "../PlayableCard";
 import { CardType } from "../Primitives";
 import { AbstractBuff } from "../buffs/AbstractBuff";
 import { RetainBuff } from "../buffs/playable_card/Retain";

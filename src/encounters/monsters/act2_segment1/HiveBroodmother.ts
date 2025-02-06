@@ -1,11 +1,11 @@
 import { AbstractIntent, AddCardToPileIntent, AttackIntent } from "../../../gamecharacters/AbstractIntent";
 import { AutomatedCharacter } from "../../../gamecharacters/AutomatedCharacter";
-import { PlayerCharacter } from "../../../gamecharacters/BaseCharacterClass";
 import { HatchesIntoEnemyIfRetained } from "../../../gamecharacters/buffs/playable_card/HatchesIntoEnemyIfRetained";
 import { LimitedUses } from "../../../gamecharacters/buffs/playable_card/LimitedUses";
 import { Popular } from "../../../gamecharacters/buffs/playable_card/Popular";
 import { ReturnCardToHandAtStartOfTurn } from "../../../gamecharacters/buffs/playable_card/ReturnCardToHandAtStartOfTurn";
 import { PlayableCard } from "../../../gamecharacters/PlayableCard";
+import { PlayerCharacter } from "../../../gamecharacters/PlayerCharacter";
 import { CrawlingInfestation } from "./CrawlingInfestation";
 
 // imagine a card representing an egg that hatches into something nasty later

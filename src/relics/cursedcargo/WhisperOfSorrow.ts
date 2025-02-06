@@ -1,5 +1,6 @@
 import { Hazardous } from "../../gamecharacters/buffs/playable_card/Hazardous";
-import { EntityRarity, PlayableCard } from "../../gamecharacters/PlayableCard";
+import { EntityRarity } from "../../gamecharacters/EntityRarity";
+import { PlayableCard } from "../../gamecharacters/PlayableCard";
 import { AbstractRelic } from "../AbstractRelic";
 
 export class WhisperOfSorrow extends AbstractRelic {

@@ -2,8 +2,8 @@ import { CombatRules } from '../rules/CombatRulesHelper';
 import { GameState } from '../rules/GameState';
 import { AbstractCard, Team } from './AbstractCard';
 import { AbstractIntent } from './AbstractIntent';
-import { Stress } from './buffs/standard/Stress';
 import { IBaseCharacter } from './IBaseCharacter';
+
 
 
 export enum Gender{
@@ -44,19 +44,10 @@ export class BaseCharacter extends AbstractCard implements IBaseCharacter {
     }
 
     get stress(): number {
-        const stressBuff = this.buffs.find(buff => buff instanceof Stress);
+        const stressBuff = this.buffs.find(buff => buff.id === "stress");
         return stressBuff ? stressBuff.stacks : 0;
     }
 
-    set stress(value: number) {
-        const stressBuff = this.buffs.find(buff => buff instanceof Stress);
-        if (stressBuff) {
-            stressBuff.stacks = value;
-        } else {
-            const newStressBuff = new Stress(value);
-            this.buffs.push(newStressBuff);
-        }
-    }
 
     constructor({ name, portraitName, maxHitpoints, description }
         : { name: string; portraitName: string; maxHitpoints: number; description?: string}) {

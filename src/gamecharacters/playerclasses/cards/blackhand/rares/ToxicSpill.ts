@@ -4,7 +4,8 @@ import { VolatileBuff } from "../../../../buffs/playable_card/VolatileCardBuff";
 import { Burning } from "../../../../buffs/standard/Burning";
 import { Poisoned } from "../../../../buffs/standard/Poisoned";
 import { Weak } from "../../../../buffs/standard/Weak";
-import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity } from "../../../../EntityRarity";
+import { PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 
 export class ToxicSpill extends PlayableCard {

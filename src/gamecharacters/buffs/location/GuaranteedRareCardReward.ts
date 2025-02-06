@@ -1,7 +1,7 @@
-import { EntityRarity } from "../../../gamecharacters/PlayableCard";
 import { CardLibrary } from "../../../gamecharacters/playerclasses/cards/CardLibrary";
 import { AbstractReward } from "../../../rewards/AbstractReward";
 import { CardReward } from "../../../rewards/CardReward";
+import { EntityRarity } from "../../EntityRarity";
 import { AbstractBuff } from "../AbstractBuff";
 
 export class GuaranteedRareCardReward extends AbstractBuff {

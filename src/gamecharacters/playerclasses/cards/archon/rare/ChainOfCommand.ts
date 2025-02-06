@@ -1,6 +1,9 @@
 import { GameState } from "../../../../../rules/GameState";
+import { ActionManager } from "../../../../../utils/ActionManager";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
-import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
+import { Stress } from "../../../../buffs/standard/Stress";
+import { EntityRarity } from "../../../../EntityRarity";
+import { PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { BasicProcs } from "../../../../procs/BasicProcs";
 import { TakeCover } from "../tokens/TakeCover";
@@ -39,7 +42,7 @@ export class ChainOfCommand extends PlayableCard {
 
         // All party members take 1 Stress
         combatState.playerCharacters.forEach(ally => {
-            ally.stress += 1;
+            ActionManager.getInstance().applyBuffToCharacterOrCard(ally, new Stress(1));
         });
 
         BasicProcs.getInstance().ManufactureCardToHand(new TakeCover());

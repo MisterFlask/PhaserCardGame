@@ -1,6 +1,6 @@
 
 import { AbstractBuff } from "../AbstractBuff";
-import { Lethality } from "./Strong";
+import { Lethality } from "./Lethality";
 
 export class GrowingPowerBuff extends AbstractBuff {
     constructor(stacks: number = 1) {

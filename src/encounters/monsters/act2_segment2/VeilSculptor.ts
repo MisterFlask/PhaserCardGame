@@ -1,9 +1,9 @@
 import { ActionManager } from "../../../gamecharacters/../utils/ActionManager";
 import { AbstractIntent, ApplyDebuffToAllPlayerCharactersIntent, AttackIntent } from "../../../gamecharacters/AbstractIntent";
 import { AutomatedCharacter } from "../../../gamecharacters/AutomatedCharacter";
-import { PlayerCharacter } from "../../../gamecharacters/BaseCharacterClass";
 import { AbstractBuff } from "../../../gamecharacters/buffs/AbstractBuff";
 import { PlayableCard } from "../../../gamecharacters/PlayableCard";
+import { PlayerCharacter } from "../../../gamecharacters/PlayerCharacter";
 import { PileName } from "../../../rules/DeckLogicHelper";
 
 // a strange debuff that causes each character affected to draw haunting illusions each time they draw a card.

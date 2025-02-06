@@ -1,8 +1,11 @@
+import { ActionManager } from "../../../../../utils/ActionManager";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
-import { EntityRarity, PlayableCard } from "../../../../PlayableCard";
+import { EntityRarity } from "../../../../EntityRarity";
+import { PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { AbstractBuff } from "../../../../buffs/AbstractBuff";
 import { ExhaustBuff } from "../../../../buffs/playable_card/ExhaustBuff";
+import { Stress } from "../../../../buffs/standard/Stress";
 
 class IronWillBuff extends AbstractBuff {
     constructor() {
@@ -39,7 +42,8 @@ export class IronWill extends PlayableCard {
 
         if (owner) {
             // Owner gains 2 stress
-            owner.stress += 2;
+            ActionManager.getInstance().applyBuffToCharacterOrCard(owner, new Stress(2));
+
 
             // Apply Iron Will buff to the owner
             const ironWillBuff = new IronWillBuff();

@@ -1,8 +1,7 @@
 import { Encounter } from '../encounters/EncountersList';
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
-import type { PlayerCharacter } from '../gamecharacters/BaseCharacterClass';
-import { CharacterGenerator } from '../gamecharacters/CharacterGenerator';
 import type { PlayableCard } from '../gamecharacters/PlayableCard';
+import type { PlayerCharacter } from '../gamecharacters/PlayerCharacter';
 import { PlayerCargoHolder } from '../gamecharacters/playerclasses/cards/cargo/PlayerCargoHolder';
 import type { LocationCard } from '../maplogic/LocationCard';
 import { AbstractRelic } from '../relics/AbstractRelic';
@@ -42,7 +41,7 @@ export class GameState {
         this.relicsInventory = []
         this.currentRunCharacters.forEach(character => {
             character.buffs = character.buffs.filter(buff => buff.isPersonaTrait);
-            character.cardsInMasterDeck = CharacterGenerator.getInstance().generateStartingDeck(character.characterClass)
+            character.cardsInMasterDeck = character.startingDeck.slice().map(card => card.Copy())
         });
         this.currentRunCharacters = []
         this.currentLocation = null

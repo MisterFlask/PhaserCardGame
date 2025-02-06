@@ -1,7 +1,8 @@
 import { DeckLogic, PileName } from "../../../../rules/DeckLogicHelper";
 import { GameState } from "../../../../rules/GameState";
 import { TargetingType } from "../../../AbstractCard";
-import { EntityRarity, PlayableCard } from "../../../PlayableCard";
+import { EntityRarity } from "../../../EntityRarity";
+import { PlayableCard } from "../../../PlayableCard";
 import { CardType } from "../../../Primitives";
 import { BalefireRevolver } from "./BalefireRevolver";
 

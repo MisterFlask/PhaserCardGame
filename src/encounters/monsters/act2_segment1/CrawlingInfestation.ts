@@ -1,7 +1,7 @@
 import { AbstractIntent, ApplyBuffToSelfIntent, AttackAllPlayerCharactersIntent, IntentListCreator } from "../../../gamecharacters/AbstractIntent";
 import { AutomatedCharacter } from "../../../gamecharacters/AutomatedCharacter";
 import { GrowingPowerBuff } from "../../../gamecharacters/buffs/standard/GrowingPower";
-import { Lethality } from "../../../gamecharacters/buffs/standard/Strong";
+import { Lethality } from "../../../gamecharacters/buffs/standard/Lethality";
 import { Swarm } from "../../../gamecharacters/buffs/standard/Swarm";
 
 

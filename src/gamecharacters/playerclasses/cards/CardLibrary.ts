@@ -1,6 +1,7 @@
 import { GameState } from '../../../rules/GameState';
 import { BaseCharacterClass } from '../../BaseCharacterClass';
-import { EntityRarity, PlayableCard } from '../../PlayableCard';
+import { EntityRarity } from "../../EntityRarity";
+import { PlayableCard } from '../../PlayableCard';
 import { ArchonClass } from '../ArchonClass';
 import { BlackhandClass } from '../BlackhandClass';
 import { DiabolistClass } from '../DiabolistClass';

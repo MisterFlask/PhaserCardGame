@@ -2,7 +2,8 @@ import { TargetingType } from "../../../AbstractCard";
 import { BaseCharacter } from "../../../BaseCharacter";
 import { AbstractBuff } from "../../../buffs/AbstractBuff";
 import { RetainBuff } from "../../../buffs/playable_card/Retain";
-import { EntityRarity, PlayableCard } from "../../../PlayableCard";
+import { EntityRarity } from "../../../EntityRarity";
+import { PlayableCard } from "../../../PlayableCard";
 import { CardType } from "../../../Primitives";
 
 

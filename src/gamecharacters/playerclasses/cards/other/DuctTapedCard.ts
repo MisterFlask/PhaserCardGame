@@ -1,5 +1,6 @@
 import { AbstractCard, TargetingType } from "../../../AbstractCard";
-import { EntityRarity, PlayableCard } from "../../../PlayableCard";
+import { EntityRarity } from "../../../EntityRarity";
+import { PlayableCard } from "../../../PlayableCard";
 import { CardType } from "../../../Primitives";
 
 export class DuctTapedCard extends PlayableCard {

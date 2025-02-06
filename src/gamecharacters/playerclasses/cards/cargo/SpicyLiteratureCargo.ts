@@ -1,6 +1,7 @@
 import { TargetingType } from "../../../AbstractCard";
 import { HellSellValue } from "../../../buffs/standard/HellSellValue";
-import { EntityRarity, PlayableCard } from "../../../PlayableCard";
+import { EntityRarity } from "../../../EntityRarity";
+import { PlayableCard } from "../../../PlayableCard";
 import { CardType } from "../../../Primitives";
 
 export class SpicyLiteratureCargo extends PlayableCard {

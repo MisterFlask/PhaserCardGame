@@ -1,4 +1,5 @@
-import { EntityRarity, PlayableCard } from "../gamecharacters/PlayableCard";
+import { EntityRarity } from "../gamecharacters/EntityRarity";
+import { PlayableCard } from "../gamecharacters/PlayableCard";
 import { CardLibrary } from "../gamecharacters/playerclasses/cards/CardLibrary";
 import { GameState } from "./GameState";
 import { ModifierContext } from "./modifiers/AbstractCardModifier";

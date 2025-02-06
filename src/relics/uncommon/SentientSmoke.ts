@@ -1,4 +1,4 @@
-import { EntityRarity } from "../../gamecharacters/PlayableCard";
+import { EntityRarity } from "../../gamecharacters/EntityRarity";
 import { EldritchSmoke } from "../../gamecharacters/playerclasses/cards/diabolist/tokens/EldritchSmoke";
 import { BasicProcs } from "../../gamecharacters/procs/BasicProcs";
 import { AbstractCombatEvent } from "../../rules/AbstractCombatEvent";

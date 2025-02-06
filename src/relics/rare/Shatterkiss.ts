@@ -1,5 +1,5 @@
 import { TemporaryLethality } from "../../gamecharacters/buffs/standard/TemporaryLethality";
-import { EntityRarity } from "../../gamecharacters/PlayableCard";
+import { EntityRarity } from "../../gamecharacters/EntityRarity";
 import { GameState } from "../../rules/GameState";
 import { ActionManager } from "../../utils/ActionManager";
 import { AbstractRelic } from "../AbstractRelic";
