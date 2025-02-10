@@ -7,7 +7,7 @@ export class EschatonMirror extends AutomatedCharacter {
     constructor() {
         super({
             name: "Eschaton Mirror",
-            portraitName: "eschaton_mirror",
+            portraitName: "Mirror Mimic",
             maxHitpoints: 55,
             description: "a cracked reflection of impossible futures. it manipulates the deck itself, warping your memory of cards."
         });

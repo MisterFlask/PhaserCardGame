@@ -6,7 +6,7 @@ export class VeilCapacitor extends AutomatedCharacter {
     constructor() {
         super({
             name: "Obelisk of Pentacles",
-            portraitName: "veil-capacitor",
+            portraitName: "Obelisk of Pentacles",
             maxHitpoints: 14,
             description: "A small, unsettling totem.  Probably not worth worrying about."
         });

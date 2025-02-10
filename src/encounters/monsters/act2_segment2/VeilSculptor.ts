@@ -54,9 +54,9 @@ export class VeilSculptor extends AutomatedCharacter {
     constructor() {
         super({
             name: "Veil Sculptor",
-            portraitName: "veil_sculptor",
+            portraitName: "Light Creatures Throne",
             maxHitpoints: 50,
-            description: "a half-glimpsed entity of folded space and twitching glyphs. it twists your mind, conjuring illusions into your deck."
+            description: "a half-glimpsed entity of folded space and twitching glyphs. it twists your mind, conjuring illusions into your mind."
         });
     }
 

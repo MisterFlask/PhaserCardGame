@@ -42,7 +42,7 @@ export class FrenchIntellectual extends AutomatedCharacter {
     constructor() {
         super({
             name: "Lexiophage",
-            portraitName: "Eldritch Intellectual",
+            portraitName: "Clockwork Seer",
             maxHitpoints: 120,
             description: "responsible for three out of four paperwork errors"
         });

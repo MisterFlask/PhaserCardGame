@@ -8,7 +8,7 @@ export class FrenchPoliceman extends AutomatedCharacter {
     constructor() {
         super({
             name: "Ashcop",
-            portraitName: "Eldritch Policeman",
+            portraitName: "Clockwork Iron Maiden",
             maxHitpoints: 175,
             description: "keeping paris out of the Null Layer"
         });

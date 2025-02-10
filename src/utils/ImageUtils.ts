@@ -266,7 +266,8 @@ export default class GameImageLoader {
                 'Corrupted Legendary Knight Sen.png', 'Corrupted Spider.png', 'Demon Critter Squirrel.png',
                 'Dryads Mage.png', 'Eldritch Corruption Obelisk.png', 'Eldritch Corruption Treant.png',
                 'Golems Eye Golem.png', 'Hero Magic Knightess.png', 'Slime Darkii.png', 'Slime Fireii.png',
-                'Slime Iceii.png', 'Slime RPG Basic.png', 'Boss Harbinger.png',
+                'Slime Iceii.png', 'Slime RPG Basic.png', 'Boss Harbinger.png', 'Torture Device Iron Maiden A.png',
+                'Light Creatures Throne.png', "Light Wisp.png", "Mirror Mimic.png", "Obelisk of Pentacles.png", "swarm_bugs_placeholder.png", "Torture Device Iron Maiden A.png", "Weird Mirror.png", "Arcane Crystal.png",
 
                 // french
                 "Eldritch Corruption Deer.png", "Eldritch Soldier Gunner.png", "Eldritch Corruption Crow.png",
@@ -300,7 +301,7 @@ export default class GameImageLoader {
         },
         combat_resources: {
             prefix: 'Sprites/CombatResources/',
-            files: ['powder_icon.png', 'iron_icon.png', 'papers_icon.png', 'feather_icon.png', 'venture_icon.png', 'smog_icon.png', 'ashes_icon.png', 'blood_icon.svg']
+            files: ['powder_icon.png', 'iron_icon.png', 'papers_icon.png', 'feather_icon.png', 'venture_icon.png', 'smog_icon.png', 'ashes_icon.png', 'blood_icon.png']
         },
         mission_icons: {
             prefix: 'Sprites/MissionIcons/',

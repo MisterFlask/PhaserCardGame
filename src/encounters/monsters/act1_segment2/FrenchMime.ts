@@ -10,7 +10,7 @@ export class EldritchMime extends AutomatedCharacter {
     constructor() {
         super({
             name: "...",
-            portraitName: "Eldritch Mime",
+            portraitName: "Golems Eye Golem",
             maxHitpoints: 15,
             description: "the white face paint isn’t for show.  it's a seal.  a binding."
         });

@@ -6,7 +6,7 @@ export class VesperOfMeat extends AutomatedCharacter {
     constructor() {
         super({
             name: "Vesper of Meat",
-            portraitName: "Eldritch Slime Spawn",
+            portraitName: "Eldritch Slime Spawn A",
             maxHitpoints: 25,
             description: "you will be baked, and then there will be cake"
         });

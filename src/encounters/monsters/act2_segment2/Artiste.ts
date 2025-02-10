@@ -1,5 +1,5 @@
 import { AbstractCard, TargetingType } from "../../../gamecharacters/AbstractCard";
-import { AbstractIntent, ApplyDebuffToAllPlayerCharactersIntent, AttackIntent, IntentListCreator } from "../../../gamecharacters/AbstractIntent";
+import { AbstractIntent, AddCardToPileIntent, AttackIntent, IntentListCreator } from "../../../gamecharacters/AbstractIntent";
 import { AutomatedCharacter } from "../../../gamecharacters/AutomatedCharacter";
 import { BaseCharacter } from "../../../gamecharacters/BaseCharacter";
 import { Muse } from "../../../gamecharacters/buffs/enemy_buffs/Muse";
@@ -10,37 +10,6 @@ import { PlayableCard } from "../../../gamecharacters/PlayableCard";
 import { CardType } from "../../../gamecharacters/Primitives";
 
 
-export class Artiste extends AutomatedCharacter {
-    constructor() {
-        super({
-            name: "L'Artiste Moderne",
-            portraitName: "Eldritch Artiste",
-            maxHitpoints: 120,
-            description: "creates art that hurts to look at"
-        });
-
-        this.buffs.push(new Muse(1));
-    }
-
-    override generateNewIntents(): AbstractIntent[] {
-        const intents: AbstractIntent[][] = [
-            [
-                new ApplyDebuffToAllPlayerCharactersIntent({ 
-                    debuff: new Painful(1), 
-                    owner: this 
-                }).withTitle("Avant-Garde Vision")
-            ],
-            [
-                new AttackIntent({ 
-                    baseDamage: 36, 
-                    owner: this,
-                }).withTitle("Penetration")
-            ]
-        ];
-
-        return IntentListCreator.iterateIntents(intents);
-    }
-}
 
 class ModernArtAttack extends PlayableCard {
     constructor() {
@@ -113,3 +82,45 @@ class ModernArtStrength extends PlayableCard {
     }
 }
 
+export class Artiste extends AutomatedCharacter {
+    constructor() {
+        super({
+            name: "L'Artiste Moderne",
+            portraitName: "Eldritch Slime Spawn A",
+            maxHitpoints: 120,
+            description: "creates art that hurts to look at"
+        });
+
+        this.buffs.push(new Muse(1));
+    }
+
+    override generateNewIntents(): AbstractIntent[] {
+        const intents: AbstractIntent[][] = [
+            [
+                new AddCardToPileIntent({
+                    cardToAdd: new ModernArtAttack(),
+                    pileName: 'draw',
+                    owner: this
+                }).withTitle("Incomprehensible Scribbles"),
+                new AddCardToPileIntent({
+                    cardToAdd: new ModernArtDefend(),
+                    pileName: 'draw',
+                    owner: this
+                }).withTitle("Incomprehensible Scribbles"),
+                new AddCardToPileIntent({
+                    cardToAdd: new ModernArtStrength(),
+                    pileName: 'draw',
+                    owner: this
+                }).withTitle("Incomprehensible Scribbles")
+            ],
+            [
+                new AttackIntent({ 
+                    baseDamage: 36, 
+                    owner: this,
+                }).withTitle("Penetration")
+            ]
+        ];
+
+        return IntentListCreator.iterateIntents(intents);
+    }
+}

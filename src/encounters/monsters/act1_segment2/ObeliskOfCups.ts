@@ -10,7 +10,7 @@ export class AccursedObelisk extends AutomatedCharacter {
     constructor() {
         super({
             name: "Obelisk of Cups",
-            portraitName: "obelisk_portrait",
+            portraitName: "Eldritch Corruption Obelisk",
             maxHitpoints: 40,
             description: "An ancient obelisk radiating dark energy."
         });

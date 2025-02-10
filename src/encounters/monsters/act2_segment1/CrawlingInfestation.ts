@@ -9,7 +9,7 @@ export class CrawlingInfestation extends AutomatedCharacter {
     constructor() {
         super({
             name: "Solicitor Swarm",
-            portraitName: "crawling infestation",
+            portraitName: "swarm_bugs_placeholder",
             maxHitpoints: 60,
             description: "countless tiny mandibles clicking in unison, moving as one entity. the swarm is never just one bug, it's many. too many."
         });

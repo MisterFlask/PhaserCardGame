@@ -13,7 +13,7 @@ import { GameState } from '../rules/GameState';
 import { CardModifier } from '../rules/modifiers/AbstractCardModifier';
 import { RestEvent } from './events/RestEvent';
 import { FrenchBlindProphetess } from './monsters/act1_boss/FrenchBlindProphetess';
-import { Echophagist } from './monsters/act1_segment1/Cacophagist';
+import { Echophagist } from './monsters/act1_segment1/Echophagist';
 import { SorrowmothSwarm } from './monsters/act1_segment1/CaulMoth';
 import { FrenchCrow } from './monsters/act1_segment1/HymnalOfMeat';
 import { VeilCapacitor } from './monsters/act1_segment1/ObeliskOfPentacles';
@@ -228,7 +228,7 @@ export class TreasureChest extends AutomatedCharacter {
     constructor() {
         super({ 
             name: 'Treasure Chest', 
-            portraitName: 'TreasureChest', 
+            portraitName: 'Torture Device Iron Maiden A', 
             maxHitpoints: 1, 
             description: 'Contains valuable treasures' 
         });

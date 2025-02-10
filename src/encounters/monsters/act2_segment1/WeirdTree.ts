@@ -6,7 +6,7 @@ export class WeirdTree extends AutomatedCharacter {
     constructor() {
         super({
             name: "Weird Tree",
-            portraitName: "weird tree",
+            portraitName: "Eldritch Corruption Treant",
             maxHitpoints: 45,
             description: "A twisted tree that drips with sticky sap. Its branches reach out menacingly."
         });
