@@ -12,7 +12,7 @@ export class FrenchCrow extends AutomatedCharacter {
     constructor() {
         super({
             name: "Hymnal of Meat",
-            portraitName: "Eldritch Corruption Crow",
+            portraitName: "Darkness Wisp",
             maxHitpoints: 10,
             description: "it sings, and the choir is made from those who listen."
         });

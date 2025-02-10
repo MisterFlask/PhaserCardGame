@@ -9,7 +9,7 @@ export class SorrowmothSwarm extends AutomatedCharacter {
     constructor() {
         super({
             name: "Caul-Moth",
-            portraitName: "Sorrowmoth Swarm",
+            portraitName: "Light Gemstone A",
             maxHitpoints: 35,
             description: "a noble thing, unwound and draped over too many dimensions."
         });

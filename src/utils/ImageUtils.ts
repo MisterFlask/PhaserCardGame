@@ -268,6 +268,7 @@ export default class GameImageLoader {
                 'Golems Eye Golem.png', 'Hero Magic Knightess.png', 'Slime Darkii.png', 'Slime Fireii.png',
                 'Slime Iceii.png', 'Slime RPG Basic.png', 'Boss Harbinger.png', 'Torture Device Iron Maiden A.png',
                 'Light Creatures Throne.png', "Light Wisp.png", "Mirror Mimic.png", "Obelisk of Pentacles.png", "swarm_bugs_placeholder.png", "Torture Device Iron Maiden A.png", "Weird Mirror.png", "Arcane Crystal.png",
+                'Darkness Wisp.png', 'Light Gemstone A.png',
 
                 // french
                 "Eldritch Corruption Deer.png", "Eldritch Soldier Gunner.png", "Eldritch Corruption Crow.png",

@@ -11,13 +11,13 @@ export class FrenchBlindProphetess extends AutomatedCharacter {
     constructor() {
         super({
             name: "Doris Smith",
-            portraitName: "doris-smith",
+            portraitName: "Boss Grand Sorceress Duessa",
             maxHitpoints: 200,
             description: "whispers of the Final Argument"
         });
-        //this.portraitTargetLargestDimension = 600;
-        //this.portraitOffsetXOverride = -100
-        //this.portraitOffsetYOverride = 0
+        this.portraitTargetLargestDimension = 600;
+        this.portraitOffsetXOverride = -100
+        this.portraitOffsetYOverride = 0
         this.size = CardSize.LARGE;
         // Apply initial MothGod buff
         this.buffs.push(new EggLayer(2));

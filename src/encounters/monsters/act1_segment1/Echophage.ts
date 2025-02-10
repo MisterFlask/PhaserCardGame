@@ -5,7 +5,7 @@ import { Burning } from '../../../gamecharacters/buffs/standard/Burning';
 export class Echophagist extends AutomatedCharacter {
     constructor() {
         super({
-            name: "Echophagist",
+            name: "Echophage",
             portraitName: "Eldritch Corruption Deer",
             maxHitpoints: 30,
             description: "Antlers sharp as philosophy, refracting light into spectral halos that contain glimpses of forgotten monarchies"
