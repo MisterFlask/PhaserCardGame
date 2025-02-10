@@ -134,7 +134,7 @@ export class SummonIntent extends AbstractIntent {
     monsterToSummon: AutomatedCharacter;
 
     constructor({ monsterToSummon, owner }: { monsterToSummon: AutomatedCharacter, owner: BaseCharacter }) {
-        super({ imageName: 'pentacle', target: undefined, owner: owner });
+        super({ imageName: 'pentacle-intent', target: undefined, owner: owner });
         this.monsterToSummon = monsterToSummon;
     }
 
