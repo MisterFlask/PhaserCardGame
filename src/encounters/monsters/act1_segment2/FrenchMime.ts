@@ -15,6 +15,10 @@ export class EldritchMime extends AutomatedCharacter {
             description: "the white face paint isn’t for show.  it's a seal.  a binding."
         });
         
+        this.portraitTargetLargestDimension = 300;
+        this.portraitOffsetXOverride = -40
+        this.portraitOffsetYOverride = 0
+
         this.buffs.push(new DoNotLookAtMe(1));
         this.buffs.push(new SelfDestruct(10, 3));
     }

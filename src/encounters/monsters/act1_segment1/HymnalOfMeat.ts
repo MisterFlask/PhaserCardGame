@@ -16,6 +16,10 @@ export class FrenchCrow extends AutomatedCharacter {
             maxHitpoints: 10,
             description: "it sings, and the choir is made from those who listen."
         });
+        
+        this.portraitTargetLargestDimension = 300;
+        this.portraitOffsetXOverride = -40
+        this.portraitOffsetYOverride = 0
         this.buffs.push(new Flying(1));
         this.buffs.push(new Terrifying(1));
     }

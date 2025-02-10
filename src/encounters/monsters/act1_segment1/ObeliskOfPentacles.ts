@@ -6,10 +6,14 @@ export class VeilCapacitor extends AutomatedCharacter {
     constructor() {
         super({
             name: "Obelisk of Pentacles",
-            portraitName: "Obelisk of Pentacles",
+            portraitName: "Arcane Crystal",
             maxHitpoints: 14,
             description: "A small, unsettling totem.  Probably not worth worrying about."
         });
+        
+        this.portraitTargetLargestDimension = 300;
+        this.portraitOffsetXOverride = -40
+        this.portraitOffsetYOverride = 0
     }
 
     override generateNewIntents(): AbstractIntent[] {

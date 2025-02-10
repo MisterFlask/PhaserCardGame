@@ -15,6 +15,10 @@ export class SorrowmothSwarm extends AutomatedCharacter {
         });
         this.buffs.push(new Swarm(10));
         this.buffs.push(new EggLayer(2));
+        
+        this.portraitTargetLargestDimension = 300;
+        this.portraitOffsetXOverride = -40
+        this.portraitOffsetYOverride = 0
     }
 
     override generateNewIntents(): AbstractIntent[] {

@@ -15,6 +15,10 @@ export class AccursedObelisk extends AutomatedCharacter {
             description: "An ancient obelisk radiating dark energy."
         });
         
+        
+        this.portraitTargetLargestDimension = 300;
+        this.portraitOffsetXOverride = -40
+        this.portraitOffsetYOverride = 0
         // Apply initial Regeneration buff
         this.buffs.push(new Regeneration(3));
     }

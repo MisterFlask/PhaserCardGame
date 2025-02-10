@@ -10,6 +10,10 @@ export class Echophagist extends AutomatedCharacter {
             maxHitpoints: 30,
             description: "Antlers sharp as philosophy, refracting light into spectral halos that contain glimpses of forgotten monarchies"
         });
+        
+        this.portraitTargetLargestDimension = 300;
+        this.portraitOffsetXOverride = -40
+        this.portraitOffsetYOverride = 0
     }
 
     override generateNewIntents(): AbstractIntent[] {
