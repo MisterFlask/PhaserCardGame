@@ -324,7 +324,8 @@ export default class GameImageLoader {
             prefix: 'Sprites/IntentIcons/',
             files: [
                 'knife-thrust.png', 'magick-trick.png', 'poison-bottle-2.png', 'round-shield.png',
-                'star-swirl.png', 'uncertainty.png', 'unstable-orb.png', 'sword-array.svg'
+                'star-swirl.png', 'uncertainty.png', 'unstable-orb.png', 'sword-array.svg',
+                'chemical-bolt.svg', 'add-card-to-pile.svg'
             ]
         },
         effects: {

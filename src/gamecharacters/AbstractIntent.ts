@@ -179,7 +179,7 @@ export class AddCardToPileIntent extends AbstractIntent {
     }
 
     displayText(): string {
-        return "Add Card";
+        return "";
     }
 
     act(): void {
@@ -356,8 +356,9 @@ export class ApplyDebuffToAllPlayerCharactersIntent extends AbstractIntent {
     debuff: AbstractBuff;
 
     constructor({ debuff, owner }: { debuff: AbstractBuff, owner: BaseCharacter }) {
-        super({ imageName: 'chemical-bolt', target: undefined, owner: owner });
+        super({ imageName: 'chemical-bolt',   target: undefined, owner: owner });
         this.debuff = debuff;
+        this.iconTint = 0x0000ff;
     }
 
     tooltipText(): string {
@@ -391,7 +392,7 @@ export class ApplyBuffToAllEnemyCharactersIntent extends AbstractIntent {
     buff: AbstractBuff;
 
     constructor({ debuff, owner }: { debuff: AbstractBuff, owner: BaseCharacter }) {
-        super({ imageName: 'magic', target: undefined, owner: owner });
+        super({ imageName: 'magick-trick', target: undefined, owner: owner });
         this.buff = debuff;
     }
 
@@ -465,7 +466,7 @@ export class BlockForSelfIntent extends AbstractIntent {
     blockAmount: number;
 
     constructor({ blockAmount, owner }: { blockAmount: number, owner: BaseCharacter }) {
-        super({ imageName: 'shield', target: undefined, owner: owner });
+        super({ imageName: 'round-shield', target: undefined, owner: owner });
         this.blockAmount = blockAmount;
     }
 
