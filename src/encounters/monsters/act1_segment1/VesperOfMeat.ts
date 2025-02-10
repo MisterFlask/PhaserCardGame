@@ -6,13 +6,18 @@ export class VesperOfMeat extends AutomatedCharacter {
     constructor() {
         super({
             name: "Vesper of Meat",
-            portraitName: "Eldritch Slime Spawn A",
+            portraitName: "Breakfast Nightmares Bacon Beast",
             maxHitpoints: 25,
             description: "you will be baked, and then there will be cake"
         });
+
+        this.portraitTargetLargestDimension = 300;
+        this.portraitOffsetXOverride = -40
+        this.portraitOffsetYOverride = 0
     }
 
     override generateNewIntents(): AbstractIntent[] {
+
         const intents: AbstractIntent[][] = [
             [
                 new AttackAllPlayerCharactersIntent({ baseDamage: 3, owner: this }).withTitle("Gorge Self")
