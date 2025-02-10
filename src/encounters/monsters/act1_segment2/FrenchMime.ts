@@ -2,6 +2,7 @@ import { AbstractIntent, AttackIntent } from '../../../gamecharacters/AbstractIn
 import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
 import { DoNotLookAtMe } from '../../../gamecharacters/buffs/enemy_buffs/DoNotLookAtMe';
 import { SelfDestruct } from '../../../gamecharacters/buffs/enemy_buffs/SelfDestruct';
+import { CardSize } from '../../../gamecharacters/Primitives';
 import { TargetingUtils } from '../../../utils/TargetingUtils';
 
 export class EldritchMime extends AutomatedCharacter {
@@ -12,9 +13,10 @@ export class EldritchMime extends AutomatedCharacter {
             name: "...",
             portraitName: "Golems Eye Golem",
             maxHitpoints: 15,
-            description: "the white face paint isn’t for show.  it's a seal.  a binding."
+            description: "Avert your gaze"
         });
         
+        this.size = CardSize.LARGE;
         this.portraitTargetLargestDimension = 300;
         this.portraitOffsetXOverride = -40
         this.portraitOffsetYOverride = 0

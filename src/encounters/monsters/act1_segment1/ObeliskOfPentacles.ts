@@ -11,8 +11,8 @@ export class VeilCapacitor extends AutomatedCharacter {
             description: "A small, unsettling totem.  Probably not worth worrying about."
         });
         
-        this.portraitTargetLargestDimension = 300;
-        this.portraitOffsetXOverride = -40
+        this.portraitTargetLargestDimension = 150;
+        this.portraitOffsetXOverride = -20
         this.portraitOffsetYOverride = 0
     }
 

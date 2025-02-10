@@ -302,6 +302,12 @@ export class PhysicalCard implements IPhysicalCardInterface {
         // update card content
         this.applyVisualScaling();
 
+        if (this.data.isAutomatedCharacter()){
+            // eliminate background of card, it's just an unsightly distraction
+            this.cardBackground.setVisible(false);
+            this.cardBorder.setVisible(false);
+        }
+
         const scale = this.data.size.sizeModifier;
         const newWidth = this.cardConfig.cardWidth * scale;
         const newHeight = this.cardConfig.cardHeight * scale;

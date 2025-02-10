@@ -5,6 +5,7 @@
 import { AbstractIntent, AttackAllPlayerCharactersIntent, IntentListCreator } from '../../../gamecharacters/AbstractIntent';
 import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
 import { Regeneration } from '../../../gamecharacters/buffs/enemy_buffs/Regeneration';
+import { CardSize } from '../../../gamecharacters/Primitives';
 
 export class AccursedObelisk extends AutomatedCharacter {
     constructor() {
@@ -15,12 +16,13 @@ export class AccursedObelisk extends AutomatedCharacter {
             description: "An ancient obelisk radiating dark energy."
         });
         
-        
+        this.size = CardSize.LARGE;
         this.portraitTargetLargestDimension = 300;
         this.portraitOffsetXOverride = -40
         this.portraitOffsetYOverride = 0
         // Apply initial Regeneration buff
         this.buffs.push(new Regeneration(3));
+
     }
 
     override generateNewIntents(): AbstractIntent[] {
