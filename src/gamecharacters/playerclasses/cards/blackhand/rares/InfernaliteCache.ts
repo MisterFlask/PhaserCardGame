@@ -21,7 +21,7 @@ export class InfernaliteCache extends PlayableCard {
     
     override InvokeCardEffects(targetCard?: BaseCharacter): void {
         if (this.owningCharacter) {
-            this.actionManager.modifyAshes(this.getBaseMagicNumberAfterResourceScaling(), this.owningCharacter as BaseCharacter);
+            this.actionManager.modifySmog(this.getBaseMagicNumberAfterResourceScaling(), this.owningCharacter as BaseCharacter);
         }
     }
 }

@@ -134,7 +134,7 @@ export class SummonIntent extends AbstractIntent {
     monsterToSummon: AutomatedCharacter;
 
     constructor({ monsterToSummon, owner }: { monsterToSummon: AutomatedCharacter, owner: BaseCharacter }) {
-        super({ imageName: 'summon', target: undefined, owner: owner });
+        super({ imageName: 'pentacle', target: undefined, owner: owner });
         this.monsterToSummon = monsterToSummon;
     }
 
@@ -143,7 +143,7 @@ export class SummonIntent extends AbstractIntent {
     }
 
     displayText(): string {
-        return "Summon";
+        return "";
     }
 
     act(): void {
