@@ -9,6 +9,7 @@ export class SelfDestruct extends AbstractBuff {
         this.isDebuff = false;
         this.secondaryStacks = turnsUntilExplosion;
         this.showSecondaryStacks = true;
+        this.imageName = "self-destruct";
     }
 
     override getDisplayName(): string {

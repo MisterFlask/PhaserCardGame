@@ -8,7 +8,7 @@ export class DoNotLookAtMe extends AbstractBuff {
         super();
         this.stacks = stacks;
         this.stackable = true;
-        this.imageName = "hidden-face"; // Replace with actual icon name if available
+        this.imageName = "do-not-look"; // Replace with actual icon name if available
     }
 
     override getDisplayName(): string {

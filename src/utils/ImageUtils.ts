@@ -290,7 +290,8 @@ export default class GameImageLoader {
                 'king.png', 'lamprey-mouth.png', 'matchbox.png', 'metal-scales.png', 'pocket-watch.png',
                 'prayer.png', 'public-speaker.png', 'rear-aura.png', 'run.png', 'rusty-sword.png',
                 'sea-turtle.png', 'shattered-heart.png', 'smart.png', 'spiked-tentacle.png',
-                'sticky-boot.png', 'surprised-skull.png', 'unbalanced.png', 'weight-lifting-up.png', 'pizza-slice.svg'
+                'sticky-boot.png', 'surprised-skull.png', 'unbalanced.png', 'weight-lifting-up.png', 'pizza-slice.svg',
+                'card-draw-minus.svg', 'do-not-look.svg', 'heavy.svg', 'self-destruct.svg',
             ]
         },
         map_icons: {

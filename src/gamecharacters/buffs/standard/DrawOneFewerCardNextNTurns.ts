@@ -17,6 +17,7 @@ export class DrawOneFewerCardNextNTurns extends AbstractBuff {
     constructor(stacks: number = 1) {
         super();
         this.stacks = stacks;   
+        this.imageName = "card-draw-minus";
     }
 
     override onTurnStart(): void {

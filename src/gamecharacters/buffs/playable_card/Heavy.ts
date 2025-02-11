@@ -4,6 +4,7 @@ import { DrawOneFewerCardNextNTurns } from "../standard/DrawOneFewerCardNextNTur
 export class Heavy extends AbstractBuff {
     constructor() {
         super();
+        this.imageName = "heavy";
     }
 
     getDisplayName(): string {
