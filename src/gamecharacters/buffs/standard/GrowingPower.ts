@@ -7,6 +7,7 @@ export class GrowingPowerBuff extends AbstractBuff {
         super();
         this.stacks = stacks;
         this.isDebuff = false;
+        this.imageName = "enrage";
     }
 
     override getDisplayName(): string {

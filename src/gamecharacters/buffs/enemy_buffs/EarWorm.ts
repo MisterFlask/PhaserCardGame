@@ -12,6 +12,7 @@ export class EarWorm extends AbstractBuff {
         this.stacks = stacks;
         this.isDebuff = true;
         this.imageName = "ear-worm"; // Replace with actual icon name if available
+        this.tint = 0x8B4513; // Brown color
     }
 
     override getDisplayName(): string {

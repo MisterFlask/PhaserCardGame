@@ -11,6 +11,8 @@ export class EggLayer extends AbstractBuff {
     constructor(stacks: number = 1) {
         super();
         this.stacks = stacks;
+        this.imageName = "egg-clutch";
+        this.tint = 0xF5F5DC; // Beige color
         this.isDebuff = false;
     }
 

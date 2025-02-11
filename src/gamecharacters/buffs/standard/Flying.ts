@@ -10,6 +10,7 @@ export class Flying extends AbstractBuff {
         this.isDebuff = false;
         this.secondaryStacks = stacks; // Used to track remaining dodges this turn
         this.showSecondaryStacks = true;
+        this.imageName = 'spiky-wing'
     }
 
     override getDisplayName(): string {

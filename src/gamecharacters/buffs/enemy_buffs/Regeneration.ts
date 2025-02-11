@@ -5,7 +5,8 @@ export class Regeneration extends AbstractBuff {
         super();
         this.stacks = stacks;
         this.isDebuff = false;
-        this.imageName = "healing";
+        this.imageName = "regeneration";
+        this.tint = 0x00FF00;
     }
 
     getDisplayName(): string {

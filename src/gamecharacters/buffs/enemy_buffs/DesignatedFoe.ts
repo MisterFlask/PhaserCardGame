@@ -5,6 +5,7 @@ export class DesignatedFoe extends AbstractBuff {
         super();
         this.stackable = false;
         this.isDebuff = true;
+        this.imageName = "fencer";
     }
 
     override getDisplayName(): string {

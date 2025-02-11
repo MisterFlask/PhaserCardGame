@@ -292,6 +292,7 @@ export default class GameImageLoader {
                 'sea-turtle.png', 'shattered-heart.png', 'smart.png', 'spiked-tentacle.png',
                 'sticky-boot.png', 'surprised-skull.png', 'unbalanced.png', 'weight-lifting-up.png', 'pizza-slice.svg',
                 'card-draw-minus.svg', 'do-not-look.svg', 'heavy.svg', 'self-destruct.svg',
+                'egg-clutch.svg', 'regeneration.svg', 'giant.svg', 'spiky-wing.svg', 'duel.svg', 'fencer.svg'
             ]
         },
         map_icons: {

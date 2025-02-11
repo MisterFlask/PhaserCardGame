@@ -1,4 +1,5 @@
 import { PlayableCard } from "../../../gamecharacters/PlayableCard";
+import { ProcBroadcaster } from "../../../gamecharacters/procs/ProcBroadcaster";
 import { DeckLogic } from "../../../rules/DeckLogicHelper";
 import { GameState } from "../../../rules/GameState";
 import { GameAction } from "../GameAction";
@@ -31,9 +32,9 @@ export class DrawCardsAction extends GameAction {
                 buff.onCardDrawn();
             });
             
-            // Trigger onAnyCardDrawn for relics
-            gameState.relicsInventory.forEach(relic => {
-                relic.onAnyCardDrawn(drawnCard);
+            // Trigger onAnyCardDrawn for relics and buffs
+            ProcBroadcaster.getInstance().retrieveAllRelevantBuffsForProcs(true, false).forEach(buff => {
+                buff.onAnyCardDrawn?.(drawnCard);
             });
 
             // Animate draw and wait

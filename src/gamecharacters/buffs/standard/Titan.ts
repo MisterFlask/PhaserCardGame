@@ -6,6 +6,7 @@ export class Titan extends AbstractBuff {
         super();
         this.stacks = stacks;
         this.stackable = true;
+        this.imageName = "giant";
         
     }
     override getDisplayName(): string {

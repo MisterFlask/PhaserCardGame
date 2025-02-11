@@ -7,6 +7,7 @@ export class FearEater extends AbstractBuff {
         super();
         this.stacks = stacks;
         this.isDebuff = false;
+        this.imageName = "dread";
     }
 
     override getDisplayName(): string {

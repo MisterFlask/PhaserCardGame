@@ -8,6 +8,7 @@ export class Duelist extends AbstractBuff {
         super();
         this.stackable = false;
         this.isDebuff = false;
+        this.imageName = "duel";
     }
 
     override getDisplayName(): string {
