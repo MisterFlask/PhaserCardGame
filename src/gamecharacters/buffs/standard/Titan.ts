@@ -7,7 +7,7 @@ export class Titan extends AbstractBuff {
         this.stacks = stacks;
         this.stackable = true;
         this.imageName = "giant";
-        
+        this.tint = 0x800080; // Dark purple color
     }
     override getDisplayName(): string {
         return "Titan";

@@ -96,7 +96,7 @@ export default class GameImageLoader {
                 'fire-zone.png', 'fire.png', 'fireball.png', 'fireflake.png', 'firewall.png',
                 'flame.png', 'flamethrower-soldier.png', 'flaming-trident.png', 'flash-grenade.png',
                 'gorilla.png', 'grenade-a.png', 'half-dead.png', 'hidden.png', 'power-generator.png',
-                'radial-balance.png', 'regeneration.png', 'screaming.png', 'smog-grenade.png',
+                'radial-balance.png',  'screaming.png', 'smog-grenade.png',
                 'stone-wall.png', 'tv.png', 'vacuum-cleaner.png', 'white-book.png'
             ]
         },
