@@ -54,10 +54,6 @@ export default class GameImageLoader {
             files: [
                 "blackhand_female_1.png",
                 "blackhand_female_2.png",
-                "blackhand_female_3.png",
-                "blackhand_female_4.png",
-                "blackhand_female_5.png",
-                "blackhand_female_6.png"
               ]
         },
         portraits_diabolist_female: {
@@ -66,7 +62,7 @@ export default class GameImageLoader {
                 "diabolist_female_1.png",
                 "diabolist_female_2.png",
                 "diabolist_female_3.png",
-                "diabolist_female_4.png"
+                "diabolist_female_4.png",
               ]
         },
         portraits_archon_female: {
@@ -74,9 +70,6 @@ export default class GameImageLoader {
             files: [
                 "archon_female_1.png",
                 "archon_female_2.png",
-                "archon_female_3.png",
-                "archon_female_4.png",
-                "archon_female_5.png"
               ]
         },
         ui: {
