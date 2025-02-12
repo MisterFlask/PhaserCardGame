@@ -59,7 +59,7 @@ export class CombatCardManager {
         // Calculate battlefield bounds - adjust these values as needed
         const battlefieldBounds = new Phaser.Geom.Rectangle(
             300, // x position
-            CombatSceneLayoutUtils.getBattlefieldY(this.scene) - 200, // y position
+            CombatSceneLayoutUtils.getBattlefieldY(this.scene) - 100, // y position, adjusted from -200 to -100
             this.scene.scale.width - 600, // width
             400 // height
         );
@@ -165,8 +165,8 @@ export class CombatCardManager {
 
         this.exhaustPile = CardGuiUtils.getInstance().createCard({
             scene: this.scene,
-            x: gameWidth * 0.1,
-            y: pileY - 180,
+            x: gameWidth * 0.3,
+            y: pileY,
             data: new UiCard({ name: 'Exhaust Pile (0)', description: 'Exhausted cards', portraitName: "exhaustpile",tint:0x800080,size:CardSize.TINY }),
             onCardCreatedEventCallback: (card: PhysicalCard) => {
                 card.container.setInteractive();

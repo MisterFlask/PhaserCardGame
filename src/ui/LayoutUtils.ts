@@ -7,15 +7,15 @@ import { TransientUiState } from './TransientUiState';
 
 class CombatSceneLayoutUtils {
     static getBattlefieldY(scene: Phaser.Scene): number {
-        return scene.scale.height * 0.33;
+        return scene.scale.height * 0.43;
     }
 
     static getHandY(scene: Phaser.Scene): number {
-        return scene.scale.height * 0.75;
+        return scene.scale.height * 0.8;
     }
 
     static getDividerY(scene: Phaser.Scene): number {
-        return scene.scale.height * 0.58;
+        return scene.scale.height * 0.68;
     }
 
     static getPileY(scene: Phaser.Scene): number {

@@ -195,6 +195,10 @@ export class ActionManager {
 
     heal(character: BaseCharacter, amount: number) {
         this.actionQueue.addAction(new GenericAction(async () => {
+            if (character == null){
+                console.error("ActionManager: heal called with null character");
+                return [];
+            }
             character.hitpoints += amount;
             if (character.hitpoints > character.maxHitpoints) {
                 character.hitpoints = character.maxHitpoints;
