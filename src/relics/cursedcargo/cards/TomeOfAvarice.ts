@@ -18,6 +18,7 @@ export class TomeOfAvarice extends PlayableCard {
         this.baseEnergyCost = 1;
         this.buffs.push(new ExhaustBuff());
         this.buffs.push(new RetainBuff());
+        this.portraitName = "cursed_cargo_4";
     }
 
     override InvokeCardEffects(): void {

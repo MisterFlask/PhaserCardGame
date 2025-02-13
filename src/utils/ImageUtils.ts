@@ -93,6 +93,19 @@ export default class GameImageLoader {
                 'stone-wall.png', 'tv.png', 'vacuum-cleaner.png', 'white-book.png'
             ]
         },
+        cards_cursed_cargo:{
+            prefix: 'Sprites/Cards/CursedCargo/',
+            files: [
+                'cursed_cargo_1.png',
+                'cursed_cargo_2.png',
+                'cursed_cargo_3.png',
+                'cursed_cargo_4.png',
+                'cursed_cargo_5.png',
+                'cursed_cargo_6.png',
+                'cursed_cargo_7.png',
+                'cursed_cargo_8.png',
+            ]
+        },
         abstract_placeholders: {
             prefix: 'Sprites/Placeholders/',
             files: [

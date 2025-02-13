@@ -18,6 +18,7 @@ export class ChairmanVizzerix extends PlayableCard {
         });
         this.baseEnergyCost = 1;
         this.baseBlock = 15;
+        this.portraitName = "cursed_cargo_2";
     }
 
     override get description(): string {

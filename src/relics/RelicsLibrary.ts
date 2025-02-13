@@ -16,13 +16,13 @@ import { BurningCommissar } from './cursedcargo/cards/BurningCommissar';
 import { ChairmanVizzerix } from './cursedcargo/cards/ChairmanVizzerix';
 import { MawSculpture } from './cursedcargo/cards/MawSculpture';
 import { TomeOfAvarice } from './cursedcargo/cards/TomeOfAvarice';
+import { WatchfulClown } from './cursedcargo/cards/WatchfulClown';
 import { DevouringIcon } from './cursedcargo/DevouringIcon';
 import { GreedyParasite } from './cursedcargo/GreedyParasite';
 import { OublietteFlower } from './cursedcargo/OublietteFlower';
 import { ScreamingParasite } from './cursedcargo/ScreamingParasite';
 import { SirenDaguerreotype } from './cursedcargo/SirenDaguerreotype';
 import { SonorousKlaxon } from './cursedcargo/SonorousKlaxon';
-import { WatchfulClown } from './cursedcargo/WatchfulClown';
 import { WhisperOfSorrow } from './cursedcargo/WhisperOfSorrow';
 import { WraithInABottle } from './cursedcargo/WraithInABottle';
 

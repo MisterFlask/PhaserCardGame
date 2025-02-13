@@ -1,9 +1,9 @@
-import { TargetingType } from "../../gamecharacters/AbstractCard";
-import { EntityRarity } from "../../gamecharacters/EntityRarity";
-import { PlayableCard } from "../../gamecharacters/PlayableCard";
-import { CardType } from "../../gamecharacters/Primitives";
-import { AbstractBuff } from "../../gamecharacters/buffs/AbstractBuff";
-import { Jumpscare } from "../../gamecharacters/playerclasses/cards/curse/Jumpscare";
+import { TargetingType } from "../../../gamecharacters/AbstractCard";
+import { EntityRarity } from "../../../gamecharacters/EntityRarity";
+import { PlayableCard } from "../../../gamecharacters/PlayableCard";
+import { CardType } from "../../../gamecharacters/Primitives";
+import { AbstractBuff } from "../../../gamecharacters/buffs/AbstractBuff";
+import { Jumpscare } from "../../../gamecharacters/playerclasses/cards/curse/Jumpscare";
 
 class AmbientJumpscareBuff extends AbstractBuff {
     constructor() {
@@ -48,7 +48,8 @@ export class WatchfulClown extends PlayableCard {
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.SPECIAL,
-        });
+            portraitName: "cursed_cargo_5",
+        }); 
         this.baseEnergyCost = 0;
         this.buffs.push(new AmbientJumpscareBuff());
     }

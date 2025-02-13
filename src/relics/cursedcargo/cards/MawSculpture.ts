@@ -45,6 +45,7 @@ export class MawSculpture extends PlayableCard {
             rarity: EntityRarity.UNCOMMON,
         });
         this.baseEnergyCost = 1;
+        this.portraitName = "cursed_cargo_3";
         this.buffs.push(new MawSculptureBuff());
     }
 

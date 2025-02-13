@@ -18,6 +18,7 @@ export class BurningCommissar extends PlayableCard {
         });
         this.baseEnergyCost = 1;
         this.baseDamage = 15;
+        this.portraitName = "cursed_cargo_1";
     }
 
     override get description(): string {
