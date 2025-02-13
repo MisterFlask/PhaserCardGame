@@ -26,6 +26,7 @@ import { BlackhandClass } from "./playerclasses/BlackhandClass";
 import { Defend } from "./playerclasses/cards/basic/Defend";
 import { Rummage } from "./playerclasses/cards/basic/Rummage";
 import { Shoot as FireRevolver } from "./playerclasses/cards/basic/Shoot";
+import { CogClass } from "./playerclasses/CogClass";
 import { DiabolistClass } from "./playerclasses/DiabolistClass";
 
 export class CharacterGenerator {
@@ -45,7 +46,8 @@ export class CharacterGenerator {
         const characterClasses = [
             new ArchonClass(),
             new BlackhandClass(), 
-            new DiabolistClass()
+            new DiabolistClass(),
+            new CogClass()
         ];
 
         const selectedClass = characterClasses[Math.floor(Math.random() * characterClasses.length)];

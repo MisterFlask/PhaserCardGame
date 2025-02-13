@@ -1,11 +1,14 @@
+// The first time you play a card each turn, manufacture a copy of it into your hand.
+
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { AbstractBuff } from "../../../../buffs/AbstractBuff";
 import { EntityRarity } from "../../../../EntityRarity";
 import { PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
+import { BasicProcs } from "../../../../procs/BasicProcs";
 
-class RevolverExpertBuff extends AbstractBuff {
-    private revolverCardsPlayedThisTurn: number = 0;
+class MidnightOilBuff extends AbstractBuff {
+    private hasTriggeredThisTurn: boolean = false;
 
     constructor() {
         super();
@@ -14,32 +17,30 @@ class RevolverExpertBuff extends AbstractBuff {
     }
 
     override getDisplayName(): string {
-        return "Revolver Expert";
+        return "Midnight Oil";
     }
 
     override getDescription(): string {
-        return "The first 2 times per turn you play a card with \"Revolver\" in its name, gain 1 energy and draw a card.";
+        return "The first time you play a card each turn, manufacture a copy of it into your hand.";
     }
 
     override onTurnStart(): void {
-        this.revolverCardsPlayedThisTurn = 0;
+        this.hasTriggeredThisTurn = false;
     }
 
-    override onAnyCardPlayedByAnyone(playedCard: PlayableCard): void {
-        if (this.revolverCardsPlayedThisTurn < 2 && 
-            playedCard.name.toLowerCase().includes("revolver") && 
-            playedCard.owningCharacter === this.getOwnerAsCharacter()) {
-            this.revolverCardsPlayedThisTurn++;
-            this.actionManager.modifyEnergy(1);
-            this.actionManager.drawCards(1);
+    onCardPlayed(card: AbstractCard): void {
+        if (!this.hasTriggeredThisTurn && card !== this.getOwnerAsPlayableCard()) {
+            this.hasTriggeredThisTurn = true;
+            const copy = card.Copy()
+            BasicProcs.getInstance().ManufactureCardToHand(copy as PlayableCard);
         }
     }
 }
 
-export class RevolverExpert extends PlayableCard {
+export class MidnightOil extends PlayableCard {
     constructor() {
         super({
-            name: "Revolver Expert",
+            name: "Midnight Oil",
             cardType: CardType.POWER,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.RARE,
@@ -48,7 +49,7 @@ export class RevolverExpert extends PlayableCard {
     }
 
     override get description(): string {
-        return "The first 2 times per turn you play a card with \"Revolver\" in its name, gain 1 energy and draw a card.";
+        return "The first time you play a card each turn, manufacture a copy of it into your hand.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
@@ -56,7 +57,7 @@ export class RevolverExpert extends PlayableCard {
         
         this.actionManager.applyBuffToCharacterOrCard(
             this.owningCharacter,
-            new RevolverExpertBuff()
+            new MidnightOilBuff()
         );
     }
 }

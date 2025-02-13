@@ -1,0 +1,1 @@
+// precision.  Deal 15 damage.  Slayer: Gain 4 Ashes and 4 Blood.

@@ -106,6 +106,10 @@ export abstract class AbstractCard implements IAbstractCard {
 
     tags: string[] = [];
 
+    wasManufactured(): boolean {
+        return this.tags.includes("manufactured");
+    }
+
     asPlayerCharacter() : PlayerCharacter | null {
         if (this.isPlayerCharacter()) {
             return this as unknown as PlayerCharacter;

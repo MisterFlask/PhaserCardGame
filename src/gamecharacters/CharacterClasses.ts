@@ -13,9 +13,10 @@ export class CharacterClasses {
     static ARCHON = new CharacterClasses("ARCHON");
     static BLACKHAND = new CharacterClasses("BLACKHAND");
     static DIABOLIST = new CharacterClasses("DIABOLIST");
+    static COG = new CharacterClasses("COG");
 
     static ARCHON_ID = this.ARCHON.id
     static BLACKHAND_ID = this.BLACKHAND.id
     static DIABOLIST_ID = this.DIABOLIST.id
-
+    static COG_ID = this.COG.id
 }

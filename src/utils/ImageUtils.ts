@@ -72,6 +72,13 @@ export default class GameImageLoader {
                 "archon_female_2.png",
               ]
         },
+        portraits_cog_female: {
+            prefix: 'Portraits/CogPortraits/female/',
+            files: [
+                "cog_female_1.png",
+                "cog_female_2.png",
+              ]
+        },
         ui: {
             prefix: 'UI/',
             files: ['drawpile.svg', 'discardpile.svg', 'placeholder.png', 'oops_image.webp', 'select.svg', 'square.svg']
