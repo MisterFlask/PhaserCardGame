@@ -18,6 +18,14 @@ export interface CardRewardScreenData {
 const CARD_REWARD_DEPTH = DepthManager.getInstance().REWARD_SCREEN + 2000; // ensure above GeneralRewardScreen
 const CARD_REWARD_HOVERED_DEPTH = CARD_REWARD_DEPTH + 1000; // New depth for hovered cards
 
+// Introduce a new interface to track card elements with a unique ID
+interface RewardCardElement {
+    id: string;                       // Unique identifier
+    reward: PlayableCard;            // Reference to the underlying reward
+    physicalCard: PhysicalCard;      
+    ownerText: Phaser.GameObjects.Text;
+}
+
 class CardRewardScreen {
     private scene: Phaser.Scene;
     public rewards: PlayableCard[];
@@ -30,10 +38,7 @@ class CardRewardScreen {
     private background!: Phaser.GameObjects.Rectangle;
     private goToMapButton!: TextBoxButton;
     private rerollButton!: TextBoxButton;
-    private cardElements: {
-        physicalCard: PhysicalCard,
-        ownerText: Phaser.GameObjects.Text
-    }[] = [];
+    private cardElements: RewardCardElement[] = [];
 
     private centerX: number;
     private centerY: number;
@@ -62,13 +67,20 @@ class CardRewardScreen {
             .setVisible(false);
     }
 
-    private handleCardSelection(selectedCard: PlayableCard): void {
+    private handleCardSelectionById(cardId: string): void {
+        // Find the matching card element by its unique ID.
+        const selectedElement = this.cardElements.find(el => el.id === cardId);
+        if (!selectedElement) return; // No element found, do nothing.
+
+        // Grab the relevant card and invoke selection logic.
+        const selectedCard = selectedElement.reward;
         this.onSelect(selectedCard);
         this.scene.events.emit('cardReward:selected');
         this.hide();
     }
 
     public displayRewardCards(): void {
+        // Clean out existing UI elements.
         this.cardElements.forEach(el => {
             el.physicalCard.container.destroy();
             el.ownerText.destroy();
@@ -80,9 +92,13 @@ class CardRewardScreen {
         const yPosition = this.centerY - 100;
         const cardGuiUtils = CardGuiUtils.getInstance();
 
+        // Loop through rewards, but do not treat the index as a stable ID
         this.rewards.forEach((cardReward, index) => {
             const cardX = startX + index * cardSpacing;
             const cardY = yPosition;
+
+            // Generate a unique ID for each card
+            const uniqueId = Phaser.Utils.String.UUID();
 
             const physicalCard = cardGuiUtils.createCard({
                 scene: this.scene,
@@ -97,14 +113,14 @@ class CardRewardScreen {
                         cardInstance.container.setDepth(CARD_REWARD_HOVERED_DEPTH);
                         this.scene.events.emit('card:pointerover', cardInstance);
                     });
-
                     cardInstance.container.on('pointerout', () => {
                         cardInstance.container.setDepth(CARD_REWARD_DEPTH + 1);
                         this.scene.events.emit('card:pointerout', cardInstance);
                     });
 
+                    // Handle selection by cardId
                     cardInstance.container.on('pointerdown', () => {
-                        this.handleCardSelection(cardReward);
+                        this.handleCardSelectionById(uniqueId);
                     });
                 }
             });
@@ -124,7 +140,10 @@ class CardRewardScreen {
              .setDepth(CARD_REWARD_DEPTH + 1)
              .setVisible(false);
 
+            // Store everything in our updated structure
             this.cardElements.push({
+                id: uniqueId,
+                reward: cardReward,
                 physicalCard,
                 ownerText
             });

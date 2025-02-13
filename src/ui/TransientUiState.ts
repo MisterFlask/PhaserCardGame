@@ -1,4 +1,4 @@
-import { ActionManager } from "../utils/ActionManager";
+import { ActionManagerFetcher } from "../utils/ActionManagerFetcher";
 import { IncomingIntent } from "./IncomingIntent";
 import type { PhysicalCard } from "./PhysicalCard";
 import type { PhysicalIntent } from "./PhysicalIntent";
@@ -51,7 +51,7 @@ Dragged Card: ${this.draggedCard ? this.draggedCard.data.name : 'None'}
 Hovered Card: ${this.hoveredCard ? this.hoveredCard.data.name : 'None'}
 Hovered Intent: ${this.hoveredIntent ? this.hoveredIntent.intent.id : 'None'}
 Hovered Incoming Intent: ${this.hoveredIncomingIntent ? this.hoveredIncomingIntent.intent.id : 'None'}
-Queue As String: ${ActionManager.getInstance().queueAsString()}
+Queue As String: ${ActionManagerFetcher.getActionManager().queueAsString()}
 Mouse Over Card Drop Zone: ${this.mouseOverCardDropZone ? 'Yes' : 'No'}`.trim();
     }
 } 

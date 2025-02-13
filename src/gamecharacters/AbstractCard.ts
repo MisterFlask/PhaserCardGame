@@ -128,6 +128,8 @@ export abstract class AbstractCard implements IAbstractCard {
     public portraitOffsetXOverride?: number
     public portraitOffsetYOverride?: number 
     
+    public isSelected: boolean = false;
+
     public get name(): string {
         return this._name;
     }
