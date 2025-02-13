@@ -1,7 +1,7 @@
 import { AbstractBuff } from "../AbstractBuff";
 import { Lethality } from "./Lethality";
 
-export class NextTurnStrength extends AbstractBuff {
+export class NextTurnLethality extends AbstractBuff {
     constructor(stacks: number = 1) {
         super();
         this.stacks = stacks;
@@ -9,11 +9,11 @@ export class NextTurnStrength extends AbstractBuff {
     }
 
     override getDisplayName(): string {
-        return "Next Turn Strength";
+        return "Next Turn Lethality";
     }
 
     override getDescription(): string {
-        return `At the start of your next turn, gain ${this.getStacksDisplayText()} Strength.`;
+        return `At the start of your next turn, gain ${this.getStacksDisplayText()} Lethality.`;
     }
 
     override onTurnStart(): void {

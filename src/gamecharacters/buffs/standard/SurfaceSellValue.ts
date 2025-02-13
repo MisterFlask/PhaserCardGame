@@ -10,11 +10,11 @@ export class SurfaceSellValue extends AbstractBuff {
     }
 
     override getDisplayName(): string {
-        return "Surface Sell Value";
+        return "Surface Sale Value";
     }
 
     override getDescription(): string {
-        return `Increases the Surface value of this card by ${this.getStacksDisplayText()}.`;
+        return `You can sell this on the surface for $${this.getStacksDisplayText()}.`;
     }
 
     override surfaceValueModifier(): number {

@@ -25,7 +25,7 @@ import { GrowingPowerBuff } from "../gamecharacters/buffs/standard/GrowingPower"
 import { HellSellValue } from "../gamecharacters/buffs/standard/HellSellValue";
 import { Holy } from "../gamecharacters/buffs/standard/Holy";
 import { Lethality } from "../gamecharacters/buffs/standard/Lethality";
-import { NextTurnStrength } from "../gamecharacters/buffs/standard/NextTurnStrength";
+import { NextTurnLethality } from "../gamecharacters/buffs/standard/NextTurnLethality";
 import { Obsession } from "../gamecharacters/buffs/standard/Obsession";
 import { Poisoned } from "../gamecharacters/buffs/standard/Poisoned";
 import { ReactiveShielding } from "../gamecharacters/buffs/standard/ReactiveShielding";
@@ -94,7 +94,7 @@ export class MagicWords {
         new GrowingPowerBuff(),
         new HellSellValue(),
         new Holy(),
-        new NextTurnStrength(),
+        new NextTurnLethality(),
         new Obsession(),
         new Poisoned(),
         new ReactiveShielding(),

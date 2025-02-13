@@ -1,10 +1,10 @@
-import { TargetingType } from "../../gamecharacters/AbstractCard";
-import { BaseCharacter } from "../../gamecharacters/BaseCharacter";
-import { EntityRarity } from "../../gamecharacters/EntityRarity";
-import { PlayableCard } from "../../gamecharacters/PlayableCard";
-import { CardType } from "../../gamecharacters/Primitives";
-import { AbstractBuff } from "../../gamecharacters/buffs/AbstractBuff";
-import { Stress } from "../../gamecharacters/buffs/standard/Stress";
+import { TargetingType } from "../../../gamecharacters/AbstractCard";
+import { BaseCharacter } from "../../../gamecharacters/BaseCharacter";
+import { EntityRarity } from "../../../gamecharacters/EntityRarity";
+import { PlayableCard } from "../../../gamecharacters/PlayableCard";
+import { CardType } from "../../../gamecharacters/Primitives";
+import { AbstractBuff } from "../../../gamecharacters/buffs/AbstractBuff";
+import { Stress } from "../../../gamecharacters/buffs/standard/Stress";
 
 class SirenDaguerreotypeBuff extends AbstractBuff {
     constructor() {

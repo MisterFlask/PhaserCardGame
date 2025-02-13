@@ -35,7 +35,7 @@ export class VolatileBuff extends AbstractBuff {
         return "Volatile";
     }
     getDescription(): string {
-        return "When this card is discarded, play it instead, exhaust it, and exhaust another random card in hand.";
+        return "When this card is discarded, play it instead on a random target, exhaust it, and exhaust another random card in hand.";
     }
 }
 

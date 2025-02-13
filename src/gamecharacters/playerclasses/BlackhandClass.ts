@@ -5,7 +5,7 @@ import { CharacterClasses } from "../CharacterClasses";
 import { Rummage } from "./cards/basic/Rummage";
 import { FireAxe } from "./cards/blackhand/commons/FireAxe";
 import { FlamePistol } from "./cards/blackhand/commons/FlamePistol";
-import { PocketVial } from "./cards/blackhand/commons/PocketVial";
+import { PocketVial } from "./cards/blackhand/commons/CorrosiveAccelerant";
 import { RageFueledAxe } from "./cards/blackhand/commons/RageFueledAxe";
 import { StormCloak } from "./cards/blackhand/commons/StormCloak";
 import { InfernaliteCache } from "./cards/blackhand/rares/InfernaliteCache";

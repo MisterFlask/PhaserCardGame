@@ -9,7 +9,7 @@ import { CardType } from "../../../../Primitives";
 export class PocketVial extends PlayableCardWithHelpers {
     constructor() {
         super({
-            name: "Pocket Vial",
+            name: "Corrosive Accelerant",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
             rarity: EntityRarity.COMMON,

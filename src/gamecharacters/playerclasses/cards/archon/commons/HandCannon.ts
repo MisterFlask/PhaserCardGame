@@ -1,6 +1,5 @@
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
-import { Vulnerable } from "../../../../buffs/standard/Vulnerable";
 import { Weak } from "../../../../buffs/standard/Weak";
 import { EntityRarity } from "../../../../EntityRarity";
 import { PlayableCard } from "../../../../PlayableCard";
@@ -30,7 +29,7 @@ export class HandCannon extends PlayableCard {
             
             BasicProcs.getInstance().Exert(this, 1, (energyExerted) => {
                 if (energyExerted > 0) {
-                    this.actionManager.applyBuffToCharacterOrCard(targetCard, new Vulnerable(this.getBaseMagicNumberAfterResourceScaling()));
+                    this.dealDamageToTarget(targetCard);
                     this.actionManager.applyBuffToCharacterOrCard(targetCard, new Weak(this.getBaseMagicNumberAfterResourceScaling()));
                 }
             });
@@ -38,6 +37,6 @@ export class HandCannon extends PlayableCard {
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage. Exert 1: Apply ${this.getDisplayedMagicNumber()} Vulnerable and Weak to the target.`;
+        return `Deal ${this.getDisplayedDamage()} damage. Exert 1: Do it again, then apply ${this.getDisplayedMagicNumber()} Weak to the target.`;
     }
 }

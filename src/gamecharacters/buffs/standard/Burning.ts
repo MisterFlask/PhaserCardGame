@@ -1,6 +1,7 @@
 import { GameState } from "../../../rules/GameState";
 import { TextGlyphs } from "../../../text/TextGlyphs";
 import { AbstractIntent, CosmeticCharacterBuffIntent } from "../../AbstractIntent";
+import { PlayableCard } from "../../PlayableCard";
 import { FlamesAmplifierBuff } from "../../playerclasses/cards/blackhand/rares/Pyronox";
 import { AbstractBuff } from "../AbstractBuff";
 
@@ -13,7 +14,7 @@ export class Burning extends AbstractBuff {
 
     override getDescription(): string {
         const totalDamage = this.baseDamage + GameState.getInstance().combatState.combatResources.blood.value;
-        return `At the end of turn, take ${totalDamage} damage for ${this.getStacksDisplayText()} turns. Damage increases with ${TextGlyphs.getInstance().ashesIcon}`;
+        return `At the end of turn or whenever a card is discarded, take ${totalDamage} damage and decrease stacks by 1. Damage increases with ${TextGlyphs.getInstance().ashesIcon}.`;
     }
 
     constructor(stacks: number = 1) {
@@ -48,5 +49,11 @@ export class Burning extends AbstractBuff {
             // Reduce stacks by 1
             this.stacks--;
         }
+    }
+
+    override onAnyCardDiscarded(card: PlayableCard): void {
+        this.pulseBuff();
+        this.actionManager.dealDamage({ baseDamageAmount: this.baseDamage, target: this.getOwnerAsCharacter()!, fromAttack: false });
+        this.stacks--;
     }
 }

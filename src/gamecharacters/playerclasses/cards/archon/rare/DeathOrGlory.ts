@@ -1,12 +1,10 @@
-import { GameState } from "../../../../../rules/GameState";
 import { ActionManagerFetcher } from "../../../../../utils/ActionManagerFetcher";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
 import { EntityRarity } from "../../../../EntityRarity";
 import { PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { ExhaustBuff } from "../../../../buffs/playable_card/ExhaustBuff";
-import { Vulnerable } from "../../../../buffs/standard/Vulnerable";
-import { BasicProcs } from "../../../../procs/BasicProcs";
+import { Intimidation } from "../../../../buffs/standard/Intimidation";
 
 export class DeathOrGlory extends PlayableCard {
     constructor() {
@@ -21,20 +19,13 @@ export class DeathOrGlory extends PlayableCard {
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
-        const gameState = GameState.getInstance();
-        const combatState = gameState.combatState;
 
-        if (targetCard) {
-
-            combatState.enemies.forEach(enemy => {
-                BasicProcs.getInstance().Taunt(enemy, this.owningCharacter!);
-            });
-
-            ActionManagerFetcher.getActionManager().applyBuffToCharacterOrCard(this.owningCharacter!,new Vulnerable(1));
-        }
+        const gameState = this.gameState;
+        this.actionManager.modifyCombatResource(gameState.combatState.combatResources.pluck, gameState.combatState.combatResources.pluck.value);
+        ActionManagerFetcher.getActionManager().applyBuffToCharacterOrCard(this.owningCharacter!,new Intimidation(10));
     }
 
     override get description(): string {
-        return `Taunt all enemies and apply 1 Vulnerable to self.  Double your Pluck.`;
+        return `Gain 10 Intimidation.  Double your Pluck.`;
     }
 }

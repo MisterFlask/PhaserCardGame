@@ -119,7 +119,7 @@ export class ShopPopulator {
         const cards = RelicsLibrary.getInstance().getRandomCursedCards(ShopPopulator.NUM_CARDS_PER_SHOP);
         cards.forEach(card => {
             card.applyBuffs_useFromActionManager([new SurfaceSellValue(Math.floor(Math.random() * 200) + 1)])
-            card.hellPurchaseValue = this.getCardPrice(card) / 2;
+            card.hellPurchaseValue = Math.floor(this.getCardPrice(card) / 2);
         });
         return cards;
     }
@@ -127,7 +127,7 @@ export class ShopPopulator {
     public getCursedGoodsRelics(): AbstractRelic[] {
         const relics = RelicsLibrary.getInstance().getRandomCursedRelics(ShopPopulator.NUM_RELICS_PER_SHOP);
         relics.forEach(relic => {
-            relic.price = this.getRelicPrice(relic) / 2;
+            relic.price = Math.floor(this.getRelicPrice(relic) / 2);
             relic.surfaceSellValue = Math.floor(Math.random() * 200) + 1;
         });
         return relics;

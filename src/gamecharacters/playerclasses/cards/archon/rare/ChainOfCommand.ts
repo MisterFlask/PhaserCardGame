@@ -1,12 +1,9 @@
 import { GameState } from "../../../../../rules/GameState";
-import { ActionManager } from "../../../../../utils/ActionManager";
 import { AbstractCard, TargetingType } from "../../../../AbstractCard";
-import { Stress } from "../../../../buffs/standard/Stress";
+import { Intimidation } from "../../../../buffs/standard/Intimidation";
 import { EntityRarity } from "../../../../EntityRarity";
 import { PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
-import { BasicProcs } from "../../../../procs/BasicProcs";
-import { TakeCover } from "../tokens/TakeCover";
 
 export class ChainOfCommand extends PlayableCard {
     constructor() {
@@ -17,7 +14,7 @@ export class ChainOfCommand extends PlayableCard {
             rarity: EntityRarity.RARE,
         });
         this.baseEnergyCost = 2;
-        this.baseDamage = 8;
+        this.baseDamage = 18;
         
         this.resourceScalings.push({
             resource: this.mettle,
@@ -29,26 +26,15 @@ export class ChainOfCommand extends PlayableCard {
         const gameState = GameState.getInstance();
         const combatState = gameState.combatState;
 
-        // Deal 8 damage to ALL enemies
         combatState.enemies.forEach(enemy => {
             this.dealDamageToTarget(enemy);
         });
 
-        // Gain 2 energy
-        combatState.energyAvailable += 2;
+        this.actionManager.applyBuffToCharacterOrCard(this.owningCharacter!, new Intimidation(20));
 
-        // Draw two cards
-        this.actionManager.drawCards(2);
-
-        // All party members take 1 Stress
-        combatState.playerCharacters.forEach(ally => {
-            ActionManager.getInstance().applyBuffToCharacterOrCard(ally, new Stress(1));
-        });
-
-        BasicProcs.getInstance().ManufactureCardToHand(new TakeCover());
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage to ALL enemies. Gain 2 energy. Draw two cards. All party members take 1 Stress.`;
+        return `Deal ${this.getDisplayedDamage()} damage to ALL enemies.  Gain 20 Intimidation.`;
     }
 }

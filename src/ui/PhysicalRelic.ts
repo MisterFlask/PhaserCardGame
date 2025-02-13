@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { AbstractRelic } from '../relics/AbstractRelic';
+import { RelicTooltipGenerator } from '../text/RelicTooltipGenerator';
 import ImageUtils from '../utils/ImageUtils';
 import { ShadowedImage } from './ShadowedImage';
 import { TextBox } from './TextBox';
@@ -141,6 +142,10 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
         console.log('PhysicalRelic: onPointerOver');
 
         this.tooltipBox.setVisible(true);
+        this.tooltipBox.setDepth(2)
+
+        const tooltipText = RelicTooltipGenerator.getInstance().generateTooltip(this.abstractRelic);
+        this.tooltipBox.setText(tooltipText);
 
         const globalY = this.y + (this.parentContainer?.y ?? 0);
         const screenHeight = this.scene.scale.height;

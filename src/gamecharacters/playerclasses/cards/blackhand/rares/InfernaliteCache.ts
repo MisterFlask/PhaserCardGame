@@ -16,7 +16,7 @@ export class InfernaliteCache extends PlayableCard {
     }
 
     override get description(): string {
-        return `Gain ${this.getDisplayedMagicNumber()} ${TextGlyphs.getInstance().smogIcon}.`;
+        return `Gain ${this.getDisplayedMagicNumber()} ${TextGlyphs.getInstance().smogIcon}.  Volatile.`;
     }
     
     override InvokeCardEffects(targetCard?: BaseCharacter): void {
