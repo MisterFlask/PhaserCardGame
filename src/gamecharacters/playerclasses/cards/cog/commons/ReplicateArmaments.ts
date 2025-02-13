@@ -1,0 +1,1 @@
+// Gain 2 Lethality.   Shuffle a copy of one of your cards into your draw pile.
