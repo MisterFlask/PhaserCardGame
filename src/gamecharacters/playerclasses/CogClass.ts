@@ -26,7 +26,7 @@ import { RevolverExpert } from "./cards/cog/rares/RevolverExpert";
 
 export class CogClass extends BaseCharacterClass {
     getPortraitNameAtRandom(gender: Gender): string {
-        return ImageUtils.getRandomImageNameFromCategory(`portraits_cog_${gender === Gender.Female ? "female" : "male"}` as any);    
+        return ImageUtils.getRandomImageNameFromCategory(`portraits_cog_${gender === Gender.Female ? "female" : "male"}` as any);
     }
 
     constructor() {

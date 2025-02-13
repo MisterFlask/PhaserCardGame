@@ -18,17 +18,13 @@ export class SelfUpgradingRevolver extends PlayableCard {
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage. Permanently increase this card's damage by ${this.getDisplayedMagicNumber()}.`;
+        return `Deal ${this.getDisplayedDamage()} damage. Increase this card's damage by ${this.getDisplayedMagicNumber()}.`;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         if (targetCard instanceof BaseCharacter) {
             this.dealDamageToTarget(targetCard);
-            
-            // Permanently increase this card's damage
-            this.mirrorChangeToCanonicalCard((card) => {
-                card.baseDamage += this.getBaseMagicNumberAfterResourceScaling();
-            });
+            this.baseDamage += this.getBaseMagicNumberAfterResourceScaling();
         }
     }
 }
