@@ -1,3 +1,4 @@
+import { PlayableCard } from "../../../gamecharacters/PlayableCard";
 import { ProcBroadcaster } from "../../../gamecharacters/procs/ProcBroadcaster";
 import { GameState } from "../../../rules/GameState";
 import { ActionManager } from "../../ActionManager";
@@ -17,8 +18,8 @@ export class StartCombatAction extends GameAction {
             });
         });
 
-        // Initialize combat deck
-        combatState.drawPile = [...gameState.currentRunCharacters.flatMap(c => c.cardsInMasterDeck)];
+        // Initialize combat deck: copy all cards in master deck into draw pile
+        combatState.drawPile = [...gameState.currentRunCharacters.flatMap(c => c.cardsInMasterDeck)].map(c => c.Copy() as PlayableCard);
         
         // Fisher-Yates shuffle algorithm
         for (let i = combatState.drawPile.length - 1; i > 0; i--) {

@@ -210,7 +210,7 @@ class GeneralRewardScreen {
                 tooltipText.setVisible(false);
             })
             .on(Phaser.Input.Events.GAMEOBJECT_POINTER_UP, () => {
-                this.handleRewardClick(index, reward);
+                this.handleRewardClick(reward);
             });
 
             this.rewardObjects.push({
@@ -224,11 +224,16 @@ class GeneralRewardScreen {
         });
     }
 
-    private handleRewardClick(index: number, reward: AbstractReward): void {
-        if (!this.rewardObjects[index]) {
-            console.warn(`handleRewardClick: reward object at index ${index} is already removed.`);
+    private handleRewardClick(reward: AbstractReward): void {
+        // Find the corresponding reward object
+        const rewardObjectIndex = this.rewardObjects.findIndex(ro => ro.reward.guid === reward.guid);
+        
+        if (rewardObjectIndex === -1) {
+            console.warn(`handleRewardClick: reward object with type ${reward.type} and GUID ${reward.guid} not found.`);
             return;
         }
+
+        const rewardObject = this.rewardObjects[rewardObjectIndex];
 
         if (reward instanceof CardReward) {
             this.showCardRewardScreen(reward);
@@ -236,7 +241,7 @@ class GeneralRewardScreen {
         }
 
         reward.collect(this.scene);
-        this.removeRewardElement(this.rewardObjects[index], reward);
+        this.removeRewardElement(rewardObject, reward);
     }
 
     private removeRewardElement(
@@ -261,10 +266,16 @@ class GeneralRewardScreen {
         ro.tooltipBackground?.destroy();
         ro.tooltipText?.destroy();
 
-        const idx = this.rewards.indexOf(reward);
-        if (idx >= 0) {
-            this.rewards.splice(idx, 1);
-            this.rewardObjects.splice(idx, 1);
+        // Find and remove the reward using its GUID
+        const rewardIndex = this.rewards.findIndex(r => r.guid === reward.guid);
+        const rewardObjectIndex = this.rewardObjects.findIndex(r => r.reward.guid === reward.guid);
+
+        if (rewardIndex >= 0) {
+            this.rewards.splice(rewardIndex, 1);
+        }
+
+        if (rewardObjectIndex >= 0) {
+            this.rewardObjects.splice(rewardObjectIndex, 1);
         }
 
         if (this.rewards.length === 0 && this.onDoneCallback) {

@@ -21,7 +21,7 @@ export class ObsidianCandlesEffect extends AbstractBuff {
     override onEvent(event: AbstractCombatEvent): void {
         if (event instanceof SacrificeEvent) {
             for (let i = 0; i < this.stacks; i++) {
-                BasicProcs.getInstance().ManufactureCardToHand(new EldritchSmoke());
+                BasicProcs.getInstance().ManufactureCardToHand(new EldritchSmoke().withOwner(this.getOwnerAsCharacter()!));
             }
         }
     }
@@ -49,7 +49,7 @@ export class ObsidianCandles extends PlayableCard {
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         // Manufacture an Eldritch Smoke to your hand
-        BasicProcs.getInstance().ManufactureCardToHand(new EldritchSmoke());
+        BasicProcs.getInstance().ManufactureCardToHand(new EldritchSmoke().withOwner(this.owningCharacter!));
 
         // Draw 2 cards
         const gameState = GameState.getInstance();

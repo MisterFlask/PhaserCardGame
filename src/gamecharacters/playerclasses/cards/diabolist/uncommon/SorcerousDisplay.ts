@@ -23,7 +23,7 @@ export class SorcerousDisplay extends PlayableCard {
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         for (let i = 0; i < this.getBaseMagicNumberAfterResourceScaling(); i++) {
-            BasicProcs.getInstance().ManufactureCardToHand(new EldritchSmoke());
+            BasicProcs.getInstance().ManufactureCardToHand(new EldritchSmoke().withOwner(this.owningCharacter!));
         }
         
         this.actionManager.drawCards(this.getBaseMagicNumberAfterResourceScaling());

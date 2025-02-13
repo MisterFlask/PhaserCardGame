@@ -19,7 +19,7 @@ export class Incoming extends PlayableCard {
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         for (let i = 0; i < this.getBaseMagicNumberAfterResourceScaling(); i++) {
-            BasicProcs.getInstance().ManufactureCardToHand(new TakeCover());
+            BasicProcs.getInstance().ManufactureCardToHand(new TakeCover().withOwner(this.owningCharacter!));
         }
     }
 

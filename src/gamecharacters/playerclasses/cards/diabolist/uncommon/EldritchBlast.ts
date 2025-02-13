@@ -29,7 +29,7 @@ export class EldritchBlast extends PlayableCard {
         this.dealDamageToTarget(targetCard as BaseCharacter);
 
 
-        BasicProcs.getInstance().ManufactureCardToHand(new EldritchSmoke());        
+        BasicProcs.getInstance().ManufactureCardToHand(new EldritchSmoke().withOwner(this.owningCharacter!));        
     }
 
     override get description(): string {

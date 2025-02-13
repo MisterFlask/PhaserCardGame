@@ -31,7 +31,7 @@ class MidnightOilBuff extends AbstractBuff {
     onCardPlayed(card: AbstractCard): void {
         if (!this.hasTriggeredThisTurn && card !== this.getOwnerAsPlayableCard()) {
             this.hasTriggeredThisTurn = true;
-            const copy = card.Copy()
+            const copy = (card.Copy() as PlayableCard)
             BasicProcs.getInstance().ManufactureCardToHand(copy as PlayableCard);
         }
     }
