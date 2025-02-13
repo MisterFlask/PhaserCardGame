@@ -16,11 +16,21 @@ export class ExhaustCardAction extends GameAction {
         card.transientUiFlag_disableStandardDiscardAfterPlay = true;
 
         // Burn up animation
-        await new Promise<void>(resolve => {
+        await new Promise<void>((resolve) => {
+            let resolved = false;
             card.physicalCard?.burnUp(async () => {
+                resolved = true;
                 await new WaitAction(100).playAction(); // Short delay for visual feedback
                 resolve();
             });
+
+            // Fallback in case burnUp never calls the callback
+            setTimeout(() => {
+                if (!resolved) {
+                    console.error("burnUp callback not fired, continuing...");
+                    resolve();
+                }
+            }, 200); // 200ms fallback; adjust as needed
         });
 
         // Move card to exhaust pile

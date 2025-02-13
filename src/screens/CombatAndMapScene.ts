@@ -319,7 +319,7 @@ class CombatScene extends Phaser.Scene {
         this.campaignBriefStatus.setScrollFactor(0);
 
         if (this.campaignBriefStatus) {
-            this.campaignBriefStatus.setPosition(700, 11);
+            this.campaignBriefStatus.setPosition(333, 11);
         }
 
         if (this.characterDeckOverlay) {

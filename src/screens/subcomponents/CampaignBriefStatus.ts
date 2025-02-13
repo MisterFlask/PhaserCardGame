@@ -6,10 +6,8 @@ import { TooltipAttachment } from "../../ui/TooltipAttachment";
 export class CampaignBriefStatus extends Phaser.GameObjects.Container {
     private actNumberText: TextBox;
     private surfaceCurrencyText: TextBox;
-    private hellCurrencyText: TextBox;
-    private brimstoneDistillateText: TextBox;
-    private brimstoneTooltip: TooltipAttachment;
-    private hellCurrencyTooltip: TooltipAttachment;
+    private combinedCurrencyText: TextBox;
+    private combinedCurrencyTooltip: TooltipAttachment;
     private surfaceCurrencyTooltip: TooltipAttachment;
     private relicContainer: Phaser.GameObjects.Container;
     private readonly CURRENCY_WIDTH = 280;
@@ -44,11 +42,11 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
             }
         });
 
-        // Adjust y positions of existing elements to make room for act number
+        // Surface currency display
         this.surfaceCurrencyText = new TextBox({
             scene: this.scene,
             x: 10,
-            y: 45, // Moved down
+            y: 45,
             width: this.CURRENCY_WIDTH,
             height: 30,
             text: `Surface Currency: ${GameState.getInstance().moneyInVault}`,
@@ -64,18 +62,17 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
             scene: this.scene,
             container: this.surfaceCurrencyText,
             tooltipText: "Utterly worthless and inaccessible in Hell but i guess it's nice to know you have it",
-            fillColor: 0x333333  // Dark gray background for surface currency tooltip
+            fillColor: 0x333333
         });
 
-
-
-        this.hellCurrencyText = new TextBox({
+        // Combined hell currency and promissory notes display
+        this.combinedCurrencyText = new TextBox({
             scene: this.scene,
             x: 10,
-            y: 80, // Moved down
+            y: 80,
             width: this.CURRENCY_WIDTH,
             height: 30,
-            text: `Hell Currency: ${GameState.getInstance().denarians}`,
+            text: `🪙 ${GameState.getInstance().denarians} | 📝 ${GameState.getInstance().promissoryNotes}`,
             style: {
                 fontSize: '16px',
                 color: '#ff4444',
@@ -83,36 +80,12 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
             }
         });
 
-        // Add tooltip to hell currency display
-        this.hellCurrencyTooltip = new TooltipAttachment({
+        // Add tooltip to combined currency display
+        this.combinedCurrencyTooltip = new TooltipAttachment({
             scene: this.scene,
-            container: this.hellCurrencyText,
-            tooltipText: "Can't be brought back to the surface because something something Charon is a bastard",
-            fillColor: 0x440000  // Dark red background for hell currency tooltip
-        });
-
-        // Add brimstone distillate display
-        this.brimstoneDistillateText = new TextBox({
-            scene: this.scene,
-            x: 10,
-            y: 115, // Moved down
-            width: this.CURRENCY_WIDTH,
-            height: 30,
-            text: `Promissory Notes: $${GameState.getInstance().promissoryNotes}`,
-            style: {
-                fontSize: '16px',
-                color: '#8B0000',  // Dark red color for brimstone
-                fontFamily: 'Arial'
-            },
-            fillColor: 0x200000  // Very dark red background
-        });
-
-        // Add tooltip to brimstone display
-        this.brimstoneTooltip = new TooltipAttachment({
-            scene: this.scene,
-            container: this.brimstoneDistillateText,
-            tooltipText: "Valuable on the surface.  Not considered legal tender in Hell.",
-            fillColor: 0x200000  // Optional dark red background
+            container: this.combinedCurrencyText,
+            tooltipText: "🪙 Denarians: Hell's currency | 📝 Promissory Notes: Valuable on the surface",
+            fillColor: 0x440000
         });
 
         // Create relic container
@@ -123,8 +96,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
         this.add([
             this.actNumberText,
             this.surfaceCurrencyText, 
-            this.hellCurrencyText, 
-            this.brimstoneDistillateText,
+            this.combinedCurrencyText,
             this.relicContainer
         ]);
 
@@ -135,7 +107,6 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
         if (areRelicsActivatable) {
             scene.events.on('relic_pointerdown', this.handleRelicPointerDown, this);
         }
-
     }
 
     private handleRelicPointerDown(relic: PhysicalRelic): void {
@@ -195,13 +166,11 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
         const gameState = GameState.getInstance();
         this.actNumberText.setText(`Act ${gameState.currentAct}`);
         this.surfaceCurrencyText.setText(`Surface Currency: ${gameState.moneyInVault}`);
-        this.hellCurrencyText.setText(`Hell Currency: ${gameState.denarians}`);
-        this.brimstoneDistillateText.setText(`Promissory Notes: : $${gameState.promissoryNotes}`);
+        this.combinedCurrencyText.setText(`🪙 ${gameState.denarians} | 📝 ${gameState.promissoryNotes}`);
     }
 
     public destroy(fromScene?: boolean): void {
-        this.brimstoneTooltip.destroy();
-        this.hellCurrencyTooltip.destroy();
+        this.combinedCurrencyTooltip.destroy();
         this.surfaceCurrencyTooltip.destroy();
         this.scene?.events?.off('update', this.updateCurrencyDisplay, this);
         this.scene?.events?.off('propagateGameStateChangesToUi', this.updateRelicDisplay, this);

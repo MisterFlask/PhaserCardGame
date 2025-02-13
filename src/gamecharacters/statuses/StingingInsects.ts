@@ -2,8 +2,8 @@ import { TargetingType } from "../AbstractCard";
 import { EntityRarity } from "../EntityRarity";
 import { PlayableCard } from "../PlayableCard";
 import { CardType } from "../Primitives";
+import { Erratic } from "../buffs/playable_card/Erratic";
 import { Painful } from "../buffs/playable_card/Painful";
-
 export class StingingInsects extends PlayableCard {
     constructor(painfulValue: number = 5) {
         super({
@@ -14,6 +14,7 @@ export class StingingInsects extends PlayableCard {
         });
         this.baseEnergyCost = 0;
         this.buffs.push(new Painful(painfulValue));
+        this.buffs.push(new Erratic());
     }
 
     override get description(): string {
@@ -21,6 +22,6 @@ export class StingingInsects extends PlayableCard {
     }
 
     override InvokeCardEffects(): void {
-        // No effect
+        this.actionManager.drawCards(1);
     }
 }

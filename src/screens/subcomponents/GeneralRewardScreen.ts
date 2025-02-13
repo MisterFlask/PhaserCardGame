@@ -225,6 +225,11 @@ class GeneralRewardScreen {
     }
 
     private handleRewardClick(index: number, reward: AbstractReward): void {
+        if (!this.rewardObjects[index]) {
+            console.warn(`handleRewardClick: reward object at index ${index} is already removed.`);
+            return;
+        }
+
         if (reward instanceof CardReward) {
             this.showCardRewardScreen(reward);
             return;
@@ -245,6 +250,11 @@ class GeneralRewardScreen {
         },
         reward: AbstractReward
     ): void {
+        if (ro == null){
+            console.warn("ro is null");
+            return;
+        }
+
         ro.iconBackground?.destroy();
         ro.icon?.destroy();
         ro.text?.destroy();

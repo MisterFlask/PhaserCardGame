@@ -1,6 +1,8 @@
+import { ActionManager } from "../utils/ActionManager";
 import { IncomingIntent } from "./IncomingIntent";
 import type { PhysicalCard } from "./PhysicalCard";
 import type { PhysicalIntent } from "./PhysicalIntent";
+import { UIContextManager } from "./UIContextManager";
 
 export class TransientUiState {
     private static instance: TransientUiState;
@@ -44,11 +46,12 @@ export class TransientUiState {
     }
 
     public getDebugDisplayString(): string {
-        return `UI State:
+        return `UI State: ${UIContextManager.getInstance().getContext()}
 Dragged Card: ${this.draggedCard ? this.draggedCard.data.name : 'None'}
 Hovered Card: ${this.hoveredCard ? this.hoveredCard.data.name : 'None'}
 Hovered Intent: ${this.hoveredIntent ? this.hoveredIntent.intent.id : 'None'}
 Hovered Incoming Intent: ${this.hoveredIncomingIntent ? this.hoveredIncomingIntent.intent.id : 'None'}
+Queue As String: ${ActionManager.getInstance().queueAsString()}
 Mouse Over Card Drop Zone: ${this.mouseOverCardDropZone ? 'Yes' : 'No'}`.trim();
     }
 } 

@@ -155,6 +155,9 @@ class CardSelectionFromHandManager {
     }
 
     private toggleCardSelection(card: PlayableCardType): void {
+        if (UIContextManager.getInstance().getContext() !== UIContext.CARD_SELECTION_FROM_HAND) {
+            return;
+        }
         if (this.selectedCards.has(card)) {
             this.selectedCards.delete(card);
             card.unhighlight();

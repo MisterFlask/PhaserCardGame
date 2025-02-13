@@ -43,6 +43,11 @@ import { StartCombatAction } from "./actions/specific/StartCombatAction";
 import { WaitAction } from "./actions/WaitAction";
 
 export class ActionManager {
+
+    queueAsString(): string {
+        return this.actionQueue.getQueueAsString();
+    }
+
     modifyCombatResource(resource: AbstractCombatResource, amount: number) {
         this.actionQueue.addAction(new GenericAction(async () => {
             resource.value += amount;
@@ -489,6 +494,7 @@ export class ActionManager {
 
         return true;
     }
+
     InvokeSecondaryEffectsOfPlayingCard(playableCard: PlayableCard, target: BaseCharacter | undefined) 
     {
         playableCard.buffs.forEach(buff => {
@@ -929,6 +935,7 @@ export class ActionManager {
     }
 
     public endTurn(): void {
+        console.log("Ending turn action applied to queue");
         this.actionQueue.addAction(new EndTurnAction());
     }
 
@@ -1067,6 +1074,26 @@ class ActionNode {
 }
 
 export class ActionQueue {
+    getQueueAsString(): string {
+        let output: string[] = ["Current Action Queue:"];
+        if (this.queue.length === 0) {
+            output.push("  Queue is empty");
+            return output.join("\n");
+        }
+
+        const printNode = (node: ActionNode, depth: number = 0): string => {
+            const indent = "  ".repeat(depth);
+            return `${indent}Action: ${node.action.constructor.name}${node.children.map(child => "\n" + printNode(child, depth + 1)).join("")}`;
+        };
+
+        this.queue.forEach((node, index) => {
+            output.push(`\nQueue Item ${index + 1}:`);
+            output.push(printNode(node));
+        });
+
+        return output.join("\n");
+    }
+
     clear() {
         this.queue = [];
         this.currentActionNode = null;
@@ -1084,7 +1111,10 @@ export class ActionQueue {
             this.queue.push(new ActionNode(action));
         }
         if (!this.isResolving) {
-            this.resolveActions();
+            this.resolveActions().catch(err => {
+                console.error("Action Queue encountered an error while resolving actions:", err);
+                this.isResolving = false;
+            });
         }
     }
 
@@ -1094,28 +1124,81 @@ export class ActionQueue {
 
         while (this.queue.length > 0) {
             const currentNode = this.queue.pop();
-            if (currentNode) {
-                this.currentActionNode = currentNode;
-                const newActions = await currentNode.action.playAction();
-                for (const action of newActions) {
-                    this.currentActionNode?.children.push(new ActionNode(action));
-                }
-                // Process child actions first (depth-first)
+            if (!currentNode) {
+                continue;
+            }
+            this.currentActionNode = currentNode;
+
+            let newActions: GameAction[] = [];
+            try {
+                const TIMEOUT_MS = 5000;
+                const actionPromise = currentNode.action.playAction();
+                const timedPromise = this.forceTimeout(actionPromise, TIMEOUT_MS);
+
+                newActions = await timedPromise.catch(err => {
+                    console.error(`Action "${currentNode.action.constructor.name}" failed and was skipped:`, err);
+                    return [];
+                });
+
+            } catch (outerErr) {
+                console.error("Unexpected error in resolveActions loop:", outerErr);
+            }
+
+            try {
                 while (currentNode.children.length > 0) {
                     const childNode = currentNode.children.pop();
                     if (childNode) {
                         this.queue.push(childNode);
                     }
                 }
-                // {{ edit_2 }}
-                // Reset currentActionNode after processing its children
-                this.currentActionNode = null;
+            } catch (childErr) {
+                console.error("Error appending child actions:", childErr);
             }
-            // Add a small delay to allow for animations and prevent blocking
+            this.currentActionNode = null;
+
+            for (const action of newActions) {
+                this.queue.push(new ActionNode(action));
+            }
+
             await new Promise(resolve => setTimeout(resolve, 50));
         }
 
-        ActionManager.getInstance().stateBasedEffects();
+        try {
+            ActionManager.getInstance().stateBasedEffects();
+        } catch (sbeErr) {
+            console.error("Error in stateBasedEffects:", sbeErr);
+        }
+
         this.isResolving = false;
+    }
+
+    private forceTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+        return new Promise<T>((resolve, reject) => {
+            let didFinish = false;
+
+            const timer = setTimeout(() => {
+                if (!didFinish) {
+                    didFinish = true;
+                    reject(new Error(`Action did not complete within ${timeoutMs}ms and has been aborted.`));
+                }
+            }, timeoutMs);
+
+            promise.then(
+                res => {
+                    if (!didFinish) {
+                        didFinish = true;
+                        clearTimeout(timer);
+                        resolve(res);
+                    }
+                },
+                err => {
+                    if (!didFinish) {
+                        didFinish = true;
+                        clearTimeout(timer);
+                        reject(err);
+                    }
+                }
+            );
+        });
     }
 }

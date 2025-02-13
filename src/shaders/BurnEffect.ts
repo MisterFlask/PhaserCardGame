@@ -37,7 +37,8 @@ export class BurnEffect {
     }
 
     public destroy(){
-        const glRenderer = this.scene.game.renderer as Phaser.Renderer.WebGL.WebGLRenderer;
-        glRenderer.pipelines.remove('BurnPipeline');
+        // Commented out to avoid removing the pipeline for other burn effects still running:
+        // const glRenderer = this.scene.game.renderer as Phaser.Renderer.WebGL.WebGLRenderer;
+        // glRenderer.pipelines.remove('BurnPipeline');
     }
 }

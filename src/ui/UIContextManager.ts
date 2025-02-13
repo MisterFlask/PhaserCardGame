@@ -1,14 +1,14 @@
 export enum UIContext {
-    COMBAT,
-    MAP,
-    SHOP,
-    CARD_REWARD,
-    CHARACTER_DECK_SHOWN,
-    CAMPAIGN_HQ,
-    CARD_SELECTION_FROM_HAND,
-    DEBUG_MENU,
-    COMBAT_BUT_NOT_YOUR_TURN,
-    REWARD_SCREEN
+    COMBAT = "COMBAT",
+    MAP = "MAP",
+    SHOP = "SHOP",
+    CARD_REWARD = "CARD_REWARD",
+    CHARACTER_DECK_SHOWN = "CHARACTER_DECK_SHOWN",
+    CAMPAIGN_HQ = "CAMPAIGN_HQ",
+    CARD_SELECTION_FROM_HAND = "CARD_SELECTION_FROM_HAND",
+    DEBUG_MENU = "DEBUG_MENU",
+    COMBAT_BUT_NOT_YOUR_TURN = "COMBAT_BUT_NOT_YOUR_TURN",
+    REWARD_SCREEN = "REWARD_SCREEN"
 }
 
 export class UIContextManager {
@@ -25,6 +25,8 @@ export class UIContextManager {
     }
 
     public setContext(context: UIContext): void {
+        console.log(`UIContext changing from ${UIContext[this.currentContext]} to ${UIContext[context]}`);
+        console.trace(); // This will log the stack trace
         this.currentContext = context;
     }
 

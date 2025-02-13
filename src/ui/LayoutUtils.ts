@@ -7,7 +7,7 @@ import { TransientUiState } from './TransientUiState';
 
 class CombatSceneLayoutUtils {
     static getBattlefieldY(scene: Phaser.Scene): number {
-        return scene.scale.height * 0.43;
+        return scene.scale.height * 0.53;
     }
 
     static getHandY(scene: Phaser.Scene): number {

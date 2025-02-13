@@ -35,8 +35,8 @@ export class SorrowmothSwarm extends AutomatedCharacter {
                 new DoSomethingIntent({
                     owner: this,
                     action: () => {
-                        this.actionManager.heal(this.owningCharacter!, 10);
-                        this.actionManager.applyBuffToCharacter(this.owningCharacter!, new Lethality(4));
+                        this.actionManager.heal(this, 10);
+                        this.actionManager.applyBuffToCharacter(this, new Lethality(4));
                     },
                     imageName: 'heal'
                 }).withTitle("recruit")
