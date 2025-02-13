@@ -47,7 +47,7 @@ export class CharacterGenerator {
             new ArchonClass(),
             new BlackhandClass(), 
             new DiabolistClass(),
-            new CogClass()
+            new CogClass(),
         ];
 
         const selectedClass = characterClasses[Math.floor(Math.random() * characterClasses.length)];

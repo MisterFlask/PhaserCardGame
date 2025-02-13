@@ -10,11 +10,14 @@ import { InspiringPresence } from "./cards/archon/commons/InspiringPresence";
 import { TacticalManual } from "./cards/archon/commons/TacticalManual";
 import { TheLash } from "./cards/archon/commons/TheLash";
 import { ChainOfCommand } from "./cards/archon/rare/ChainOfCommand";
+import { Comrades } from "./cards/archon/rare/Comrades";
 import { DeathOrGlory } from "./cards/archon/rare/DeathOrGlory";
 import { IronWill } from "./cards/archon/rare/IronWill";
 import { LastBastion } from "./cards/archon/rare/LastBastion";
 import { Quartermaster } from "./cards/archon/rare/Quartermaster";
 import { QueensMandate } from "./cards/archon/rare/QueensMandate";
+import { BlessedBuzzsword } from "./cards/archon/uncommon/BlessedBuzzsword";
+import { Glower } from "./cards/archon/uncommon/Glower";
 import { HoldTheLine } from "./cards/archon/uncommon/HoldTheLine";
 import { InspireFear } from "./cards/archon/uncommon/InspireFear";
 import { Orders } from "./cards/archon/uncommon/Orders";
@@ -42,6 +45,8 @@ export class ArchonClass extends BaseCharacterClass {
             new TheLash(),
 
             // uncommon
+            new BlessedBuzzsword(),
+            new Glower(),
             new HoldTheLine(),
             new InspireFear(),
             new Orders(),
@@ -50,6 +55,7 @@ export class ArchonClass extends BaseCharacterClass {
 
             // rare
             new ChainOfCommand(),
+            new Comrades(),
             new DeathOrGlory(),
             new LastBastion(),
             new IronWill(),

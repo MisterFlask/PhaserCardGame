@@ -8,12 +8,14 @@ import { DarkWhisper } from "./cards/diabolist/commons/DarkWhisper";
 import { ObsidianCandles } from "./cards/diabolist/commons/ObsidianCandles";
 import { Balefire } from "./cards/diabolist/rares/Balefire";
 import { ExpertOccultist } from "./cards/diabolist/rares/ExpertOccultist";
+import { Hemomancer } from "./cards/diabolist/rares/Hemomancer";
 import { HorrificRegeneration } from "./cards/diabolist/rares/HorrificRegeneration";
 import { IllFatedBlade } from "./cards/diabolist/rares/IllFatedBlade";
 import { Soulsuck } from "./cards/diabolist/rares/Soulsuck";
 import { BurningSight } from "./cards/diabolist/uncommon/BurningSight";
 import { EldritchBlast } from "./cards/diabolist/uncommon/EldritchBlast";
 import { Shadowflame } from "./cards/diabolist/uncommon/Shadowflame";
+import { SorcerousDisplay } from "./cards/diabolist/uncommon/SorcerousDisplay";
 import { UnnaturalVigor } from "./cards/diabolist/uncommon/UnnaturalVigor";
 
 export class DiabolistClass extends BaseCharacterClass {
@@ -31,17 +33,20 @@ export class DiabolistClass extends BaseCharacterClass {
             new ObsidianCandles(),
             new BloodShield(),
             
-            // rare
-            new Balefire(),
-            new IllFatedBlade(),
-            new HorrificRegeneration(),
-            new ExpertOccultist(),
-            new Soulsuck(),
-
-            //uncommon
+            // uncommon
             new BurningSight(),
             new EldritchBlast(),
             new Shadowflame(),
-            new UnnaturalVigor()]
+            new SorcerousDisplay(),
+            new UnnaturalVigor(),
+
+            // rare
+            new Balefire(),
+            new ExpertOccultist(),
+            new Hemomancer(),
+            new HorrificRegeneration(),
+            new IllFatedBlade(),
+            new Soulsuck()
+        ]
     }
 }
