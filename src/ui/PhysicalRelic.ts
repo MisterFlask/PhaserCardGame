@@ -4,13 +4,14 @@ import { RelicTooltipGenerator } from '../text/RelicTooltipGenerator';
 import ImageUtils from '../utils/ImageUtils';
 import { ShadowedImage } from './ShadowedImage';
 import { TextBox } from './TextBox';
+import { TooltipAttachment } from './TooltipAttachment';
 import { UIContext } from './UIContextManager';
 
 export class PhysicalRelic extends Phaser.GameObjects.Container {
     contextRelevant?: UIContext;
     relicImage: Phaser.GameObjects.Image;
     shadowImage: Phaser.GameObjects.Image;
-    tooltipBox: TextBox;
+    private tooltipAttachment: TooltipAttachment;
     priceBox?: TextBox;
     abstractRelic: AbstractRelic;
     private _isHighlighted: boolean = false;
@@ -82,14 +83,13 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
             });
         }
 
-        // Create tooltip without specifying y position yet
-        this.tooltipBox = new TextBox({
+        // Create tooltip using TooltipAttachment
+        const tooltipText = RelicTooltipGenerator.getInstance().generateTooltip(abstractRelic);
+        this.tooltipAttachment = new TooltipAttachment({
             scene,
-            text: `${abstractRelic.getDisplayName()}\n${abstractRelic.getDescription()}`,
-            width: 200
+            container: this.relicImage,
+            tooltipText: tooltipText
         });
-        this.tooltipBox.setVisible(false);
-        this.add(this.tooltipBox);
 
         this.priceBox = new TextBox({
             scene,
@@ -124,6 +124,7 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
 
         this.setupInteractivity();
     }
+
     private getAbstractIcon(abstractBuff: AbstractRelic) : string{
         return ImageUtils.getDeterministicAbstractPlaceholder(abstractBuff.getDisplayName());
     }
@@ -132,31 +133,16 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
     setupInteractivity(): void {
         // Remove the container's interactivity and set it on the shadowed image's main image instead
         this.relicImage.setInteractive()
-            .on('pointerover', this.onPointerOver, this)
-            .on('pointerout', this.onPointerOut, this)
             .on('pointerdown', this.onPointerDown, this);
+
+        // Scale effects for hover
+        this.relicImage
+            .on('pointerover', this.onPointerOver, this)
+            .on('pointerout', this.onPointerOut, this);
     }
 
     private onPointerOver = (): void => {
         if (this.obliterated) return;
-        console.log('PhysicalRelic: onPointerOver');
-
-        this.tooltipBox.setVisible(true);
-        this.tooltipBox.setDepth(2)
-
-        const tooltipText = RelicTooltipGenerator.getInstance().generateTooltip(this.abstractRelic);
-        this.tooltipBox.setText(tooltipText);
-
-        const globalY = this.y + (this.parentContainer?.y ?? 0);
-        const screenHeight = this.scene.scale.height;
-        const isCloserToTop = globalY < screenHeight / 2;
-
-        const tooltipBounds = this.tooltipBox.getBounds();
-        const tooltipHeight = tooltipBounds.height;
-
-        this.tooltipBox.y = isCloserToTop ? 
-            (this.baseSize + 10) + 100 :
-            -(tooltipHeight + 10);
 
         // Scale up both the main image and shadow
         this.scene.tweens.add({
@@ -181,8 +167,6 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
             duration: 200,
             ease: 'Power2'
         });
-
-        this.tooltipBox.setVisible(false);
         
         this.parentContainer?.emit('pointerout');
     }
@@ -219,6 +203,7 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
         console.log(`Destroying PhysicalRelic for: ${this.abstractRelic.getDisplayName()}`);
         this.stacksBox?.destroy();
         this.selectOverlay?.destroy();
+        this.tooltipAttachment?.destroy(); // Destroy tooltip attachment
         super.destroy();
     }
 
@@ -235,6 +220,9 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
         if (this.stacksBox && this.abstractRelic.stacks !== undefined) {
             this.stacksBox.setText(`${this.abstractRelic.stacks}`);
         }
-        this.tooltipBox.setText(`${this.abstractRelic.getDisplayName()}\n${this.abstractRelic.getDescription()}`);
+        
+        // Update tooltip text
+        const tooltipText = RelicTooltipGenerator.getInstance().generateTooltip(this.abstractRelic);
+        this.tooltipAttachment.updateText(tooltipText);
     }
 }
