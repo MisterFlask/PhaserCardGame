@@ -12,19 +12,22 @@ import { CampaignUiState } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
 
 export class CargoSelectionPanel extends AbstractHqPanel {
-    private characterContainer: Phaser.GameObjects.Container;
-    private cargoContainer: Phaser.GameObjects.Container;
     private locationCard: PhysicalCard | null = null;
     private launchButton: TextBoxButton;
     private backButton: TextBoxButton;
     private statusText: TextBox;
     private fundsDisplay: TextBox;
+
+    // we keep track of all dynamically created objects (except those that have their own destroy/obliterate logic)
+    // so we can remove or destroy them when hiding or refreshing
+    private characterObjects: Phaser.GameObjects.GameObject[] = [];
+    private cargoObjects: Phaser.GameObjects.GameObject[] = [];
     private characterCards: Map<PlayerCharacter, PhysicalCard> = new Map();
 
     constructor(scene: Scene) {
         super(scene, 'Cargo Selection');
 
-        // Create funds display
+        // create funds display
         this.fundsDisplay = new TextBox({
             scene,
             x: scene.scale.width * 0.5,
@@ -32,24 +35,23 @@ export class CargoSelectionPanel extends AbstractHqPanel {
             width: 300,
             height: 40,
             text: `Available Funds: £${GameState.getInstance().moneyInVault}`,
-            style: { 
-                fontSize: '24px', 
+            style: {
+                fontSize: '24px',
                 color: '#ffff00',
-                align: 'center'
-            }
+                align: 'center',
+            },
         });
 
-        // Create containers
-        this.characterContainer = this.scene.add.container(0, 0);
-        this.cargoContainer = this.scene.add.container(0, 0);
-        this.add([this.characterContainer, this.cargoContainer, this.fundsDisplay]);
+        // place fundsDisplay at a visible depth
+        scene.add.existing(this.fundsDisplay);
+        this.fundsDisplay.setDepth(100);
 
-        // Listen for funds changes
+        // listen for funds changes
         this.scene.events.on('fundsChanged', () => {
             this.updateFundsDisplay();
         });
 
-        // Create back button (separate from the default return to hub button)
+        // create back button
         this.backButton = new TextBoxButton({
             scene,
             x: scene.scale.width * 0.2,
@@ -58,10 +60,12 @@ export class CargoSelectionPanel extends AbstractHqPanel {
             height: 50,
             text: 'Back to Loadout',
             style: { fontSize: '20px', color: '#ffffff' },
-            fillColor: 0x444444
+            fillColor: 0x444444,
         });
+        scene.add.existing(this.backButton);
+        this.backButton.setDepth(100);
 
-        // Create launch button
+        // create launch button
         this.launchButton = new TextBoxButton({
             scene,
             x: scene.scale.width * 0.8,
@@ -70,10 +74,12 @@ export class CargoSelectionPanel extends AbstractHqPanel {
             height: 50,
             text: 'Launch Expedition',
             style: { fontSize: '20px', color: '#ffffff' },
-            fillColor: 0x444444
+            fillColor: 0x444444,
         });
+        scene.add.existing(this.launchButton);
+        this.launchButton.setDepth(100);
 
-        // Create status text
+        // create status text
         this.statusText = new TextBox({
             scene,
             x: scene.scale.width * 0.5,
@@ -81,20 +87,21 @@ export class CargoSelectionPanel extends AbstractHqPanel {
             width: 300,
             height: 100,
             text: '',
-            style: { 
-                fontSize: '16px', 
+            style: {
+                fontSize: '16px',
                 color: '#ffffff',
                 align: 'center',
-                wordWrap: { width: 290 }
-            }
+                wordWrap: { width: 290 },
+            },
         });
+        scene.add.existing(this.statusText);
+        this.statusText.setDepth(100);
 
+        // wire up button events
         this.backButton.onClick(() => this.handleBack());
         this.launchButton.onClick(() => this.handleLaunch());
 
-        this.add([this.backButton, this.launchButton, this.statusText]);
-
-        // Hide the default return to hub button since we have our own back button
+        // hide the default return to hub button since we have our own back button
         this.returnButton.setVisible(false);
     }
 
@@ -107,19 +114,23 @@ export class CargoSelectionPanel extends AbstractHqPanel {
         if (this.isReadyToLaunch()) {
             const campaignState = CampaignUiState.getInstance();
             const gameState = GameState.getInstance();
-            
+
             gameState.currentRunCharacters = campaignState.selectedParty;
-            
-            // No need to copy cards to cargoHolder since we're already using it
             gameState.initializeRun();
-            SceneChanger.switchToCombatScene(EncounterManager.getInstance().getShopEncounter(), true);
+            SceneChanger.switchToCombatScene(
+                EncounterManager.getInstance().getShopEncounter(),
+                true
+            );
         }
     }
 
     private isReadyToLaunch(): boolean {
         const readinessState = this.getReadinessStatus();
         if (!readinessState.ready) {
-            console.log("CargoSelectionPanel is not ready to launch: ", readinessState.reasons);
+            console.log(
+                'CargoSelectionPanel is not ready to launch: ',
+                readinessState.reasons
+            );
         }
         return readinessState.ready;
     }
@@ -128,14 +139,14 @@ export class CargoSelectionPanel extends AbstractHqPanel {
         const gameState = GameState.getInstance();
         const reasons: string[] = [];
 
-        // Check if any cargo is selected
+        // check if any cargo is selected
         if (gameState.cargoHolder.cardsInMasterDeck.length === 0) {
-            reasons.push("No cargo purchased for the expedition");
+            reasons.push('No cargo purchased for the expedition');
         }
 
         return {
             ready: reasons.length === 0,
-            reasons
+            reasons,
         };
     }
 
@@ -144,22 +155,23 @@ export class CargoSelectionPanel extends AbstractHqPanel {
         this.launchButton.setButtonEnabled(status.ready);
 
         if (status.ready) {
-            this.statusText.setText("Ready to launch!");
-            this.statusText.setFillColor(0x006400); // Dark green
+            this.statusText.setText('Ready to launch!');
+            this.statusText.setFillColor(0x006400); // dark green
         } else {
             const reasonsText = status.reasons.join('\n• ');
             this.statusText.setText(`Cannot launch:\n• ${reasonsText}`);
-            this.statusText.setFillColor(0x8B0000); // Dark red
+            this.statusText.setFillColor(0x8b0000); // dark red
         }
     }
 
     private displayCharacters(): void {
-        // Clear existing character cards
-        this.characterCards.forEach(card => card.obliterate());
+        // clear old stuff
+        this.characterCards.forEach((card) => card.obliterate());
         this.characterCards.clear();
-        this.characterContainer.removeAll(true);
+        this.characterObjects.forEach((obj) => obj.destroy());
+        this.characterObjects = [];
 
-        // Create section for characters
+        // create a border + title for the character zone
         const characterSection = this.createSection(
             'Expedition Party',
             50,
@@ -167,42 +179,53 @@ export class CargoSelectionPanel extends AbstractHqPanel {
             this.scene.scale.width * 0.3,
             this.scene.scale.height - 200
         );
-        this.characterContainer.add(characterSection);
+        characterSection.forEach((obj) => {
+            this.scene.add.existing(obj);
+            if ('setDepth' in obj) {
+                (obj as any).setDepth(100);
+            }
+            this.characterObjects.push(obj);
+        });
 
-        // Display selected party members
+        // display selected party members
         const campaignState = CampaignUiState.getInstance();
         campaignState.selectedParty.forEach((character, index) => {
+            const xPos = 100;
+            const yPos = 150 + index * 120;
             const card = CardGuiUtils.getInstance().createCard({
                 scene: this.scene,
-                x: 100,
-                y: 150 + index * 120,
+                x: xPos,
+                y: yPos,
                 data: character,
-                onCardCreatedEventCallback: (card) => {
-                    this.characterCards.set(character, card);
-                    this.characterContainer.add(card.container);
-                }
+                onCardCreatedEventCallback: (createdCard) => {
+                    // track it
+                    this.scene.add.existing(createdCard.container);
+                    createdCard.container.setDepth(500);
+                    this.characterCards.set(character, createdCard);
+                },
             });
         });
     }
 
-    private createSection(title: string, x: number, y: number, width: number, height: number): Phaser.GameObjects.Container {
-        const container = this.scene.add.container(x, y);
-
-        // Add border
-        const border = this.scene.add.rectangle(0, 0, width, height, 0x666666);
-        border.setStrokeStyle(2, 0x888888);
+    private createSection(
+        title: string,
+        x: number,
+        y: number,
+        width: number,
+        height: number
+    ): Phaser.GameObjects.GameObject[] {
+        const border = this.scene.add.rectangle(x, y, width, height, 0x666666);
         border.setOrigin(0, 0);
+        border.setStrokeStyle(2, 0x888888);
 
-        // Add title
-        const titleText = this.scene.add.text(10, 10, title, {
+        const titleText = this.scene.add.text(x + 10, y + 10, title, {
             fontSize: '20px',
             color: '#ffffff',
             backgroundColor: '#444444',
-            padding: { x: 10, y: 5 }
+            padding: { x: 10, y: 5 },
         });
 
-        container.add([border, titleText]);
-        return container;
+        return [border, titleText];
     }
 
     private displayLocationCard(): void {
@@ -213,42 +236,49 @@ export class CargoSelectionPanel extends AbstractHqPanel {
 
         const campaignState = CampaignUiState.getInstance();
         if (campaignState.selectedTradeRoute) {
+            const xPos = this.scene.scale.width * 0.2;
+            const yPos = this.scene.scale.height * 0.2;
             this.locationCard = CardGuiUtils.getInstance().createCard({
                 scene: this.scene,
-                x: this.scene.scale.width * 0.2,
-                y: this.scene.scale.height * 0.2,
+                x: xPos,
+                y: yPos,
                 data: campaignState.selectedTradeRoute,
-                onCardCreatedEventCallback: (card) => {
-                    this.add(card.container);
-                }
+                onCardCreatedEventCallback: (createdCard) => {
+                    this.scene.add.existing(createdCard.container);
+                    createdCard.container.setDepth(500);
+                },
             });
         }
     }
 
     private displayCargo(): void {
-        // Clear existing cargo container and destroy its children
-        this.cargoContainer.removeAll(true);
+        // clear existing cargo objects
+        this.cargoObjects.forEach((o) => o.destroy());
+        this.cargoObjects = [];
 
-        // Create sections for available and owned cargo
-        const availableCargoSection = this.createSection(
+        // create sections for available & owned cargo
+        const availableSection = this.createSection(
             'Available Cargo',
             this.scene.scale.width * 0.4,
             100,
             this.scene.scale.width * 0.25,
             this.scene.scale.height - 200
         );
-
-        const ownedCargoSection = this.createSection(
+        const ownedSection = this.createSection(
             'Purchased Cargo',
             this.scene.scale.width * 0.7,
             100,
             this.scene.scale.width * 0.25,
             this.scene.scale.height - 200
         );
+        [...availableSection, ...ownedSection].forEach((obj) => {
+            this.scene.add.existing(obj);
+            if ('setDepth' in obj) {
+                (obj as any).setDepth(100);
+            }
+            this.cargoObjects.push(obj);
+        });
 
-        this.cargoContainer.add([availableCargoSection, ownedCargoSection]);
-
-        // Display cargo cards in a grid
         const campaignState = CampaignUiState.getInstance();
         const gameState = GameState.getInstance();
         const GRID_COLS = 2;
@@ -256,140 +286,125 @@ export class CargoSelectionPanel extends AbstractHqPanel {
         const CARD_HEIGHT = 160;
         const PADDING = 20;
 
-        // Display available trade goods
+        // display available trade goods
         campaignState.availableTradeGoods.forEach((good, index) => {
             const col = index % GRID_COLS;
             const row = Math.floor(index / GRID_COLS);
-            
-            const x = this.scene.scale.width * 0.45 + col * (CARD_WIDTH + PADDING);
-            const y = 150 + row * (CARD_HEIGHT + PADDING);
+            const xPos =
+                this.scene.scale.width * 0.45 + col * (CARD_WIDTH + PADDING);
+            const yPos = 150 + row * (CARD_HEIGHT + PADDING);
 
-            const card = CardGuiUtils.getInstance().createCard({
+            CardGuiUtils.getInstance().createCard({
                 scene: this.scene,
-                x,
-                y,
+                x: xPos,
+                y: yPos,
                 data: good,
                 onCardCreatedEventCallback: (card) => {
-                    this.setupAvailableCargoCard(card);
-                    
-                    // Add price display text
+                    this.scene.add.existing(card.container);
+                    card.container.setDepth(500);
+
+                    // make it interactive
+                    card.container.setInteractive();
+                    card.container.on('pointerdown', () => this.purchaseCargo(good));
+                    card.container.on('pointerover', () => card.container.setDepth(1500));
+                    card.container.on('pointerout', () => card.container.setDepth(500));
+
+                    // create price text
                     const priceText = new TextBox({
                         scene: this.scene,
-                        x: CARD_WIDTH / 2,
-                        y: CARD_HEIGHT + 10,
+                        x: xPos + CARD_WIDTH / 2,
+                        y: yPos + CARD_HEIGHT + 10,
                         width: 100,
                         height: 30,
                         text: `£${good.surfacePurchaseValue}`,
-                        style: { fontSize: '14px', color: '#ffffff' }
+                        style: { fontSize: '14px', color: '#ffffff' },
                     });
+                    this.scene.add.existing(priceText);
+                    priceText.setDepth(500);
 
-                    card.container.add(priceText);
-                    this.cargoContainer.add(card.container);
-                }
+                    // track them for cleanup
+                    this.cargoObjects.push(card.container, priceText);
+                },
             });
         });
 
-        // Display owned trade goods
+        // display owned trade goods
         gameState.cargoHolder.cardsInMasterDeck.forEach((good, index) => {
             const col = index % GRID_COLS;
             const row = Math.floor(index / GRID_COLS);
-            
-            const x = this.scene.scale.width * 0.75 + col * (CARD_WIDTH + PADDING);
-            const y = 150 + row * (CARD_HEIGHT + PADDING);
+            const xPos =
+                this.scene.scale.width * 0.75 + col * (CARD_WIDTH + PADDING);
+            const yPos = 150 + row * (CARD_HEIGHT + PADDING);
 
-            const card = CardGuiUtils.getInstance().createCard({
+            CardGuiUtils.getInstance().createCard({
                 scene: this.scene,
-                x,
-                y,
+                x: xPos,
+                y: yPos,
                 data: good,
                 onCardCreatedEventCallback: (card) => {
-                    this.setupOwnedCargoCard(card);
-                    
-                    // Add price display text
+                    this.scene.add.existing(card.container);
+                    card.container.setDepth(500);
+
+                    // make it interactive
+                    card.container.setInteractive();
+                    card.container.on('pointerdown', () => this.sellCargo(good));
+                    card.container.on('pointerover', () => card.container.setDepth(1500));
+                    card.container.on('pointerout', () => card.container.setDepth(500));
+
+                    // create price text
                     const priceText = new TextBox({
                         scene: this.scene,
-                        x: CARD_WIDTH / 2,
-                        y: CARD_HEIGHT + 10,
+                        x: xPos + CARD_WIDTH / 2,
+                        y: yPos + CARD_HEIGHT + 10,
                         width: 100,
                         height: 30,
                         text: `£${good.surfacePurchaseValue}`,
-                        style: { fontSize: '14px', color: '#ffffff' }
+                        style: { fontSize: '14px', color: '#ffffff' },
                     });
+                    this.scene.add.existing(priceText);
+                    priceText.setDepth(500);
 
-                    card.container.add(priceText);
-                    this.cargoContainer.add(card.container);
-                }
+                    // track them for cleanup
+                    this.cargoObjects.push(card.container, priceText);
+                },
             });
-        });
-    }
-
-    private setupAvailableCargoCard(card: PhysicalCard): void {
-        card.container.setInteractive();
-        card.container.on('pointerdown', () => this.purchaseCargo(card.data as PlayableCard));
-
-        // Add hover effects for depth management
-        const baseDepth = card.container.depth;
-        card.container.on('pointerover', () => {
-            card.container.setDepth(1000); // Bring to front when hovered
-        });
-        card.container.on('pointerout', () => {
-            card.container.setDepth(baseDepth); // Restore original depth
-        });
-    }
-
-    private setupOwnedCargoCard(card: PhysicalCard): void {
-        card.container.setInteractive();
-        card.container.on('pointerdown', () => this.sellCargo(card.data as PlayableCard));
-
-        // Add hover effects for depth management
-        const baseDepth = card.container.depth;
-        card.container.on('pointerover', () => {
-            card.container.setDepth(1000); // Bring to front when hovered
-        });
-        card.container.on('pointerout', () => {
-            card.container.setDepth(baseDepth); // Restore original depth
         });
     }
 
     private purchaseCargo(good: PlayableCard): void {
         const gameState = GameState.getInstance();
         const campaignState = CampaignUiState.getInstance();
-        
+
         if (gameState.moneyInVault >= good.surfacePurchaseValue) {
-            // Remove from available and add to owned
-            const index = campaignState.availableTradeGoods.indexOf(good);
-            if (index > -1) {
-                campaignState.availableTradeGoods.splice(index, 1);
+            // remove from available
+            const idx = campaignState.availableTradeGoods.indexOf(good);
+            if (idx > -1) {
+                campaignState.availableTradeGoods.splice(idx, 1);
                 gameState.cargoHolder.cardsInMasterDeck.push(good);
-                
-                // Update money
                 gameState.moneyInVault -= good.surfacePurchaseValue;
-                
-                // Refresh display
+
                 this.scene.events.emit('fundsChanged');
                 this.displayCargo();
                 this.updateLaunchButton();
             }
         } else {
-            this.statusText.setText(`Cannot afford cargo: Need £${good.surfacePurchaseValue}`);
-            this.statusText.setFillColor(0x8B0000);
+            this.statusText.setText(
+                `Cannot afford cargo: Need £${good.surfacePurchaseValue}`
+            );
+            this.statusText.setFillColor(0x8b0000);
         }
     }
 
     private sellCargo(good: PlayableCard): void {
         const gameState = GameState.getInstance();
         const campaignState = CampaignUiState.getInstance();
-        
-        // Remove from owned and add back to available
-        const index = gameState.cargoHolder.cardsInMasterDeck.indexOf(good);
-        if (index > -1) {
-            gameState.cargoHolder.cardsInMasterDeck.splice(index, 1);
+
+        const idx = gameState.cargoHolder.cardsInMasterDeck.indexOf(good);
+        if (idx > -1) {
+            gameState.cargoHolder.cardsInMasterDeck.splice(idx, 1);
             campaignState.availableTradeGoods.push(good);
-            
-            // Return full purchase value
             gameState.moneyInVault += good.surfacePurchaseValue;
-            
-            // Refresh display
+
             this.scene.events.emit('fundsChanged');
             this.displayCargo();
             this.updateLaunchButton();
@@ -397,7 +412,9 @@ export class CargoSelectionPanel extends AbstractHqPanel {
     }
 
     private updateFundsDisplay(): void {
-        this.fundsDisplay.setText(`Available Funds: £${GameState.getInstance().moneyInVault}`);
+        this.fundsDisplay.setText(
+            `Available Funds: £${GameState.getInstance().moneyInVault}`
+        );
     }
 
     show(): void {
@@ -413,22 +430,23 @@ export class CargoSelectionPanel extends AbstractHqPanel {
         this.updateLaunchButton();
     }
 
-    // Override hide to clear dynamic elements when navigating away
     public hide(): void {
-        // Obliterate character cards
-        this.characterCards.forEach(card => card.obliterate());
+        // obliterate character cards
+        this.characterCards.forEach((card) => card.obliterate());
         this.characterCards.clear();
 
-        // Obliterate location card if it exists
+        // obliterate location card if it exists
         if (this.locationCard) {
             this.locationCard.obliterate();
             this.locationCard = null;
         }
 
-        // Remove and destroy all children from the containers so no duplicates remain
-        this.characterContainer.removeAll(true);
-        this.cargoContainer.removeAll(true);
+        // destroy all ephemeral objects
+        this.characterObjects.forEach((obj) => obj.destroy());
+        this.characterObjects = [];
+        this.cargoObjects.forEach((obj) => obj.destroy());
+        this.cargoObjects = [];
 
         super.hide();
     }
-} 
+}
