@@ -47,10 +47,12 @@ export abstract class AbstractHqPanel extends Phaser.GameObjects.Container {
     public show(): void {
         this.titleText.setText(this.title)
         this.setVisible(true);
+        this.setActive(true);
     }
 
     public hide(): void {
         this.setVisible(false);
+        this.setActive(false);
     }
 
     abstract update(): void;

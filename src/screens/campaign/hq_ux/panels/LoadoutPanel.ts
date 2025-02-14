@@ -1,19 +1,15 @@
 import { Scene } from 'phaser';
-import { EncounterManager } from '../../../../encounters/EncountersList';
 import { PlayerCharacter } from '../../../../gamecharacters/PlayerCharacter';
-import { GameState } from '../../../../rules/GameState';
 import { TextBoxButton } from '../../../../ui/Button';
 import { PhysicalCard } from '../../../../ui/PhysicalCard';
 import { TextBox } from '../../../../ui/TextBox';
 import { CardGuiUtils } from '../../../../utils/CardGuiUtils';
-import { SceneChanger } from '../../../SceneChanger';
 import { CampaignUiState } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
 
 export class LoadoutPanel extends AbstractHqPanel {
     public rosterPanel: RosterPanel;
     public partyPanel: CaravanPartyPanel;
-    public equipmentPanel: EquipmentAssignmentPanel;
     public summaryPanel: ExpeditionSummaryPanel;
     private launchButton: TextBoxButton;
     private statusText: TextBox;
@@ -25,13 +21,14 @@ export class LoadoutPanel extends AbstractHqPanel {
         // Create sub-panels, passing 'this' as a reference
         this.rosterPanel = new RosterPanel(scene, this);
         this.partyPanel = new CaravanPartyPanel(scene, this);
-        this.equipmentPanel = new EquipmentAssignmentPanel(scene, this);
         this.summaryPanel = new ExpeditionSummaryPanel(scene, this);
 
         // Position panels
-        this.rosterPanel.setPosition(scene.scale.width * 0.2, scene.scale.height * 0.2);
-        this.partyPanel.setPosition(scene.scale.width * 0.4, scene.scale.height * 0.2);
-        this.equipmentPanel.setPosition(scene.scale.width * 0.6, scene.scale.height * 0.2);
+        // Roster at top
+        this.rosterPanel.setPosition(scene.scale.width * 0.2, scene.scale.height * 0.15);
+        // Selected party below roster
+        this.partyPanel.setPosition(scene.scale.width * 0.2, scene.scale.height * 0.45);
+        // Summary on the right
         this.summaryPanel.setPosition(scene.scale.width * 0.8, scene.scale.height * 0.2);
 
         // Create launch button
@@ -41,7 +38,7 @@ export class LoadoutPanel extends AbstractHqPanel {
             y: scene.scale.height * 0.85,
             width: 200,
             height: 50,
-            text: 'Launch Expedition',
+            text: 'Select Cargo',
             style: { fontSize: '20px', color: '#ffffff' },
             fillColor: 0x444444
         });
@@ -69,7 +66,6 @@ export class LoadoutPanel extends AbstractHqPanel {
         this.add([
             this.rosterPanel,
             this.partyPanel,
-            this.equipmentPanel,
             this.summaryPanel,
             this.launchButton,
             this.statusText
@@ -89,30 +85,12 @@ export class LoadoutPanel extends AbstractHqPanel {
             this.updateSummary();
         });
 
-        this.partyPanel.on('characterSelected', (character: PlayerCharacter) => {
-            this.equipmentPanel.setActiveCharacter(character);
-            this.updateSummary();
-        });
-
         this.updateTradeRouteCard();
     }
 
     private handleLaunch(): void {
         if (this.isReadyToLaunch()) {
-            this.scene.events.emit('launchExpedition');
-            GameState.getInstance().currentRunCharacters = CampaignUiState.getInstance().selectedParty;
-            
-            // Add cargo cards to characters' master decks
-            const campaignState = CampaignUiState.getInstance();
-            campaignState.selectedParty.forEach(character => {
-                const assignedTradeGoods = campaignState.ownedTradeGoods.filter(
-                    good => good.owningCharacter === character
-                );
-                character.cardsInMasterDeck.push(...assignedTradeGoods);
-            });
-
-            GameState.getInstance().initializeRun();
-            SceneChanger.switchToCombatScene(EncounterManager.getInstance().getShopEncounter(), true);
+            this.scene.events.emit('navigate', 'cargoselection');
         }
     }
 
@@ -122,15 +100,6 @@ export class LoadoutPanel extends AbstractHqPanel {
             console.log("LoadoutPanel is not ready to launch: ", readinessState.reasons);
         }
         return readinessState.ready;
-    }
-
-    private hasValidEquipment(): boolean {
-        // Check if all party members have necessary equipment
-        const campaignState = CampaignUiState.getInstance();
-        return campaignState.selectedParty.every(character => {
-            // Add your equipment validation logic here
-            return true; // Placeholder
-        });
     }
 
     private getReadinessStatus(): { ready: boolean; reasons: string[] } {
@@ -147,11 +116,6 @@ export class LoadoutPanel extends AbstractHqPanel {
             reasons.push("No trade route selected");
         }
 
-        // Check equipment
-        if (!this.hasValidEquipment()) {
-            reasons.push("Missing required equipment");
-        }
-
         return {
             ready: reasons.length === 0,
             reasons
@@ -164,11 +128,11 @@ export class LoadoutPanel extends AbstractHqPanel {
 
         // Update status text
         if (status.ready) {
-            this.statusText.setText("Ready to launch!");
+            this.statusText.setText("Ready to select cargo!");
             this.statusText.setFillColor(0x006400); // Dark green
         } else {
             const reasonsText = status.reasons.join('\n• ');
-            this.statusText.setText(`Cannot launch:\n• ${reasonsText}`);
+            this.statusText.setText(`Cannot proceed:\n• ${reasonsText}`);
             this.statusText.setFillColor(0x8B0000); // Dark red
         }
     }
@@ -186,7 +150,7 @@ export class LoadoutPanel extends AbstractHqPanel {
             this.tradeRouteCard = CardGuiUtils.getInstance().createCard({
                 scene: this.scene,
                 x: this.scene.scale.width * 0.2,
-                y: this.scene.scale.height * 0.8,
+                y: this.scene.scale.height * 0.7, // Moved down to accommodate the new layout
                 data: campaignState.selectedTradeRoute,
                 onCardCreatedEventCallback: (card) => {
                     this.add(card.container);
@@ -205,7 +169,6 @@ export class LoadoutPanel extends AbstractHqPanel {
     update(): void {
         this.rosterPanel.update();
         this.partyPanel.update();
-        this.equipmentPanel.update();
         this.summaryPanel.update();
         this.updateTradeRouteCard();
         this.updateSummary();
@@ -246,11 +209,11 @@ class RosterPanel extends Phaser.GameObjects.Container {
     }
 
     addCharacter(character: PlayerCharacter): void {
-        const yOffset = 60 + (this.characterCards.size * 120);
+        const xOffset = (this.characterCards.size * 140); // Increased spacing for better readability
         const card = CardGuiUtils.getInstance().createCard({
             scene: this.scene,
-            x: 0,
-            y: yOffset,
+            x: xOffset,
+            y: 60, // Fixed Y position since we're arranging horizontally
             data: character,
             onCardCreatedEventCallback: (card) => this.setupCharacterCard(card)
         });
@@ -270,17 +233,26 @@ class RosterPanel extends Phaser.GameObjects.Container {
     }
 
     private setupCharacterCard(card: PhysicalCard): void {
-        card.container.setInteractive()
-            .on('pointerdown', () => {
-                this.loadoutPanel.rosterPanel.emit('characterSelected', card.data);
-            })
+        card.container.setInteractive();
+        card.container.on('pointerdown', () => {
+            this.emit('characterSelected', card.data);
+        });
+
+        // Add hover effects for depth management
+        const baseDepth = card.container.depth;
+        card.container.on('pointerover', () => {
+            card.container.setDepth(1000); // Bring to front when hovered
+        });
+        card.container.on('pointerout', () => {
+            card.container.setDepth(baseDepth); // Restore original depth
+        });
     }
 
     private repositionCards(): void {
-        let yOffset = 60;
+        let xOffset = 0;
         this.characterCards.forEach(card => {
-            card.container.setPosition(0, yOffset);
-            yOffset += 120;
+            card.container.setPosition(xOffset, 60);
+            xOffset += 140; // Increased spacing for better readability
         });
     }
 }
@@ -302,7 +274,7 @@ class CaravanPartyPanel extends Phaser.GameObjects.Container {
             y: -30,
             width: 200,
             height: 40,
-            text: 'Caravan Party',
+            text: 'Selected Party',
             style: { fontSize: '18px', color: '#ffffff' }
         });
         this.add(this.title);
@@ -315,39 +287,38 @@ class CaravanPartyPanel extends Phaser.GameObjects.Container {
     addCharacter(character: PlayerCharacter): void {
         if (!this.canAddCharacter()) return;
 
-        const yOffset = 60 + (this.characterCards.size * 120);
+        const xOffset = (this.characterCards.size * 140); // Increased spacing for better readability
         const card = CardGuiUtils.getInstance().createCard({
             scene: this.scene,
-            x: 0,
-            y: yOffset,
+            x: xOffset,
+            y: 60, // Fixed Y position since we're arranging horizontally
             data: character,
             onCardCreatedEventCallback: (card) => this.setupCharacterCard(card)
         });
-        
+
         this.characterCards.set(character, card);
         this.add(card.container);
-        CampaignUiState.getInstance().selectedParty.push(character);
         
-        // Assign all unowned cargo to this character
-        const campaignState = CampaignUiState.getInstance();
-        campaignState.ownedTradeGoods.forEach(good => {
-            if (!good.owningCharacter) {
-                good.owningCharacter = character;
-            }
-        });
+        // Update campaign state
+        CampaignUiState.getInstance().selectedParty.push(character);
         
         this.repositionCards();
     }
 
     private setupCharacterCard(card: PhysicalCard): void {
-        card.container.setInteractive()
-            .on('pointerdown', () => {
-                this.loadoutPanel.partyPanel.emit('characterSelected', card.data);
-            })
-            .on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-                this.loadoutPanel.partyPanel.removeCharacter(card.data as PlayerCharacter);
-                this.loadoutPanel.partyPanel.emit('characterRemoved', card.data);
-            })
+        card.container.setInteractive();
+        card.container.on('pointerdown', () => {
+            this.removeCharacter(card.data as PlayerCharacter);
+        });
+
+        // Add hover effects for depth management
+        const baseDepth = card.container.depth;
+        card.container.on('pointerover', () => {
+            card.container.setDepth(1000); // Bring to front when hovered
+        });
+        card.container.on('pointerout', () => {
+            card.container.setDepth(baseDepth); // Restore original depth
+        });
     }
 
     removeCharacter(character: PlayerCharacter): void {
@@ -355,177 +326,30 @@ class CaravanPartyPanel extends Phaser.GameObjects.Container {
         if (card) {
             card.obliterate();
             this.characterCards.delete(character);
-            this.repositionCards();
             
-            // Remove character from selected party
-            CampaignUiState.getInstance().selectedParty = 
-                CampaignUiState.getInstance().selectedParty.filter(c => c !== character);
-            
-            // Reassign their cargo
-            this.reassignCargo(character);
-            
-        }
-    }
-
-    private reassignCargo(formerOwner: PlayerCharacter): void {
-        const campaignState = CampaignUiState.getInstance();
-        const remainingParty = campaignState.selectedParty.filter(c => c !== formerOwner);
-        
-        campaignState.ownedTradeGoods.forEach(good => {
-            if (good.owningCharacter === formerOwner) {
-                if (remainingParty.length > 0) {
-                    // Randomly assign to another party member
-                    good.owningCharacter = remainingParty[Math.floor(Math.random() * remainingParty.length)];
-                } else {
-                    // If no party members left, unassign
-                    good.owningCharacter = undefined;
-                }
+            // Update campaign state
+            const campaignState = CampaignUiState.getInstance();
+            const index = campaignState.selectedParty.indexOf(character);
+            if (index > -1) {
+                campaignState.selectedParty.splice(index, 1);
             }
-        });
+            
+            this.repositionCards();
+            this.emit('characterRemoved', character);
+        }
     }
 
     private repositionCards(): void {
-        let yOffset = 60;
+        let xOffset = 0;
         this.characterCards.forEach(card => {
-            card.container.setPosition(0, yOffset);
-            yOffset += 120;
+            card.container.setPosition(xOffset, 60);
+            xOffset += 140; // Increased spacing for better readability
         });
-    }
-
-    getCharacterCards(): Map<PlayerCharacter, PhysicalCard> {
-        return this.characterCards;
-    }
-
-}
-
-class EquipmentAssignmentPanel extends Phaser.GameObjects.Container {
-    private loadoutPanel: LoadoutPanel;
-    private equipmentSlots: PhysicalCard[] = [];
-    private gridContainer: Phaser.GameObjects.Container;
-
-    constructor(scene: Scene, loadoutPanel: LoadoutPanel) {
-        super(scene, 0, 0);
-        this.loadoutPanel = loadoutPanel;
-        scene.add.existing(this);
-
-        // Create a container for the grid
-        this.gridContainer = new Phaser.GameObjects.Container(scene, 0, 0);
-        this.add(this.gridContainer);
-
-        this.createTitle();
-        this.createAssignableCardsGrid();
-        
-        this.scene.events.on('tradeGoodsChanged', () => {
-            this.refreshGrid();
-        });
-    }
-
-    private refreshGrid(): void {
-        // Clear existing grid
-        this.equipmentSlots.forEach(card => {
-            card.obliterate();
-        });
-        this.equipmentSlots = [];
-        this.gridContainer.removeAll();
-
-        // Recreate the grid
-        this.createAssignableCardsGrid();
-    }
-
-    private createTitle(): void {
-        const title = new TextBox({
-            scene: this.scene,
-            x: 0,
-            y: -30,
-            width: 200,
-            height: 40,
-            text: 'Cargo Selection',
-            style: { fontSize: '18px', color: '#ffffff' }
-        });
-        this.add(title);
-    }
-
-    private createAssignableCardsGrid(): void {
-        const campaignState = CampaignUiState.getInstance();
-        const GRID_ROWS = 3;
-        const CARD_WIDTH = 100;
-        const CARD_HEIGHT = 140;
-        const PADDING = 20;
-
-        campaignState.ownedTradeGoods.forEach((good, index) => {
-            const row = index % GRID_ROWS;
-            const col = Math.floor(index / GRID_ROWS);
-            
-            const x = col * (CARD_WIDTH + PADDING);
-            const y = 60 + row * (CARD_HEIGHT + PADDING);
-
-            const card = CardGuiUtils.getInstance().createCard({
-                scene: this.scene,
-                x,
-                y,
-                data: good,
-                onCardCreatedEventCallback: (card) => {
-                    this.setupTradeGoodCard(card);
-                    
-                    // Create toggle status text box as child of card container
-                    const toggleText = new TextBox({
-                        scene: this.scene,
-                        x: CARD_WIDTH + 5,
-                        y: CARD_HEIGHT / 2,
-                        width: 120,
-                        height: 30,
-                        text: good.isSelected ? 'Taking' : 'Not Taking',
-                        style: { 
-                            fontSize: '14px', 
-                            color: good.isSelected ? '#006400' : '#8B0000', // Dark green and dark red
-                            align: 'left',
-                            wordWrap: { width: 110 }
-                        }
-                    });
-
-                    card.container.add(toggleText);
-                    (card as any).toggleText = toggleText;
-                }
-            });
-
-            this.gridContainer.add(card.container);
-            this.equipmentSlots.push(card);
-        });
-    }
-
-    private setupTradeGoodCard(card: PhysicalCard): void {
-        card.container.setInteractive();
-        
-        card.container.on('pointerdown', () => {
-            this.toggleCardSelection(card);
-        });
-    }
-
-    private toggleCardSelection(card: PhysicalCard): void {
-        card.data.isSelected = !card.data.isSelected;
-        
-        const toggleText = (card as any).toggleText as TextBox;
-        if (toggleText) {
-            toggleText.setText(card.data.isSelected ? 'Taking' : 'Not Taking');
-            toggleText.setFillColor(card.data.isSelected ? 0x006400 : 0x8B0000);
-        }
-
-        // Update summary panel
-        this.loadoutPanel.summaryPanel.update();
-    }
-
-    setActiveCharacter(character: PlayerCharacter): void {
-        // Implementation needed
-    }
-
-    update(): void {
-        // Update equipment states and positions if needed
     }
 }
 
 class ExpeditionSummaryPanel extends Phaser.GameObjects.Container {
     private loadoutPanel: LoadoutPanel;
-    private cargoValueText!: TextBox;
     private partyInfoText!: TextBox;
     private tradeRouteText!: TextBox;
     private warningsText!: TextBox;
@@ -534,92 +358,64 @@ class ExpeditionSummaryPanel extends Phaser.GameObjects.Container {
         super(scene, 0, 0);
         this.loadoutPanel = loadoutPanel;
         scene.add.existing(this);
-
         this.createSummaryTexts();
     }
 
     private createSummaryTexts(): void {
-        const textStyle = { 
-            fontSize: '16px', 
-            color: '#ffffff',
-            align: 'left',
-            wordWrap: { width: 290 }
-        };
-
-        // Cargo value text
-        this.cargoValueText = new TextBox({
-            scene: this.scene,
-            x: 0,
-            y: 30,
-            width: 300,
-            height: 60,
-            text: '',
-            style: textStyle
-        });
-
-        // Party info text
+        // Create text boxes for different summary sections
         this.partyInfoText = new TextBox({
             scene: this.scene,
             x: 0,
-            y: 100,
+            y: 0,
             width: 300,
             height: 100,
-            text: '',
-            style: textStyle
+            text: 'Party: None',
+            style: { fontSize: '16px', color: '#ffffff' }
         });
 
-        // Trade route text
         this.tradeRouteText = new TextBox({
             scene: this.scene,
             x: 0,
-            y: 210,
+            y: 120,
             width: 300,
-            height: 60,
-            text: '',
-            style: textStyle
+            height: 100,
+            text: 'Trade Route: None',
+            style: { fontSize: '16px', color: '#ffffff' }
         });
 
-        // Warnings text
         this.warningsText = new TextBox({
             scene: this.scene,
             x: 0,
-            y: 280,
+            y: 240,
             width: 300,
             height: 100,
             text: '',
-            style: { ...textStyle, color: '#ff6b6b' }
+            style: { fontSize: '16px', color: '#ff0000' }
         });
 
-        this.add([
-            this.cargoValueText,
-            this.partyInfoText,
-            this.tradeRouteText,
-            this.warningsText
-        ]);
+        this.add([this.partyInfoText, this.tradeRouteText, this.warningsText]);
     }
 
     update(): void {
         const campaignState = CampaignUiState.getInstance();
         
-        // Update cargo value
-        const selectedGoods = campaignState.ownedTradeGoods.filter(good => good.isSelected);
-        const totalValue = selectedGoods.reduce((total, good) => total + good.hellSellValue, 0);
-        this.cargoValueText.setText(
-            `Total Cargo Value: ${totalValue} Hell\n` +
-            `Selected Cards: ${selectedGoods.length}/${campaignState.ownedTradeGoods.length}`
-        );
-
         // Update party info
         const partySize = campaignState.selectedParty.length;
-        this.partyInfoText.setText(
-            `Party Members: ${partySize}/3\n` +
-            `${campaignState.selectedParty.map(char => `• ${char.name}`).join('\n')}`
-        );
+        this.partyInfoText.setText(`Party Members: ${partySize}/3`);
 
         // Update trade route info
-        this.tradeRouteText.setText(
-            `Trade Route: ${campaignState.selectedTradeRoute ? 
-                campaignState.selectedTradeRoute.name : 'None selected'}`
-        );
+        const tradeRoute = campaignState.selectedTradeRoute;
+        this.tradeRouteText.setText(`Trade Route: ${tradeRoute ? tradeRoute.name : 'None'}`);
+
+        // Update warnings
+        const warnings: string[] = [];
+        if (partySize < 3) {
+            warnings.push(`Need ${3 - partySize} more party members`);
+        }
+        if (!tradeRoute) {
+            warnings.push('No trade route selected');
+        }
+
+        this.warningsText.setText(warnings.length > 0 ? `Warnings:\n• ${warnings.join('\n• ')}` : '');
     }
 } 

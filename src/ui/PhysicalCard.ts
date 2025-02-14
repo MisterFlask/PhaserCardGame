@@ -225,6 +225,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
     // main cleanup
     obliterate(): void {
         this.scene.events.off('update', this.updateVisuals, this);
+        
         this.data.physicalCard = undefined;
 
         if (this.wiggleTween) {
@@ -299,6 +300,11 @@ export class PhysicalCard implements IPhysicalCardInterface {
         if (this.obliterated) return;
         if (!this.scene.sys) return;
 
+        if (!this.cardBorder.geom){
+            console.warn("card geom not found");
+            this.obliterate();
+            return;
+        }
         // update card content
         this.applyVisualScaling();
 

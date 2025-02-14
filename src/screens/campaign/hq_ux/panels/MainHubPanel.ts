@@ -111,7 +111,13 @@ export class MainHubPanel extends AbstractHqPanel {
     }
 
     private navigateTo(destination: string): void {
-        this.scene.events.emit('navigate', destination.toLowerCase());
+        const lowerDest = destination.toLowerCase();
+        // Map 'expedition loadout' to 'loadout'
+        if (lowerDest === 'expedition loadout') {
+            this.scene.events.emit('navigate', 'loadout');
+        } else {
+            this.scene.events.emit('navigate', lowerDest);
+        }
     }
 
     private updateWarnings(): void {

@@ -6,12 +6,12 @@ import GameImageLoader from '../../../utils/ImageUtils';
 import { SceneChanger } from '../../SceneChanger';
 import { CampaignUiState } from './CampaignUiState';
 import { AbstractHqPanel } from './panels/AbstractHqPanel';
+import { CargoSelectionPanel } from './panels/CargoSelectionPanel';
 import { InvestmentPanel } from './panels/InvestmentPanel';
 import { LiquidationPanel } from './panels/LiquidationPanel';
 import { LoadoutPanel } from './panels/LoadoutPanel';
 import { MainHubPanel } from './panels/MainHubPanel';
 import { PersonnelPanel } from './panels/PersonnelPanel';
-import { TradeGoodsPanel } from './panels/TradeGoodsPanel';
 import { TradeRouteSelectionPanel } from './panels/TradeRouteSelectionPanel';
 
 export class HqScene extends Scene {
@@ -21,8 +21,8 @@ export class HqScene extends Scene {
     private tradePanel!: TradeRouteSelectionPanel;
     private personnelPanel!: PersonnelPanel;
     private loadoutPanel!: LoadoutPanel;
-    private tradeGoodsPanel!: TradeGoodsPanel;
     private liquidationPanel!: LiquidationPanel;
+    private cargoSelectionPanel!: CargoSelectionPanel;
 
     constructor() {
         super({ key: 'HqScene' });
@@ -62,32 +62,59 @@ export class HqScene extends Scene {
     }
 
     create(): void {
-        // Initialize all panels
+        // Create all panels
         this.mainHubPanel = new MainHubPanel(this);
         this.investmentPanel = new InvestmentPanel(this);
         this.tradePanel = new TradeRouteSelectionPanel(this);
         this.personnelPanel = new PersonnelPanel(this);
         this.loadoutPanel = new LoadoutPanel(this);
-        this.tradeGoodsPanel = new TradeGoodsPanel(this);
         this.liquidationPanel = new LiquidationPanel(this);
+        this.cargoSelectionPanel = new CargoSelectionPanel(this);
 
         // Hide all panels initially
-        [
-            this.investmentPanel,
-            this.tradePanel,
-            this.personnelPanel,
-            this.loadoutPanel,
-            this.tradeGoodsPanel,
-            this.liquidationPanel
-        ].forEach(panel => panel.hide());
+        this.mainHubPanel.setVisible(false);
+        this.investmentPanel.setVisible(false);
+        this.tradePanel.setVisible(false);
+        this.personnelPanel.setVisible(false);
+        this.loadoutPanel.setVisible(false);
+        this.liquidationPanel.setVisible(false);
+        this.cargoSelectionPanel.setVisible(false);
 
-        // Show main hub initially
+        // Show main hub panel by default
         this.showPanel('main');
 
         // Set up event listeners
-        this.events.on('navigate', this.handleNavigation, this);
-        this.events.on('returnToHub', () => this.showPanel('main'), this);
-        this.events.on('launchExpedition', this.handleLaunchExpedition, this);
+        this.events.on('navigate', (destination: string) => {
+            switch (destination) {
+                case 'investment':
+                    this.showPanel('investment');
+                    break;
+                case 'trade routes':
+                    this.showPanel('trade');
+                    break;
+                case 'personnel':
+                    this.showPanel('personnel');
+                    break;
+                case 'loadout':
+                    this.showPanel('loadout');
+                    break;
+                case 'trade goods':
+                    this.showPanel('tradegoods');
+                    break;
+                case 'liquidation':
+                    this.showPanel('liquidation');
+                    break;
+                case 'cargoselection':
+                    this.showPanel('cargoselection');
+                    break;
+                default:
+                    this.showPanel('main');
+            }
+        });
+
+        this.events.on('returnToHub', () => {
+            this.showPanel('main');
+        });
 
         // Set up scene-wide keyboard shortcuts
         this.input?.keyboard?.on('keydown-ESC', () => {
@@ -98,12 +125,11 @@ export class HqScene extends Scene {
     }
 
     private showPanel(
-        panelKey: 'main' | 'investment' | 'trade' | 'personnel' | 'loadout' | 'tradegoods' | 'liquidation'
+        panelKey: 'main' | 'investment' | 'trade' | 'personnel' | 'loadout' | 'tradegoods' | 'liquidation' | 'cargoselection'
     ): void {
         if (this.currentPanel) {
             this.currentPanel.setVisible(false);
             this.currentPanel.hide();
-            // optionally set a lower depth for the old panel
             this.currentPanel.setDepth(0);
         }
 
@@ -123,44 +149,17 @@ export class HqScene extends Scene {
             case 'loadout':
                 this.currentPanel = this.loadoutPanel;
                 break;
-            case 'tradegoods':
-                this.currentPanel = this.tradeGoodsPanel;
-                break;
             case 'liquidation':
-                console.log('selected liquidation panel');
                 this.currentPanel = this.liquidationPanel;
+                break;
+            case 'cargoselection':
+                this.currentPanel = this.cargoSelectionPanel;
                 break;
         }
         
         this.currentPanel?.setVisible(true);
         this.currentPanel?.show();
-        // Force it to a large depth
         this.currentPanel?.setDepth(999);
-    }
-
-    private handleNavigation(destination: string): void {
-        switch (destination) {
-            case 'investment':
-                this.showPanel('investment');
-                break;
-            case 'trade routes':
-                this.showPanel('trade');
-                break;
-            case 'personnel':
-                this.showPanel('personnel');
-                break;
-            case 'expedition loadout':
-                this.showPanel('loadout');
-                break;
-            case 'trade goods':
-                this.showPanel('tradegoods');
-                break;
-            case 'liquidation':
-                this.showPanel('liquidation');
-                break;
-            default:
-                console.warn(`Unknown destination: ${destination}`);
-        }
     }
 
     private handleLaunchExpedition(): void {

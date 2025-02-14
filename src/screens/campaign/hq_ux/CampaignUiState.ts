@@ -1,4 +1,3 @@
-import { Scene } from 'phaser';
 import { PlayableCard } from '../../../gamecharacters/PlayableCard';
 import { PlayerCharacter } from '../../../gamecharacters/PlayerCharacter';
 import { CoalCargo } from '../../../gamecharacters/playerclasses/cards/cargo/CoalCargo';
@@ -21,7 +20,6 @@ export class CampaignUiState {
     public selectedParty: PlayerCharacter[] = [];
     public roster: PlayerCharacter[] = CampaignRules.getInstance().generateLogicalCharacterRoster();
     public availableTradeGoods: PlayableCard[] = [new CoffeeCargo(), new CoalCargo(), new SpicyLiteratureCargo()];
-    public ownedTradeGoods: PlayableCard[] = [];
     
     private constructor() {}
 
@@ -37,7 +35,6 @@ export class CampaignUiState {
         this.availableFactories = [];
         this.selectedTradeRoute = null;
         this.selectedParty = [];
-        this.ownedTradeGoods = [];
     }
 
     public getCurrentFunds(): number {
@@ -46,18 +43,5 @@ export class CampaignUiState {
 
     public getShareholderSatisfaction(): number {
         return this.getCurrentFunds() / this.shareholderExpectation;
-    }
-
-    public addTradeGood(good: PlayableCard, scene: Scene): void {
-        this.ownedTradeGoods.push(good);
-        scene.events.emit('tradeGoodsChanged');
-    }
-
-    public removeTradeGood(good: PlayableCard, scene: Scene): void {
-        const index = this.ownedTradeGoods.indexOf(good);
-        if (index > -1) {
-            this.ownedTradeGoods.splice(index, 1);
-            scene.events.emit('tradeGoodsChanged');
-        }
     }
 } 
