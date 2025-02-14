@@ -63,7 +63,8 @@ export class CargoSelectionPanel extends AbstractHqPanel {
             fillColor: 0x444444,
         });
         scene.add.existing(this.backButton);
-        this.backButton.setDepth(100);
+        this.backButton.setDepth(1000);
+        this.backButton.setVisible(false);
 
         // create launch button
         this.launchButton = new TextBoxButton({
@@ -77,7 +78,8 @@ export class CargoSelectionPanel extends AbstractHqPanel {
             fillColor: 0x444444,
         });
         scene.add.existing(this.launchButton);
-        this.launchButton.setDepth(100);
+        this.launchButton.setDepth(1000);
+        this.launchButton.setVisible(false);
 
         // create status text
         this.statusText = new TextBox({
@@ -95,7 +97,7 @@ export class CargoSelectionPanel extends AbstractHqPanel {
             },
         });
         scene.add.existing(this.statusText);
-        this.statusText.setDepth(100);
+        this.statusText.setDepth(1000);
 
         // wire up button events
         this.backButton.onClick(() => this.handleBack());
@@ -138,11 +140,6 @@ export class CargoSelectionPanel extends AbstractHqPanel {
     private getReadinessStatus(): { ready: boolean; reasons: string[] } {
         const gameState = GameState.getInstance();
         const reasons: string[] = [];
-
-        // check if any cargo is selected
-        if (gameState.cargoHolder.cardsInMasterDeck.length === 0) {
-            reasons.push('No cargo purchased for the expedition');
-        }
 
         return {
             ready: reasons.length === 0,
@@ -191,7 +188,7 @@ export class CargoSelectionPanel extends AbstractHqPanel {
         const campaignState = CampaignUiState.getInstance();
         campaignState.selectedParty.forEach((character, index) => {
             const xPos = 100;
-            const yPos = 150 + index * 120;
+            const yPos = 250 + index * 170;
             const card = CardGuiUtils.getInstance().createCard({
                 scene: this.scene,
                 x: xPos,
@@ -201,6 +198,12 @@ export class CargoSelectionPanel extends AbstractHqPanel {
                     // track it
                     this.scene.add.existing(createdCard.container);
                     createdCard.container.setDepth(500);
+
+                    // Add hover effects similar to cargo cards
+                    createdCard.container.setInteractive();
+                    createdCard.container.on('pointerover', () => createdCard.container.setDepth(1500));
+                    createdCard.container.on('pointerout', () => createdCard.container.setDepth(500));
+
                     this.characterCards.set(character, createdCard);
                 },
             });
@@ -285,14 +288,17 @@ export class CargoSelectionPanel extends AbstractHqPanel {
         const CARD_WIDTH = 120;
         const CARD_HEIGHT = 160;
         const PADDING = 20;
+        const VERTICAL_SPACING = 70;
+        const ROWS_PER_COL = Math.floor((this.scene.scale.height - 350) / (CARD_HEIGHT + VERTICAL_SPACING));
 
         // display available trade goods
         campaignState.availableTradeGoods.forEach((good, index) => {
-            const col = index % GRID_COLS;
-            const row = Math.floor(index / GRID_COLS);
+            // Fill vertically first, then horizontally
+            const col = Math.floor(index / ROWS_PER_COL);
+            const row = index % ROWS_PER_COL;
             const xPos =
                 this.scene.scale.width * 0.45 + col * (CARD_WIDTH + PADDING);
-            const yPos = 150 + row * (CARD_HEIGHT + PADDING);
+            const yPos = 250 + row * (CARD_HEIGHT + VERTICAL_SPACING);
 
             CardGuiUtils.getInstance().createCard({
                 scene: this.scene,
@@ -309,12 +315,12 @@ export class CargoSelectionPanel extends AbstractHqPanel {
                     card.container.on('pointerover', () => card.container.setDepth(1500));
                     card.container.on('pointerout', () => card.container.setDepth(500));
 
-                    // create price text
+                    // create price text - now to the right of the card
                     const priceText = new TextBox({
                         scene: this.scene,
-                        x: xPos + CARD_WIDTH / 2,
-                        y: yPos + CARD_HEIGHT + 10,
-                        width: 100,
+                        x: xPos + CARD_WIDTH + 10,
+                        y: yPos,
+                        width: 60,
                         height: 30,
                         text: `£${good.surfacePurchaseValue}`,
                         style: { fontSize: '14px', color: '#ffffff' },
@@ -330,11 +336,12 @@ export class CargoSelectionPanel extends AbstractHqPanel {
 
         // display owned trade goods
         gameState.cargoHolder.cardsInMasterDeck.forEach((good, index) => {
-            const col = index % GRID_COLS;
-            const row = Math.floor(index / GRID_COLS);
+            // Fill vertically first, then horizontally
+            const col = Math.floor(index / ROWS_PER_COL);
+            const row = index % ROWS_PER_COL;
             const xPos =
                 this.scene.scale.width * 0.75 + col * (CARD_WIDTH + PADDING);
-            const yPos = 150 + row * (CARD_HEIGHT + PADDING);
+            const yPos = 250 + row * (CARD_HEIGHT + VERTICAL_SPACING);
 
             CardGuiUtils.getInstance().createCard({
                 scene: this.scene,
@@ -351,12 +358,12 @@ export class CargoSelectionPanel extends AbstractHqPanel {
                     card.container.on('pointerover', () => card.container.setDepth(1500));
                     card.container.on('pointerout', () => card.container.setDepth(500));
 
-                    // create price text
+                    // create price text - now to the right of the card
                     const priceText = new TextBox({
                         scene: this.scene,
-                        x: xPos + CARD_WIDTH / 2,
-                        y: yPos + CARD_HEIGHT + 10,
-                        width: 100,
+                        x: xPos + CARD_WIDTH + 10,
+                        y: yPos,
+                        width: 60,
                         height: 30,
                         text: `£${good.surfacePurchaseValue}`,
                         style: { fontSize: '14px', color: '#ffffff' },
@@ -424,6 +431,10 @@ export class CargoSelectionPanel extends AbstractHqPanel {
         this.displayCargo();
         this.updateFundsDisplay();
         this.updateLaunchButton();
+        
+        // Ensure buttons are visible only in this screen
+        this.launchButton.setVisible(true);
+        this.backButton.setVisible(true);
     }
 
     update(): void {
@@ -431,6 +442,10 @@ export class CargoSelectionPanel extends AbstractHqPanel {
     }
 
     public hide(): void {
+        // Ensure buttons are hidden when leaving this screen
+        this.launchButton.setVisible(false);
+        this.backButton.setVisible(false);
+
         // obliterate character cards
         this.characterCards.forEach((card) => card.obliterate());
         this.characterCards.clear();

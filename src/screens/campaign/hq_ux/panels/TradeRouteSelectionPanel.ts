@@ -11,6 +11,7 @@ import { AbstractHqPanel } from './AbstractHqPanel';
 export class TradeRouteSelectionPanel extends AbstractHqPanel {
     private tradeRouteCards: PhysicalCard[] = [];
     private detailsContainer: Phaser.GameObjects.Container;
+    private modifierButtons: TextBoxButton[] = []; // Track modifier buttons separately
 
     constructor(scene: Scene) {
         super(scene, 'Trade Route Selection');
@@ -42,7 +43,6 @@ export class TradeRouteSelectionPanel extends AbstractHqPanel {
     }
 
     private createTradeRouteCard(route: AbstractTradeRoute, x: number, y: number): PhysicalCard {
-        
         const physicalCard = CardGuiUtils.getInstance().createCard(
             {
                 scene: this.scene,
@@ -73,17 +73,18 @@ export class TradeRouteSelectionPanel extends AbstractHqPanel {
                 CampaignUiState.getInstance().selectedTradeRoute = card.data as AbstractTradeRoute;
                 GameState.getInstance().currentRoute = card.data as AbstractTradeRoute;
                 this.scene.events.emit('routeSelected', card.data);
-                this.returnToHub();
+                this.hide();
+                this.scene.events.emit('navigate', 'loadout');
             });
     }
 
     private showRouteDetails(card: PhysicalCard): void {
-        this.detailsContainer.removeAll();
+        this.hideRouteDetails(); // Clean up existing details first
         const route = card.data as AbstractTradeRoute;
 
         // Create detailed view of route modifiers
-        const modifierDetails = route.buffs.map((modifier, index) => {
-            return new TextBoxButton({
+        this.modifierButtons = route.buffs.map((modifier, index) => {
+            const button = new TextBoxButton({
                 scene: this.scene,
                 x: this.scene.scale.width * 0.75,
                 y: this.scene.scale.height * (0.3 + index * 0.1),
@@ -93,14 +94,39 @@ export class TradeRouteSelectionPanel extends AbstractHqPanel {
                 style: { fontSize: '16px', color: '#ffffff' },
                 fillColor: 0x333333
             });
+            this.scene.add.existing(button);
+            return button;
         });
 
-        this.detailsContainer.add(modifierDetails);
+        this.detailsContainer.add(this.modifierButtons);
         this.detailsContainer.setVisible(true);
     }
 
     private hideRouteDetails(): void {
+        // Properly destroy all modifier buttons
+        this.modifierButtons.forEach(button => {
+            button.destroy();
+        });
+        this.modifierButtons = [];
+        
+        this.detailsContainer.removeAll();
         this.detailsContainer.setVisible(false);
+    }
+
+    public hide(): void {
+        // Clean up trade route cards
+        this.tradeRouteCards.forEach(card => {
+            card.obliterate();
+        });
+        this.tradeRouteCards = [];
+
+        // Clean up details
+        this.hideRouteDetails();
+        
+        // Clean up the details container itself
+        this.detailsContainer.destroy();
+
+        super.hide();
     }
 
     update(): void {
