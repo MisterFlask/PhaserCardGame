@@ -5,10 +5,8 @@ import { TooltipAttachment } from "../../ui/TooltipAttachment";
 
 export class CampaignBriefStatus extends Phaser.GameObjects.Container {
     private actNumberText: TextBox;
-    private surfaceCurrencyText: TextBox;
     private combinedCurrencyText: TextBox;
     private combinedCurrencyTooltip: TooltipAttachment;
-    private surfaceCurrencyTooltip: TooltipAttachment;
     private relicContainer: Phaser.GameObjects.Container;
     private readonly CURRENCY_WIDTH = 280;
     private readonly RELIC_GRID_WIDTH = 900; // 5x currency width
@@ -42,34 +40,11 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
             }
         });
 
-        // Surface currency display
-        this.surfaceCurrencyText = new TextBox({
-            scene: this.scene,
-            x: 10,
-            y: 45,
-            width: this.CURRENCY_WIDTH,
-            height: 30,
-            text: `Surface Currency: ${GameState.getInstance().moneyInVault}`,
-            style: { 
-                fontSize: '16px',
-                color: '#ffffff',
-                fontFamily: 'Arial'
-            }
-        });
-
-        // Add tooltip to surface currency display
-        this.surfaceCurrencyTooltip = new TooltipAttachment({
-            scene: this.scene,
-            container: this.surfaceCurrencyText,
-            tooltipText: "Utterly worthless and inaccessible in Hell but i guess it's nice to know you have it",
-            fillColor: 0x333333
-        });
-
         // Combined hell currency and promissory notes display
         this.combinedCurrencyText = new TextBox({
             scene: this.scene,
             x: 10,
-            y: 80,
+            y: 45,
             width: this.CURRENCY_WIDTH,
             height: 30,
             text: `🪙 ${GameState.getInstance().denarians} | 📝 ${GameState.getInstance().promissoryNotes}`,
@@ -79,12 +54,14 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
                 fontFamily: 'Arial'
             }
         });
+        // Make the combined currency text interactive so that tooltip hover events are registered
+        this.combinedCurrencyText.setInteractive();
 
         // Add tooltip to combined currency display
         this.combinedCurrencyTooltip = new TooltipAttachment({
             scene: this.scene,
             container: this.combinedCurrencyText,
-            tooltipText: "🪙 Denarians: Hell's currency | 📝 Promissory Notes: Valuable on the surface",
+            tooltipText: "🪙 Denarians: Currency spent in Hell\n📝 Promissory Notes: Converted to money if expedition succeeds",
             fillColor: 0x440000
         });
 
@@ -95,7 +72,6 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
         // Add everything to this container
         this.add([
             this.actNumberText,
-            this.surfaceCurrencyText, 
             this.combinedCurrencyText,
             this.relicContainer
         ]);
@@ -121,7 +97,6 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
                 child.updateStacksDisplay();
             }
         });
-
     }
 
     private updateRelicDisplay(): void {
@@ -165,16 +140,13 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
     private updateCurrencyDisplay(): void {
         const gameState = GameState.getInstance();
         this.actNumberText.setText(`Act ${gameState.currentAct}`);
-        this.surfaceCurrencyText.setText(`Surface Currency: ${gameState.moneyInVault}`);
         this.combinedCurrencyText.setText(`🪙 ${gameState.denarians} | 📝 ${gameState.promissoryNotes}`);
     }
 
     public destroy(fromScene?: boolean): void {
         this.combinedCurrencyTooltip.destroy();
-        this.surfaceCurrencyTooltip.destroy();
         this.scene?.events?.off('update', this.updateCurrencyDisplay, this);
         this.scene?.events?.off('propagateGameStateChangesToUi', this.updateRelicDisplay, this);
         super.destroy(fromScene);
     }
-
 }
