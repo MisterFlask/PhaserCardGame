@@ -176,44 +176,54 @@ export class CargoSelectionPanel extends AbstractHqPanel {
   }
 
   private buildCargoSection(cargoSizer: Sizer): void {
+    const panelWidth = this.scene.scale.width * 0.25;
+
     const availablePanel = this.rexUI.add.scrollablePanel({
-      width: this.scene.scale.width * 0.18,
-      height: this.scene.scale.height * 0.6,
-      scrollMode: 0, // vertical
-      panel: {
-        child: this.rexUI.add.fixWidthSizer({
-          space: { top: 10, bottom: 10, left: 10, right: 10, item: 10, line: 10 },
-          align: 'left',
-        }),
-      },
-      mouseWheelScroller: { focus: true },
-      slider: {
-        track: this.rexUI.add.roundRectangle(0, 0, 3, 0, 5, 0x888888),
-        thumb: this.rexUI.add.roundRectangle(0, 0, 0, 0, 5, 0xcccccc),
-      },
-      space: {
-        panel: 10,
-      },
+        width: panelWidth,
+        height: this.scene.scale.height * 0.6,
+        scrollMode: 0, // vertical
+        panel: {
+            child: this.rexUI.add.fixWidthSizer({
+                space: { top: 10, bottom: 10, left: 20, right: 20, item: 10, line: 10 },
+                align: 'center',
+            }),
+        },
+        mouseWheelScroller: { focus: true },
+        slider: {
+            track: this.rexUI.add.roundRectangle(0, 0, 3, 0, 5, 0x888888),
+            thumb: this.rexUI.add.roundRectangle(0, 0, 0, 0, 5, 0xcccccc),
+        },
+        space: {
+            left: 20,
+            right: 20,
+            top: 10,
+            bottom: 10,
+            panel: 10,
+        },
     });
 
     const purchasedPanel = this.rexUI.add.scrollablePanel({
-      width: this.scene.scale.width * 0.18,
-      height: this.scene.scale.height * 0.6,
-      scrollMode: 0, // vertical
-      panel: {
-        child: this.rexUI.add.fixWidthSizer({
-          space: { top: 10, bottom: 10, left: 10, right: 10, item: 10, line: 10 },
-          align: 'left',
-        }),
-      },
-      mouseWheelScroller: { focus: true },
-      slider: {
-        track: this.rexUI.add.roundRectangle(0, 0, 3, 0, 5, 0x888888),
-        thumb: this.rexUI.add.roundRectangle(0, 0, 0, 0, 5, 0xcccccc),
-      },
-      space: {
-        panel: 10,
-      },
+        width: panelWidth,
+        height: this.scene.scale.height * 0.6,
+        scrollMode: 0,
+        panel: {
+            child: this.rexUI.add.fixWidthSizer({
+                space: { top: 10, bottom: 10, left: 20, right: 20, item: 10, line: 10 },
+                align: 'center',
+            }),
+        },
+        mouseWheelScroller: { focus: true },
+        slider: {
+            track: this.rexUI.add.roundRectangle(0, 0, 3, 0, 5, 0x888888),
+            thumb: this.rexUI.add.roundRectangle(0, 0, 0, 0, 5, 0xcccccc),
+        },
+        space: {
+            left: 20,
+            right: 20,
+            top: 10,
+            bottom: 10,
+            panel: 10,
+        },
     });
 
     this.availableCargoSizer = availablePanel;
