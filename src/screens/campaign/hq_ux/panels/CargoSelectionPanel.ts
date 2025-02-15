@@ -1,467 +1,547 @@
 import { Scene } from 'phaser';
+import FixWidthSizer from 'phaser3-rex-plugins/templates/ui/fixwidthsizer/FixWidthSizer.js';
+import Label from 'phaser3-rex-plugins/templates/ui/label/Label.js';
+import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel.js';
+import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer.js';
+import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 import { EncounterManager } from '../../../../encounters/EncountersList';
 import { PlayableCard } from '../../../../gamecharacters/PlayableCard';
 import { PlayerCharacter } from '../../../../gamecharacters/PlayerCharacter';
 import { GameState } from '../../../../rules/GameState';
-import { TextBoxButton } from '../../../../ui/Button';
+import { DepthManager } from '../../../../ui/DepthManager';
 import { PhysicalCard } from '../../../../ui/PhysicalCard';
-import { TextBox } from '../../../../ui/TextBox';
 import { CardGuiUtils } from '../../../../utils/CardGuiUtils';
 import { SceneChanger } from '../../../SceneChanger';
 import { CampaignUiState } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
 
 export class CargoSelectionPanel extends AbstractHqPanel {
-    private locationCard: PhysicalCard | null = null;
-    private launchButton: TextBoxButton;
-    private backButton: TextBoxButton;
-    private statusText: TextBox;
-    private fundsDisplay: TextBox;
+  private mainSizer!: Sizer;
+  private fundsLabel!: Label;
+  private backButton!: Label;
+  private launchButton!: Label;
+  private statusLabel!: Label;
 
-    // we keep track of all dynamically created objects (except those that have their own destroy/obliterate logic)
-    // so we can remove or destroy them when hiding or refreshing
-    private characterObjects: Phaser.GameObjects.GameObject[] = [];
-    private cargoObjects: Phaser.GameObjects.GameObject[] = [];
-    private characterCards: Map<PlayerCharacter, PhysicalCard> = new Map();
+  private locationCard: PhysicalCard | null = null;
+  private characterCards = new Map<PlayerCharacter, PhysicalCard>();
+  
+  // store references to sizers and objects we want to clear/destroy on hide
+  private characterSizer!: Sizer;
+  private cargoSizer!: Sizer;
+  private availableCargoSizer!: ScrollablePanel;
+  private purchasedCargoSizer!: ScrollablePanel;
+  private locationSizer!: Sizer;
 
-    constructor(scene: Scene) {
-        super(scene, 'Cargo Selection');
+  constructor(scene: Scene) {
+    super(scene, 'Cargo Selection');
 
-        // create funds display
-        this.fundsDisplay = new TextBox({
-            scene,
-            x: scene.scale.width * 0.5,
-            y: 70,
-            width: 300,
-            height: 40,
-            text: `Available Funds: £${GameState.getInstance().moneyInVault}`,
-            style: {
-                fontSize: '24px',
-                color: '#ffff00',
-                align: 'center',
-            },
-        });
+    // hide the default return to hub button
+    this.returnButton.setVisible(false);
+    
+    // build main container
+    this.buildUI();
+    this.updateFunds();
+    this.updateLaunchButton();
+  }
 
-        // place fundsDisplay at a visible depth
-        scene.add.existing(this.fundsDisplay);
-        this.fundsDisplay.setDepth(100);
+  private get rexUI(): RexUIPlugin {
+    return (this.scene as Scene & { rexUI: RexUIPlugin }).rexUI;
+  }
 
-        // listen for funds changes
-        this.scene.events.on('fundsChanged', () => {
-            this.updateFundsDisplay();
-        });
+  // build the entire panel using rexUI
+  private buildUI(): void {
+    // main sizer
+    this.mainSizer = this.rexUI.add.sizer({
+      orientation: 'vertical',
+      x: this.scene.scale.width / 2,
+      y: this.scene.scale.height / 2,
+      width: this.scene.scale.width * 0.9,
+      height: this.scene.scale.height * 0.9,
+      space: { top: 10, left: 10, right: 10, bottom: 10, item: 10 },
+    });
 
-        // create back button
-        this.backButton = new TextBoxButton({
-            scene,
-            x: scene.scale.width * 0.2,
-            y: scene.scale.height * 0.85,
-            width: 200,
-            height: 50,
-            text: 'Back to Loadout',
-            style: { fontSize: '20px', color: '#ffffff' },
-            fillColor: 0x444444,
-        });
-        scene.add.existing(this.backButton);
-        this.backButton.setDepth(1000);
-        this.backButton.setVisible(false);
+    // background
+    const background = this.rexUI.add.roundRectangle(0, 0, 10, 10, 20, 0x2c2c2c);
 
-        // create launch button
-        this.launchButton = new TextBoxButton({
-            scene,
-            x: scene.scale.width * 0.8,
-            y: scene.scale.height * 0.85,
-            width: 200,
-            height: 50,
-            text: 'Launch Expedition',
-            style: { fontSize: '20px', color: '#ffffff' },
-            fillColor: 0x444444,
-        });
-        scene.add.existing(this.launchButton);
-        this.launchButton.setDepth(1000);
-        this.launchButton.setVisible(false);
+    this.mainSizer
+      .addBackground(background)
+      .add(
+        // funds + status row
+        this.createTopBar(),
+        { proportion: 0, expand: false, align: 'center', padding: { bottom: 10 } }
+      )
+      .add(
+        // main content row: characters / location / cargo
+        this.createMainContent(),
+        { proportion: 1, expand: true }
+      )
+      .add(
+        // footer (buttons)
+        this.createFooterButtons(),
+        { proportion: 0, expand: false, align: 'center', padding: { top: 10 } }
+      )
+      .layout();
 
-        // create status text
-        this.statusText = new TextBox({
-            scene,
-            x: scene.scale.width * 0.5,
-            y: scene.scale.height * 0.85,
-            width: 300,
-            height: 100,
-            text: '',
-            style: {
-                fontSize: '16px',
-                color: '#ffffff',
-                align: 'center',
-                wordWrap: { width: 290 },
-            },
-        });
-        scene.add.existing(this.statusText);
-        this.statusText.setDepth(1000);
+    this.scene.add.existing(this.mainSizer);
+    this.mainSizer.setDepth(DepthManager.getInstance().OVERLAY_BASE);
+    this.mainSizer.setVisible(false);
 
-        // wire up button events
-        this.backButton.onClick(() => this.handleBack());
-        this.launchButton.onClick(() => this.handleLaunch());
+    // listen for funds changes
+    this.scene.events.on('fundsChanged', () => this.updateFunds());
+  }
 
-        // hide the default return to hub button since we have our own back button
-        this.returnButton.setVisible(false);
+  private createTopBar(): Sizer {
+    const sizer = this.rexUI.add.sizer({ orientation: 'horizontal', space: { item: 20 } });
+    
+    // funds display
+    this.fundsLabel = this.rexUI.add.label({
+      background: this.rexUI.add.roundRectangle(0, 0, 0, 0, 10, 0x444444),
+      text: this.scene.add.text(0, 0, '', {
+        fontSize: '22px',
+        color: '#ffff00',
+      }),
+      space: { top: 8, bottom: 8, left: 10, right: 10 },
+    });
+
+    // status text
+    this.statusLabel = this.rexUI.add.label({
+      background: this.rexUI.add.roundRectangle(0, 0, 0, 0, 10, 0x555555),
+      text: this.scene.add.text(0, 0, '', {
+        fontSize: '16px',
+        color: '#ffffff',
+        wordWrap: { width: 300 },
+      }),
+      space: { top: 8, bottom: 8, left: 10, right: 10 },
+    });
+
+    sizer.add(this.fundsLabel, { proportion: 0, expand: false });
+    sizer.add(this.statusLabel, { proportion: 1, expand: true, align: 'center' });
+    return sizer;
+  }
+
+  private createMainContent(): Sizer {
+    const mainContentSizer = this.rexUI.add.sizer({
+      orientation: 'horizontal',
+      space: { item: 20 },
+    });
+
+    // left: characters
+    this.characterSizer = this.rexUI.add.sizer({
+      orientation: 'vertical',
+      width: this.scene.scale.width * 0.25,
+      space: { top: 10, bottom: 10, left: 10, right: 10, item: 10 },
+    });
+
+    // middle: location card
+    const locationSizer = this.rexUI.add.sizer({
+      orientation: 'vertical',
+      width: this.scene.scale.width * 0.2,
+      space: { top: 10, bottom: 10, item: 10 },
+    });
+
+    // right: cargo (two scrollable panels)
+    this.cargoSizer = this.rexUI.add.sizer({
+      orientation: 'horizontal',
+      width: this.scene.scale.width * 0.4,
+      space: { item: 30 },
+    });
+
+    // build sub-sections
+    this.buildCharacterSection(this.characterSizer);
+    this.buildLocationSection(locationSizer);
+    this.buildCargoSection(this.cargoSizer);
+
+    mainContentSizer.add(this.characterSizer, { proportion: 1, expand: true });
+    mainContentSizer.add(locationSizer, { proportion: 1, expand: true });
+    mainContentSizer.add(this.cargoSizer, { proportion: 2, expand: true });
+
+    this.locationSizer = locationSizer;
+
+    return mainContentSizer;
+  }
+
+  private buildCharacterSection(charSizer: Sizer): void {
+    // heading
+    const heading = this.rexUI.add.label({
+      text: this.scene.add.text(0, 0, 'Expedition Party', { fontSize: '20px', color: '#ffffff' }),
+    });
+    charSizer.add(heading, { align: 'center', padding: { bottom: 10 } });
+  }
+
+  private buildLocationSection(locSizer: Sizer): void {
+    const heading = this.rexUI.add.label({
+      text: this.scene.add.text(0, 0, 'Trade Route', { fontSize: '20px', color: '#ffffff' }),
+    });
+    locSizer.add(heading, { align: 'center', padding: { bottom: 10 } });
+  }
+
+  private buildCargoSection(cargoSizer: Sizer): void {
+    const availablePanel = this.rexUI.add.scrollablePanel({
+      width: this.scene.scale.width * 0.18,
+      height: this.scene.scale.height * 0.6,
+      scrollMode: 0, // vertical
+      panel: {
+        child: this.rexUI.add.fixWidthSizer({
+          space: { top: 10, bottom: 10, left: 10, right: 10, item: 10, line: 10 },
+          align: 'left',
+        }),
+      },
+      mouseWheelScroller: { focus: true },
+      slider: {
+        track: this.rexUI.add.roundRectangle(0, 0, 3, 0, 5, 0x888888),
+        thumb: this.rexUI.add.roundRectangle(0, 0, 0, 0, 5, 0xcccccc),
+      },
+      space: {
+        panel: 10,
+      },
+    });
+
+    const purchasedPanel = this.rexUI.add.scrollablePanel({
+      width: this.scene.scale.width * 0.18,
+      height: this.scene.scale.height * 0.6,
+      scrollMode: 0, // vertical
+      panel: {
+        child: this.rexUI.add.fixWidthSizer({
+          space: { top: 10, bottom: 10, left: 10, right: 10, item: 10, line: 10 },
+          align: 'left',
+        }),
+      },
+      mouseWheelScroller: { focus: true },
+      slider: {
+        track: this.rexUI.add.roundRectangle(0, 0, 3, 0, 5, 0x888888),
+        thumb: this.rexUI.add.roundRectangle(0, 0, 0, 0, 5, 0xcccccc),
+      },
+      space: {
+        panel: 10,
+      },
+    });
+
+    this.availableCargoSizer = availablePanel;
+    this.purchasedCargoSizer = purchasedPanel;
+
+    // labels for each scrollable panel
+    const availableLabel = this.rexUI.add.label({
+      text: this.scene.add.text(0, 0, 'Available Cargo', { fontSize: '18px', color: '#ffffff' }),
+    });
+    const purchasedLabel = this.rexUI.add.label({
+      text: this.scene.add.text(0, 0, 'Purchased Cargo', { fontSize: '18px', color: '#ffffff' }),
+    });
+
+    // column 1
+    const leftCol = this.rexUI.add.sizer({ orientation: 'vertical', space: { item: 10 } });
+    leftCol.add(availableLabel, { align: 'center' });
+    leftCol.add(availablePanel, { expand: true });
+
+    // column 2
+    const rightCol = this.rexUI.add.sizer({ orientation: 'vertical', space: { item: 10 } });
+    rightCol.add(purchasedLabel, { align: 'center' });
+    rightCol.add(purchasedPanel, { expand: true });
+
+    cargoSizer.add(leftCol, { proportion: 1, expand: true });
+    cargoSizer.add(rightCol, { proportion: 1, expand: true });
+  }
+
+  private createFooterButtons(): Sizer {
+    const footerSizer = this.rexUI.add.sizer({ orientation: 'horizontal', space: { item: 50 } });
+    
+    // back
+    this.backButton = this.rexUI.add.label({
+      background: this.rexUI.add.roundRectangle(0, 0, 0, 0, 10, 0x444444),
+      text: this.scene.add.text(0, 0, 'Back to Loadout', {
+        fontSize: '20px',
+        color: '#ffffff',
+      }),
+      space: { top: 10, bottom: 10, left: 20, right: 20 },
+    });
+    this.backButton.setInteractive().on('pointerdown', () => this.handleBack());
+
+    // launch
+    this.launchButton = this.rexUI.add.label({
+      background: this.rexUI.add.roundRectangle(0, 0, 0, 0, 10, 0x444444),
+      text: this.scene.add.text(0, 0, 'Launch Expedition', {
+        fontSize: '20px',
+        color: '#ffffff',
+      }),
+      space: { top: 10, bottom: 10, left: 20, right: 20 },
+    });
+    this.launchButton.setInteractive().on('pointerdown', () => this.handleLaunch());
+
+    footerSizer.add(this.backButton);
+    footerSizer.add(this.launchButton);
+    return footerSizer;
+  }
+
+  private handleBack(): void {
+    this.hide();
+    this.scene.events.emit('navigate', 'loadout');
+  }
+
+  private handleLaunch(): void {
+    if (this.isReadyToLaunch()) {
+      const campaignState = CampaignUiState.getInstance();
+      const gameState = GameState.getInstance();
+
+      gameState.currentRunCharacters = campaignState.selectedParty;
+      gameState.initializeRun();
+      SceneChanger.switchToCombatScene(
+        EncounterManager.getInstance().getShopEncounter(),
+        true
+      );
+    }
+  }
+
+  private isReadyToLaunch(): boolean {
+    const readiness = this.getReadinessStatus();
+    if (!readiness.ready) {
+      console.log('CargoSelectionPanel not ready:', readiness.reasons);
+    }
+    return readiness.ready;
+  }
+
+  private getReadinessStatus(): { ready: boolean; reasons: string[] } {
+    // add logic if needed
+    const reasons: string[] = [];
+    return { ready: reasons.length === 0, reasons };
+  }
+
+  private updateLaunchButton(): void {
+    const status = this.getReadinessStatus();
+    if (status.ready) {
+      (this.statusLabel.getElement('text') as Phaser.GameObjects.Text).setText('Ready to launch!');
+      (this.statusLabel.getElement('background') as Phaser.GameObjects.Rectangle).setFillStyle(0x006400);
+    } else {
+      if (status.reasons.length > 0) {
+        (this.statusLabel.getElement('text') as Phaser.GameObjects.Text).setText(`Cannot launch:\n• ${status.reasons.join('\n• ')}`);
+      } else {
+        (this.statusLabel.getElement('text') as Phaser.GameObjects.Text).setText('Cannot launch for unknown reasons');
+      }
+      (this.statusLabel.getElement('background') as Phaser.GameObjects.Rectangle).setFillStyle(0x8b0000);
+    }
+  }
+
+  private displayCharacters(): void {
+    // clear old
+    this.characterCards.forEach(card => card.obliterate());
+    this.characterCards.clear();
+    this.characterSizer.clear(true);
+
+    // heading again (since we cleared)
+    this.buildCharacterSection(this.characterSizer);
+
+    // create cards for each party member
+    const campaignState = CampaignUiState.getInstance();
+    campaignState.selectedParty.forEach((character) => {
+      const phCard = CardGuiUtils.getInstance().createCard({
+        scene: this.scene,
+        x: 0,
+        y: 0,
+        data: character,
+        onCardCreatedEventCallback: (createdCard) => {
+          // add to sizer
+          this.characterSizer.addSpace();
+          this.characterSizer.add(this.wrapCard(createdCard), { align: 'center' });
+          this.characterSizer.addSpace();
+
+          this.characterCards.set(character, createdCard);
+        },
+      });
+    });
+
+    this.characterSizer.layout();
+  }
+
+  private wrapCard(card: PhysicalCard): Sizer {
+    const wrapper = this.rexUI.add.sizer({ orientation: 'vertical' });
+    wrapper.addBackground(this.rexUI.add.roundRectangle(0, 0, 0, 0, 10, 0x333333));
+
+    const gameObject = card.container;
+    const depthManager = DepthManager.getInstance();
+
+    // Set initial depth so it's above the overlay base
+    gameObject.setDepth(depthManager.OVERLAY_BASE + 100);
+
+    gameObject.setInteractive();
+    gameObject.on('pointerover', () => gameObject.setDepth(depthManager.SHOP_CARD_HOVER));
+    gameObject.on('pointerout', () => gameObject.setDepth(depthManager.OVERLAY_BASE + 100));
+
+    wrapper.add(gameObject, { align: 'center', padding: 10 });
+    return wrapper;
+  }
+
+  private displayLocationCard(): void {
+    if (this.locationCard) {
+      this.locationCard.obliterate();
+      this.locationCard = null;
     }
 
-    private handleBack(): void {
-        this.hide();
-        this.scene.events.emit('navigate', 'loadout');
+    this.locationSizer.clear(true);
+
+    // re-add heading
+    this.buildLocationSection(this.locationSizer);
+
+    const campaignState = CampaignUiState.getInstance();
+    if (campaignState.selectedTradeRoute) {
+      const phCard = CardGuiUtils.getInstance().createCard({
+        scene: this.scene,
+        x: 0,
+        y: 0,
+        data: campaignState.selectedTradeRoute,
+        onCardCreatedEventCallback: (createdCard) => {
+          this.locationSizer.addSpace();
+          this.locationSizer.add(this.wrapCard(createdCard), { align: 'center' });
+          this.locationSizer.addSpace();
+        },
+      });
+      this.locationCard = phCard;
     }
 
-    private handleLaunch(): void {
-        if (this.isReadyToLaunch()) {
-            const campaignState = CampaignUiState.getInstance();
-            const gameState = GameState.getInstance();
+    this.locationSizer.layout();
+  }
 
-            gameState.currentRunCharacters = campaignState.selectedParty;
-            gameState.initializeRun();
-            SceneChanger.switchToCombatScene(
-                EncounterManager.getInstance().getShopEncounter(),
-                true
-            );
-        }
-    }
+  private displayCargo(): void {
+    // clear each scrollable panel
+    const availableFixSizer = this.availableCargoSizer.getElement('panel') as FixWidthSizer;
+    const purchasedFixSizer = this.purchasedCargoSizer.getElement('panel') as FixWidthSizer;
+    availableFixSizer.clear(true);
+    purchasedFixSizer.clear(true);
 
-    private isReadyToLaunch(): boolean {
-        const readinessState = this.getReadinessStatus();
-        if (!readinessState.ready) {
-            console.log(
-                'CargoSelectionPanel is not ready to launch: ',
-                readinessState.reasons
-            );
-        }
-        return readinessState.ready;
-    }
+    const campaignState = CampaignUiState.getInstance();
+    const gameState = GameState.getInstance();
 
-    private getReadinessStatus(): { ready: boolean; reasons: string[] } {
-        const gameState = GameState.getInstance();
-        const reasons: string[] = [];
+    // build available cargo
+    campaignState.availableTradeGoods.forEach((good) => {
+      const phCard = CardGuiUtils.getInstance().createCard({
+        scene: this.scene,
+        x: 0,
+        y: 0,
+        data: good,
+        onCardCreatedEventCallback: (card) => {
+          card.container.setInteractive();
+          card.container.on('pointerdown', () => this.purchaseCargo(good));
+          this.addHoverDepth(card.container);
 
-        return {
-            ready: reasons.length === 0,
-            reasons,
-        };
-    }
+          const itemSizer = this.makeCargoItem(card, `£${good.surfacePurchaseValue}`);
+          availableFixSizer.add(itemSizer);
+        },
+      });
+    });
 
-    private updateLaunchButton(): void {
-        const status = this.getReadinessStatus();
-        this.launchButton.setButtonEnabled(status.ready);
+    // build purchased cargo
+    gameState.cargoHolder.cardsInMasterDeck.forEach((good) => {
+      const phCard = CardGuiUtils.getInstance().createCard({
+        scene: this.scene,
+        x: 0,
+        y: 0,
+        data: good,
+        onCardCreatedEventCallback: (card) => {
+          card.container.setInteractive();
+          card.container.on('pointerdown', () => this.sellCargo(good));
+          this.addHoverDepth(card.container);
 
-        if (status.ready) {
-            this.statusText.setText('Ready to launch!');
-            this.statusText.setFillColor(0x006400); // dark green
-        } else {
-            const reasonsText = status.reasons.join('\n• ');
-            this.statusText.setText(`Cannot launch:\n• ${reasonsText}`);
-            this.statusText.setFillColor(0x8b0000); // dark red
-        }
-    }
+          const itemSizer = this.makeCargoItem(card, `£${good.surfacePurchaseValue}`);
+          purchasedFixSizer.add(itemSizer);
+        },
+      });
+    });
 
-    private displayCharacters(): void {
-        // clear old stuff
-        this.characterCards.forEach((card) => card.obliterate());
-        this.characterCards.clear();
-        this.characterObjects.forEach((obj) => obj.destroy());
-        this.characterObjects = [];
+    this.availableCargoSizer.layout();
+    this.purchasedCargoSizer.layout();
+  }
 
-        // create a border + title for the character zone
-        const characterSection = this.createSection(
-            'Expedition Party',
-            50,
-            100,
-            this.scene.scale.width * 0.3,
-            this.scene.scale.height - 200
-        );
-        characterSection.forEach((obj) => {
-            this.scene.add.existing(obj);
-            if ('setDepth' in obj) {
-                (obj as any).setDepth(100);
-            }
-            this.characterObjects.push(obj);
-        });
+  private makeCargoItem(card: PhysicalCard, price: string): Sizer {
+    const itemSizer = this.rexUI.add.sizer({
+      orientation: 'horizontal',
+      space: { item: 10 },
+    });
+    const bg = this.rexUI.add.roundRectangle(0, 0, 0, 0, 10, 0x333333);
+    itemSizer.addBackground(bg);
 
-        // display selected party members
-        const campaignState = CampaignUiState.getInstance();
-        campaignState.selectedParty.forEach((character, index) => {
-            const xPos = 100;
-            const yPos = 250 + index * 170;
-            const card = CardGuiUtils.getInstance().createCard({
-                scene: this.scene,
-                x: xPos,
-                y: yPos,
-                data: character,
-                onCardCreatedEventCallback: (createdCard) => {
-                    // track it
-                    this.scene.add.existing(createdCard.container);
-                    createdCard.container.setDepth(500);
+    itemSizer.add(card.container, { align: 'center', padding: 10 });
+    const priceText = this.scene.add.text(0, 0, price, { fontSize: '14px', color: '#ffffff' });
+    itemSizer.add(priceText, { align: 'center', padding: { right: 10 } });
 
-                    // Add hover effects similar to cargo cards
-                    createdCard.container.setInteractive();
-                    createdCard.container.on('pointerover', () => createdCard.container.setDepth(1500));
-                    createdCard.container.on('pointerout', () => createdCard.container.setDepth(500));
+    return itemSizer;
+  }
 
-                    this.characterCards.set(character, createdCard);
-                },
-            });
-        });
-    }
+  private addHoverDepth(go: PhysicalCard['container']) {
+    const depthManager = DepthManager.getInstance();
+    go.setDepth(depthManager.OVERLAY_BASE + 100);
+    go.on('pointerover', () => go.setDepth(depthManager.SHOP_CARD_HOVER));
+    go.on('pointerout', () => go.setDepth(depthManager.OVERLAY_BASE + 100));
+  }
 
-    private createSection(
-        title: string,
-        x: number,
-        y: number,
-        width: number,
-        height: number
-    ): Phaser.GameObjects.GameObject[] {
-        const border = this.scene.add.rectangle(x, y, width, height, 0x666666);
-        border.setOrigin(0, 0);
-        border.setStrokeStyle(2, 0x888888);
+  private purchaseCargo(good: PlayableCard): void {
+    const gameState = GameState.getInstance();
+    const campaignState = CampaignUiState.getInstance();
 
-        const titleText = this.scene.add.text(x + 10, y + 10, title, {
-            fontSize: '20px',
-            color: '#ffffff',
-            backgroundColor: '#444444',
-            padding: { x: 10, y: 5 },
-        });
+    if (gameState.moneyInVault >= good.surfacePurchaseValue) {
+      const idx = campaignState.availableTradeGoods.indexOf(good);
+      if (idx > -1) {
+        campaignState.availableTradeGoods.splice(idx, 1);
+        gameState.cargoHolder.cardsInMasterDeck.push(good);
+        gameState.moneyInVault -= good.surfacePurchaseValue;
 
-        return [border, titleText];
-    }
-
-    private displayLocationCard(): void {
-        if (this.locationCard) {
-            this.locationCard.obliterate();
-            this.locationCard = null;
-        }
-
-        const campaignState = CampaignUiState.getInstance();
-        if (campaignState.selectedTradeRoute) {
-            const xPos = this.scene.scale.width * 0.2;
-            const yPos = this.scene.scale.height * 0.2;
-            this.locationCard = CardGuiUtils.getInstance().createCard({
-                scene: this.scene,
-                x: xPos,
-                y: yPos,
-                data: campaignState.selectedTradeRoute,
-                onCardCreatedEventCallback: (createdCard) => {
-                    this.scene.add.existing(createdCard.container);
-                    createdCard.container.setDepth(500);
-                },
-            });
-        }
-    }
-
-    private displayCargo(): void {
-        // clear existing cargo objects
-        this.cargoObjects.forEach((o) => o.destroy());
-        this.cargoObjects = [];
-
-        // create sections for available & owned cargo
-        const availableSection = this.createSection(
-            'Available Cargo',
-            this.scene.scale.width * 0.4,
-            100,
-            this.scene.scale.width * 0.25,
-            this.scene.scale.height - 200
-        );
-        const ownedSection = this.createSection(
-            'Purchased Cargo',
-            this.scene.scale.width * 0.7,
-            100,
-            this.scene.scale.width * 0.25,
-            this.scene.scale.height - 200
-        );
-        [...availableSection, ...ownedSection].forEach((obj) => {
-            this.scene.add.existing(obj);
-            if ('setDepth' in obj) {
-                (obj as any).setDepth(100);
-            }
-            this.cargoObjects.push(obj);
-        });
-
-        const campaignState = CampaignUiState.getInstance();
-        const gameState = GameState.getInstance();
-        const GRID_COLS = 2;
-        const CARD_WIDTH = 120;
-        const CARD_HEIGHT = 160;
-        const PADDING = 20;
-        const VERTICAL_SPACING = 70;
-        const ROWS_PER_COL = Math.floor((this.scene.scale.height - 350) / (CARD_HEIGHT + VERTICAL_SPACING));
-
-        // display available trade goods
-        campaignState.availableTradeGoods.forEach((good, index) => {
-            // Fill vertically first, then horizontally
-            const col = Math.floor(index / ROWS_PER_COL);
-            const row = index % ROWS_PER_COL;
-            const xPos =
-                this.scene.scale.width * 0.45 + col * (CARD_WIDTH + PADDING);
-            const yPos = 250 + row * (CARD_HEIGHT + VERTICAL_SPACING);
-
-            CardGuiUtils.getInstance().createCard({
-                scene: this.scene,
-                x: xPos,
-                y: yPos,
-                data: good,
-                onCardCreatedEventCallback: (card) => {
-                    this.scene.add.existing(card.container);
-                    card.container.setDepth(500);
-
-                    // make it interactive
-                    card.container.setInteractive();
-                    card.container.on('pointerdown', () => this.purchaseCargo(good));
-                    card.container.on('pointerover', () => card.container.setDepth(1500));
-                    card.container.on('pointerout', () => card.container.setDepth(500));
-
-                    // create price text - now to the right of the card
-                    const priceText = new TextBox({
-                        scene: this.scene,
-                        x: xPos + CARD_WIDTH + 10,
-                        y: yPos,
-                        width: 60,
-                        height: 30,
-                        text: `£${good.surfacePurchaseValue}`,
-                        style: { fontSize: '14px', color: '#ffffff' },
-                    });
-                    this.scene.add.existing(priceText);
-                    priceText.setDepth(500);
-
-                    // track them for cleanup
-                    this.cargoObjects.push(card.container, priceText);
-                },
-            });
-        });
-
-        // display owned trade goods
-        gameState.cargoHolder.cardsInMasterDeck.forEach((good, index) => {
-            // Fill vertically first, then horizontally
-            const col = Math.floor(index / ROWS_PER_COL);
-            const row = index % ROWS_PER_COL;
-            const xPos =
-                this.scene.scale.width * 0.75 + col * (CARD_WIDTH + PADDING);
-            const yPos = 250 + row * (CARD_HEIGHT + VERTICAL_SPACING);
-
-            CardGuiUtils.getInstance().createCard({
-                scene: this.scene,
-                x: xPos,
-                y: yPos,
-                data: good,
-                onCardCreatedEventCallback: (card) => {
-                    this.scene.add.existing(card.container);
-                    card.container.setDepth(500);
-
-                    // make it interactive
-                    card.container.setInteractive();
-                    card.container.on('pointerdown', () => this.sellCargo(good));
-                    card.container.on('pointerover', () => card.container.setDepth(1500));
-                    card.container.on('pointerout', () => card.container.setDepth(500));
-
-                    // create price text - now to the right of the card
-                    const priceText = new TextBox({
-                        scene: this.scene,
-                        x: xPos + CARD_WIDTH + 10,
-                        y: yPos,
-                        width: 60,
-                        height: 30,
-                        text: `£${good.surfacePurchaseValue}`,
-                        style: { fontSize: '14px', color: '#ffffff' },
-                    });
-                    this.scene.add.existing(priceText);
-                    priceText.setDepth(500);
-
-                    // track them for cleanup
-                    this.cargoObjects.push(card.container, priceText);
-                },
-            });
-        });
-    }
-
-    private purchaseCargo(good: PlayableCard): void {
-        const gameState = GameState.getInstance();
-        const campaignState = CampaignUiState.getInstance();
-
-        if (gameState.moneyInVault >= good.surfacePurchaseValue) {
-            // remove from available
-            const idx = campaignState.availableTradeGoods.indexOf(good);
-            if (idx > -1) {
-                campaignState.availableTradeGoods.splice(idx, 1);
-                gameState.cargoHolder.cardsInMasterDeck.push(good);
-                gameState.moneyInVault -= good.surfacePurchaseValue;
-
-                this.scene.events.emit('fundsChanged');
-                this.displayCargo();
-                this.updateLaunchButton();
-            }
-        } else {
-            this.statusText.setText(
-                `Cannot afford cargo: Need £${good.surfacePurchaseValue}`
-            );
-            this.statusText.setFillColor(0x8b0000);
-        }
-    }
-
-    private sellCargo(good: PlayableCard): void {
-        const gameState = GameState.getInstance();
-        const campaignState = CampaignUiState.getInstance();
-
-        const idx = gameState.cargoHolder.cardsInMasterDeck.indexOf(good);
-        if (idx > -1) {
-            gameState.cargoHolder.cardsInMasterDeck.splice(idx, 1);
-            campaignState.availableTradeGoods.push(good);
-            gameState.moneyInVault += good.surfacePurchaseValue;
-
-            this.scene.events.emit('fundsChanged');
-            this.displayCargo();
-            this.updateLaunchButton();
-        }
-    }
-
-    private updateFundsDisplay(): void {
-        this.fundsDisplay.setText(
-            `Available Funds: £${GameState.getInstance().moneyInVault}`
-        );
-    }
-
-    show(): void {
-        super.show();
-        this.displayCharacters();
-        this.displayLocationCard();
+        this.scene.events.emit('fundsChanged');
         this.displayCargo();
-        this.updateFundsDisplay();
         this.updateLaunchButton();
-        
-        // Ensure buttons are visible only in this screen
-        this.launchButton.setVisible(true);
-        this.backButton.setVisible(true);
+      }
+    } else {
+      (this.statusLabel.getElement('text') as Phaser.GameObjects.Text).setText(`Cannot afford cargo: Need £${good.surfacePurchaseValue}`);
+      (this.statusLabel.getElement('background') as Phaser.GameObjects.Rectangle).setFillStyle(0x8b0000);
     }
+  }
 
-    update(): void {
-        this.updateLaunchButton();
+  private sellCargo(good: PlayableCard): void {
+    const gameState = GameState.getInstance();
+    const campaignState = CampaignUiState.getInstance();
+
+    const idx = gameState.cargoHolder.cardsInMasterDeck.indexOf(good);
+    if (idx > -1) {
+      gameState.cargoHolder.cardsInMasterDeck.splice(idx, 1);
+      campaignState.availableTradeGoods.push(good);
+      gameState.moneyInVault += good.surfacePurchaseValue;
+
+      this.scene.events.emit('fundsChanged');
+      this.displayCargo();
+      this.updateLaunchButton();
     }
+  }
 
-    public hide(): void {
-        // Ensure buttons are hidden when leaving this screen
-        this.launchButton.setVisible(false);
-        this.backButton.setVisible(false);
+  private updateFunds(): void {
+    const textObj = this.fundsLabel.getElement('text') as Phaser.GameObjects.Text;
+    textObj.setText(`Available Funds: £${GameState.getInstance().moneyInVault}`);
+    this.fundsLabel.layout();
+  }
 
-        // obliterate character cards
-        this.characterCards.forEach((card) => card.obliterate());
-        this.characterCards.clear();
+  show(): void {
+    super.show();
+    this.mainSizer.setVisible(true);
 
-        // obliterate location card if it exists
-        if (this.locationCard) {
-            this.locationCard.obliterate();
-            this.locationCard = null;
-        }
+    this.displayCharacters();
+    this.displayLocationCard();
+    this.displayCargo();
+    this.updateFunds();
+    this.updateLaunchButton();
 
-        // destroy all ephemeral objects
-        this.characterObjects.forEach((obj) => obj.destroy());
-        this.characterObjects = [];
-        this.cargoObjects.forEach((obj) => obj.destroy());
-        this.cargoObjects = [];
+    this.mainSizer.layout();
+  }
 
-        super.hide();
+  update(): void {
+    this.updateLaunchButton();
+  }
+
+  public hide(): void {
+    super.hide();
+    this.mainSizer.setVisible(false);
+
+    // obliterate character cards
+    this.characterCards.forEach((card) => card.obliterate());
+    this.characterCards.clear();
+
+    // obliterate location card
+    if (this.locationCard) {
+      this.locationCard.obliterate();
+      this.locationCard = null;
     }
+  }
 }
