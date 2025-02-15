@@ -1,4 +1,5 @@
 import { Scene } from 'phaser';
+import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 import { GameState } from '../../../rules/GameState';
 import { TransientUiState } from '../../../ui/TransientUiState';
 import { ActionManagerFetcher } from '../../../utils/ActionManagerFetcher';
@@ -59,6 +60,11 @@ export class HqScene extends Scene {
         SceneChanger.setCurrentScene(this);
         this.load.plugin('rexbbcodetextplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbbcodetextplugin.min.js', true);
         // Load any required assets
+        this.load.scenePlugin({
+            key: 'rexUI',
+            url: RexUIPlugin,
+            sceneKey: 'rexUI'
+        });
     }
 
     create(): void {

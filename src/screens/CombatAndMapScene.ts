@@ -2,6 +2,7 @@
 
 import Phaser from 'phaser';
 import BBCodeTextPlugin from 'phaser3-rex-plugins/plugins/bbcodetext-plugin.js';
+import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 import { Encounter } from '../encounters/EncountersList';
 import { AbstractEvent } from '../events/AbstractEvent';
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
@@ -401,9 +402,13 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
             key: 'rexBBCodeTextPlugin',
             plugin: BBCodeTextPlugin,
             start: true
-        },
-        ]
-      },
+        }],
+        scene: [{
+            key: 'rexUI',
+            plugin: RexUIPlugin,
+            mapping: 'rexUI'
+        }]
+    },
     type: Phaser.AUTO,
     width: 1920,
     height: 1080,
