@@ -5,7 +5,6 @@ import { AbstractCard, IPhysicalCardInterface, PriceContext } from '../gamechara
 import { AbstractIntent } from '../gamecharacters/AbstractIntent';
 import { BurnEffect } from '../shaders/BurnEffect';
 import { CardDescriptionGenerator } from '../text/CardDescriptionGenerator';
-import { CardTooltipGenerator } from '../text/CardTooltipGenerator';
 import { ResourceDisplayGenerator } from '../text/ResourceDisplayGenerator';
 import type { CardConfig } from '../utils/CardGuiUtils';
 import { CheapGlowEffect } from './CheapGlowEffect';
@@ -29,6 +28,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
     private static readonly GLOW_SCALE_MULTIPLIER = 1.7;
     contextRelevant?: UIContext;
+    disableInternalTooltip: boolean = false;
 
     cardConfig: CardConfig;
 
@@ -624,66 +624,25 @@ export class PhysicalCard implements IPhysicalCardInterface {
     
     
 
-    onPointerOver_PhysicalCard = (): void => {
-        TransientUiState.getInstance().setHoveredCard(this);
-        if (this.obliterated) return;
-
-        this.scene.tweens.add({
-            targets: this.visualContainer,
-            scale: 1.1,
-            duration: 200,
-            ease: 'Power2'
-        });
-
-        this.descBox.setVisible(true);
-
-        const tooltipText = CardTooltipGenerator.getInstance().generateTooltip(this.data);
-        if (tooltipText && tooltipText.trim() !== '') {
-            this.tooltipBox.setVisible(true);
-            this.tooltipBox.setText(tooltipText);
-            this.positionTooltipBox();
-        } else {
-            this.tooltipBox.setVisible(false);
+    private onPointerOver_PhysicalCard(): void {
+        if (!this.obliterated) {
+            this.setGlow(true);
+            if (!this.disableInternalTooltip) {
+                this.tooltipBox.setVisible(true);
+            }
+            if (this.hoverSound) {
+                this.hoverSound.play();
+            }
         }
-
-        if (this.hoverSound) {
-            // this.hoverSound.play();
-        }
-
-        if (!this.wiggleTween) {
-            this.wiggleTween = this.scene.tweens.add({
-                targets: this.visualContainer,
-                angle: { from: -1, to: 1 },
-                duration: 88,
-                repeat: 2,
-                yoyo: true
-            });
-        }
-
-        this.scene.events.emit("card:pointerover", this);
     }
 
-    onPointerOut_PhysicalCard = (): void => {
-        if (this.obliterated) return;
-
-        this.scene.tweens.add({
-            targets: this.visualContainer,
-            scale: 1,
-            duration: 200,
-            ease: 'Power2'
-        });
-
-        this.descBox.setVisible(false);
-        this.tooltipBox.setVisible(false);
-
-        if (this.wiggleTween) {
-            this.wiggleTween.stop();
-            this.wiggleTween = null;
-            this.visualContainer.setAngle(0);
+    private onPointerOut_PhysicalCard(): void {
+        if (!this.obliterated) {
+            this.setGlow(false);
+            if (!this.disableInternalTooltip) {
+                this.tooltipBox.setVisible(false);
+            }
         }
-
-        this.transientUiState.setHoveredCard(null);
-        this.scene.events.emit("card:pointerout", this);
     }
 
     onPointerDown_PhysicalCard = (): void => {
@@ -752,18 +711,20 @@ export class PhysicalCard implements IPhysicalCardInterface {
     private createTooltipBox(data: AbstractCard, cardWidth: number, cardHeight: number): TextBox {
         const box = new TextBox({
             scene: this.scene,
-            x: cardWidth + cardWidth / 2,
-            y: 0,
-            width: cardWidth + 100,
-            height: cardHeight,
-            text: data.tooltip || '',
+            x: -20,
+            y: cardHeight / 2,
+            width: cardWidth + 40,
+            height: 60,
+            text: data.description,
             textBoxName: "tooltipBox:" + data.id,
             style: {
-                fontSize: '20px',
+                fontSize: '17px',
                 color: '#000',
                 wordWrap: { width: cardWidth - 20 },
-                align: 'left'
-            }
+                align: 'center'
+            },
+            verticalExpand: 'down',
+            horizontalExpand: 'center'
         });
         box.setVisible(false);
         return box;

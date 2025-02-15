@@ -10,6 +10,7 @@ import { PlayerCharacter } from '../../../../gamecharacters/PlayerCharacter';
 import { GameState } from '../../../../rules/GameState';
 import { DepthManager } from '../../../../ui/DepthManager';
 import { PhysicalCard } from '../../../../ui/PhysicalCard';
+import { TooltipAttachment } from '../../../../ui/TooltipAttachment';
 import { CardGuiUtils } from '../../../../utils/CardGuiUtils';
 import { SceneChanger } from '../../../SceneChanger';
 import { CampaignUiState } from '../CampaignUiState';
@@ -21,6 +22,7 @@ export class CargoSelectionPanel extends AbstractHqPanel {
   private backButton!: Label;
   private launchButton!: Label;
   private statusLabel!: Label;
+  private tooltipAttachments: TooltipAttachment[] = [];
 
   private locationCard: PhysicalCard | null = null;
   private characterCards = new Map<PlayerCharacter, PhysicalCard>();
@@ -415,6 +417,10 @@ export class CargoSelectionPanel extends AbstractHqPanel {
     availableFixSizer.clear(true);
     purchasedFixSizer.clear(true);
 
+    // Clear existing tooltips
+    this.tooltipAttachments.forEach(tooltip => tooltip.destroy());
+    this.tooltipAttachments = [];
+
     const campaignState = CampaignUiState.getInstance();
     const gameState = GameState.getInstance();
 
@@ -426,9 +432,18 @@ export class CargoSelectionPanel extends AbstractHqPanel {
         y: 0,
         data: good,
         onCardCreatedEventCallback: (card) => {
+          card.disableInternalTooltip = true;
           card.container.setInteractive();
           card.container.on('pointerdown', () => this.purchaseCargo(good));
           this.addHoverDepth(card.container);
+
+          // Create tooltip
+          const tooltip = new TooltipAttachment({
+            scene: this.scene,
+            container: card.container,
+            tooltipText: good.description,
+          });
+          this.tooltipAttachments.push(tooltip);
 
           const itemSizer = this.makeCargoItem(card, `£${good.surfacePurchaseValue}`);
           availableFixSizer.add(itemSizer);
@@ -444,9 +459,18 @@ export class CargoSelectionPanel extends AbstractHqPanel {
         y: 0,
         data: good,
         onCardCreatedEventCallback: (card) => {
+          card.disableInternalTooltip = true;
           card.container.setInteractive();
           card.container.on('pointerdown', () => this.sellCargo(good));
           this.addHoverDepth(card.container);
+
+          // Create tooltip
+          const tooltip = new TooltipAttachment({
+            scene: this.scene,
+            container: card.container,
+            tooltipText: good.description,
+          });
+          this.tooltipAttachments.push(tooltip);
 
           const itemSizer = this.makeCargoItem(card, `£${good.surfacePurchaseValue}`);
           purchasedFixSizer.add(itemSizer);
@@ -553,5 +577,9 @@ export class CargoSelectionPanel extends AbstractHqPanel {
       this.locationCard.obliterate();
       this.locationCard = null;
     }
+
+    // destroy tooltips
+    this.tooltipAttachments.forEach(tooltip => tooltip.destroy());
+    this.tooltipAttachments = [];
   }
 }
