@@ -122,11 +122,19 @@ export class TradeRouteSelectionPanel extends AbstractHqPanel {
 
         // Clean up details
         this.hideRouteDetails();
-        
-        // Clean up the details container itself
-        this.detailsContainer.destroy();
+
+        // Instead of destroying detailsContainer, just hide it
+        this.detailsContainer.setVisible(false);
 
         super.hide();
+    }
+
+    public show(): void {
+        // Recreate trade route cards every time the panel is shown
+        this.displayTradeRoutes();
+        // Ensure the details container is hidden by default
+        this.detailsContainer.setVisible(false);
+        super.show();
     }
 
     update(): void {
