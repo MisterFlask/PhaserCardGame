@@ -1,6 +1,8 @@
 import { Scene } from 'phaser';
+import Label from 'phaser3-rex-plugins/templates/ui/label/Label.js';
+import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer.js';
+import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 import { PlayerCharacter } from '../../../../gamecharacters/PlayerCharacter';
-import { TextBoxButton } from '../../../../ui/Button';
 import { PhysicalCard } from '../../../../ui/PhysicalCard';
 import { TextBox } from '../../../../ui/TextBox';
 import { CardGuiUtils } from '../../../../utils/CardGuiUtils';
@@ -11,9 +13,14 @@ export class LoadoutPanel extends AbstractHqPanel {
     public rosterPanel: RosterPanel;
     public partyPanel: CaravanPartyPanel;
     public summaryPanel: ExpeditionSummaryPanel;
-    private launchButton: TextBoxButton;
-    private statusText: TextBox;
+    private launchButton: Label;
+    private statusText: Label;
     private tradeRouteCard: PhysicalCard | null = null;
+    private mainSizer!: Sizer;
+
+    private get rexUI(): RexUIPlugin {
+        return (this.scene as Scene & { rexUI: RexUIPlugin }).rexUI;
+    }
 
     constructor(scene: Scene) {
         super(scene, 'Expedition Loadout');
@@ -23,55 +30,67 @@ export class LoadoutPanel extends AbstractHqPanel {
         this.partyPanel = new CaravanPartyPanel(scene, this);
         this.summaryPanel = new ExpeditionSummaryPanel(scene, this);
 
-        // Position panels
-        // Roster at top
-        this.rosterPanel.setPosition(scene.scale.width * 0.2, scene.scale.height * 0.15);
-        // Selected party below roster
-        this.partyPanel.setPosition(scene.scale.width * 0.2, scene.scale.height * 0.45);
-        // Summary on the right
-        this.summaryPanel.setPosition(scene.scale.width * 0.8, scene.scale.height * 0.2);
+        // Create launch button using rexUI label
+        this.launchButton = this.rexUI.add.label({
+            background: this.rexUI.add.roundRectangle(0, 0, 0, 0, 10, 0x444444),
+            text: this.scene.add.text(0, 0, 'Select Cargo', { fontSize: '20px', color: '#ffffff' }),
+            space: { top: 10, bottom: 10, left: 20, right: 20 },
+        });
+        this.launchButton.setInteractive().on('pointerdown', () => this.handleLaunch());
 
-        // Create launch button
-        this.launchButton = new TextBoxButton({
-            scene,
-            x: scene.scale.width * 0.8,
-            y: scene.scale.height * 0.85,
-            width: 200,
-            height: 50,
-            text: 'Select Cargo',
-            style: { fontSize: '20px', color: '#ffffff' },
-            fillColor: 0x444444
+        // Create status text using rexUI label
+        this.statusText = this.rexUI.add.label({
+            background: this.rexUI.add.roundRectangle(0, 0, 0, 0, 10, 0x555555),
+            text: this.scene.add.text(0, 0, '', { fontSize: '16px', color: '#ffffff', wordWrap: { width: 300 } }),
+            space: { top: 8, bottom: 8, left: 10, right: 10 },
         });
 
-        // Create status text box below launch button
-        this.statusText = new TextBox({
-            scene,
-            x: scene.scale.width * 0.8,
-            y: scene.scale.height * 0.85 + 70, // Position below launch button
-            width: 300,
-            height: 100,
-            text: '',
-            style: { 
-                fontSize: '16px', 
-                color: '#ffffff',
-                align: 'center',
-                wordWrap: { width: 290 }
-            }
-        });
-
-        this.launchButton.onClick(() => this.handleLaunch());
         this.updateLaunchButton();
 
-        // Add everything to the panel
-        this.add([
-            this.rosterPanel,
-            this.partyPanel,
-            this.summaryPanel,
-            this.launchButton,
-            this.statusText
-        ]);
+        // ---- Build the main panel layout via RexUI sizers ----
+        const mainSizer = this.rexUI.add.sizer({
+            orientation: 'vertical',
+            x: scene.scale.width / 2,
+            y: scene.scale.height / 2,
+            width: scene.scale.width * 0.9,
+            height: scene.scale.height * 0.9,
+            space: { top: 10, bottom: 10, left: 10, right: 10, item: 10 },
+        });
 
-        // Set up event listeners between panels
+        // Upper section: panels on the left/right
+        const panelsSizer = this.rexUI.add.sizer({
+            orientation: 'horizontal',
+            space: { item: 20 },
+        });
+
+        // Left column: vertical sizer for roster and party panels
+        const leftColumn = this.rexUI.add.sizer({
+            orientation: 'vertical',
+            space: { item: 10 },
+        });
+        leftColumn.add(this.rosterPanel, { proportion: 1, expand: true, align: 'center' });
+        leftColumn.add(this.partyPanel, { proportion: 1, expand: true, align: 'center' });
+
+        panelsSizer.add(leftColumn, { proportion: 2, expand: true });
+        panelsSizer.add(this.summaryPanel, { proportion: 1, expand: true });
+
+        // Lower section: horizontal sizer for launch button and status text
+        const bottomSizer = this.rexUI.add.sizer({
+            orientation: 'horizontal',
+            space: { item: 10 },
+        });
+        bottomSizer.add(this.launchButton, { proportion: 0, expand: false });
+        bottomSizer.add(this.statusText, { proportion: 1, expand: true });
+
+        // Add panels and bottom row to the main sizer
+        mainSizer.add(panelsSizer, { proportion: 1, expand: true });
+        mainSizer.add(bottomSizer, { proportion: 0, expand: false });
+
+        // Add the main sizer to this panel
+        this.add(mainSizer);
+        this.mainSizer = mainSizer;
+
+        // ---- Update event listeners between panels remain unchanged ----
         this.rosterPanel.on('characterSelected', (character: PlayerCharacter) => {
             if (this.partyPanel.canAddCharacter()) {
                 this.partyPanel.addCharacter(character);
@@ -85,6 +104,7 @@ export class LoadoutPanel extends AbstractHqPanel {
             this.updateSummary();
         });
 
+        // Adjust the trade route card update: add it into the summary panel
         this.updateTradeRouteCard();
     }
 
@@ -124,16 +144,17 @@ export class LoadoutPanel extends AbstractHqPanel {
 
     private updateLaunchButton(): void {
         const status = this.getReadinessStatus();
-        this.launchButton.setButtonEnabled(status.ready);
-
-        // Update status text
         if (status.ready) {
-            this.statusText.setText("Ready to select cargo!");
-            this.statusText.setFillColor(0x006400); // Dark green
+            // Update status text and background for "ready" state
+            (this.statusText.getElement('text') as Phaser.GameObjects.Text).setText("Ready to select cargo!");
+            (this.statusText.getElement('background') as Phaser.GameObjects.Rectangle).setFillStyle(0x006400); // Dark green
+            this.launchButton.setInteractive();
         } else {
             const reasonsText = status.reasons.join('\n• ');
-            this.statusText.setText(`Cannot proceed:\n• ${reasonsText}`);
-            this.statusText.setFillColor(0x8B0000); // Dark red
+            (this.statusText.getElement('text') as Phaser.GameObjects.Text).setText(`Cannot proceed:\n• ${reasonsText}`);
+            (this.statusText.getElement('background') as Phaser.GameObjects.Rectangle).setFillStyle(0x8B0000); // Dark red
+            // Disable interactive if not ready
+            this.launchButton.disableInteractive();
         }
     }
 
@@ -149,11 +170,12 @@ export class LoadoutPanel extends AbstractHqPanel {
             // Create the card if it doesn't exist and we have a route
             this.tradeRouteCard = CardGuiUtils.getInstance().createCard({
                 scene: this.scene,
-                x: this.scene.scale.width * 0.2,
-                y: this.scene.scale.height * 0.7, // Moved down to accommodate the new layout
+                x: 0, // positions will be managed by the summary panel layout
+                y: 0,
                 data: campaignState.selectedTradeRoute,
                 onCardCreatedEventCallback: (card) => {
-                    this.add(card.container);
+                    // NEW: Add card to the summary panel container
+                    this.summaryPanel.add(card.container);
                 }
             });
         } else if (this.tradeRouteCard && !campaignState.selectedTradeRoute) {
@@ -172,6 +194,8 @@ export class LoadoutPanel extends AbstractHqPanel {
         this.summaryPanel.update();
         this.updateTradeRouteCard();
         this.updateSummary();
+        // Relayout the main sizer after updating
+        this.mainSizer.layout();
     }
 }
 
@@ -209,7 +233,7 @@ class RosterPanel extends Phaser.GameObjects.Container {
     }
 
     addCharacter(character: PlayerCharacter): void {
-        const xOffset = (this.characterCards.size * 140); // Increased spacing for better readability
+        const xOffset = (this.characterCards.size * 180); // Increased spacing for better readability
         const card = CardGuiUtils.getInstance().createCard({
             scene: this.scene,
             x: xOffset,
@@ -252,7 +276,7 @@ class RosterPanel extends Phaser.GameObjects.Container {
         let xOffset = 0;
         this.characterCards.forEach(card => {
             card.container.setPosition(xOffset, 60);
-            xOffset += 140; // Increased spacing for better readability
+            xOffset += 180; // Increased spacing for better readability
         });
     }
 }
@@ -287,7 +311,7 @@ class CaravanPartyPanel extends Phaser.GameObjects.Container {
     addCharacter(character: PlayerCharacter): void {
         if (!this.canAddCharacter()) return;
 
-        const xOffset = (this.characterCards.size * 140); // Increased spacing for better readability
+        const xOffset = (this.characterCards.size * 180); // Increased spacing for better readability
         const card = CardGuiUtils.getInstance().createCard({
             scene: this.scene,
             x: xOffset,
@@ -343,7 +367,7 @@ class CaravanPartyPanel extends Phaser.GameObjects.Container {
         let xOffset = 0;
         this.characterCards.forEach(card => {
             card.container.setPosition(xOffset, 60);
-            xOffset += 140; // Increased spacing for better readability
+            xOffset += 180; // Increased spacing for better readability
         });
     }
 }
