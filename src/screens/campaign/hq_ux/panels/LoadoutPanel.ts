@@ -2,6 +2,7 @@ import { Scene } from 'phaser';
 import Label from 'phaser3-rex-plugins/templates/ui/label/Label.js';
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer.js';
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
+import { PlayableCard } from '../../../../gamecharacters/PlayableCard';
 import { PlayerCharacter } from '../../../../gamecharacters/PlayerCharacter';
 import { PhysicalCard } from '../../../../ui/PhysicalCard';
 import { TextBox } from '../../../../ui/TextBox';
@@ -203,11 +204,31 @@ class RosterPanel extends Phaser.GameObjects.Container {
     private loadoutPanel: LoadoutPanel;
     private characterCards: Map<PlayerCharacter, PhysicalCard> = new Map();
     private title: TextBox;
+    private deckDisplayContainer: Phaser.GameObjects.Container;
+    private deckCards: PhysicalCard[] = [];
+    private deckNameText: TextBox;
+    private currentlyDisplayedCharacter: PlayerCharacter | null = null;
 
     constructor(scene: Scene, loadoutPanel: LoadoutPanel) {
         super(scene, 0, 0);
         this.loadoutPanel = loadoutPanel;
         scene.add.existing(this);
+
+        // Create deck display container to the left of the roster
+        this.deckDisplayContainer = new Phaser.GameObjects.Container(scene, -400, 0);
+        this.add(this.deckDisplayContainer);
+
+        // Create deck name text
+        this.deckNameText = new TextBox({
+            scene: this.scene,
+            x: 0,
+            y: -30,
+            width: 200,
+            height: 40,
+            text: '',
+            style: { fontSize: '18px', color: '#ffffff' }
+        });
+        this.deckDisplayContainer.add(this.deckNameText);
 
         this.title = new TextBox({
             scene: this.scene,
@@ -221,6 +242,66 @@ class RosterPanel extends Phaser.GameObjects.Container {
         this.add(this.title);
 
         this.refreshRoster();
+    }
+
+    private clearDeckDisplay(): void {
+        this.deckCards.forEach(card => card.obliterate());
+        this.deckCards = [];
+        this.deckNameText.setText('');
+        this.currentlyDisplayedCharacter = null;
+    }
+
+    private showDeckForCharacter(character: PlayerCharacter): void {
+        if (this.currentlyDisplayedCharacter === character) return;
+        
+        this.clearDeckDisplay();
+        this.currentlyDisplayedCharacter = character;
+        this.deckNameText.setText(`${character.name}'s Starting Deck`);
+
+        // Create and position cards diagonally with overlap
+        character.cardsInMasterDeck.forEach((cardData: PlayableCard, index: number) => {
+            const card = CardGuiUtils.getInstance().createCard({
+                scene: this.scene,
+                x: index * 40, // Diagonal offset X
+                y: index * 40, // Diagonal offset Y
+                data: cardData,
+                onCardCreatedEventCallback: (card) => {
+                    this.setupDeckCard(card, index);
+                }
+            });
+            this.deckCards.push(card);
+        });
+    }
+
+    private setupDeckCard(card: PhysicalCard, index: number): void {
+        this.deckDisplayContainer.add(card.container);
+        card.container.setDepth(index); // Base depth is card's position in stack
+        
+        // Add hover effects
+        card.container.setInteractive();
+        card.container.on('pointerover', () => {
+            card.container.setDepth(1000 + index); // Bring to front when hovered
+        });
+        card.container.on('pointerout', () => {
+            card.container.setDepth(index); // Restore original depth
+        });
+    }
+
+    private setupCharacterCard(card: PhysicalCard): void {
+        card.container.setInteractive();
+        card.container.on('pointerdown', () => {
+            this.emit('characterSelected', card.data);
+        });
+
+        // Update hover effects to show deck
+        const baseDepth = card.container.depth;
+        card.container.on('pointerover', () => {
+            card.container.setDepth(1000);
+            this.showDeckForCharacter(card.data as PlayerCharacter);
+        });
+        card.container.on('pointerout', () => {
+            card.container.setDepth(baseDepth);
+        });
     }
 
     private refreshRoster(): void {
@@ -254,22 +335,6 @@ class RosterPanel extends Phaser.GameObjects.Container {
             this.characterCards.delete(character);
             this.repositionCards();
         }
-    }
-
-    private setupCharacterCard(card: PhysicalCard): void {
-        card.container.setInteractive();
-        card.container.on('pointerdown', () => {
-            this.emit('characterSelected', card.data);
-        });
-
-        // Add hover effects for depth management
-        const baseDepth = card.container.depth;
-        card.container.on('pointerover', () => {
-            card.container.setDepth(1000); // Bring to front when hovered
-        });
-        card.container.on('pointerout', () => {
-            card.container.setDepth(baseDepth); // Restore original depth
-        });
     }
 
     private repositionCards(): void {
