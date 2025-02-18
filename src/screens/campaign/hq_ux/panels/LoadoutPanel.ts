@@ -241,6 +241,15 @@ class RosterPanel extends Phaser.GameObjects.Container {
         });
         this.add(this.title);
 
+        // Listen for deck display events at scene level
+        scene.events.on('loadout:showdeck', (character: PlayerCharacter) => {
+            this.showDeckForCharacter(character);
+        });
+
+        scene.events.on('loadout:hidedeck', () => {
+            this.clearDeckDisplay();
+        });
+
         this.refreshRoster();
     }
 
@@ -297,10 +306,11 @@ class RosterPanel extends Phaser.GameObjects.Container {
         const baseDepth = card.container.depth;
         card.container.on('pointerover', () => {
             card.container.setDepth(1000);
-            this.showDeckForCharacter(card.data as PlayerCharacter);
+            this.scene.events.emit('loadout:showdeck', card.data as PlayerCharacter);
         });
         card.container.on('pointerout', () => {
             card.container.setDepth(baseDepth);
+            this.scene.events.emit('loadout:hidedeck');
         });
     }
 
@@ -400,13 +410,14 @@ class CaravanPartyPanel extends Phaser.GameObjects.Container {
             this.removeCharacter(card.data as PlayerCharacter);
         });
 
-        // Add hover effects for depth management
         const baseDepth = card.container.depth;
         card.container.on('pointerover', () => {
             card.container.setDepth(1000); // Bring to front when hovered
+            this.scene.events.emit('loadout:showdeck', card.data as PlayerCharacter);
         });
         card.container.on('pointerout', () => {
             card.container.setDepth(baseDepth); // Restore original depth
+            this.scene.events.emit('loadout:hidedeck');
         });
     }
 
