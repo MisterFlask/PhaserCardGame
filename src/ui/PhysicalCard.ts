@@ -720,7 +720,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
             scene: this.scene,
             x: 0,  // Centered horizontally
             y: 0,  // Will be positioned in updateVisuals
-            width: cardWidth - 20,  // Slightly narrower than card for better readability
+            width: cardWidth + 100,  // Wider than the card for better readability
             height: 60,
             text: data.description,
             textBoxName: "descBox:" + data.id,
