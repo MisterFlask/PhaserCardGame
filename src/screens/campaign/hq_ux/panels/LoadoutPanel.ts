@@ -267,12 +267,12 @@ class RosterPanel extends Phaser.GameObjects.Container {
         this.currentlyDisplayedCharacter = character;
         this.deckNameText.setText(`${character.name}'s Starting Deck`);
 
-        // Create and position cards diagonally with overlap
+        // Create and position cards vertically with proper spacing
         character.cardsInMasterDeck.forEach((cardData: PlayableCard, index: number) => {
             const card = CardGuiUtils.getInstance().createCard({
                 scene: this.scene,
-                x: index * 40, // Diagonal offset X
-                y: -index * 40, // Negative Y offset to go upward
+                x: 0, // All cards aligned vertically
+                y: index * 160, // Vertical spacing between cards
                 data: cardData,
                 onCardCreatedEventCallback: (card) => {
                     this.setupDeckCard(card, index);
@@ -284,24 +284,23 @@ class RosterPanel extends Phaser.GameObjects.Container {
 
     private setupDeckCard(card: PhysicalCard, index: number): void {
         this.deckDisplayContainer.add(card.container);
-        card.container.setDepth(index); // Base depth is card's position in stack
+        card.container.setDepth(index);
         
-        // Add hover effects
         card.container.setInteractive();
         
         // Track the highest depth used in the deck
         const deckHighestDepth = this.deckCards.length + 1000;
         
         card.container.on('pointerover', () => {
-            // When hovering, bring this card above all others in the deck
             card.container.setDepth(deckHighestDepth);
+            // Scale up slightly on hover for better visibility
+            card.container.setScale(1.1);
             this.deckDisplayContainer.bringToTop(card.container) // hack
-            console.log("bringing to top this card: ", card.data.name)
         });
+        
         card.container.on('pointerout', () => {
-            // Return to original stack position when not hovering
             card.container.setDepth(index);
-            console.log("bringing down this card: ", card.data.name)
+            card.container.setScale(1.0);
         });
     }
 
@@ -458,9 +457,6 @@ class CaravanPartyPanel extends Phaser.GameObjects.Container {
 
 class ExpeditionSummaryPanel extends Phaser.GameObjects.Container {
     private loadoutPanel: LoadoutPanel;
-    private partyInfoText!: TextBox;
-    private tradeRouteText!: TextBox;
-    private warningsText!: TextBox;
 
     constructor(scene: Scene, loadoutPanel: LoadoutPanel) {
         super(scene, 0, 0);
@@ -470,60 +466,9 @@ class ExpeditionSummaryPanel extends Phaser.GameObjects.Container {
     }
 
     private createSummaryTexts(): void {
-        // Create text boxes for different summary sections
-        this.partyInfoText = new TextBox({
-            scene: this.scene,
-            x: 0,
-            y: 0,
-            width: 300,
-            height: 100,
-            text: 'Party: None',
-            style: { fontSize: '16px', color: '#ffffff' }
-        });
-
-        this.tradeRouteText = new TextBox({
-            scene: this.scene,
-            x: 0,
-            y: 120,
-            width: 300,
-            height: 100,
-            text: 'Trade Route: None',
-            style: { fontSize: '16px', color: '#ffffff' }
-        });
-
-        this.warningsText = new TextBox({
-            scene: this.scene,
-            x: 0,
-            y: 240,
-            width: 300,
-            height: 100,
-            text: '',
-            style: { fontSize: '16px', color: '#ff0000' }
-        });
-
-        this.add([this.partyInfoText, this.tradeRouteText, this.warningsText]);
     }
 
     update(): void {
-        const campaignState = CampaignUiState.getInstance();
-        
-        // Update party info
-        const partySize = campaignState.selectedParty.length;
-        this.partyInfoText.setText(`Party Members: ${partySize}/3`);
 
-        // Update trade route info
-        const tradeRoute = campaignState.selectedTradeRoute;
-        this.tradeRouteText.setText(`Trade Route: ${tradeRoute ? tradeRoute.name : 'None'}`);
-
-        // Update warnings
-        const warnings: string[] = [];
-        if (partySize < 3) {
-            warnings.push(`Need ${3 - partySize} more party members`);
-        }
-        if (!tradeRoute) {
-            warnings.push('No trade route selected');
-        }
-
-        this.warningsText.setText(warnings.length > 0 ? `Warnings:\n• ${warnings.join('\n• ')}` : '');
     }
 } 

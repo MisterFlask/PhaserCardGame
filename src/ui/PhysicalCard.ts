@@ -5,6 +5,7 @@ import { AbstractCard, IPhysicalCardInterface, PriceContext } from '../gamechara
 import { AbstractIntent } from '../gamecharacters/AbstractIntent';
 import { BurnEffect } from '../shaders/BurnEffect';
 import { CardDescriptionGenerator } from '../text/CardDescriptionGenerator';
+import { CardTooltipGenerator } from '../text/CardTooltipGenerator';
 import { ResourceDisplayGenerator } from '../text/ResourceDisplayGenerator';
 import type { CardConfig } from '../utils/CardGuiUtils';
 import { CheapGlowEffect } from './CheapGlowEffect';
@@ -325,6 +326,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
     
         // ensure intents stay at top-center:
         this.intentsContainer.setPosition(0, -newHeight / 2 - 40);
+        
         // name debug info
         if (this.depthDebug) {
             this.nameBox.setText(`${this.data.name} depth=[${this.container.depth}]`);
@@ -332,8 +334,32 @@ export class PhysicalCard implements IPhysicalCardInterface {
             this.nameBox.setText(this.data.name);
         }
 
+        // Update portrait position and properties
+        const effectivePortraitName = this.data.getEffectivePortraitName(this.scene);
+        const effectivePortraitTint = this.data.getEffectivePortraitTint(this.scene);
+        const texture = this.scene.textures.get(effectivePortraitName);
+        texture.setFilter(Phaser.Textures.LINEAR);
+        this.updatePortraitDisplaySize(texture);
+        this.cardImage.setPosition(
+            this.data.portraitOffsetXOverride ?? 0,
+            this.data.portraitOffsetYOverride ?? -this.cardBackground.displayHeight * 0.2
+        );
+        this.cardImage.setTint(effectivePortraitTint);
+
+        // Position name box just below portrait
+        const portraitBottom = this.cardImage.y + this.cardImage.displayHeight / 2;
+        const nameBoxY = portraitBottom + this.nameBox.height / 2 + 5; // 5px gap
+        this.nameBox.setPosition(0, nameBoxY);
+
+        // Position description box below name
         const description = CardDescriptionGenerator.generateCardDescription(this.data);
         this.descBox.setText(description);
+        const descBoxY = nameBoxY + this.nameBox.height / 2 + this.descBox.height / 2 + 5; // 5px gap
+        this.descBox.setPosition(0, descBoxY);
+        
+        // Update tooltip text
+        const tooltipText = CardTooltipGenerator.getInstance().generateTooltip(this.data);
+        this.tooltipBox.setText(tooltipText);
 
         if (this.hpBox && this.data.isBaseCharacter()) {
             const baseCharacter = this.data as BaseCharacterType;
@@ -350,34 +376,11 @@ export class PhysicalCard implements IPhysicalCardInterface {
             }
         }
 
-        const effectivePortraitName = this.data.getEffectivePortraitName(this.scene);
-        const effectivePortraitTint = this.data.getEffectivePortraitTint(this.scene);
-        const texture = this.scene.textures.get(effectivePortraitName);
-        texture.setFilter(Phaser.Textures.LINEAR);
-        this.updatePortraitDisplaySize(texture);
-        this.cardImage.setPosition(
-            this.data.portraitOffsetXOverride ?? 0,
-            this.data.portraitOffsetYOverride ?? -this.cardBackground.displayHeight * 0.2
-        );
-        this.cardImage.setTint(effectivePortraitTint);
-
-        // reposition text boxes relative to portrait
-        const nameBoxY = this.cardImage.y + this.cardImage.displayHeight / 2 + this.nameBox.height / 2 + 10;
-        this.nameBox.setPosition(0, nameBoxY);
-        const descBoxY = nameBoxY + this.nameBox.height / 2 + this.descBox.height / 2 + 10;
-        this.descBox.setPosition(0, descBoxY);
-
-        // block
-        this.blockText.setText(`${this.data.block}`);
-        const isBaseChar = this.data.isBaseCharacter();
-        this.blockText.setVisible(this.data.block > 0 && isBaseChar);
-        this.blockIcon?.setVisible(this.data.block > 0 && isBaseChar);
-
         this.updateIntentsUI();
         this.syncBuffs();
         this.syncIncomingIntents();
 
-        if (isBaseChar) {
+        if (this.data.isBaseCharacter()) {
             const baseCharacter = this.data as BaseCharacterType;
             if (baseCharacter.hitpoints <= 0) {
                 this.cardImage.setTint(0x808080);
@@ -604,7 +607,22 @@ export class PhysicalCard implements IPhysicalCardInterface {
     }
 
     private getHitArea(): Phaser.Geom.Rectangle {
-        return new Phaser.Geom.Rectangle(0, 0, this.cardBackground.displayWidth + 4, this.cardBackground.displayHeight + 4);
+        // Base interactive area based on cardBackground
+        const baseWidth = this.cardBackground.displayWidth + 4;
+        const baseHeight = this.cardBackground.displayHeight + 4;
+        
+        // If descBox exists and is positioned below the cardBackground, extend the height
+        let extraHeight = 0;
+        if (this.descBox && this.descBox.visible) {
+            // Assuming descBox.y is relative to the container's origin
+            const descBoxBottom = this.descBox.y + this.descBox.height;
+            // Extend hit area if descBox extends below the base area
+            if (descBoxBottom > baseHeight) {
+                extraHeight = descBoxBottom - baseHeight + 10; // add a 10px margin
+            }
+        }
+
+        return new Phaser.Geom.Rectangle(0, 0, baseWidth, baseHeight + extraHeight);
     }
 
     private setupInteractivity(): this {
@@ -628,7 +646,12 @@ export class PhysicalCard implements IPhysicalCardInterface {
         if (!this.obliterated) {
             this.setGlow(true);
             if (!this.disableInternalTooltip) {
+                this.positionTooltipBox();
                 this.tooltipBox.setVisible(true);
+                if (this.tooltipBox.parentContainer) {
+                    this.tooltipBox.parentContainer.bringToTop(this.tooltipBox);
+                }
+                this.descBox.setVisible(true);
             }
             if (this.hoverSound) {
                 this.hoverSound.play();
@@ -641,6 +664,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
             this.setGlow(false);
             if (!this.disableInternalTooltip) {
                 this.tooltipBox.setVisible(false);
+                this.descBox.setVisible(false);
             }
         }
     }
@@ -675,9 +699,9 @@ export class PhysicalCard implements IPhysicalCardInterface {
         return new TextBox({
             scene: this.scene,
             x: 0,
-            y: cardHeight / 4,
+            y: 0,  // Will be positioned in updateVisuals
             width: cardWidth + 40,
-            height: 60,
+            height: 30,  // Reduced height since we're tightening the layout
             text: data.name,
             textBoxName: "nameBox:" + data.id,
             style: { fontSize: '22px', fontFamily: 'impact', color: '#000', wordWrap: { width: cardWidth - 10 } },
@@ -689,16 +713,16 @@ export class PhysicalCard implements IPhysicalCardInterface {
     private createDescBox(data: AbstractCard, cardWidth: number, cardHeight: number): TextBox {
         const box = new TextBox({
             scene: this.scene,
-            x: -20,
-            y: cardHeight / 2,
-            width: cardWidth + 40,
+            x: 0,  // Centered horizontally
+            y: 0,  // Will be positioned in updateVisuals
+            width: cardWidth - 20,  // Slightly narrower than card for better readability
             height: 60,
             text: data.description,
             textBoxName: "descBox:" + data.id,
             style: {
                 fontSize: '17px',
                 color: '#000',
-                wordWrap: { width: cardWidth - 20 },
+                wordWrap: { width: cardWidth - 30 },
                 align: 'center'
             },
             verticalExpand: 'down',
@@ -709,20 +733,22 @@ export class PhysicalCard implements IPhysicalCardInterface {
     }
 
     private createTooltipBox(data: AbstractCard, cardWidth: number, cardHeight: number): TextBox {
+        const tooltipText = CardTooltipGenerator.getInstance().generateTooltip(data);
         const box = new TextBox({
             scene: this.scene,
             x: -20,
             y: cardHeight / 2,
             width: cardWidth + 40,
             height: 60,
-            text: data.description,
+            text: tooltipText,
             textBoxName: "tooltipBox:" + data.id,
             style: {
                 fontSize: '17px',
-                color: '#000',
+                color: '#ffffff',
                 wordWrap: { width: cardWidth - 20 },
                 align: 'center'
             },
+            fillColor: 0x000000,
             verticalExpand: 'down',
             horizontalExpand: 'center'
         });

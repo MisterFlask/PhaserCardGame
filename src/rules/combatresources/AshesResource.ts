@@ -1,4 +1,5 @@
 import { TextGlyphs } from '../../text/TextGlyphs';
+import { PlayableCardType } from '../../Types';
 import { ActionManager } from '../../utils/ActionManager';
 import { GameState } from '../GameState';
 import { AbstractCombatResource } from './AbstractCombatResource';
@@ -7,7 +8,7 @@ export class Ashes extends AbstractCombatResource {
     constructor() {
         super(
             "Ashes",
-            `Passive: If you win combat with at least 4 Ashes, gain an additional card reward option.  Pay 2 Ashes: Increase damage and block of a random card in your hand by 50%.`,
+            `Pay 2 Ashes: Increase damage and block of a random card in your hand by 50%.`,
             'ashes_icon',
             TextGlyphs.getInstance().ashesIcon
         );
@@ -17,26 +18,33 @@ export class Ashes extends AbstractCombatResource {
     public onClick(): boolean {
         const gameState = GameState.getInstance();
         if (this.value >= 2) {
-            ActionManager.getInstance().DoAThing("Ashes Resource Click", () => {
-                // Filter hand for cards with damage or block
-                const eligibleCards = gameState.combatState.currentHand.filter(card => 
-                    card.baseDamage > 0 || card.baseBlock > 0
-                );
+            // Filter hand for cards with damage or block
+            const eligibleCards = gameState.combatState.currentHand.filter(card => 
+                card.baseDamage > 0 || card.baseBlock > 0
+            );
 
-                if (eligibleCards.length > 0) {
-                    // Select random eligible card
-                    const targetCard = eligibleCards[Math.floor(Math.random() * eligibleCards.length)];
+            if (eligibleCards.length === 0) {
+                // Display a message if no eligible card is available.
+                ActionManager.getInstance().displaySubtitle("No eligible cards for Ashes boost", 1000);
+                return false;
+            }
 
-                    // Increase damage and block by 50% if they exist
+            // Use requireCardSelection instead of randomly selecting a card.
+            ActionManager.getInstance().requireCardSelection({
+                name: "Ashes Ability",
+                instructions: "Select a card to empower (damage and block increased by 50%)",
+                min: 1,
+                max: 1,
+                cancellable: false,
+                action: (selectedCards: PlayableCardType[]) => {
+                    const targetCard = selectedCards[0];
                     if (targetCard.baseDamage > 0) {
                         targetCard.baseDamage = Math.floor(targetCard.baseDamage * 1.5);
                     }
                     if (targetCard.baseBlock > 0) {
                         targetCard.baseBlock = Math.floor(targetCard.baseBlock * 1.5);
                     }
-
-                    targetCard.name += "⚡"
-
+                    targetCard.name += "⚡";
                     this.value -= 2;
                 }
             });
