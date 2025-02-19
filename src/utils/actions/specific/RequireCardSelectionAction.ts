@@ -4,7 +4,7 @@ import { PlayableCardType } from "../../../Types";
 import CardSelectionFromHandManager from "../../../ui/CardSelectionFromHandManager";
 import { GameAction } from "../GameAction";
 
-export class RequireCardSelectionAction extends GameAction {
+export class RequireCardSelectionFromHandAction extends GameAction {
     constructor(
         private params: {
             name: string;
@@ -16,6 +16,7 @@ export class RequireCardSelectionAction extends GameAction {
         }
     ) {
         super();
+        this.neverTimeout = true;
     }
 
     async playAction(): Promise<GameAction[]> {

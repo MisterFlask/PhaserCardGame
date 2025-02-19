@@ -61,7 +61,7 @@ export class BasicProcs {
     }
 
     public Barrage(card: PlayableCard): void {
-        ActionManagerFetcher.getActionManager().requireCardSelection(
+        ActionManagerFetcher.getActionManager().requireCardSelectionFromHand(
             { name:"Barrage", 
                 instructions: "Select cards to discard.", 
                 min: 1, 

@@ -38,7 +38,8 @@ import {
     ModifyVentureAction
 } from "./actions/specific/ModifyCombatResourceAction";
 import { RelieveStressAction } from "./actions/specific/RelieveStressAction";
-import { RequireCardSelectionAction } from "./actions/specific/RequireCardSelectionAction";
+import { RequireCardSelectionFromHandAction } from "./actions/specific/RequireCardSelectionAction";
+import { SelectFromCardPoolAction } from "./actions/specific/SelectFromCardPoolAction";
 import { StartCombatAction } from "./actions/specific/StartCombatAction";
 import { WaitAction } from "./actions/WaitAction";
 
@@ -997,7 +998,7 @@ export class ActionManager {
 
 public chooseCardToDiscard(): void {
     this.actionQueue.addAction(new GenericAction(async () => {
-        this.requireCardSelection({
+        this.requireCardSelectionFromHand({
             name: "Discard",
             instructions: "Choose a card to discard", 
             min: 1,
@@ -1013,7 +1014,7 @@ public chooseCardToDiscard(): void {
         }));
     }
 
-    public requireCardSelection(params: {
+    public requireCardSelectionFromHand(params: {
         name: string;
         instructions: string;
         min: number;
@@ -1021,7 +1022,7 @@ public chooseCardToDiscard(): void {
         cancellable: boolean;
         action: (selectedCards: PlayableCardType[]) => void;
     }): void {
-        this.actionQueue.addAction(new RequireCardSelectionAction(params));
+        this.actionQueue.addAction(new RequireCardSelectionFromHandAction(params));
     }
 
     private displayDamageNumber(params: {
@@ -1064,6 +1065,23 @@ public chooseCardToDiscard(): void {
             await new WaitAction(1).playAction(); // Not really waiting.
             return [];
         }));
+    }
+
+    public selectFromCardPool(params: {
+        name: string;
+        instructions: string;
+        min: number;
+        max: number;
+        cancellable: boolean;
+        cardPool: PlayableCard[];
+        action: (selectedCards: PlayableCard[]) => void;
+        onCancelAction?: () => void;
+    }): void {
+        if (!this.scene) {
+            console.error("No scene available for selectFromCardPool");
+            return;
+        }
+        this.actionQueue.addAction(new SelectFromCardPoolAction(params));
     }
 }
 
@@ -1173,6 +1191,11 @@ export class ActionQueue {
     }
 
     private forceTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+        // If the current action has neverTimeout flag set to true, return the original promise
+        if (this.currentActionNode?.action.neverTimeout) {
+            return promise;
+        }
+
         return new Promise<T>((resolve, reject) => {
             let didFinish = false;
 

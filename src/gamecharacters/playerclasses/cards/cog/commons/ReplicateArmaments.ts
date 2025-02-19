@@ -30,7 +30,7 @@ export class ReplicateArmaments extends PlayableCard {
         );
 
         // Choose a card to copy
-        this.actionManager.requireCardSelection({
+        this.actionManager.requireCardSelectionFromHand({
             name: "copy_card",
             instructions: "Choose a card to copy into your draw pile",
             min: 1,

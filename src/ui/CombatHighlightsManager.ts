@@ -29,7 +29,8 @@ export class CombatHighlightsManager {
     }
 
     public update(allCharacters: BaseCharacterType[]): void {
-        if (UIContextManager.getInstance().isContext(UIContext.CARD_SELECTION_FROM_HAND)) {
+        if (UIContextManager.getInstance().isContext(UIContext.CARD_SELECTION_FROM_HAND)
+        || UIContextManager.getInstance().isContext(UIContext.CARD_SELECTION_FROM_CUSTOM_POOL)) {
             return;
         };
 

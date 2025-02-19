@@ -17,22 +17,29 @@ export class SmogResource extends AbstractCombatResource {
 
     public onClick(): boolean {
         const gameState = GameState.getInstance();
-        if (this.value >= 2) {
+        if (this.value >= 3) {
             if (gameState.combatState.currentDiscardPile.length > 0) {
-                ActionManager.getInstance().requireCardSelection({
+                // Deduct the cost upfront
+                this.value -= 3;
+                
+                ActionManager.getInstance().selectFromCardPool({
                     name: "Return to Hand",
                     instructions: "Choose a card to return to your hand",
                     min: 1,
                     max: 1,
                     cancellable: true,
+                    cardPool: gameState.combatState.currentDiscardPile,
                     action: (selectedCards) => {
                         if (selectedCards.length > 0) {
                             ActionManager.getInstance().DoAThing("Smog Resource Click", () => {
                                 const card = selectedCards[0];
                                 ActionManager.getInstance().moveCardToPile(card, PileName.Hand);
-                                this.value -= 2;
                             });
                         }
+                    },
+                    onCancelAction: () => {
+                        // Refund the cost if cancelled
+                        this.value += 3;
                     }
                 });
             }

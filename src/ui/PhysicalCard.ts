@@ -389,6 +389,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
             }
         }
 
+        this.blockText?.setText(`${this.data.block}`);
+
         this.updatePriceBox();
         this.glowEffect?.update();
     }
@@ -661,7 +663,10 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
     private onPointerOut_PhysicalCard(): void {
         if (!this.obliterated) {
-            this.setGlow(false);
+            // Only remove glow if the card is NOT selected
+            if (!this.isSelected) {
+                this.setGlow(false);
+            }
             if (!this.disableInternalTooltip) {
                 this.tooltipBox.setVisible(false);
                 this.descBox.setVisible(false);

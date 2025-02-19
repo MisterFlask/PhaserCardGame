@@ -30,7 +30,7 @@ export class Ashes extends AbstractCombatResource {
             }
 
             // Use requireCardSelection instead of randomly selecting a card.
-            ActionManager.getInstance().requireCardSelection({
+            ActionManager.getInstance().requireCardSelectionFromHand({
                 name: "Ashes Ability",
                 instructions: "Select a card to empower (damage and block increased by 50%)",
                 min: 1,
