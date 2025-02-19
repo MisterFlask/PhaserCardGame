@@ -100,6 +100,12 @@ export default class GameImageLoader {
                 'stone-wall.png', 'tv.png', 'vacuum-cleaner.png', 'white-book.png'
             ]
         },
+        cards_status:{
+            prefix: 'Sprites/Cards/StatusCards/',
+            files: [
+                'stinging-insects.svg',
+            ]
+        },
         cards_cursed_cargo:{
             prefix: 'Sprites/Cards/CursedCargo/',
             files: [

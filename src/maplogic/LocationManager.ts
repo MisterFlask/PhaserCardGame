@@ -20,7 +20,7 @@ export class LocationManager {
             { type: EliteRoomCard, weight: 1 },
             { type: ShopCard, weight: 1 },
             { type: TreasureRoomCard, weight: 1 },
-            { type: EventRoomCard, weight: 3 }
+            { type: EventRoomCard, weight: 1 }
         ];
 
         // Create the deck based on weights

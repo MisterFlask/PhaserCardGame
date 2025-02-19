@@ -3,6 +3,7 @@ import { AdjacencyLineRenderer } from '../../maplogic/AdjacencyLineRenderer';
 import { AdjacencyManager } from '../../maplogic/AdjacencyManager';
 import { LocationCard } from '../../maplogic/LocationCard';
 import { LocationManager } from '../../maplogic/LocationManager';
+import { MapInvariantRunner } from '../../maplogic/MapInvariant';
 import { SpatialManager } from '../../maplogic/SpatialManager';
 import { GameState } from '../../rules/GameState';
 import { TextBoxButton } from '../../ui/Button';
@@ -174,6 +175,11 @@ export class MapOverlay {
         GameState.getInstance().setLocations(locationData);
 
         this.adjacencyManager.enrichLocationsWithAdjacencies();
+        
+        // Apply map invariants
+        const invariantRunner = new MapInvariantRunner();
+        invariantRunner.applyAll(locationData);
+        
         this.spatialManager.enrichLocationsWithPositioning();
         const reachableLocations = this.locationManager.cullUnreachableRooms(locationData);
         GameState.getInstance().setLocations(reachableLocations);

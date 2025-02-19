@@ -1,6 +1,6 @@
 import { AbstractBuff } from "../AbstractBuff";
 
-export class Erratic extends AbstractBuff {
+export class SelfAssigning extends AbstractBuff {
     constructor(stacks: number = 1) {
         super();
         this.stacks = stacks;
@@ -8,7 +8,7 @@ export class Erratic extends AbstractBuff {
     }
 
     override getDisplayName(): string {
-        return "Erratic";
+        return "Self-Assigning";
     }
 
     override getDescription(): string {

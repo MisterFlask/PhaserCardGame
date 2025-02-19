@@ -9,7 +9,7 @@ import { Lethality } from "../../../../buffs/standard/Lethality";
 export class Charge extends PlayableCard {
     constructor() {
         super({
-            name: "Charge",
+            name: "Generate Charge",
             cardType: CardType.POWER,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.COMMON,

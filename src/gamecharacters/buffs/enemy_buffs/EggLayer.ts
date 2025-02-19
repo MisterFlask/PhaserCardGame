@@ -4,7 +4,7 @@ import { EntityRarity } from "../../EntityRarity";
 import { PlayableCard } from "../../PlayableCard";
 import { CardType } from "../../Primitives";
 import { AbstractBuff } from "../AbstractBuff";
-import { Erratic } from "../playable_card/Erratic";
+import { SelfAssigning } from "../playable_card/Erratic";
 import { ExhaustBuff } from "../playable_card/ExhaustBuff";
 import { Hazardous } from "../playable_card/Hazardous";
 
@@ -75,7 +75,7 @@ export class Moth extends PlayableCard {
         this.baseEnergyCost = 1;
         this.buffs.push(new ExhaustBuff());
         this.buffs.push(new Hazardous(4));
-        this.buffs.push(new Erratic());
+        this.buffs.push(new SelfAssigning());
     }
 
     override get description(): string {
