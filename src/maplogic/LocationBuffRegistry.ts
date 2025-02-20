@@ -33,8 +33,8 @@ export class LocationBuffRegistry {
             new AnotherCardReward(),
             new UpgradedCardReward(),
             new GuaranteedRareCardReward(),
-            new AdditionalHellCurrency(),
-            new AdditionalPromissoryNotes(),
+            new AdditionalHellCurrency(25),
+            new AdditionalPromissoryNotes(25),
             new GuaranteedRelic(),
         ];
     }

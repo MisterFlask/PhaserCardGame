@@ -465,6 +465,14 @@ export class MapOverlay {
     // Setup Location Card Events
     private setupLocationCardEvents = (card: PhysicalCard) => {
         card.container.setInteractive();
+        
+        // Add pointer over handler
+        card.container.on('pointerover', () => {
+            // Bring the card's container to the top of the overlay
+            this.overlay.bringToTop(card.container);
+            
+        });
+
         card.container.on('pointerdown', () => {
             if (this.isLocationTransitionInProgress) return; // Early return if transition is in progress
             

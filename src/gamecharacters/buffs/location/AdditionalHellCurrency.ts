@@ -3,9 +3,10 @@ import { CurrencyReward } from "../../../rewards/CurrencyReward";
 import { AbstractBuff } from "../AbstractBuff";
 
 export class AdditionalHellCurrency extends AbstractBuff {
-    constructor() {
+    constructor(stacks: number) {
         super();
         this.isDebuff = false;
+        this.stacks = stacks;
     }
 
     override getDisplayName(): string {
@@ -17,7 +18,7 @@ export class AdditionalHellCurrency extends AbstractBuff {
     }
 
     override alterRewards(currentRewards: AbstractReward[]): AbstractReward[] {
-        currentRewards.push(new CurrencyReward(25));
+        currentRewards.push(new CurrencyReward(this.stacks));
         return currentRewards;
     }
 } 

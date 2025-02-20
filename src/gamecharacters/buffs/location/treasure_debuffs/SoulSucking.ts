@@ -1,0 +1,1 @@
+// drain all characters of [stacks] Max HP

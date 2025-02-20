@@ -1,0 +1,1 @@
+// get a choice of [stacks] cards of the highest rarity the player has.  The player must choose one to remove.
