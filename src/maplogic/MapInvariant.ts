@@ -51,65 +51,23 @@ export class FloorFiveTreasureInvariant extends MapInvariant {
     }
 }
 
-export class RestSiteAdjacentInvariant extends MapInvariant {
-    name = "Rest Site Adjacent Invariant";
-    description = "Rest sites may never be next to each other";
-
-    apply(locations: LocationCard[]): MapInvariantResult {
-        let actionsPerformed = 0;
-        const restSites = locations.filter(loc => loc instanceof RestSiteCard);
-        
-        for (const restSite of restSites) {
-            const adjacentRestSites = restSite.adjacentLocations.filter(adj => adj instanceof RestSiteCard);
-            
-            if (adjacentRestSites.length > 0) {
-                // Convert this rest site to a normal room
-                const normalRoom = new NormalRoomCard(restSite.floor, restSite.roomNumber);
-                
-                // Copy over adjacencies
-                restSite.adjacentLocations.forEach(adj => {
-                    normalRoom.setAdjacent(adj);
-                    // Update the adjacent node to point to the new normal room
-                    const idx = adj.adjacentLocations.indexOf(restSite);
-                    if (idx !== -1) {
-                        adj.adjacentLocations[idx] = normalRoom;
-                    }
-                });
-
-                // Replace the node in the locations array
-                const idx = locations.indexOf(restSite);
-                if (idx !== -1) {
-                    locations[idx] = normalRoom;
-                    actionsPerformed++;
-                }
-            }
-        }
-
-        return {
-            actionsPerformed,
-            description: `Converted ${actionsPerformed} rest sites that were adjacent to other rest sites into normal rooms`
-        };
-    }
-}
-
 export class SpecialRoomAdjacentInvariant extends MapInvariant {
     name = "Special Room Adjacent Invariant";
-    description = "Treasure nodes, elite enemy nodes, and shops must never be next to each other";
+    description = "Special rooms (rest sites, treasure nodes, elite enemy nodes, and shops) must never be next to each other";
+
+    private isSpecialRoom(loc: LocationCard): boolean {
+        return loc instanceof RestSiteCard ||
+               loc instanceof TreasureRoomCard || 
+               loc instanceof EliteRoomCard || 
+               loc instanceof ShopCard;
+    }
 
     apply(locations: LocationCard[]): MapInvariantResult {
         let actionsPerformed = 0;
-        const specialRooms = locations.filter(loc => 
-            loc instanceof TreasureRoomCard || 
-            loc instanceof EliteRoomCard || 
-            loc instanceof ShopCard
-        );
+        const specialRooms = locations.filter(loc => this.isSpecialRoom(loc));
         
         for (const specialRoom of specialRooms) {
-            const adjacentSpecialRooms = specialRoom.adjacentLocations.filter(adj => 
-                adj instanceof TreasureRoomCard || 
-                adj instanceof EliteRoomCard || 
-                adj instanceof ShopCard
-            );
+            const adjacentSpecialRooms = specialRoom.adjacentLocations.filter(adj => this.isSpecialRoom(adj));
             
             if (adjacentSpecialRooms.length > 0) {
                 // Convert this special room to a normal room
@@ -143,53 +101,65 @@ export class SpecialRoomAdjacentInvariant extends MapInvariant {
 
 export class FirstNodeEnemiesInvariant extends MapInvariant {
     name = "First Node Enemies Invariant";
-    description = "The first node on each floor must be an enemies node";
+    description = "All nodes on floor 2 must be enemy nodes and connect to floor 1 entrance";
 
     apply(locations: LocationCard[]): MapInvariantResult {
         let actionsPerformed = 0;
         
-        // Group locations by floor
-        const floorMap = new Map<number, LocationCard[]>();
-        locations.forEach(loc => {
-            if (!floorMap.has(loc.floor)) {
-                floorMap.set(loc.floor, []);
-            }
-            floorMap.get(loc.floor)!.push(loc);
-        });
+        // Get all floor 2 locations and entrance node
+        const floor2Locations = locations.filter(loc => loc.floor === 2);
+        const entranceNode = locations.find(loc => loc.floor === 1);
+        
+        if (!entranceNode) {
+            console.error("No entrance node found on floor 1");
+            return {
+                actionsPerformed,
+                description: "Error: No entrance node found on floor 1"
+            };
+        }
 
-        // For each floor
-        for (const [floor, floorLocations] of floorMap.entries()) {
-            // Find the first node (lowest roomNumber)
-            const firstNode = floorLocations.reduce((min, curr) => 
-                curr.roomNumber < min.roomNumber ? curr : min
-            );
-
-            if (!(firstNode instanceof NormalRoomCard)) {
+        for (const node of floor2Locations) {
+            let nodeChanged = false;
+            
+            // First ensure it's a normal room
+            if (!(node instanceof NormalRoomCard)) {
                 // Convert to normal room
-                const normalRoom = new NormalRoomCard(firstNode.floor, firstNode.roomNumber);
+                const normalRoom = new NormalRoomCard(node.floor, node.roomNumber);
                 
                 // Copy over adjacencies
-                firstNode.adjacentLocations.forEach(adj => {
+                node.adjacentLocations.forEach(adj => {
                     normalRoom.setAdjacent(adj);
                     // Update the adjacent node to point to the new normal room
-                    const idx = adj.adjacentLocations.indexOf(firstNode);
+                    const idx = adj.adjacentLocations.indexOf(node);
                     if (idx !== -1) {
                         adj.adjacentLocations[idx] = normalRoom;
                     }
                 });
 
                 // Replace the node in the locations array
-                const idx = locations.indexOf(firstNode);
+                const idx = locations.indexOf(node);
                 if (idx !== -1) {
                     locations[idx] = normalRoom;
+                    nodeChanged = true;
                     actionsPerformed++;
                 }
+            }
+
+            // Then ensure connection to entrance
+            const currentNode = nodeChanged ? locations.find(loc => 
+                loc.floor === node.floor && loc.roomNumber === node.roomNumber
+            )! : node;
+
+            if (!currentNode.adjacentLocations.includes(entranceNode)) {
+                currentNode.setAdjacent(entranceNode);
+                entranceNode.setAdjacent(currentNode);
+                actionsPerformed++;
             }
         }
 
         return {
             actionsPerformed,
-            description: `Converted ${actionsPerformed} non-enemy first nodes to enemy nodes`
+            description: `Converted ${actionsPerformed} nodes on floor 2 to enemy nodes and ensured entrance connections`
         };
     }
 }
@@ -201,7 +171,6 @@ export class MapInvariantRunner {
     constructor() {
         this.invariants = [
             new FloorFiveTreasureInvariant(),
-            new RestSiteAdjacentInvariant(),
             new SpecialRoomAdjacentInvariant(),
             new FirstNodeEnemiesInvariant()
         ];
