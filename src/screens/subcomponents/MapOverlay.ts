@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { AdjacencyLineRenderer } from '../../maplogic/AdjacencyLineRenderer';
 import { AdjacencyManager } from '../../maplogic/AdjacencyManager';
+import { LocationBuffsManager } from '../../maplogic/LocationBuffsManager';
 import { LocationCard } from '../../maplogic/LocationCard';
 import { LocationManager } from '../../maplogic/LocationManager';
 import { MapInvariantRunner } from '../../maplogic/MapInvariant';
@@ -48,6 +49,7 @@ export class MapOverlay {
     private mapDebugOverlay?: MapDebugOverlay;
 
     private tradeRouteCard: PhysicalCard | null = null;
+    private locationBuffsManager: LocationBuffsManager;
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -63,6 +65,7 @@ export class MapOverlay {
         // Initialize components
         ActionManagerFetcher.getActionManager();
         this.adjacencyLineRenderer = new AdjacencyLineRenderer(this.scene, this.overlay);
+        this.locationBuffsManager = LocationBuffsManager.getInstance();
         this.createOverlay();
 
         // Listen for map regeneration event
@@ -181,6 +184,7 @@ export class MapOverlay {
         invariantRunner.applyAll(locationData);
         
         this.spatialManager.enrichLocationsWithPositioning();
+        this.locationBuffsManager.enrichLocationsWithBuffs(locationData);
         const reachableLocations = this.locationManager.cullUnreachableRooms(locationData);
         GameState.getInstance().setLocations(reachableLocations);
         GameState.getInstance().mapInitialized = true;

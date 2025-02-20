@@ -6,6 +6,7 @@ import { Encounter, EncounterManager } from '../encounters/EncountersList';
 import { Charon } from '../encounters/monsters/special/Charon';
 import { AbstractEvent } from '../events/AbstractEvent';
 import { AbstractCard } from '../gamecharacters/AbstractCard';
+import { AbstractBuff } from "../gamecharacters/buffs/AbstractBuff";
 import { CardSize, CardType } from '../gamecharacters/Primitives';
 import { RelicsLibrary } from '../relics/RelicsLibrary';
 import { AbstractReward } from '../rewards/AbstractReward';
@@ -18,9 +19,9 @@ import { CardModifier } from '../rules/modifiers/AbstractCardModifier';
 import { RestSiteUpgradeOptionManager } from '../rules/RestSiteUpgradeOption';
 import { ActionManager } from '../utils/ActionManager';
 import { Faction } from './Faction';
+import { LocationType, LocationTypes } from "./LocationType";
 
-
-export class LocationCard extends AbstractCard {
+export abstract class LocationCard extends AbstractCard {
     override typeTag = "LocationCard";
     encounter!: Encounter;
     controllingFaction: Faction = Faction.NEUTRAL;
@@ -29,12 +30,16 @@ export class LocationCard extends AbstractCard {
     public yPos: number = 0;
     public floor: number = 0;
     public roomNumber: number = 0;
-    public segment: number = 0;
+    public get segment(): number {
+        return this.floor < 5 ? 1 : 2;
+    }
     public backgroundName?: string;
     public gameEvent?: AbstractEvent;
     public currentExpectedRewards: AbstractReward[] = [];
+    public readonly locationType: LocationType;
+    public buffs: AbstractBuff[] = [];
 
-    constructor({ name, description, portraitName, tooltip, size, floor, index }: { name: string; description: string; portraitName?: string; tooltip?: string; size: CardSize; floor: number; index: number }) { 
+    constructor({ name, description, portraitName, tooltip, size, floor, index }: { name: string; description: string; portraitName?: string; tooltip?: string; size: CardSize; floor: number; index: number }, type: LocationType) { 
         const fullName = `${name} ${floor}-${index + 1}`;
 
         super({
@@ -48,6 +53,7 @@ export class LocationCard extends AbstractCard {
 
         this.floor = floor;
         this.roomNumber = index;       
+        this.locationType = type;
     }
 
     initEncounter() {
@@ -92,7 +98,7 @@ export class EntranceCard extends LocationCard {
             size: CardSize.SMALL,
             floor,
             index
-        });
+        }, LocationTypes.COMBAT);
         this.portraitName = 'entrance-icon';
         this.portraitTint = 0x00ffff;
     }
@@ -106,7 +112,7 @@ export class BossRoomCard extends LocationCard {
             size: CardSize.LARGE,
             floor,
             index
-        });
+        }, LocationTypes.BOSS);
         this.portraitName = 'boss-icon';
         this.portraitTint = 0x800080;
     }
@@ -139,7 +145,7 @@ export class RestSiteCard extends LocationCard {
             size: CardSize.SMALL,
             floor,
             index
-        });
+        }, LocationTypes.REST);
         this.portraitName = 'rest-icon';
         this.portraitTint = 0xffa500;
         this.restSiteUpgradeOptions = RestSiteUpgradeOptionManager.getInstance().getRandomSetOfUpgradeOptions(3);
@@ -163,7 +169,7 @@ export class CharonRoomCard extends LocationCard {
             size: CardSize.SMALL,
             floor,
             index
-        });
+        }, LocationTypes.COMBAT);
         this.portraitName = 'CharonRoom';
         this.portraitTint = 0x800080;
     }
@@ -181,7 +187,7 @@ export class NormalRoomCard extends LocationCard {
             size: CardSize.SMALL,
             floor,
             index
-        });
+        }, LocationTypes.COMBAT);
         this.portraitName = 'room-fight-icon';
         this.portraitTint = 0xff0000;
     }
@@ -203,7 +209,7 @@ export class EliteRoomCard extends LocationCard {
             size: CardSize.SMALL,
             floor,
             index
-        });
+        }, LocationTypes.ELITE_COMBAT);
         this.portraitName = 'elite-icon';
         this.portraitTint = 0x8B0000;
     }
@@ -235,7 +241,7 @@ export class ShopCard extends LocationCard {
             size: CardSize.SMALL,
             floor,
             index
-        });
+        }, LocationTypes.MERCHANT);
         this.portraitName = 'shop-icon';
         this.portraitTint = 0x00ff00;
         this.backgroundName = shopBackgrounds[Math.floor(Math.random() * shopBackgrounds.length)];
@@ -258,7 +264,7 @@ export class TreasureRoomCard extends LocationCard {
             size: CardSize.SMALL,
             floor,
             index
-        });
+        }, LocationTypes.COMBAT);
         this.portraitName = 'treasure-icon';
         this.portraitTint = 0xFFD700;
     }
@@ -278,7 +284,7 @@ export class EventRoomCard extends LocationCard {
             size: CardSize.SMALL,
             floor,
             index
-        });
+        }, LocationTypes.EVENT);
         this.portraitName = 'event-icon';
     }
     override OnLocationSelected(scene: Phaser.Scene): void {

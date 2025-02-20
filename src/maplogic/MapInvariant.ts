@@ -89,6 +89,8 @@ export class SpecialRoomAdjacentInvariant extends MapInvariant {
                     locations[idx] = normalRoom;
                     actionsPerformed++;
                 }
+
+                normalRoom.initEncounter();
             }
         }
 
@@ -125,7 +127,6 @@ export class FirstNodeEnemiesInvariant extends MapInvariant {
             if (!(node instanceof NormalRoomCard)) {
                 // Convert to normal room
                 const normalRoom = new NormalRoomCard(node.floor, node.roomNumber);
-                
                 // Copy over adjacencies
                 node.adjacentLocations.forEach(adj => {
                     normalRoom.setAdjacent(adj);
@@ -143,6 +144,8 @@ export class FirstNodeEnemiesInvariant extends MapInvariant {
                     nodeChanged = true;
                     actionsPerformed++;
                 }
+
+                normalRoom.initEncounter();
             }
 
             // Then ensure connection to entrance

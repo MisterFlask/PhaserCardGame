@@ -72,7 +72,6 @@ export class LocationManager {
                 }
 
                 // Set segment based on floor number
-                location.segment = floor < 5 ? 1 : 2;
                 location.initEncounter();
                 floorLocationData.push(location);
             }

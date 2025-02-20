@@ -25,7 +25,6 @@ export class LocationBuffRegistry {
             new EldritchFoes(),
             new RockSlides(),
             new TougherEnemies(),
-
             new DrainCombatResource(this.combatResources.mettle, 1),
         ];
 
@@ -40,8 +39,6 @@ export class LocationBuffRegistry {
         ];
     }
 
-
-
     public static getInstance(): LocationBuffRegistry {
         if (!LocationBuffRegistry.instance) {
             LocationBuffRegistry.instance = new LocationBuffRegistry();
@@ -49,5 +46,11 @@ export class LocationBuffRegistry {
         return LocationBuffRegistry.instance;
     }
 
+    public getAvailablePositiveBuffs(): AbstractBuff[] {
+        return this.availablePositiveBuffs;
+    }
 
+    public getAvailableNegativeBuffs(): AbstractBuff[] {
+        return this.availableNegativeBuffs;
+    }
 }
