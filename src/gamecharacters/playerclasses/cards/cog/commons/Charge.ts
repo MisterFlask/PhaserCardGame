@@ -6,7 +6,7 @@ import { PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
 import { Lethality } from "../../../../buffs/standard/Lethality";
 
-export class Charge extends PlayableCard {
+export class GenerateCharge extends PlayableCard {
     constructor() {
         super({
             name: "Generate Charge",

@@ -161,7 +161,7 @@ export class ActionManager {
     sellItemForBrimstoneDistillate(item: PlayableCard) {
         this.removeCardFromMasterDeck(item);
 
-        GameState.getInstance().promissoryNotes += item.hellSellValue;
+        GameState.getInstance().promissoryNotes += item.finalHellSellValue;
     }
     
     buyRelicForHellCurrency(relic: AbstractRelic, price: number) : boolean {

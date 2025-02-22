@@ -1,6 +1,7 @@
 import { TreasureChest } from '../../encounters/EncountersList';
 import { AbstractCard } from '../../gamecharacters/AbstractCard';
 import { BaseCharacter } from '../../gamecharacters/BaseCharacter';
+import { AbstractRelic } from '../../relics/AbstractRelic';
 import { TextBoxButton } from '../../ui/Button';
 import { DepthManager } from '../../ui/DepthManager';
 import { PhysicalRelic } from '../../ui/PhysicalRelic';
@@ -11,7 +12,7 @@ export class TreasureOverlay extends Phaser.GameObjects.Container {
     private chest?: TreasureChest;
     private isVisible: boolean = false;
     private background: Phaser.GameObjects.Rectangle;
-    private relicDisplay?: PhysicalRelic;
+    private relicDisplays: PhysicalRelic[] = [];
     private cancelButton: TextBoxButton;
     private titleText: TextBoxButton;
 
@@ -42,21 +43,21 @@ export class TreasureOverlay extends Phaser.GameObjects.Container {
         this.titleText = new TextBoxButton({
             scene: this.scene,
             x: width/2,
-            y: height/2 - 200, // Position above where relic will be
+            y: height/2 - 200, // Position above where relics will be
             width: 400,
             height: 60,
-            text: 'SEIZE WHAT IS YOURS!',
+            text: 'Choose one treasure.',
             textBoxName: 'treasureTitleText',
             fillColor: 0x555555
         });
-        this.titleText.setInteractive(false); // Make it non-interactive since it's just display text
+        this.titleText.setInteractive(false);
         this.add(this.titleText);
         
         // Create the cancel button
         this.cancelButton = new TextBoxButton({
             scene: this.scene,
             x: width/2,
-            y: height/2 + 200, // Position below where relic will be
+            y: height/2 + 200, // Position below where relics will be
             width: 200,
             height: 50,
             text: 'Perhaps not',
@@ -74,63 +75,61 @@ export class TreasureOverlay extends Phaser.GameObjects.Container {
         scene.add.existing(this);
     }
 
-    private createRelicDisplay(): void {
-
-        // Remove existing relic display if it exists
-        this.relicDisplay?.destroy();
+    private createRelicDisplays(): void {
+        // Clear existing relic displays
+        this.relicDisplays.forEach(display => display.destroy());
+        this.relicDisplays = [];
         
         if (!this.chest) {
-            console.error("No chest provided to createRelicDisplay");
-            throw new Error("No chest provided to createRelicDisplay");
+            console.error("No chest provided to createRelicDisplays");
+            throw new Error("No chest provided to createRelicDisplays");
         }
 
-        if (!this.chest.relic) {
-            console.log('No relic to display');
+        if (!this.chest.relics || this.chest.relics.length === 0) {
+            console.log('No relics to display');
             return;
         }
-        
-        // Create new PhysicalRelic
-        this.relicDisplay = new PhysicalRelic({
-            scene: this.scene,
-            x: 0,  // Will be centered in container
-            y: 0,
-            abstractRelic: this.chest.relic,
-            baseSize: 128  // Larger size for better visibility
+
+        // Calculate positions for two relics
+        const spacing = 300; // Space between relics
+        const centerX = this.scene.scale.width / 2;
+        const centerY = this.scene.scale.height / 2;
+
+        this.chest.relics.forEach((relic: AbstractRelic, index: number) => {
+            if (!relic) return;
+
+            const xPos = centerX + (index === 0 ? -spacing/2 : spacing/2);
+            const relicDisplay = new PhysicalRelic({
+                scene: this.scene,
+                x: xPos,
+                y: centerY,
+                abstractRelic: relic,
+                baseSize: 128
+            });
+
+            relicDisplay.on('relic_pointerdown', () => this.handleRelicPointerDown(relicDisplay), this);
+            this.relicDisplays.push(relicDisplay);
+            this.add(relicDisplay);
         });
-
-        // Add listener for 'relic_pointerdown' events from PhysicalRelic
-        this.relicDisplay.on('relic_pointerdown', this.handleRelicPointerDown, this);
-
-        // Add the relic display to our overlay
-        this.add(this.relicDisplay);
-        
-        // Center the relic display in the screen
-        this.relicDisplay.setPosition(
-            this.scene.scale.width / 2,
-            this.scene.scale.height / 2
-        );
     }
 
     public handleCardClickOnTreasureChest(card: AbstractCard): void {
-        
         if (card instanceof BaseCharacter && card.name === new TreasureChest().name) {
             console.log('Treasure clicked');
             this.chest = card as TreasureChest;
             
-            // Verify that a relic was retrieved successfully
             if (this.chest) {
-                console.log(`Selected relic: ${this.chest.relic?.getDisplayName()}`);
+                console.log(`Selected relics: ${this.chest.relics?.map(r => r?.getDisplayName()).join(', ')}`);
                 this.show();
             } else {
-                console.log('Failed to retrieve a relic');
+                console.log('Failed to retrieve relics');
             }
         }
     }
 
     public show(): void {
-        
         console.log('Showing TreasureOverlay');
-        this.createRelicDisplay();
+        this.createRelicDisplays();
         this.setVisible(true);
         this.isVisible = true;
         UIContextManager.getInstance().setContext(UIContext.SHOP);
@@ -162,7 +161,7 @@ export class TreasureOverlay extends Phaser.GameObjects.Container {
 
         console.log('Adding relic to player from treasure overlay');
         ActionManager.getInstance().addRelicToInventory(physicalRelic.abstractRelic);
-        this.chest!.relic = undefined;
+        this.chest!.relics = [];  // Clear all relics after choosing one
 
         this.hide();
     }

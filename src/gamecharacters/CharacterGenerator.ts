@@ -68,13 +68,18 @@ export class CharacterGenerator {
     }
 
     public generateStartingDeck(characterClass: BaseCharacterClass): PlayableCard[] {
-        return [
-            new FireRevolver(), 
+        const deck = [
             this.generateImprovedShoot(),
             new Defend(), 
-            new Defend(),
             this.getRandomCommonCard(characterClass)
         ]
+        // now add EITHER a FireRevolver OR a defend to the deck
+        if (Math.random() < 0.5) {
+            deck.push(new FireRevolver());
+        } else {
+            deck.push(new Defend());
+        }
+        return deck;
     }    
 
     private generateImprovedShoot(): PlayableCard {

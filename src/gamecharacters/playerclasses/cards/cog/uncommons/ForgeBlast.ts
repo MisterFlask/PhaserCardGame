@@ -5,7 +5,7 @@ import { BaseCharacter } from "../../../../BaseCharacter";
 import { EntityRarity } from "../../../../EntityRarity";
 import { PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
-import { Charge } from "../commons/Charge";
+import { GenerateCharge } from "../commons/Charge";
 
 export class ForgeBlast extends PlayableCard {
     constructor() {
@@ -33,7 +33,7 @@ export class ForgeBlast extends PlayableCard {
 
         // Manufacture Charges
         for (let i = 0; i < chargesToManufacture; i++) {
-            this.actionManager.createCardToHand(new Charge());
+            this.actionManager.createCardToHand(new GenerateCharge());
         }
     }
 

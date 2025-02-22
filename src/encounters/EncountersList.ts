@@ -13,8 +13,8 @@ import { GameState } from '../rules/GameState';
 import { CardModifier } from '../rules/modifiers/AbstractCardModifier';
 import { RestEvent } from './events/RestEvent';
 import { FrenchBlindProphetess } from './monsters/act1_boss/FrenchBlindProphetess';
-import { Echophagist } from './monsters/act1_segment1/Echophage';
 import { SorrowmothSwarm } from './monsters/act1_segment1/CaulMoth';
+import { Echophagist } from './monsters/act1_segment1/Echophage';
 import { FrenchCrow } from './monsters/act1_segment1/HymnalOfMeat';
 import { VeilCapacitor } from './monsters/act1_segment1/ObeliskOfPentacles';
 import { VesperOfMeat } from './monsters/act1_segment1/VesperOfMeat';
@@ -223,7 +223,7 @@ export class CursedGoodsTrader extends AutomatedCharacter {
 }
 
 export class TreasureChest extends AutomatedCharacter {
-    public relic?: AbstractRelic;
+    public relics: AbstractRelic[];
     
     constructor() {
         super({ 
@@ -232,14 +232,15 @@ export class TreasureChest extends AutomatedCharacter {
             maxHitpoints: 1, 
             description: 'Contains valuable treasures' 
         });
-        this.relic = RelicsLibrary.getInstance().getRandomBeneficialRelics(1)[0];
-        if (!this.relic) {
-            throw new Error("Failed to retrieve a relic");
+        this.size = CardSize.LARGE;
+        this.relics = RelicsLibrary.getInstance().getRandomBeneficialRelics(2);
+        if (!this.relics || this.relics.length < 2) {
+            throw new Error("Failed to retrieve relics");
         }
     }
 
     override generateNewIntents(): AbstractIntent[] {
-        return []; // Treasure chest doesn't attack or   have intents
+        return []; // Treasure chest doesn't attack or have intents
     }
 }
 

@@ -221,7 +221,7 @@ export class ShopOverlay {
         const verticalSpacing = 250;
         
         inventory.forEach((item, index) => {
-            if (item.hellSellValue > 0) {
+            if (item.finalHellSellValue > 0) {
                 const row = Math.floor(index / gridColumns);
                 const col = index % gridColumns;
                 

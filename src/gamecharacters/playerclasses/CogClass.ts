@@ -4,7 +4,7 @@ import { BaseCharacterClass } from "../BaseCharacterClass";
 import { CharacterClasses } from "../CharacterClasses";
 
 // Import commons
-import { Charge } from "./cards/cog/commons/Charge";
+import { GenerateCharge } from "./cards/cog/commons/Charge";
 import { PneumaticBarrier } from "./cards/cog/commons/PneumaticBarrier";
 import { ReplicateArmaments } from "./cards/cog/commons/ReplicateArmaments";
 import { ScrapShield } from "./cards/cog/commons/ScrapShield";
@@ -35,7 +35,7 @@ export class CogClass extends BaseCharacterClass {
         this.longDescription = "INSERT DESCRIPTION HERE"
         this.availableCards = [
             // commons
-            new Charge(),
+            new GenerateCharge(),
             new PneumaticBarrier(),
             new ReplicateArmaments(),
             new ScrapShield(),
