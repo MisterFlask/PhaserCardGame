@@ -167,6 +167,12 @@ export class FirstNodeEnemiesInvariant extends MapInvariant {
     }
 }
 
+interface IterationResult {
+    invariantName: string;
+    actionsPerformed: number;
+    description: string;
+}
+
 export class MapInvariantRunner {
     private invariants: MapInvariant[];
     private maxIterations: number = 20;
@@ -182,18 +188,28 @@ export class MapInvariantRunner {
     public applyAll(locations: LocationCard[]): void {
         let iteration = 0;
         let totalActionsPerformed = 0;
+        const iterationHistory: IterationResult[][] = [];
         
         while (iteration < this.maxIterations) {
             let iterationActionsPerformed = 0;
+            const currentIterationResults: IterationResult[] = [];
             
             for (const invariant of this.invariants) {
                 const result = invariant.apply(locations);
                 iterationActionsPerformed += result.actionsPerformed;
+                
+                currentIterationResults.push({
+                    invariantName: invariant.name,
+                    actionsPerformed: result.actionsPerformed,
+                    description: result.description
+                });
+
                 if (result.actionsPerformed > 0) {
                     console.log(`${invariant.name}: ${result.description}`);
                 }
             }
             
+            iterationHistory.push(currentIterationResults);
             totalActionsPerformed += iterationActionsPerformed;
             
             if (iterationActionsPerformed === 0) {
@@ -206,6 +222,18 @@ export class MapInvariantRunner {
             iteration++;
             if (iteration === this.maxIterations) {
                 console.error(`Map invariants did not stabilize after ${this.maxIterations} iterations with ${totalActionsPerformed} total actions`);
+                console.error('Last 5 iterations:');
+                
+                const lastFiveIterations = iterationHistory.slice(-5);
+                lastFiveIterations.forEach((iterResults, idx) => {
+                    const iterationNumber = iteration - 5 + idx + 1;
+                    console.error(`\nIteration ${iterationNumber}:`);
+                    iterResults.forEach(result => {
+                        if (result.actionsPerformed > 0) {
+                            console.error(`  ${result.invariantName}: ${result.description}`);
+                        }
+                    });
+                });
             }
         }
     }

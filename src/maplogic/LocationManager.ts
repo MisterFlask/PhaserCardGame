@@ -1,5 +1,6 @@
 // src/managers/LocationManager.ts
 
+import { LocationBuffRegistry } from "../maplogic/LocationBuffRegistry";
 import { GameState } from "../rules/GameState";
 import { BossRoomCard, CharonRoomCard, EliteRoomCard, EntranceCard, EventRoomCard, LocationCard, NormalRoomCard, RestSiteCard, ShopCard, TreasureRoomCard } from "./LocationCard";
 
@@ -47,6 +48,15 @@ export class LocationManager {
         const card = this.locationDeck.pop()!;
         card.floor = floor;
         card.roomNumber = roomNumber;
+
+        // Add random debuff to treasure rooms
+        if (card instanceof TreasureRoomCard) {
+            const buffRegistry = LocationBuffRegistry.getInstance();
+            const treasureDebuffs = buffRegistry.getTreasureNegativeBuffs();
+            const randomDebuff = treasureDebuffs[Math.floor(Math.random() * treasureDebuffs.length)];
+            card.buffs.push(randomDebuff.clone()); // Clone to avoid sharing buff instances
+        }
+
         return card;
     }
 
