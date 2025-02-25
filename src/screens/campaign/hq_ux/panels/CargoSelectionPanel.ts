@@ -237,6 +237,7 @@ export class CargoSelectionPanel extends AbstractHqPanel {
     });
     const purchasedLabel = this.rexUI.add.label({
       text: this.scene.add.text(0, 0, 'Purchased Cargo', { fontSize: '18px', color: '#ffffff' }),
+      space: { bottom: 10 }
     });
 
     // column 1
@@ -244,10 +245,28 @@ export class CargoSelectionPanel extends AbstractHqPanel {
     leftCol.add(availableLabel, { align: 'center' });
     leftCol.add(availablePanel, { expand: true });
 
-    // column 2
-    const rightCol = this.rexUI.add.sizer({ orientation: 'vertical', space: { item: 10 } });
-    rightCol.add(purchasedLabel, { align: 'center' });
-    rightCol.add(purchasedPanel, { expand: true });
+    // column 2 - wrap in container with border
+    const rightCol = this.rexUI.add.sizer({ 
+      orientation: 'vertical',
+      space: { item: 10 },
+      name: 'purchasedCargoContainer'
+    });
+    
+    // Create border container
+    const purchasedContainer = this.rexUI.add.sizer({
+      orientation: 'vertical',
+      space: { item: 10 },
+    });
+    
+    // Add golden border background
+    purchasedContainer.addBackground(
+      this.rexUI.add.roundRectangle(0, 0, 0, 0, 10, 0x000000)
+        .setStrokeStyle(3, 0xffd700) // Gold color border
+    );
+
+    purchasedContainer.add(purchasedLabel, { align: 'center', padding: { top: 15 } });
+    purchasedContainer.add(purchasedPanel, { expand: true, padding: { left: 15, right: 15, bottom: 15 } });
+    rightCol.add(purchasedContainer, { expand: true });
 
     cargoSizer.add(leftCol, { proportion: 1, expand: true });
     cargoSizer.add(rightCol, { proportion: 1, expand: true });

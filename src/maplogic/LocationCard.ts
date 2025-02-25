@@ -31,7 +31,13 @@ export abstract class LocationCard extends AbstractCard {
     public floor: number = 0;
     public roomNumber: number = 0;
     public get segment(): number {
-        return this.floor < 5 ? 1 : 2;
+        if (this.floor < 3) {
+            return 0;
+        } else if (this.floor < 6) {
+            return 1;
+        } else {
+            return 2;
+        }
     }
     public backgroundName?: string;
     public gameEvent?: AbstractEvent;

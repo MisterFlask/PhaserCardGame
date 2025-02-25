@@ -19,6 +19,7 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
     private baseSize: number;
     stacksBox?: Phaser.GameObjects.Text;
     private selectOverlay!: Phaser.GameObjects.Image;
+    currentlyActivatable: boolean = false;
 
     constructor({
         scene,
@@ -71,7 +72,7 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
         this.add(this.selectOverlay);
 
         // Add glow animation to select overlay
-        if (abstractRelic.clickable) {
+        if (abstractRelic.clickable && this.currentlyActivatable) {
             scene.tweens.add({
                 targets: this.selectOverlay,
                 tint: { from: 0xffffff, to: 0xffa500 },
@@ -174,8 +175,9 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
     private onPointerDown = (): void => {
         if (this.obliterated) return;
         console.log('PhysicalRelic: onPointerDown');
-
-        this.abstractRelic.onClicked();
+        if (this.currentlyActivatable){        
+            this.abstractRelic.onClicked();
+        }
         
         // Emit the event to parent
         this?.emit('relic_pointerdown', this);

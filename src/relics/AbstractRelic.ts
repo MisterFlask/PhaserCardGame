@@ -8,7 +8,7 @@ export abstract class AbstractRelic extends AbstractBuff {
 
     rarity: EntityRarity = EntityRarity.COMMON;
     price: number = this.rarity.basePrice * 2;
-    surfaceSellValue: number = this.price;
+    surfaceSellValue: number = 0;
 
     constructor() {
         super();

@@ -13,6 +13,8 @@ import { GameState } from '../rules/GameState';
 import { CardModifier } from '../rules/modifiers/AbstractCardModifier';
 import { RestEvent } from './events/RestEvent';
 import { FrenchBlindProphetess } from './monsters/act1_boss/FrenchBlindProphetess';
+import { Brigand } from './monsters/act1_segment1/act1_segment0/Brigand';
+import { Hellworm } from './monsters/act1_segment1/act1_segment0/Hellworm';
 import { SorrowmothSwarm } from './monsters/act1_segment1/CaulMoth';
 import { Echophagist } from './monsters/act1_segment1/Echophage';
 import { FrenchCrow } from './monsters/act1_segment1/HymnalOfMeat';
@@ -28,7 +30,6 @@ import { FrenchPoliceman } from './monsters/act2_segment1/FrenchPoliceman';
 import { HiveBroodmother } from './monsters/act2_segment1/HiveBroodmother';
 import { Artiste } from './monsters/act2_segment2/Artiste';
 import { FrenchRestauranteur } from './monsters/act2_segment2/FrenchRestauranteur';
-
 // Define new character classes
 export class ClockworkAbomination extends AutomatedCharacter {
     constructor() {
@@ -76,6 +77,17 @@ export class ActSegmentData {
 }
 
 export class ActSegment {
+
+    static readonly Act1_Segment0 = new ActSegmentData("Act 1 - Segment 0", 1, 0, [
+        {
+            enemies: [new Hellworm(), new Hellworm(), new Hellworm()]
+        },
+        {
+            enemies: [new Brigand(), new Brigand(), new Brigand()]
+        }
+
+    ]);
+
     static readonly Act1_Segment1 = new ActSegmentData("Act 1 - Segment 1", 1, 1, [
         {
             enemies: [new VesperOfMeat(), new VesperOfMeat(), new VeilCapacitor()]
@@ -230,13 +242,16 @@ export class TreasureChest extends AutomatedCharacter {
             name: 'Treasure Chest', 
             portraitName: 'Torture Device Iron Maiden A', 
             maxHitpoints: 1, 
-            description: 'Contains valuable treasures' 
+            description: 'REACH INSIDE FOR VALUABLE TREASURES' 
         });
         this.size = CardSize.LARGE;
         this.relics = RelicsLibrary.getInstance().getRandomBeneficialRelics(2);
         if (!this.relics || this.relics.length < 2) {
             throw new Error("Failed to retrieve relics");
         }
+        this.portraitTargetLargestDimension = 600;
+        this.portraitOffsetXOverride = -100
+        this.portraitOffsetYOverride = 0
     }
 
     override generateNewIntents(): AbstractIntent[] {

@@ -15,10 +15,11 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
     private readonly RELIC_PADDING = 6;
     private readonly BASE_RELIC_DEPTH = 100;
     private readonly HOVER_RELIC_DEPTH = 1000;
-
+    private areRelicsActivatable: boolean = false;
     constructor(scene: Phaser.Scene, areRelicsActivatable: boolean) {
         super(scene, 10, 10);
 
+        this.areRelicsActivatable = areRelicsActivatable;
         if (!this.scene){
             console.error("No scene provided to CampaignBriefStatus");
             throw new Error("No scene provided to CampaignBriefStatus");
@@ -80,7 +81,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
         scene.events.on('update', this.updateCurrencyDisplay, this);
         scene.events.on('propagateGameStateChangesToUi', this.updateRelicDisplay, this);
         scene.events.on('update', this.updateRelicStacksDisplay, this);
-        if (areRelicsActivatable) {
+        if (this.areRelicsActivatable) {
             scene.events.on('relic_pointerdown', this.handleRelicPointerDown, this);
         }
     }
@@ -121,6 +122,8 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
                 abstractRelic: relic,
                 baseSize: this.RELIC_SIZE
             });
+
+            physicalRelic.currentlyActivatable = this.areRelicsActivatable;
 
             physicalRelic.setDepth(this.BASE_RELIC_DEPTH);
             physicalRelic.priceBox?.setVisible(false);

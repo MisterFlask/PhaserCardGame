@@ -13,7 +13,7 @@ interface DebugMenuOption {
     callback: () => void;
 }
 
-type PageType = 'main' | 'cards' | 'relics' | 'backgrounds';
+type PageType = 'main' | 'cards' | 'relics' | 'backgrounds' | 'combat';
 
 export class DebugMenu {
     private scene: Scene;
@@ -93,6 +93,7 @@ export class DebugMenu {
             { text: 'Add Cards', callback: () => this.goToPage('cards') },
             { text: 'Add Relics', callback: () => this.goToPage('relics') },
             { text: 'Change Background', callback: () => this.goToPage('backgrounds') },
+            { text: 'Combat Options', callback: () => this.goToPage('combat') },
             {
                 text: 'Add Resources (+4 each)',
                 callback: () => {
@@ -118,6 +119,26 @@ export class DebugMenu {
                 }
             },
             { text: 'Close', callback: () => this.hide() }
+        ];
+    }
+
+    private getCombatOptions(): DebugMenuOption[] {
+        return [
+            {
+                text: 'Kill All Enemies',
+                callback: () => {
+                    const gameState = GameState.getInstance();
+                    const actionManager = ActionManager.getInstance();
+                    gameState.combatState.enemies.forEach(enemy => {
+                        actionManager.dealDamage({
+                            baseDamageAmount: 9999,
+                            target: enemy,
+                            ignoresBlock: true
+                        });
+                    });
+                }
+            },
+            { text: 'Back to Main', callback: () => this.backToMain() }
         ];
     }
 
@@ -147,6 +168,10 @@ export class DebugMenu {
                     i => (this.currentBackgroundPage = i),
                     () => this.backToMain()
                 );
+                break;
+            case 'combat':
+                this.menu.updateOptions(this.getCombatOptions());
+                this.pageDisplay.setVisible(false);
                 break;
             default:
                 this.menu.updateOptions(this.getMainMenuOptions());

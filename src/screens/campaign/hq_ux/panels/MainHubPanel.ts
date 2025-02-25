@@ -85,10 +85,8 @@ export class MainHubPanel extends AbstractHqPanel {
         };
 
         const buttons = [
-            { text: 'Investment', x: 0.2, y: 0.6 },
+            //{ text: 'Investment', x: 0.2, y: 0.6 },
             { text: 'Trade Routes', x: 0.4, y: 0.6, special: true },
-            { text: 'Expedition Loadout', x: 0.5, y: 0.75 },
-            { text: 'Liquidation', x: 0.5, y: 0.85 }
         ];
 
         buttons.forEach(({ text, x, y, special }) => {
@@ -140,13 +138,8 @@ export class MainHubPanel extends AbstractHqPanel {
         
         if (!tradeButton) return;
 
-        if (campaignState.selectedTradeRoute) {
-            tradeButton.setText('Trade Route (finished)');
-            tradeButton.setFillColor(0x00aa00); // Green
-        } else {
-            tradeButton.setText('Select Trade Route (required)');
-            tradeButton.setFillColor(0xffff00); // Yellow
-        }
+        tradeButton.setText('Trade Route');
+        tradeButton.setFillColor(0x00aa00); // Green
     }
 
     update(): void {
