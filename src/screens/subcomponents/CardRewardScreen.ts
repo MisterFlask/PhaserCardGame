@@ -92,14 +92,34 @@ class CardRewardScreen {
                 onCardCreatedEventCallback: (cardInstance: PhysicalCard) => {
                     cardInstance.container.setDepth(CARD_REWARD_DEPTH + 1).setVisible(false);
                     
-                    // Add hover events
+                    // Fix hover events to prevent immediate return to background
+                    cardInstance.container.setInteractive();
+                    
+                    // Update hover event handling
                     cardInstance.container.on('pointerover', () => {
+                        // Set higher depth for the hovered card
                         cardInstance.container.setDepth(CARD_REWARD_HOVERED_DEPTH);
+                        // Apply a slight scale increase to make it more noticeable
+                        this.scene.tweens.add({
+                            targets: cardInstance.container,
+                            scaleX: 1.1,
+                            scaleY: 1.1,
+                            duration: 100,
+                            ease: 'Power1'
+                        });
                         this.scene.events.emit('card:pointerover', cardInstance);
                     });
 
                     cardInstance.container.on('pointerout', () => {
+                        // Return to normal depth and scale
                         cardInstance.container.setDepth(CARD_REWARD_DEPTH + 1);
+                        this.scene.tweens.add({
+                            targets: cardInstance.container,
+                            scaleX: 1.0,
+                            scaleY: 1.0,
+                            duration: 100,
+                            ease: 'Power1'
+                        });
                         this.scene.events.emit('card:pointerout', cardInstance);
                     });
 

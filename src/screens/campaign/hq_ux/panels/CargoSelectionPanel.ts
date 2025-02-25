@@ -233,10 +233,10 @@ export class CargoSelectionPanel extends AbstractHqPanel {
 
     // labels for each scrollable panel
     const availableLabel = this.rexUI.add.label({
-      text: this.scene.add.text(0, 0, 'Available Cargo', { fontSize: '18px', color: '#ffffff' }),
+      text: this.scene.add.text(0, 0, 'Available Cargo Cards', { fontSize: '18px', color: '#ffffff' }),
     });
     const purchasedLabel = this.rexUI.add.label({
-      text: this.scene.add.text(0, 0, 'Purchased Cargo', { fontSize: '18px', color: '#ffffff' }),
+      text: this.scene.add.text(0, 0, 'Expedition Inventory', { fontSize: '18px', color: '#ffffff' }),
       space: { bottom: 10 }
     });
 
@@ -252,6 +252,9 @@ export class CargoSelectionPanel extends AbstractHqPanel {
       name: 'purchasedCargoContainer'
     });
     
+    // Add label first, outside the bordered container
+    rightCol.add(purchasedLabel, { align: 'center' });
+    
     // Create border container
     const purchasedContainer = this.rexUI.add.sizer({
       orientation: 'vertical',
@@ -264,8 +267,8 @@ export class CargoSelectionPanel extends AbstractHqPanel {
         .setStrokeStyle(3, 0xffd700) // Gold color border
     );
 
-    purchasedContainer.add(purchasedLabel, { align: 'center', padding: { top: 15 } });
-    purchasedContainer.add(purchasedPanel, { expand: true, padding: { left: 15, right: 15, bottom: 15 } });
+    // Add only the panel to the bordered container
+    purchasedContainer.add(purchasedPanel, { expand: true, padding: { left: 15, right: 15, top: 15, bottom: 15 } });
     rightCol.add(purchasedContainer, { expand: true });
 
     cargoSizer.add(leftCol, { proportion: 1, expand: true });

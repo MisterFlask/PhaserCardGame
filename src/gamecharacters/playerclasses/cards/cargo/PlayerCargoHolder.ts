@@ -22,8 +22,8 @@ class DummyCharacterClass extends BaseCharacterClass {
 export class PlayerCargoHolder extends PlayerCharacter {
     constructor() { 
         super({
-            name: "Cargo Holder",
-            description: "A dummy character used to hold cargo.",
+            name: "Cargo",
+            description: "Your cargo is here.",
 
             portraitName: "placeholder_character_background_1",
             characterClass: new DummyCharacterClass(), //doesn't actually matter here

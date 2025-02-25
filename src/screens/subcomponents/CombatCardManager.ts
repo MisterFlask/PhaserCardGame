@@ -52,6 +52,7 @@ export class CombatCardManager {
     public playerHand: PhysicalCard[] = [];
     public enemyUnits: PhysicalCard[] = [];
     public playerUnits: PhysicalCard[] = [];
+    public cargoHolderCard?: PhysicalCard;
     public drawPile!: PhysicalCard;
     public discardPile!: PhysicalCard;
     public exhaustPile!: PhysicalCard;
@@ -136,6 +137,23 @@ export class CombatCardManager {
             unit.data.team = Team.ALLY;
             (unit as any).isPlayerUnit = true;
             this.playerUnits.push(unit);
+        });
+
+        // Create cargo holder card below the last player unit
+        const cargoHolder = GameState.getInstance().cargoHolder;
+        const lastPlayerY = 100 + (playerCharacters.length - 1) * 180;
+        const cargoY = lastPlayerY + 180; // Position below last player
+
+        this.cargoHolderCard = CardGuiUtils.getInstance().createCard({
+            scene: this.scene,
+            x: this.scene.scale.width - 100,
+            y: cargoY,
+            data: cargoHolder,
+            onCardCreatedEventCallback: (card: PhysicalCard) => {
+                card.container.setInteractive(false);
+                card.data.size = CardSize.TINY;
+                card.container.setScrollFactor(0);
+            }
         });
     }
 
@@ -362,6 +380,11 @@ export class CombatCardManager {
             }
         });
 
+        // Also set scroll factor for cargo holder
+        if (this.cargoHolderCard?.container) {
+            this.cargoHolderCard.container.setScrollFactor(0);
+        }
+
         // Add new section to sync enemy cards with game state
         this.syncEnemyCardsWithGameState();
 
@@ -493,6 +516,12 @@ export class CombatCardManager {
         if (this.currentLocationCard) {
             this.currentLocationCard.obliterate();
             this.currentLocationCard = undefined;
+        }
+
+        // Clean up cargo holder card
+        if (this.cargoHolderCard) {
+            this.cargoHolderCard.obliterate();
+            this.cargoHolderCard = undefined;
         }
     }
 
