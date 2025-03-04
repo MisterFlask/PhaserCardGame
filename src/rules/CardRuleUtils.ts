@@ -1,6 +1,7 @@
 import { PlayableCard } from "../gamecharacters/PlayableCard";
 import { PlayerCharacter } from "../gamecharacters/PlayerCharacter";
 import { CardReward } from "../rewards/CardReward";
+import { CardOwnershipManager } from "../utils/CardOwnershipManager";
 import { CardRewardsGenerator } from "./CardRewardsGenerator";
 import { GameState } from "./GameState";
 
@@ -21,15 +22,22 @@ export class CardRuleUtils {
     }
 
     public deriveOwnerFromCardNativeClass(card: PlayableCard): PlayerCharacter { 
-        var clazz = card.nativeToCharacterClass;
-        if (!clazz) {
-            console.warn(`Card ${card.name} has no associated character class`);
+        // Use the CardOwnershipManager to find a matching character
+        const matchingCharacter = CardOwnershipManager.getInstance().findMatchingCharacterForCard(card);
+        
+        if (matchingCharacter) {
+            return matchingCharacter;
         }
-        var playerCharacter = GameState.getInstance().getCurrentRunCharacters().find(c => c.characterClass.id === clazz?.id);
-        if (!playerCharacter) {
-            // If no matching class found, randomly assign to a current run character
-            playerCharacter = GameState.getInstance().getCurrentRunCharacters()[Math.floor(Math.random() * GameState.getInstance().getCurrentRunCharacters().length)];
+        
+        // If no matching character found, assign a random one
+        const gameState = GameState.getInstance();
+        const randomCharacter = gameState.getCurrentRunCharacters()[Math.floor(Math.random() * gameState.getCurrentRunCharacters().length)];
+        
+        if (!randomCharacter) {
+            console.error(`No characters available to assign to card ${card.name}`);
+            throw new Error(`No characters available to assign to card ${card.name}`);
         }
-        return playerCharacter;
+        
+        return randomCharacter;
     }
 }

@@ -1,7 +1,6 @@
 import Phaser from 'phaser';
 import { AbstractCard, PriceContext } from '../../gamecharacters/AbstractCard';
 import { PlayableCard } from '../../gamecharacters/PlayableCard';
-import { PlayerCharacter } from '../../gamecharacters/PlayerCharacter';
 import { AbstractRelic } from '../../relics/AbstractRelic';
 import { GameState, ShopContents } from '../../rules/GameState';
 import { DepthManager } from '../../ui/DepthManager';
@@ -11,6 +10,7 @@ import { TextBox } from '../../ui/TextBox';
 import { TransientUiState } from '../../ui/TransientUiState';
 import { UIContext, UIContextManager } from '../../ui/UIContextManager';
 import { ActionManagerFetcher } from '../../utils/ActionManagerFetcher';
+import { CardOwnershipManager } from '../../utils/CardOwnershipManager';
 import { CampaignBriefStatus } from './CampaignBriefStatus';
 
 export class ShopOverlay {
@@ -258,14 +258,9 @@ export class ShopOverlay {
     private getShopItems(): PlayableCard[] {
         var cards = this.currentShop.shopCardsForSale;
 
-        // assign each card to a random character of the appropriate class, or if no such character exists, assign it to a random player character
-        cards.forEach(card => {
-            var character = GameState.getInstance().currentRunCharacters.find((c: PlayerCharacter) => c.characterClass === card.nativeToCharacterClass);
-            if (!character) {
-                character = GameState.getInstance().currentRunCharacters[Math.floor(Math.random() * GameState.getInstance().currentRunCharacters.length)];
-            }
-            card.owningCharacter = character;
-        });
+        // Use the CardOwnershipManager to assign owners to all cards
+        CardOwnershipManager.getInstance().assignOwnersToCards(cards);
+        
         return cards;
     }
 

@@ -115,9 +115,12 @@ export class CharacterGenerator {
         var character = new PlayerCharacter({ name: characterClass.name, portraitName: characterClass.iconName, characterClass: characterClass })
         character.cardsInMasterDeck = CharacterGenerator.getInstance().generateStartingDeck(characterClass)
         character.startingDeck = character.cardsInMasterDeck.slice().map(card => card.Copy())
+        
+        // Assign the character as owner to all cards in the deck
         for (const card of character.cardsInMasterDeck) {
             card.owningCharacter = character;
         }
+        
         character.buffs = [CharacterGenerator.getInstance().generateStartingPersonaTraits()]
 
         return character

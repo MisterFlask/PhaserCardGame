@@ -1,0 +1,1 @@
+// effect: draw three cards and grant them bloodprice (3) if they do not have bloodprice.

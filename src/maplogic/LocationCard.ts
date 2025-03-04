@@ -104,7 +104,7 @@ export class EntranceCard extends LocationCard {
             size: CardSize.SMALL,
             floor,
             index
-        }, LocationTypes.COMBAT);
+        }, LocationTypes.ENTRANCE);
         this.portraitName = 'entrance-icon';
         this.portraitTint = 0x00ffff;
     }
@@ -175,7 +175,7 @@ export class CharonRoomCard extends LocationCard {
             size: CardSize.SMALL,
             floor,
             index
-        }, LocationTypes.COMBAT);
+        }, LocationTypes.CHARON);
         this.portraitName = 'CharonRoom';
         this.portraitTint = 0x800080;
     }

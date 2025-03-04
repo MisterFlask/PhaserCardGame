@@ -3,6 +3,7 @@ import { CardLibrary } from '../gamecharacters/playerclasses/cards/CardLibrary';
 import { RelicsLibrary } from '../relics/RelicsLibrary';
 import { GameState } from '../rules/GameState';
 import { ActionManager } from '../utils/ActionManager';
+import { CardOwnershipManager } from "../utils/CardOwnershipManager";
 import GameImageLoader from '../utils/ImageUtils';
 import { DepthManager } from './DepthManager';
 import Menu from './Menu';
@@ -181,7 +182,7 @@ export class DebugMenu {
 
     private addCard(card: any): void {
         const newCard = card.Copy();
-        newCard.owningCharacter = GameState.getInstance().combatState.playerCharacters[0];
+        CardOwnershipManager.getInstance().assignOwnerToCard(newCard);
         ActionManager.getInstance().createCardToHand(newCard);
     }
 

@@ -42,6 +42,7 @@ import { RequireCardSelectionFromHandAction } from "./actions/specific/RequireCa
 import { SelectFromCardPoolAction } from "./actions/specific/SelectFromCardPoolAction";
 import { StartCombatAction } from "./actions/specific/StartCombatAction";
 import { WaitAction } from "./actions/WaitAction";
+import { CardOwnershipManager } from "./CardOwnershipManager";
 
 export class ActionManager {
 
@@ -115,14 +116,9 @@ export class ActionManager {
     }
 
     addCardToMasterDeck(card: PlayableCard) {
-        if (!card.owningCharacter){
-            // Assign to a random character in the party
-            const gameState = GameState.getInstance();
-            const partyMembers = gameState.currentRunCharacters;
-            if (partyMembers.length > 0) {
-                const randomCharacter = partyMembers[Math.floor(Math.random() * partyMembers.length)];
-                card.owningCharacter = randomCharacter;
-            }
+        if (!card.owningCharacter) {
+            // Use the CardOwnershipManager to assign an owner to the card
+            CardOwnershipManager.getInstance().assignOwnerToCard(card);
         }
 
         card.owningCharacter?.cardsInMasterDeck.push(card);

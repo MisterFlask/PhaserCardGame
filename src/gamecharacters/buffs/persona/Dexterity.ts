@@ -1,6 +1,6 @@
 import { AbstractBuff } from "../AbstractBuff";
 
-export class Bastion extends AbstractBuff {
+export class Dexterity extends AbstractBuff {
     constructor(stacks: number = 1) {
         super();
         this.stacks = stacks;
@@ -8,7 +8,7 @@ export class Bastion extends AbstractBuff {
     }
 
     override getDisplayName(): string {
-        return "Bastion";
+        return "Dexterity";
     }
 
     override getDescription(): string {

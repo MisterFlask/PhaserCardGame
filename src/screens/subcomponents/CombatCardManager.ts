@@ -42,11 +42,6 @@ export class CombatCardManager {
 
         // Clear stored enemy positions
         this.enemyPositions.clear();
-
-        // Don't remove the location card on combat end
-        if (this.currentLocationCard) {
-            this.currentLocationCard.container.setAlpha(1);
-        }
     }
     private scene: Phaser.Scene;
     public playerHand: PhysicalCard[] = [];
@@ -58,7 +53,6 @@ export class CombatCardManager {
     public exhaustPile!: PhysicalCard;
     private enemyPositions: Map<string, { x: number, y: number }> = new Map();
     private enemyPositionManager: EnemyPositionManager;
-    private currentLocationCard?: PhysicalCard;
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -76,7 +70,6 @@ export class CombatCardManager {
         this.createPlayerHand();
         this.createPlayerUnits();
         this.createEnemyCards();
-        this.createCurrentLocationDisplay();
     }
 
     private createPlayerHand(): void {
@@ -392,15 +385,6 @@ export class CombatCardManager {
         this.updateDrawPileCount();
         this.updateDiscardPileCount();
         this.updateExhaustPileCount();
-
-        // Update current location card if needed
-        const currentLocation = GameState.getInstance().getCurrentLocation();
-        if (currentLocation && (!this.currentLocationCard || this.currentLocationCard.data.id !== currentLocation.id)) {
-            if (this.currentLocationCard) {
-                this.currentLocationCard.obliterate();
-            }
-            this.createCurrentLocationDisplay();
-        }
     }
 
     private syncEnemyCardsWithGameState(): void {
@@ -512,40 +496,12 @@ export class CombatCardManager {
 
         this.enemyPositionManager.reset();
 
-        // Clean up location card
-        if (this.currentLocationCard) {
-            this.currentLocationCard.obliterate();
-            this.currentLocationCard = undefined;
-        }
-
         // Clean up cargo holder card
         if (this.cargoHolderCard) {
             this.cargoHolderCard.obliterate();
             this.cargoHolderCard = undefined;
         }
     }
-
-    private createCurrentLocationDisplay(): void {
-        const currentLocation = GameState.getInstance().getCurrentLocation();
-        if (!currentLocation) return;
-
-        // Position the location card below the campaign brief panel
-        const locationY = 240; // Adjust this value based on your UI layout
-
-        this.currentLocationCard = CardGuiUtils.getInstance().createCard({
-            scene: this.scene,
-            x: 300, // Left side of screen
-            y: locationY,
-            data: currentLocation,
-            onCardCreatedEventCallback: (card: PhysicalCard) => {
-                // Make non-interactive but visible
-                card.container.setInteractive(false);
-                // Ensure it stays on screen and doesn't scroll
-                card.container.setScrollFactor(0);
-            }
-        });
-    }
-
 }
 
 export default CombatCardManager;

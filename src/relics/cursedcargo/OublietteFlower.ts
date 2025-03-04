@@ -1,4 +1,4 @@
-import { Bastion } from "../../gamecharacters/buffs/persona/Bastion";
+import { Dexterity } from "../../gamecharacters/buffs/persona/Dexterity";
 import { EntityRarity } from "../../gamecharacters/EntityRarity";
 import { AbstractRelic } from "../AbstractRelic";
 
@@ -24,7 +24,7 @@ export class OublietteFlower extends AbstractRelic {
             this.stacks = 0;
             
             this.forEachAlly((ally) => {
-                this.actionManager.applyBuffToCharacterOrCard(ally, new Bastion(-1));
+                this.actionManager.applyBuffToCharacterOrCard(ally, new Dexterity(-1));
             });
         }
     }

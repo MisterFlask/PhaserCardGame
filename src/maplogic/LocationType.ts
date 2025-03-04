@@ -7,5 +7,7 @@ export const LocationTypes = {
     MERCHANT: 'MERCHANT',
     EVENT: 'EVENT',
     BOSS: 'BOSS',
-    REST: 'REST'
+    REST: 'REST',
+    CHARON: 'CHARON',
+    ENTRANCE: 'ENTRANCE',
 } as const; 
