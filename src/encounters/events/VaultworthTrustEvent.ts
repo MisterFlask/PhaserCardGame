@@ -12,7 +12,7 @@ class AssetProtectionChoice extends AbstractChoice {
     }
 
     canChoose(): boolean {
-        return this.gameState().denarians >= 50 && 
+        return this.gameState().sovereignInfernalNotes >= 50 && 
                this.gameState().relicsInventory.length > 0;
     }
 

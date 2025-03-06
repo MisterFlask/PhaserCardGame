@@ -321,6 +321,8 @@ export class CargoSelectionPanel extends AbstractHqPanel {
         EncounterManager.getInstance().getRandomCombatEncounter(gameState.currentAct, 0),
         true
       );
+      GameState.getInstance().currentLocation!.OnLocationSelected(SceneChanger.getCurrentScene()!);
+
     }
   }
 

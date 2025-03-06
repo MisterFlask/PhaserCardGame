@@ -300,7 +300,7 @@ export class ShopOverlay {
     private sellItem(item: PlayableCard): void {
         // Implement selling logic here
         console.log(`Selling ${item.name}`);
-        ActionManagerFetcher.getActionManager().sellItemForBrimstoneDistillate(item);
+        ActionManagerFetcher.getActionManager().sellItemsForPoundsSterling(item);
         
         // After selling, refresh the shop and inventory
         this.refreshShop();

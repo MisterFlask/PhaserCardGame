@@ -28,15 +28,12 @@ export class TooltipAttachment {
         this.scene = scene;
         this.gameObject = container;
         
-        // Create temporary text to measure dimensions
-        const tempText = new TextBox({
-            scene,
-            text: tooltipText,
-            fillColor,
-            width: 350,
+        // Get the bounds of the text
+        const tempText = new Phaser.GameObjects.Text(scene, 0, 0, tooltipText, {
+            fontSize: '18px',
+            fontFamily: 'verdana',
+            wordWrap: { width: 300 }
         });
-        
-        // Get the natural dimensions of the text
         const bounds = tempText.getBounds();
         tempText.destroy();
         
@@ -54,12 +51,24 @@ export class TooltipAttachment {
         });
         this.tooltip.setVisible(false);
         
+        // Make tooltip fixed to camera (not affected by scroll)
+        this.tooltip.setScrollFactor(0);
+        
+        // Add the tooltip directly to the scene instead of a container
+        scene.add.existing(this.tooltip);
+        
         // Add hover listeners
         // assume it's interactive
         if (!disableAutomaticHoverListeners) {
             this.gameObject.on('pointerover', this.showTooltip, this);
             this.gameObject.on('pointerout', this.hideTooltip, this);
         }
+        
+        // Add resize listener to update tooltip position when window is resized
+        this.scene.scale.on('resize', this.updateTooltipPosition, this);
+        
+        // Add camera move listener to update tooltip position when camera moves
+        this.scene.cameras.main.on('camerascroll', this.updateTooltipPosition, this);
     }
 
     public showTooltip(): void {
@@ -80,23 +89,17 @@ export class TooltipAttachment {
             console.log("showTooltip called (unparented)");
             this.scene.children.bringToTop(this.tooltip);
         }
-
-        // Add update listener to scene
-        this.scene.events.on('update', this.updateTooltipPosition, this);
     }
 
     public hideTooltip(): void {
         this.isVisible = false;
         this.tooltip.setVisible(false);
-        
-        // Remove update listener
-        this.scene.events.off('update', this.updateTooltipPosition, this);
     }
 
     public updateTooltipPosition = (): void => {
         if (!this.isVisible) return;
         
-        // Get current mouse position in world coordinates
+        // Get current mouse position in screen coordinates
         const pointer = this.scene.input.activePointer;
         const mouseX = pointer.x;
         const mouseY = pointer.y;
@@ -133,7 +136,7 @@ export class TooltipAttachment {
             yPos = mouseY - Math.abs(yOffset) - tooltipBounds.height;
         }
 
-        // Update tooltip position
+        // Update tooltip position in screen coordinates
         this.tooltip.setPosition(xPos, yPos);
     }
 
@@ -146,5 +149,7 @@ export class TooltipAttachment {
         this.tooltip.destroy();
         this.gameObject.off('pointerover', this.showTooltip, this);
         this.gameObject.off('pointerout', this.hideTooltip, this);
+        this.scene?.scale?.off('resize', this.updateTooltipPosition, this);
+        this.scene?.cameras?.main?.off('camerascroll', this.updateTooltipPosition, this);
     }
 } 

@@ -20,6 +20,6 @@ export class Undersider extends AbstractBuff {
 
     override onRunStart(): void {
         const gameState = GameState.getInstance();
-        gameState.denarians += this.stacks;
+        gameState.sovereignInfernalNotes += this.stacks;
     }
 }

@@ -22,6 +22,6 @@ export class CurrencyReward extends AbstractReward {
     }
 
     collect(scene: Phaser.Scene): void {
-        GameState.getInstance().denarians += this.amount;
+        GameState.getInstance().sovereignInfernalNotes += this.amount;
     }
 } 

@@ -17,7 +17,7 @@ export class AkashicNewspaper extends AbstractRelic {
 
     override onCombatEnd(): void {
         if (this.combatResources.ashes.value < 5) {
-            this.gameState.denarians -= 20;
+            this.gameState.sovereignInfernalNotes -= 20;
         }
     }
 

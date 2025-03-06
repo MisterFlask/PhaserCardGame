@@ -12,7 +12,7 @@ class CelestialForecastChoice extends AbstractChoice {
     }
 
     canChoose(): boolean {
-        return this.gameState().denarians >= 10;
+        return this.gameState().sovereignInfernalNotes >= 10;
     }
 
     effect(): void {

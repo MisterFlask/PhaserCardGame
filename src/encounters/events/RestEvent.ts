@@ -104,7 +104,7 @@ class ScavengeChoice extends AbstractChoice {
 
     effect(): void {
         const gameState = this.gameState();
-        gameState.denarians += 30;
+        gameState.sovereignInfernalNotes += 30;
     }
 }
 

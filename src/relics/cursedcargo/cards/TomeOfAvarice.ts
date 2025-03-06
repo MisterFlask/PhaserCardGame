@@ -34,6 +34,6 @@ export class TomeOfAvarice extends PlayableCard {
     }
 
     OnRetain(): void {
-        GameState.getInstance().promissoryNotes -= 4;
+        GameState.getInstance().britishPoundsSterling -= 4;
     }
 } 

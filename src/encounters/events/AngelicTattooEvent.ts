@@ -39,7 +39,7 @@ class ElaborateTattooChoice extends AbstractChoice {
     }
 
     canChoose(): boolean {
-        return this.gameState().denarians >= 75;
+        return this.gameState().sovereignInfernalNotes >= 75;
     }
 
     effect(): void {

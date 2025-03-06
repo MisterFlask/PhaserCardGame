@@ -33,7 +33,7 @@ class DenarianExchangeChoice extends AbstractChoice {
     }
 
     canChoose(): boolean {
-        return this.gameState().promissoryNotes >= 10;
+        return this.gameState().britishPoundsSterling >= 10;
     }
 
     effect(): void {

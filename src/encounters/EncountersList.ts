@@ -316,7 +316,10 @@ export class EncounterManager {
         }
 
         var enemies = this.getRandomEnemiesListFromActSegmentNumbers(actSegment.act, actSegment.segment);
-        return new Encounter(enemies.enemies, actSegment.act, actSegment.segment);
+        var encounter = new Encounter(enemies.enemies, actSegment.act, actSegment.segment);
+
+        return encounter;
+        
     }
     public getRandomCombatEncounterFromSegment(actSegment: ActSegmentData): { enemies: AutomatedCharacter[] } {
         return this.getRandomEnemiesListFromActSegmentNumbers(actSegment.act, actSegment.segment);

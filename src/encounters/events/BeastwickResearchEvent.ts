@@ -39,7 +39,7 @@ class ContainmentConsultChoice extends AbstractChoice {
     }
 
     canChoose(): boolean {
-        return this.gameState().denarians >= 25;
+        return this.gameState().sovereignInfernalNotes >= 25;
     }
 
     effect(): void {

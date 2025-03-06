@@ -58,14 +58,14 @@ export class ActionManager {
     }
     modifyDenarians(amount: number) {
         this.actionQueue.addAction(new GenericAction(async () => {
-            GameState.getInstance().denarians += amount;
+            GameState.getInstance().sovereignInfernalNotes += amount;
             return [];
         }));
     }
 
     modifyPromissoryNotes(amount: number) {
         this.actionQueue.addAction(new GenericAction(async () => {
-            GameState.getInstance().promissoryNotes += amount;
+            GameState.getInstance().britishPoundsSterling += amount;
             return [];
         }));
     }
@@ -154,20 +154,20 @@ export class ActionManager {
         this.actionQueue.addAction(new StartCombatAction());
     }
 
-    sellItemForBrimstoneDistillate(item: PlayableCard) {
+    sellItemsForPoundsSterling(item: PlayableCard) {
         this.removeCardFromMasterDeck(item);
 
-        GameState.getInstance().promissoryNotes += item.finalHellSellValue;
+        GameState.getInstance().britishPoundsSterling += item.finalHellSellValue;
     }
     
     buyRelicForHellCurrency(relic: AbstractRelic, price: number) : boolean {
-        if (GameState.getInstance().denarians < price) {
+        if (GameState.getInstance().sovereignInfernalNotes < price) {
             return false;
         }
         const inventory = GameState.getInstance().relicsInventory;
         inventory.push(relic);
         
-        GameState.getInstance().denarians -= price;
+        GameState.getInstance().sovereignInfernalNotes -= price;
         return true;
     }
 
@@ -182,7 +182,7 @@ export class ActionManager {
 
 
     buyItemForHellCurrency(item: PlayableCard) : boolean {
-        if (GameState.getInstance().denarians < item.hellPurchaseValue) {
+        if (GameState.getInstance().sovereignInfernalNotes < item.hellPurchaseValue) {
             return false;
         }
 
@@ -190,7 +190,7 @@ export class ActionManager {
         item.buffs.forEach(buff => {
             buff.onGainingThisCard();
         });
-        GameState.getInstance().denarians -= item.hellPurchaseValue;
+        GameState.getInstance().sovereignInfernalNotes -= item.hellPurchaseValue;
         return true;
     }
 

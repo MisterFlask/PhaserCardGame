@@ -36,8 +36,8 @@ export class GameState {
             });
         });
 
-        this.denarians = 40
-        this.promissoryNotes = 0
+        this.sovereignInfernalNotes = 40
+        this.britishPoundsSterling = 0
     }
 
     public cleanUpAfterLiquidation(){
@@ -83,8 +83,8 @@ export class GameState {
     public relicsInventory: AbstractRelic[] = [];
 
     public moneyInVault: number = 200
-    public denarians: number = 0
-    public promissoryNotes: number = 0
+    public sovereignInfernalNotes: number = 0
+    public britishPoundsSterling: number = 0
 
     public combatState: CombatState = new CombatState()
 

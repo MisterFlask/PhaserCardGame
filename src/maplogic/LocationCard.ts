@@ -108,6 +108,20 @@ export class EntranceCard extends LocationCard {
         this.portraitName = 'entrance-icon';
         this.portraitTint = 0x00ffff;
     }
+
+    override OnLocationSelected(scene: Phaser.Scene): void {
+        console.log(`Entrance ${this.id} selected`);
+        ActionManager.getInstance().cleanupAndRestartCombat({ encounter: this.encounter, shouldStartWithMapOverlay: false });
+    }
+
+    override determineBaseRewards(): AbstractReward[] {
+        const rewards: AbstractReward[] = [];
+        rewards.push(new CurrencyReward(100));
+
+        const cardRewards = CardRewardsGenerator.getInstance().generateCardRewardsForCombat();
+        rewards.push(new CardReward(cardRewards));  
+        return rewards;
+    }
 }
 
 export class BossRoomCard extends LocationCard {

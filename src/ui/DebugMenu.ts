@@ -116,7 +116,7 @@ export class DebugMenu {
             {
                 text: 'Add Hell Currency (+1000)',
                 callback: () => {
-                    GameState.getInstance().denarians += 1000;
+                    GameState.getInstance().sovereignInfernalNotes += 1000;
                 }
             },
             { text: 'Close', callback: () => this.hide() }

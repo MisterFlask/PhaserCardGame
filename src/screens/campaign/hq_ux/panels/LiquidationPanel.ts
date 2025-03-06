@@ -176,7 +176,7 @@ export class LiquidationPanel extends AbstractHqPanel {
         }
 
         // After relics section, add promissory notes section
-        const promissoryValue = gameState.promissoryNotes || 0;
+        const promissoryValue = gameState.britishPoundsSterling || 0;
         if (promissoryValue > 0) {
             const promissoryHeaderText = new TextBox({
                 scene: this.scene,
@@ -270,13 +270,13 @@ export class LiquidationPanel extends AbstractHqPanel {
         });
 
         // Add promissory notes value
-        totalValue += (gameState.promissoryNotes || 0);
+        totalValue += (gameState.britishPoundsSterling || 0);
 
         // Add value to surface currency
         gameState.moneyInVault += totalValue;
         
         // Clear promissory notes after converting to surface currency
-        gameState.promissoryNotes = 0;
+        gameState.britishPoundsSterling = 0;
 
         // Return to hub
         gameState.cleanUpAfterLiquidation();

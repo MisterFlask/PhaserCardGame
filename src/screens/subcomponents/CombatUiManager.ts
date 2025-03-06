@@ -374,12 +374,12 @@ class CombatUIManager {
 
         const gameWidth = this.scene.scale.width;
         const gameHeight = this.scene.scale.height;
-        const startX = gameWidth - 150;
-        const startY = gameHeight - 350;
-        const spacingY = 50;
+        const startX = gameWidth - 300;
+        const startY = gameHeight - 500;
+        const spacingY = 80;
 
         const boxPadding = 10;
-        const backgroundWidth = 190;
+        const backgroundWidth = 240;
         const backgroundHeight = resourceArray.length * spacingY + boxPadding * 2;
         const backgroundX = startX - boxPadding + backgroundWidth / 2 - 40;
         const backgroundY = startY - boxPadding + backgroundHeight / 2;

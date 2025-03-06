@@ -10,6 +10,6 @@ export class ImperialSubsidyModifier extends AbstractBuff {
     }
 
     override onActStart(): void {
-        this.gameState.promissoryNotes += 30;
+        this.gameState.britishPoundsSterling += 30;
     }
 }

@@ -43,7 +43,7 @@ class EspionageChoice extends AbstractChoice {
     }
 
     canChoose(): boolean {
-        return this.gameState().denarians >= 50;
+        return this.gameState().sovereignInfernalNotes >= 50;
     }
 
     effect(): void {
