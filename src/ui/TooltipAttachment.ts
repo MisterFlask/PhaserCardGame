@@ -66,11 +66,18 @@ export class TooltipAttachment {
         this.isVisible = true;
         this.tooltip.setVisible(true);
         this.updateTooltipPosition();
-        this.tooltip.setDepth(DepthManager.getInstance().TOOLTIP);
+        
+        // Set a higher depth value that will be above all overlays (including MapOverlay + 1000)
+        // For context, the MapOverlay is using DepthManager.getInstance().MAP_OVERLAY + 1000
+        const depthManager = DepthManager.getInstance();
+        this.tooltip.setDepth(depthManager.TOOLTIP);
+        
         // Bring tooltip to top of display list
         if (this.tooltip.parentContainer) {
+            console.log("showTooltip called (parented)");
             this.tooltip.parentContainer.bringToTop(this.tooltip);
         } else {
+            console.log("showTooltip called (unparented)");
             this.scene.children.bringToTop(this.tooltip);
         }
 

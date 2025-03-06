@@ -658,6 +658,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
             if (this.hoverSound) {
                 this.hoverSound.play();
             }
+            this.scene.events.emit("card:pointerover", this);
         }
     }
 
@@ -671,6 +672,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
                 this.tooltipBox.setVisible(false);
                 this.descBox.setVisible(false);
             }
+            this.scene.events.emit("card:pointerout", this);
         }
     }
 

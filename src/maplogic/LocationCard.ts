@@ -2,19 +2,19 @@
 
 import Phaser from 'phaser';
 import { EncounterEnhancer } from '../encounters/EncounterEnhancer';
-import { Encounter, EncounterManager } from '../encounters/EncountersList';
+import { Encounter, EncounterManager } from "../encounters/EncountersList";
 import { Charon } from '../encounters/monsters/special/Charon';
-import { AbstractEvent } from '../events/AbstractEvent';
-import { AbstractCard } from '../gamecharacters/AbstractCard';
+import { AbstractEvent } from "../events/AbstractEvent";
+import { AbstractCard } from "../gamecharacters/AbstractCard";
 import { AbstractBuff } from "../gamecharacters/buffs/AbstractBuff";
 import { CardSize, CardType } from '../gamecharacters/Primitives';
 import { RelicsLibrary } from '../relics/RelicsLibrary';
-import { AbstractReward } from '../rewards/AbstractReward';
-import { CardReward } from '../rewards/CardReward';
+import { AbstractReward } from "../rewards/AbstractReward";
+import { CardReward } from "../rewards/CardReward";
 import { CurrencyReward } from '../rewards/CurrencyReward';
 import { RelicReward } from '../rewards/RelicReward';
 import { CardRewardsGenerator } from '../rules/CardRewardsGenerator';
-import { GameState } from '../rules/GameState';
+import { GameState } from "../rules/GameState";
 import { CardModifier } from '../rules/modifiers/AbstractCardModifier';
 import { RestSiteUpgradeOptionManager } from '../rules/RestSiteUpgradeOption';
 import { ActionManager } from '../utils/ActionManager';

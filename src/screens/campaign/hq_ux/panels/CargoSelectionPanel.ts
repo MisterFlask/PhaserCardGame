@@ -318,7 +318,7 @@ export class CargoSelectionPanel extends AbstractHqPanel {
       gameState.currentRunCharacters = campaignState.selectedParty;
       gameState.initializeRun();
       SceneChanger.switchToCombatScene(
-        EncounterManager.getInstance().getShopEncounter(),
+        EncounterManager.getInstance().getRandomCombatEncounter(gameState.currentAct, 0),
         true
       );
     }

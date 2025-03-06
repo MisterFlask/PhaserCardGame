@@ -307,7 +307,18 @@ export class EncounterManager {
         return encounter;
     }
     
-    public getRandomCombatEncounter(actSegment: ActSegmentData): { enemies: AutomatedCharacter[] } {
+    public getRandomCombatEncounter(act: integer, segment: integer): Encounter {
+        const actSegment = Object.values(ActSegment).find(
+            segmentData => segmentData.act === act && segmentData.segment === segment
+        ) as ActSegmentData;
+        if (!actSegment) {
+            throw new Error(`No act segment found for act ${act}, segment ${segment}`);
+        }
+
+        var enemies = this.getRandomEnemiesListFromActSegmentNumbers(actSegment.act, actSegment.segment);
+        return new Encounter(enemies.enemies, actSegment.act, actSegment.segment);
+    }
+    public getRandomCombatEncounterFromSegment(actSegment: ActSegmentData): { enemies: AutomatedCharacter[] } {
         return this.getRandomEnemiesListFromActSegmentNumbers(actSegment.act, actSegment.segment);
     }
 

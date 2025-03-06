@@ -1,4 +1,3 @@
-import { EncounterManager } from "../encounters/EncountersList";
 import { GameState } from "../rules/GameState";
 import { SceneChanger } from "./SceneChanger";
 
@@ -33,7 +32,7 @@ export class ActChanger {
             gameState.setCurrentLocation(locations[0]);
         }
 
-        SceneChanger.switchToCombatScene(EncounterManager.getInstance().getShopEncounter(), true);
+        SceneChanger.switchToCombatScene(gameState.currentLocation?.encounter!, true);
 
         // Emit event to show map overlay
         this.scene.events.emit('showMapOverlay');

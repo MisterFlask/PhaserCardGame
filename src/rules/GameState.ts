@@ -35,6 +35,9 @@ export class GameState {
                 buff.onRunStart();
             });
         });
+
+        this.denarians = 40
+        this.promissoryNotes = 0
     }
 
     public cleanUpAfterLiquidation(){

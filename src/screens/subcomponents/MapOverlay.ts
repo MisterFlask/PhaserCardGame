@@ -464,7 +464,8 @@ export class MapOverlay {
 
     // Setup Location Card Events
     private setupLocationCardEvents = (card: PhysicalCard) => {
-        card.container.setInteractive();
+        // Don't override the card's interactivity setup with setInteractive()
+        // Instead, use the existing interactivity
         
         // Add pointer over handler
         card.container.on('pointerover', () => {
@@ -493,6 +494,8 @@ export class MapOverlay {
     // Setup Character Card Events
     private setupCharacterCardEvents = (card: PhysicalCard) => {
         // Character card events can be set up here if needed
+        // Make sure not to override the card's internal interactivity
+        // by avoiding card.container.setInteractive() unless absolutely necessary
     }
 
     // Resize Handler
