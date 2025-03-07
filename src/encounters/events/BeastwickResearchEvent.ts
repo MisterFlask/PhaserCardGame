@@ -44,7 +44,7 @@ class ContainmentConsultChoice extends AbstractChoice {
 
     effect(): void {
         const actionManager = ActionManager.getInstance();
-        actionManager.modifyDenarians(-25);
+        actionManager.modifySovereignInfernalNotes(-25);
         // TODO IMPLEMENT: Card upgrade logic
     }
 }

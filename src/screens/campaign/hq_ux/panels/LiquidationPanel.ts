@@ -175,7 +175,7 @@ export class LiquidationPanel extends AbstractHqPanel {
             });
         }
 
-        // After relics section, add promissory notes section
+        // After relics section, add pounds sterling section
         const promissoryValue = gameState.britishPoundsSterling || 0;
         if (promissoryValue > 0) {
             const promissoryHeaderText = new TextBox({
@@ -184,7 +184,7 @@ export class LiquidationPanel extends AbstractHqPanel {
                 y: yOffset,
                 width: 400,
                 height: 30,
-                text: 'Promissory Notes:',
+                text: 'Pounds Sterling:',
                 style: { fontSize: '20px', color: '#ffffff' }
             });
             this.contentContainer.add(promissoryHeaderText);
@@ -192,7 +192,7 @@ export class LiquidationPanel extends AbstractHqPanel {
 
             this.createItemRow(
                 'promissory_note', // Make sure this texture exists
-                `Promissory Notes: $${promissoryValue}`,
+                `Pounds Sterling: $${promissoryValue}`,
                 promissoryValue,
                 this.scene.scale.width / 2 - 200,
                 yOffset
@@ -269,13 +269,13 @@ export class LiquidationPanel extends AbstractHqPanel {
             totalValue += relic.surfaceSellValue;
         });
 
-        // Add promissory notes value
+        // Add pounds sterling value
         totalValue += (gameState.britishPoundsSterling || 0);
 
         // Add value to surface currency
         gameState.moneyInVault += totalValue;
         
-        // Clear promissory notes after converting to surface currency
+        // Clear pounds sterling after converting to surface currency
         gameState.britishPoundsSterling = 0;
 
         // Return to hub

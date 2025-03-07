@@ -18,7 +18,7 @@ class AssetProtectionChoice extends AbstractChoice {
 
     effect(): void {
         const actionManager = ActionManager.getInstance();
-        actionManager.modifyDenarians(-50);
+        actionManager.modifySovereignInfernalNotes(-50);
         // TODO IMPLEMENT: Relic protection logic
     }
 }

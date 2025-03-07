@@ -41,7 +41,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
             }
         });
 
-        // Combined hell currency and promissory notes display
+        // Combined hell currency and pounds sterling display
         this.combinedCurrencyText = new TextBox({
             scene: this.scene,
             x: 10,
@@ -62,7 +62,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
         this.combinedCurrencyTooltip = new TooltipAttachment({
             scene: this.scene,
             container: this.combinedCurrencyText,
-            tooltipText: "🪙 Denarians: Currency spent in Hell\n📝 Promissory Notes: Converted to money if expedition succeeds",
+            tooltipText: "🪙 Sovereign Infernal Notes (SIN): The official currency of Hell.\n📝 Pounds Sterling: Demons mostly do not respect this as currency, but bulk cargo purchasers have it on-hand for transactions with mortals.",
             fillColor: 0x440000
         });
 

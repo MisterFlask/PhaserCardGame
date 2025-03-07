@@ -4,10 +4,13 @@ import { GameState } from '../GameState';
 import { AbstractCombatResource } from './AbstractCombatResource';
 
 export class BloodResource extends AbstractCombatResource {
+    private static readonly BLOOD_COST: number = 1;
+    private static readonly ENERGY_GAIN: number = 1;
+
     constructor() {
         super(
             "Blood",
-            "Spend 3 Blood: gain 1 Energy.",
+            `Spend ${BloodResource.BLOOD_COST} Blood: gain ${BloodResource.ENERGY_GAIN} Energy.`,
             'blood_icon',
             TextGlyphs.getInstance().bloodIcon
         );
@@ -16,10 +19,10 @@ export class BloodResource extends AbstractCombatResource {
 
     public onClick(): boolean {
         const gameState = GameState.getInstance();
-        if (this.value >= 3) {
+        if (this.value >= BloodResource.BLOOD_COST) {
             ActionManager.getInstance().DoAThing("Blood Resource Click", () => {
-                ActionManager.getInstance().gainEnergy(1);
-                this.value -= 3;
+                ActionManager.getInstance().gainEnergy(BloodResource.ENERGY_GAIN);
+                this.value -= BloodResource.BLOOD_COST;
             });
             return true;
         }

@@ -48,7 +48,7 @@ class EspionageChoice extends AbstractChoice {
 
     effect(): void {
         const actionManager = ActionManager.getInstance();
-        actionManager.modifyDenarians(-50);
+        actionManager.modifySovereignInfernalNotes(-50);
         const relic = RelicsLibrary.getInstance().getRandomBeneficialRelics(1)[0];
         actionManager.addRelicToInventory(relic);
     }

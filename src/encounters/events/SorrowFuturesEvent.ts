@@ -18,7 +18,7 @@ class FuturesTradingChoice extends AbstractChoice {
 
     effect(): void {
         const actionManager = ActionManager.getInstance();
-        actionManager.modifyDenarians(25);
+        actionManager.modifySovereignInfernalNotes(25);
     }
 }
 

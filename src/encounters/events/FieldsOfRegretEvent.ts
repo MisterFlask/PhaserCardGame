@@ -42,7 +42,7 @@ class RegretAbsolutionChoice extends AbstractChoice {
 
     effect(): void {
         const actionManager = ActionManager.getInstance();
-        actionManager.modifyDenarians(-25);
+        actionManager.modifySovereignInfernalNotes(-25);
         for (const character of this.gameState().currentRunCharacters) {
             actionManager.applyBuffToCharacter(character, new Stress(-2));
         }

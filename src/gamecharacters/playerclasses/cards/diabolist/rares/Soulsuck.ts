@@ -21,7 +21,7 @@ class SoulsuckBuff extends AbstractBuff {
     }
 
     override onFatal(killedUnit: BaseCharacter): void {
-        this.actionManager.modifyDenarians(15);
+        this.actionManager.modifySovereignInfernalNotes(15);
     }
 }
 

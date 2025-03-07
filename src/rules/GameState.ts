@@ -11,7 +11,7 @@ import type { AutomatedCharacterType, BaseCharacterType } from '../Types';
 import type { PhysicalCard } from '../ui/PhysicalCard';
 import { ActRegion } from './acts/ActRegion';
 import { AbstractCombatResource } from './combatresources/AbstractCombatResource';
-import { Ashes } from './combatresources/AshesResource';
+import { AshesResource } from './combatresources/AshesResource';
 import { BloodResource } from './combatresources/BloodResource';
 import { MettleResource } from './combatresources/MettleResource';
 import { PluckResource } from './combatresources/PluckResource';
@@ -333,7 +333,7 @@ export class MissionDetails{
 export class CombatResources {
     blood: BloodResource = new BloodResource();
     mettle: MettleResource = new MettleResource();
-    ashes: Ashes = new Ashes();
+    ashes: AshesResource = new AshesResource();
     pluck: PluckResource = new PluckResource();
     smog: SmogResource = new SmogResource();
     venture: VentureResource = new VentureResource();

@@ -1,6 +1,6 @@
 import { AbstractBuff } from "../gamecharacters/buffs/AbstractBuff";
 import { AdditionalHellCurrency } from "../gamecharacters/buffs/location/AdditionalHellCurrency";
-import { AdditionalPromissoryNotes } from "../gamecharacters/buffs/location/AdditionalPromissoryNotes";
+import { AdditionalPoundsSterling } from "../gamecharacters/buffs/location/AdditionalPromissoryNotes";
 import { AnotherCardReward } from "../gamecharacters/buffs/location/AnotherCardReward";
 import { EldritchFoes } from "../gamecharacters/buffs/location/EldritchFoes";
 import { GuaranteedRareCardReward } from "../gamecharacters/buffs/location/GuaranteedRareCardReward";
@@ -36,13 +36,13 @@ export class LocationBuffRegistry {
             new DrainCombatResource(this.combatResources.smog, 1),
         ];
 
-        // positive buffs: another card reward, upgraded card rewards, guaranteed rare card reward, additional hell currency, additional promissory notes, guaranteed relic
+        // positive buffs: another card reward, upgraded card rewards, guaranteed rare card reward, additional hell currency, additional pounds sterling, guaranteed relic
         this.availablePositiveBuffs = [
             new AnotherCardReward(),
             new UpgradedCardReward(),
             new GuaranteedRareCardReward(),
             new AdditionalHellCurrency(25),
-            new AdditionalPromissoryNotes(25),
+            new AdditionalPoundsSterling(25),
             new GuaranteedRelic(),
             new MerchantMultiplier(),
         ];

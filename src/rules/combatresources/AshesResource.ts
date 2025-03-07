@@ -4,11 +4,13 @@ import { ActionManager } from '../../utils/ActionManager';
 import { GameState } from '../GameState';
 import { AbstractCombatResource } from './AbstractCombatResource';
 
-export class Ashes extends AbstractCombatResource {
+export class AshesResource extends AbstractCombatResource {
+    private static readonly ASHES_COST: number = 2;
+
     constructor() {
         super(
             "Ashes",
-            `Pay 2 Ashes: Increase damage and block of a random card in your hand by 50%.`,
+            `Pay ${AshesResource.ASHES_COST} Ashes: Increase damage and block of a random card in your hand by 50%.`,
             'ashes_icon',
             TextGlyphs.getInstance().ashesIcon
         );

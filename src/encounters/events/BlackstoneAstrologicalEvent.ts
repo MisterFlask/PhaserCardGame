@@ -17,7 +17,7 @@ class CelestialForecastChoice extends AbstractChoice {
 
     effect(): void {
         const actionManager = ActionManager.getInstance();
-        actionManager.modifyDenarians(-10);
+        actionManager.modifySovereignInfernalNotes(-10);
         // TODO IMPLEMENT: Encounter preview logic
     }
 }

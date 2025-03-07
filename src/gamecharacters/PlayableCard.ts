@@ -1,4 +1,4 @@
-import { Ashes } from "../rules/combatresources/AshesResource";
+import { AshesResource } from "../rules/combatresources/AshesResource";
 import { BloodResource } from "../rules/combatresources/BloodResource";
 import { MettleResource } from "../rules/combatresources/MettleResource";
 import { PluckResource } from "../rules/combatresources/PluckResource";
@@ -152,7 +152,7 @@ export abstract class PlayableCard extends AbstractCard {
         return this.combatResources.pluck;
     }
 
-    get ashes(): Ashes {
+    get ashes(): AshesResource {
         return this.combatResources.ashes;
     }
 

@@ -80,10 +80,10 @@ class CombatScene extends Phaser.Scene {
         SceneChanger.setCurrentScene(this);
         ActionManager.init(this);
 
-        const stateService = CombatStateService.getInstance();
-        stateService.initializeCombat(data.encounter, GameState.getInstance().currentRunCharacters);
         UIContextManager.getInstance().setContext(UIContext.COMBAT);
         this.combatEndHandled = false;
+
+        this.cleanupAndRestartCombat(data);
     }
 
     cleanupAndRestartCombat(data: CombatSceneData): void {

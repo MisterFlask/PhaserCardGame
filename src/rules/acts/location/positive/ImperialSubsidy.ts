@@ -6,7 +6,7 @@ export class ImperialSubsidyModifier extends AbstractBuff {
     }
 
     getDescription(): string {
-        return `At the start of each Act, gain 30 Promissory Notes.`;
+        return `At the start of each Act, gain 30 Pounds Sterling.`;
     }
 
     override onActStart(): void {

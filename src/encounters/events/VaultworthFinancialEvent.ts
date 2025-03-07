@@ -26,10 +26,10 @@ class DenarianExchangeChoice extends AbstractChoice {
 
         super(
             "Access Denarian Exchange Desk",
-            "Convert 10 Promissory Notes to 150 Denarians"
+            "Convert 10 Pounds Sterling to 150 Denarians"
         );
         this.nextEvent = new DeadEndEvent();
-        this.nextEvent.description = "Tellers in pinstripe suits stamp your documents with infernal seals. The air smells of ink and brimstone as your promissory note dissolves into shimmering currency.";
+        this.nextEvent.description = "Tellers in pinstripe suits stamp your documents with infernal seals. The air smells of ink and brimstone as your pounds sterling dissolve into shimmering currency.";
     }
 
     canChoose(): boolean {
@@ -39,7 +39,7 @@ class DenarianExchangeChoice extends AbstractChoice {
     effect(): void {
         const actionManager = ActionManager.getInstance();
         actionManager.modifyPromissoryNotes(-10);
-        actionManager.modifyDenarians(150);
+        actionManager.modifySovereignInfernalNotes(150);
     }
 }
 
@@ -50,7 +50,7 @@ class LiquidityAssistanceChoice extends AbstractChoice {
             "Gain 50 Denarians"
         );
         this.nextEvent = new DeadEndEvent();
-        this.nextEvent.description = "The loan officer's monocle glints as they slide a contract across the desk. The fine print writhes like living things.  You're pretty sure it's fine.";
+        this.nextEvent.description = "The loan officer's monocle glints as they slide a contract across the desk. The small print writhes like living things.  You're pretty sure it's fine.";
     }
 
     canChoose(): boolean {
@@ -59,7 +59,7 @@ class LiquidityAssistanceChoice extends AbstractChoice {
 
     effect(): void {
         const actionManager = ActionManager.getInstance();
-        actionManager.modifyDenarians(50);
+        actionManager.modifySovereignInfernalNotes(50);
     }
 }
 

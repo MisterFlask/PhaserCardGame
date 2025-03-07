@@ -56,7 +56,7 @@ export class ActionManager {
             return [];
         }));
     }
-    modifyDenarians(amount: number) {
+    modifySovereignInfernalNotes(amount: number) {
         this.actionQueue.addAction(new GenericAction(async () => {
             GameState.getInstance().sovereignInfernalNotes += amount;
             return [];

@@ -47,7 +47,7 @@ class ElaborateTattooChoice extends AbstractChoice {
         const character = gameState.currentRunCharacters[0];
         const actionManager = ActionManager.getInstance();
         
-        actionManager.modifyDenarians(-75);
+        actionManager.modifySovereignInfernalNotes(-75);
         actionManager.applyBuffToCharacter(character, new Lethality(2));
         actionManager.applyBuffToCharacter(character, new Stress(2));
     }

@@ -29,7 +29,7 @@ class PropagandaPressChoice extends AbstractChoice {
     constructor() {
         super(
             "Run Revolutionary Broadsheets",
-            "Gain 100 Promissory Notes (1 Stress)"
+            "Gain 100 Pounds Sterling (1 Stress)"
         );
         this.nextEvent = new DeadEndEvent();
         this.nextEvent.description = "Typesetting demons clatter away as your manifesto flows through the presses. The finished sheets smell of ink and righteous fury.";

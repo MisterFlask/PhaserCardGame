@@ -5,10 +5,12 @@ import { GameState } from '../GameState';
 import { AbstractCombatResource } from './AbstractCombatResource';
 
 export class SmogResource extends AbstractCombatResource {
+    private static readonly RETURN_CARD_COST: number = 2;
+
     constructor() {
         super(
             "Smog",
-            "Spend 3 Smog: Return a card from your discard pile to your hand",
+            `Spend ${SmogResource.RETURN_CARD_COST} Smog: Return a card from your discard pile to your hand`,
             'smog_icon',
             TextGlyphs.getInstance().smogIcon
         );
@@ -17,10 +19,10 @@ export class SmogResource extends AbstractCombatResource {
 
     public onClick(): boolean {
         const gameState = GameState.getInstance();
-        if (this.value >= 3) {
+        if (this.value >= SmogResource.RETURN_CARD_COST) {
             if (gameState.combatState.currentDiscardPile.length > 0) {
                 // Deduct the cost upfront
-                this.value -= 3;
+                this.value -= SmogResource.RETURN_CARD_COST;
                 
                 ActionManager.getInstance().selectFromCardPool({
                     name: "Return to Hand",
@@ -39,7 +41,7 @@ export class SmogResource extends AbstractCombatResource {
                     },
                     onCancelAction: () => {
                         // Refund the cost if cancelled
-                        this.value += 3;
+                        this.value += SmogResource.RETURN_CARD_COST;
                     }
                 });
             }

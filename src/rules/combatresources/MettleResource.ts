@@ -4,10 +4,13 @@ import { GameState } from '../GameState';
 import { AbstractCombatResource } from './AbstractCombatResource';
 
 export class MettleResource extends AbstractCombatResource {
+    private static readonly METTLE_COST: number = 1;
+    private static readonly BLOCK_AMOUNT: number = 2;
+
     constructor() {
         super(
             "Mettle",
-            "Spend 1 Mettle: all characters gain 2 Block.",
+            `Spend ${MettleResource.METTLE_COST} Mettle: all characters gain ${MettleResource.BLOCK_AMOUNT} Block.`,
             'iron_icon',
             TextGlyphs.getInstance().mettleIcon
         );
@@ -16,15 +19,15 @@ export class MettleResource extends AbstractCombatResource {
 
     public onClick(): boolean {
         const gameState = GameState.getInstance();
-        if (this.value >= 1) {
+        if (this.value >= MettleResource.METTLE_COST) {
             ActionManager.getInstance().DoAThing("Iron Resource Click", () => {
                 gameState.combatState.allPlayerAndEnemyCharacters.forEach(character => {
                     ActionManager.getInstance().applyBlock({
-                        baseBlockValue: 2,
+                        baseBlockValue: MettleResource.BLOCK_AMOUNT,
                         blockTargetCharacter: character
                     });
                 });
-                this.value -= 1;
+                this.value -= MettleResource.METTLE_COST;
             });
             return true;
         }

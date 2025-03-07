@@ -14,7 +14,6 @@ export class LoadoutPanel extends AbstractHqPanel {
     public rosterPanel: RosterPanel;
     public partyPanel: CaravanPartyPanel;
     public summaryPanel: ExpeditionSummaryPanel;
-    private launchButton: Label;
     private statusText: Label;
     private tradeRouteCard: PhysicalCard | null = null;
     private mainSizer!: Sizer;
@@ -30,14 +29,6 @@ export class LoadoutPanel extends AbstractHqPanel {
         this.rosterPanel = new RosterPanel(scene, this);
         this.partyPanel = new CaravanPartyPanel(scene, this);
         this.summaryPanel = new ExpeditionSummaryPanel(scene, this);
-
-        // Create launch button using rexUI label
-        this.launchButton = this.rexUI.add.label({
-            background: this.rexUI.add.roundRectangle(0, 0, 0, 0, 10, 0x444444),
-            text: this.scene.add.text(0, 0, 'Select Cargo', { fontSize: '20px', color: '#ffffff' }),
-            space: { top: 10, bottom: 10, left: 20, right: 20 },
-        });
-        this.launchButton.setInteractive().on('pointerdown', () => this.handleLaunch());
 
         // Create status text using rexUI label
         this.statusText = this.rexUI.add.label({
@@ -75,12 +66,11 @@ export class LoadoutPanel extends AbstractHqPanel {
         panelsSizer.add(leftColumn, { proportion: 2, expand: true });
         panelsSizer.add(this.summaryPanel, { proportion: 1, expand: true });
 
-        // Lower section: horizontal sizer for launch button and status text
+        // Lower section: just the status text now
         const bottomSizer = this.rexUI.add.sizer({
             orientation: 'horizontal',
             space: { item: 10 },
         });
-        bottomSizer.add(this.launchButton, { proportion: 0, expand: false });
         bottomSizer.add(this.statusText, { proportion: 1, expand: true });
 
         // Add panels and bottom row to the main sizer
@@ -149,13 +139,23 @@ export class LoadoutPanel extends AbstractHqPanel {
             // Update status text and background for "ready" state
             (this.statusText.getElement('text') as Phaser.GameObjects.Text).setText("Ready to select cargo!");
             (this.statusText.getElement('background') as Phaser.GameObjects.Rectangle).setFillStyle(0x006400); // Dark green
-            this.launchButton.setInteractive();
+            
+            // Make the status text interactive when ready
+            this.statusText.setInteractive()
+                .on('pointerdown', () => this.handleLaunch())
+                .on('pointerover', () => {
+                    (this.statusText.getElement('background') as Phaser.GameObjects.Rectangle).setFillStyle(0x008800); // Lighter green on hover
+                })
+                .on('pointerout', () => {
+                    (this.statusText.getElement('background') as Phaser.GameObjects.Rectangle).setFillStyle(0x006400); // Back to dark green
+                });
         } else {
             const reasonsText = status.reasons.join('\n• ');
             (this.statusText.getElement('text') as Phaser.GameObjects.Text).setText(`Cannot proceed:\n• ${reasonsText}`);
             (this.statusText.getElement('background') as Phaser.GameObjects.Rectangle).setFillStyle(0x8B0000); // Dark red
-            // Disable interactive if not ready
-            this.launchButton.disableInteractive();
+            
+            // Remove interactivity if not ready
+            this.statusText.removeInteractive();
         }
     }
 

@@ -3,10 +3,12 @@ import { ActionManager } from '../../utils/ActionManager';
 import { AbstractCombatResource } from './AbstractCombatResource';
 
 export class VentureResource extends AbstractCombatResource {
+    private static readonly DRAW_CARD_COST: number = 2;
+
     constructor() {
         super(
             "Venture",
-            "Spend 2 Venture: Draw a card",
+            `Spend ${VentureResource.DRAW_CARD_COST} Venture: Draw a card`,
             'venture_icon',
             TextGlyphs.getInstance().ventureIcon
         );
@@ -14,10 +16,10 @@ export class VentureResource extends AbstractCombatResource {
     }
 
     public onClick(): boolean {
-        if (this.value >= 2) {
+        if (this.value >= VentureResource.DRAW_CARD_COST) {
             ActionManager.getInstance().DoAThing("Venture Resource Click", () => {
                 ActionManager.getInstance().drawCards(1);
-                this.value -= 2;
+                this.value -= VentureResource.DRAW_CARD_COST;
 
             });
             return true;

@@ -20,7 +20,7 @@ Core idea here is they denote places where specific kinds of events can trigger.
 - Astral projection chamber (explore distant locations)
 
 ## Vaultworth Financial Group
-- Promissory note conversion services (Denarian Exchange Desk)
+- Pounds Sterling conversion services (Denarian Exchange Desk)
 - Liquidity assistance program (short-term capital infusion with reputation impact)
 - Shareholder dividend portal (requires Silver-tier membership status)
 
