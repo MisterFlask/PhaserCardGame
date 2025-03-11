@@ -10,7 +10,7 @@ export class Charon extends AutomatedCharacter {
             name: 'Charon', 
             portraitName: 'Boss Harbinger', 
             maxHitpoints: 200, 
-            description: 'Think of him as a large, ominous friend.' 
+            description: 'a large, ominous friend.' 
         });
         this.portraitTargetLargestDimension = 600;
         this.portraitOffsetXOverride = -100

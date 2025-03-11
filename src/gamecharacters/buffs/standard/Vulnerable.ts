@@ -20,7 +20,7 @@ export class Vulnerable extends AbstractBuff {
         return 50; // Increases damage taken by 50%
     }
 
-    override onTurnStart(): void {
+    override onTurnEnd(): void {
         this.stacks--;
     }
 }

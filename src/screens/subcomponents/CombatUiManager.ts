@@ -447,6 +447,11 @@ class CombatUIManager {
         this.generalRewardScreen?.hide();
         if (GameState.getInstance().currentLocation) {
             GameState.getInstance().currentLocation!.currentExpectedRewards = GameState.getInstance().currentLocation!.determineBaseRewards();
+            // Apply any reward modifiers from location buffs
+            GameState.getInstance().currentLocation!.buffs.forEach(buff => {
+                GameState.getInstance().currentLocation!.currentExpectedRewards = 
+                    buff.alterRewards(GameState.getInstance().currentLocation!.currentExpectedRewards);
+            });
         }
     }
 

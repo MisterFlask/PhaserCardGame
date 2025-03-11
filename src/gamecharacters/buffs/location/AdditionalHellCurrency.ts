@@ -10,11 +10,11 @@ export class AdditionalHellCurrency extends AbstractBuff {
     }
 
     override getDisplayName(): string {
-        return "Additional Denarians";
+        return "Additional Sovereign Infernal Notes";
     }
 
     override getDescription(): string {
-        return "Receive additional Denarians at the end of combat.";
+        return "Receive additional Sovereign Infernal Notes at the end of combat.";
     }
 
     override alterRewards(currentRewards: AbstractReward[]): AbstractReward[] {

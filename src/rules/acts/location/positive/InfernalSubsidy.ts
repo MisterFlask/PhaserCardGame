@@ -6,7 +6,7 @@ export class InfernalSubsidyModifier extends AbstractBuff {
     }
 
     getDescription(): string {
-        return `At the start of each Act, gain 30 Denarians.`;
+        return `At the start of each Act, gain 30 Sovereign Infernal Notes.`;
     }
 
     override onActStart(): void {

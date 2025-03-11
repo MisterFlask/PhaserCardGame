@@ -31,7 +31,7 @@ class HybridizationChoice extends AbstractChoice {
 class ContainmentConsultChoice extends AbstractChoice {
     constructor() {
         super(
-            "Purchase Containment Blueprints (Costs 25 Denarians)",
+            "Purchase Containment Blueprints (Costs 25 Sovereign Infernal Notes)",
             "Upgrade a random card in your deck"
         );
         this.nextEvent = new DeadEndEvent();

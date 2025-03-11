@@ -17,14 +17,14 @@ class PowerCoreBuff extends AbstractBuff {
     }
 
     override getDescription(): string {
-        return "Whenever you play a Power card, deal 15 damage to ALL enemies.";
+        return "Whenever a Power card is played, deal 15 damage to ALL enemies.";
     }
 
     override onAnyCardPlayedByAnyone(playedCard: PlayableCard): void {
         const owner = this.getOwnerAsCharacter();
         if (!owner) return;
 
-        if (playedCard.cardType === CardType.POWER && playedCard.owningCharacter === owner) {
+        if (playedCard.cardType === CardType.POWER) {
             this.forEachEnemy(enemy => {
                 this.actionManager.dealDamage({
                     baseDamageAmount: 15,

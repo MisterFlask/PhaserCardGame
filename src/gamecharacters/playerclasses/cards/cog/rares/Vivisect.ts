@@ -1,1 +1,2 @@
-// precision.  Deal 15 damage.  Slayer: Gain 4 Ashes and 4 Blood.
+// Deal 10 damage.  Gain 1 Ash and 1 Blood.  Exert: Do it again.  Cost 1.
+

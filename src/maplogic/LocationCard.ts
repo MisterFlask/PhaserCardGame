@@ -185,7 +185,7 @@ export class CharonRoomCard extends LocationCard {
     constructor(floor: number, index: number) {
         super({
             name: 'Charon',
-            description: `Incur a debt of 100 Denarians for passage, payable on departure from Hell.`,
+            description: `Incur a debt of 100 Sovereign Infernal Notes for passage, payable on departure from Hell.`,
             size: CardSize.SMALL,
             floor,
             index

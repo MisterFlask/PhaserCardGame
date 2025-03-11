@@ -62,7 +62,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
         this.combinedCurrencyTooltip = new TooltipAttachment({
             scene: this.scene,
             container: this.combinedCurrencyText,
-            tooltipText: "🪙 Sovereign Infernal Notes (SIN): The official currency of Hell.\n📝 Pounds Sterling: Demons mostly do not respect this as currency, but bulk cargo purchasers have it on-hand for transactions with mortals.",
+            tooltipText: "🔥 Sovereign Infernal Notes (SIN): The official currency of Hell.  Considered contraband on Earth.\n💷 Pounds Sterling: Not infernal legal tender, but some merchants have it on-hand for bulk commodity transactions with mortals.",
             fillColor: 0x440000
         });
 
@@ -143,7 +143,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
     private updateCurrencyDisplay(): void {
         const gameState = GameState.getInstance();
         this.actNumberText.setText(`Act ${gameState.currentAct}`);
-        this.combinedCurrencyText.setText(`🪙 ${gameState.sovereignInfernalNotes} | 📝 ${gameState.britishPoundsSterling}`);
+        this.combinedCurrencyText.setText(`🔥 ${gameState.sovereignInfernalNotes} | £ ${gameState.britishPoundsSterling}`);
     }
 
     public destroy(fromScene?: boolean): void {

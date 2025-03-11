@@ -59,6 +59,7 @@ class CombatScene extends Phaser.Scene {
     private eventToRunNext?: AbstractEvent;
     private hasEventBeenRun: boolean = false;
     private sceneStartsWithMapOverlayUp: boolean = false;
+    private initialData: CombatSceneData = new CombatSceneData();
 
     private setNewEvent(event?: AbstractEvent): void {
         this.eventToRunNext = event;
@@ -82,8 +83,7 @@ class CombatScene extends Phaser.Scene {
 
         UIContextManager.getInstance().setContext(UIContext.COMBAT);
         this.combatEndHandled = false;
-
-        this.cleanupAndRestartCombat(data);
+        this.initialData = data;
     }
 
     cleanupAndRestartCombat(data: CombatSceneData): void {
@@ -237,6 +237,8 @@ class CombatScene extends Phaser.Scene {
         this.events.on('changeBackground', (backgroundName: string) => {
             this.changeBackground(backgroundName);
         });
+
+        this.cleanupAndRestartCombat(this.initialData);
     }
 
     private obliterate(): void {

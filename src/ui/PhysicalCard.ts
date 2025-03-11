@@ -390,6 +390,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
         }
 
         this.blockText?.setText(`${this.data.block}`);
+        this.blockText?.setVisible(this.data.block > 0);
 
         this.updatePriceBox();
         this.glowEffect?.update();

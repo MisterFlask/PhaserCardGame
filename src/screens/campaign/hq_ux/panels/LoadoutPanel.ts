@@ -37,6 +37,20 @@ export class LoadoutPanel extends AbstractHqPanel {
             space: { top: 8, bottom: 8, left: 10, right: 10 },
         });
 
+        // Set up event listeners once
+        this.statusText.setInteractive()
+            .on('pointerdown', () => this.handleLaunch())
+            .on('pointerover', () => {
+                if (this.isReadyToLaunch()) {
+                    (this.statusText.getElement('background') as Phaser.GameObjects.Rectangle).setFillStyle(0x008800); // Lighter green on hover
+                }
+            })
+            .on('pointerout', () => {
+                if (this.isReadyToLaunch()) {
+                    (this.statusText.getElement('background') as Phaser.GameObjects.Rectangle).setFillStyle(0x006400); // Back to dark green
+                }
+            });
+
         this.updateLaunchButton();
 
         // ---- Build the main panel layout via RexUI sizers ----
@@ -101,7 +115,9 @@ export class LoadoutPanel extends AbstractHqPanel {
 
     private handleLaunch(): void {
         if (this.isReadyToLaunch()) {
+            console.log("about to navigate to cargoselection");
             this.scene.events.emit('navigate', 'cargoselection');
+            console.log("navigated to cargoselection");
         }
     }
 
@@ -140,22 +156,15 @@ export class LoadoutPanel extends AbstractHqPanel {
             (this.statusText.getElement('text') as Phaser.GameObjects.Text).setText("Ready to select cargo!");
             (this.statusText.getElement('background') as Phaser.GameObjects.Rectangle).setFillStyle(0x006400); // Dark green
             
-            // Make the status text interactive when ready
-            this.statusText.setInteractive()
-                .on('pointerdown', () => this.handleLaunch())
-                .on('pointerover', () => {
-                    (this.statusText.getElement('background') as Phaser.GameObjects.Rectangle).setFillStyle(0x008800); // Lighter green on hover
-                })
-                .on('pointerout', () => {
-                    (this.statusText.getElement('background') as Phaser.GameObjects.Rectangle).setFillStyle(0x006400); // Back to dark green
-                });
+            // Enable interactivity when ready
+            this.statusText.setInteractive();
         } else {
             const reasonsText = status.reasons.join('\n• ');
             (this.statusText.getElement('text') as Phaser.GameObjects.Text).setText(`Cannot proceed:\n• ${reasonsText}`);
             (this.statusText.getElement('background') as Phaser.GameObjects.Rectangle).setFillStyle(0x8B0000); // Dark red
             
-            // Remove interactivity if not ready
-            this.statusText.removeInteractive();
+            // Disable interactivity if not ready
+            this.statusText.disableInteractive();
         }
     }
 

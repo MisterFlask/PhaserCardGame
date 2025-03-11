@@ -1,0 +1,1 @@
+// every time you target this character with a card, Sacrifice.

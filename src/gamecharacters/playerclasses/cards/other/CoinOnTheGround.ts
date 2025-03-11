@@ -22,6 +22,6 @@ export class CoinOnTheGround extends PlayableCard {
     }
 
     override get description(): string {
-        return `Gain 4 Denarians. Exhaust.`;
+        return `Gain 4 Sovereign Infernal Notes. Exhaust.`;
     }
 } 

@@ -24,8 +24,8 @@ import { PlayerCharacter } from "./PlayerCharacter";
 import { ArchonClass } from "./playerclasses/ArchonClass";
 import { BlackhandClass } from "./playerclasses/BlackhandClass";
 import { Defend } from "./playerclasses/cards/basic/Defend";
+import { FireRevolver } from "./playerclasses/cards/basic/FireRevolver";
 import { Rummage } from "./playerclasses/cards/basic/Rummage";
-import { Shoot as FireRevolver } from "./playerclasses/cards/basic/Shoot";
 import { CogClass } from "./playerclasses/CogClass";
 import { DiabolistClass } from "./playerclasses/DiabolistClass";
 

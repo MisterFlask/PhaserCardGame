@@ -317,12 +317,18 @@ export class CargoSelectionPanel extends AbstractHqPanel {
 
       gameState.currentRunCharacters = campaignState.selectedParty;
       gameState.initializeRun();
+      const encounter = EncounterManager.getInstance().getRandomCombatEncounter(gameState.currentAct, 0);
       SceneChanger.switchToCombatScene(
-        EncounterManager.getInstance().getRandomCombatEncounter(gameState.currentAct, 0),
+        encounter,
         true
       );
-      GameState.getInstance().currentLocation!.OnLocationSelected(SceneChanger.getCurrentScene()!);
-
+      
+      // Make sure currentLocation exists before calling OnLocationSelected
+      if (gameState.currentLocation) {
+        gameState.currentLocation.OnLocationSelected(SceneChanger.getCurrentScene()!);
+      } else {
+        console.warn("Cannot call OnLocationSelected: currentLocation is null");
+      }
     }
   }
 
@@ -335,8 +341,16 @@ export class CargoSelectionPanel extends AbstractHqPanel {
   }
 
   private getReadinessStatus(): { ready: boolean; reasons: string[] } {
-    // add logic if needed
     const reasons: string[] = [];
+    const campaignState = CampaignUiState.getInstance();
+    
+    // Check if party is empty
+    if (!campaignState.selectedParty || campaignState.selectedParty.length === 0) {
+      reasons.push("No characters selected for the expedition");
+    }
+    
+    // Add additional checks here if needed
+    
     return { ready: reasons.length === 0, reasons };
   }
 
@@ -447,6 +461,19 @@ export class CargoSelectionPanel extends AbstractHqPanel {
 
     const campaignState = CampaignUiState.getInstance();
     const gameState = GameState.getInstance();
+
+    // Reset physicalCard property on all cards before creating new ones
+    campaignState.availableTradeGoods.forEach(good => {
+      if (good.physicalCard) {
+        good.physicalCard = undefined;
+      }
+    });
+
+    gameState.cargoHolder.cardsInMasterDeck.forEach(good => {
+      if (good.physicalCard) {
+        good.physicalCard = undefined;
+      }
+    });
 
     // build available cargo
     campaignState.availableTradeGoods.forEach((good) => {
@@ -605,5 +632,21 @@ export class CargoSelectionPanel extends AbstractHqPanel {
     // destroy tooltips
     this.tooltipAttachments.forEach(tooltip => tooltip.destroy());
     this.tooltipAttachments = [];
+
+    // Reset physicalCard property on all cards
+    const campaignState = CampaignUiState.getInstance();
+    const gameState = GameState.getInstance();
+
+    campaignState.availableTradeGoods.forEach(good => {
+      if (good.physicalCard) {
+        good.physicalCard = undefined;
+      }
+    });
+
+    gameState.cargoHolder.cardsInMasterDeck.forEach(good => {
+      if (good.physicalCard) {
+        good.physicalCard = undefined;
+      }
+    });
   }
 }

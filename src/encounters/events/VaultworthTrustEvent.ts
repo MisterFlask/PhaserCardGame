@@ -4,7 +4,7 @@ import { ActionManager } from "../../utils/ActionManager";
 class AssetProtectionChoice extends AbstractChoice {
     constructor() {
         super(
-            "Purchase Insurance Policy (Costs 50 Denarians)",
+            "Purchase Insurance Policy (Costs 50 Sovereign Infernal Notes)",
             "Protect a relic from loss for this run"
         );
         this.nextEvent = new DeadEndEvent();

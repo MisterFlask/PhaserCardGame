@@ -3,7 +3,7 @@ import { BaseCharacter } from "../../../BaseCharacter";
 import { EntityRarity } from "../../../EntityRarity";
 import { PlayableCard } from "../../../PlayableCard";
 
-export class Shoot extends PlayableCard {
+export class FireRevolver extends PlayableCard {
 
     constructor() {
         super({
