@@ -12,7 +12,7 @@ export class PneumaticBarrier extends PlayableCard {
         super({
             name: "Pneumatic Barrier",
             cardType: CardType.SKILL,
-            targetingType: TargetingType.NO_TARGETING,
+            targetingType: TargetingType.ALLY,
             rarity: EntityRarity.COMMON,
         });
         this.baseEnergyCost = 1;
@@ -22,15 +22,13 @@ export class PneumaticBarrier extends PlayableCard {
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         // Apply block to the owner
-        this.forEachAlly(ally => {
-            this.applyBlockToTarget(ally);
-        });
+        this.applyBlockToTarget(targetCard?.asBaseCharacter());
 
         // Manufacture a copy into hand
-        BasicProcs.getInstance().ManufactureCardToHand(new PneumaticBarrier().withOwner(this.owningCharacter!));
+        BasicProcs.getInstance().ManufactureCardToHand(this.Copy().withOwner(this.owningCharacter!));
     }
 
     override get description(): string {
-        return `Gain ${this.getDisplayedBlock()} block. Manufacture a copy of this card into your hand. Exhaust.`;
+        return `Apply ${this.getDisplayedBlock()} block. Manufacture a copy of this card into your hand.`;
     }
 }
