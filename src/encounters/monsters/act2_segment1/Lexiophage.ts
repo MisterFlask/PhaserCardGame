@@ -38,13 +38,13 @@ class PhilosophicalShield extends AbstractBuff {
     }
 }
 
-export class FrenchIntellectual extends AutomatedCharacter {
+export class Lexiophage extends AutomatedCharacter {
     constructor() {
         super({
             name: "Lexiophage",
             portraitName: "Clockwork Seer",
             maxHitpoints: 120,
-            description: "responsible for three out of four paperwork errors"
+            description: "responsible for three out of four paperwork errors within the Lowerarchy"
         });
         
         // Apply initial Philosophical Shield buff

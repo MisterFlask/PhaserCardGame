@@ -1,42 +1,42 @@
-import { AbstractIntent, AttackIntent, BlockForSelfIntent, IntentListCreator } from "../../../gamecharacters/AbstractIntent";
+import { AbstractIntent, AttackIntent, BlockForSelfIntent } from "../../../gamecharacters/AbstractIntent";
 import { AutomatedCharacter } from "../../../gamecharacters/AutomatedCharacter";
 import { AbstractBuff } from "../../../gamecharacters/buffs/AbstractBuff";
 import { DamageInfo } from "../../../rules/DamageInfo";
 
 // Custom buff to track damage taken in a turn and trigger a state change
 class BureaucraticOutrage extends AbstractBuff {
-    private damageTakenThisTurn: number = 0;
     private thresholdExceeded: boolean = false;
-    private damageThreshold: number = 40;
 
     constructor() {
         super();
         this.isDebuff = false;
         this.imageName = "bureaucrat";
+        this.stacks = 40; // Damage threshold
+        this.secondaryStacks = 0; // Damage taken this turn
     }
 
     override getDisplayName(): string {
-        return "Bureaucratic Outrage";
+        return "Heavy Armaments Limitations Act";
     }
 
     override getDescription(): string {
-        return `If this creature takes more than ${this.damageThreshold} damage in a single turn, it will switch to a heavy attack pattern.`;
+        return `If this creature takes more than ${this.stacks} damage in a single turn, it will switch to a heavy attack pattern next turn. (${this.secondaryStacks}/${this.stacks})`;
     }
 
     override onTurnStart(): void {
         // Reset damage tracking at the start of each turn
-        this.damageTakenThisTurn = 0;
+        this.secondaryStacks = 0;
         this.thresholdExceeded = false;
     }
 
     override onOwnerStruck_CannotModifyDamage(_strikingUnit: any, _cardPlayedIfAny: any, damageInfo: DamageInfo): void {
         // Track damage taken this turn
-        this.damageTakenThisTurn += damageInfo.unblockedDamageTaken;
+        this.secondaryStacks += damageInfo.unblockedDamageTaken;
         
         // Check if threshold is exceeded
-        if (this.damageTakenThisTurn > this.damageThreshold && !this.thresholdExceeded) {
+        if (this.secondaryStacks > this.stacks && !this.thresholdExceeded) {
             this.thresholdExceeded = true;
-            console.log(`${this.getOwnerAsCharacter()?.name} has taken more than ${this.damageThreshold} damage this turn and is outraged!`);
+            console.log(`${this.getOwnerAsCharacter()?.name} has taken more than ${this.stacks} damage this turn and is outraged!`);
             
             // Get the owner and update its intents if it's a BureaucraticBehemoth
             const owner = this.getOwnerAsCharacter();
@@ -49,8 +49,7 @@ class BureaucraticOutrage extends AbstractBuff {
 
 export class BureaucraticBehemoth extends AutomatedCharacter {
     private isOutraged: boolean = false;
-    private normalIntents: AbstractIntent[][] = [];
-    private outrageIntents: AbstractIntent[][] = [];
+    private intentCounter: number = 0;
     
     constructor() {
         super({
@@ -62,37 +61,6 @@ export class BureaucraticBehemoth extends AutomatedCharacter {
         
         // Add the tracking buff
         this.buffs.push(new BureaucraticOutrage());
-        
-        // Initialize intent patterns
-        this.initializeIntentPatterns();
-    }
-    
-    private initializeIntentPatterns(): void {
-        // Normal intent pattern - methodical, predictable
-        this.normalIntents = [
-            // First turn: Block and small attack
-            [
-                new BlockForSelfIntent({ blockAmount: 15, owner: this }).withTitle("File Defensive Forms"),
-                new AttackIntent({ baseDamage: 8, owner: this }).withTitle("Stamp of Disapproval")
-            ],
-            // Second turn: Medium attack
-            [
-                new AttackIntent({ baseDamage: 14, owner: this }).withTitle("Regulatory Strike")
-            ],
-            // Third turn: Block and small attack again
-            [
-                new BlockForSelfIntent({ blockAmount: 12, owner: this }).withTitle("Bureaucratic Shield"),
-                new AttackIntent({ baseDamage: 10, owner: this }).withTitle("Red Tape Lash")
-            ]
-        ];
-        
-        // Outrage intent pattern - heavy attacks
-        this.outrageIntents = [
-            // Just one heavy attack pattern that repeats
-            [
-                new AttackIntent({ baseDamage: 25, owner: this }).withTitle("ADMINISTRATIVE FURY")
-            ]
-        ];
     }
     
     // Method to trigger outrage mode
@@ -112,9 +80,38 @@ export class BureaucraticBehemoth extends AutomatedCharacter {
     override generateNewIntents(): AbstractIntent[] {
         // Use different intent patterns based on outrage state
         if (this.isOutraged) {
-            return IntentListCreator.iterateIntents(this.outrageIntents);
+            // In outraged state, just use a single heavy attack pattern
+            return [
+                new AttackIntent({ baseDamage: 45, owner: this }).withTitle("ADMINISTRATIVE FURY")
+            ];
         } else {
-            return IntentListCreator.iterateIntents(this.normalIntents);
+            // In normal state, cycle through a 3-turn pattern
+            this.intentCounter = (this.intentCounter % 3) + 1;
+            
+            switch (this.intentCounter) {
+                case 1:
+                    // First turn: Block and small attack
+                    return [
+                        new BlockForSelfIntent({ blockAmount: 15, owner: this }).withTitle("File Defensive Forms"),
+                        new AttackIntent({ baseDamage: 8, owner: this }).withTitle("Stamp of Disapproval")
+                    ];
+                case 2:
+                    // Second turn: Medium attack
+                    return [
+                        new AttackIntent({ baseDamage: 14, owner: this }).withTitle("Regulatory Strike")
+                    ];
+                case 3:
+                    // Third turn: Block and small attack again
+                    return [
+                        new BlockForSelfIntent({ blockAmount: 12, owner: this }).withTitle("Bureaucratic Shield"),
+                        new AttackIntent({ baseDamage: 10, owner: this }).withTitle("Red Tape Lash")
+                    ];
+                default:
+                    // Should never happen, but just in case
+                    return [
+                        new AttackIntent({ baseDamage: 10, owner: this }).withTitle("Bureaucratic Error")
+                    ];
+            }
         }
     }
 } 

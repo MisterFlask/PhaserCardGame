@@ -26,9 +26,9 @@ import { RuminantOfSwords } from './monsters/act1_segment2/RuminantOfSwords';
 import { LuridAutarch } from './monsters/act2_boss/LuridAutarch';
 import { BureaucraticBehemoth } from './monsters/act2_segment1/BureaucraticBehemoth';
 import { CrawlingInfestation } from './monsters/act2_segment1/CrawlingInfestation';
-import { FrenchIntellectual } from './monsters/act2_segment1/FrenchIntellectual';
 import { FrenchPoliceman } from './monsters/act2_segment1/FrenchPoliceman';
 import { HiveBroodmother } from './monsters/act2_segment1/HiveBroodmother';
+import { Lexiophage } from './monsters/act2_segment1/Lexiophage';
 import { SlothfulSentinel } from './monsters/act2_segment1/SlothfulSentinel';
 import { WeirdTree } from './monsters/act2_segment1/WeirdTree';
 import { Artiste } from './monsters/act2_segment2/Artiste';
@@ -125,13 +125,24 @@ export class ActSegment {
             enemies: [new FrenchBlindProphetess(), new VeilCapacitor(), new VeilCapacitor()]
         },
     ]);
+    static readonly Act2_Segment0 = new ActSegmentData("Act 2 - Segment 1", 2, 1, [
+        {
+            enemies: [new FrenchPoliceman()]
+        },
+        {
+            enemies: [new Lexiophage()]
+        },
+        {
+            enemies: [new CrawlingInfestation()]
+        },
+    ]);
 
     static readonly Act2_Segment1 = new ActSegmentData("Act 2 - Segment 1", 2, 1, [
         {
             enemies: [new FrenchPoliceman(), new FrenchPoliceman()]
         },
         {
-            enemies: [new FrenchIntellectual(), new FrenchIntellectual()]
+            enemies: [new Lexiophage(), new Lexiophage()]
         },
         {
             enemies: [new CrawlingInfestation()]
@@ -155,7 +166,7 @@ export class ActSegment {
 
     static readonly Act2_Segment2 = new ActSegmentData("Act 2 - Segment 2", 2, 2, [
         {
-            enemies: [new FrenchIntellectual(), new FrenchIntellectual(), new Artiste()]
+            enemies: [new Lexiophage(), new Lexiophage(), new Artiste()]
         },
         {
             enemies: [new VesperOfMeat(), new VesperOfMeat(), new FrenchRestauranteur()]

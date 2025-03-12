@@ -11,7 +11,7 @@ export class CrawlingInfestation extends AutomatedCharacter {
             name: "Solicitor Swarm",
             portraitName: "swarm_bugs_placeholder",
             maxHitpoints: 60,
-            description: "countless tiny mandibles clicking in unison, moving as one entity. the swarm is never just one bug, it's many. too many."
+            description: "it's never just one bug."
         });
         // swarm buff caps damage from any single attack
         this.buffs.push(new Swarm(10));

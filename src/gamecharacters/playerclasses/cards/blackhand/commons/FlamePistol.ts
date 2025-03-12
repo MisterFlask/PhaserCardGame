@@ -25,13 +25,13 @@ export class FlamePistol extends PlayableCard {
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage and apply ${this.getDisplayedMagicNumber()} Burning to the target.`;
+        return `Deal ${this.getDisplayedDamage()} damage and apply ${this.getDisplayedMagicNumber()} Burning to ALL Z.`;
     }
     
     override InvokeCardEffects(targetCard?: BaseCharacter): void {
-        if (targetCard && targetCard instanceof BaseCharacter) {
-            this.dealDamageToTarget(targetCard);
-            this.actionManager.applyBuffToCharacterOrCard(targetCard, new Burning(this.getBaseMagicNumberAfterResourceScaling()), this.owningCharacter as BaseCharacter);
+        for (const enemy of this.combatState.enemies){
+            this.dealDamageToTarget(enemy);
+            this.actionManager.applyBuffToCharacterOrCard(enemy, new Burning(this.getBaseMagicNumberAfterResourceScaling()), this.owningCharacter as BaseCharacter);
         }
     }
 }
