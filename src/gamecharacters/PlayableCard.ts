@@ -203,11 +203,11 @@ export abstract class PlayableCard extends AbstractCard {
     /**
      * DO NOT OVERRIDE.
      */
-    protected applyBlockToTarget(targetCard?: IBaseCharacter): void {
+    protected applyBlockToTarget(targetCard?: IBaseCharacter, blockOverride?: number): void {
         if (targetCard) {
             this.actionManager.applyBlock({
                 blockTargetCharacter: targetCard,
-                baseBlockValue: this.getBaseBlockAfterResourceScaling(),
+                baseBlockValue: blockOverride ?? this.getBaseBlockAfterResourceScaling(),
                 appliedViaPlayableCard: this,
                 blockSourceCharacter: this.owningCharacter
             });

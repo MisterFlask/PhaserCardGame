@@ -1,3 +1,4 @@
+import { AshesResource } from "../../../../../rules/combatresources/AshesResource";
 import { TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
 import { VolatileBuff } from "../../../../buffs/playable_card/VolatileCardBuff";
@@ -18,6 +19,10 @@ export class ToxicSpill extends PlayableCard {
         this.baseEnergyCost = 2;
         this.baseMagicNumber = 6;
         this.buffs.push(new VolatileBuff());
+        this.resourceScalings.push({
+            resource: new AshesResource(),
+            magicNumberScaling: 3
+        })
     }
 
     override get description(): string {

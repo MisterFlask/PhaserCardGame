@@ -1,6 +1,6 @@
 import { AbstractCard, TargetingType } from '../../../../AbstractCard';
+import type { BaseCharacter } from '../../../../BaseCharacter';
 import { EntityRarity } from "../../../../EntityRarity";
-import { IBaseCharacter } from '../../../../IBaseCharacter';
 import { PlayableCardWithHelpers } from '../../../../PlayableCardWithHelpers';
 import { CardType } from '../../../../Primitives';
 import { Burning } from '../../../../buffs/standard/Burning';
@@ -20,19 +20,19 @@ export class AndThenHeExploded extends PlayableCardWithHelpers {
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage.`;
+        return `Deal ${this.getDisplayedDamage()} damage to ALL enemies for each stack of Burning on the target.`;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         if (!targetCard) return;
         if (!targetCard.isBaseCharacter()) return;
 
-        var target = targetCard as unknown as IBaseCharacter
+        var target = targetCard as unknown as BaseCharacter
+        var damage = this.getBaseDamageAfterResourceScaling() * target.getBuffStacks(new Burning(1).getBuffCanonicalName());
 
-        this.dealDamageToTarget(targetCard);
+        this.forEachEnemy(enemy => {
+            this.dealDamageToTarget(enemy, damage);
+        });
 
-        if (target.hasBuff(new Burning(1).getDisplayName())) {
-            this.dealDamageToTarget(targetCard);
-        }
     }
 }

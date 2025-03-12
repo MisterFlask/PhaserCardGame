@@ -12,7 +12,7 @@ export class ReIgnition extends PlayableCard {
             targetingType: TargetingType.ALLY,
         });
         this.baseBlock = 5;
-        this.baseMagicNumber = 3;
+        this.baseMagicNumber = 4;
         this.baseEnergyCost = 1;
     }
 

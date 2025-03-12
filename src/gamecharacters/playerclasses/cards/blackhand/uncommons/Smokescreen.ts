@@ -1,5 +1,4 @@
 import { TargetingType } from "../../../../AbstractCard";
-import { BaseCharacter } from "../../../../BaseCharacter";
 import { ExhaustBuff } from "../../../../buffs/playable_card/ExhaustBuff";
 import { Burning } from "../../../../buffs/standard/Burning";
 import { PlayableCard } from "../../../../PlayableCard";
@@ -19,18 +18,22 @@ export class Smokescreen extends PlayableCard {
 	}
 
 	override get description(): string {
-		return `All party members gain ${this.getDisplayedBlock()} Block, plus 1 for each Burning on the enemy. Gain ${this.getDisplayedMagicNumber()} Smog.`;
+		return `All party members gain ${this.getDisplayedBlock()} Block, plus 1 for each stack of Burning on anyone. Gain ${this.getDisplayedMagicNumber()} Smog.`;
 	}
 	
 	override InvokeCardEffects(): void {
 		let burningCount = 0;
 		this.forEachEnemy(enemy => {
-			burningCount += enemy.getBuffStacks(new Burning(1).getDisplayName());
-			this.actionManager.applyBuffToCharacterOrCard(enemy as BaseCharacter, new Burning(this.getBaseMagicNumberAfterResourceScaling()), this.owningCharacter as BaseCharacter);
+			burningCount += enemy.getBuffStacks(new Burning(1).getBuffCanonicalName());
+		});
+		this.forEachAlly(ally => {
+			burningCount += ally.getBuffStacks(new Burning(1).getBuffCanonicalName());
 		});
 
 		this.forEachAlly(ally => {
-			this.applyBlockToTarget(ally);
+			this.applyBlockToTarget(ally, burningCount + this.getBaseBlockAfterResourceScaling());
 		});
+
+		this.actionManager.modifySmog(this.getBaseMagicNumberAfterResourceScaling());
 	}
 }
