@@ -992,19 +992,22 @@ export class ActionManager {
         }));
     }
 
-public chooseCardToDiscard(): void {
-    this.actionQueue.addAction(new GenericAction(async () => {
-        this.requireCardSelectionFromHand({
-            name: "Discard",
-            instructions: "Choose a card to discard", 
-            min: 1,
-            max: 1,
-            cancellable: false,
-            action: (selectedCards: PlayableCardType[]) => {
-                if (selectedCards.length > 0) {
-                    this.activeDiscardCard(selectedCards[0]);
+
+    public chooseCardToDiscard(min: number = 1, max: number = 1, cancellable: boolean = false): void {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            this.requireCardSelectionFromHand({
+                name: "Discard",
+                instructions: `Choose ${min === 1 ? "a card" : min + " cards"} to discard`, 
+                min: min,
+                max: max,
+                cancellable: false,
+                action: (selectedCards: PlayableCardType[]) => {
+                    if (selectedCards.length > 0) {
+                        selectedCards.forEach(card => {
+                            this.activeDiscardCard(card);
+                        });
+                    }
                 }
-            }
             });
             return [];
         }));

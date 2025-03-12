@@ -20,14 +20,14 @@ export class Pyrestarter extends PlayableCard {
     }
 
     override get description(): string {
-        return `Apply ${this.getDisplayedBlock()} block to ALL party members. The rest of this turn, attacks from your party apply ${this.getDisplayedMagicNumber()} Burning per hit.`;
+        return `Apply ${this.getDisplayedBlock()} block to ALL party members.  Discard 2 cards.`;
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         this.forEachAlly(ally => {
             this.applyBlockToTarget(ally);
-            this.actionManager.applyBuffToCharacterOrCard(ally, new PyrestarterBuff(this.getBaseMagicNumberAfterResourceScaling()));
         });
+        this.actionManager.chooseCardToDiscard(1,2, true);
     }
 }
 

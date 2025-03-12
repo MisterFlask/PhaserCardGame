@@ -13,7 +13,7 @@ export class Pyronox extends PlayableCard {
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.RARE,
         });
-        this.baseMagicNumber = 3;
+        this.baseMagicNumber = 6;
         this.baseEnergyCost = 1;
     }
 

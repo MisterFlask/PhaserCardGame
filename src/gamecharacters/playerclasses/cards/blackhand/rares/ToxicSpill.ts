@@ -3,7 +3,6 @@ import { BaseCharacter } from "../../../../BaseCharacter";
 import { VolatileBuff } from "../../../../buffs/playable_card/VolatileCardBuff";
 import { Burning } from "../../../../buffs/standard/Burning";
 import { Poisoned } from "../../../../buffs/standard/Poisoned";
-import { Weak } from "../../../../buffs/standard/Weak";
 import { EntityRarity } from "../../../../EntityRarity";
 import { PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
@@ -22,14 +21,13 @@ export class ToxicSpill extends PlayableCard {
     }
 
     override get description(): string {
-        return `Apply 4 Burning, ${this.getDisplayedMagicNumber()} Poison, and 1 Weak to an enemy. Volatile.`;
+        return `Apply 4 Burning and ${this.getDisplayedMagicNumber()} Poison to ALL enemies.`;
     }
 
     override InvokeCardEffects(targetCard?: BaseCharacter): void {
-        if (targetCard) {
-            this.actionManager.applyBuffToCharacterOrCard(targetCard, new Burning(4));
-            this.actionManager.applyBuffToCharacterOrCard(targetCard, new Poisoned(this.getBaseMagicNumberAfterResourceScaling()));
-            this.actionManager.applyBuffToCharacterOrCard(targetCard, new Weak(1));
-        }
+        this.forEachEnemy(enemy => {
+            this.actionManager.applyBuffToCharacterOrCard(enemy, new Burning(4));
+            this.actionManager.applyBuffToCharacterOrCard(enemy, new Poisoned(this.getBaseMagicNumberAfterResourceScaling()));
+        });
     }
 }
