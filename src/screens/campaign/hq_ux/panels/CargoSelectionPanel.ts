@@ -4,7 +4,7 @@ import Label from 'phaser3-rex-plugins/templates/ui/label/Label.js';
 import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/ScrollablePanel.js';
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer.js';
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
-import { EncounterManager } from '../../../../encounters/EncountersList';
+import { EncounterManager } from '../../../../encounters/EncounterManager';
 import { PlayableCard } from '../../../../gamecharacters/PlayableCard';
 import { PlayerCharacter } from '../../../../gamecharacters/PlayerCharacter';
 import { GameState } from '../../../../rules/GameState';

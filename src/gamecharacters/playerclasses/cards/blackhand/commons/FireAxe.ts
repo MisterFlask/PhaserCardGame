@@ -1,3 +1,4 @@
+import { PluckResource } from "../../../../../rules/combatresources/PluckResource";
 import { TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
 import { Burning } from "../../../../buffs/standard/Burning";
@@ -14,6 +15,10 @@ export class FireAxe extends PlayableCard {
         this.baseDamage = 8;
         this.baseMagicNumber = 2;
         this.baseEnergyCost = 1;
+        this.resourceScalings.push({
+            resource: new PluckResource(),
+            attackScaling: 2
+        })
     }
 
     override get description(): string {

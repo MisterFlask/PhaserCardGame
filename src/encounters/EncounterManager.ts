@@ -316,11 +316,14 @@ export class EncounterManager {
         return EncounterManager.instance;
     }
 
+    public getCommoditiesTrader(): Encounter {
+        return new Encounter([new CommoditiesGuy()], GameState.getInstance().currentAct, 0);
+    }
+
     public getShopEncounter(): Encounter {
         
         // todo: differentiate between acts
         var shopGuys = [new ShopGuy()];
-        shopGuys.push(new CommoditiesGuy());
         shopGuys.push(new CursedGoodsTrader());
 
         return new Encounter(shopGuys, GameState.getInstance().currentAct, 0);

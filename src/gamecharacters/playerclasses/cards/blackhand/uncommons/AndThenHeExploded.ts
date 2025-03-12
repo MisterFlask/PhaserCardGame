@@ -1,3 +1,4 @@
+import { AshesResource } from '../../../../../rules/combatresources/AshesResource';
 import { AbstractCard, TargetingType } from '../../../../AbstractCard';
 import type { BaseCharacter } from '../../../../BaseCharacter';
 import { EntityRarity } from "../../../../EntityRarity";
@@ -17,6 +18,10 @@ export class AndThenHeExploded extends PlayableCardWithHelpers {
         this.baseDamage = 8;
         this.baseEnergyCost = 1;
         this.buffs.push(new ExplosiveFinishCardBuff(10));
+        this.resourceScalings.push({
+            resource: new AshesResource(),
+            attackScaling: 4
+        })
     }
 
     override get description(): string {

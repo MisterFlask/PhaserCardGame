@@ -1,4 +1,4 @@
-import { Encounter } from "../../encounters/EncountersList";
+import { Encounter } from "../../encounters/EncounterManager";
 import { AbstractBuff } from "../../gamecharacters/buffs/AbstractBuff";
 
 export class ActRegion{

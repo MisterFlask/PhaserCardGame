@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { Encounter } from '../encounters/EncountersList';
+import { Encounter } from '../encounters/EncounterManager';
 import { GameState } from '../rules/GameState';
 import { TransientUiState } from '../ui/TransientUiState';
 

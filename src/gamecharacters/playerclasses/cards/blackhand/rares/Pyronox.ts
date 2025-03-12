@@ -18,8 +18,8 @@ export class Pyronox extends PlayableCard {
     }
 
     override get description(): string {
-        return `Apply ${this.getDisplayedMagicNumber()} stacks of Flames Amplifier to ALL enemies.`;
-    }
+        return `Apply ${this.getDisplayedMagicNumber()} stacks of Flames Amplifier to ALL enemies.  Gain 1 Venture.`;
+    };
 
     override InvokeCardEffects(targetCard?: BaseCharacter): void {
         this.forEachEnemy(enemy => {

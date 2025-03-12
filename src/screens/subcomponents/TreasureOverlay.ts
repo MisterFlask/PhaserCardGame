@@ -1,4 +1,4 @@
-import { TreasureChest } from '../../encounters/EncountersList';
+import { TreasureChest } from '../../encounters/EncounterManager';
 import { AbstractCard } from '../../gamecharacters/AbstractCard';
 import { BaseCharacter } from '../../gamecharacters/BaseCharacter';
 import { AbstractRelic } from '../../relics/AbstractRelic';

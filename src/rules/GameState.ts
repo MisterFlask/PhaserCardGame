@@ -1,4 +1,4 @@
-import { Encounter } from '../encounters/EncountersList';
+import { Encounter } from '../encounters/EncounterManager';
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
 import type { PlayableCard } from '../gamecharacters/PlayableCard';
 import type { PlayerCharacter } from '../gamecharacters/PlayerCharacter';

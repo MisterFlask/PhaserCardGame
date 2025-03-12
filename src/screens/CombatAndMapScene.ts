@@ -3,7 +3,7 @@
 import Phaser from 'phaser';
 import BBCodeTextPlugin from 'phaser3-rex-plugins/plugins/bbcodetext-plugin.js';
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
-import { Encounter } from '../encounters/EncountersList';
+import { Encounter } from '../encounters/EncounterManager';
 import { AbstractEvent } from '../events/AbstractEvent';
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
 import { PlayerCharacter } from '../gamecharacters/PlayerCharacter';

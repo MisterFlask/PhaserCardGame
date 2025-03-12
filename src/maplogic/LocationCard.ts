@@ -2,7 +2,7 @@
 
 import Phaser from 'phaser';
 import { EncounterEnhancer } from '../encounters/EncounterEnhancer';
-import { Encounter, EncounterManager } from "../encounters/EncountersList";
+import { Encounter, EncounterManager } from "../encounters/EncounterManager";
 import { Charon } from '../encounters/monsters/special/Charon';
 import { AbstractEvent } from "../events/AbstractEvent";
 import { AbstractCard } from "../gamecharacters/AbstractCard";
@@ -273,6 +273,29 @@ export class ShopCard extends LocationCard {
         GameState.getInstance().rerollShop();
 
         ActionManager.getInstance().cleanupAndRestartCombat({ encounter: EncounterManager.getInstance().getShopEncounter(), shouldStartWithMapOverlay: false });
+    }
+}
+
+export class CommoditiesTraderCard extends LocationCard {
+    constructor(floor: number, index: number) {
+        super({
+            name: 'Commodities Trader',
+            description: `This is a commodities trader on floor ${floor}.`,
+            size: CardSize.SMALL,
+            floor,
+            index
+        }, LocationTypes.MERCHANT);
+        this.portraitName = 'shop-icon';
+        this.portraitTint = 0xFFA500;
+        this.backgroundName = shopBackgrounds[Math.floor(Math.random() * shopBackgrounds.length)];
+    }
+
+    override OnLocationSelected(scene: Phaser.Scene): void {
+        console.log(`Location ${this.id} selected with encounter: ${this.encounter.enemies.map(e => e.name).join(', ')}`);
+
+        GameState.getInstance().rerollShop();
+
+        ActionManager.getInstance().cleanupAndRestartCombat({ encounter: EncounterManager.getInstance().getCommoditiesTrader(), shouldStartWithMapOverlay: false });
     }
 }
 
