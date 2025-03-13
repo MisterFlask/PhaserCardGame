@@ -125,7 +125,7 @@ export class ActSegment {
             enemies: [new FrenchBlindProphetess(), new VeilCapacitor(), new VeilCapacitor()]
         },
     ]);
-    static readonly Act2_Segment0 = new ActSegmentData("Act 2 - Segment 1", 2, 1, [
+    static readonly Act2_Segment0 = new ActSegmentData("Act 2 - Segment 1", 2, 0, [
         {
             enemies: [new FrenchPoliceman()]
         },

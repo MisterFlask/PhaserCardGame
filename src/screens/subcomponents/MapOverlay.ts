@@ -480,6 +480,10 @@ export class MapOverlay {
                     relic.onLocationEntered(card.data as LocationCard)
                 });
 
+                card.data.buffs.forEach(buff => {
+                    buff.onLocationEntered(card.data as LocationCard)
+                });
+
                 // OnLocationSelected is now called after the lerp completes
                 this.updatePlayerLocationIcon();
             }

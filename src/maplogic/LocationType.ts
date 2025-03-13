@@ -10,4 +10,6 @@ export const LocationTypes = {
     REST: 'REST',
     CHARON: 'CHARON',
     ENTRANCE: 'ENTRANCE',
+    COMMODITY_TRADER: 'COMMODITY_TRADER',
+    TREASURE: 'TREASURE',
 } as const; 

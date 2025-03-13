@@ -6,7 +6,7 @@ import { EldritchFoes } from "../gamecharacters/buffs/location/EldritchFoes";
 import { GuaranteedRareCardReward } from "../gamecharacters/buffs/location/GuaranteedRareCardReward";
 import { GuaranteedRelic } from "../gamecharacters/buffs/location/GuaranteedRelic";
 import { MerchantMultiplier } from "../gamecharacters/buffs/location/MerchantMultiplier";
-import { TrappedLocation } from "../gamecharacters/buffs/location/RockSlides";
+import { RockSlides } from "../gamecharacters/buffs/location/RockSlides";
 import { TougherEnemies } from "../gamecharacters/buffs/location/TougherEnemies";
 import { UpgradedCardReward } from "../gamecharacters/buffs/location/UpgradedCardReward";
 import { DrainCombatResource } from "../gamecharacters/buffs/standard/combatresource/detrimental/DrainCombatResource";
@@ -17,7 +17,7 @@ export class LocationBuffRegistry {
     private static instance: LocationBuffRegistry;
     private availableNegativeBuffs: AbstractBuff[] = [];
     private availablePositiveBuffs: AbstractBuff[] = [];
-    treasureNegativeBuffs: TrappedLocation[];
+    treasureNegativeBuffs: RockSlides[];
 
     private get combatResources(): CombatResources {
         return GameState.getInstance().combatState.combatResources;
@@ -26,7 +26,7 @@ export class LocationBuffRegistry {
     private constructor() {
         this.availableNegativeBuffs = [
             new EldritchFoes(),
-            new TrappedLocation(4),
+            new RockSlides(4),
             new TougherEnemies(),
             new SorrowMothsModifier(2),
             new DrainCombatResource(this.combatResources.mettle, 1),
@@ -48,7 +48,7 @@ export class LocationBuffRegistry {
         ];
 
         this.treasureNegativeBuffs = [
-            new TrappedLocation(4),
+            new RockSlides(4),
         ];
     }
 
@@ -67,7 +67,7 @@ export class LocationBuffRegistry {
         return this.availableNegativeBuffs;
     }
 
-    public getTreasureNegativeBuffs(): TrappedLocation[] {
+    public getTreasureNegativeBuffs(): RockSlides[] {
         return this.treasureNegativeBuffs;
     }
 }

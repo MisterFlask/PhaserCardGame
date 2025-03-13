@@ -19,15 +19,21 @@ export class LocationBuffsManager {
 
     public enrichLocationsWithBuffs(locations: LocationCard[]): void {
         locations.forEach(location => {
-            if (this.shouldReceiveBuffs(location)) {
+            if (this.shouldReceiveRegularBuffs(location)) {
                 this.assignBuffsToLocation(location);
+            } else if (this.shouldReceiveTreasureBuffs(location)) {
+                this.assignTreasureBuffsToLocation(location);
             }
         });
     }
 
-    private shouldReceiveBuffs(location: LocationCard): boolean {
+    private shouldReceiveRegularBuffs(location: LocationCard): boolean {
         return location.locationType === LocationTypes.COMBAT || 
                location.locationType === LocationTypes.ELITE_COMBAT;
+    }
+    
+    private shouldReceiveTreasureBuffs(location: LocationCard): boolean {
+        return location.locationType === LocationTypes.TREASURE;
     }
 
     private assignBuffsToLocation(location: LocationCard): void {
@@ -48,6 +54,16 @@ export class LocationBuffsManager {
         }
         // 40% chance for no buffs
     }
+    
+    private assignTreasureBuffsToLocation(location: LocationCard): void {
+        const roll = Math.random();
+        
+        // 30% chance for a treasure debuff
+        if (roll < 0.3) {
+            this.assignRandomTreasureDebuff(location);
+        }
+        // 70% chance for no debuffs
+    }
 
     private assignRandomBuff(location: LocationCard): void {
         const availableBuffs = this.buffRegistry.getAvailablePositiveBuffs();
@@ -63,6 +79,15 @@ export class LocationBuffsManager {
         if (availableDebuffs.length > 0) {
             const randomIndex = Math.floor(Math.random() * availableDebuffs.length);
             const selectedDebuff = availableDebuffs[randomIndex];
+            location.buffs.push(selectedDebuff.clone());
+        }
+    }
+    
+    private assignRandomTreasureDebuff(location: LocationCard): void {
+        const treasureDebuffs = this.buffRegistry.getTreasureNegativeBuffs();
+        if (treasureDebuffs.length > 0) {
+            const randomIndex = Math.floor(Math.random() * treasureDebuffs.length);
+            const selectedDebuff = treasureDebuffs[randomIndex];
             location.buffs.push(selectedDebuff.clone());
         }
     }

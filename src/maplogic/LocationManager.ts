@@ -2,7 +2,7 @@
 
 import { LocationBuffRegistry } from "../maplogic/LocationBuffRegistry";
 import { GameState } from "../rules/GameState";
-import { BossRoomCard, CharonRoomCard, EliteRoomCard, EntranceCard, LocationCard, NormalRoomCard, RestSiteCard, ShopCard, TreasureRoomCard } from "./LocationCard";
+import { BossRoomCard, CharonRoomCard, CommoditiesTraderCard, EliteRoomCard, EntranceCard, LocationCard, NormalRoomCard, RestSiteCard, ShopCard, TreasureRoomCard } from "./LocationCard";
 
 export class LocationManager {
     // Map configuration constants
@@ -41,7 +41,12 @@ export class LocationManager {
         this.verifyMapConstraints(locationData);
 
         // Step 6: Cull unreachable rooms
-        return this.cullUnreachableRooms(locationData);
+        const finalLocations = this.cullUnreachableRooms(locationData);
+        
+        // Step 7: Final verification - ensure all locations have encounters initialized
+        this.verifyAllLocationsHaveEncounters(finalLocations);
+        
+        return finalLocations;
     }
 
     /**
@@ -53,17 +58,20 @@ export class LocationManager {
         // Create entrance room (floor 0, middle position)
         const entrancePosition = Math.floor(this.nodesPerFloor / 2);
         const entrance = new EntranceCard(this.entranceFloor, entrancePosition);
+        entrance.initEncounter(); // Initialize encounter
         locationData.push(entrance);
         GameState.getInstance().setCurrentLocation(entrance);
 
         // Create boss room (second-to-last floor, middle position)
         const bossPosition = Math.floor(this.nodesPerFloor / 2);
         const bossRoom = new BossRoomCard(this.bossFloor, bossPosition);
+        bossRoom.initEncounter(); // Initialize encounter
         locationData.push(bossRoom);
 
         // Create Charon's room (last floor, middle position)
         const charonPosition = Math.floor(this.nodesPerFloor / 2);
         const charonRoom = new CharonRoomCard(this.charonFloor, charonPosition);
+        charonRoom.initEncounter(); // Initialize encounter
         locationData.push(charonRoom);
 
         // Connect boss room to Charon's room
@@ -80,6 +88,7 @@ export class LocationManager {
             for (let roomNumber = 0; roomNumber < this.nodesPerFloor; roomNumber++) {
                 // Start with all normal rooms - we'll change types later
                 const room = new NormalRoomCard(floor, roomNumber);
+                room.initEncounter(); // Initialize encounter
                 locationData.push(room);
             }
         }
@@ -135,6 +144,9 @@ export class LocationManager {
      * Distribute special rooms across the map while ensuring no adjacent special rooms
      */
     private distributeSpecialRooms(locations: LocationCard[], roomsByFloor: Map<number, LocationCard[]>): void {
+        // Get current game act
+        const currentAct = GameState.getInstance().currentAct;
+        
         // Define room type distribution per floor (excluding treasure floor)
         // Using createRoomTemplate to create prototype instances for each room type
         const distribution = [
@@ -143,6 +155,14 @@ export class LocationManager {
             { template: (floor: number, roomNumber: number) => new EliteRoomCard(floor, roomNumber), count: 1 },
             { template: (floor: number, roomNumber: number) => new TreasureRoomCard(floor, roomNumber), count: 1 }
         ];
+        
+        // Add CommoditiesTraderCard for Act 2
+        if (currentAct === 2) {
+            distribution.push({ 
+                template: (floor: number, roomNumber: number) => new CommoditiesTraderCard(floor, roomNumber), 
+                count: 2 
+            });
+        }
 
         // Apply distribution for each floor (except entrance, treasure, boss, and Charon floors)
         for (let floor = this.entranceFloor + 1; floor <= this.bossFloor; floor++) {
@@ -153,10 +173,54 @@ export class LocationManager {
 
             // Shuffle the distribution for this floor
             const floorDistribution = [...distribution]
-                .sort(() => Math.random() - 0.5)
-                .slice(0, Math.min(roomsOnFloor.length, distribution.length));
-
-            for (const { template, count } of floorDistribution) {
+                .sort(() => Math.random() - 0.5);
+                
+            // When in Act 2, ensure we distribute CommoditiesTraderCards to different floors
+            if (currentAct === 2) {
+                const commoditiesTraderTemplate = floorDistribution.find(
+                    item => item.template(0, 0) instanceof CommoditiesTraderCard
+                );
+                
+                // If we found the commodities trader template
+                if (commoditiesTraderTemplate) {
+                    // Remove from general distribution to handle separately
+                    const index = floorDistribution.indexOf(commoditiesTraderTemplate);
+                    floorDistribution.splice(index, 1);
+                    
+                    // Add one commodities trader to this floor if there's room
+                    if (commoditiesTraderTemplate.count > 0 && roomsOnFloor.length > 0) {
+                        const normalRooms = roomsOnFloor.filter(room => 
+                            room instanceof NormalRoomCard && 
+                            this.isValidForSpecialRoom(room, locations, commoditiesTraderTemplate.template)
+                        );
+                        
+                        if (normalRooms.length > 0) {
+                            // Pick a random normal room
+                            const randomIndex = Math.floor(Math.random() * normalRooms.length);
+                            const roomToReplace = normalRooms[randomIndex];
+                            
+                            // Replace with the commodities trader
+                            const traderRoom = commoditiesTraderTemplate.template(roomToReplace.floor, roomToReplace.roomNumber);
+                            this.replaceRoom(locations, roomToReplace, traderRoom);
+                            
+                            // Update the rooms on floor list
+                            const idx = roomsOnFloor.indexOf(roomToReplace);
+                            if (idx !== -1) {
+                                roomsOnFloor[idx] = traderRoom;
+                            }
+                            
+                            // Decrease the count
+                            commoditiesTraderTemplate.count--;
+                        }
+                    }
+                }
+            }
+            
+            // Now handle the regular distribution for this floor
+            // Limit by available rooms
+            const regularDistribution = floorDistribution.slice(0, Math.min(roomsOnFloor.length, floorDistribution.length));
+            
+            for (const { template, count } of regularDistribution) {
                 for (let i = 0; i < count; i++) {
                     // Find a suitable normal room to replace
                     const normalRooms = roomsOnFloor.filter(room => 
@@ -178,6 +242,51 @@ export class LocationManager {
                     const idx = roomsOnFloor.indexOf(roomToReplace);
                     if (idx !== -1) {
                         roomsOnFloor[idx] = specialRoom;
+                    }
+                }
+            }
+        }
+        
+        // If we're in Act 2, make sure we've added both commodities traders by adding any remaining ones
+        if (currentAct === 2) {
+            const remainingCount = distribution.find(
+                item => item.template(0, 0) instanceof CommoditiesTraderCard
+            )?.count || 0;
+            
+            if (remainingCount > 0) {
+                // Find floors that don't have a commodities trader yet
+                const floors = Array.from(roomsByFloor.keys()).filter(
+                    floor => floor !== this.entranceFloor && 
+                            floor !== this.treasureFloorIndex && 
+                            floor !== this.bossFloor &&
+                            floor !== this.charonFloor
+                );
+                
+                // Shuffle the floors
+                const shuffledFloors = [...floors].sort(() => Math.random() - 0.5);
+                
+                // Try to add remaining traders
+                for (let i = 0; i < remainingCount && i < shuffledFloors.length; i++) {
+                    const floor = shuffledFloors[i];
+                    const roomsOnFloor = roomsByFloor.get(floor) || [];
+                    
+                    // Find normal rooms on this floor
+                    const normalRooms = roomsOnFloor.filter(room => room instanceof NormalRoomCard);
+                    
+                    if (normalRooms.length > 0) {
+                        // Pick a random normal room
+                        const randomIndex = Math.floor(Math.random() * normalRooms.length);
+                        const roomToReplace = normalRooms[randomIndex];
+                        
+                        // Replace with a commodities trader
+                        const traderRoom = new CommoditiesTraderCard(roomToReplace.floor, roomToReplace.roomNumber);
+                        this.replaceRoom(locations, roomToReplace, traderRoom);
+                        
+                        // Update the rooms on floor list
+                        const idx = roomsOnFloor.indexOf(roomToReplace);
+                        if (idx !== -1) {
+                            roomsOnFloor[idx] = traderRoom;
+                        }
                     }
                 }
             }
@@ -613,5 +722,17 @@ export class LocationManager {
         const numCulled = locationData.length - reachable.size;
         console.log(`Culled ${numCulled} unreachable rooms`);
         return locationData.filter(loc => reachable.has(loc));
+    }
+
+    /**
+     * Verify that all locations have encounters initialized
+     */
+    private verifyAllLocationsHaveEncounters(locations: LocationCard[]): void {
+        for (const location of locations) {
+            if (!location.encounter) {
+                console.warn(`Location ${location.name} has no encounter initialized. Initializing now...`);
+                location.initEncounter();
+            }
+        }
     }
 }

@@ -11,11 +11,11 @@ export class FlamePistol extends PlayableCard {
             name: "Flame Revolver",
             description: `_`,
             portraitName: "fire-ray",
-            targetingType: TargetingType.ENEMY,
+            targetingType: TargetingType.NO_TARGETING,
             cardType: CardType.ATTACK,
         });
         this.baseDamage = 4;
-        this.baseMagicNumber = 2;
+        this.baseMagicNumber = 1;
         this.baseEnergyCost = 1;
 
         this.resourceScalings.push({
@@ -25,11 +25,14 @@ export class FlamePistol extends PlayableCard {
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage and apply ${this.getDisplayedMagicNumber()} Burning to ALL Z.`;
+        return `Deal ${this.getDisplayedDamage()} damage and apply ${this.getDisplayedMagicNumber()} Burning to up to two random enemies.`;
     }
     
     override InvokeCardEffects(targetCard?: BaseCharacter): void {
-        for (const enemy of this.combatState.enemies){
+        const enemies = this.combatState.enemies.filter(e => !e.isDead);
+        const targets = enemies.sort(() => Math.random() - 0.5).slice(0, 2);
+
+        for (const enemy of targets){
             this.dealDamageToTarget(enemy);
             this.actionManager.applyBuffToCharacterOrCard(enemy, new Burning(this.getBaseMagicNumberAfterResourceScaling()), this.owningCharacter as BaseCharacter);
         }

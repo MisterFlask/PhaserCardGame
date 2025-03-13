@@ -1,7 +1,7 @@
 import { BaseCharacter } from "../../BaseCharacter";
 import { AbstractBuff } from "../AbstractBuff";
 
-export class TrappedLocation extends AbstractBuff {
+export class RockSlides extends AbstractBuff {
     constructor(stacks: number) {
         super();
         this.stackable = true;

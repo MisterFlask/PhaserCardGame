@@ -5,6 +5,7 @@ import ScrollablePanel from 'phaser3-rex-plugins/templates/ui/scrollablepanel/Sc
 import Sizer from 'phaser3-rex-plugins/templates/ui/sizer/Sizer.js';
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 import { EncounterManager } from '../../../../encounters/EncounterManager';
+import { PriceContext } from '../../../../gamecharacters/AbstractCard';
 import { PlayableCard } from '../../../../gamecharacters/PlayableCard';
 import { PlayerCharacter } from '../../../../gamecharacters/PlayerCharacter';
 import { GameState } from '../../../../rules/GameState';
@@ -511,6 +512,7 @@ export class CargoSelectionPanel extends AbstractHqPanel {
         data: good,
         onCardCreatedEventCallback: (card) => {
           card.disableInternalTooltip = true;
+          card.priceContext = PriceContext.SURFACE_BUY
           card.container.setInteractive();
           card.container.on('pointerdown', () => this.sellCargo(good));
           this.addHoverDepth(card.container);

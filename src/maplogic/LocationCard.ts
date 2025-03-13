@@ -85,9 +85,12 @@ export abstract class LocationCard extends AbstractCard {
     }
 
     OnLocationSelected(scene: Phaser.Scene): void {
-        console.log(`Location ${this.id} selected with encounter: ${this.encounter.enemies.map(e => e.name).join(', ')}`);
-        
-        ActionManager.getInstance().cleanupAndRestartCombat({ encounter: this.encounter, shouldStartWithMapOverlay: false });
+        console.log(`Location ${this.id} selected with encounter: ${this.encounter?.enemies?.map(e => e.name)?.join(', ')}`);
+        if (this.encounter) {
+            ActionManager.getInstance().cleanupAndRestartCombat({ encounter: this.encounter, shouldStartWithMapOverlay: false });
+        }else{
+            console.log(`Location ${this.id} has no encounter`);
+        }
     }
 
     public determineBaseRewards(): AbstractReward[] {
@@ -284,7 +287,7 @@ export class CommoditiesTraderCard extends LocationCard {
             size: CardSize.SMALL,
             floor,
             index
-        }, LocationTypes.MERCHANT);
+        }, LocationTypes.COMMODITY_TRADER);
         this.portraitName = 'shop-icon';
         this.portraitTint = 0xFFA500;
         this.backgroundName = shopBackgrounds[Math.floor(Math.random() * shopBackgrounds.length)];
@@ -307,7 +310,7 @@ export class TreasureRoomCard extends LocationCard {
             size: CardSize.SMALL,
             floor,
             index
-        }, LocationTypes.COMBAT);
+        }, LocationTypes.TREASURE);
         this.portraitName = 'treasure-icon';
         this.portraitTint = 0xFFD700;
     }

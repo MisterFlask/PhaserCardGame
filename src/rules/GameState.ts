@@ -77,7 +77,9 @@ export class GameState {
     }
 
     public get allCardsWithHellSellValue(): readonly PlayableCard[] {
-        return this.masterDeckAllCharacters.filter(card => card.finalHellSellValue > 0)
+        const masterDeckCards = this.masterDeckAllCharacters.filter(card => card.finalHellSellValue > 0);
+        const cargoCards = this.cargoHolder.cardsInMasterDeck.filter(card => card.finalHellSellValue > 0);
+        return [...masterDeckCards, ...cargoCards];
     }
     
     public relicsInventory: AbstractRelic[] = [];
