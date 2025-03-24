@@ -14,7 +14,7 @@ export class SurfaceSellValue extends AbstractBuff {
     }
 
     override getDescription(): string {
-        return `You can sell this on the surface for $${this.getStacksDisplayText()}.`;
+        return `You can sell this on the surface for ${this.getStacksDisplayText()} 💷.`;
     }
 
     override surfaceValueModifier(): number {

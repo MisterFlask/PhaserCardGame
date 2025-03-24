@@ -33,6 +33,12 @@ export class StartCombatAction extends GameAction {
             [combatState.drawPile[i], combatState.drawPile[j]] = [combatState.drawPile[j], combatState.drawPile[i]];
         }
 
+
+        // Reset all combat resources to 0
+        combatState.combatResources.resources().forEach(resource => {
+            resource.value = 0;
+        });
+        
         combatState.currentHand = [];
         combatState.currentDiscardPile = [];
         combatState.currentExhaustPile = [];

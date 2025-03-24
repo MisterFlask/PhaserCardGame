@@ -12,19 +12,28 @@ export class CoffeeCargo extends PlayableCard {
             rarity: EntityRarity.COMMON,
         });
         this.baseEnergyCost = 0;
-        this.buffs.push(new HellSellValue(50));
+        this.buffs.push(new HellSellValue(60));
         this.surfacePurchaseValue = 50;
         this.hellPurchaseValue = 0;
     }
 
     override get description(): string {
-        return `Draw 2 cards.  Decrease the HellSellValue of this card by 10.`;
+        return `Draw 2 cards if Hell Sell Value is 10 or more.  Decrease the Hell Sell Value of this card by 10. `;
     }
 
     override InvokeCardEffects(): void {
+        
+        // If hell sell value drops to 0 or below, remove from deck and exhaust
+        const hellSellValue = this.getBuffStacks("HELL_SELL_VALUE");
+        if (hellSellValue <= 9) {
+            console.log("Coffee Cargo is now non-playable due to HellSellValue being 9 or below");
+            return;
+        }
+
         this.actionManager.drawCards(2);    
         this.mirrorChangeToCanonicalCard((card) => {
             this.actionManager.applyBuffToCard(card, new HellSellValue(-10));
         });
+
     }
 }

@@ -9,6 +9,7 @@ export class LocationManager {
     private readonly numberOfFloors = 10; // 0-9, entrance on 0, boss on 8, Charon on 9
     private readonly nodesPerFloor = 5;
     private readonly treasureFloorIndex = 5; // The middle floor that will be all treasure rooms
+    private readonly minEntranceConnections = 3; // Minimum number of paths from entrance
     
     // Special floor indices
     private readonly entranceFloor = 0;
@@ -74,9 +75,8 @@ export class LocationManager {
         charonRoom.initEncounter(); // Initialize encounter
         locationData.push(charonRoom);
 
-        // Connect boss room to Charon's room
+        // Connect boss room to Charon's room (this is a special case - one-way from boss to Charon)
         bossRoom.setAdjacent(charonRoom);
-        charonRoom.setAdjacent(bossRoom);
         
         // Create normal rooms for all other positions
         for (let floor = this.entranceFloor; floor <= this.charonFloor; floor++) {
@@ -85,7 +85,12 @@ export class LocationManager {
                 continue;
             }
             
-            for (let roomNumber = 0; roomNumber < this.nodesPerFloor; roomNumber++) {
+            // Ensure first floor after entrance has at least minEntranceConnections rooms
+            const roomsToCreate = (floor === this.entranceFloor + 1) 
+                ? Math.max(this.minEntranceConnections, this.nodesPerFloor) 
+                : this.nodesPerFloor;
+            
+            for (let roomNumber = 0; roomNumber < roomsToCreate; roomNumber++) {
                 // Start with all normal rooms - we'll change types later
                 const room = new NormalRoomCard(floor, roomNumber);
                 room.initEncounter(); // Initialize encounter
@@ -134,8 +139,8 @@ export class LocationManager {
         for (const room of preBossRooms) {
             // Add connection to boss if it doesn't exist
             if (!room.adjacentLocations.includes(bossRoom)) {
+                // Create a one-way connection from pre-boss room to boss
                 room.setAdjacent(bossRoom);
-                bossRoom.setAdjacent(room);
             }
         }
     }
@@ -164,9 +169,10 @@ export class LocationManager {
             });
         }
 
-        // Apply distribution for each floor (except entrance, treasure, boss, and Charon floors)
+        // Apply distribution for each floor (except entrance, treasure, boss, Charon floors, and first floor after entrance)
         for (let floor = this.entranceFloor + 1; floor <= this.bossFloor; floor++) {
-            if (floor === this.treasureFloorIndex || floor === this.bossFloor) continue;
+            // Skip special floors and the first floor after entrance (floor 1)
+            if (floor === this.treasureFloorIndex || floor === this.bossFloor || floor === this.entranceFloor + 1) continue;
             
             const roomsOnFloor = roomsByFloor.get(floor) || [];
             if (roomsOnFloor.length === 0) continue;
@@ -257,6 +263,7 @@ export class LocationManager {
                 // Find floors that don't have a commodities trader yet
                 const floors = Array.from(roomsByFloor.keys()).filter(
                     floor => floor !== this.entranceFloor && 
+                            floor !== this.entranceFloor + 1 && // Also exclude the first floor after entrance
                             floor !== this.treasureFloorIndex && 
                             floor !== this.bossFloor &&
                             floor !== this.charonFloor
@@ -322,14 +329,19 @@ export class LocationManager {
      * Replace a room in the locations array and maintain its connections
      */
     private replaceRoom(locations: LocationCard[], oldRoom: LocationCard, newRoom: LocationCard): void {
-        // Copy over adjacent connections
+        // Copy over adjacent connections (outgoing connections)
         for (const adj of oldRoom.adjacentLocations) {
             newRoom.setAdjacent(adj);
-            
-            // Update the adjacent room to point to the new room
-            const idx = adj.adjacentLocations.indexOf(oldRoom);
-            if (idx !== -1) {
-                adj.adjacentLocations[idx] = newRoom;
+        }
+        
+        // Find all rooms that have this room in their adjacency list (incoming connections)
+        for (const loc of locations) {
+            if (loc.adjacentLocations.includes(oldRoom)) {
+                // Replace old room reference with new room reference
+                const idx = loc.adjacentLocations.indexOf(oldRoom);
+                if (idx !== -1) {
+                    loc.adjacentLocations[idx] = newRoom;
+                }
             }
         }
         
@@ -358,13 +370,20 @@ export class LocationManager {
         const firstFloorRooms = roomsByFloor.get(this.entranceFloor + 1) || [];
         
         if (entrance && firstFloorRooms.length > 0) {
-            // Connect entrance to at most 2 first floor rooms
-            const maxConnections = Math.min(2, firstFloorRooms.length);
+            // Ensure at least minEntranceConnections connections from entrance to first floor
+            // If we don't have enough rooms, connect to all available rooms
+            const maxConnections = Math.min(this.minEntranceConnections, firstFloorRooms.length);
+            
+            // Ensure we connect to at least minEntranceConnections rooms if possible
+            if (firstFloorRooms.length < this.minEntranceConnections) {
+                console.warn(`Only ${firstFloorRooms.length} rooms on first floor, connecting entrance to all of them`);
+            }
+            
             const shuffledFirstFloor = [...firstFloorRooms].sort(() => Math.random() - 0.5);
             
             for (let i = 0; i < maxConnections; i++) {
+                // Create a one-way connection from entrance to first floor
                 entrance.setAdjacent(shuffledFirstFloor[i]);
-                shuffledFirstFloor[i].setAdjacent(entrance);
             }
         }
         
@@ -396,9 +415,8 @@ export class LocationManager {
                 for (const nextRoom of sortedNextFloorRooms) {
                     if (connectionsAdded >= numConnections) break;
                     
-                    // Create connection
+                    // Create one-way connection from current floor to next floor
                     room.setAdjacent(nextRoom);
-                    nextRoom.setAdjacent(room);
                     
                     // Update the incoming connection count
                     const count = incomingConnectionsCount.get(nextRoom) || 0;
@@ -425,8 +443,8 @@ export class LocationManager {
                     const incomingConnectionsCount = new Map<LocationCard, number>();
                     
                     for (const nextRoom of nextFloorRooms) {
-                        const incomingCount = nextRoom.adjacentLocations.filter(
-                            adj => adj.floor < nextRoom.floor
+                        const incomingCount = locations.filter(
+                            loc => loc.adjacentLocations.includes(nextRoom) && loc.floor < nextRoom.floor
                         ).length;
                         incomingConnectionsCount.set(nextRoom, incomingCount);
                     }
@@ -441,8 +459,8 @@ export class LocationManager {
                     // Connect to the room with fewest incoming connections
                     if (sortedNextFloorRooms.length > 0) {
                         const targetRoom = sortedNextFloorRooms[0];
+                        // Create one-way connection
                         room.setAdjacent(targetRoom);
-                        targetRoom.setAdjacent(room);
                     }
                 }
             }
@@ -455,8 +473,8 @@ export class LocationManager {
         
         if (bossRoom && preBossRooms.length > 0) {
             for (const room of preBossRooms) {
+                // Create one-way connection from pre-boss room to boss
                 room.setAdjacent(bossRoom);
-                bossRoom.setAdjacent(room);
             }
         }
     }
@@ -485,12 +503,42 @@ export class LocationManager {
      * Verify the map meets all the constraints
      */
     private verifyMapConstraints(locations: LocationCard[]): void {
+        this.verifyEntranceConnections(locations);
         this.verifyPathToBoss(locations);
         this.verifyNoAdjacentRestSites(locations);
         this.verifyNoAdjacentShops(locations);
         this.verifyTreasureFloor(locations);
         this.verifyTreasureRoomDebuffs(locations);
         this.verifyPreBossConnections(locations);
+        this.verifyFirstFloorNormalRooms(locations);
+    }
+
+    /**
+     * Verify the entrance has the minimum required number of paths
+     */
+    private verifyEntranceConnections(locations: LocationCard[]): void {
+        const entrance = locations.find(loc => loc instanceof EntranceCard);
+        if (!entrance) return;
+        
+        const firstFloorRooms = locations.filter(loc => loc.floor === this.entranceFloor + 1);
+        const connectionsFromEntrance = entrance.adjacentLocations.length;
+        
+        if (connectionsFromEntrance < this.minEntranceConnections && firstFloorRooms.length >= this.minEntranceConnections) {
+            console.warn(`Entrance has only ${connectionsFromEntrance} connections, adding more to reach ${this.minEntranceConnections}...`);
+            
+            // Get rooms not already connected to entrance
+            const unconnectedRooms = firstFloorRooms.filter(room => !entrance.adjacentLocations.includes(room));
+            const shuffledUnconnected = [...unconnectedRooms].sort(() => Math.random() - 0.5);
+            
+            // Add more connections until we reach the minimum or run out of unconnected rooms
+            let connectionsToAdd = Math.min(this.minEntranceConnections - connectionsFromEntrance, shuffledUnconnected.length);
+            
+            for (let i = 0; i < connectionsToAdd; i++) {
+                entrance.setAdjacent(shuffledUnconnected[i]);
+            }
+            
+            console.log(`Added ${connectionsToAdd} more connections from entrance, now has ${entrance.adjacentLocations.length} connections`);
+        }
     }
 
     /**
@@ -547,8 +595,8 @@ export class LocationManager {
         if (nextFloorRooms.length === 0) {
             // If on the floor just before boss, connect directly to boss
             if (room.floor === this.bossFloor - 1) {
+                // Create one-way connection from room to boss
                 room.setAdjacent(bossRoom);
-                bossRoom.setAdjacent(room);
                 return;
             }
             return;
@@ -580,9 +628,8 @@ export class LocationManager {
             }
             
             if (canReachBoss) {
-                // Connect to this room
+                // Connect to this room (one-way)
                 room.setAdjacent(nextRoom);
-                nextRoom.setAdjacent(room);
                 return;
             }
         }
@@ -591,8 +638,8 @@ export class LocationManager {
         // Connect to any room on the next floor and then recursively solve
         if (nextFloorRooms.length > 0) {
             const randomNextRoom = nextFloorRooms[Math.floor(Math.random() * nextFloorRooms.length)];
+            // Create one-way connection
             room.setAdjacent(randomNextRoom);
-            randomNextRoom.setAdjacent(room);
             this.createPathToBoss(randomNextRoom, locations);
         }
     }
@@ -686,7 +733,23 @@ export class LocationManager {
             if (!room.adjacentLocations.includes(bossRoom)) {
                 console.warn(`Room ${room.name} on pre-boss floor doesn't connect to boss. Adding connection...`);
                 room.setAdjacent(bossRoom);
-                bossRoom.setAdjacent(room);
+            }
+        }
+    }
+
+    /**
+     * Verify constraint 7: All rooms on the first floor after entrance are normal combat rooms
+     */
+    private verifyFirstFloorNormalRooms(locations: LocationCard[]): void {
+        const firstFloor = this.entranceFloor + 1;
+        const firstFloorRooms = locations.filter(loc => loc.floor === firstFloor);
+        
+        for (const room of firstFloorRooms) {
+            if (!(room instanceof NormalRoomCard)) {
+                console.warn(`Room ${room.name} on first floor after entrance is not a normal combat room. Converting...`);
+                // Convert to normal room
+                const normalRoom = new NormalRoomCard(room.floor, room.roomNumber);
+                this.replaceRoom(locations, room, normalRoom);
             }
         }
     }
@@ -707,13 +770,15 @@ export class LocationManager {
             
             reachable.add(current);
             
+            // Only follow forward connections (to higher floor numbers)
             for (const adjacent of current.adjacentLocations) {
-                if (!reachable.has(adjacent)) {
+                if (!reachable.has(adjacent) && adjacent.floor >= current.floor) {
                     queue.push(adjacent);
                 }
             }
         }
 
+        // Always include the boss and Charon rooms as reachable
         const specialRooms = locationData.filter(
             loc => loc instanceof BossRoomCard || loc instanceof CharonRoomCard
         );

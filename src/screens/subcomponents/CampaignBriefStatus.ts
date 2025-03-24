@@ -48,7 +48,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
             y: 45,
             width: this.CURRENCY_WIDTH,
             height: 30,
-            text: `🪙 ${GameState.getInstance().sovereignInfernalNotes} | 📝 ${GameState.getInstance().britishPoundsSterling}`,
+            text: `🔥 ${GameState.getInstance().sovereignInfernalNotes} | 💷 ${GameState.getInstance().britishPoundsSterling}`,
             style: {
                 fontSize: '16px',
                 color: '#ff4444',
@@ -143,7 +143,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
     private updateCurrencyDisplay(): void {
         const gameState = GameState.getInstance();
         this.actNumberText.setText(`Act ${gameState.currentAct}`);
-        this.combinedCurrencyText.setText(`🔥 ${gameState.sovereignInfernalNotes} | £ ${gameState.britishPoundsSterling}`);
+        this.combinedCurrencyText.setText(`🔥 ${gameState.sovereignInfernalNotes} | 💷 ${gameState.britishPoundsSterling}`);
     }
 
     public destroy(fromScene?: boolean): void {

@@ -13,9 +13,9 @@ export class SpicyLiteratureCargo extends PlayableCard {
             rarity: EntityRarity.COMMON,
         });
         this.baseEnergyCost = 1;
-        this.surfacePurchaseValue = 20;
+        this.surfacePurchaseValue = 30;
         this.hellPurchaseValue = 40;
-        this.buffs.push(new HellSellValue(55));   
+        this.buffs.push(new HellSellValue(100));   
     }
 
     override get description(): string {

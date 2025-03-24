@@ -14,8 +14,9 @@ export class CoalCargo extends PlayableCard {
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.COMMON,
         });
+        this.surfacePurchaseValue = 20;
         this.baseEnergyCost = 1;
-        this.buffs.push(new HellSellValue(85));
+        this.buffs.push(new HellSellValue(185));
         this.buffs.push(new Heavy());
     }
 

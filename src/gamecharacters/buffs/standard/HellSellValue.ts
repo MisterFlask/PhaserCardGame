@@ -18,7 +18,7 @@ export class HellSellValue extends AbstractBuff {
     }
 
     override getDescription(): string {
-        return `The sell value of this card in Hell is, at baseline, ${this.getStacksDisplayText()} in Brimstone Distillate.`;
+        return `The sell value of this card in Hell is, at baseline, ${this.getStacksDisplayText()} 💷.`;
     }
 
     override hellValueFlatModifier(): number {

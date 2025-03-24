@@ -485,6 +485,7 @@ export class CargoSelectionPanel extends AbstractHqPanel {
         data: good,
         onCardCreatedEventCallback: (card) => {
           card.disableInternalTooltip = true;
+          card.priceContext = PriceContext.SURFACE_BUY
           card.container.setInteractive();
           card.container.on('pointerdown', () => this.purchaseCargo(good));
           this.addHoverDepth(card.container);
@@ -596,7 +597,7 @@ export class CargoSelectionPanel extends AbstractHqPanel {
 
   private updateFunds(): void {
     const textObj = this.fundsLabel.getElement('text') as Phaser.GameObjects.Text;
-    textObj.setText(`Available Funds: £${GameState.getInstance().moneyInVault}`);
+    textObj.setText(`Available Funds: 💷${GameState.getInstance().moneyInVault}`);
     this.fundsLabel.layout();
   }
 
