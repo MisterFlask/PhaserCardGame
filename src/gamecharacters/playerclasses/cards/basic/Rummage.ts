@@ -1,4 +1,5 @@
 import { AbstractCard, TargetingType } from '../../../AbstractCard';
+import { IncreaseVenture } from '../../../buffs/standard/combatresource/IncreaseVenture';
 import { PlayableCard } from '../../../PlayableCard';
 
 export class Rummage extends PlayableCard {
@@ -9,6 +10,7 @@ export class Rummage extends PlayableCard {
       targetingType: TargetingType.NO_TARGETING,
     });
     this.baseEnergyCost = 1;
+    this.buffs.push(new IncreaseVenture());
   }
 
   override get description(): string {

@@ -568,6 +568,7 @@ export class CargoSelectionPanel extends AbstractHqPanel {
         campaignState.availableTradeGoods.splice(idx, 1);
         gameState.cargoHolder.cardsInMasterDeck.push(good);
         gameState.moneyInVault -= good.surfacePurchaseValue;
+        good.owningCharacter = gameState.cargoHolder;
 
         this.scene.events.emit('fundsChanged');
         this.displayCargo();
@@ -589,6 +590,7 @@ export class CargoSelectionPanel extends AbstractHqPanel {
       campaignState.availableTradeGoods.push(good);
       gameState.moneyInVault += good.surfacePurchaseValue;
 
+      good.owningCharacter = undefined;
       this.scene.events.emit('fundsChanged');
       this.displayCargo();
       this.updateLaunchButton();

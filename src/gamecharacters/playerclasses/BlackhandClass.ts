@@ -3,9 +3,9 @@ import { Gender } from "../BaseCharacter";
 import { BaseCharacterClass } from "../BaseCharacterClass";
 import { CharacterClasses } from "../CharacterClasses";
 import { Rummage } from "./cards/basic/Rummage";
+import { CorrosiveAccelerant } from "./cards/blackhand/commons/CorrosiveAccelerant";
 import { FireAxe } from "./cards/blackhand/commons/FireAxe";
 import { FlamePistol } from "./cards/blackhand/commons/FlamePistol";
-import { PocketVial } from "./cards/blackhand/commons/CorrosiveAccelerant";
 import { RageFueledAxe } from "./cards/blackhand/commons/RageFueledAxe";
 import { StormCloak } from "./cards/blackhand/commons/StormCloak";
 import { InfernaliteCache } from "./cards/blackhand/rares/InfernaliteCache";
@@ -36,7 +36,7 @@ export class BlackhandClass extends BaseCharacterClass {
         this.addCard(new InfernaliteCache())
         this.addCard(new FlamePistol())
         this.addCard(new HazmatSpecialist())
-        this.addCard(new PocketVial())
+        this.addCard(new CorrosiveAccelerant())
         this.addCard(new Pyrestarter())
         this.addCard(new RageFueledAxe())
         this.addCard(new ReIgnition())

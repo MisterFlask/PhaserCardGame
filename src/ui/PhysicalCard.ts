@@ -78,7 +78,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
     private transientUiState = TransientUiState.getInstance();
 
-    isSelected: boolean = false;
+    public isSelected: boolean = false;
     private jsonModal: Phaser.GameObjects.Container | null = null;
 
     public get isHighlighted(): boolean {

@@ -3,7 +3,7 @@ import { BaseCharacter } from "../../../BaseCharacter";
 import { AbstractBuff } from "../../AbstractBuff";
 
 export class IncreaseVenture extends AbstractBuff {
-    constructor() {
+    constructor(stacks: number = 1) {
         super();
         this.stackable = true;
         this.isDebuff = false;

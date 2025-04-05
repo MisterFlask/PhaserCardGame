@@ -6,7 +6,7 @@ import { EntityRarity } from "../../../../EntityRarity";
 import { PlayableCardWithHelpers } from "../../../../PlayableCardWithHelpers";
 import { CardType } from "../../../../Primitives";
 
-export class PocketVial extends PlayableCardWithHelpers {
+export class CorrosiveAccelerant extends PlayableCardWithHelpers {
     constructor() {
         super({
             name: "Corrosive Accelerant",
@@ -25,7 +25,8 @@ export class PocketVial extends PlayableCardWithHelpers {
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         for (const enemy of this.combatState.enemies){
-            this.dealDamageToTarget(targetCard as BaseCharacter);
+            console.log("applying effects to enemy from corrosive accelerant")
+            this.dealDamageToTarget(targetCard);
             this.addBuff(targetCard as BaseCharacter, new Weak(this.getBaseMagicNumberAfterResourceScaling()));
             const burningCount = enemy.getBuffStacks(new Burning(1).getDisplayName());
             if (burningCount > 0) {

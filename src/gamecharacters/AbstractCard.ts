@@ -179,6 +179,7 @@ export abstract class AbstractCard implements IAbstractCard {
     public baseEnergyCost: number = 0;
     protected _name: string;
     protected _description: string;
+    public flavorText: string = "";
     public portraitName?: string
     cardType: CardType
     public tooltip: string

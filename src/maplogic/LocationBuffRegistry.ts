@@ -18,6 +18,7 @@ export class LocationBuffRegistry {
     private availableNegativeBuffs: AbstractBuff[] = [];
     private availablePositiveBuffs: AbstractBuff[] = [];
     treasureNegativeBuffs: RockSlides[];
+    merchantPositiveBuffs: MerchantMultiplier[];
 
     private get combatResources(): CombatResources {
         return GameState.getInstance().combatState.combatResources;
@@ -44,12 +45,15 @@ export class LocationBuffRegistry {
             new AdditionalHellCurrency(25),
             new AdditionalPoundsSterling(25),
             new GuaranteedRelic(),
-            new MerchantMultiplier(),
         ];
 
         this.treasureNegativeBuffs = [
             new RockSlides(4),
         ];
+
+        this.merchantPositiveBuffs = [
+            new MerchantMultiplier(),
+        ]
     }
 
     public static getInstance(): LocationBuffRegistry {

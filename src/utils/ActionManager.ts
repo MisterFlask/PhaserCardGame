@@ -156,7 +156,7 @@ export class ActionManager {
 
     sellItemsForPoundsSterling(item: PlayableCard) {
         this.removeCardFromMasterDeck(item);
-
+        
         GameState.getInstance().britishPoundsSterling += item.finalHellSellValue;
     }
     
