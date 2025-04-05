@@ -1,4 +1,4 @@
-// rows of smoldering hives drip luminous honey, guarded by infernal bees whispering in unison. a veiled apiarist gestures silently, offering a choice.
+// Phlegethon Apiary: rows of smoldering hives drip luminous honey, guarded by infernal bees whispering in unison. a veiled apiarist gestures silently, offering a choice.
 
 // event choices:
 
