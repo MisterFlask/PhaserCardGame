@@ -16,6 +16,10 @@ export class StrategicResource {
         this.id = id;
     }
 
+    public ofQuantity(quantity: number) {
+        return new StrategicResource(this.name, this.flavorText, this.description, this.imageName, this.id, quantity);
+    }
+
     public addQuantity(quantity: number) {
         this.quantity += quantity;
     }
