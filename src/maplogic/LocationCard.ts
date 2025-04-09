@@ -17,6 +17,7 @@ import { CardRewardsGenerator } from '../rules/CardRewardsGenerator';
 import { GameState } from "../rules/GameState";
 import { CardModifier } from '../rules/modifiers/AbstractCardModifier';
 import { RestSiteUpgradeOptionManager } from '../rules/RestSiteUpgradeOption';
+import CombatUIManager from '../screens/subcomponents/CombatUiManager';
 import { ActionManager } from '../utils/ActionManager';
 import { Faction } from './Faction';
 import { LocationType, LocationTypes } from "./LocationType";
@@ -114,15 +115,13 @@ export class EntranceCard extends LocationCard {
 
     override OnLocationSelected(scene: Phaser.Scene): void {
         console.log(`Entrance ${this.id} selected`);
-        ActionManager.getInstance().cleanupAndRestartCombat({ encounter: this.encounter, shouldStartWithMapOverlay: false });
+        ActionManager.getInstance().cleanupAndRestartCombat({ encounter: new Encounter([], GameState.getInstance().currentAct, this.segment), shouldStartWithMapOverlay: false });
+
+        CombatUIManager.getInstance().showCustomRewards([new CardReward(CardRewardsGenerator.getInstance().generateCardRewardsForCombat())]);
     }
 
     override determineBaseRewards(): AbstractReward[] {
         const rewards: AbstractReward[] = [];
-        rewards.push(new CurrencyReward(100));
-
-        const cardRewards = CardRewardsGenerator.getInstance().generateCardRewardsForCombat();
-        rewards.push(new CardReward(cardRewards));  
         return rewards;
     }
 }

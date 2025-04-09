@@ -595,6 +595,23 @@ class CombatUIManager {
         );
         this.eventWindow.setScrollFactor(0);
     }
+
+    /**
+     * Shows a reward screen with custom rewards
+     * @param rewards - Array of AbstractReward to display
+     * @param setRewardContext - Whether to set the UI context to reward screen (defaults to true)
+     */
+    public showCustomRewards(rewards: AbstractReward[], setRewardContext: boolean = true): void {
+        if (rewards.length === 0) {
+            console.log("No custom rewards to show");
+            return;
+        }
+
+        console.log("Showing custom rewards screen");
+        this.generalRewardScreen = new GeneralRewardScreen(this.scene, rewards);
+        this.generalRewardScreen.show();
+        
+    }
 }
 
 export default CombatUIManager;

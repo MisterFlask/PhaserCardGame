@@ -5,6 +5,7 @@ import { CardRuleUtils } from '../../rules/CardRuleUtils';
 import { TextBoxButton } from '../../ui/Button';
 import { DepthManager } from '../../ui/DepthManager';
 import { PhysicalCard } from '../../ui/PhysicalCard';
+import { UIContext, UIContextManager } from '../../ui/UIContextManager';
 import { CardGuiUtils } from '../../utils/CardGuiUtils';
 
 export interface CardRewardScreenData {
@@ -16,7 +17,7 @@ export interface CardRewardScreenData {
 }
 
 const CARD_REWARD_DEPTH = DepthManager.getInstance().REWARD_SCREEN + 2000; // ensure above GeneralRewardScreen
-const CARD_REWARD_HOVERED_DEPTH = CARD_REWARD_DEPTH + 1000; // New depth for hovered cards
+const CARD_REWARD_HOVERED_DEPTH = CARD_REWARD_DEPTH + 3000; // New depth for hovered cards
 
 class CardRewardScreen {
     private scene: Phaser.Scene;
@@ -69,6 +70,7 @@ class CardRewardScreen {
     }
 
     public displayRewardCards(): void {
+        UIContextManager.getInstance().setContext(UIContext.REWARD_SCREEN);
         this.cardElements.forEach(el => {
             el.physicalCard.container.destroy();
             el.ownerText.destroy();
@@ -90,39 +92,14 @@ class CardRewardScreen {
                 y: cardY,
                 data: cardReward,
                 onCardCreatedEventCallback: (cardInstance: PhysicalCard) => {
-                    cardInstance.container.setDepth(CARD_REWARD_DEPTH + 1).setVisible(false);
-                    
-                    // Fix hover events to prevent immediate return to background
-                    cardInstance.container.setInteractive();
-                    
-                    // Update hover event handling
+                    cardInstance.setDepth(CARD_REWARD_DEPTH + 100);
+
                     cardInstance.container.on('pointerover', () => {
-                        // Set higher depth for the hovered card
-                        cardInstance.container.setDepth(CARD_REWARD_HOVERED_DEPTH);
-                        // Apply a slight scale increase to make it more noticeable
-                        this.scene.tweens.add({
-                            targets: cardInstance.container,
-                            scaleX: 1.1,
-                            scaleY: 1.1,
-                            duration: 100,
-                            ease: 'Power1'
-                        });
-                        this.scene.events.emit('card:pointerover', cardInstance);
+                        cardInstance.setDepth(CARD_REWARD_HOVERED_DEPTH);
                     });
-
                     cardInstance.container.on('pointerout', () => {
-                        // Return to normal depth and scale
-                        cardInstance.container.setDepth(CARD_REWARD_DEPTH + 1);
-                        this.scene.tweens.add({
-                            targets: cardInstance.container,
-                            scaleX: 1.0,
-                            scaleY: 1.0,
-                            duration: 100,
-                            ease: 'Power1'
-                        });
-                        this.scene.events.emit('card:pointerout', cardInstance);
+                        cardInstance.setDepth(CARD_REWARD_DEPTH + 100);
                     });
-
                     cardInstance.container.on('pointerdown', () => {
                         this.handleCardSelection(cardReward);
                     });
@@ -132,7 +109,7 @@ class CardRewardScreen {
             const ownerName = CardRuleUtils.getInstance().deriveOwnerFromCardNativeClass(cardReward).name;
             const ownerText = this.scene.add.text(
                 cardX,
-                cardY + (physicalCard.container.height / 2) + 20,
+                cardY + (physicalCard.container.displayHeight / 2) + 20,
                 ownerName,
                 {
                     fontSize: '16px',
