@@ -110,11 +110,14 @@ export class UpgradePreviewOverlay extends Phaser.GameObjects.Container {
      * show candidate cards
      */
     public showCandidates(): void {
+        if (UIContextManager.getInstance().getContext() !== UIContext.CHARACTER_DECK_SHOWN) {
+            UIContextManager.getInstance().pushContext(UIContext.CHARACTER_DECK_SHOWN);
+        }
+
         this.viewState = ViewState.SHOWING_CANDIDATES;
         this.selectedCard = null;
         this.upgrades = [];
 
-        UIContextManager.getInstance().setContext(UIContext.CHARACTER_DECK_SHOWN);
 
         this.clearNeverMindButton();
         this.clearCards();
@@ -193,7 +196,6 @@ export class UpgradePreviewOverlay extends Phaser.GameObjects.Container {
         if (!this.selectedCard) return;
 
         this.viewState = ViewState.SHOWING_UPGRADES;
-        UIContextManager.getInstance().setContext(UIContext.CHARACTER_DECK_SHOWN);
 
         this.clearCards();
         this.scrollY = 0;
@@ -289,7 +291,7 @@ export class UpgradePreviewOverlay extends Phaser.GameObjects.Container {
     }
 
     public hide(): void {
-        UIContextManager.getInstance().setContext(UIContext.COMBAT);
+        UIContextManager.getInstance().popContext();
         this.setVisible(false);
         this.viewState = ViewState.SHOWING_CANDIDATES;
         this.selectedCard = null;

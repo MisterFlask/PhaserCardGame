@@ -14,7 +14,7 @@ export enum UIContext {
 
 export class UIContextManager {
     private static instance: UIContextManager;
-    private currentContext: UIContext = UIContext.COMBAT;
+    private contextStack: UIContext[] = [UIContext.COMBAT];
 
     private constructor() {}
 
@@ -25,18 +25,47 @@ export class UIContextManager {
         return UIContextManager.instance;
     }
 
-    public setContext(context: UIContext): void {
-        console.log(`UIContext changing from ${UIContext[this.currentContext]} to ${UIContext[context]}`);
+    public pushContext(context: UIContext): void {
+        console.log(`UIContext pushing ${UIContext[context]} onto stack`);
         console.trace(); // This will log the stack trace
-        this.currentContext = context;
+        this.contextStack.push(context);
+    }
+
+    public popContext(): UIContext | undefined {
+        // Never pop the last element (COMBAT)
+        if (this.contextStack.length <= 1) {
+            console.warn("Attempted to pop the base COMBAT context, ignoring");
+            return undefined;
+        }
+        
+        const poppedContext = this.contextStack.pop();
+        console.log(`UIContext popped ${poppedContext ? UIContext[poppedContext] : "undefined"} from stack`);
+        console.trace();
+        return poppedContext;
+    }
+
+    public getCurrentContext(): UIContext {
+        return this.contextStack[this.contextStack.length - 1];
     }
 
     public getContext(): UIContext {
-        return this.currentContext;
+        return this.getCurrentContext();
     }
 
     public isContext(context: UIContext): boolean {
-        return this.currentContext === context;
+        return this.getCurrentContext() === context;
     }
 
+    public isContextInStack(context: UIContext): boolean {
+        return this.contextStack.includes(context);
+    }
+
+    public clearToBase(): void {
+        this.contextStack = [UIContext.COMBAT];
+        console.log("UIContext stack cleared to base COMBAT context");
+    }
+
+    public printCurrentContextStack(): string {
+        return this.contextStack.map(context => UIContext[context]).join(", ");
+    }
 }

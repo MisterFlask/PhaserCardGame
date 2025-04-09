@@ -150,7 +150,9 @@ export class CharacterDeckOverlay extends Phaser.GameObjects.Container {
     }
 
     public showCards(cards: PlayableCard[]): void {
-        UIContextManager.getInstance().setContext(UIContext.CHARACTER_DECK_SHOWN);
+        if (UIContextManager.getInstance().getContext() !== UIContext.CHARACTER_DECK_SHOWN) {
+            UIContextManager.getInstance().pushContext(UIContext.CHARACTER_DECK_SHOWN);
+        }
         this.cards.forEach(card => card.obliterate());
         this.cards = [];
 
@@ -194,7 +196,7 @@ export class CharacterDeckOverlay extends Phaser.GameObjects.Container {
     }
 
     public hide(): void {
-        UIContextManager.getInstance().setContext(UIContext.COMBAT);
+        UIContextManager.getInstance().popContext();
         this.setVisible(false);
     }
 

@@ -618,7 +618,10 @@ export class MapOverlay {
         // Make visible but start off-screen
         this.overlay.setVisible(true);
         this.overlay.setPosition(this.SLIDE_DISTANCE, 0);
-        
+        if (UIContextManager.getInstance().getContext() !== UIContext.MAP) {
+            UIContextManager.getInstance().pushContext(UIContext.MAP);
+        }
+
         // Tween into view
         this.scene.tweens.add({
             targets: this.overlay,
@@ -629,7 +632,6 @@ export class MapOverlay {
                 this.isVisible = true;
                 this.isTransitioning = false;
                 this.resetCameraPosition();
-                UIContextManager.getInstance().setContext(UIContext.MAP);
                 // Add slight delay before centering to ensure everything is properly positioned
                 this.scene.time.delayedCall(100, () => {
                     this.centerCameraOnPlayerLocation();
@@ -642,6 +644,9 @@ export class MapOverlay {
         if (this.isTransitioning || !this.isVisible) return;
         this.isTransitioning = true;
         
+        UIContextManager.getInstance().popContext();
+
+        
         // Tween out of view
         this.scene.tweens.add({
             targets: this.overlay,
@@ -653,7 +658,6 @@ export class MapOverlay {
                 this.isVisible = false;
                 this.isTransitioning = false;
                 this.resetCameraPosition();
-                UIContextManager.getInstance().setContext(UIContext.COMBAT);
                 
                 // Ensure the campaign brief status is properly updated when hiding
                 if (this.campaignBriefStatus) {

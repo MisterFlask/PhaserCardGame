@@ -110,7 +110,7 @@ export class CardSelectionFromCustomPoolOverlay extends Phaser.GameObjects.Conta
         callback: (cards: PlayableCard[]) => void,
         cancellable: boolean = true
     ): void {
-        UIContextManager.getInstance().setContext(UIContext.CARD_SELECTION_FROM_CUSTOM_POOL);
+        UIContextManager.getInstance().pushContext(UIContext.CARD_SELECTION_FROM_CUSTOM_POOL);
         this.minSelection = min;
         this.maxSelection = max;
         this.callback = callback;
@@ -261,7 +261,7 @@ export class CardSelectionFromCustomPoolOverlay extends Phaser.GameObjects.Conta
     }
 
     public hide(): void {
-        UIContextManager.getInstance().setContext(UIContext.COMBAT);
+        UIContextManager.getInstance().popContext();
         this.setVisible(false);
         // Clean up selections
         this.selectedCards.forEach(card => {

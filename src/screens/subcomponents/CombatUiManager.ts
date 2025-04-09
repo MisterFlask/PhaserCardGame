@@ -465,7 +465,6 @@ class CombatUIManager {
             console.log("Showing rewards for room: " + GameState.getInstance().currentLocation?.name);       
             this.generalRewardScreen = new GeneralRewardScreen(this.scene, rewards);
             this.generalRewardScreen.show();
-            UIContextManager.getInstance().setContext(UIContext.REWARD_SCREEN);
         } else {
             console.log("No rewards to show for room: " + GameState.getInstance().currentLocation?.name);
         }

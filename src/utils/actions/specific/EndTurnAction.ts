@@ -11,7 +11,7 @@ export class EndTurnAction extends GameAction {
         const combatState = gameState.combatState;
 
         // Set UI context
-        UIContextManager.getInstance().setContext(UIContext.COMBAT_BUT_NOT_YOUR_TURN);
+        UIContextManager.getInstance().pushContext(UIContext.COMBAT_BUT_NOT_YOUR_TURN);
         console.log('Ending turn');
 
         // Remove intents from dead enemies

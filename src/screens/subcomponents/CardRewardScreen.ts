@@ -5,7 +5,6 @@ import { CardRuleUtils } from '../../rules/CardRuleUtils';
 import { TextBoxButton } from '../../ui/Button';
 import { DepthManager } from '../../ui/DepthManager';
 import { PhysicalCard } from '../../ui/PhysicalCard';
-import { UIContext, UIContextManager } from '../../ui/UIContextManager';
 import { CardGuiUtils } from '../../utils/CardGuiUtils';
 
 export interface CardRewardScreenData {
@@ -70,7 +69,6 @@ class CardRewardScreen {
     }
 
     public displayRewardCards(): void {
-        UIContextManager.getInstance().setContext(UIContext.REWARD_SCREEN);
         this.cardElements.forEach(el => {
             el.physicalCard.container.destroy();
             el.ownerText.destroy();
@@ -175,6 +173,7 @@ class CardRewardScreen {
     }
 
     public show(): void {
+
         this.shouldShow = true;
         this.background.setVisible(true);
         this.goToMapButton.setVisible(true);
@@ -193,6 +192,7 @@ class CardRewardScreen {
     }
 
     public hide(): void {
+
         this.shouldShow = false;
         const targets = [this.background, this.goToMapButton, this.rerollButton, ...this.cardElements.map(el => el.physicalCard.container), ...this.cardElements.map(el => el.ownerText)];
         this.scene.tweens.add({

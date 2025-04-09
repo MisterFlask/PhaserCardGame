@@ -132,13 +132,13 @@ export class TreasureOverlay extends Phaser.GameObjects.Container {
         this.createRelicDisplays();
         this.setVisible(true);
         this.isVisible = true;
-        UIContextManager.getInstance().setContext(UIContext.SHOP);
+        UIContextManager.getInstance().pushContext(UIContext.SHOP);
     }
 
     public hide(): void {
         this.setVisible(false);
         this.isVisible = false;
-        UIContextManager.getInstance().setContext(UIContext.COMBAT);
+        UIContextManager.getInstance().popContext();
     }
     
     public toggle(): void {

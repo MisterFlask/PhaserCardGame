@@ -334,13 +334,13 @@ export class ShopOverlay {
     public show(): void {
         this.overlay.setVisible(true);
         this.isVisible = true;
-        UIContextManager.getInstance().setContext(UIContext.SHOP);
+        UIContextManager.getInstance().pushContext(UIContext.SHOP);
     }
 
     public hide(): void {
         this.overlay.setVisible(false);
         this.isVisible = false;
-        UIContextManager.getInstance().setContext(UIContext.COMBAT);
+        UIContextManager.getInstance().popContext();
     }
 
     public toggle(): void {

@@ -46,7 +46,7 @@ export class TransientUiState {
     }
 
     public getDebugDisplayString(): string {
-        return `UI State: ${UIContextManager.getInstance().getContext()}
+        return `UI State: ${UIContextManager.getInstance().printCurrentContextStack()}
 Dragged Card: ${this.draggedCard ? this.draggedCard.data.name : 'None'}
 Hovered Card: ${this.hoveredCard ? this.hoveredCard.data.name : 'None'}
 Hovered Intent: ${this.hoveredIntent ? this.hoveredIntent.intent.id : 'None'}

@@ -1,6 +1,5 @@
 import { ProcBroadcaster } from "../../../gamecharacters/procs/ProcBroadcaster";
 import { GameState } from "../../../rules/GameState";
-import { UIContext, UIContextManager } from "../../../ui/UIContextManager";
 import { ActionManagerFetcher } from "../../ActionManagerFetcher";
 import { GameAction } from "../GameAction";
 
@@ -57,10 +56,6 @@ export class BeginTurnAction extends GameAction {
 
         // Reset energy to default max
         combatState.energyAvailable = combatState.defaultMaxEnergy;
-
-        // Set UI context
-        UIContextManager.getInstance().setContext(UIContext.COMBAT);
-
         return [];
     }
 } 

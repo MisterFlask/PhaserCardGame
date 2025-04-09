@@ -49,7 +49,7 @@ class CardSelectionFromHandManager {
         if (this.cancellable) {
             this.createCancelButton();
         }
-        UIContextManager.getInstance().setContext(UIContext.CARD_SELECTION_FROM_HAND);
+        UIContextManager.getInstance().pushContext(UIContext.CARD_SELECTION_FROM_HAND);
     }
 
     private createCancelButton(): void {
@@ -213,7 +213,7 @@ class CardSelectionFromHandManager {
                 card.physicalCard.container.setDepth(depthManager.CARD_BASE + i);
             }
         });
-        UIContextManager.getInstance().setContext(UIContext.COMBAT);
+        UIContextManager.getInstance().popContext();
     }
 
     private unhighlightAllSelectedCards(): void {

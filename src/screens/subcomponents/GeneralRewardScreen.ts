@@ -6,6 +6,7 @@ import { CardReward } from '../../rewards/CardReward';
 import { CardRuleUtils } from '../../rules/CardRuleUtils';
 import { TextBoxButton } from '../../ui/Button';
 import { DepthManager } from '../../ui/DepthManager';
+import { UIContext, UIContextManager } from '../../ui/UIContextManager';
 import { ActionManager } from '../../utils/ActionManager';
 import CardRewardScreen from './CardRewardScreen';
 
@@ -285,6 +286,7 @@ class GeneralRewardScreen {
     }
 
     public show(): void {
+        UIContextManager.getInstance().pushContext(UIContext.REWARD_SCREEN);
         this.shouldShow = true;
         this.background.setVisible(true);
         this.doneButton?.setVisible(true);
@@ -304,6 +306,9 @@ class GeneralRewardScreen {
     }
 
     public hide(): void {
+        if (UIContextManager.getInstance().getContext() === UIContext.REWARD_SCREEN) {
+            UIContextManager.getInstance().popContext();
+        }
         this.shouldShow = false;
 
         this.scene.tweens.add({

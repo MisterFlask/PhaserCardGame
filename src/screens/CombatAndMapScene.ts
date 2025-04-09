@@ -81,7 +81,6 @@ class CombatScene extends Phaser.Scene {
         SceneChanger.setCurrentScene(this);
         ActionManager.init(this);
 
-        UIContextManager.getInstance().setContext(UIContext.COMBAT);
         this.combatEndHandled = false;
         this.initialData = data;
     }
@@ -96,9 +95,6 @@ class CombatScene extends Phaser.Scene {
         // Reinitialize combat state with new encounter
         const stateService = CombatStateService.getInstance();
         stateService.initializeCombat(data.encounter, GameState.getInstance().currentRunCharacters);
-        
-        // Reset UI context
-        UIContextManager.getInstance().setContext(UIContext.COMBAT);
 
         this.changeBackground(data.encounter.getBackgroundName());
         
