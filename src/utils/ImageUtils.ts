@@ -19,6 +19,7 @@ export default class GameImageLoader {
         location_backgrounds: {
             prefix: 'Backgrounds/Location/',
             files: [
+                "investments-screen.png",
                 "backrooms-oil-painting.png",
                 "canyon-oil-painting.png",
                 "facility-oil-painting.png",

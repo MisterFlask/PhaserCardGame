@@ -83,6 +83,11 @@ export class CardTooltipGenerator {
             }
         }
 
+        // flavor text
+        tooltip += `[i][color=gold]Flavor:[/color]\n`;
+        tooltip += `- ${card.flavorText}\n`;
+        tooltip += `[/i]\n`;
+
         return tooltip;
     }
 }

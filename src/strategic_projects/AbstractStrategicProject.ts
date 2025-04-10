@@ -15,6 +15,10 @@ export abstract class AbstractStrategicProject extends AbstractCard {
         });
     }
 
+    public getMoneyCost(): number {
+        return 100;
+    }
+
     public getStrategicResourceCost(): StrategicResource[]
     {
         return [

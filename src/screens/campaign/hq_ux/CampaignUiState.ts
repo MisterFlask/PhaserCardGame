@@ -5,8 +5,9 @@ import { CoffeeCargo } from '../../../gamecharacters/playerclasses/cards/cargo/C
 import { SpicyLiteratureCargo } from '../../../gamecharacters/playerclasses/cards/cargo/SpicyLiteratureCargo';
 import { CampaignRules } from '../../../rules/CampaignRulesHelper';
 import { GameState } from '../../../rules/GameState';
+import { AbstractStrategicProject } from '../../../strategic_projects/AbstractStrategicProject';
+import { AbyssalResearchInstitute } from '../../../strategic_projects/AbyssalResearchInstitute';
 import { AbstractTradeRoute, StandardTradeRoute } from './AbstractTradeRoute';
-import { StrategicImprovementCard } from './StrategicImprovementCard';
 
 export class CampaignUiState {
     private static instance: CampaignUiState;
@@ -14,8 +15,13 @@ export class CampaignUiState {
     public currentYear: number = 1;
     public shareholderExpectation: number = 1000;
     public availableTradeRoutes: AbstractTradeRoute[] = [new StandardTradeRoute(),new StandardTradeRoute(),new StandardTradeRoute()];
-    public ownedFactories: StrategicImprovementCard[] = [];
-    public availableFactories: StrategicImprovementCard[] = [];
+    public ownedStrategicProjects: AbstractStrategicProject[] = [];
+    public availableStrategicProjects: AbstractStrategicProject[] = [
+
+        new AbyssalResearchInstitute()
+
+
+    ];
     public selectedTradeRoute: AbstractTradeRoute | null = null;
     public selectedParty: PlayerCharacter[] = [];
     public roster: PlayerCharacter[] = CampaignRules.getInstance().generateLogicalCharacterRoster();
@@ -32,7 +38,7 @@ export class CampaignUiState {
 
     public reinitializeCampaignUiStateAfterRun(): void {
         this.availableTradeRoutes = [new StandardTradeRoute(),new StandardTradeRoute(),new StandardTradeRoute()];
-        this.availableFactories = [];
+        this.availableStrategicProjects = [];
         this.selectedTradeRoute = null;
         this.selectedParty = [];
     }

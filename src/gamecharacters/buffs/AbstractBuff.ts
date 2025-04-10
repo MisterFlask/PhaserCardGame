@@ -491,6 +491,10 @@ export abstract class AbstractBuff implements IAbstractBuff {
     public alterRewards(currentRewards: AbstractReward[]): AbstractReward[] {
         return currentRewards;
     }
+
+    public addRewardOnRunStart(): AbstractReward[] {
+        return [];
+    }
     
 }
 

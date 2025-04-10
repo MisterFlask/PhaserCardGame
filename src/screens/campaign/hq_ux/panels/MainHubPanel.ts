@@ -85,11 +85,11 @@ export class MainHubPanel extends AbstractHqPanel {
         };
 
         const buttons = [
-            //{ text: 'Investment', x: 0.2, y: 0.6 },
-            { text: 'Trade Routes', x: 0.4, y: 0.6, special: true },
+            { text: 'Investment', x: 0.2, y: 0.6 },
+            { text: 'New Expedition', x: 0.4, y: 0.6},
         ];
 
-        buttons.forEach(({ text, x, y, special }) => {
+        buttons.forEach(({ text, x, y}) => {
             const button = new TextBoxButton({
                 scene: this.scene,
                 x: this.scene.scale.width * x,

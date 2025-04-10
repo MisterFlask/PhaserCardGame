@@ -1,16 +1,37 @@
 import { Scene } from 'phaser';
+import { AbstractStrategicProject } from '../../../../strategic_projects/AbstractStrategicProject';
 import { PhysicalCard } from '../../../../ui/PhysicalCard';
+import { TextBox } from '../../../../ui/TextBox';
 import { CardGuiUtils } from '../../../../utils/CardGuiUtils';
 import { CampaignUiState } from '../CampaignUiState';
-import { StrategicImprovementCard } from '../StrategicImprovementCard';
 import { AbstractHqPanel } from './AbstractHqPanel';
 
 export class InvestmentPanel extends AbstractHqPanel {
     private availableFactories: PhysicalCard[] = [];
     private ownedFactories: PhysicalCard[] = [];
+    private backgroundImage: Phaser.GameObjects.Image;
+    private titleTextBox: TextBox;
 
     constructor(scene: Scene) {
         super(scene, 'Factory Investments');
+        
+        // Add background image
+        this.backgroundImage = scene.add.image(0, 0, 'investments-screen')
+            .setOrigin(0, 0)
+            .setDisplaySize(scene.scale.width, scene.scale.height);
+        this.add(this.backgroundImage);
+        
+        // Add title TextBox
+        this.titleTextBox = new TextBox({
+            scene: scene,
+            x: scene.scale.width / 2,
+            y: 50,
+            width: 400,
+            text: 'STRATEGIC INVESTMENTS',
+            style: { fontSize: '28px', fontFamily: 'verdana' }
+        });
+        this.add(this.titleTextBox);
+        
         this.displayFactories();
     }
 
@@ -28,7 +49,7 @@ export class InvestmentPanel extends AbstractHqPanel {
         const startY = 150;
 
         // Display available factories on the left
-        campaignState.availableFactories.forEach((factory, index) => {
+        campaignState.availableStrategicProjects.forEach((factory, index) => {
             const card = this.createFactoryCard(factory, 
                 this.scene.scale.width * 0.25,
                 startY + index * (cardSpacing + 150)
@@ -37,7 +58,7 @@ export class InvestmentPanel extends AbstractHqPanel {
         });
 
         // Display owned factories on the right
-        campaignState.ownedFactories.forEach((factory, index) => {
+        campaignState.ownedStrategicProjects.forEach((factory, index) => {
             const card = this.createFactoryCard(factory,
                 this.scene.scale.width * 0.75,
                 startY + index * (cardSpacing + 150)
@@ -46,7 +67,7 @@ export class InvestmentPanel extends AbstractHqPanel {
         });
     }
 
-    private createFactoryCard(factory: StrategicImprovementCard, x: number, y: number): PhysicalCard {
+    private createFactoryCard(factory: AbstractStrategicProject, x: number, y: number): PhysicalCard {
         const card = CardGuiUtils.getInstance().createCard({
             scene: this.scene,
             x,
@@ -72,14 +93,14 @@ export class InvestmentPanel extends AbstractHqPanel {
     }
 
     private handleFactoryCardClick(card: PhysicalCard): void {
-        const factory = card.data as StrategicImprovementCard;
+        const factory = card.data as AbstractStrategicProject;
         const campaignState = CampaignUiState.getInstance();
 
-        if (!campaignState.ownedFactories.includes(factory) && 
-            campaignState.getCurrentFunds() >= factory.purchaseCost) {
-            campaignState.availableFactories = campaignState.availableFactories
+        if (!campaignState.ownedStrategicProjects.includes(factory) && 
+            campaignState.getCurrentFunds() >= factory.getMoneyCost()) {
+            campaignState.availableStrategicProjects = campaignState.availableStrategicProjects
                 .filter(f => f !== factory);
-            campaignState.ownedFactories.push(factory);
+            campaignState.ownedStrategicProjects.push(factory);
             this.clearCards();
             this.displayFactories();
         }

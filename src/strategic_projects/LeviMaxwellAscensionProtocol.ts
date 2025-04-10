@@ -2,3 +2,4 @@
 
 
 // Effect: ALL cargo you bring starts combat with 2 Light.
+
