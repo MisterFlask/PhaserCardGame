@@ -6,11 +6,22 @@ export abstract class AbstractHqPanel extends Phaser.GameObjects.Container {
     protected titleText: TextBox;
     protected returnButton: TextBoxButton;
     protected title: string;
-    constructor(scene: Scene, title: string) {
+    protected backgroundImage?: Phaser.GameObjects.Image;
+
+    constructor(scene: Scene, title: string, backgroundImageKey?: string) {
         super(scene, 0, 0);
         scene.add.existing(this);
 
         this.title = title;
+
+        // Add background image if provided
+        if (backgroundImageKey) {
+            this.backgroundImage = scene.add.image(0, 0, backgroundImageKey)
+                .setOrigin(0, 0)
+                .setDisplaySize(scene.scale.width, scene.scale.height)
+                .setDepth(-1); // Set a negative depth to ensure it stays below other elements
+            this.add(this.backgroundImage);
+        }
 
         // Add title
         this.titleText = new TextBox({

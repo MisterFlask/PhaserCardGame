@@ -109,8 +109,8 @@ export class MainHubPanel extends AbstractHqPanel {
     private navigateTo(destination: string): void {
         const lowerDest = destination.toLowerCase();
         // Map 'expedition loadout' to 'loadout'
-        if (lowerDest === 'expedition loadout') {
-            this.scene.events.emit('navigate', 'loadout');
+        if (lowerDest === 'new expedition') {
+            this.scene.events.emit('navigate', 'trade routes');
         } else {
             this.scene.events.emit('navigate', lowerDest);
         }
