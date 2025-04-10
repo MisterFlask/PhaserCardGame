@@ -364,19 +364,37 @@ export default class GameImageLoader {
      * @param loader - The Phaser loader object.
      */
     public loadAllImages(loader: Phaser.Loader.LoaderPlugin): void {
+        console.log('Starting to load all images...');
+        
+        // Add error event listener
+        loader.on(Phaser.Loader.Events.FILE_LOAD_ERROR, (file: any) => {
+            console.error(`Failed to load asset: ${file.key} from ${file.url || file.src}`);
+        });
+        
+        // Add completion listener
+        loader.on(Phaser.Loader.Events.COMPLETE, () => {
+            console.log('All assets finished loading.');
+        });
+        
         for (const category in GameImageLoader.images) {
             const categoryData = GameImageLoader.images[category as keyof typeof GameImageLoader.images];
+            console.log(`Loading category: ${category}, count of assets: ${categoryData.files.length}`);
+            
             categoryData.files.forEach((file: string) => {
                 const key = file.replace(/\.(png|svg)$/, '');
+                const fullUrl = `${this.baseURL}${categoryData.prefix}${file}`;
+                
+                console.log(`Attempting to load [${key}] from: ${fullUrl}`);
+                
                 if (file.endsWith('.svg')) {
                     loader.svg({
                         key: key,
-                        url: `${this.baseURL}${categoryData.prefix}${file}`
+                        url: fullUrl
                     });
                 } else {
                     loader.image({
                         key: key,
-                        url: `${this.baseURL}${categoryData.prefix}${file}`
+                        url: fullUrl
                     });
                 }
                 const texture = loader.scene.textures.get(key);
