@@ -56,7 +56,11 @@ export class HqScene extends Scene {
         });
 
         ActionManagerFetcher.initServicesAsync(this);
+        this.load.setBaseURL('https://raw.githubusercontent.com/');
+
+        // Add all images to the load queue
         new GameImageLoader().loadAllImages(this.load);
+        
         SceneChanger.setCurrentScene(this);
         this.load.plugin('rexbbcodetextplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbbcodetextplugin.min.js', true);
         // Load any required assets

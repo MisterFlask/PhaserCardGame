@@ -375,6 +375,10 @@ export default class GameImageLoader {
         loader.on(Phaser.Loader.Events.COMPLETE, () => {
             console.log('All assets finished loading.');
         });
+
+        loader.on(Phaser.Loader.Events.FILE_LOAD, (file: any) => {
+            console.log(`Loaded asset: ${file.key} from ${file.url || file.src}`);
+        });
         
         for (const category in GameImageLoader.images) {
             const categoryData = GameImageLoader.images[category as keyof typeof GameImageLoader.images];
@@ -437,6 +441,7 @@ export default class GameImageLoader {
         const randomIndex = Math.floor(Math.random() * categoryData.files.length);
         
         const randomFile = categoryData.files[randomIndex];
+        
         return randomFile.replace(/\.(png|svg)$/, '');
     }
 }

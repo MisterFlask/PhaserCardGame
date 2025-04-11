@@ -25,6 +25,12 @@ export class ShadowedImage extends Phaser.GameObjects.Container {
     }) {
         super(scene, x, y);
 
+        // Check if texture exists in cache
+        if (!scene.textures.exists(texture)) {
+            console.warn(`Texture "${texture}" does not exist in the cache. Using default texture.`);
+            texture = '__DEFAULT' in scene.textures.list ? '__DEFAULT' : 'missing';
+        }
+
         // Create shadow image first (so it appears behind)
         this.shadowImage = scene.add.image(shadowOffset, shadowOffset, texture);
         this.shadowImage.setDisplaySize(displaySize, displaySize);
@@ -60,6 +66,12 @@ export class ShadowedImage extends Phaser.GameObjects.Container {
     }
 
     setImage(name: string): this {
+        // Check if texture exists in cache
+        if (!this.scene.textures.exists(name)) {
+            console.warn(`Texture "${name}" does not exist in the cache. Using current texture.`);
+            return this;
+        }
+        
         this.mainImage.setTexture(name);
         this.shadowImage.setTexture(name);
         return this;
