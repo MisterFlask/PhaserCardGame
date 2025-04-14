@@ -109,8 +109,8 @@ export class TooltipAttachment {
         
         // Position tooltip up and to the right of cursor
         // Base offset that grows with tooltip height
-        const xOffset = 30;
-        const baseYOffset = -40;
+        const xOffset = 130;
+        const baseYOffset = -140;
         const heightBasedOffset = -(tooltipBounds.height * 0.5); // Additional offset based on height
         const yOffset = baseYOffset + heightBasedOffset;
         

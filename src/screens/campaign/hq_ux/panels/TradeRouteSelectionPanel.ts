@@ -14,7 +14,7 @@ export class TradeRouteSelectionPanel extends AbstractHqPanel {
     private modifierButtons: TextBoxButton[] = []; // Track modifier buttons separately
 
     constructor(scene: Scene) {
-        super(scene, 'Trade Route Selection');
+        super(scene, 'Trade Route Selection', 'route-select-screen-stained-glass');
 
         this.detailsContainer = this.scene.add.container(0, 0);
         this.detailsContainer.setVisible(false);
@@ -64,6 +64,9 @@ export class TradeRouteSelectionPanel extends AbstractHqPanel {
                 card.setGlow(true);
                 this.showRouteDetails(card);
                 CampaignUiState.getInstance().selectedTradeRoute = card.data as AbstractTradeRoute;
+                // bring to front
+                // Bring the card to the front of the display
+                this.bringToTop(card.container);
             })
             .on('pointerout', () => {
                 card.setGlow(false);

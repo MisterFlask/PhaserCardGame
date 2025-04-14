@@ -28,6 +28,8 @@ import { UIContext } from './UIContextManager';
 export class PhysicalCard implements IPhysicalCardInterface {
 
     private static readonly GLOW_SCALE_MULTIPLIER = 1.7;
+    private static readonly TOOLTIP_DEPTH_OFFSET = 1000;
+    
     contextRelevant?: UIContext;
     disableInternalTooltip: boolean = false;
 
@@ -43,7 +45,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
     nameBox: TextBox;
     descBox: TextBox;
-    tooltipBox: TextBox;
+    cardTooltip: TooltipAttachment;
     hpBox: TextBox | null;
     costBox: TextBox | null = null;
     resourceScalingBox: TextBox | null = null;
@@ -147,10 +149,9 @@ export class PhysicalCard implements IPhysicalCardInterface {
         this.cardBorder.setStrokeStyle(2, 0x000000);
         this.visualContainer.addAt(this.cardBorder, 0);
 
-        // textboxes: name, desc, tooltip
+        // textboxes: name, desc
         this.nameBox = this.createNameBox(data, cardWidth, cardHeight);
         this.descBox = this.createDescBox(data, cardWidth, cardHeight);
-        this.tooltipBox = this.createTooltipBox(data, cardWidth, cardHeight);
 
         // hp / cost / resource scaling / card type boxes
         this.hpBox = this.maybeCreateHpBox(data);
@@ -186,12 +187,22 @@ export class PhysicalCard implements IPhysicalCardInterface {
         // visual first
         this.container.add(this.visualContainer);
         // ui after
-        this.uiContainer.add([this.nameBox, this.descBox, this.tooltipBox, this.blocksContainer, this.buffsContainer, this.intentsContainer, this.incomingIntentsContainer]);
+        this.uiContainer.add([this.nameBox, this.descBox, this.blocksContainer, this.buffsContainer, this.intentsContainer, this.incomingIntentsContainer]);
         if (this.hpBox) this.uiContainer.add(this.hpBox);
         if (this.costBox) this.uiContainer.add(this.costBox);
         if (this.resourceScalingBox) this.uiContainer.add(this.resourceScalingBox);
         if (this.cardTypeBox) this.uiContainer.add(this.cardTypeBox);
         this.container.add(this.uiContainer);
+
+        // create tooltip attachment (outside of any container)
+        const tooltipText = CardTooltipGenerator.getInstance().generateTooltip(this.data);
+        this.cardTooltip = new TooltipAttachment({
+            scene: this.scene,
+            container: this.container,
+            tooltipText: tooltipText,
+            fillColor: 0x000000,
+            disableAutomaticHoverListeners: false
+        });
 
         this.initBuffsGrid();
 
@@ -207,7 +218,6 @@ export class PhysicalCard implements IPhysicalCardInterface {
         this.scene.events.once('shutdown', this.obliterate, this);
         this.scene.events.once('destroy', this.obliterate, this);
         this.setupInteractivity();
-
     }
 
     setInteractive(isInteractive: boolean): Phaser.GameObjects.Container {
@@ -239,7 +249,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
         this.nameBox.destroy();
         this.descBox.destroy();
-        this.tooltipBox.destroy();
+        this.cardTooltip.destroy();
         this.hpBox?.destroy();
         this.blockTooltip.destroy();
         this.cardImage?.destroy();
@@ -359,7 +369,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
         
         // Update tooltip text
         const tooltipText = CardTooltipGenerator.getInstance().generateTooltip(this.data);
-        this.tooltipBox.setText(tooltipText);
+        this.cardTooltip.updateTooltipPosition();
+        this.cardTooltip.updateText(tooltipText);
 
         if (this.hpBox && this.data.isBaseCharacter()) {
             const baseCharacter = this.data as BaseCharacterType;
@@ -605,8 +616,6 @@ export class PhysicalCard implements IPhysicalCardInterface {
         this.container.setDepth(depth);
         this.visualContainer.setDepth(depth);
         this.uiContainer.setDepth(depth + 1); // ui above visuals
-
-        // no complicated per-element depth logic; containers now handle relative stacking
     }
 
     private getHitArea(): Phaser.Geom.Rectangle {
@@ -643,17 +652,11 @@ export class PhysicalCard implements IPhysicalCardInterface {
         return this;
     }
     
-    
-
     private onPointerOver_PhysicalCard(): void {
         if (!this.obliterated) {
             this.setGlow(true);
             if (!this.disableInternalTooltip) {
-                this.positionTooltipBox();
-                this.tooltipBox.setVisible(true);
-                if (this.tooltipBox.parentContainer) {
-                    this.tooltipBox.parentContainer.bringToTop(this.tooltipBox);
-                }
+                this.cardTooltip.showTooltip();
                 this.descBox.setVisible(true);
             }
             if (this.hoverSound) {
@@ -670,7 +673,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
                 this.setGlow(false);
             }
             if (!this.disableInternalTooltip) {
-                this.tooltipBox.setVisible(false);
+                this.cardTooltip.hideTooltip();
                 this.descBox.setVisible(false);
             }
             this.scene.events.emit("card:pointerout", this);
@@ -733,30 +736,6 @@ export class PhysicalCard implements IPhysicalCardInterface {
                 wordWrap: { width: cardWidth - 30 },
                 align: 'center'
             },
-            verticalExpand: 'down',
-            horizontalExpand: 'center'
-        });
-        box.setVisible(false);
-        return box;
-    }
-
-    private createTooltipBox(data: AbstractCard, cardWidth: number, cardHeight: number): TextBox {
-        const tooltipText = CardTooltipGenerator.getInstance().generateTooltip(data);
-        const box = new TextBox({
-            scene: this.scene,
-            x: -20,
-            y: cardHeight / 2,
-            width: cardWidth + 40,
-            height: 60,
-            text: tooltipText,
-            textBoxName: "tooltipBox:" + data.id,
-            style: {
-                fontSize: '17px',
-                color: '#ffffff',
-                wordWrap: { width: cardWidth - 20 },
-                align: 'center'
-            },
-            fillColor: 0x000000,
             verticalExpand: 'down',
             horizontalExpand: 'center'
         });
@@ -872,24 +851,6 @@ export class PhysicalCard implements IPhysicalCardInterface {
         return container;
     }
 
-    private positionTooltipBox(): void {
-        const tooltipBox = this.tooltipBox;
-        const padding = 20;
-        const requiredTooltipWidth = tooltipBox.width + padding * 2;
-        const requiredTooltipHeight = tooltipBox.height + padding * 2;
-        tooltipBox.setSize(requiredTooltipWidth, requiredTooltipHeight);
-
-        const cardWidth = this.cardBackground.displayWidth * this.data.size.sizeModifier * 1.1;
-        const gameWidth = this.scene.scale.width;
-        const cardCenterX = this.container.x;
-
-        if (cardCenterX > gameWidth / 2) {
-            tooltipBox.setPosition(-cardWidth - requiredTooltipWidth / 2 - 10, 0);
-        } else {
-            tooltipBox.setPosition(cardWidth + requiredTooltipWidth / 2 + 10, 0);
-        }
-    }
-
     private updatePriceBox() {
         if (this.priceContext !== PriceContext.NONE) {
             const priceText = this.data.getPriceDisplayText(this.priceContext);
@@ -901,7 +862,6 @@ export class PhysicalCard implements IPhysicalCardInterface {
             this.priceBox.setVisible(false);
         }
     }
-
 
     public addGrowAndShrinkAnimationOnHoverLerps(): this {
         this.container.setInteractive({

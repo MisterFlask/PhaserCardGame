@@ -16,7 +16,7 @@ export class InvestmentPanel extends AbstractHqPanel {
     private poundsDisplay: TextBox;
 
     constructor(scene: Scene) {
-        super(scene, 'Factory Investments', 'investments-screen');
+        super(scene, 'Factory Investments', 'investments-screen-stained-glass');
         
         // Add title TextBox
         this.titleTextBox = new TextBox({
@@ -28,6 +28,17 @@ export class InvestmentPanel extends AbstractHqPanel {
             style: { fontSize: '28px', fontFamily: 'verdana' }
         });
         this.add(this.titleTextBox);
+
+        // Add British Pounds Sterling display below the title
+        this.poundsDisplay = new TextBox({
+            scene: scene,
+            x: scene.scale.width / 2,
+            y:120,
+            width: 250,
+            text: `CurrentWorking Capital: £${GameState.getInstance().moneyInVault}`,
+            style: { fontSize: '24px', fontFamily: 'verdana', color: '#FFD700', align: 'center' }
+        });
+        this.add(this.poundsDisplay);
 
         // Add section headers
         this.availableSectionText = new TextBox({
@@ -50,17 +61,6 @@ export class InvestmentPanel extends AbstractHqPanel {
         });
         this.add(this.ownedSectionText);
         
-        // Add British Pounds Sterling display in upper right
-        this.poundsDisplay = new TextBox({
-            scene: scene,
-            x: scene.scale.width - 150,
-            y: 40,
-            width: 250,
-            text: `£${GameState.getInstance().britishPoundsSterling}`,
-            style: { fontSize: '24px', fontFamily: 'verdana', color: '#FFD700', align: 'right' }
-        });
-        this.add(this.poundsDisplay);
-        
         // Listen for funds changed events
         scene.events.on('fundsChanged', this.updatePoundsDisplay, this);
         
@@ -68,7 +68,7 @@ export class InvestmentPanel extends AbstractHqPanel {
     }
 
     private updatePoundsDisplay(): void {
-        this.poundsDisplay.setText(`£${GameState.getInstance().britishPoundsSterling}`);
+        this.poundsDisplay.setText(`£${GameState.getInstance().moneyInVault}`);
     }
 
     private clearCards(): void {
@@ -140,11 +140,11 @@ export class InvestmentPanel extends AbstractHqPanel {
             
             const purchaseButton = this.scene.add.container(0, 90);
             
-            const buttonBg = this.scene.add.rectangle(0, 0, 120, 40, 
+            const buttonBg = this.scene.add.rectangle(0, -200, 120, 40, 
                 canAfford ? 0x4CAF50 : 0x9E9E9E) // Green if affordable, gray if not
                 .setOrigin(0.5);
             
-            const costText = this.scene.add.text(0, 0, `BUY: $${factory.getMoneyCost()}`, {
+            const costText = this.scene.add.text(0, -200, `$${factory.getMoneyCost()}`, {
                 fontSize: '14px',
                 fontFamily: 'verdana',
                 color: '#FFFFFF'

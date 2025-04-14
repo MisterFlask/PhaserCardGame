@@ -8,20 +8,14 @@ import { AbstractHqPanel } from './AbstractHqPanel';
 
 export class PersonnelPanel extends AbstractHqPanel {
     private characterCards: PhysicalCard[] = [];
-    private detailsContainer: Phaser.GameObjects.Container;
     private selectedCharacter: PhysicalCard | null = null;
-    private deckDisplayContainer: Phaser.GameObjects.Container;
+    private deckCards: PhysicalCard[] = [];
+    private detailTexts: TextBox[] = [];
     private deckScrollPosition: number = 0;
     private readonly SCROLL_SPEED: number = 4;
 
     constructor(scene: Scene) {
-        super(scene, 'Personnel Management');
-
-        // Create containers for details and deck display
-        this.detailsContainer = this.scene.add.container(0, 0);
-        this.deckDisplayContainer = this.scene.add.container(0, this.scene.scale.height * 0.7);
-        
-        this.add([this.detailsContainer, this.deckDisplayContainer]);
+        super(scene, 'Personnel Management', 'roster-screen-staineds-glass');
 
         // Add scroll wheel listener for deck display
         this.scene.input.on('wheel', (pointer: Phaser.Input.Pointer, gameObjects: any, deltaX: number, deltaY: number) => {
@@ -29,8 +23,33 @@ export class PersonnelPanel extends AbstractHqPanel {
                 this.handleMouseWheel(deltaY);
             }
         });
+    }
 
+    show(): void {
+        super.show();
         this.displayRoster();
+    }
+
+    hide(): void {
+        super.hide();
+        this.cleanup();
+    }
+
+    private cleanup(): void {
+        // Clear character cards
+        this.characterCards.forEach(card => card.obliterate());
+        this.characterCards = [];
+
+        // Clear deck cards
+        this.deckCards.forEach(card => card.obliterate());
+        this.deckCards = [];
+
+        // Clear detail texts
+        this.detailTexts.forEach(text => text.destroy());
+        this.detailTexts = [];
+
+        this.selectedCharacter = null;
+        this.deckScrollPosition = 0;
     }
 
     private displayRoster(): void {
@@ -68,7 +87,7 @@ export class PersonnelPanel extends AbstractHqPanel {
 
         // Add status indicators
         this.addStatusIndicators(card, character);
-        this.add(card.container);
+        this.scene.add.existing(card.container);
         return card;
     }
 
@@ -106,7 +125,9 @@ export class PersonnelPanel extends AbstractHqPanel {
         card.container.setInteractive()
             .on('pointerover', () => {
                 card.setGlow(true);
+                this.scene.children.bringToTop(card.container);
                 this.showCharacterDetails(card);
+                this.scene.children.bringToTop(card.uiContainer);
             })
             .on('pointerout', () => {
                 if (this.selectedCharacter !== card) {
@@ -131,7 +152,10 @@ export class PersonnelPanel extends AbstractHqPanel {
     }
 
     private showCharacterDetails(card: PhysicalCard): void {
-        this.detailsContainer.removeAll();
+        // Clear existing detail texts
+        this.detailTexts.forEach(text => text.destroy());
+        this.detailTexts = [];
+
         const character = card.data as PlayerCharacter;
 
         const details = [
@@ -151,12 +175,16 @@ export class PersonnelPanel extends AbstractHqPanel {
                 text: detail,
                 style: { fontSize: '16px', color: '#ffffff' }
             });
-            this.detailsContainer.add(detailText);
+            this.scene.add.existing(detailText);
+            this.detailTexts.push(detailText);
         });
     }
 
     private displayCharacterDeck(card: PhysicalCard): void {
-        this.deckDisplayContainer.removeAll();
+        // Clear existing deck cards
+        this.deckCards.forEach(deckCard => deckCard.obliterate());
+        this.deckCards = [];
+
         const character = card.data as PlayerCharacter;
         
         // Display deck cards in a scrollable horizontal line
@@ -165,11 +193,24 @@ export class PersonnelPanel extends AbstractHqPanel {
             const physicalCard = CardGuiUtils.getInstance().createCard({
                 scene: this.scene,
                 x: index * (100 + cardSpacing),
-                y: 0,
+                y: this.scene.scale.height * 0.7,
                 data: deckCard,
                 onCardCreatedEventCallback: () => {}
             });
-            this.deckDisplayContainer.add(physicalCard.container);
+
+            // Add mouseover event to bring card to top when hovered
+            physicalCard.container.setInteractive()
+                .on('pointerover', () => {
+                    this.scene.children.bringToTop(physicalCard.container);
+                    physicalCard.setGlow(true);
+                    this.scene.children.bringToTop(physicalCard.uiContainer);
+                })
+                .on('pointerout', () => {
+                    physicalCard.setGlow(false);
+                });
+
+            this.scene.add.existing(physicalCard.container);
+            this.deckCards.push(physicalCard);
         });
 
         this.deckScrollPosition = 0;
@@ -182,7 +223,9 @@ export class PersonnelPanel extends AbstractHqPanel {
     }
 
     private updateDeckPosition(): void {
-        this.deckDisplayContainer.setX(-this.deckScrollPosition);
+        this.deckCards.forEach((card, index) => {
+            card.container.x = index * (100 + 20) - this.deckScrollPosition;
+        });
     }
 
     update(): void {

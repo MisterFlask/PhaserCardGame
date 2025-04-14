@@ -17,7 +17,7 @@ export class AbyssalResearchInstitute extends AbstractStrategicProject {
             portraitName: "abyssal_research_institute"
         });
         this.surfacePurchaseValue = 200;
-        this.flavorText = "A research collaboration with the Wetenschepellejik Broedershcap van Natuurkundegen.";
+        this.flavorText = "Here, the Maatschappij's academics conduct 'experiments.' Politely, they do not specify on what (or whom) these experiments are performed.  Genteel ignorance is the cornerstone of civilization, after all.";
 
     }
 

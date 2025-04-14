@@ -19,7 +19,12 @@ export default class GameImageLoader {
         location_backgrounds: {
             prefix: 'Backgrounds/Location/',
             files: [
-                "investments-screen.png",
+                // screens
+                "roster-screen-stained-glass.png",
+                "route-select-screen-stained-glass.png",
+                "investments-screen-stained-glass.png",
+
+                // battle backgrounds
                 "backrooms-oil-painting.png",
                 "canyon-oil-painting.png",
                 "facility-oil-painting.png",
