@@ -372,6 +372,11 @@ export class PhysicalCard implements IPhysicalCardInterface {
         this.cardTooltip.updateTooltipPosition();
         this.cardTooltip.updateText(tooltipText);
 
+        // if tooltip is empty, hide it
+        if (tooltipText.length === 0) {
+            this.cardTooltip.hideTooltip();
+        }
+
         if (this.hpBox && this.data.isBaseCharacter()) {
             const baseCharacter = this.data as BaseCharacterType;
             this.hpBox.setText(`${baseCharacter.hitpoints}/${baseCharacter.maxHitpoints}`);

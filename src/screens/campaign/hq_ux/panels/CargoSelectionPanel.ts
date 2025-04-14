@@ -187,7 +187,7 @@ export class CargoSelectionPanel extends AbstractHqPanel {
         scrollMode: 0, // vertical
         panel: {
             child: this.rexUI.add.fixWidthSizer({
-                space: { top: 10, bottom: 10, left: 20, right: 20, item: 10, line: 10 },
+                space: { top: 10, bottom: 310, left: 20, right: 20, item: 10, line: 10 },
                 align: 'center',
             }),
         },
@@ -211,7 +211,7 @@ export class CargoSelectionPanel extends AbstractHqPanel {
         scrollMode: 0,
         panel: {
             child: this.rexUI.add.fixWidthSizer({
-                space: { top: 10, bottom: 10, left: 20, right: 20, item: 10, line: 10 },
+                space: { top: 10, bottom: 310, left: 20, right: 20, item: 10, line: 10 },
                 align: 'center',
             }),
         },
@@ -484,19 +484,9 @@ export class CargoSelectionPanel extends AbstractHqPanel {
         y: 0,
         data: good,
         onCardCreatedEventCallback: (card) => {
-          card.disableInternalTooltip = true;
           card.priceContext = PriceContext.SURFACE_BUY
-          card.container.setInteractive();
           card.container.on('pointerdown', () => this.purchaseCargo(good));
           this.addHoverDepth(card.container);
-
-          // Create tooltip
-          const tooltip = new TooltipAttachment({
-            scene: this.scene,
-            container: card.container,
-            tooltipText: good.description,
-          });
-          this.tooltipAttachments.push(tooltip);
 
           const itemSizer = this.makeCargoItem(card, `£${good.surfacePurchaseValue}`);
           availableFixSizer.add(itemSizer);
@@ -512,19 +502,9 @@ export class CargoSelectionPanel extends AbstractHqPanel {
         y: 0,
         data: good,
         onCardCreatedEventCallback: (card) => {
-          card.disableInternalTooltip = true;
           card.priceContext = PriceContext.SURFACE_BUY
-          card.container.setInteractive();
           card.container.on('pointerdown', () => this.sellCargo(good));
           this.addHoverDepth(card.container);
-
-          // Create tooltip
-          const tooltip = new TooltipAttachment({
-            scene: this.scene,
-            container: card.container,
-            tooltipText: good.description,
-          });
-          this.tooltipAttachments.push(tooltip);
 
           const itemSizer = this.makeCargoItem(card, `£${good.surfacePurchaseValue}`);
           purchasedFixSizer.add(itemSizer);
@@ -548,7 +528,49 @@ export class CargoSelectionPanel extends AbstractHqPanel {
     const priceText = this.scene.add.text(0, 0, price, { fontSize: '14px', color: '#ffffff' });
     itemSizer.add(priceText, { align: 'center', padding: { right: 10 } });
 
+    // Add wheel event handler to card container to allow scrolling when hovering over cards
+    card.container.on('wheel', (pointer: Phaser.Input.Pointer, deltaX: number, deltaY: number, deltaZ: number) => {
+      // Find the parent scrollable panel
+      const panel = card.container.parentContainer ? 
+        this.findParentScrollablePanel(card.container.parentContainer) : null;
+      
+      if (panel) {
+        // Manually scroll the panel
+        const scrollStep = deltaY * 0.1; // Adjust this value to control scroll speed
+        // Use the setT method to scroll the panel
+        (panel as any).setT(panel.t + scrollStep);
+      }
+    });
+
     return itemSizer;
+  }
+
+  private findParentScrollablePanel(container: Phaser.GameObjects.Container): any {
+    // Traverse up through parent containers to find a ScrollablePanel
+    let current = container;
+    while (current) {
+      // Check if this container is a ScrollablePanel
+      if ((current as any).childrenMap && 
+          (current as any).childrenMap.panel && 
+          (current as any).childrenMap.scroller) {
+        return current;
+      }
+      
+      // Check parent
+      current = current.parentContainer;
+      if (!current) break;
+    }
+    
+    // Try both panels directly if not found through hierarchy
+    const pointer = this.scene.input.activePointer;
+    if (this.availableCargoSizer.getBounds().contains(pointer.x, pointer.y)) {
+      return this.availableCargoSizer;
+    }
+    if (this.purchasedCargoSizer.getBounds().contains(pointer.x, pointer.y)) {
+      return this.purchasedCargoSizer;
+    }
+    
+    return null;
   }
 
   private addHoverDepth(go: PhysicalCard['container']) {
