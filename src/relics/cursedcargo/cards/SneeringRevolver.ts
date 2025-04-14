@@ -6,12 +6,12 @@ import { PlayableCard } from "../../../gamecharacters/PlayableCard";
 import { CardType } from "../../../gamecharacters/Primitives";
 import { ResourceUsedEvent } from "../../../rules/combatresources/AbstractCombatResource";
 
-export class BurningCommissar extends PlayableCard {
+export class SneeringRevolver extends PlayableCard {
     private mettleSpentThisCombat: boolean = false;
 
     constructor() {
         super({
-            name: "Burning Commissar",
+            name: "Sneering Revolver",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
             rarity: EntityRarity.COMMON,

@@ -11,7 +11,7 @@ export class RuminantOfSwords extends AutomatedCharacter {
     constructor() {
         super({
             name: "Ruminant of Swords",
-            portraitName: "Eldritch Soldier Gunner",
+            portraitName: "Lumberjack",
             maxHitpoints: 60,
             description: "Many unsanctioned pine dimensions.  Culling necessary."
         });

@@ -11,7 +11,7 @@ export class Hellworm extends AutomatedCharacter {
     constructor() {
         super({
             name: "Hellworm",
-            portraitName: "Hellworm",
+            portraitName: "Worm",
             maxHitpoints: 20,
             description: "A writhing, segmented pest characteristic of the upper Hells."
         });

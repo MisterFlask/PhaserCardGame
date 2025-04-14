@@ -12,7 +12,7 @@ import { VialOfBlood } from './common/VialOfBlood';
 import { AkashicNewspaper } from './cursedcargo/AkashicNewspaper';
 import { BloomOfSorrow } from './cursedcargo/BloomOfSorrow';
 import { BomberGremlin } from './cursedcargo/BomberGremlin';
-import { BurningCommissar } from './cursedcargo/cards/BurningCommissar';
+import { SneeringRevolver } from './cursedcargo/cards/SneeringRevolver';
 import { ChairmanVizzerix } from './cursedcargo/cards/ChairmanVizzerix';
 import { MawSculpture } from './cursedcargo/cards/MawSculpture';
 import { SirenDaguerreotype } from './cursedcargo/cards/SirenDaguerreotype';
@@ -63,7 +63,7 @@ export class RelicsLibrary {
         this.cursedCargoCards = [
             new SirenDaguerreotype(),
             new WatchfulClown(),
-            new BurningCommissar(),
+            new SneeringRevolver(),
             new ChairmanVizzerix(),
             new TomeOfAvarice(),
             new MawSculpture()
