@@ -4,7 +4,7 @@ import { RelicsLibrary } from '../relics/RelicsLibrary';
 import { GameState } from '../rules/GameState';
 import { ActionManager } from '../utils/ActionManager';
 import { CardOwnershipManager } from "../utils/CardOwnershipManager";
-import GameImageLoader from '../utils/ImageUtils';
+import ImageUtils from '../utils/ImageUtils';
 import { DepthManager } from './DepthManager';
 import Menu from './Menu';
 import { TextBox } from './TextBox';
@@ -46,7 +46,7 @@ export class DebugMenu {
 
         const categories = ['location_backgrounds'] as const;
         categories.forEach(cat => {
-            const data = GameImageLoader.images[cat].files;
+            const data = ImageUtils.images[cat].files;
             data.forEach(file => this.allBackgrounds.push(file.replace(/\.(png|svg)$/, '')));
         });
     }

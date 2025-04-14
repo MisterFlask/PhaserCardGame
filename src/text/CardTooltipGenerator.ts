@@ -85,9 +85,9 @@ export class CardTooltipGenerator {
 
         // flavor text
         if (card.flavorText) {
-            tooltip += `[i][color=gold]Flavor:[/color]\n`;
+            tooltip += `[i][color=gold]\n`;
             tooltip += `- ${card.flavorText}\n`;
-            tooltip += `[/i]\n`;
+            tooltip += `[/i][/color]\n`;
         }
 
         return tooltip;

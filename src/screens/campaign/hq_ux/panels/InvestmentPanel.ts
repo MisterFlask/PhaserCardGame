@@ -16,7 +16,7 @@ export class InvestmentPanel extends AbstractHqPanel {
     private poundsDisplay: TextBox;
 
     constructor(scene: Scene) {
-        super(scene, 'Factory Investments', 'investments-screen-stained-glass');
+        super(scene, 'Factory Investments');
         
         // Add title TextBox
         this.titleTextBox = new TextBox({

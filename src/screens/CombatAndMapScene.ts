@@ -17,7 +17,7 @@ import { PhysicalCard } from '../ui/PhysicalCard';
 import { UIContext, UIContextManager } from '../ui/UIContextManager';
 import { ActionManager } from '../utils/ActionManager';
 import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
-import GameImageLoader from '../utils/ImageUtils';
+import ImageUtils from '../utils/ImageUtils';
 import { HqScene } from './campaign/hq_ux/HqScene';
 import { SceneChanger } from './SceneChanger';
 import { CampaignBriefStatus } from './subcomponents/CampaignBriefStatus';
@@ -74,7 +74,7 @@ class CombatScene extends Phaser.Scene {
         this.load.setBaseURL('https://raw.githubusercontent.com/');
         
         // Add all images to the load queue
-        new GameImageLoader().loadAllImages(this.load);
+        new ImageUtils().loadAllImages(this.load);
         
         this.load.plugin('rexbbcodetextplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbbcodetextplugin.min.js', true);
         ActionManagerFetcher.initServicesAsync(this);

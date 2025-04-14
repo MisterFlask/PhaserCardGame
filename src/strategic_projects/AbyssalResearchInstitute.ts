@@ -12,7 +12,7 @@ import { StrategicResource } from "./strategic_resources.ts/StrategicResources";
 export class AbyssalResearchInstitute extends AbstractStrategicProject {
     constructor() {
         super({
-            name: "Abyssal Research Institute",
+            name: "Abyssal Research Outpost",
             description: "At the beginning of each run, gain a card reward.",
             portraitName: "abyssal_research_institute"
         });

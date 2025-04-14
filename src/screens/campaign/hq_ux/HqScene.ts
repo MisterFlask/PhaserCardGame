@@ -3,7 +3,7 @@ import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 import { GameState } from '../../../rules/GameState';
 import { TransientUiState } from '../../../ui/TransientUiState';
 import { ActionManagerFetcher } from '../../../utils/ActionManagerFetcher';
-import GameImageLoader from '../../../utils/ImageUtils';
+import ImageUtils from '../../../utils/ImageUtils';
 import { SceneChanger } from '../../SceneChanger';
 import { CampaignUiState } from './CampaignUiState';
 import { AbstractHqPanel } from './panels/AbstractHqPanel';
@@ -59,7 +59,7 @@ export class HqScene extends Scene {
         this.load.setBaseURL('https://raw.githubusercontent.com/');
 
         // Add all images to the load queue
-        new GameImageLoader().loadAllImages(this.load);
+        new ImageUtils().loadAllImages(this.load);
         
         SceneChanger.setCurrentScene(this);
         this.load.plugin('rexbbcodetextplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbbcodetextplugin.min.js', true);

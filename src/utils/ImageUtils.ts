@@ -1,4 +1,4 @@
-export default class GameImageLoader {
+export default class ImageUtils {
     // Nested object containing categories with file prefix and an array of image filenames
     public static readonly images = {
         map_backgrounds: {
@@ -44,6 +44,7 @@ export default class GameImageLoader {
                 "planar-gate-oil-painting-1.png",
                 "planar-gate-oil-painting-2.png",
                 "british-office-1.png",
+                "investments-screen-oil-painting.png"
               ]
         },
         portraits_npcs: {
@@ -385,8 +386,8 @@ export default class GameImageLoader {
             console.log(`Loaded asset: ${file.key} from ${file.url || file.src}`);
         });
         
-        for (const category in GameImageLoader.images) {
-            const categoryData = GameImageLoader.images[category as keyof typeof GameImageLoader.images];
+        for (const category in ImageUtils.images) {
+            const categoryData = ImageUtils.images[category as keyof typeof ImageUtils.images];
             console.log(`Loading category: ${category}, count of assets: ${categoryData.files.length}`);
             
             categoryData.files.forEach((file: string) => {

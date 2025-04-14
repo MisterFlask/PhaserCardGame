@@ -14,7 +14,7 @@ export class TradeRouteSelectionPanel extends AbstractHqPanel {
     private modifierButtons: TextBoxButton[] = []; // Track modifier buttons separately
 
     constructor(scene: Scene) {
-        super(scene, 'Trade Route Selection', 'route-select-screen-stained-glass');
+        super(scene, 'Trade Route Selection');
 
         this.detailsContainer = this.scene.add.container(0, 0);
         this.detailsContainer.setVisible(false);

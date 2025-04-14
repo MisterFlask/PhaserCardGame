@@ -12,6 +12,10 @@ export abstract class AbstractHqPanel extends Phaser.GameObjects.Container {
         super(scene, 0, 0);
         scene.add.existing(this);
 
+        if (!backgroundImageKey) {
+            backgroundImageKey = "investments-screen-oil-painting"
+        }
+        
         this.title = title;
 
         // Add background image if provided
