@@ -105,7 +105,11 @@ The company specializes in "cultural exports" - fine wines, controversial litera
 The company aggressively claims sovereignty over various infernal trade routes, particularly those that skirt the edges of the Abyss. Their enforcers employ both conventional violence and reality-warping abilities gained through their otherworldly partnerships.
 
 
-### De Helrader Maatschappij
+### De Koninklijke Wetenschappelijke Helrader Maatschappij
+#### ("The Cloggers")
+
+The British refer to this group as the Cloggers in preference to their extremely long and unwieldy formal name (translating roughly to "The Royal Scientific Hell-Wheel Company.")
+
 In collaboration with the Dutch occult organization De Bloedmolen, the Helrader Maatschappij has established a gateway in Rotterdam.  They specialize in the collection of infernal flora and fauna, and the study of infernal geology.  They are particularly interested in the strange creatures that dwell in The Screaming Forests and The Clockwork Wastes.
 
 Unlike the rigid formality of the British Trade Delegation or the esoteric mysticism of the CGVI, the Dutch presence in Hell takes on a more naturalist-academic approach. Their representatives wear practical field gear adapted for infernal conditions - reinforced leather coats treated with protective alchemical compounds, brass-framed goggles with interchangeable lenses for different environmental conditions, and specimen collection gear that would look at home in a natural history museum.

@@ -6,7 +6,7 @@ export class Stress extends AbstractBuff {
     }
 
     override getDescription(): string {
-        return `For every ${this.secondaryStacks} Stress stacks, enemies start combat with 1 more Lethality.`;
+        return `If you have ${this.secondaryStacks} Stress stacks, lose all Stress and then gain 1 Trauma and lose 2 Strength.`;
     }
 
     override id: string = "stress";

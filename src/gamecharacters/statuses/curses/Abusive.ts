@@ -1,0 +1,1 @@
+// Cost 1 energy.  Deal 5 damage to a target.  Retained: deal 3 damage to another random ally.

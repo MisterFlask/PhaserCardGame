@@ -225,6 +225,8 @@ export abstract class AbstractBuff implements IAbstractBuff {
     tint: number = 0xFFFFFF;
     public clickable: boolean =  false
 
+    public flavorText: string = "";
+    
     get stacks(): number {
         return this._stacks;
     }
