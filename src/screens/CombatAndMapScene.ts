@@ -9,6 +9,7 @@ import type { AbstractCard } from '../gamecharacters/AbstractCard';
 import { PlayerCharacter } from '../gamecharacters/PlayerCharacter';
 import { GameState } from '../rules/GameState';
 import { TextBoxButton } from '../ui/Button';
+import { CheapGlowEffect } from '../ui/CheapGlowEffect';
 import { CombatHighlightsManager } from '../ui/CombatHighlightsManager';
 import { DepthManager } from '../ui/DepthManager';
 import InventoryPanel from '../ui/InventoryPanel';
@@ -51,6 +52,7 @@ class CombatScene extends Phaser.Scene {
     private shopOverlay!: ShopOverlay;
     private mapOverlay!: MapOverlay;
     private mapButton!: TextBoxButton;
+    private mapButtonGlow!: CheapGlowEffect;
     private campaignBriefStatus!: CampaignBriefStatus;
     private characterDeckOverlay!: CharacterDeckOverlay;
     private treasureOverlay!: TreasureOverlay;
@@ -193,6 +195,12 @@ class CombatScene extends Phaser.Scene {
             });
         this.add.existing(this.mapButton);
 
+        // Create glow effect for map button
+        this.mapButtonGlow = new CheapGlowEffect(this, this.mapButton.x, this.mapButton.y);
+        this.mapButtonGlow.setScale(1.5, 0.75); // Width: 1.5x, Height: 0.75x (half height)
+        this.mapButtonGlow.setDepth(this.mapButton.depth - 1); // Place behind button
+        this.mapButtonGlow.turnOff();
+
         this.campaignBriefStatus = new CampaignBriefStatus(this, true);
         this.add.existing(this.campaignBriefStatus);
         this.campaignBriefStatus.depth = DepthManager.getInstance().COMBAT_UI;
@@ -248,6 +256,11 @@ class CombatScene extends Phaser.Scene {
         this.scale.off('resize', this.resize, this);
         if (this.campaignBriefStatus) {
             this.campaignBriefStatus.destroy();
+        }
+        
+        // Clean up the map button glow
+        if (this.mapButtonGlow) {
+            this.mapButtonGlow.destroy();
         }
 
         // Remove the pile click event listeners
@@ -316,6 +329,11 @@ class CombatScene extends Phaser.Scene {
             this.mapButton.setPosition(100, 200);
         }
 
+        // Reposition map button glow effect
+        if (this.mapButtonGlow) {
+            this.mapButtonGlow.setPosition(this.mapButton.x, this.mapButton.y);
+        }
+
         this.mapButton.setScrollFactor(0);
         this.background.setScrollFactor(0);
         this.campaignBriefStatus.setScrollFactor(0);
@@ -330,11 +348,20 @@ class CombatScene extends Phaser.Scene {
     }
 
     update(time: number, delta: number): void {
-
         this.cardManager.drawPile.setGlow(false);
         this.cardManager.discardPile.setGlow(false);
 
         this.performanceMonitor.update(time, delta);
+
+        // Make map button glow after combat ends
+        if (this.combatEndHandled && this.mapButton) {
+            this.mapButtonGlow.turnOn(true); // Turn on with pulsing
+        } else {
+            this.mapButtonGlow.turnOff();
+        }
+        
+        // Update glow effect
+        this.mapButtonGlow.update();
 
         // Sync the hand with the game state
         if (this.cardManager) {

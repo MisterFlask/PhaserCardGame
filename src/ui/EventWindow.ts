@@ -159,6 +159,7 @@ export class EventWindow extends Phaser.GameObjects.Container {
                 text: choice.text,
             });
             choice.parentEvent = event;
+            choice.init();
 
             button.setButtonEnabled(choice.canChoose());
             if (choice.canChoose()) {

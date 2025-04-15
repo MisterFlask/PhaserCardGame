@@ -9,6 +9,10 @@ export abstract class AbstractChoice {
         public mechanicalInformationText: string = "",
     ) {}
 
+    init(): void {
+        // override in subclasses
+    }
+
     abstract canChoose(): boolean;
     abstract effect(): void;
     public nextEvent: AbstractEvent | null = null;

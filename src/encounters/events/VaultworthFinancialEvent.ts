@@ -1,44 +1,45 @@
 import { AbstractChoice, AbstractEvent, DeadEndEvent } from "../../events/AbstractEvent";
-import { AbstractRelic } from "../../relics/AbstractRelic";
+import { PlayableCard } from "../../gamecharacters/PlayableCard";
 import { ActionManager } from "../../utils/ActionManager";
-
-class DepositedSovereignInfernalNotes extends AbstractRelic {
-    constructor() {
-        super()
-        this.id = "DEPOSITED_SOVEREIGN_INFERNAL_NOTES";
-        this.stacks = 0;
-
-    }
-
-    getDisplayName(): string {
-        return "Deposited Sovereign Infernal Notes";
-    }
-
-    getDescription(): string {
-        return "You have some durians deposited with the Vaultworth Financial Group.";
-    }
-}
-
 
 
 class SovereignInfernalNotesExchangeChoice extends AbstractChoice {
-    constructor() {
+    private selectedCargoCard: PlayableCard | null = null;
 
+    constructor() {
         super(
             "Access Sovereign Infernal Notes Exchange Desk",
-            "Convert 10 Pounds Sterling to 150 Sovereign Infernal Notes"
+            "Trade a cargo item for Sovereign Infernal Notes"
         );
         this.nextEvent = new DeadEndEvent();
-        this.nextEvent.description = "Tellers in pinstripe suits stamp your documents with infernal seals. The air smells of ink and brimstone as your pounds sterling dissolve into shimmering currency.";
+        this.nextEvent.description = "Tellers in pinstripe suits appraise your cargo with unnatural precision. The air smells of ink and brimstone as your goods dissolve into shimmering currency.";
+    }
+
+    init(): void {
+        const cargoCards = this.gameState().cargoHolder.cardsInMasterDeck;
+        if (cargoCards.length > 0) {
+            this.selectedCargoCard = cargoCards[Math.floor(Math.random() * cargoCards.length)];
+            this.mechanicalInformationText = `Trade ${this.selectedCargoCard?.name} for 150 Sovereign Infernal Notes`;
+        }
     }
 
     canChoose(): boolean {
-        return this.gameState().britishPoundsSterling >= 10;
+        return this.gameState().cargoHolder.cardsInMasterDeck.length > 0;
     }
 
     effect(): void {
+        if (!this.selectedCargoCard) return;
+        
         const actionManager = ActionManager.getInstance();
-        actionManager.modifyPromissoryNotes(-10);
+        const cargoCards = this.gameState().cargoHolder.cardsInMasterDeck;
+        
+        // Remove the selected cargo card
+        const cardIndex = cargoCards.findIndex(card => card.id === this.selectedCargoCard?.id);
+        if (cardIndex !== -1) {
+            this.gameState().cargoHolder.cardsInMasterDeck.splice(cardIndex, 1);
+        }
+        
+        // Add Sovereign Infernal Notes
         actionManager.modifySovereignInfernalNotes(150);
     }
 }

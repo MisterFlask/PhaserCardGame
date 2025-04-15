@@ -63,11 +63,7 @@ export class CargoSelectionPanel extends AbstractHqPanel {
       space: { top: 10, left: 10, right: 10, bottom: 10, item: 10 },
     });
 
-    // background
-    const background = this.rexUI.add.roundRectangle(0, 0, 10, 10, 20, 0x2c2c2c);
-
     this.mainSizer
-      .addBackground(background)
       .add(
         // funds + status row
         this.createTopBar(),

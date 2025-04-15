@@ -299,7 +299,8 @@ export default class ImageUtils {
                 // french
                 "Eldritch Corruption Deer.png", "Eldritch Soldier Gunner.png", "Eldritch Corruption Crow.png",
 
-                "veil-capacitor.png", "doris-smith.png"
+                "veil-capacitor.png", "doris-smith.png",
+                "Worm.png", "Lumberjack.png"
             ]
         },
         attributes_and_augments: {
