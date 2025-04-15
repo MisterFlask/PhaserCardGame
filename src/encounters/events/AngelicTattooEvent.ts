@@ -1,7 +1,7 @@
 import { AbstractChoice, AbstractEvent, DeadEndEvent } from "../../events/AbstractEvent";
 import { Stress } from "../../gamecharacters/buffs/standard/Stress";
 import { ActionManager } from "../../utils/ActionManager";
-import { getAllAngelicTattooBuffs, getRandomAngelicTattooBuff } from "./event_buffs/AngelicTattooBuffs";
+import { getRandomAngelicTattooBuff } from "./event_buffs/AngelicTattooBuffs";
 
 class BasicTattooChoice extends AbstractChoice {
     constructor() {
@@ -52,7 +52,6 @@ class ElaborateTattooChoice extends AbstractChoice {
         const actionManager = ActionManager.getInstance();
         
         // Apply more powerful angelic tattoo buff and stress
-        actionManager.modifySovereignInfernalNotes(-75);
         const tattooBuff = getRandomAngelicTattooBuff(2);
         actionManager.applyBuffToCharacter(character, tattooBuff);
         actionManager.applyBuffToCharacter(character, new Stress(2));
@@ -61,38 +60,6 @@ class ElaborateTattooChoice extends AbstractChoice {
         actionManager.displaySubtitle(`Received the ${tattooBuff.getDisplayName()} (Enhanced)`, 2000);
     }
 }
-
-class ExamineTattoosChoice extends AbstractChoice {
-    constructor() {
-        super(
-            "Ask to See the Designs",
-            "Examine the available tattoo designs before deciding."
-        );
-        
-        // Create a description that lists all the tattoo buffs
-        const tattooBuffs = getAllAngelicTattooBuffs(1);
-        let designsDescription = "The angel's limbs flicker across the space, tracing ephemeral patterns that hover in the air before dissipating. Each design seems to whisper its purpose directly into your mind:\n\n";
-        
-        // Add each tattoo description
-        for (const buff of tattooBuffs) {
-            designsDescription += `[color=white]${buff.getDisplayName()}[/color]: "${buff.flavorText}" ${buff.getDescription()}\n\n`;
-        }
-        
-        designsDescription += "The patterns fade, leaving you to consider your choice.";
-        
-        this.nextEvent = new AngelicTattooEvent();
-        this.nextEvent.description = designsDescription;
-    }
-
-    canChoose(): boolean {
-        return true;
-    }
-
-    effect(): void {
-        // No permanent effect, just informational
-    }
-}
-
 class DeclineChoice extends AbstractChoice {
     constructor() {
         super(
@@ -113,17 +80,17 @@ class DeclineChoice extends AbstractChoice {
 export class AngelicTattooEvent extends AbstractEvent {
     constructor() {
         super();
-        this.name = "The Impossible Tattoo Parlor";
+        this.name = "The Seraphic Tattooist";
         this.portraitName = "placeholder_event_background_2";
-        this.description = "In the slag marches, wedged between collapsing pylons of molten scrap and steel bones half-melted into abstract sculpture, stands a structure: a tattoo parlor whose walls bend at contradictory angles, as if a cathedral had been folded into a cramped shipping crate. The air inside is taut with a pressure that hums, but no sound reaches the ear. The floor appears motionless yet shifts in subtle ways that cannot be followed.\n\n" +
-            "Inside, an [color=white]ANGEL[/color] operates a suspended array of instruments. Its form is a lattice of refracted light and twisted geometry, impossible to map fully in the mind. Multiple limbs, each wielding a needle-like stylus, carve the air in perfect arcs. The afterimages left by its movements coalesce briefly into intricate glyphs before dissolving, suggesting patterns larger than language.\n\n" +
-            "Its voice is not heard but understood, as if the words bypass the senses entirely:\n" +
-            "[color=white]\"YOUR FLESH. A CANVAS. SHALL WE INSCRIBE HIGHER ORDER?\"[/color]";
+        this.description = "In the middle of nowhere, an impossible tattoo parlor awaits. It's elegant, terrifyingly clean, all polished marble and silver filigree. Within hovers a figure composed entirely of wings, flame, and eyeballs. They rotate slowly in impossible geometries, ink-stained needles flickering in its dozen feathered hands.\n\n" +
+            "[color=white]\"COME,\"[/color] the angel commands. The voice is beautiful. The voice is horrifying. It echoes behind your eyes. [color=white]\"I OFFER MY ARTISTRY UNTO YOU.\"[/color]\n\n" +
+            "[color=white]\"FOR A SMALL TATTOO, THERE SHALL BE NO CHARGE. FOR A GREATER TATTOO—A MARK OF TRUE SIGNIFICANCE—THERE IS ALSO NO CHARGE. THE ONLY COST IS [UNTRANSLATABLE GLYPH].  MORE SO FOR THE LARGER TATTOO, OF COURSE.\"[/color]\n\n" +
+            "The angel pauses, needles poised.\n\n" +
+            "[color=white]\"CHOOSE.\"[/color]";
         
         this.choices = [
             new BasicTattooChoice(),
             new ElaborateTattooChoice(),
-            new ExamineTattoosChoice(),
             new DeclineChoice()
         ];
     }

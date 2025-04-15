@@ -54,7 +54,7 @@ export class StigmataOfTheMartyr extends AbstractBuff {
     }
 
     getDescription(): string {
-        return "Whenever you draw a Curse, gain 1 Strength.";
+        return "Whenever you draw a Curse, gain " + this.getStacksDisplayText()+ " Strength.";
     }
 
     // Handle the card drawn through onAnyCardDrawn which is a valid method
@@ -63,7 +63,7 @@ export class StigmataOfTheMartyr extends AbstractBuff {
         if (card.cardType === CardType.STATUS || card.name.toLowerCase().includes("curse")) {
             const owner = this.getOwnerAsCharacter();
             if (owner) {
-                this.actionManager.applyBuffToCharacter(owner, new Lethality(1));
+                this.actionManager.applyBuffToCharacter(owner, new Lethality(this.stacks));
                 this.pulseBuff();
             }
         }
@@ -86,14 +86,14 @@ export class MarkOfZadkiel extends AbstractBuff {
     }
 
     getDescription(): string {
-        return "At combat start, apply 2 Weak to all enemies.";
+        return "At combat start, apply " + this.getStacksDisplayText() + " Weak to all enemies.";
     }
 
     onCombatStart(): void {
         // Using the enemies array directly, which we know exists
         const enemies = this.gameState.combatState.enemies;
         for (const enemy of enemies) {
-            this.actionManager.applyBuffToCharacter(enemy, new Weak(2));
+            this.actionManager.applyBuffToCharacter(enemy, new Weak(this.stacks));
         }
         this.pulseBuff();
     }
