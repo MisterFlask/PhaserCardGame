@@ -1,8 +1,8 @@
 import { PlayableCard } from '../../../gamecharacters/PlayableCard';
 import { PlayerCharacter } from '../../../gamecharacters/PlayerCharacter';
-import { CoalCargo } from '../../../gamecharacters/playerclasses/cards/cargo/CoalCargo';
-import { CoffeeCargo } from '../../../gamecharacters/playerclasses/cards/cargo/CoffeeCargo';
-import { SpicyLiteratureCargo } from '../../../gamecharacters/playerclasses/cards/cargo/SpicyLiteratureCargo';
+import { CoalCargo } from '../../../gamecharacters/cargo/CoalCargo';
+import { CoffeeCargo } from '../../../gamecharacters/cargo/CoffeeCargo';
+import { SpicyLiteratureCargo } from '../../../gamecharacters/cargo/SpicyLiteratureCargo';
 import { CampaignRules } from '../../../rules/CampaignRulesHelper';
 import { GameState } from '../../../rules/GameState';
 import { AbstractStrategicProject } from '../../../strategic_projects/AbstractStrategicProject';

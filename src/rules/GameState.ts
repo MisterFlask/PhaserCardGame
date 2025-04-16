@@ -1,8 +1,8 @@
 import { Encounter } from '../encounters/EncounterManager';
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
+import { PlayerCargoHolder } from '../gamecharacters/cargo/PlayerCargoHolder';
 import type { PlayableCard } from '../gamecharacters/PlayableCard';
 import type { PlayerCharacter } from '../gamecharacters/PlayerCharacter';
-import { PlayerCargoHolder } from '../gamecharacters/playerclasses/cards/cargo/PlayerCargoHolder';
 import type { LocationCard } from '../maplogic/LocationCard';
 import { AbstractRelic } from '../relics/AbstractRelic';
 import { EmergencyTeleporter } from '../relics/special/EmergencyTeleporter';

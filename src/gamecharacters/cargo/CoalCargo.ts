@@ -1,9 +1,9 @@
-import { TargetingType } from "../../../AbstractCard";
-import { Heavy } from "../../../buffs/playable_card/Heavy";
-import { HellSellValue } from "../../../buffs/standard/HellSellValue";
-import { EntityRarity } from "../../../EntityRarity";
-import { PlayableCard } from "../../../PlayableCard";
-import { CardType } from "../../../Primitives";
+import { TargetingType } from "../AbstractCard";
+import { Heavy } from "../buffs/playable_card/Heavy";
+import { HellSellValue } from "../buffs/standard/HellSellValue";
+import { EntityRarity } from "../EntityRarity";
+import { PlayableCard } from "../PlayableCard";
+import { CardType } from "../Primitives";
 
 
 export class CoalCargo extends PlayableCard {

@@ -1,7 +1,7 @@
-import { Gender } from "../../../BaseCharacter";
-import { BaseCharacterClass } from "../../../BaseCharacterClass";
-import { PlayableCard } from "../../../PlayableCard";
-import { PlayerCharacter } from "../../../PlayerCharacter";
+import { Gender } from "../BaseCharacter";
+import { BaseCharacterClass } from "../BaseCharacterClass";
+import { PlayableCard } from "../PlayableCard";
+import { PlayerCharacter } from "../PlayerCharacter";
 
 class DummyCharacterClass extends BaseCharacterClass {
     constructor() {

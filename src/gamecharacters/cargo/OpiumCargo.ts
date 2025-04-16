@@ -4,25 +4,25 @@ import { EntityRarity } from "../EntityRarity";
 import { PlayableCard } from "../PlayableCard";
 import { CardType } from "../Primitives";
 
-export class SpicyLiteratureCargo extends PlayableCard {
+export class OpiumCargo extends PlayableCard {
     constructor() {
         super({
-            name: "Spicy Literature Cargo",
+            name: "Opium Cargo",
             cardType: CardType.ITEM,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.COMMON,
         });
         this.baseEnergyCost = 1;
-        this.surfacePurchaseValue = 30;
-        this.hellPurchaseValue = 40;
-        this.buffs.push(new HellSellValue(100));   
+        this.surfacePurchaseValue = 40;
+        this.hellPurchaseValue = 60;
+        this.buffs.push(new HellSellValue(150));   
     }
 
     override get description(): string {
-        return `Draw a card.`;
+        return `Draw 2 cards.`;
     }
 
     override InvokeCardEffects(): void {
-        this.actionManager.drawCards(1);
+        this.actionManager.drawCards(2);
     }
 }

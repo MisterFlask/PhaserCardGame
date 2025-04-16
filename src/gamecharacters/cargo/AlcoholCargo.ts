@@ -1,9 +1,9 @@
-import { TargetingType } from "../../../AbstractCard";
-import { BaseCharacter } from "../../../BaseCharacter";
-import { EntityRarity } from "../../../EntityRarity";
-import { PlayableCard } from "../../../PlayableCard";
-import { CardType } from "../../../Primitives";
-import { HellSellValue } from "../../../buffs/standard/HellSellValue";
+import { TargetingType } from "../AbstractCard";
+import { BaseCharacter } from "../BaseCharacter";
+import { EntityRarity } from "../EntityRarity";
+import { PlayableCard } from "../PlayableCard";
+import { CardType } from "../Primitives";
+import { HellSellValue } from "../buffs/standard/HellSellValue";
 
 export class AlcoholCargo extends PlayableCard {
     constructor() {

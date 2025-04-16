@@ -530,7 +530,7 @@ export class ActionManager {
 
         // now stress for all characters
         combatState.allPlayerAndEnemyCharacters.forEach(character => {
-            var stress =  character.getBuffStacks("Stress") 
+            var stress =  character.getBuffStacks("stress") 
             if (stress >= 10) {
                 this.applyBuffToCharacter(character as BaseCharacter, new Stress(-10));
                 var trauma= TraumaLibrary.getRandomTrauma()

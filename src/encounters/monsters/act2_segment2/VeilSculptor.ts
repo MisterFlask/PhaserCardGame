@@ -56,7 +56,7 @@ export class VeilSculptor extends AutomatedCharacter {
             name: "Veil Sculptor",
             portraitName: "Light Creatures Throne",
             maxHitpoints: 50,
-            description: "a half-glimpsed entity of folded space and twitching glyphs. it twists your mind, conjuring illusions into your mind."
+            description: "a half-glimpsed entity of folded space and twitching glyphs."
         });
     }
 

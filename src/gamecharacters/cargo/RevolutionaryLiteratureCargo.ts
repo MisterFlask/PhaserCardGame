@@ -1,8 +1,8 @@
-import { TargetingType } from "../../../AbstractCard";
-import { HellSellValue } from "../../../buffs/standard/HellSellValue";
-import { EntityRarity } from "../../../EntityRarity";
-import { PlayableCard } from "../../../PlayableCard";
-import { CardType } from "../../../Primitives";
+import { TargetingType } from "../AbstractCard";
+import { HellSellValue } from "../buffs/standard/HellSellValue";
+import { EntityRarity } from "../EntityRarity";
+import { PlayableCard } from "../PlayableCard";
+import { CardType } from "../Primitives";
 
 export class RevolutionaryLiteratureCargo extends PlayableCard {
     constructor() {

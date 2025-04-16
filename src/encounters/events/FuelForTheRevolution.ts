@@ -41,7 +41,7 @@ the stokers howl betrayal, pamphlets torn from trembling claws. management cackl
  */
 
 import { AbstractChoice, AbstractEvent, DeadEndEvent } from "../../events/AbstractEvent";
-import { RevolutionaryLiteratureCargo } from "../../gamecharacters/playerclasses/cards/cargo/RevolutionaryLiteratureCargo";
+import { RevolutionaryLiteratureCargo } from "../../gamecharacters/cargo/RevolutionaryLiteratureCargo";
 
 // The initial choice to accept the revolutionary cargo
 class AcceptCargoChoice extends AbstractChoice {
