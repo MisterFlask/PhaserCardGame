@@ -143,7 +143,7 @@ export class MapOverlay {
         const { width, height } = this.scene.scale;
 
         // Create the background image
-        this.background = this.scene.add.image(width / 2, height / 2, backgroundName).setOrigin(0.5, 0.5);
+        this.background = this.scene.add.image(width / 2, height * 3 / 4, backgroundName).setOrigin(0.5, 0.5);
         this.background.setScrollFactor(1);
 
         // Calculate scaling to cover the screen while maintaining aspect ratio
@@ -507,7 +507,7 @@ export class MapOverlay {
             const scaleY = height / this.background.height;
             const scale = Math.max(scaleX, scaleY);
             this.background.setScale(scale);
-            this.background.setPosition(width / 2, height / 2);
+            this.background.setPosition(width / 2, height * 3 / 4);
         }
 
         // Update campaign brief status position

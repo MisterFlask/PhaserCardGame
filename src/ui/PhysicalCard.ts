@@ -82,6 +82,9 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
     public isSelected: boolean = false;
     private jsonModal: Phaser.GameObjects.Container | null = null;
+    
+    // Track additional portrait layers
+    private additionalPortraitLayers: Map<string, Phaser.GameObjects.Image> = new Map();
 
     public get isHighlighted(): boolean {
         return this.glowEffect?.visible ?? false;
@@ -133,6 +136,9 @@ export class PhysicalCard implements IPhysicalCardInterface {
             shadowOffset: 3
         });
         this.visualContainer.add(this.cardImage);
+
+        // Add initial portrait layers
+        this.updateAdditionalPortraitLayers();
 
         // glow effect (behind card)
         this.glowEffect = new CheapGlowEffect(scene);
@@ -220,6 +226,31 @@ export class PhysicalCard implements IPhysicalCardInterface {
         this.setupInteractivity();
     }
 
+    // Update additional portrait layers based on data.additionalPortraitLayerNames
+    private updateAdditionalPortraitLayers(): void {
+        // Get the current list from the data
+        const currentLayerNames = new Set(this.data.additionalPortraitLayerNames || []);
+        
+        // Remove layers that are no longer in the list
+        for (const [layerName, layerImage] of this.additionalPortraitLayers.entries()) {
+            if (!currentLayerNames.has(layerName)) {
+                layerImage.destroy();
+                this.additionalPortraitLayers.delete(layerName);
+            }
+        }
+        
+        // Add new layers
+        for (const layerName of currentLayerNames) {
+            if (!this.additionalPortraitLayers.has(layerName)) {
+                const tex = this.scene.textures.get(layerName);
+                const img = this.scene.add.image(0, 0, tex)
+                    .setDisplaySize(this.cardConfig.cardWidth, this.cardConfig.cardHeight);
+                this.visualContainer.add(img);
+                this.additionalPortraitLayers.set(layerName, img);
+            }
+        }
+    }
+
     setInteractive(isInteractive: boolean): Phaser.GameObjects.Container {
         this.container.setInteractive(isInteractive);
         return this.container;
@@ -254,6 +285,11 @@ export class PhysicalCard implements IPhysicalCardInterface {
         this.blockTooltip.destroy();
         this.cardImage?.destroy();
         this.cardBackground?.destroy();
+        
+        // Clean up additional portrait layers
+        this.additionalPortraitLayers.forEach(img => img.destroy());
+        this.additionalPortraitLayers.clear();
+        
         this.visualContainer?.destroy();
         this.uiContainer?.destroy();
         this.container?.destroy();
@@ -291,6 +327,11 @@ export class PhysicalCard implements IPhysicalCardInterface {
         } else {
             this.cardImage.setDisplaySize(newWidth, newHeight);
         }
+        
+        // Scale additional portrait layers
+        this.additionalPortraitLayers.forEach(img => {
+            img.setDisplaySize(newWidth, newHeight);
+        });
 
         const scaledWidth = newWidth * PhysicalCard.GLOW_SCALE_MULTIPLIER;
         const scaledHeight = newHeight * PhysicalCard.GLOW_SCALE_MULTIPLIER;
@@ -316,6 +357,10 @@ export class PhysicalCard implements IPhysicalCardInterface {
             this.obliterate();
             return;
         }
+        
+        // Update additional portrait layers if needed
+        this.updateAdditionalPortraitLayers();
+        
         // update card content
         this.applyVisualScaling();
 

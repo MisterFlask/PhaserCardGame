@@ -56,18 +56,6 @@ export class CombatRules {
         combatState.drawPile = removeDeadCharacterCards(combatState.drawPile );
     }
 
-    public static handleStateBasedEffects(){
-        const gameState = GameState.getInstance();
-        const combatState = gameState.combatState;
-
-        // Check if all enemies are defeated
-        const allEnemiesDefeated = combatState.enemies.every(enemy => enemy.hitpoints <= 0);
-
-        if (allEnemiesDefeated) {
-            //todo
-        }
-    }
-
 
     /**
      * The only time target is null is when we're calculating the damage of something hypothetically.

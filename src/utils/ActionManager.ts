@@ -5,11 +5,14 @@ import { AbstractCard, IPhysicalCardInterface } from '../gamecharacters/Abstract
 import { AutomatedCharacter } from "../gamecharacters/AutomatedCharacter";
 import type { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { AbstractBuff } from "../gamecharacters/buffs/AbstractBuff";
+import { Lethality } from "../gamecharacters/buffs/standard/Lethality";
+import { Stress } from "../gamecharacters/buffs/standard/Stress";
 import { CardResourceScaling } from "../gamecharacters/CardResourceScaling";
 import { IBaseCharacter } from "../gamecharacters/IBaseCharacter";
 import { PlayableCard } from "../gamecharacters/PlayableCard";
 import { CardType } from "../gamecharacters/Primitives";
 import { ProcBroadcaster } from "../gamecharacters/procs/ProcBroadcaster";
+import { TraumaLibrary } from "../gamecharacters/statuses/curses/traumas/TraumaLibrary";
 import { AbstractRelic } from "../relics/AbstractRelic";
 import { AbstractCombatResource } from "../rules/combatresources/AbstractCombatResource";
 import { CombatRules, DamageCalculationResult } from "../rules/CombatRulesHelper";
@@ -524,6 +527,19 @@ export class ActionManager {
 
         // Consolidate stacks of buffs of the same type
         this.consolidateBuffsOnCharacters(combatState);
+
+        // now stress for all characters
+        combatState.allPlayerAndEnemyCharacters.forEach(character => {
+            var stress =  character.getBuffStacks("Stress") 
+            if (stress >= 10) {
+                this.applyBuffToCharacter(character as BaseCharacter, new Stress(-10));
+                var trauma= TraumaLibrary.getRandomTrauma()
+                this.createCardToHand(trauma);
+                this.addCardToMasterDeck(trauma);
+                this.applyBuffToCharacter(character as BaseCharacter, new Lethality(-2));
+            }
+        });
+
     }
     consolidateResourceScalingOnCard(card: PlayableCard) {
         if (!card.resourceScalings || card.resourceScalings.length <= 1) {
@@ -594,6 +610,7 @@ export class ActionManager {
                 );
             }
         });
+
     }
 
     private animateDrawCard(card: PlayableCard): Promise<void> {

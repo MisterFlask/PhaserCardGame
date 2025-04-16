@@ -181,6 +181,9 @@ export abstract class AbstractCard implements IAbstractCard {
     protected _description: string;
     public flavorText: string = "";
     public portraitName?: string
+
+    public additionalPortraitLayerNames: string[] = [];
+
     cardType: CardType
     public tooltip: string
     owningCharacter?: PlayerCharacter
