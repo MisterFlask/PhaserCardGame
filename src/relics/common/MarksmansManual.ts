@@ -1,10 +1,9 @@
 import { BaseCharacter } from "../../gamecharacters/BaseCharacter";
 import { EntityRarity } from "../../gamecharacters/EntityRarity";
 import { PlayableCard } from "../../gamecharacters/PlayableCard";
-import { FireRevolver } from "../../gamecharacters/playerclasses/cards/basic/FireRevolver";
 import { AbstractRelic } from "../AbstractRelic";
 
-export class Catspaw extends AbstractRelic {
+export class MarksmansManual extends AbstractRelic {
     private readonly BASE_DAMAGE = 2;
 
     constructor() {
@@ -15,15 +14,15 @@ export class Catspaw extends AbstractRelic {
     }
 
     getDisplayName(): string {
-        return "Catspaw";
+        return "Marksman's Manual";
     }
 
     getDescription(): string {
-        return `Shoot cards deal ${this.BASE_DAMAGE * this.stacks} more damage.`;
+        return `Revolver cards deal ${this.BASE_DAMAGE * this.stacks} more damage.`;
     }
 
     public getCombatDamageDealtModifier(target: BaseCharacter, card: PlayableCard): number {
-        if (card instanceof FireRevolver) {
+        if (card.name.toLowerCase().includes("revolver")) {
             return this.BASE_DAMAGE * this.stacks;
         }
         return 0;

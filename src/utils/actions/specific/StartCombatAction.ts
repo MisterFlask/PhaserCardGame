@@ -3,6 +3,7 @@ import { ProcBroadcaster } from "../../../gamecharacters/procs/ProcBroadcaster";
 import { GameState } from "../../../rules/GameState";
 import { ActionManager } from "../../ActionManager";
 import { GameAction } from "../GameAction";
+import { BeginTurnAction } from "./BeginTurnAction";
 
 export class StartCombatAction extends GameAction {
     async playAction(): Promise<GameAction[]> {
@@ -45,6 +46,8 @@ export class StartCombatAction extends GameAction {
 
         // Set max energy based on relics
         combatState.defaultMaxEnergy = 3; // Base energy
+        
+        new BeginTurnAction().playAction();
 
         // Trigger onCombatStart for all relevant buffs
         ProcBroadcaster.getInstance().retrieveAllRelevantBuffsForProcs(true).forEach(buff => {

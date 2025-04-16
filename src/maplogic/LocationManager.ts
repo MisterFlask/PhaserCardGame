@@ -6,9 +6,9 @@ import { BossRoomCard, CharonRoomCard, CommoditiesTraderCard, EliteRoomCard, Ent
 
 export class LocationManager {
     // Map configuration constants
-    private readonly numberOfFloors = 10; // 0-9, entrance on 0, boss on 8, Charon on 9
+    private readonly numberOfFloors = 15; // 0-9, entrance on 0, boss on 14, Charon on 15
     private readonly nodesPerFloor = 5;
-    private readonly treasureFloorIndex = 5; // The middle floor that will be all treasure rooms
+    private readonly treasureFloorIndex = 8; // The middle floor that will be all treasure rooms
     private readonly minEntranceConnections = 3; // Minimum number of paths from entrance
     
     // Special floor indices
@@ -152,151 +152,184 @@ export class LocationManager {
         // Get current game act
         const currentAct = GameState.getInstance().currentAct;
         
-        // Define room type distribution per floor (excluding treasure floor)
-        // Using createRoomTemplate to create prototype instances for each room type
-        const distribution = [
-            { template: (floor: number, roomNumber: number) => new ShopCard(floor, roomNumber), count: 1 },
-            { template: (floor: number, roomNumber: number) => new RestSiteCard(floor, roomNumber), count: 1 },
-            { template: (floor: number, roomNumber: number) => new EliteRoomCard(floor, roomNumber), count: 1 },
-            { template: (floor: number, roomNumber: number) => new TreasureRoomCard(floor, roomNumber), count: 1 },
-            { template: (floor: number, roomNumber: number) => new EventRoomCard(floor, roomNumber), count: 1 }
-        ];
+        // Define total counts for each special room type
+        const totalSpecialCounts = new Map<string, number>([
+            ["Shop", 2],
+            ["RestSite", 2],
+            ["Elite", 2],
+            ["Treasure", 2],
+            ["Event", 2],
+        ]);
         
-        // Add CommoditiesTraderCard for Act 2
+        // Add CommoditiesTrader for Act 2
         if (currentAct === 2) {
-            distribution.push({ 
-                template: (floor: number, roomNumber: number) => new CommoditiesTraderCard(floor, roomNumber), 
-                count: 2 
-            });
+            totalSpecialCounts.set("CommoditiesTrader", 2);
         }
-
-        // Apply distribution for each floor (except entrance, treasure, boss, Charon floors, and first floor after entrance)
-        for (let floor = this.entranceFloor + 1; floor <= this.bossFloor; floor++) {
-            // Skip special floors and the first floor after entrance (floor 1)
-            if (floor === this.treasureFloorIndex || floor === this.bossFloor || floor === this.entranceFloor + 1) continue;
+        
+        // Get all valid floors (excluding entrance, treasure, boss, Charon floors, and first floor after entrance)
+        const validFloors = Array.from(roomsByFloor.keys())
+            .filter(floor => 
+                floor !== this.entranceFloor && 
+                floor !== this.entranceFloor + 1 && // Exclude first floor after entrance
+                floor !== this.treasureFloorIndex && 
+                floor !== this.bossFloor &&
+                floor !== this.charonFloor
+            )
+            .sort(() => Math.random() - 0.5); // Shuffle floors
+        
+        // First pass: distribute special rooms across floors
+        for (const floor of validFloors) {
+            const floorRooms = locations.filter(loc => 
+                loc.floor === floor && 
+                loc instanceof NormalRoomCard // Only replace normal rooms
+            );
             
-            const roomsOnFloor = roomsByFloor.get(floor) || [];
-            if (roomsOnFloor.length === 0) continue;
-
-            // Shuffle the distribution for this floor
-            const floorDistribution = [...distribution]
-                .sort(() => Math.random() - 0.5);
+            if (floorRooms.length === 0) continue;
+            
+            // Shuffle floor rooms to randomize selection
+            const shuffledRooms = [...floorRooms].sort(() => Math.random() - 0.5);
+            
+            // Try to place one special room on this floor
+            let placedRoomOnFloor = false;
+            
+            // Shuffle the room types to try in random order
+            const roomTypes = Array.from(totalSpecialCounts.entries())
+                .filter(([_, count]) => count > 0) // Only consider types with remaining count
+                .sort(() => Math.random() - 0.5);  // Shuffle
+            
+            for (const [roomType, remaining] of roomTypes) {
+                if (remaining <= 0) continue;
                 
-            // When in Act 2, ensure we distribute CommoditiesTraderCards to different floors
-            if (currentAct === 2) {
-                const commoditiesTraderTemplate = floorDistribution.find(
-                    item => item.template(0, 0) instanceof CommoditiesTraderCard
+                // Find a valid room for this special room type
+                const roomToReplace = shuffledRooms.find(room => 
+                    this.isValidForSpecialRoom(room, locations, (f, n) => this.makeSpecialRoom(roomType, f, n))
                 );
                 
-                // If we found the commodities trader template
-                if (commoditiesTraderTemplate) {
-                    // Remove from general distribution to handle separately
-                    const index = floorDistribution.indexOf(commoditiesTraderTemplate);
-                    floorDistribution.splice(index, 1);
-                    
-                    // Add one commodities trader to this floor if there's room
-                    if (commoditiesTraderTemplate.count > 0 && roomsOnFloor.length > 0) {
-                        const normalRooms = roomsOnFloor.filter(room => 
-                            room instanceof NormalRoomCard && 
-                            this.isValidForSpecialRoom(room, locations, commoditiesTraderTemplate.template)
-                        );
-                        
-                        if (normalRooms.length > 0) {
-                            // Pick a random normal room
-                            const randomIndex = Math.floor(Math.random() * normalRooms.length);
-                            const roomToReplace = normalRooms[randomIndex];
-                            
-                            // Replace with the commodities trader
-                            const traderRoom = commoditiesTraderTemplate.template(roomToReplace.floor, roomToReplace.roomNumber);
-                            this.replaceRoom(locations, roomToReplace, traderRoom);
-                            
-                            // Update the rooms on floor list
-                            const idx = roomsOnFloor.indexOf(roomToReplace);
-                            if (idx !== -1) {
-                                roomsOnFloor[idx] = traderRoom;
-                            }
-                            
-                            // Decrease the count
-                            commoditiesTraderTemplate.count--;
-                        }
-                    }
-                }
+                if (!roomToReplace) continue;
+                
+                // Replace with special room
+                const newRoom = this.makeSpecialRoom(roomType, roomToReplace.floor, roomToReplace.roomNumber);
+                this.replaceRoom(locations, roomToReplace, newRoom);
+                
+                // Update count
+                totalSpecialCounts.set(roomType, remaining - 1);
+                
+                // Mark as placed on this floor
+                placedRoomOnFloor = true;
+                break; // Only place one special room per floor
             }
             
-            // Now handle the regular distribution for this floor
-            // Limit by available rooms
-            const regularDistribution = floorDistribution.slice(0, Math.min(roomsOnFloor.length, floorDistribution.length));
+            // If we couldn't place any special room on this floor, try the next floor
+            if (!placedRoomOnFloor) continue;
+        }
+        
+        // Second pass: Check for any remaining room counts and distribute them
+        const remainingTypesWithCount = Array.from(totalSpecialCounts.entries())
+            .filter(([_, count]) => count > 0)
+            .sort(() => Math.random() - 0.5);
             
-            for (const { template, count } of regularDistribution) {
-                for (let i = 0; i < count; i++) {
-                    // Find a suitable normal room to replace
-                    const normalRooms = roomsOnFloor.filter(room => 
-                        room instanceof NormalRoomCard && 
-                        this.isValidForSpecialRoom(room, locations, template)
+        if (remainingTypesWithCount.length > 0) {
+            // Try again with any remaining floors that still have normal rooms
+            const remainingValidFloors = Array.from(roomsByFloor.keys())
+                .filter(floor => 
+                    floor !== this.entranceFloor && 
+                    floor !== this.entranceFloor + 1 && // Exclude first floor after entrance
+                    floor !== this.treasureFloorIndex && 
+                    floor !== this.bossFloor &&
+                    floor !== this.charonFloor
+                )
+                .sort(() => Math.random() - 0.5); // Shuffle floors
+                
+            for (const floor of remainingValidFloors) {
+                // Get normal rooms on this floor
+                const normalRooms = locations.filter(loc => 
+                    loc.floor === floor && 
+                    loc instanceof NormalRoomCard
+                );
+                
+                if (normalRooms.length === 0) continue;
+                
+                // Shuffle normal rooms
+                const shuffledNormalRooms = [...normalRooms].sort(() => Math.random() - 0.5);
+                
+                // Try each remaining room type
+                for (const [roomType, remaining] of remainingTypesWithCount) {
+                    if (remaining <= 0) continue;
+                    
+                    // Find a valid room
+                    const roomToReplace = shuffledNormalRooms.find(room => 
+                        this.isValidForSpecialRoom(room, locations, (f, n) => this.makeSpecialRoom(roomType, f, n))
                     );
                     
-                    if (normalRooms.length === 0) continue;
+                    if (!roomToReplace) continue;
                     
-                    // Pick a random normal room
-                    const randomIndex = Math.floor(Math.random() * normalRooms.length);
-                    const roomToReplace = normalRooms[randomIndex];
+                    // Replace with special room
+                    const newRoom = this.makeSpecialRoom(roomType, roomToReplace.floor, roomToReplace.roomNumber);
+                    this.replaceRoom(locations, roomToReplace, newRoom);
                     
-                    // Replace with the special room
-                    const specialRoom = template(roomToReplace.floor, roomToReplace.roomNumber);
-                    this.replaceRoom(locations, roomToReplace, specialRoom);
+                    // Update count
+                    totalSpecialCounts.set(roomType, remaining - 1);
                     
-                    // Update the rooms on floor list
-                    const idx = roomsOnFloor.indexOf(roomToReplace);
-                    if (idx !== -1) {
-                        roomsOnFloor[idx] = specialRoom;
+                    // Remove this room from consideration
+                    const index = shuffledNormalRooms.indexOf(roomToReplace);
+                    if (index !== -1) {
+                        shuffledNormalRooms.splice(index, 1);
                     }
+                    
+                    // If no more normal rooms, move to next floor
+                    if (shuffledNormalRooms.length === 0) break;
                 }
             }
         }
         
-        // If we're in Act 2, make sure we've added both commodities traders by adding any remaining ones
-        if (currentAct === 2) {
-            const remainingCount = distribution.find(
-                item => item.template(0, 0) instanceof CommoditiesTraderCard
-            )?.count || 0;
+        // Final validation pass: fix any adjacency constraint violations
+        this.validateSpecialRoomConstraints(locations);
+    }
+    
+    /**
+     * Create a special room of the specified type
+     */
+    private makeSpecialRoom(type: string, floor: number, roomNumber: number): LocationCard {
+        switch (type) {
+            case "Shop": return new ShopCard(floor, roomNumber);
+            case "RestSite": return new RestSiteCard(floor, roomNumber);
+            case "Elite": return new EliteRoomCard(floor, roomNumber);
+            case "Treasure": return new TreasureRoomCard(floor, roomNumber);
+            case "Event": return new EventRoomCard(floor, roomNumber);
+            case "CommoditiesTrader": return new CommoditiesTraderCard(floor, roomNumber);
+            default: return new NormalRoomCard(floor, roomNumber);
+        }
+    }
+    
+    /**
+     * Validate and fix any constraints violations for special rooms
+     */
+    private validateSpecialRoomConstraints(locations: LocationCard[]): void {
+        // Find shops and rest sites that violate adjacency constraints
+        const restSites = locations.filter(loc => loc instanceof RestSiteCard);
+        const shops = locations.filter(loc => loc instanceof ShopCard);
+        
+        // Check for rest sites with adjacent rest sites
+        for (const site of restSites) {
+            const adjacentRestSites = site.adjacentLocations.filter(adj => adj instanceof RestSiteCard);
             
-            if (remainingCount > 0) {
-                // Find floors that don't have a commodities trader yet
-                const floors = Array.from(roomsByFloor.keys()).filter(
-                    floor => floor !== this.entranceFloor && 
-                            floor !== this.entranceFloor + 1 && // Also exclude the first floor after entrance
-                            floor !== this.treasureFloorIndex && 
-                            floor !== this.bossFloor &&
-                            floor !== this.charonFloor
-                );
-                
-                // Shuffle the floors
-                const shuffledFloors = [...floors].sort(() => Math.random() - 0.5);
-                
-                // Try to add remaining traders
-                for (let i = 0; i < remainingCount && i < shuffledFloors.length; i++) {
-                    const floor = shuffledFloors[i];
-                    const roomsOnFloor = roomsByFloor.get(floor) || [];
-                    
-                    // Find normal rooms on this floor
-                    const normalRooms = roomsOnFloor.filter(room => room instanceof NormalRoomCard);
-                    
-                    if (normalRooms.length > 0) {
-                        // Pick a random normal room
-                        const randomIndex = Math.floor(Math.random() * normalRooms.length);
-                        const roomToReplace = normalRooms[randomIndex];
-                        
-                        // Replace with a commodities trader
-                        const traderRoom = new CommoditiesTraderCard(roomToReplace.floor, roomToReplace.roomNumber);
-                        this.replaceRoom(locations, roomToReplace, traderRoom);
-                        
-                        // Update the rooms on floor list
-                        const idx = roomsOnFloor.indexOf(roomToReplace);
-                        if (idx !== -1) {
-                            roomsOnFloor[idx] = traderRoom;
-                        }
-                    }
-                }
+            if (adjacentRestSites.length > 0) {
+                console.warn(`Rest site ${site.name} has adjacent rest sites. Converting to normal room...`);
+                // Convert this rest site to a normal room
+                const normalRoom = new NormalRoomCard(site.floor, site.roomNumber);
+                this.replaceRoom(locations, site, normalRoom);
+            }
+        }
+        
+        // Check for shops with adjacent shops
+        for (const shop of shops) {
+            const adjacentShops = shop.adjacentLocations.filter(adj => adj instanceof ShopCard);
+            
+            if (adjacentShops.length > 0) {
+                console.warn(`Shop ${shop.name} has adjacent shops. Converting to normal room...`);
+                // Convert this shop to a normal room
+                const normalRoom = new NormalRoomCard(shop.floor, shop.roomNumber);
+                this.replaceRoom(locations, shop, normalRoom);
             }
         }
     }

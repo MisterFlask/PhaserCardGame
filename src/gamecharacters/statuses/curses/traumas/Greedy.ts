@@ -1,11 +1,11 @@
 /**
  * Hazardous (2).  Cost 0, lose 3 SIN.
  */
-import { TargetingType } from "../../AbstractCard";
-import { EntityRarity } from "../../EntityRarity";
-import { PlayableCard } from "../../PlayableCard";
-import { CardType } from "../../Primitives";
-import { Hazardous } from "../../buffs/playable_card/Hazardous";
+import { TargetingType } from "../../../AbstractCard";
+import { EntityRarity } from "../../../EntityRarity";
+import { PlayableCard } from "../../../PlayableCard";
+import { CardType } from "../../../Primitives";
+import { Hazardous } from "../../../buffs/playable_card/Hazardous";
 
 export class Greedy extends PlayableCard {
     constructor() {

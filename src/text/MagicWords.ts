@@ -129,7 +129,8 @@ export class MagicWords {
             new MagicConcept("Brimstone Badlands", "A volcanic wasteland dominated by brimstone mines and controlled by the Brimstone Barons.  The Phlegothon runs through it; valuable exports include Phlegothon Oil and Brimstone Distillate."),
             new MagicConcept("Screaming Forests", "A primeval wilderness of sentient, wailing trees and dangerous creatures. Valuable exports include Screaming Timber and Sorrowvines."),
             new MagicConcept("Clockwork Wastes", "A desolate wasteland littered with ancient infernal machines and half-mechanical creatures used in a war long-forgotten.  Valuable exports include prelapsarian war machines and the occasional angelic artifact."),
-            new MagicConcept("Abyssal Frontier", "The edge of Hell, where its reality fades into infinite darkness and alien geometries.")
+            new MagicConcept("Abyssal Frontier", "The edge of Hell, where its reality fades into infinite darkness and alien geometries."),
+            new MagicConcept("clogger", "A metonym referring to the De Koninklijke Wetenschappelijke Helrader Maatschappij (literally, 'the Royal Scientific Hell-Wheel Company'), a consortium of scientists who attempt to push the bounds of Hellish science.")
         ]
     
 

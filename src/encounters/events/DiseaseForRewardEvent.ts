@@ -29,7 +29,7 @@ class AcceptDiseaseChoice extends AbstractChoice {
         );
         this.nextEvent = new DeadEndEvent();
         this.nextEvent.description = "The clogger's eyes light up with excitement. \"Ja, excellent choice! Zeer goed!\" He gestures to his assistants, who draw forth needles and vials of sickly fluids. The procedure is mercifully quick, though deeply uncomfortable. Your soldier winces as the infection takes hold, but the cloggers insist it's \"perfectly manageable\" and \"only occasionally fatal.\" The lead researcher places the promised artifact in your hands, its surface warm with strange energies. \"For science, ja? A fair exchange!\"";
-    }
+    } 
 
     init(): void {
         // Select a relic when the choice is initialized
@@ -67,7 +67,7 @@ class DeclineChoice extends AbstractChoice {
     constructor() {
         super(
             "Decline the Offer",
-            "Refuse to participate in their experiment."
+            "Your father always told you to never trust a man in clogs."
         );
         this.nextEvent = new DeadEndEvent();
         this.nextEvent.description = "The clogger's smile falters, then fixes itself back into place with mechanical precision. \"Ah, a shame. Science marches on, however! Ve will find other... volunteers.\" He makes a small notation in his ledger as the other researchers begin collapsing their equipment with practiced efficiency. Within minutes, the entire operation is packed away, and the cloggers trudge off toward another part of Hell, their wooden shoes clacking on the ashen ground. Your soldiers visibly relax as they depart.";
@@ -83,7 +83,7 @@ class DeclineChoice extends AbstractChoice {
 export class DiseaseForMoneyEvent extends AbstractEvent {
     constructor() {
         super();
-        this.name = "The Cloggers' Clinic";
+        this.name = "The Cloggers Want A Body";
         this.portraitName = "placeholder_event_background_1";
         this.description = "The landscape is ulcerated with neatly arranged tents, a clinic nestled absurdly into the blistered flank of hell. Your caravan halts. Clog-footed figures shuffle eagerly forward, pristine lab coats stark against volcanic dust. One of your soldiers mutters \"B___dy cloggers\" under his breath.  one such clogger notices you.\n\n" +
             "[color=white]\"Ah, goedendag!\"[/color] their leader greets you cheerfully, adjusting brass-framed spectacles that do nothing against the smoke. [color=white]\"You hef arrifed at a most oppurtune moment, mijn vrienden! Ja, history in de making—met uw hulp, natuurlijk.\"[/color]\n\n" +

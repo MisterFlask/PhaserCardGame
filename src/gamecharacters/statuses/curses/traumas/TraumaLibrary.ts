@@ -1,4 +1,4 @@
-import { PlayableCard } from "../../PlayableCard";
+import { PlayableCard } from "../../../PlayableCard";
 import { Berserk } from "./Berserk";
 import { Greedy } from "./Greedy";
 import { Idolatrous } from "./Idolatrous";

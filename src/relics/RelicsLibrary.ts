@@ -1,21 +1,21 @@
 import { PlayableCard } from '../gamecharacters/PlayableCard';
 import { AbstractRelic } from './AbstractRelic';
 import { CaskOfErrantSouls } from './common/CaskOfErrantSouls';
-import { Catspaw } from './common/Catspaw';
 import { FrozenDew } from './common/FrozenDew';
 import { GlassCross } from './common/GlassCross';
 import { HopeCandle } from './common/HopeCandle';
 import { IronFilings } from './common/IronFilings';
+import { MarksmansManual } from './common/MarksmansManual';
 import { MistBottle } from './common/MistBottle';
 import { TornPage } from './common/TornPage';
 import { VialOfBlood } from './common/VialOfBlood';
 import { AkashicNewspaper } from './cursedcargo/AkashicNewspaper';
 import { BloomOfSorrow } from './cursedcargo/BloomOfSorrow';
 import { BomberGremlin } from './cursedcargo/BomberGremlin';
-import { SneeringRevolver } from './cursedcargo/cards/SneeringRevolver';
 import { ChairmanVizzerix } from './cursedcargo/cards/ChairmanVizzerix';
 import { MawSculpture } from './cursedcargo/cards/MawSculpture';
 import { SirenDaguerreotype } from './cursedcargo/cards/SirenDaguerreotype';
+import { SneeringRevolver } from './cursedcargo/cards/SneeringRevolver';
 import { TomeOfAvarice } from './cursedcargo/cards/TomeOfAvarice';
 import { WatchfulClown } from './cursedcargo/cards/WatchfulClown';
 import { DevouringIcon } from './cursedcargo/DevouringIcon';
@@ -34,7 +34,7 @@ export class RelicsLibrary {
 
     private constructor() {
         this.beneficialRelics = [
-            new Catspaw(),
+            new MarksmansManual(),
             new HopeCandle(),
             new TornPage(),
             new MistBottle(),

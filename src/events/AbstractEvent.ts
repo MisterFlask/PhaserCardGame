@@ -42,7 +42,7 @@ export abstract class AbstractChoice {
 }
 export class FinishChoice extends AbstractChoice {
     constructor() {
-        super("Ah.", ".");
+        super("Ah.", "");
         this.nextEvent = null;
     }
 

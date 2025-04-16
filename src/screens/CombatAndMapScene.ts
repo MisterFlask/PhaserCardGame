@@ -125,7 +125,6 @@ class CombatScene extends Phaser.Scene {
         
         // Start new combat
         ActionManager.getInstance().startCombat();
-        ActionManager.beginTurn();
 
         // Set up event if present in the encounter
         if (data.encounter.event) {

@@ -1,11 +1,11 @@
 /**
  * Sacrifice.  Draw 2 cards.  Cost 1 energy.
  */
-import { TargetingType } from "../../AbstractCard";
-import { EntityRarity } from "../../EntityRarity";
-import { PlayableCard } from "../../PlayableCard";
-import { CardType } from "../../Primitives";
-import { AbstractBuff } from "../../buffs/AbstractBuff";
+import { TargetingType } from "../../../AbstractCard";
+import { EntityRarity } from "../../../EntityRarity";
+import { PlayableCard } from "../../../PlayableCard";
+import { CardType } from "../../../Primitives";
+import { AbstractBuff } from "../../../buffs/AbstractBuff";
 
 // Buff that implements the Sacrifice effect
 class SacrificeBuff extends AbstractBuff {

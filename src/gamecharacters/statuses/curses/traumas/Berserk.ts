@@ -1,14 +1,14 @@
 /**
  * Deal 4 damage.  Lose 1 Dexterity and gain 1 Strength.  Hazardous (3).  Cost 1 energy.
  */
-import { TargetingType } from "../../AbstractCard";
-import { BaseCharacter } from "../../BaseCharacter";
-import { EntityRarity } from "../../EntityRarity";
-import { PlayableCard } from "../../PlayableCard";
-import { CardType } from "../../Primitives";
-import { Dexterity } from "../../buffs/persona/Dexterity";
-import { Hazardous } from "../../buffs/playable_card/Hazardous";
-import { Lethality } from "../../buffs/standard/Lethality";
+import { TargetingType } from "../../../AbstractCard";
+import { BaseCharacter } from "../../../BaseCharacter";
+import { EntityRarity } from "../../../EntityRarity";
+import { PlayableCard } from "../../../PlayableCard";
+import { CardType } from "../../../Primitives";
+import { Dexterity } from "../../../buffs/persona/Dexterity";
+import { Hazardous } from "../../../buffs/playable_card/Hazardous";
+import { Lethality } from "../../../buffs/standard/Lethality";
 
 export class Berserk extends PlayableCard {
     constructor() {

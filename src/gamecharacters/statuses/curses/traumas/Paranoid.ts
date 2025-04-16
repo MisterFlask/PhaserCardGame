@@ -1,12 +1,12 @@
 /*
 If retained: lose 2 Dexterity.  Cost 1 to play; draw a card.
 */
-import { TargetingType } from "../../AbstractCard";
-import { EntityRarity } from "../../EntityRarity";
-import { PlayableCard } from "../../PlayableCard";
-import { CardType } from "../../Primitives";
-import { AbstractBuff } from "../../buffs/AbstractBuff";
-import { Dexterity } from "../../buffs/persona/Dexterity";
+import { TargetingType } from "../../../AbstractCard";
+import { EntityRarity } from "../../../EntityRarity";
+import { PlayableCard } from "../../../PlayableCard";
+import { CardType } from "../../../Primitives";
+import { AbstractBuff } from "../../../buffs/AbstractBuff";
+import { Dexterity } from "../../../buffs/persona/Dexterity";
 
 // Buff that applies the "if retained" effect
 class ParanoidBuff extends AbstractBuff {

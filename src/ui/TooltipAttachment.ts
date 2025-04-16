@@ -40,8 +40,8 @@ export class TooltipAttachment {
         // Create actual tooltip with proper dimensions
         this.tooltip = new TextBox({
             scene,
-            width: bounds.width + this.padding * 2,
-            height: bounds.height + this.padding * 2,
+            width: 400,
+            height: 50,
             text: tooltipText,
             fillColor,
             style: {

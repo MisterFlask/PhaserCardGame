@@ -1,12 +1,12 @@
 /**
  * While this is in your hand, any time you target a different ally with a card, deal 5 damage to that ally.  Cost 1 energy.
  */
-import { TargetingType } from "../../AbstractCard";
-import { BaseCharacter } from "../../BaseCharacter";
-import { EntityRarity } from "../../EntityRarity";
-import { PlayableCard } from "../../PlayableCard";
-import { CardType } from "../../Primitives";
-import { AbstractBuff } from "../../buffs/AbstractBuff";
+import { TargetingType } from "../../../AbstractCard";
+import { BaseCharacter } from "../../../BaseCharacter";
+import { EntityRarity } from "../../../EntityRarity";
+import { PlayableCard } from "../../../PlayableCard";
+import { CardType } from "../../../Primitives";
+import { AbstractBuff } from "../../../buffs/AbstractBuff";
 
 // Buff that implements the Vain curse effect
 class VainBuff extends AbstractBuff {
