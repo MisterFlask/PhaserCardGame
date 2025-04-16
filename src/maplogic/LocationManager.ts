@@ -2,7 +2,7 @@
 
 import { LocationBuffRegistry } from "../maplogic/LocationBuffRegistry";
 import { GameState } from "../rules/GameState";
-import { BossRoomCard, CharonRoomCard, CommoditiesTraderCard, EliteRoomCard, EntranceCard, LocationCard, NormalRoomCard, RestSiteCard, ShopCard, TreasureRoomCard } from "./LocationCard";
+import { BossRoomCard, CharonRoomCard, CommoditiesTraderCard, EliteRoomCard, EntranceCard, EventRoomCard, LocationCard, NormalRoomCard, RestSiteCard, ShopCard, TreasureRoomCard } from "./LocationCard";
 
 export class LocationManager {
     // Map configuration constants
@@ -158,7 +158,8 @@ export class LocationManager {
             { template: (floor: number, roomNumber: number) => new ShopCard(floor, roomNumber), count: 1 },
             { template: (floor: number, roomNumber: number) => new RestSiteCard(floor, roomNumber), count: 1 },
             { template: (floor: number, roomNumber: number) => new EliteRoomCard(floor, roomNumber), count: 1 },
-            { template: (floor: number, roomNumber: number) => new TreasureRoomCard(floor, roomNumber), count: 1 }
+            { template: (floor: number, roomNumber: number) => new TreasureRoomCard(floor, roomNumber), count: 1 },
+            { template: (floor: number, roomNumber: number) => new EventRoomCard(floor, roomNumber), count: 1 }
         ];
         
         // Add CommoditiesTraderCard for Act 2

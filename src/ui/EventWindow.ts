@@ -59,7 +59,7 @@ export class EventWindow extends Phaser.GameObjects.Container {
         // Add portrait with a fancy border
         const portraitWidth = windowWidth * 0.4;
         const portraitHeight = windowHeight * 0.5;
-        const portraitX = -windowWidth * 0.25;
+        const portraitX = -windowWidth * 0.35;
         const portraitY = -windowHeight * 0.2;
 
         // Add portrait border
@@ -100,9 +100,9 @@ export class EventWindow extends Phaser.GameObjects.Container {
         // Add description text with improved styling
         this.descriptionText = new TextBox({
             scene,
-            x: windowWidth * 0.3,
+            x: windowWidth * 0.2,
             y: -windowHeight * 0.25,
-            width: windowWidth * 0.35,
+            width: windowWidth * 0.55,
             text: magicWordsResult.stringResult,
             style: {
                 fontSize: '22px',
@@ -152,7 +152,7 @@ export class EventWindow extends Phaser.GameObjects.Container {
         event.choices.forEach((choice, index) => {
             const button = new EventButton({
                 scene,
-                x: windowWidth * -0.2,
+                x: windowWidth * -0.35,
                 y: buttonStartY + index * buttonSpacing,
                 width: buttonWidth,
                 height: 60,

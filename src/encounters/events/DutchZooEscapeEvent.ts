@@ -28,7 +28,7 @@ class CatchDaemonChoice extends AbstractChoice {
     constructor() {
         super(
             "Help Capture the Daemon",
-            "Agree to help capture the escaped beast. Combat will ensue."
+            "Combat will ensue."
         );
         this.nextEvent = new DeadEndEvent();
         this.nextEvent.description = "The clogger beams with relief. \"Oh, vonderful! Truly most superior! Just follow ze roaring—you cannot miss it. Ve vill ready ze containment cage.\" He scurries off, wooden shoes clacking frantically against volcanic gravel.\n\nAs you approach the source of the bellowing, the air grows sulfurous and thick. Through the haze, you spot a hulking, terrible form—more machinery than flesh, its parts grinding and steaming as it tears through what remains of the menagerie's snack bar.";
@@ -37,6 +37,7 @@ class CatchDaemonChoice extends AbstractChoice {
     init(): void {
         // Select a relic when the choice is initialized
         this.selectedRelic = RelicsLibrary.getInstance().getRandomBeneficialRelics(1)[0];
+        this.mechanicalInformationText = "Combat will ensue.  Gain " + this.selectedRelic.getDisplayName() + " as a reward.";
     }
 
     canChoose(): boolean {
@@ -81,7 +82,7 @@ class DeclineChoice extends AbstractChoice {
             "This is clearly not your problem."
         );
         this.nextEvent = new DeadEndEvent();
-        this.nextEvent.description = "The clogger's face falls. \"Ah, I see. Ja, it is perhaps a bit... inconvenient.\" Another roar echoes, followed by the sound of splintering wood. The clogger winces. \"Ve vill manage, somehow. Ze creature cannot digest vood, only flesh, so ze structural damage is mainly cosmetic.\" He sighs, looking forlornly at his exhibition. \"Perhaps zis is not ze ideal location for a roadside attraction after all.\" As you leave, you hear him mumbling about insurance claims and whether acts of daemon are covered under standard hellish policies.";
+        this.nextEvent.description = "The clogger's face falls. \"Ah, I see. Ja, it is perhaps a bit... inconvenient.\" Another roar echoes, followed by the sound of splintering wood. The clogger winces. \"Ve vill manage, somehow. Ze creature cannot digest vood, only flesh, so ze structural damage is mainly cosmetic.\" He sighs, looking forlornly at his exhibition. \"Perhaps zis is not ze ideal location for a roadside attraction after all.\"";
     }
 
     canChoose(): boolean {

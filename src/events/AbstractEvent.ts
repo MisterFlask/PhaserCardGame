@@ -1,3 +1,4 @@
+import { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { AbstractRelic } from "../relics/AbstractRelic";
 import { GameState } from "../rules/GameState";
 import { ActionManager } from "../utils/ActionManager";
@@ -29,6 +30,13 @@ export abstract class AbstractChoice {
 
     protected addLedgerItem(ledgerItem: AbstractRelic): void {
         this.actionManager().createLedgerItem(ledgerItem);
+    }
+
+    ///helper methods
+    public getRandomCharacter(): BaseCharacter {
+        const gameState = this.gameState();
+        const characters = gameState.currentRunCharacters;
+        return characters[Math.floor(Math.random() * characters.length)];
     }
 
 }

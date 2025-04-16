@@ -19,7 +19,7 @@ class BasicTattooChoice extends AbstractChoice {
 
     effect(): void {
         const gameState = this.gameState();
-        const character = gameState.currentRunCharacters[0]; // Assumes first character is the soldier
+        const character = this.getRandomCharacter(); // Assumes first character is the soldier
         const actionManager = ActionManager.getInstance();
         
         // Apply angelic tattoo buff and stress
@@ -35,7 +35,7 @@ class BasicTattooChoice extends AbstractChoice {
 class ElaborateTattooChoice extends AbstractChoice {
     constructor() {
         super(
-            "Request the 'Complete Work' (Costs 75 Hell Currency)",
+            "Request the 'Complete Work'",
             "Your soldier gains a more powerful angelic tattoo buff permanently and 2 Stress."
         );
         this.nextEvent = new DeadEndEvent();
@@ -43,18 +43,18 @@ class ElaborateTattooChoice extends AbstractChoice {
     }
 
     canChoose(): boolean {
-        return this.gameState().sovereignInfernalNotes >= 75;
+        return true;
     }
 
     effect(): void {
         const gameState = this.gameState();
-        const character = gameState.currentRunCharacters[0];
+        const character = this.getRandomCharacter();
         const actionManager = ActionManager.getInstance();
         
         // Apply more powerful angelic tattoo buff and stress
         const tattooBuff = getRandomAngelicTattooBuff(2);
         actionManager.applyBuffToCharacter(character, tattooBuff);
-        actionManager.applyBuffToCharacter(character, new Stress(2));
+        actionManager.applyBuffToCharacter(character, new Stress(6));
         
         // Display what buff was applied
         actionManager.displaySubtitle(`Received the ${tattooBuff.getDisplayName()} (Enhanced)`, 2000);

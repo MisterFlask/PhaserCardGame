@@ -13,7 +13,7 @@ export default class ImageUtils {
         },
         backgrounds: {
             prefix: 'Backgrounds/',
-            files: ['greyscale.png', 'mapbackground1.png', 'vintage_brown.png', 'battleback1.png'
+            files: ['greyscale.png', 'mapbackground1.png'
             ]
         },
         location_backgrounds: {
@@ -357,10 +357,6 @@ export default class ImageUtils {
                 'chemical-bolt.png', 'add-card-to-pile.png', 'pentacle.png'
             ]
         },
-        effects: {
-            prefix: 'Sprites/Effects/',
-            files: ['particle.png']
-        }
     };
 
     private readonly baseURL: string = 'https://raw.githubusercontent.com/MisterFlask/PhaserCardGame/master/resources/';

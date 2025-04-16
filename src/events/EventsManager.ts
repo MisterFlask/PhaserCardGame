@@ -1,10 +1,14 @@
-import { StokersVersusAristocracy } from "../encounters/events/StokersVersusAristocracy";
+import { AngelicTattooEvent } from "../encounters/events/AngelicTattooEvent";
+import { DiseaseForMoneyEvent } from "../encounters/events/DiseaseForRewardEvent";
+import { DutchZooEscapeEvent } from "../encounters/events/DutchZooEscapeEvent";
 import { AbstractEvent } from "./AbstractEvent";
 
 export class EventsManager {
     private static instance: EventsManager;
     private events: AbstractEvent[] = [
-        new StokersVersusAristocracy()
+        new AngelicTattooEvent(),
+        new DiseaseForMoneyEvent(),
+        new DutchZooEscapeEvent(),
     ];
 
     private constructor() {}
