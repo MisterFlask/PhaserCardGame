@@ -1,3 +1,4 @@
+import { AbstractConsumable } from '../consumables/AbstractConsumable';
 import { Encounter } from '../encounters/EncounterManager';
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
 import { PlayerCargoHolder } from '../gamecharacters/cargo/PlayerCargoHolder';
@@ -62,6 +63,8 @@ export class GameState {
     public currentRunCharacters: PlayerCharacter[] = [];
 
     public cargoHolder: PlayerCargoHolder = new PlayerCargoHolder();
+
+    public consumables: AbstractConsumable[] = [];
 
     public getRandomAllyCharacter(): PlayerCharacter {
         return this.currentRunCharacters[Math.floor(Math.random() * this.currentRunCharacters.length)];
