@@ -12,7 +12,7 @@ export class OpiumCargo extends PlayableCard {
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.COMMON,
         });
-        this.baseEnergyCost = 1;
+        this.baseEnergyCost = 2;
         this.surfacePurchaseValue = 40;
         this.hellPurchaseValue = 60;
         this.buffs.push(new HellSellValue(150));   

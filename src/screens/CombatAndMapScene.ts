@@ -1,8 +1,9 @@
 // src/scenes/CombatAndMapScene.ts
+// src/scenes/CombatAndMapScene.ts
 
 import Phaser from 'phaser';
-import BBCodeTextPlugin from 'phaser3-rex-plugins/plugins/bbcodetext-plugin.js';
-import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
+import BBCodeTextPlugin from 'phaser3-rex-plugins/plugins/bbcodetext-plugin';
+import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin';
 import { Encounter } from '../encounters/EncounterManager';
 import { AbstractEvent } from '../events/AbstractEvent';
 import type { AbstractCard } from '../gamecharacters/AbstractCard';

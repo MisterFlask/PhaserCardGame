@@ -1,8 +1,11 @@
 {
   "dependencies": {
+    "@types/dagre": "^0.7.52",
+    "dagre": "^0.8.5",
     "lodash": "^4.17.21",
     "openai": "^4.61.1",
-    "phaser": "^3.85.2"
+    "phaser": "^3.85.2",
+    "phaser3-rex-plugins": "^1.80.15"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.7",

@@ -19,6 +19,10 @@ export abstract class AbstractStrategicProject extends AbstractCard {
         return 100;
     }
 
+    public getPrerequisites(): AbstractStrategicProject[] {
+        return [];
+    }
+    
     public getStrategicResourceCost(): StrategicResource[]
     {
         return [

@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import { GameState } from '../../../../rules/GameState';
 import { AbstractStrategicProject } from '../../../../strategic_projects/AbstractStrategicProject';
+import { StrategicProjectTechTree } from '../../../../strategic_projects/StrategicProjectTechTree';
 import { PhysicalCard } from '../../../../ui/PhysicalCard';
 import { TextBox } from '../../../../ui/TextBox';
 import { CardGuiUtils } from '../../../../utils/CardGuiUtils';
@@ -8,12 +9,10 @@ import { CampaignUiState } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
 
 export class InvestmentPanel extends AbstractHqPanel {
-    private availableFactories: PhysicalCard[] = [];
-    private ownedFactories: PhysicalCard[] = [];
+    private projectCards: PhysicalCard[] = [];
     private titleTextBox: TextBox;
-    private availableSectionText: TextBox;
-    private ownedSectionText: TextBox;
     private poundsDisplay: TextBox;
+    private connectionLines: Phaser.GameObjects.Line[] = [];
 
     constructor(scene: Scene) {
         super(scene, 'Factory Investments');
@@ -33,38 +32,17 @@ export class InvestmentPanel extends AbstractHqPanel {
         this.poundsDisplay = new TextBox({
             scene: scene,
             x: scene.scale.width / 2,
-            y:120,
+            y: 120,
             width: 250,
-            text: `CurrentWorking Capital: £${GameState.getInstance().moneyInVault}`,
+            text: `Current Working Capital: £${GameState.getInstance().moneyInVault}`,
             style: { fontSize: '24px', fontFamily: 'verdana', color: '#FFD700', align: 'center' }
         });
         this.add(this.poundsDisplay);
-
-        // Add section headers
-        this.availableSectionText = new TextBox({
-            scene: scene,
-            x: scene.scale.width * 0.25,
-            y: 100,
-            width: 300,
-            text: 'AVAILABLE FOR PURCHASE',
-            style: { fontSize: '20px', fontFamily: 'verdana', color: '#FFD700' }
-        });
-        this.add(this.availableSectionText);
-
-        this.ownedSectionText = new TextBox({
-            scene: scene,
-            x: scene.scale.width * 0.75,
-            y: 100,
-            width: 300,
-            text: 'OWNED INVESTMENTS',
-            style: { fontSize: '20px', fontFamily: 'verdana', color: '#32CD32' }
-        });
-        this.add(this.ownedSectionText);
         
         // Listen for funds changed events
         scene.events.on('fundsChanged', this.updatePoundsDisplay, this);
         
-        this.displayFactories();
+        this.displayTechTree();
     }
 
     private updatePoundsDisplay(): void {
@@ -72,51 +50,85 @@ export class InvestmentPanel extends AbstractHqPanel {
     }
 
     private clearCards(): void {
-        [...this.availableFactories, ...this.ownedFactories].forEach(card => {
+        // Clear all cards
+        this.projectCards.forEach(card => {
             card.obliterate();
         });
-        this.availableFactories = [];
-        this.ownedFactories = [];
+        this.projectCards = [];
+        
+        // Clear all connection lines
+        this.connectionLines.forEach(line => {
+            line.destroy();
+        });
+        this.connectionLines = [];
     }
 
-    private displayFactories(): void {
+    private displayTechTree(): void {
         const campaignState = CampaignUiState.getInstance();
-        const cardSpacing = 20;
-        const startY = 350;
+        
+        // Combine available and owned projects for the tech tree layout
+        const allProjects = [
+            ...campaignState.availableStrategicProjects,
+            ...campaignState.ownedStrategicProjects
+        ];
+        
+        // Calculate layout using dagre
+        const layout = StrategicProjectTechTree.calculateLayout(allProjects);
+        const edges = StrategicProjectTechTree.getEdges(allProjects);
 
-        // Display available factories on the left
-        campaignState.availableStrategicProjects.forEach((factory, index) => {
-            const card = this.createFactoryCard(factory, 
-                this.scene.scale.width * 0.25,
-                startY + index * (cardSpacing + 150),
-                false
-            );
-            this.availableFactories.push(card);
+        // Create a container for the tech tree that we can position and scale
+        const treeContainer = this.scene.add.container(this.scene.scale.width / 2, 200);
+        this.add(treeContainer);
+        
+        // Draw connections first (so they're behind the cards)
+        edges.forEach(edge => {
+            const sourcePos = layout.get(edge.source);
+            const targetPos = layout.get(edge.target);
+            if (sourcePos && targetPos) {
+                const line = this.scene.add.line(
+                    0, 0,
+                    sourcePos.x, sourcePos.y,
+                    targetPos.x, targetPos.y,
+                    0xCCCCCC, 0.7
+                );
+                line.setOrigin(0, 0);
+                treeContainer.add(line);
+                this.connectionLines.push(line);
+            }
         });
-
-        // Display owned factories on the right
-        campaignState.ownedStrategicProjects.forEach((factory, index) => {
-            const card = this.createFactoryCard(factory,
-                this.scene.scale.width * 0.75,
-                startY + index * (cardSpacing + 150),
-                true
-            );
-            this.ownedFactories.push(card);
+        
+        // Create all project cards at their calculated positions
+        allProjects.forEach(project => {
+            const pos = layout.get(project.name);
+            if (pos) {
+                const isOwned = campaignState.ownedStrategicProjects.includes(project);
+                const card = this.createProjectCard(project, pos.x, pos.y, isOwned);
+                treeContainer.add(card.container);
+                this.projectCards.push(card);
+            }
         });
+        
+        // Center the tech tree in the panel
+        const bounds = treeContainer.getBounds();
+        treeContainer.setPosition(
+            this.scene.scale.width / 2 - bounds.width / 2, 
+            200
+        );
+        
+        // Add zoom controls if needed
+        // this.addZoomControls(treeContainer);
     }
 
-    private createFactoryCard(factory: AbstractStrategicProject, x: number, y: number, isOwned: boolean): PhysicalCard {
+    private createProjectCard(project: AbstractStrategicProject, x: number, y: number, isOwned: boolean): PhysicalCard {
         const card = CardGuiUtils.getInstance().createCard({
             scene: this.scene,
             x,
             y,
-            data: factory,
-            onCardCreatedEventCallback: (card) => this.setupFactoryCardEvents(card, isOwned)
+            data: project,
+            onCardCreatedEventCallback: (card) => this.setupProjectCardEvents(card, isOwned)
         });
         
-        this.add(card.container);
-        
-        // Apply visual distinctions based on ownership status
+        // Apply visual distinctions based on ownership and availability
         if (isOwned) {
             // Add a green overlay or border for owned cards
             const ownedIndicator = this.scene.add.image(0, -90, 'card-frame')
@@ -136,15 +148,19 @@ export class InvestmentPanel extends AbstractHqPanel {
         } else {
             // Add purchase indicator for available cards
             const campaignState = CampaignUiState.getInstance();
-            const canAfford = campaignState.getCurrentFunds() >= factory.getMoneyCost();
+            const canAfford = campaignState.getCurrentFunds() >= project.getMoneyCost();
+            
+            // Check if prerequisites are met
+            const prereqsMet = this.checkPrerequisitesMet(project);
+            const isAvailable = canAfford && prereqsMet;
             
             const purchaseButton = this.scene.add.container(0, 90);
             
             const buttonBg = this.scene.add.rectangle(0, -200, 120, 40, 
-                canAfford ? 0x4CAF50 : 0x9E9E9E) // Green if affordable, gray if not
+                isAvailable ? 0x4CAF50 : 0x9E9E9E) // Green if available, gray if not
                 .setOrigin(0.5);
             
-            const costText = this.scene.add.text(0, -200, `$${factory.getMoneyCost()}`, {
+            const costText = this.scene.add.text(0, -200, `£${project.getMoneyCost()}`, {
                 fontSize: '14px',
                 fontFamily: 'verdana',
                 color: '#FFFFFF'
@@ -153,49 +169,123 @@ export class InvestmentPanel extends AbstractHqPanel {
             purchaseButton.add([buttonBg, costText]);
             card.container.add(purchaseButton);
             
-            if (!canAfford) {
-                const unavailableOverlay = this.scene.add.rectangle(0, 0, card.container.width, card.container.height, 
-                    0x000000, 0.3)
+            // Add an overlay if the project is not available
+            if (!isAvailable) {
+                const unavailableOverlay = this.scene.add.rectangle(0, 0, 180, 250, 
+                    0x000000, 0.5)
                     .setOrigin(0.5);
                 card.container.add(unavailableOverlay);
+                
+                // Add text indicating why it's unavailable
+                let reasonText = canAfford ? "" : "Insufficient Funds";
+                if (!prereqsMet) {
+                    reasonText = reasonText ? "Requirements Not Met" : "Missing Prerequisites";
+                }
+                
+                if (reasonText) {
+                    const reason = this.scene.add.text(0, 0, reasonText, {
+                        fontSize: '14px',
+                        fontFamily: 'verdana',
+                        color: '#FFFFFF',
+                        backgroundColor: '#FF0000',
+                        padding: { x: 5, y: 3 }
+                    }).setOrigin(0.5);
+                    card.container.add(reason);
+                }
             }
         }
         
         return card;
     }
+    
+    private checkPrerequisitesMet(project: AbstractStrategicProject): boolean {
+        const campaignState = CampaignUiState.getInstance();
+        const prerequisites = project.getPrerequisites();
+        
+        // If no prerequisites, then requirements are met
+        if (prerequisites.length === 0) {
+            return true;
+        }
+        
+        // Check if all prerequisites are in the owned projects
+        return prerequisites.every(prereq => 
+            campaignState.ownedStrategicProjects.some(owned => owned.name === prereq.name)
+        );
+    }
 
-    private setupFactoryCardEvents(card: PhysicalCard, isOwned: boolean): void {
+    private setupProjectCardEvents(card: PhysicalCard, isOwned: boolean): void {
         card.container.setInteractive()
             .on('pointerover', () => {
                 card.setGlow(true);
+                this.highlightConnections(card.data as AbstractStrategicProject);
             })
             .on('pointerout', () => {
                 card.setGlow(false);
+                this.resetConnectionHighlights();
             })
             .on('pointerdown', () => {
                 if (!isOwned) {
-                    this.handleFactoryCardClick(card);
+                    this.handleProjectCardClick(card);
                 }
             });
     }
+    
+    private highlightConnections(project: AbstractStrategicProject): void {
+        // Highlight connections to prerequisites
+        const prerequisites = project.getPrerequisites();
+        
+        this.connectionLines.forEach(line => {
+            line.setStrokeStyle(1, 0xCCCCCC, 0.7); // Reset to default
+        });
+        
+        if (prerequisites.length > 0) {
+            const campaignState = CampaignUiState.getInstance();
+            const allProjects = [
+                ...campaignState.availableStrategicProjects,
+                ...campaignState.ownedStrategicProjects
+            ];
+            
+            const edges = StrategicProjectTechTree.getEdges(allProjects);
+            
+            // Find the edges connected to this project
+            edges.forEach((edge, index) => {
+                if (edge.target === project.name) {
+                    // This is a prerequisite connection
+                    this.connectionLines[index]?.setStrokeStyle(3, 0xFFFF00, 1); // Yellow, thicker, fully opaque
+                }
+            });
+        }
+    }
+    
+    private resetConnectionHighlights(): void {
+        // Reset all connection lines to default appearance
+        this.connectionLines.forEach(line => {
+            line.setStrokeStyle(1, 0xCCCCCC, 0.7);
+        });
+    }
 
-    private handleFactoryCardClick(card: PhysicalCard): void {
-        const factory = card.data as AbstractStrategicProject;
+    private handleProjectCardClick(card: PhysicalCard): void {
+        const project = card.data as AbstractStrategicProject;
         const campaignState = CampaignUiState.getInstance();
 
-        if (campaignState.getCurrentFunds() >= factory.getMoneyCost()) {
+        // Check if player can afford it and prerequisites are met
+        if (campaignState.getCurrentFunds() >= project.getMoneyCost() && 
+            this.checkPrerequisitesMet(project)) {
+            
+            // Move from available to owned
             campaignState.availableStrategicProjects = campaignState.availableStrategicProjects
-                .filter(f => f !== factory);
-            campaignState.ownedStrategicProjects.push(factory);
+                .filter(p => p !== project);
+            campaignState.ownedStrategicProjects.push(project);
             
             // Deduct funds from GameState
-            GameState.getInstance().moneyInVault -= factory.getMoneyCost();
+            GameState.getInstance().moneyInVault -= project.getMoneyCost();
             
             // Notify other components that funds have changed
             this.scene.events.emit('fundsChanged');
             
+            // Redraw the tech tree
             this.clearCards();
-            this.displayFactories();
+            this.displayTechTree();
         }
     }
 

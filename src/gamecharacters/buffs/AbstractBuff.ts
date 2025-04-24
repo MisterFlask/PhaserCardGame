@@ -35,6 +35,10 @@ export abstract class AbstractBuff implements IAbstractBuff {
         return buffCopy;
     }
 
+    public init(){
+        
+    }
+
     public withoutShowingUpInBuffs(): this {
         this.moveToMainDescription = true;
         return this;
@@ -498,6 +502,10 @@ export abstract class AbstractBuff implements IAbstractBuff {
         return [];
     }
     
+
+    public postprocessGeneratedMap(): void {
+        
+    }
 }
 
 

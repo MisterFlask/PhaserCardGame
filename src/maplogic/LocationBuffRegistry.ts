@@ -5,6 +5,7 @@ import { AnotherCardReward } from "../gamecharacters/buffs/location/AnotherCardR
 import { EldritchFoes } from "../gamecharacters/buffs/location/EldritchFoes";
 import { GuaranteedRareCardReward } from "../gamecharacters/buffs/location/GuaranteedRareCardReward";
 import { GuaranteedRelic } from "../gamecharacters/buffs/location/GuaranteedRelic";
+import { GuaranteedSpecificRelic } from "../gamecharacters/buffs/location/GuaranteedSpecificRelic";
 import { MerchantMultiplier } from "../gamecharacters/buffs/location/MerchantMultiplier";
 import { RockSlides } from "../gamecharacters/buffs/location/RockSlides";
 import { TougherEnemies } from "../gamecharacters/buffs/location/TougherEnemies";
@@ -45,6 +46,7 @@ export class LocationBuffRegistry {
             new AdditionalHellCurrency(25),
             new AdditionalPoundsSterling(25),
             new GuaranteedRelic(),
+            new GuaranteedSpecificRelic(),
         ];
 
         this.treasureNegativeBuffs = [

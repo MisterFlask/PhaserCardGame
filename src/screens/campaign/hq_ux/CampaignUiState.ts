@@ -7,8 +7,8 @@ import { CampaignRules } from '../../../rules/CampaignRulesHelper';
 import { GameState } from '../../../rules/GameState';
 import { AbstractStrategicProject } from '../../../strategic_projects/AbstractStrategicProject';
 import { AbyssalResearchInstitute } from '../../../strategic_projects/AbyssalResearchInstitute';
+import { LeviMaxwellAscensionProtocol } from '../../../strategic_projects/LeviMaxwellAscensionProtocol';
 import { AbstractTradeRoute, StandardTradeRoute } from './AbstractTradeRoute';
-
 export class CampaignUiState {
     private static instance: CampaignUiState;
 
@@ -18,9 +18,8 @@ export class CampaignUiState {
     public ownedStrategicProjects: AbstractStrategicProject[] = [];
     public availableStrategicProjects: AbstractStrategicProject[] = [
 
-        new AbyssalResearchInstitute()
-
-
+        new AbyssalResearchInstitute(),
+        new LeviMaxwellAscensionProtocol()
     ];
     public selectedTradeRoute: AbstractTradeRoute | null = null;
     public selectedParty: PlayerCharacter[] = [];
