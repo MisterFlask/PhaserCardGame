@@ -1,6 +1,7 @@
 import { ActionManagerFetcher } from "../utils/ActionManagerFetcher";
 import { IncomingIntent } from "./IncomingIntent";
 import type { PhysicalCard } from "./PhysicalCard";
+import { PhysicalConsumable } from "./PhysicalConsumable";
 import type { PhysicalIntent } from "./PhysicalIntent";
 import { UIContextManager } from "./UIContextManager";
 
@@ -9,6 +10,7 @@ export class TransientUiState {
 
     // UI state properties
     public draggedCard: PhysicalCard | undefined = undefined;
+    public draggedConsumable: PhysicalConsumable | undefined = undefined;
     public hoveredCard: PhysicalCard | undefined = undefined;
     public hoveredIntent: PhysicalIntent | undefined = undefined;
     public hoveredIncomingIntent: IncomingIntent | undefined = undefined;
@@ -33,6 +35,15 @@ export class TransientUiState {
         }
     }
 
+    public setDraggedConsumable(consumable: PhysicalConsumable | undefined | null): void {
+        this.draggedConsumable = consumable ?? undefined;
+        
+        // Make sure we're not tracking both a dragged card and consumable at the same time
+        if (consumable) {
+            this.draggedCard = undefined;
+        }
+    }
+
     public setHoveredCard(card: PhysicalCard | undefined | null): void {
         this.hoveredCard = card ?? undefined;
     }
@@ -48,6 +59,7 @@ export class TransientUiState {
     public getDebugDisplayString(): string {
         return `UI State: ${UIContextManager.getInstance().printCurrentContextStack()}
 Dragged Card: ${this.draggedCard ? this.draggedCard.data.name : 'None'}
+Dragged Consumable: ${this.draggedConsumable ? this.draggedConsumable.abstractConsumable.getDisplayName() : 'None'}
 Hovered Card: ${this.hoveredCard ? this.hoveredCard.data.name : 'None'}
 Hovered Intent: ${this.hoveredIntent ? this.hoveredIntent.intent.id : 'None'}
 Hovered Incoming Intent: ${this.hoveredIncomingIntent ? this.hoveredIncomingIntent.intent.id : 'None'}

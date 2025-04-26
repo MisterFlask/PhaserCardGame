@@ -1,6 +1,7 @@
 // src/subcomponents/CombatUIManager.ts
 
 import Phaser from 'phaser';
+import { AbstractConsumable } from '../../consumables/AbstractConsumable';
 import { AbstractEvent } from '../../events/AbstractEvent';
 import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
 import { AbstractReward } from '../../rewards/AbstractReward';
@@ -12,6 +13,7 @@ import { DepthManager } from '../../ui/DepthManager';
 import { EventWindow } from '../../ui/EventWindow';
 import { default as CombatSceneLayoutUtils, default as LayoutUtils } from '../../ui/LayoutUtils';
 import Menu from '../../ui/Menu';
+import { PhysicalConsumable } from '../../ui/PhysicalConsumable';
 import { SubtitleManager } from '../../ui/SubtitleManager';
 import { TextBox } from '../../ui/TextBox';
 import { TransientUiState } from '../../ui/TransientUiState';
@@ -41,6 +43,11 @@ class CombatUIManager {
     public dropZoneHighlight!: Phaser.GameObjects.Image;
     private debugMenu!: DebugMenu;
     private eventWindow: EventWindow | null = null;
+    
+    // Consumables related properties
+    public consumablesContainer!: Phaser.GameObjects.Container;
+    public activeConsumables: PhysicalConsumable[] = [];
+    public consumablesArea!: Phaser.GameObjects.Rectangle;
 
     private constructor(scene: Phaser.Scene) {
         this.scene = scene;
@@ -80,6 +87,7 @@ class CombatUIManager {
         this.createDebugOverlay();
         this.setupDebugOverlayToggle();
         this.createDebugMenu();
+        this.createConsumablesArea();
         
         this.setScrollFactorForAllElements();
     }
@@ -91,6 +99,8 @@ class CombatUIManager {
         this.battlefieldArea.setScrollFactor(0);
         this.handArea.setScrollFactor(0);
         this.dropZoneHighlight.setScrollFactor(0);
+        this.consumablesArea.setScrollFactor(0);
+        this.consumablesContainer.setScrollFactor(0);
 
         this.energyDisplay.setScrollFactor(0);
 
@@ -183,6 +193,12 @@ class CombatUIManager {
                     });
                     console.log("All enemies defeated for debugging purposes.");
                 }
+            },
+            {
+                text: 'debug:addTestConsumables',
+                callback: () => {
+                    this.addTestConsumables();
+                }
             }
         ];
 
@@ -222,6 +238,7 @@ class CombatUIManager {
     private toggleGameAreas(): void {
         this.battlefieldArea.setVisible(!this.battlefieldArea.visible);
         this.handArea.setVisible(!this.handArea.visible);
+        this.consumablesArea.setVisible(!this.consumablesArea.visible);
     }
 
     private createEndTurnButton(): void {
@@ -261,6 +278,7 @@ class CombatUIManager {
         }
 
         this.updateGameAreas();
+        this.updateConsumablesArea();
 
         const pileY = CombatSceneLayoutUtils.getPileY(this.scene);
         this.energyDisplay.setPosition(100, pileY);
@@ -331,6 +349,11 @@ class CombatUIManager {
         if (isOverHand) {
             console.log('Pointer is over the Hand Area');
         }
+
+        const isOverConsumables = this.consumablesArea.getBounds().contains(pointer.x, pointer.y);
+        if (isOverConsumables) {
+            console.log('Pointer is over the Consumables Area');
+        }
     }
 
     private updateGameAreas(): void {
@@ -340,6 +363,107 @@ class CombatUIManager {
 
         this.battlefieldArea.setPosition(gameWidth / 2, battlefieldY).setSize(gameWidth - 100, 300);
         this.handArea.setPosition(gameWidth / 2, handY).setSize(gameWidth - 100, 300);
+    }
+
+    private createConsumablesArea(): void {
+        const gameWidth = this.scene.scale.width;
+        const gameHeight = this.scene.scale.height;
+        // Position consumables on the left side of the screen
+        const consumablesX = 100;
+        const consumablesY = gameHeight / 2;
+
+        // Create a container for consumables
+        this.consumablesContainer = this.scene.add.container(consumablesX, consumablesY);
+        this.consumablesContainer.setDepth(DepthManager.getInstance().CARD_BASE);
+
+        // Create a visual area for consumables
+        this.consumablesArea = this.scene.add.rectangle(
+            consumablesX, 
+            consumablesY, 
+            150, 
+            400
+        )
+        .setStrokeStyle(3, 0x3366ff)
+        .setFillStyle(0x3366ff, 0.15)
+        .setVisible(false)
+        .setDepth(999);
+
+        // Defer loading consumables to ensure scene is properly initialized
+        this.scene.time.delayedCall(100, () => {
+            this.loadConsumablesFromGameState();
+        });
+    }
+
+    private updateConsumablesArea(): void {
+        const gameWidth = this.scene.scale.width;
+        const gameHeight = this.scene.scale.height;
+        const consumablesX = 100;
+        const consumablesY = gameHeight / 2;
+
+        this.consumablesContainer.setPosition(consumablesX, consumablesY);
+        this.consumablesArea.setPosition(consumablesX, consumablesY);
+
+        // Rearrange consumables if we have any
+        this.arrangeConsumables();
+    }
+
+    private loadConsumablesFromGameState(): void {
+        // Clear existing consumables
+        this.clearConsumables();
+
+        // Get consumables from game state
+        const gameState = GameState.getInstance();
+        if (gameState.consumables.length > 0) {
+            gameState.consumables.forEach(consumable => {
+                this.addConsumable(consumable);
+            });
+        }
+    }
+
+    public addConsumable(consumable: AbstractConsumable): PhysicalConsumable {
+        const index = this.activeConsumables.length;
+        const physicalConsumable = new PhysicalConsumable({
+            scene: this.scene,
+            x: 0,
+            y: index * 80, // Spacing between consumables
+            abstractConsumable: consumable,
+            baseSize: 64
+        });
+
+        this.activeConsumables.push(physicalConsumable);
+        this.consumablesContainer.add(physicalConsumable);
+        
+        // Setup event handling for manual dragging
+        physicalConsumable.on('consumable_dragstart', (consumable: PhysicalConsumable, pointer: Phaser.Input.Pointer) => {
+            this.scene.events.emit('consumable_dragstart', consumable, pointer);
+        });
+        
+        physicalConsumable.on('consumable_drag', (consumable: PhysicalConsumable, pointer: Phaser.Input.Pointer) => {
+            this.scene.events.emit('consumable_drag', consumable, pointer);
+        });
+        
+        physicalConsumable.on('consumable_dragend', (consumable: PhysicalConsumable, pointer: Phaser.Input.Pointer) => {
+            this.scene.events.emit('consumable_dragend', consumable, pointer);
+        });
+        
+        // Setup consumable to be activatable
+        physicalConsumable.currentlyActivatable = true;
+
+        return physicalConsumable;
+    }
+
+    public clearConsumables(): void {
+        this.activeConsumables.forEach(consumable => {
+            consumable.obliterate();
+        });
+        this.activeConsumables = [];
+        this.consumablesContainer.removeAll();
+    }
+
+    public arrangeConsumables(): void {
+        this.activeConsumables.forEach((consumable, index) => {
+            consumable.setPosition(0, index * 80);
+        });
     }
 
     private obliterate(): void {
@@ -365,6 +489,13 @@ class CombatUIManager {
         }
         if (this.resourceBackground) {
             this.resourceBackground.destroy();
+        }
+        this.clearConsumables();
+        if (this.consumablesArea) {
+            this.consumablesArea.destroy();
+        }
+        if (this.consumablesContainer) {
+            this.consumablesContainer.destroy();
         }
     }
 
@@ -453,6 +584,9 @@ class CombatUIManager {
                     buff.alterRewards(GameState.getInstance().currentLocation!.currentExpectedRewards);
             });
         }
+
+        // Load consumables at combat start
+        this.loadConsumablesFromGameState();
     }
 
     public onCombatEnd(): void {
@@ -482,10 +616,22 @@ class CombatUIManager {
 
     public disableInteractions(): void {
         this.endTurnButton.setButtonEnabled(false);
+        
+        // Disable consumable interactions
+        this.activeConsumables.forEach(consumable => {
+            consumable.disableInteractive();
+            consumable.currentlyActivatable = false;
+        });
     }
 
     public enableInteractions(): void {
         this.endTurnButton.setButtonEnabled(true);
+        
+        // Enable consumable interactions
+        this.activeConsumables.forEach(consumable => {
+            consumable.setInteractive();
+            consumable.currentlyActivatable = true;
+        });
     }
 
     public getPlayerHandCards(): IAbstractCard[] {
@@ -573,6 +719,27 @@ class CombatUIManager {
 
     private createDebugMenu(): void {
         this.debugMenu = new DebugMenu(this.scene);
+    }
+    
+    private addTestConsumables(): void {
+        // Clear existing consumables first
+        this.clearConsumables();
+        
+        // Import and use ConsumablesLibrary
+        const { ConsumablesLibrary } = require('../../consumables/ConsumablesLibrary');
+        const consumablesLibrary = ConsumablesLibrary.getInstance();
+        
+        // Get all available consumables
+        const allConsumables = consumablesLibrary.getAllConsumables();
+        
+        // Add to the game state and display
+        const gameState = GameState.getInstance();
+        gameState.consumables = allConsumables;
+        
+        // Add all consumables to the UI
+        this.loadConsumablesFromGameState();
+        
+        console.log(`Added ${allConsumables.length} test consumables for debugging`);
     }
 
     public showEvent(event: AbstractEvent): void {

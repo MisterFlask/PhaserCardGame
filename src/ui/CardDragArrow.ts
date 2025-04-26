@@ -62,11 +62,10 @@ export class CardDragArrow extends Phaser.GameObjects.Container {
         // Normalize direction
         direction.normalize();
 
-        // Calculate number of breadcrumbs needed
-        const numBreadcrumbs = Math.min(
-            Math.floor(distance / CardDragArrow.BREADCRUMB_SPACING),
-            CardDragArrow.MAX_BREADCRUMBS
-        );
+        // Calculate number of breadcrumbs needed (ensure at least one for any non-zero drag)
+        let rawCount = Math.floor(distance / CardDragArrow.BREADCRUMB_SPACING);
+        let numBreadcrumbs = rawCount > 0 ? rawCount : (distance > 0 ? 1 : 0);
+        numBreadcrumbs = Math.min(numBreadcrumbs, CardDragArrow.MAX_BREADCRUMBS);
 
         // Create breadcrumbs
         for (let i = 0; i < numBreadcrumbs; i++) {

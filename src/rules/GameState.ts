@@ -1,4 +1,5 @@
 import { AbstractConsumable } from '../consumables/AbstractConsumable';
+import { StrengthElixir } from '../consumables/StrengthElixir';
 import { Encounter } from '../encounters/EncounterManager';
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
 import { PlayerCargoHolder } from '../gamecharacters/cargo/PlayerCargoHolder';
@@ -64,7 +65,8 @@ export class GameState {
 
     public cargoHolder: PlayerCargoHolder = new PlayerCargoHolder();
 
-    public consumables: AbstractConsumable[] = [];
+    public consumables: AbstractConsumable[] = [new StrengthElixir()];
+    public maxConsumables: number = 3;
 
     public getRandomAllyCharacter(): PlayerCharacter {
         return this.currentRunCharacters[Math.floor(Math.random() * this.currentRunCharacters.length)];

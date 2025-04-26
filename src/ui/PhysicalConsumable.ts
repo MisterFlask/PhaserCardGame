@@ -5,6 +5,7 @@ import ImageUtils from '../utils/ImageUtils';
 import { ShadowedImage } from './ShadowedImage';
 import { TextBox } from './TextBox';
 import { TooltipAttachment } from './TooltipAttachment';
+import { TransientUiState } from './TransientUiState';
 import { UIContext } from './UIContextManager';
 
 export class PhysicalConsumable extends Phaser.GameObjects.Container {
@@ -21,6 +22,9 @@ export class PhysicalConsumable extends Phaser.GameObjects.Container {
     private selectOverlay!: Phaser.GameObjects.Image;
     currentlyActivatable: boolean = false;
     private target?: BaseCharacter;
+    private isDragging: boolean = false;
+    private dragStartPosition: { x: number, y: number } | null = null;
+    private transientUiState: TransientUiState;
 
     constructor({
         scene,
@@ -48,6 +52,7 @@ export class PhysicalConsumable extends Phaser.GameObjects.Container {
         this.abstractConsumable = abstractConsumable;
         this.baseSize = baseSize;
         this.usesLeft = abstractConsumable.uses;
+        this.transientUiState = TransientUiState.getInstance();
 
         const textureName = abstractConsumable.imageName.length > 0 ? abstractConsumable.imageName : this.getAbstractIcon(abstractConsumable);
         if (!scene.textures.exists(textureName)) {
@@ -121,14 +126,100 @@ export class PhysicalConsumable extends Phaser.GameObjects.Container {
     }
     
     setupInteractivity(): void {
-        // Remove the container's interactivity and set it on the shadowed image's main image instead
-        this.consumableImage.setInteractive()
-            .on('pointerdown', this.onPointerDown, this);
-
-        // Scale effects for hover
+        // Set up pointer events on the consumable image
         this.consumableImage
+            .setInteractive()
+            .on('pointerdown', this.onPointerDown, this)
+            .on('pointerup', this.onPointerUp, this)
             .on('pointerover', this.onPointerOver, this)
-            .on('pointerout', this.onPointerOut, this);
+            .on('pointerout', this.onPointerOut, this)
+            .on('pointermove', this.onPointerMove, this);
+    }
+
+    disableInteractive(): this {
+        this.consumableImage.disableInteractive();
+        return this;
+    }
+
+    setInteractive(): this {
+        this.setupInteractivity();
+        return this;
+    }
+
+    private onPointerDown = (pointer: Phaser.Input.Pointer): void => {
+        if (this.obliterated || !this.currentlyActivatable) return;
+        console.log('PhysicalConsumable: onPointerDown');
+
+        // Store the start position for dragging
+        this.dragStartPosition = { x: this.x, y: this.y };
+
+        // Start dragging
+        this.isDragging = true;
+        this.transientUiState.setDraggedConsumable(this);
+
+        // Notify input handler that this consumable drag has started (pass the object and pointer)
+        this.scene.events.emit('consumabledragstart', this, pointer);
+
+        // Emit events
+        this.emit('consumable_dragstart', this, pointer);
+        this.parentContainer?.emit('pointerdown', this);
+    }
+    
+    private onPointerUp = (pointer: Phaser.Input.Pointer): void => {
+        if (this.obliterated) return;
+        
+        console.log('PhysicalConsumable: onPointerUp');
+        
+        // Check if we were dragging
+        if (this.isDragging) {
+            this.isDragging = false;
+            this.emit('consumable_dragend', this, pointer);
+        } else {
+            // Handle as a click if we weren't dragging
+            this.handleClick(pointer);
+        }
+        
+        // Clear the dragged consumable in TransientUiState
+        this.transientUiState.setDraggedConsumable(null);
+    }
+    
+    private onPointerMove = (pointer: Phaser.Input.Pointer): void => {
+        if (this.obliterated) return;
+        
+        // If we're dragging, emit the drag event
+        if (this.isDragging) {
+            this.emit('consumable_drag', this, pointer);
+        }
+    }
+
+    private handleClick(pointer: Phaser.Input.Pointer): void {
+        // Check if we have a hovered card as a potential target
+        const hovered = this.transientUiState.hoveredCard;
+        
+        // If we have a hovered card (potential target) and it's a character, use it as target
+        if (hovered && hovered.data && hovered.data.typeTag === "BaseCharacter" && 'isDead' in hovered.data) {
+            const targetCharacter = hovered.data as BaseCharacter;
+            console.log(`Selected target for consumable: ${targetCharacter.name}`);
+            this.target = targetCharacter;
+        }
+        
+        // If we have a target set, try using the consumable
+        if (this.currentlyActivatable && this.target) {
+            const used = this.abstractConsumable.onUse(this.target);
+            if (used) {
+                this.usesLeft = Math.max(0, (this.usesLeft || 0) - 1);
+                this.updateUsesDisplay();
+                
+                if (this.usesLeft <= 0) {
+                    // Handle depleted consumable
+                    this.consumableImage.setAlpha(0.5);
+                    this.currentlyActivatable = false;
+                }
+                
+                // Clear target after use
+                this.target = undefined;
+            }
+        }
     }
 
     private onPointerOver = (): void => {
@@ -159,29 +250,6 @@ export class PhysicalConsumable extends Phaser.GameObjects.Container {
         });
         
         this.parentContainer?.emit('pointerout');
-    }
-
-    private onPointerDown = (): void => {
-        if (this.obliterated) return;
-        console.log('PhysicalConsumable: onPointerDown');
-        
-        if (this.currentlyActivatable && this.target) {
-            const used = this.abstractConsumable.onUse(this.target);
-            if (used) {
-                this.usesLeft = Math.max(0, (this.usesLeft || 0) - 1);
-                this.updateUsesDisplay();
-                
-                if (this.usesLeft <= 0) {
-                    // Handle depleted consumable
-                    this.consumableImage.setAlpha(0.5);
-                    this.currentlyActivatable = false;
-                }
-            }
-        }
-        
-        // Emit the event to parent
-        this?.emit('consumable_pointerdown', this);
-        this.parentContainer?.emit('pointerdown', this);
     }
 
     highlight(): void {
@@ -218,6 +286,10 @@ export class PhysicalConsumable extends Phaser.GameObjects.Container {
 
     setTarget(target: BaseCharacter): void {
         this.target = target;
+    }
+
+    getOriginalPosition(): { x: number, y: number } | null {
+        return this.dragStartPosition;
     }
 
     // Update the uses display

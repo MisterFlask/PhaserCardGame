@@ -12,10 +12,12 @@ import { CardDragArrow } from '../../ui/CardDragArrow';
 import { DepthManager } from '../../ui/DepthManager';
 import CombatSceneLayoutUtils from '../../ui/LayoutUtils';
 import { PhysicalCard } from '../../ui/PhysicalCard';
+import { PhysicalConsumable } from '../../ui/PhysicalConsumable';
 import { TransientUiState } from '../../ui/TransientUiState';
 import { UIContext, UIContextManager } from '../../ui/UIContextManager';
 import { ActionManager } from '../../utils/ActionManager';
 import CombatCardManager from './CombatCardManager';
+import CombatUIManager from './CombatUiManager';
 
 class CombatInputHandler {
     private scene: Phaser.Scene;
@@ -26,6 +28,11 @@ class CombatInputHandler {
     private transientUiState = TransientUiState.getInstance();
     private cardDragArrow: CardDragArrow | null = null;
     private dragStartPosition: { x: number, y: number } | null = null;
+    
+    // Consumable-related properties
+    private consumableDragArrow: CardDragArrow | null = null;
+    private draggedConsumable: PhysicalConsumable | null = null;
+    private originalConsumablePosition: { x: number; y: number } | null = null;
 
     constructor(scene: Phaser.Scene, cardManager: CombatCardManager) {
         this.scene = scene;
@@ -42,9 +49,13 @@ class CombatInputHandler {
         this.scene.input.on('dragend', this.handleDragEnd, this);
         this.scene.input.on('gameobjectover', this.handleGameObjectOver, this);
         this.scene.input.on('gameobjectout', this.handleGameObjectOut, this);
+        // Global pointer for consumables
+        this.scene.input.on('pointermove', this.handleGlobalConsumableMove, this);
+        this.scene.input.on('pointerup', this.handleGlobalConsumableUp, this);
+        // Listen for consumable drag start to show arrow
+        this.scene.events.on('consumabledragstart', this.handleConsumableDragStartGlobal, this);
 
         this.scene.events.on('shutdown', this.removeEventListeners, this);
-
     }
 
     private removeEventListeners(): void {
@@ -53,9 +64,10 @@ class CombatInputHandler {
         this.scene.input.off('dragend', this.handleDragEnd, this);
         this.scene.input.off('gameobjectover', this.handleGameObjectOver, this);
         this.scene.input.off('gameobjectout', this.handleGameObjectOut, this);
-
+        this.scene.input.off('pointermove', this.handleGlobalConsumableMove, this);
+        this.scene.input.off('pointerup', this.handleGlobalConsumableUp, this);
+        this.scene.events.off('consumabledragstart', this.handleConsumableDragStartGlobal, this);
         this.scene.events.off('shutdown', this.removeEventListeners, this);
-
     }
 
     private setupCardClickListeners(): void {
@@ -101,32 +113,35 @@ class CombatInputHandler {
     private handleDragStart(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject): void {
         if (!UIContextManager.getInstance().isContext(UIContext.COMBAT)) return;
 
+        // Handle card dragging
         const card = this.getCardFromGameObject(gameObject);
-        if (!card) return;
+        if (card) {
+            // Store the original position
+            this.dragStartPosition = {
+                x: card.container.x,
+                y: card.container.y
+            };
 
-        // Store the original position
-        this.dragStartPosition = {
-            x: card.container.x,
-            y: card.container.y
-        };
+            // Create the drag arrow if it doesn't exist
+            if (!this.cardDragArrow) {
+                this.cardDragArrow = new CardDragArrow(this.scene, 0, 0);
+                this.cardDragArrow.setDepth(DepthManager.getInstance().COMBAT_UI);
+            }
 
-        // Create the drag arrow if it doesn't exist
-        if (!this.cardDragArrow) {
-            this.cardDragArrow = new CardDragArrow(this.scene, 0, 0);
-            this.cardDragArrow.setDepth(DepthManager.getInstance().COMBAT_UI);
+            // Set up the arrow
+            this.cardDragArrow.setStartPoint(card.container.x, card.container.y);
+            this.cardDragArrow.setEndPoint(pointer.x, pointer.y);
+            this.cardDragArrow.show();
+
+            // Set up the drag state
+            this.transientUiState.setDraggedCard(card);
         }
-
-        // Set up the arrow
-        this.cardDragArrow.setStartPoint(card.container.x, card.container.y);
-        this.cardDragArrow.setEndPoint(pointer.x, pointer.y);
-        this.cardDragArrow.show();
-
-        // Set up the drag state
-        this.transientUiState.setDraggedCard(card);
     }
 
     private handleDrag(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject, dragX: number, dragY: number): void {
         if (!UIContextManager.getInstance().isContext(UIContext.COMBAT)) return;
+        
+        // Handle card dragging
         if (this.transientUiState.draggedCard && this.cardDragArrow) {
             // Update the arrow end point instead of moving the card
             this.cardDragArrow.setEndPoint(pointer.x, pointer.y);
@@ -147,70 +162,73 @@ class CombatInputHandler {
     private handleDragEnd(pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject): void {
         if (!UIContextManager.getInstance().isContext(UIContext.COMBAT)) return;
 
-        // Hide and clean up the arrow
-        if (this.cardDragArrow) {
-            this.cardDragArrow.hide();
-        }
-
-        console.log('handleDragEnd: Starting drag end handling');
-
-        const draggedCard = this.transientUiState.draggedCard;
-        if (!draggedCard) {
-            console.log('handleDragEnd: No card being dragged, resetting state');
-            this.resetDragState()
-            return;
-        }
-
-        const isPlayable = draggedCard.data instanceof PlayableCard;
-        console.log(`handleDragEnd: Card ${draggedCard.data.name} isPlayable: ${isPlayable}`);
-
-        let wasPlayed = false;
-        var target = this.transientUiState.hoveredCard?.data as BaseCharacter;
-        if (isPlayable) {
-            const playableCard = draggedCard.data as PlayableCard;
-            const targetingType = this.getTargetingType(playableCard);
-            console.log(`handleDragEnd: Card targeting type: ${targetingType}`);
-            var canPlayResult = ActionManager.getInstance().getCanPlayCardResult(draggedCard, target)
-            if (targetingType === TargetingType.NO_TARGETING && !canPlayResult.canPlay) {
-                console.log('handleDragEnd: Cannot play no-target card');
-                ActionManager.getInstance().displaySubtitle_NoQueue(canPlayResult.reason || "Unknown reason", 2000);
-                wasPlayed = false;
+        // Handle card drag end
+        if (this.transientUiState.draggedCard) {
+            // Hide and clean up the arrow
+            if (this.cardDragArrow) {
+                this.cardDragArrow.hide();
             }
-            else if (!canPlayResult.canPlay) {
-                console.log('handleDragEnd: Cannot play card on target');
-                ActionManager.getInstance().displaySubtitle_NoQueue(canPlayResult.reason || "Unknown reason", 2000);
-                wasPlayed = false;
+
+            console.log('handleDragEnd: Starting drag end handling');
+
+            const draggedCard = this.transientUiState.draggedCard;
+            if (!draggedCard) {
+                console.log('handleDragEnd: No card being dragged, resetting state');
+                this.resetDragState()
+                return;
             }
-            else if (targetingType === TargetingType.NO_TARGETING) {
-                const droppedOnBattlefield = CombatSceneLayoutUtils.isDroppedOnBattlefield(this.scene, pointer);
-                console.log(`handleDragEnd: No-target card dropped on battlefield: ${droppedOnBattlefield}`);
-                if (droppedOnBattlefield) {
-                    wasPlayed = true;
-                    this.playCardOnBattlefield(draggedCard);
+
+            const isPlayable = draggedCard.data instanceof PlayableCard;
+            console.log(`handleDragEnd: Card ${draggedCard.data.name} isPlayable: ${isPlayable}`);
+
+            let wasPlayed = false;
+            var target = this.transientUiState.hoveredCard?.data as BaseCharacter;
+            if (isPlayable) {
+                const playableCard = draggedCard.data as PlayableCard;
+                const targetingType = this.getTargetingType(playableCard);
+                console.log(`handleDragEnd: Card targeting type: ${targetingType}`);
+                var canPlayResult = ActionManager.getInstance().getCanPlayCardResult(draggedCard, target)
+                if (targetingType === TargetingType.NO_TARGETING && !canPlayResult.canPlay) {
+                    console.log('handleDragEnd: Cannot play no-target card');
+                    ActionManager.getInstance().displaySubtitle_NoQueue(canPlayResult.reason || "Unknown reason", 2000);
+                    wasPlayed = false;
                 }
-            } else if (target) {
-                console.log(`handleDragEnd: Checking if can play on target: ${target.name}`);
-                if (this.transientUiState.hoveredCard && this.isValidTarget(playableCard, this.transientUiState.hoveredCard.data)) {
-                    console.log('handleDragEnd: Valid target found, playing card');
-                    wasPlayed = true;
-                    this.playCardOnTarget(playableCard, target);
+                else if (!canPlayResult.canPlay) {
+                    console.log('handleDragEnd: Cannot play card on target');
+                    ActionManager.getInstance().displaySubtitle_NoQueue(canPlayResult.reason || "Unknown reason", 2000);
+                    wasPlayed = false;
                 }
-            }else{
-                console.log('handleDragEnd: No valid target found');
-                wasPlayed = false;
+                else if (targetingType === TargetingType.NO_TARGETING) {
+                    const droppedOnBattlefield = CombatSceneLayoutUtils.isDroppedOnBattlefield(this.scene, pointer);
+                    console.log(`handleDragEnd: No-target card dropped on battlefield: ${droppedOnBattlefield}`);
+                    if (droppedOnBattlefield) {
+                        wasPlayed = true;
+                        this.playCardOnBattlefield(draggedCard);
+                    }
+                } else if (target) {
+                    console.log(`handleDragEnd: Checking if can play on target: ${target.name}`);
+                    if (this.transientUiState.hoveredCard && this.isValidTarget(playableCard, this.transientUiState.hoveredCard.data)) {
+                        console.log('handleDragEnd: Valid target found, playing card');
+                        wasPlayed = true;
+                        this.playCardOnTarget(playableCard, target);
+                    }
+                }else{
+                    console.log('handleDragEnd: No valid target found');
+                    wasPlayed = false;
+                }
             }
-        }
 
-        console.log(`handleDragEnd: Card was${wasPlayed ? '' : ' not'} played`);
-        if (!wasPlayed) {
-            this.animateCardBack();
-        } else {
-            this.removeCardFromHand(draggedCard || undefined);
-            this.addCardToDiscardPile(draggedCard!);
-        }
+            console.log(`handleDragEnd: Card was${wasPlayed ? '' : ' not'} played`);
+            if (!wasPlayed) {
+                this.animateCardBack();
+            } else {
+                this.removeCardFromHand(draggedCard || undefined);
+                this.addCardToDiscardPile(draggedCard!);
+            }
 
-        console.log('handleDragEnd: Resetting drag state');
-        this.resetDragState();
+            console.log('handleDragEnd: Resetting drag state');
+            this.resetDragState();
+        }
     }
 
     private handleGameObjectOver = (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject): void => {
@@ -241,6 +259,27 @@ class CombatInputHandler {
         return card.isValidTarget(target);
     }
 
+    private isValidConsumableTarget(consumable: any, target: BaseCharacter): boolean {
+        // Check targeting type of consumable
+        const targetingType = consumable.targetingType;
+        
+        // Cannot target dead characters
+        if (target.isDead()) {
+            return false;
+        }
+
+        // Handle different targeting types
+        switch (targetingType) {
+            case TargetingType.ALLY:
+                return target.isPlayerCharacter();
+            case TargetingType.ENEMY:
+                return !target.isPlayerCharacter();
+            case TargetingType.NO_TARGETING:
+                return false; // No-targeting consumables shouldn't need a target
+            default:
+                return false;
+        }
+    }
 
     private playCardOnBattlefield(card: PhysicalCard): void {
         ActionManager.getInstance().playCard(card);
@@ -302,6 +341,25 @@ class CombatInputHandler {
         }
     }
 
+    private animateConsumableBack(consumable: PhysicalConsumable): void {
+        if (consumable) {
+            const originalPosition = consumable.getOriginalPosition();
+            if (originalPosition) {
+                this.scene.tweens.add({
+                    targets: consumable,
+                    x: originalPosition.x,
+                    y: originalPosition.y,
+                    duration: 300,
+                    ease: 'Power2',
+                    onComplete: () => {
+                        // Rearrange all consumables
+                        CombatUIManager.getInstance().arrangeConsumables();
+                    }
+                });
+            }
+        }
+    }
+
     private resetDragState(): void {
         if (this.cardDragArrow) {
             this.cardDragArrow.destroy();
@@ -343,11 +401,9 @@ class CombatInputHandler {
         return null;
     }
 
-
     public removeCardClickListener(listener: (card: AbstractCard) => void): void {
         this.cardClickListeners = this.cardClickListeners.filter(l => l !== listener);
     }
-
 
     private toggleInteraction = (enable: boolean): void => {
         this.isInteractionEnabled = enable;
@@ -355,6 +411,10 @@ class CombatInputHandler {
             // Reset any ongoing interactions
             if (this.transientUiState.draggedCard) {
                 this.handleDragEnd(null as any, null as any);
+            }
+            if (this.transientUiState.draggedConsumable) {
+                this.animateConsumableBack(this.transientUiState.draggedConsumable);
+                this.transientUiState.setDraggedConsumable(null);
             }
         }
         
@@ -378,9 +438,96 @@ class CombatInputHandler {
                 card.container.removeInteractive();
             }
         });
+
+        // Disable/enable interactions for consumables
+        const uiManager = CombatUIManager.getInstance();
+        uiManager.activeConsumables.forEach(consumable => {
+            if (enable) {
+                consumable.setupInteractivity();
+                consumable.currentlyActivatable = true;
+            } else {
+                consumable.disableInteractive();
+                consumable.currentlyActivatable = false;
+            }
+        });
     }
 
     public cleanup(): void {
+        this.resetDragState();
+        if (this.transientUiState.draggedConsumable) {
+            this.transientUiState.setDraggedConsumable(null);
+        }
+    }
+
+    private handleGlobalConsumableMove(pointer: Phaser.Input.Pointer): void {
+        const consumable = this.transientUiState.draggedConsumable;
+        if (consumable && this.cardDragArrow) {
+            // Update arrow endpoint
+            this.cardDragArrow.setEndPoint(pointer.x, pointer.y);
+            this.checkCardUnderPointer(pointer);
+
+            // Update arrow color based on valid target
+            const hoveredCard = this.transientUiState.hoveredCard;
+            let valid = false;
+            if (hoveredCard && hoveredCard.data instanceof BaseCharacter) {
+                valid = this.isValidConsumableTarget(consumable.abstractConsumable, hoveredCard.data);
+            }
+            this.cardDragArrow.setValidTarget(valid);
+        }
+    }
+
+    private handleGlobalConsumableUp(pointer: Phaser.Input.Pointer): void {
+        const consumable = this.transientUiState.draggedConsumable;
+        if (consumable && this.cardDragArrow) {
+            // Hide arrow
+            this.cardDragArrow.hide();
+
+            // Try to use consumable
+            const hoveredCard = this.transientUiState.hoveredCard;
+            if (hoveredCard && hoveredCard.data instanceof BaseCharacter) {
+                const target = hoveredCard.data as BaseCharacter;
+                if (this.isValidConsumableTarget(consumable.abstractConsumable, target)) {
+                    const used = consumable.abstractConsumable.onUse(target);
+                    if (used) {
+                        consumable.usesLeft = Math.max(0, (consumable.usesLeft || 0) - 1);
+                        consumable.updateUsesDisplay();
+                        if (consumable.usesLeft <= 0) {
+                            consumable.consumableImage.setAlpha(0.5);
+                            consumable.currentlyActivatable = false;
+                        }
+                    } else {
+                        ActionManager.getInstance().displaySubtitle_NoQueue('Cannot use consumable', 2000);
+                    }
+                } else {
+                    ActionManager.getInstance().displaySubtitle_NoQueue('Invalid target', 2000);
+                }
+            }
+            // Animate back
+            this.animateConsumableBack(consumable);
+            // Reset state
+            this.transientUiState.setDraggedConsumable(null);
+        }
+    }
+
+    private handleConsumableDragStartGlobal(consumable: PhysicalConsumable, pointer: Phaser.Input.Pointer): void {
+        if (!UIContextManager.getInstance().isContext(UIContext.COMBAT)) return;
+        // Create the drag arrow if it doesn't exist
+        if (!this.cardDragArrow) {
+            this.cardDragArrow = new CardDragArrow(this.scene, 0, 0);
+            this.cardDragArrow.setDepth(DepthManager.getInstance().COMBAT_UI);
+        }
+        // Compute the absolute start position of the consumable
+        let startX = consumable.x;
+        let startY = consumable.y;
+        if (consumable.parentContainer) {
+            startX += consumable.parentContainer.x;
+            startY += consumable.parentContainer.y;
+        }
+        // Initialize arrow at consumable center
+        this.cardDragArrow.setStartPoint(startX, startY);
+        // Use pointer position as initial end point
+        this.cardDragArrow.setEndPoint(pointer.x, pointer.y);
+        this.cardDragArrow.show();
     }
 }
 

@@ -428,5 +428,4 @@ export enum TargetingType{
     ALLY = "ALLY",
     ENEMY = "ENEMY",
     NO_TARGETING = "NO_TARGETING",
-    SELF = "SELF"
 }
