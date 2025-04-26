@@ -477,36 +477,41 @@ class CombatInputHandler {
     }
 
     private handleGlobalConsumableUp(pointer: Phaser.Input.Pointer): void {
-        const consumable = this.transientUiState.draggedConsumable;
-        if (consumable && this.cardDragArrow) {
-            // Hide arrow
+        // Always hide and destroy any arrow (for cards or consumables)
+        if (this.cardDragArrow) {
             this.cardDragArrow.hide();
+            this.cardDragArrow.destroy();
+            this.cardDragArrow = null;
+        }
+        const consumable = this.transientUiState.draggedConsumable;
+        if (!consumable) {
+            return;
+        }
 
-            // Try to use consumable
-            const hoveredCard = this.transientUiState.hoveredCard;
-            if (hoveredCard && hoveredCard.data instanceof BaseCharacter) {
-                const target = hoveredCard.data as BaseCharacter;
-                if (this.isValidConsumableTarget(consumable.abstractConsumable, target)) {
-                    const used = consumable.abstractConsumable.onUse(target);
-                    if (used) {
-                        consumable.usesLeft = Math.max(0, (consumable.usesLeft || 0) - 1);
-                        consumable.updateUsesDisplay();
-                        if (consumable.usesLeft <= 0) {
-                            consumable.consumableImage.setAlpha(0.5);
-                            consumable.currentlyActivatable = false;
-                        }
-                    } else {
-                        ActionManager.getInstance().displaySubtitle_NoQueue('Cannot use consumable', 2000);
+        // Try to use consumable
+        const hoveredCard = this.transientUiState.hoveredCard;
+        if (hoveredCard && hoveredCard.data instanceof BaseCharacter) {
+            const target = hoveredCard.data as BaseCharacter;
+            if (this.isValidConsumableTarget(consumable.abstractConsumable, target)) {
+                const used = consumable.abstractConsumable.onUse(target);
+                if (used) {
+                    consumable.usesLeft = Math.max(0, (consumable.usesLeft || 0) - 1);
+                    consumable.updateUsesDisplay();
+                    if (consumable.usesLeft <= 0) {
+                        consumable.consumableImage.setAlpha(0.5);
+                        consumable.currentlyActivatable = false;
                     }
                 } else {
-                    ActionManager.getInstance().displaySubtitle_NoQueue('Invalid target', 2000);
+                    ActionManager.getInstance().displaySubtitle_NoQueue('Cannot use consumable', 2000);
                 }
+            } else {
+                ActionManager.getInstance().displaySubtitle_NoQueue('Invalid target', 2000);
             }
-            // Animate back
-            this.animateConsumableBack(consumable);
-            // Reset state
-            this.transientUiState.setDraggedConsumable(null);
         }
+        // Animate back
+        this.animateConsumableBack(consumable);
+        // Reset state
+        this.transientUiState.setDraggedConsumable(null);
     }
 
     private handleConsumableDragStartGlobal(consumable: PhysicalConsumable, pointer: Phaser.Input.Pointer): void {

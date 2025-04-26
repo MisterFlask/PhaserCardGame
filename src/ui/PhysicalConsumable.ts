@@ -167,9 +167,9 @@ export class PhysicalConsumable extends Phaser.GameObjects.Container {
     
     private onPointerUp = (pointer: Phaser.Input.Pointer): void => {
         if (this.obliterated) return;
-        
+
         console.log('PhysicalConsumable: onPointerUp');
-        
+
         // Check if we were dragging
         if (this.isDragging) {
             this.isDragging = false;
@@ -178,9 +178,6 @@ export class PhysicalConsumable extends Phaser.GameObjects.Container {
             // Handle as a click if we weren't dragging
             this.handleClick(pointer);
         }
-        
-        // Clear the dragged consumable in TransientUiState
-        this.transientUiState.setDraggedConsumable(null);
     }
     
     private onPointerMove = (pointer: Phaser.Input.Pointer): void => {
