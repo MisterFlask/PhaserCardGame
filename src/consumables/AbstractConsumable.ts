@@ -24,7 +24,7 @@ export abstract class AbstractConsumable {
      * Initialize the consumable with default values
      */
     public init(): void {
-        if (!this.imageName) {
+        if (!this.imageName || this.imageName.length === 0) {
             this.imageName = ImageUtils.getDeterministicAbstractPlaceholder(this.getDisplayName());
             this.tint = this.generateSeededRandomColor();
         }

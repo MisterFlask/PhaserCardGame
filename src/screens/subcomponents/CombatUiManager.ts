@@ -49,6 +49,9 @@ class CombatUIManager {
     public activeConsumables: PhysicalConsumable[] = [];
     public consumablesArea!: Phaser.GameObjects.Rectangle;
 
+    private slotBoxesContainer!: Phaser.GameObjects.Container;
+    private slotBoxRefs: Phaser.GameObjects.Rectangle[] = [];
+
     private constructor(scene: Phaser.Scene) {
         this.scene = scene;
         SubtitleManager.setInstance(scene);
@@ -60,10 +63,15 @@ class CombatUIManager {
         this.scene.events.once('shutdown', this.obliterate, this);
         this.scene.events.once('destroy', this.obliterate, this);
         this.scene.events.on('abstractEvent:launch', this.onAbstractEventLaunch, this);
+        this.scene.events.on('consumable_depleted', this.onConsumableDepleted, this);
     }
 
-    onAbstractEventLaunch(event: AbstractEvent): void {
+    public onAbstractEventLaunch(event: AbstractEvent): void {
         this.showEvent(event);
+    }
+
+    private onConsumableDepleted(abstractConsumable: AbstractConsumable): void {
+        this.loadConsumablesFromGameState();
     }
 
     public static getInstance(): CombatUIManager {
@@ -101,6 +109,7 @@ class CombatUIManager {
         this.dropZoneHighlight.setScrollFactor(0);
         this.consumablesArea.setScrollFactor(0);
         this.consumablesContainer.setScrollFactor(0);
+        this.slotBoxesContainer.setScrollFactor(0);
 
         this.energyDisplay.setScrollFactor(0);
 
@@ -239,6 +248,8 @@ class CombatUIManager {
         this.battlefieldArea.setVisible(!this.battlefieldArea.visible);
         this.handArea.setVisible(!this.handArea.visible);
         this.consumablesArea.setVisible(!this.consumablesArea.visible);
+        // Toggle placeholder slot boxes along with consumable area
+        this.slotBoxesContainer.setVisible(!this.slotBoxesContainer.visible);
     }
 
     private createEndTurnButton(): void {
@@ -388,6 +399,22 @@ class CombatUIManager {
         .setVisible(false)
         .setDepth(999);
 
+        // Create placeholder boxes for consumable slots
+        this.slotBoxesContainer = this.scene.add.container(consumablesX, consumablesY);
+        this.slotBoxesContainer.setDepth(DepthManager.getInstance().CARD_BASE - 1);
+        this.slotBoxesContainer.setVisible(true);
+        const maxSlots = GameState.getInstance().maxConsumables;
+        const slotSize = 64;
+        const spacingY = slotSize + 16;
+        this.slotBoxRefs = [];
+        for (let i = 0; i < maxSlots; i++) {
+            const slotBox = this.scene.add.rectangle(0, i * spacingY, slotSize, slotSize)
+                .setStrokeStyle(2, 0xffffff)
+                .setOrigin(0.5, 0.5);
+            this.slotBoxesContainer.add(slotBox);
+            this.slotBoxRefs.push(slotBox);
+        }
+
         // Defer loading consumables to ensure scene is properly initialized
         this.scene.time.delayedCall(100, () => {
             this.loadConsumablesFromGameState();
@@ -402,6 +429,7 @@ class CombatUIManager {
 
         this.consumablesContainer.setPosition(consumablesX, consumablesY);
         this.consumablesArea.setPosition(consumablesX, consumablesY);
+        this.slotBoxesContainer.setPosition(consumablesX, consumablesY);
 
         // Rearrange consumables if we have any
         this.arrangeConsumables();
@@ -453,11 +481,13 @@ class CombatUIManager {
     }
 
     public clearConsumables(): void {
+        // Destroy each physical consumable
         this.activeConsumables.forEach(consumable => {
             consumable.obliterate();
         });
         this.activeConsumables = [];
-        this.consumablesContainer.removeAll();
+        // Remove and destroy all children from the container to clear visuals
+        this.consumablesContainer.removeAll(true);
     }
 
     public arrangeConsumables(): void {
@@ -470,6 +500,7 @@ class CombatUIManager {
         this.scene.input.off('pointermove', this.handlePointerMove, this);
         this.scene.events.off('disableInteractions', this.disableInteractions, this);
         this.scene.events.off('enableInteractions', this.enableInteractions, this);
+        this.scene.events.off('consumable_depleted', this.onConsumableDepleted, this);
         this.resourceIndicators.forEach(display => display.destroy());
         this.resourceIndicators = [];
         this.scene.events.off('update', this.updateResourceIndicators, this);
@@ -496,6 +527,9 @@ class CombatUIManager {
         }
         if (this.consumablesContainer) {
             this.consumablesContainer.destroy();
+        }
+        if (this.slotBoxesContainer) {
+            this.slotBoxesContainer.destroy();
         }
     }
 

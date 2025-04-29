@@ -27,12 +27,6 @@ class CombatInputHandler {
     private isInteractionEnabled: boolean = true;
     private transientUiState = TransientUiState.getInstance();
     private cardDragArrow: CardDragArrow | null = null;
-    private dragStartPosition: { x: number, y: number } | null = null;
-    
-    // Consumable-related properties
-    private consumableDragArrow: CardDragArrow | null = null;
-    private draggedConsumable: PhysicalConsumable | null = null;
-    private originalConsumablePosition: { x: number; y: number } | null = null;
 
     constructor(scene: Phaser.Scene, cardManager: CombatCardManager) {
         this.scene = scene;
@@ -116,11 +110,6 @@ class CombatInputHandler {
         // Handle card dragging
         const card = this.getCardFromGameObject(gameObject);
         if (card) {
-            // Store the original position
-            this.dragStartPosition = {
-                x: card.container.x,
-                y: card.container.y
-            };
 
             // Create the drag arrow if it doesn't exist
             if (!this.cardDragArrow) {
@@ -365,7 +354,6 @@ class CombatInputHandler {
             this.cardDragArrow.destroy();
             this.cardDragArrow = null;
         }
-        this.dragStartPosition = null;
         this.transientUiState.setDraggedCard(null);
         this.transientUiState.setHoveredCard(null);
         this.transientUiState.setHoveredIntent(null);

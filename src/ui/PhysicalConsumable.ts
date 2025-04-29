@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { AbstractConsumable } from '../consumables/AbstractConsumable';
 import { BaseCharacter } from '../gamecharacters/BaseCharacter';
+import { GameState } from '../rules/GameState';
 import ImageUtils from '../utils/ImageUtils';
 import { ShadowedImage } from './ShadowedImage';
 import { TextBox } from './TextBox';
@@ -14,6 +15,7 @@ export class PhysicalConsumable extends Phaser.GameObjects.Container {
     shadowImage: Phaser.GameObjects.Image;
     private tooltipAttachment: TooltipAttachment;
     priceBox?: TextBox;
+    public showPrice: boolean = true;
     abstractConsumable: AbstractConsumable;
     private _isHighlighted: boolean = false;
     private obliterated: boolean = false;
@@ -32,7 +34,8 @@ export class PhysicalConsumable extends Phaser.GameObjects.Container {
         y = 0,
         abstractConsumable,
         price,
-        baseSize = 64
+        baseSize = 64,
+        showPrice = false
     }: {
         scene: Phaser.Scene;
         x?: number;
@@ -40,6 +43,7 @@ export class PhysicalConsumable extends Phaser.GameObjects.Container {
         abstractConsumable: AbstractConsumable;
         price?: number;
         baseSize: number;
+        showPrice?: boolean;    
     }) {
         super(scene, x, y);
 
@@ -98,6 +102,7 @@ export class PhysicalConsumable extends Phaser.GameObjects.Container {
             tooltipText: tooltipText
         });
 
+        /*
         // Add price box if needed
         this.priceBox = new TextBox({
             scene,
@@ -108,6 +113,8 @@ export class PhysicalConsumable extends Phaser.GameObjects.Container {
         });
         this.add(this.priceBox);
         this.priceBox.setDepth(1);
+        this.priceBox.setVisible(this.showPrice);
+        */
 
         // Add uses counter if needed
         if (this.usesLeft && this.usesLeft > 1) {
@@ -205,12 +212,19 @@ export class PhysicalConsumable extends Phaser.GameObjects.Container {
             const used = this.abstractConsumable.onUse(this.target);
             if (used) {
                 this.usesLeft = Math.max(0, (this.usesLeft || 0) - 1);
+                // Update the abstract consumable uses to reflect UI state
+                this.abstractConsumable.uses = this.usesLeft;
                 this.updateUsesDisplay();
                 
                 if (this.usesLeft <= 0) {
-                    // Handle depleted consumable
-                    this.consumableImage.setAlpha(0.5);
-                    this.currentlyActivatable = false;
+                    // Remove consumable from game state
+                    const gameState = GameState.getInstance();
+                    gameState.consumables = gameState.consumables.filter(c => c !== this.abstractConsumable);
+                    // Immediately remove this UI element
+                    this.obliterate();
+                    // Notify UI manager to clear and reload consumable slots
+                    this.scene.events.emit('consumable_depleted', this.abstractConsumable);
+                    return;
                 }
                 
                 // Clear target after use
@@ -268,8 +282,10 @@ export class PhysicalConsumable extends Phaser.GameObjects.Container {
     // Add lifecycle logging for debugging
     destroy(): void {
         console.log(`Destroying PhysicalConsumable for: ${this.abstractConsumable.getDisplayName()}`);
-        this.selectOverlay?.destroy();
-        this.tooltipAttachment?.destroy(); // Destroy tooltip attachment
+        // Remove and destroy all child game objects (image, overlays, texts)
+        this.removeAll(true);
+        // Destroy the tooltip attachment if it created separate game objects
+        this.tooltipAttachment?.destroy();
         super.destroy();
     }
 
@@ -324,5 +340,13 @@ export class PhysicalConsumable extends Phaser.GameObjects.Container {
         // Update tooltip
         const tooltipText = this.generateTooltip(this.abstractConsumable);
         this.tooltipAttachment.updateText(tooltipText);
+    }
+
+    togglePriceDisplay(enabled: boolean): any {
+        this.showPrice = enabled;
+        if (this.priceBox) {
+            this.priceBox.setVisible(enabled);
+        }
+        return this;
     }
 } 

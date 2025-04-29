@@ -13,7 +13,6 @@ export class StrengthElixir extends AbstractConsumable {
         this.rarity = EntityRarity.UNCOMMON;
         this.basePrice = 125;
         this.uses = 2; // Can be used twice in a combat
-        this.imageName = "strength_elixir"; // Assuming this texture exists
         this.tint = 0xCC3300; // Orange-red tint for strength
     }
 

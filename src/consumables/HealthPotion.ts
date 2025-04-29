@@ -12,7 +12,6 @@ export class HealthPotion extends AbstractConsumable {
         this.rarity = EntityRarity.COMMON;
         this.basePrice = 75;
         this.uses = 1;
-        this.imageName = "health_potion"; // Assuming this texture exists
         this.tint = 0xFF5555; // Red tint for health potion
     }
 
