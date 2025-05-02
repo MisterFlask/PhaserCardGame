@@ -7,12 +7,9 @@ import { ShadowedImage } from './ShadowedImage';
 import { TextBox } from './TextBox';
 import { TooltipAttachment } from './TooltipAttachment';
 import { TransientUiState } from './TransientUiState';
-import { UIContext } from './UIContextManager';
 
 export class PhysicalConsumable extends Phaser.GameObjects.Container {
-    contextRelevant?: UIContext;
-    consumableImage: Phaser.GameObjects.Image;
-    shadowImage: Phaser.GameObjects.Image;
+    shadowedImage: ShadowedImage;
     private tooltipAttachment: TooltipAttachment;
     priceBox?: TextBox;
     public showPrice: boolean = true;
@@ -63,17 +60,14 @@ export class PhysicalConsumable extends Phaser.GameObjects.Container {
             console.error(`Texture not found for key: ${textureName}`);
         }
 
-        const shadowedImage = new ShadowedImage({
+        this.shadowedImage = new ShadowedImage({
             scene,
             texture: textureName,
             displaySize: baseSize,
             shadowOffset: 2,
             tint: abstractConsumable.tint
         });
-        this.add(shadowedImage);
-        
-        this.consumableImage = shadowedImage.mainImage;
-        this.shadowImage = shadowedImage.shadowImage;
+        this.add(this.shadowedImage);
 
         // Add select overlay
         this.selectOverlay = scene.add.image(0, 0, 'square');
@@ -98,7 +92,7 @@ export class PhysicalConsumable extends Phaser.GameObjects.Container {
         const tooltipText = this.generateTooltip(abstractConsumable);
         this.tooltipAttachment = new TooltipAttachment({
             scene,
-            container: this.consumableImage,
+            container: this.shadowedImage.mainImage,
             tooltipText: tooltipText
         });
 
@@ -129,12 +123,12 @@ export class PhysicalConsumable extends Phaser.GameObjects.Container {
     }
 
     private generateTooltip(abstractConsumable: AbstractConsumable): string {
-        return `[color=#gold]${abstractConsumable.getDisplayName()}[/color]\n${abstractConsumable.getDescription()}`;
+        return `[b][color=gold]${abstractConsumable.getDisplayName()}[/color][/b]\n\n${abstractConsumable.getDescription()}`;
     }
     
     setupInteractivity(): void {
         // Set up pointer events on the consumable image
-        this.consumableImage
+        this.shadowedImage.mainImage
             .setInteractive()
             .on('pointerdown', this.onPointerDown, this)
             .on('pointerup', this.onPointerUp, this)
@@ -144,7 +138,7 @@ export class PhysicalConsumable extends Phaser.GameObjects.Container {
     }
 
     disableInteractive(): this {
-        this.consumableImage.disableInteractive();
+        this.shadowedImage.mainImage.disableInteractive();
         return this;
     }
 
@@ -238,7 +232,7 @@ export class PhysicalConsumable extends Phaser.GameObjects.Container {
 
         // Scale up both the main image and shadow
         this.scene.tweens.add({
-            targets: [this.consumableImage, this.shadowImage],
+            targets: [this.shadowedImage.mainImage, this.shadowedImage.shadowImage],
             displayWidth: this.baseSize * 1.1,
             displayHeight: this.baseSize * 1.1,
             duration: 200,
@@ -253,7 +247,7 @@ export class PhysicalConsumable extends Phaser.GameObjects.Container {
 
         // Scale back both the main image and shadow
         this.scene.tweens.add({
-            targets: [this.consumableImage, this.shadowImage],
+            targets: [this.shadowedImage.mainImage, this.shadowedImage.shadowImage],
             displayWidth: this.baseSize,
             displayHeight: this.baseSize,
             duration: 200,
@@ -265,12 +259,12 @@ export class PhysicalConsumable extends Phaser.GameObjects.Container {
 
     highlight(): void {
         this._isHighlighted = true;
-        this.consumableImage.setTint(0x00ff00);
+        this.shadowedImage.mainImage.setTint(0x00ff00);
     }
 
     unhighlight(): void {
         this._isHighlighted = false;
-        this.consumableImage.clearTint();
+        this.shadowedImage.mainImage.clearTint();
     }
 
     obliterate(): void {

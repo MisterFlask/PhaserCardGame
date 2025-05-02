@@ -21,10 +21,11 @@ export class CoalCargo extends PlayableCard {
     }
 
     override get description(): string {
-        return `Draw 1 card.`;
+        return `Draw 1 card.  Discard 2 cards.`;
     }
 
     override InvokeCardEffects(): void {
         this.actionManager.drawCards(1);
+        this.actionManager.chooseCardToDiscard(2, 2, false);
     }
 }

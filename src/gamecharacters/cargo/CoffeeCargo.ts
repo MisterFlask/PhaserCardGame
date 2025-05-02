@@ -11,14 +11,14 @@ export class CoffeeCargo extends PlayableCard {
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.COMMON,
         });
-        this.baseEnergyCost = 0;
+        this.baseEnergyCost = 1;
         this.buffs.push(new HellSellValue(60));
         this.surfacePurchaseValue = 50;
         this.hellPurchaseValue = 0;
     }
 
     override get description(): string {
-        return `Draw 2 cards if Hell Sell Value is 10 or more.  Decrease the Hell Sell Value of this card by 10. `;
+        return `Draw 2 cards if Hell Sell Value is 10 or more.  Decrease the Hell Sell Value of this card by 10.`;
     }
 
     override InvokeCardEffects(): void {

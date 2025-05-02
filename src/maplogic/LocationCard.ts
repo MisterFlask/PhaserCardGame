@@ -13,6 +13,7 @@ import { AbstractReward } from "../rewards/AbstractReward";
 import { CardReward } from "../rewards/CardReward";
 import { CurrencyReward } from '../rewards/CurrencyReward';
 import { RelicReward } from '../rewards/RelicReward';
+import { ImprovedSalePrices } from '../rules/acts/location/ImprovedSalePrices';
 import { CardRewardsGenerator } from '../rules/CardRewardsGenerator';
 import { GameState } from "../rules/GameState";
 import { CardModifier } from '../rules/modifiers/AbstractCardModifier';
@@ -290,6 +291,22 @@ export class CommoditiesTraderCard extends LocationCard {
         this.portraitName = 'shop-icon';
         this.portraitTint = 0xFFA500;
         this.backgroundName = shopBackgrounds[Math.floor(Math.random() * shopBackgrounds.length)];
+    }
+
+    override initEncounter(): void {
+
+        // Add ImprovedSalePrices buff based on act
+        const gameState = GameState.getInstance();
+        if (gameState.currentAct === 2) {
+            const buff = new ImprovedSalePrices();
+            buff.stacks = 100; // +100% sale price
+            this.buffs.push(buff);
+        } else if (gameState.currentAct === 3) {
+            const buff = new ImprovedSalePrices();
+            buff.stacks = 300; // +300% sale price
+            this.buffs.push(buff);
+        }
+        this.encounter = EncounterManager.getInstance().getCommoditiesTrader();
     }
 
     override OnLocationSelected(scene: Phaser.Scene): void {

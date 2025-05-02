@@ -14,12 +14,14 @@ export class LocationManager {
     // Special floor indices
     private readonly entranceFloor = 0;
     private readonly bossFloor: number;
+    private readonly commoditiesTraderFloor: number;
     private readonly charonFloor: number;
 
     constructor() {
         // Calculate special floor indices
-        this.bossFloor = this.numberOfFloors - 2; // Boss on second-to-last floor (8)
-        this.charonFloor = this.numberOfFloors - 1; // Charon on last floor (9)
+        this.bossFloor = this.numberOfFloors - 3; // Boss on third-to-last floor (12)
+        this.commoditiesTraderFloor = this.numberOfFloors - 2; // Commodities Trader on second-to-last floor (13)
+        this.charonFloor = this.numberOfFloors - 1; // Charon on last floor (14)
     }
 
     /**
@@ -63,11 +65,17 @@ export class LocationManager {
         locationData.push(entrance);
         GameState.getInstance().setCurrentLocation(entrance);
 
-        // Create boss room (second-to-last floor, middle position)
+        // Create boss room (third-to-last floor, middle position)
         const bossPosition = Math.floor(this.nodesPerFloor / 2);
         const bossRoom = new BossRoomCard(this.bossFloor, bossPosition);
         bossRoom.initEncounter(); // Initialize encounter
         locationData.push(bossRoom);
+
+        // Create Commodities Trader room (second-to-last floor, middle position)
+        const commoditiesTraderPosition = Math.floor(this.nodesPerFloor / 2);
+        const commoditiesTraderRoom = new CommoditiesTraderCard(this.commoditiesTraderFloor, commoditiesTraderPosition);
+        commoditiesTraderRoom.initEncounter(); // Initialize encounter
+        locationData.push(commoditiesTraderRoom);
 
         // Create Charon's room (last floor, middle position)
         const charonPosition = Math.floor(this.nodesPerFloor / 2);
@@ -75,8 +83,9 @@ export class LocationManager {
         charonRoom.initEncounter(); // Initialize encounter
         locationData.push(charonRoom);
 
-        // Connect boss room to Charon's room (this is a special case - one-way from boss to Charon)
-        bossRoom.setAdjacent(charonRoom);
+        // Connect special rooms in sequence: boss -> commodities trader -> Charon
+        bossRoom.setAdjacent(commoditiesTraderRoom);
+        commoditiesTraderRoom.setAdjacent(charonRoom);
         
         // Create normal rooms for all other positions
         for (let floor = this.entranceFloor; floor <= this.charonFloor; floor++) {
@@ -161,18 +170,14 @@ export class LocationManager {
             ["Event", 2],
         ]);
         
-        // Add CommoditiesTrader for Act 2
-        if (currentAct === 2) {
-            totalSpecialCounts.set("CommoditiesTrader", 2);
-        }
-        
-        // Get all valid floors (excluding entrance, treasure, boss, Charon floors, and first floor after entrance)
+        // Get all valid floors (excluding entrance, treasure, boss, commodities trader, Charon floors, and first floor after entrance)
         const validFloors = Array.from(roomsByFloor.keys())
             .filter(floor => 
                 floor !== this.entranceFloor && 
                 floor !== this.entranceFloor + 1 && // Exclude first floor after entrance
                 floor !== this.treasureFloorIndex && 
                 floor !== this.bossFloor &&
+                floor !== this.commoditiesTraderFloor &&
                 floor !== this.charonFloor
             )
             .sort(() => Math.random() - 0.5); // Shuffle floors
@@ -545,6 +550,7 @@ export class LocationManager {
         this.verifyTreasureRoomDebuffs(locations);
         this.verifyPreBossConnections(locations);
         this.verifyFirstFloorNormalRooms(locations);
+        this.verifyCommoditiesTraderFloor(locations);
     }
 
     /**
@@ -785,6 +791,42 @@ export class LocationManager {
                 const normalRoom = new NormalRoomCard(room.floor, room.roomNumber);
                 this.replaceRoom(locations, room, normalRoom);
             }
+        }
+    }
+
+    /**
+     * Verify that the commodities trader floor is properly set up
+     */
+    private verifyCommoditiesTraderFloor(locations: LocationCard[]): void {
+        const commoditiesTraderRooms = locations.filter(loc => loc.floor === this.commoditiesTraderFloor);
+        
+        // Verify there is exactly one commodities trader room
+        if (commoditiesTraderRooms.length !== 1) {
+            console.warn(`Expected exactly one commodities trader room, found ${commoditiesTraderRooms.length}`);
+            return;
+        }
+        
+        const commoditiesTraderRoom = commoditiesTraderRooms[0];
+        
+        // Verify it's a CommoditiesTraderCard
+        if (!(commoditiesTraderRoom instanceof CommoditiesTraderCard)) {
+            console.warn(`Room on commodities trader floor is not a CommoditiesTraderCard. Converting...`);
+            const newRoom = new CommoditiesTraderCard(commoditiesTraderRoom.floor, commoditiesTraderRoom.roomNumber);
+            this.replaceRoom(locations, commoditiesTraderRoom, newRoom);
+        }
+        
+        // Verify it's connected to both boss and Charon
+        const bossRoom = locations.find(loc => loc instanceof BossRoomCard);
+        const charonRoom = locations.find(loc => loc instanceof CharonRoomCard);
+        
+        if (bossRoom && !commoditiesTraderRoom.adjacentLocations.includes(bossRoom)) {
+            console.warn(`Commodities trader room not connected to boss room. Adding connection...`);
+            commoditiesTraderRoom.setAdjacent(bossRoom);
+        }
+        
+        if (charonRoom && !commoditiesTraderRoom.adjacentLocations.includes(charonRoom)) {
+            console.warn(`Commodities trader room not connected to Charon room. Adding connection...`);
+            commoditiesTraderRoom.setAdjacent(charonRoom);
         }
     }
 

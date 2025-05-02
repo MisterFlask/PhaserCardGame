@@ -19,10 +19,11 @@ export class RevolutionaryLiteratureCargo extends PlayableCard {
     }
 
     override get description(): string {
-        return `Draw a card.`;
+        return `Draw a card.  Discard a card.`;
     }
 
     override InvokeCardEffects(): void {
         this.actionManager.drawCards(1);
+        this.actionManager.chooseCardToDiscard(1, 1, false);
     }
 } 

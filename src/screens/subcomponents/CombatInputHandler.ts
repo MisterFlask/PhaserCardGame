@@ -486,8 +486,7 @@ class CombatInputHandler {
                     consumable.usesLeft = Math.max(0, (consumable.usesLeft || 0) - 1);
                     consumable.updateUsesDisplay();
                     if (consumable.usesLeft <= 0) {
-                        consumable.consumableImage.setAlpha(0.5);
-                        consumable.currentlyActivatable = false;
+                        consumable.obliterate();
                     }
                 } else {
                     ActionManager.getInstance().displaySubtitle_NoQueue('Cannot use consumable', 2000);

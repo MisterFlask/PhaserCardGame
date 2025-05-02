@@ -36,7 +36,7 @@ export abstract class AbstractBuff implements IAbstractBuff {
     }
 
     public init(){
-        
+
     }
 
     public withoutShowingUpInBuffs(): this {
@@ -395,6 +395,10 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
     purchasePricePercentModifier(): number {
         return 0;
+    }
+
+    salePriceMultiplier(): number {
+        return 1
     }
 
     surfaceValueModifier(): number {
