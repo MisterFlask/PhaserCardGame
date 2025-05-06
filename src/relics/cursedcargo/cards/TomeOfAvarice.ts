@@ -24,7 +24,7 @@ export class TomeOfAvarice extends PlayableCard {
     override InvokeCardEffects(): void {
         const gameState = GameState.getInstance();
         const combatState = gameState.combatState;
-        const cargo = gameState.cargoHolder;
+        const cargo = gameState.currentVessel;
         cargo.addCargoCard(new CoinOnTheGround());
     }
 

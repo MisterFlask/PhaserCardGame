@@ -133,7 +133,7 @@ export class CombatCardManager {
         });
 
         // Create cargo holder card below the last player unit
-        const cargoHolder = GameState.getInstance().cargoHolder;
+        const cargoHolder = GameState.getInstance().currentVessel;
         const lastPlayerY = 100 + (playerCharacters.length - 1) * 180;
         const cargoY = lastPlayerY + 180; // Position below last player
 

@@ -78,7 +78,7 @@ export default class InventoryPanel {
 
     private updateInventoryPanel(): void {
         const gameState = GameState.getInstance();
-        const inventoryItems = gameState.cargoHolder.cardsInMasterDeck;
+        const inventoryItems = gameState.currentVessel.cardsInMasterDeck;
 
         // Clear previous cards
         this.cardsContainer.removeAll(true);

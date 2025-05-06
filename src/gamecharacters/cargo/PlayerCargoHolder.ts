@@ -3,30 +3,29 @@ import { BaseCharacterClass } from "../BaseCharacterClass";
 import { PlayableCard } from "../PlayableCard";
 import { PlayerCharacter } from "../PlayerCharacter";
 
-class DummyCharacterClass extends BaseCharacterClass {
+class SimpleAmphibiousSteamer extends BaseCharacterClass {
     constructor() {
         super({
-            name: "Dummy Character",
-            iconName: "placeholder_character_background_1",
+            name: "Erebus-Class Amphibious Traction-Steamer",
+            iconName: "amphibious_steamer",
             startingMaxHp: 100,
-            id: "dummy_character_class"
+            id: "amphibious_steamer"
         });
     }
 
     getPortraitNameAtRandom(gender: Gender): string {
-        return "placeholder_character_background_1";
+        return "amphibious_steamer";
     }
 }
 
 
-export class PlayerCargoHolder extends PlayerCharacter {
+export class PlayerVessel extends PlayerCharacter {
     constructor() { 
         super({
-            name: "Cargo",
-            description: "Your cargo is here.",
-
-            portraitName: "placeholder_character_background_1",
-            characterClass: new DummyCharacterClass(), //doesn't actually matter here
+            name: "Erebus-Class Amphibious Traction-Steamer",
+            description: "Your cargo is here.  Also, if it sinks you're toast.",
+            portraitName: "amphibious_steamer",
+            characterClass: new SimpleAmphibiousSteamer(),
         });
     }
 

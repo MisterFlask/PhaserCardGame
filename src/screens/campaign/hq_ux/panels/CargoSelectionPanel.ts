@@ -466,7 +466,7 @@ export class CargoSelectionPanel extends AbstractHqPanel {
       }
     });
 
-    gameState.cargoHolder.cardsInMasterDeck.forEach(good => {
+    gameState.currentVessel.cardsInMasterDeck.forEach(good => {
       if (good.physicalCard) {
         good.physicalCard = undefined;
       }
@@ -491,7 +491,7 @@ export class CargoSelectionPanel extends AbstractHqPanel {
     });
 
     // build purchased cargo
-    gameState.cargoHolder.cardsInMasterDeck.forEach((good) => {
+    gameState.currentVessel.cardsInMasterDeck.forEach((good) => {
       const phCard = CardGuiUtils.getInstance().createCard({
         scene: this.scene,
         x: 0,
@@ -584,9 +584,9 @@ export class CargoSelectionPanel extends AbstractHqPanel {
       const idx = campaignState.availableTradeGoods.indexOf(good);
       if (idx > -1) {
         campaignState.availableTradeGoods.splice(idx, 1);
-        gameState.cargoHolder.cardsInMasterDeck.push(good);
+        gameState.currentVessel.cardsInMasterDeck.push(good);
         gameState.moneyInVault -= good.surfacePurchaseValue;
-        good.owningCharacter = gameState.cargoHolder;
+        good.owningCharacter = gameState.currentVessel;
 
         this.scene.events.emit('fundsChanged');
         this.displayCargo();
@@ -602,9 +602,9 @@ export class CargoSelectionPanel extends AbstractHqPanel {
     const gameState = GameState.getInstance();
     const campaignState = CampaignUiState.getInstance();
 
-    const idx = gameState.cargoHolder.cardsInMasterDeck.indexOf(good);
+    const idx = gameState.currentVessel.cardsInMasterDeck.indexOf(good);
     if (idx > -1) {
-      gameState.cargoHolder.cardsInMasterDeck.splice(idx, 1);
+      gameState.currentVessel.cardsInMasterDeck.splice(idx, 1);
       campaignState.availableTradeGoods.push(good);
       gameState.moneyInVault += good.surfacePurchaseValue;
 
@@ -666,7 +666,7 @@ export class CargoSelectionPanel extends AbstractHqPanel {
       }
     });
 
-    gameState.cargoHolder.cardsInMasterDeck.forEach(good => {
+    gameState.currentVessel.cardsInMasterDeck.forEach(good => {
       if (good.physicalCard) {
         good.physicalCard = undefined;
       }

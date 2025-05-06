@@ -2,7 +2,7 @@ import { AbstractConsumable } from '../consumables/AbstractConsumable';
 import { StrengthElixir } from '../consumables/StrengthElixir';
 import { Encounter } from '../encounters/EncounterManager';
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
-import { PlayerCargoHolder } from '../gamecharacters/cargo/PlayerCargoHolder';
+import { PlayerVessel } from '../gamecharacters/cargo/PlayerCargoHolder';
 import type { PlayableCard } from '../gamecharacters/PlayableCard';
 import type { PlayerCharacter } from '../gamecharacters/PlayerCharacter';
 import type { LocationCard } from '../maplogic/LocationCard';
@@ -64,7 +64,7 @@ export class GameState {
     public roster: PlayerCharacter[] = [];
     public currentRunCharacters: PlayerCharacter[] = [];
 
-    public cargoHolder: PlayerCargoHolder = new PlayerCargoHolder();
+    public currentVessel: PlayerVessel = new PlayerVessel();
 
     public consumables: AbstractConsumable[] = [new StrengthElixir()];
     public maxConsumables: number = 3;
@@ -84,7 +84,7 @@ export class GameState {
 
     public get allCardsWithHellSellValue(): readonly PlayableCard[] {
         const masterDeckCards = this.masterDeckAllCharacters.filter(card => card.finalHellSellValue > 0);
-        const cargoCards = this.cargoHolder.cardsInMasterDeck.filter(card => card.finalHellSellValue > 0);
+        const cargoCards = this.currentVessel.cardsInMasterDeck.filter(card => card.finalHellSellValue > 0);
         return [...masterDeckCards, ...cargoCards];
     }
     

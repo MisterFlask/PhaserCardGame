@@ -22,11 +22,11 @@ export class StartCombatAction extends GameAction {
         // Initialize combat deck: copy all cards in master deck into draw pile
         combatState.drawPile = [...gameState.currentRunCharacters.flatMap(c => c.cardsInMasterDeck)].map(c => c.Copy() as PlayableCard);
         // Add cargo cards to draw pile
-        const cargoCards = gameState.cargoHolder.cardsInMasterDeck.map(c => c.Copy() as PlayableCard);
+        const cargoCards = gameState.currentVessel.cardsInMasterDeck.map(c => c.Copy() as PlayableCard);
         combatState.drawPile.push(...cargoCards);
         // Assign cargo holder as owner for all cargo cards
         cargoCards.forEach(card => {
-            card.owningCharacter = gameState.cargoHolder;
+            card.owningCharacter = gameState.currentVessel;
         });
         // Fisher-Yates shuffle algorithm
         for (let i = combatState.drawPile.length - 1; i > 0; i--) {

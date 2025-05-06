@@ -56,6 +56,12 @@ export default class ImageUtils {
                 "shopkeeper-spooky.png",
               ]
         },
+        steamers:{
+            prefix: 'Portraits/BoatPortraits/',
+            files: [
+                "amphibious_steamer.png",
+            ]
+        },
         portraits_blackhand_female: {
             prefix: 'Portraits/BlackhandPortraits/female/',
             files: [

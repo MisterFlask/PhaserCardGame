@@ -289,7 +289,7 @@ export class ActionManager {
 
     public getAllValuableCargoCards(): PlayableCard[] {
         const gameState = GameState.getInstance();
-        return gameState.cargoHolder.cardsInMasterDeck.filter(card => {
+        return gameState.currentVessel.cardsInMasterDeck.filter(card => {
             const hellSellBuff = card.buffs.find(buff => buff.getBuffCanonicalName() === "HELL_SELL_VALUE");
             return hellSellBuff && hellSellBuff.stacks > 0;
         });
@@ -302,7 +302,7 @@ export class ActionManager {
         if (hellboundCards.length > 0) {
             const randomIndex = Phaser.Math.Between(0, hellboundCards.length - 1);
             const cardToRemove = hellboundCards[randomIndex];
-            gameState.cargoHolder.cardsInMasterDeck = gameState.cargoHolder.cardsInMasterDeck.filter(card => card !== cardToRemove);
+            gameState.currentVessel.cardsInMasterDeck = gameState.currentVessel.cardsInMasterDeck.filter(card => card !== cardToRemove);
         }
     }
 
