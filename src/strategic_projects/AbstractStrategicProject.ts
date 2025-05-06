@@ -1,6 +1,7 @@
 import { AbstractCard } from "../gamecharacters/AbstractCard";
 
 import { Team } from "../gamecharacters/AbstractCard";
+import { PlayableCard } from "../gamecharacters/PlayableCard";
 import { CardType } from "../gamecharacters/Primitives";
 import { StrategicResource } from "./strategic_resources.ts/StrategicResources";
 
@@ -29,5 +30,13 @@ export abstract class AbstractStrategicProject extends AbstractCard {
             StrategicResource.InfernalMachinery.ofQuantity(1),
             StrategicResource.WhiteflameDistillate.ofQuantity(2),
         ];
+    }
+
+    public getAdditionalCargoOptions(): PlayableCard[] {
+        return [];
+    }
+
+    public postProcessCampaignStateAfterRun(): void{
+
     }
 }

@@ -9,6 +9,7 @@ import type { LocationCard } from '../maplogic/LocationCard';
 import { AbstractRelic } from '../relics/AbstractRelic';
 import { EmergencyTeleporter } from '../relics/special/EmergencyTeleporter';
 import { AbstractTradeRoute } from '../screens/campaign/hq_ux/AbstractTradeRoute';
+import { AbstractStrategicProject } from '../strategic_projects/AbstractStrategicProject';
 import type { AutomatedCharacterType, BaseCharacterType } from '../Types';
 import type { PhysicalCard } from '../ui/PhysicalCard';
 import { ActRegion } from './acts/ActRegion';
@@ -100,6 +101,8 @@ export class GameState {
     public mapInitialized: boolean = false;
     // Add all location cards
     public locations: LocationCard[] = [];
+
+    public ownedStrategicProjects: AbstractStrategicProject[] = [];
 
     private constructor() {}
 

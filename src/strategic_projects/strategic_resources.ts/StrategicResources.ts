@@ -30,6 +30,6 @@ export class StrategicResource {
 
     static InfernalMachinery = new StrategicResource("Infernal Machinery", "Infernal Machinery", "Infernal Machinery", "infernal_machinery", "infernal_machinery");
     static WhiteflameDistillate = new StrategicResource("Whiteflame Distillate", "Whiteflame Distillate", "Whiteflame Distillate", "whiteflame_distillate", "whiteflame_distillate");
-    static ObsidianSilk = new StrategicResource("Obsidian Silk", "Obsidian Silk", "Obsidian Silk", "obsidian_silk", "obsidian_silk");
+    static Hush = new StrategicResource("Hush", "Hush", "Hush", "hush", "hush");
 
 }

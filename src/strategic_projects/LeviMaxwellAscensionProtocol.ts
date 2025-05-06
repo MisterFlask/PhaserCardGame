@@ -15,21 +15,25 @@ export class LeviMaxwellAscensionProtocol extends AbstractStrategicProject {
         super({
             name: "Levi-Maxwell Ascension Protocol",
             description: "ALL cargo you bring starts combat with 2 Light.",
-            portraitName: "levi_maxwell_ascension"
+            portraitName: "levi_maxwell_ascension_protocol"
         });
         this.surfacePurchaseValue = 300;
-        this.flavorText = "The protocol disrupts the very fabric of dimensional space-time, creating a permanent breach in the Buckingham Rift. Massive cargo now flows with unprecedented efficiency, almost floating through the breach.";
+        this.flavorText = "A mysterious protocol that enhances the combat capabilities of your cargo.";
     }
 
     public override getStrategicResourceCost(): StrategicResource[] {
         return [
-            StrategicResource.ObsidianSilk.ofQuantity(3),
-            StrategicResource.WhiteflameDistillate.ofQuantity(2)
+            StrategicResource.Hush.ofQuantity(2),
+            StrategicResource.WhiteflameDistillate.ofQuantity(1)
         ];
     }
 
     public override getPrerequisites(): AbstractStrategicProject[] {
         return [new AbyssalResearchInstitute()];
+    }
+
+    public override postProcessCampaignStateAfterRun(): void {
+        // ALL cargo you bring starts combat with 2 Light
     }
 }
 

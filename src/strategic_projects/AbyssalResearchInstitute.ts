@@ -12,20 +12,23 @@ import { StrategicResource } from "./strategic_resources.ts/StrategicResources";
 export class AbyssalResearchInstitute extends AbstractStrategicProject {
     constructor() {
         super({
-            name: "Abyssal Research Outpost",
-            description: "At the beginning of each run, gain a card reward.",
+            name: "Abyssal Research Institute",
+            description: "Gain a card reward at the beginning of each run.",
             portraitName: "abyssal_research_institute"
         });
-        this.surfacePurchaseValue = 200;
-        this.flavorText = "Here, the Maatschappij's academics conduct 'experiments.' Politely, they do not specify on what (or whom) these experiments are performed.  Genteel ignorance is the cornerstone of civilization, after all.";
-
+        this.surfacePurchaseValue = 300;
+        this.flavorText = "A cutting-edge research facility dedicated to unlocking the secrets of the abyss.";
     }
 
     public override getStrategicResourceCost(): StrategicResource[] {
         return [
-            StrategicResource.ObsidianSilk.ofQuantity(2),
+            StrategicResource.Hush.ofQuantity(2),
             StrategicResource.WhiteflameDistillate.ofQuantity(1)
         ];
+    }
+
+    public override postProcessCampaignStateAfterRun(): void {
+        // Gain a card reward at the beginning of each run
     }
 }
 
