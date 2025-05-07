@@ -144,7 +144,7 @@ export class CombatCardManager {
             data: cargoHolder,
             onCardCreatedEventCallback: (card: PhysicalCard) => {
                 card.container.setInteractive(false);
-                card.data.size = CardSize.TINY;
+                card.data.size = CardSize.SMALL;
                 card.container.setScrollFactor(0);
             }
         });

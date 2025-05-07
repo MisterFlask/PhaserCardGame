@@ -22,7 +22,7 @@ class SimpleAmphibiousSteamer extends BaseCharacterClass {
 export class PlayerVessel extends PlayerCharacter {
     constructor() { 
         super({
-            name: "Erebus-Class Amphibious Traction-Steamer",
+            name: "The H.M.S. Cervantes",
             description: "Your cargo is here.  Also, if it sinks you're toast.",
             portraitName: "amphibious_steamer",
             characterClass: new SimpleAmphibiousSteamer(),
