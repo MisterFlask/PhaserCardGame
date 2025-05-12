@@ -1,4 +1,6 @@
 import { Scene } from 'phaser';
+import { ScrollablePanel } from 'phaser3-rex-plugins/templates/ui/ui-components.js';
+import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 import { GameState } from '../../../../rules/GameState';
 import { AbstractStrategicProject } from '../../../../strategic_projects/AbstractStrategicProject';
 import { StrategicProjectTechTree } from '../../../../strategic_projects/StrategicProjectTechTree';
@@ -8,14 +10,24 @@ import { CardGuiUtils } from '../../../../utils/CardGuiUtils';
 import { CampaignUiState } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
 
+// Define a type for RexUI plugin
+
 export class InvestmentPanel extends AbstractHqPanel {
     private projectCards: PhysicalCard[] = [];
     private titleTextBox: TextBox;
     private poundsDisplay: TextBox;
     private connectionLines: Phaser.GameObjects.Line[] = [];
+    private scrollablePanel: ScrollablePanel;
+    private contentContainer: RexUIPlugin.Container; // Using RexUI's container-lite
+    private edgeScrollSpeed: number = 10; // Speed of auto-scrolling near edges
+    private edgeThreshold: number = 50; // Distance from edge to trigger auto-scrolling
 
     constructor(scene: Scene) {
         super(scene, 'Factory Investments');
+        
+        // Initialize content container using RexUI's container-lite
+        const ui = (scene as any).rexUI as RexUIPlugin;   // <- this is the real instance
+        this.contentContainer = ui.add.container(0,0);
         
         // Add title TextBox
         this.titleTextBox = new TextBox({
@@ -41,8 +53,29 @@ export class InvestmentPanel extends AbstractHqPanel {
         
         // Listen for funds changed events
         scene.events.on('fundsChanged', this.updatePoundsDisplay, this);
+
+        // Create the scrollable panel
+        this.scrollablePanel = new ScrollablePanel(scene, {
+            x: scene.scale.width / 2,
+            y: scene.scale.height / 2,
+            width: scene.scale.width,
+            height: scene.scale.height - 200, // Leave space for title and money display
+            scrollMode: 2, // 2 represents 'both' in RexUI's ScrollModeTypes
+            background: scene.add.rectangle(0, 0, 1, 1, 0x000000, 0.1),
+            panel: {
+                child: this.contentContainer,
+            },
+            slider: {
+                track: scene.add.rectangle(0, 0, 20, 1, 0x000000, 0.2),
+                thumb: scene.add.rectangle(0, 0, 20, 1, 0x000000, 0.5),
+            }
+        });
+        this.add(this.scrollablePanel);
         
         this.displayTechTree();
+        
+        // Hide initially until explicitly shown
+        this.hide();
     }
 
     private updatePoundsDisplay(): void {
@@ -77,8 +110,8 @@ export class InvestmentPanel extends AbstractHqPanel {
         const edges = StrategicProjectTechTree.getEdges(allProjects);
 
         // Create a container for the tech tree that we can position and scale
-        const treeContainer = this.scene.add.container(this.scene.scale.width / 2, 200);
-        this.add(treeContainer);
+        const treeContainer = this.scene.add.container(0, 0);
+        this.contentContainer.add(treeContainer);
         
         // Draw connections first (so they're behind the cards)
         edges.forEach(edge => {
@@ -108,15 +141,17 @@ export class InvestmentPanel extends AbstractHqPanel {
             }
         });
         
-        // Center the tech tree in the panel
+        // Get tree bounds
         const bounds = treeContainer.getBounds();
-        treeContainer.setPosition(
-            this.scene.scale.width / 2 - bounds.width / 2, 
-            200
-        );
         
-        // Add zoom controls if needed
-        // this.addZoomControls(treeContainer);
+        // Move the tree so its left-top corner is at (0,0) inside the content container
+        treeContainer.setPosition(-bounds.x, -bounds.y);
+        
+        // Tell rex-ui the *logical* size of the scrollable content
+        this.contentContainer.setSize(bounds.width, bounds.height);  // Use setMinSize instead of setSize
+        
+        // Call layout to update the scrollable panel
+        this.scrollablePanel.layout();
     }
 
     private createProjectCard(project: AbstractStrategicProject, x: number, y: number, isOwned: boolean): PhysicalCard {
@@ -289,8 +324,67 @@ export class InvestmentPanel extends AbstractHqPanel {
         }
     }
 
+    private checkEdgeScrolling(): void {
+        // Get mouse position
+        const mouseX = this.scene.input.mousePointer.x;
+        const mouseY = this.scene.input.mousePointer.y;
+        
+        // Get panel bounds
+        const panelBounds = this.scrollablePanel.getBounds();
+        
+        // Only proceed if mouse is over the panel
+        if (!Phaser.Geom.Rectangle.Contains(panelBounds, mouseX, mouseY)) {
+            return;
+        }
+        
+        // Calculate distances from edges
+        const distanceFromLeft = mouseX - panelBounds.left;
+        const distanceFromRight = panelBounds.right - mouseX;
+        const distanceFromTop = mouseY - panelBounds.top;
+        const distanceFromBottom = panelBounds.bottom - mouseY;
+        
+        let scrollX = 0;
+        let scrollY = 0;
+        
+        // Check horizontal edges
+        if (distanceFromLeft < this.edgeThreshold) {
+            // Near left edge, scroll left (negative)
+            scrollX = -this.edgeScrollSpeed * (1 - distanceFromLeft / this.edgeThreshold);
+        } else if (distanceFromRight < this.edgeThreshold) {
+            // Near right edge, scroll right (positive)
+            scrollX = this.edgeScrollSpeed * (1 - distanceFromRight / this.edgeThreshold);
+        }
+        
+        // Check vertical edges
+        if (distanceFromTop < this.edgeThreshold) {
+            // Near top edge, scroll up (negative)
+            scrollY = -this.edgeScrollSpeed * (1 - distanceFromTop / this.edgeThreshold);
+        } else if (distanceFromBottom < this.edgeThreshold) {
+            // Near bottom edge, scroll down (positive)
+            scrollY = this.edgeScrollSpeed * (1 - distanceFromBottom / this.edgeThreshold);
+        }
+        
+        // Apply scrolling if needed
+        if (scrollX !== 0 || scrollY !== 0) {
+            // Apply scroll - RexUI's ScrollablePanel keeps track of position internally 
+            // and setChildOX/setChildOY handle boundaries automatically
+            if (scrollX !== 0) {
+                const panel = this.scrollablePanel;
+                panel.setChildOX(panel.childOX + scrollX);
+            }
+            
+            if (scrollY !== 0) {
+                const panel = this.scrollablePanel;
+                panel.setChildOY(panel.childOY + scrollY);
+            }
+        }
+    }
+
     update(): void {
         // Update any dynamic content
         this.updatePoundsDisplay();
+        
+        // Check for edge scrolling
+        this.checkEdgeScrolling();
     }
 } 

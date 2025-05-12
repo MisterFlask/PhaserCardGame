@@ -67,7 +67,8 @@ export class HqScene extends Scene {
         this.load.scenePlugin({
             key: 'rexUI',
             url: RexUIPlugin,
-            sceneKey: 'rexUI'
+            sceneKey: 'rexUI',
+            systemKey: 'rexUI',   // visible via plugins.get(...)
         });
     }
 

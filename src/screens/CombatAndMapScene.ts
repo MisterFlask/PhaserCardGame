@@ -435,7 +435,9 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
         scene: [{
             key: 'rexUI',
             plugin: RexUIPlugin,
-            mapping: 'rexUI'
+            mapping: 'rexUI',
+            systemKey: 'rexUI',
+            sceneKey: 'rexUI'
         }]
     },
     type: Phaser.AUTO,
