@@ -3,6 +3,7 @@
 
 import Phaser from 'phaser';
 import BBCodeTextPlugin from 'phaser3-rex-plugins/plugins/bbcodetext-plugin';
+import CameraControllerPlugin from 'phaser3-rex-plugins/plugins/cameracontroller-plugin.js';
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin';
 import { Encounter } from '../encounters/EncounterManager';
 import { AbstractEvent } from '../events/AbstractEvent';
@@ -430,8 +431,14 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
         global: [{
             key: 'rexBBCodeTextPlugin',
             plugin: BBCodeTextPlugin,
-            start: true
-        }],
+            start: true,
+        },
+        {
+            key    : 'rexCameraController',
+            plugin : CameraControllerPlugin,
+            start  : true
+            }
+        ],
         scene: [{
             key: 'rexUI',
             plugin: RexUIPlugin,
