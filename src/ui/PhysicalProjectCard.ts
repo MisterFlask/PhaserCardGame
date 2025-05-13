@@ -6,6 +6,7 @@ import { PhysicalCard } from './PhysicalCard';
 export class PhysicalProjectCard extends PhysicalCard {
     private ownedIndicator?: Phaser.GameObjects.Image;
     private ownedLabel?: Phaser.GameObjects.Text;
+    private priceLabel?: Phaser.GameObjects.Text;
     private purchaseButton?: Phaser.GameObjects.Container;
     private unavailableOverlay?: Phaser.GameObjects.Rectangle;
     private unavailableReasonText?: Phaser.GameObjects.Text;
@@ -81,6 +82,7 @@ export class PhysicalProjectCard extends PhysicalCard {
     private clearUIElements(): void {
         this.ownedIndicator?.destroy();
         this.ownedLabel?.destroy();
+        this.priceLabel?.destroy();
         if (this.purchaseButton) {
             this.purchaseButton.removeAll(true);
             this.purchaseButton.destroy();
@@ -115,20 +117,30 @@ export class PhysicalProjectCard extends PhysicalCard {
         const prereqsMet = this.checkPrerequisitesMet(project);
         const isAvailable = canAfford && prereqsMet;
         
-        // Create purchase button
+        // Add price label at the top
+        this.priceLabel = this.scene.add.text(0, -120, `£${project.getMoneyCost()}`, {
+            fontSize: '16px',
+            fontFamily: 'verdana',
+            color: '#FFFFFF',
+            backgroundColor: canAfford ? '#4CAF50' : '#9E9E9E',
+            padding: { x: 10, y: 5 }
+        }).setOrigin(0.5);
+        this.container.add(this.priceLabel);
+        
+        // Create purchase button without price text
         this.purchaseButton = this.scene.add.container(0, 0);
         
         const buttonBg = this.scene.add.rectangle(0, 90, 120, 40, 
             isAvailable ? 0x4CAF50 : 0x9E9E9E) // Green if available, gray if not
             .setOrigin(0.5);
         
-        const costText = this.scene.add.text(0, 90, `£${project.getMoneyCost()}`, {
+        const buttonText = this.scene.add.text(0, 90, "PURCHASE", {
             fontSize: '14px',
             fontFamily: 'verdana',
             color: '#FFFFFF'
         }).setOrigin(0.5);
         
-        this.purchaseButton.add([buttonBg, costText]);
+        this.purchaseButton.add([buttonBg, buttonText]);
         this.container.add(this.purchaseButton);
         
         // Add an overlay if the project is not available
