@@ -3,8 +3,8 @@ import { DepthManager } from './DepthManager';
 import { TextBox } from './TextBox';
 
 export class TooltipAttachment {
-    private gameObject: Phaser.GameObjects.Container | Phaser.GameObjects.Image;
-    private tooltip: TextBox;
+    public gameObject: Phaser.GameObjects.Container | Phaser.GameObjects.Image;
+    public tooltip: TextBox;
     private scene: Phaser.Scene;
     private padding: number = 10;
     private isVisible: boolean = false;

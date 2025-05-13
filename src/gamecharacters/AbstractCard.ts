@@ -194,6 +194,7 @@ export abstract class AbstractCard implements IAbstractCard {
     block: number = 0
     buffs: AbstractBuff[] = [];
     portraitTint?: number
+    backgroundImageNameOverride?: string
 
     applyBuffs_useFromActionManager(buffs: AbstractBuff[]): void {
         buffs.forEach(buff => AbstractBuff._applyBuffToCharacterOrCard(this, buff));
@@ -379,6 +380,11 @@ export abstract class AbstractCard implements IAbstractCard {
 
     public getCardBackgroundImageName(): string {
         // if card is a BaseCharacter, check if it has a class.  If it does use the class's cardBackgroundImageName.  Otherwise, if the card has an owner, use the owner's class's cardBackgroundImageName.  Otherwise, use the default "greyscale"
+        
+        if (this.backgroundImageNameOverride){
+            return this.backgroundImageNameOverride;
+        }
+
         if ((this as unknown as PlayerCharacter)?.characterClass) {
             return (this as unknown as PlayerCharacter)!.characterClass.cardBackgroundImageName;
         } else if ((this as unknown as PlayableCard)?.owningCharacter) {

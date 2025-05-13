@@ -358,6 +358,12 @@ export class PhysicalCard implements IPhysicalCardInterface {
             return;
         }
         
+        // Update card background texture if needed
+        const currentBackgroundTexture = this.data.getCardBackgroundImageName();
+        if (this.cardBackground.texture.key !== currentBackgroundTexture) {
+            this.cardBackground.setTexture(currentBackgroundTexture);
+        }
+        
         // Update additional portrait layers if needed
         this.updateAdditionalPortraitLayers();
         

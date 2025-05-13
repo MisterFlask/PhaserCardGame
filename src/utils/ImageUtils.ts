@@ -94,7 +94,7 @@ export default class ImageUtils {
         },
         ui: {
             prefix: 'UI/',
-            files: ['drawpile.png', 'discardpile.png', 'placeholder.png', 'oops_image.webp', 'select.png', 'square.png']
+            files: ['drawpile.png', 'discardpile.png', 'placeholder.png', 'oops_image.webp', 'select.png', 'square.png', 'red_background.png']
         },
         card_backgrounds: {
             prefix: 'Sprites/CardBackgrounds/',
