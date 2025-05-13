@@ -35,7 +35,6 @@ class CombatUIManager {
     public handArea!: Phaser.GameObjects.Rectangle;
     public energyDisplay!: TextBox;
     public resourceIndicators: CombatResourceDisplay[] = [];
-    private resourceBackground?: Phaser.GameObjects.Rectangle;
     private subtitleTextBox?: TextBox;
     private generalRewardScreen!: GeneralRewardScreen;
     private combatEnded: boolean = false;
@@ -112,10 +111,6 @@ class CombatUIManager {
         this.slotBoxesContainer.setScrollFactor(0);
 
         this.energyDisplay.setScrollFactor(0);
-
-        if (this.resourceBackground) {
-            this.resourceBackground.setScrollFactor(0);
-        }
         
         this.resourceIndicators.forEach(indicator => {
             indicator.setScrollFactor(0);
@@ -294,17 +289,6 @@ class CombatUIManager {
         const pileY = CombatSceneLayoutUtils.getPileY(this.scene);
         this.energyDisplay.setPosition(100, pileY);
 
-        if (this.resourceBackground) {
-            const newStartX = width - 150;
-            const newStartY = height - 350;
-            const boxPadding = 10;
-            const backgroundWidth = 190;
-            const backgroundHeight = this.resourceIndicators.length * 50 + boxPadding * 2;
-            const backgroundX = newStartX - boxPadding + backgroundWidth / 2 - 40;
-            const backgroundY = newStartY - boxPadding + backgroundHeight / 2;
-            this.resourceBackground.setPosition(backgroundX, backgroundY);
-            this.resourceBackground.setSize(backgroundWidth, backgroundHeight);
-        }
     }
     
     private createGameAreas(): void {
@@ -518,9 +502,6 @@ class CombatUIManager {
         if (this.debugMenu) {
             this.debugMenu.destroy();
         }
-        if (this.resourceBackground) {
-            this.resourceBackground.destroy();
-        }
         this.clearConsumables();
         if (this.consumablesArea) {
             this.consumablesArea.destroy();
@@ -548,17 +529,6 @@ class CombatUIManager {
         const backgroundHeight = resourceArray.length * spacingY + boxPadding * 2;
         const backgroundX = startX - boxPadding + backgroundWidth / 2 - 40;
         const backgroundY = startY - boxPadding + backgroundHeight / 2;
-        this.resourceBackground = this.scene.add.rectangle(
-            backgroundX,
-            backgroundY,
-            backgroundWidth,
-            backgroundHeight,
-            0x000000,
-            1.0
-        );
-        this.resourceBackground.setStrokeStyle(2, 0xFFFFFF);
-        this.resourceBackground.setScrollFactor(0);
-        this.resourceBackground.setDepth(-1);
 
         resourceArray.forEach((resource, index) => {
             const resourceDisplay = new CombatResourceDisplay(

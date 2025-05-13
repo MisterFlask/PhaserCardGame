@@ -1,5 +1,4 @@
 import { Scene } from 'phaser';
-import { TextGlyphs } from '../../../../text/TextGlyphs';
 import { TextBoxButton } from '../../../../ui/Button';
 import { TextBox } from '../../../../ui/TextBox';
 import { CampaignUiState } from '../CampaignUiState';
@@ -8,45 +7,38 @@ import { AbstractHqPanel } from './AbstractHqPanel';
 export class MainHubPanel extends AbstractHqPanel {
     private fundsDisplay: TextBox;
     private yearDisplay: TextBox;
-    private expectationsDisplay: TextBox;
-    private warningDisplay: TextBox;
+    private retirementDisplay: TextBox;
     private navigationButtons: Map<string, TextBoxButton>;
 
     constructor(scene: Scene) {
-        super(scene, `! Company HQ${TextGlyphs.getInstance().ashesIcon}! ${TextGlyphs.getInstance().ashesIcon}`);
+        super(scene, `The East Inferno Company`);
 
         const campaignState = CampaignUiState.getInstance();
+
+        // Create retirement text display
+        this.retirementDisplay = this.createInfoDisplay(
+            scene.scale.width / 2,
+            70,
+            `10 Years To Retirement`,
+            '#ffffff',
+            300,
+            30
+        );
 
         // Create displays
         this.fundsDisplay = this.createInfoDisplay(
             scene.scale.width / 2,
-            100,
+            120,
             `Funds: £${campaignState.getCurrentFunds()}`,
             '#ffff00'
         );
 
         this.yearDisplay = this.createInfoDisplay(
             scene.scale.width / 2,
-            150,
+            170,
             `Year: ${campaignState.currentYear}`
         );
 
-        this.expectationsDisplay = this.createInfoDisplay(
-            scene.scale.width / 2,
-            200,
-            `Expected Profit: £${campaignState.shareholderExpectation}`,
-            undefined,
-            300
-        );
-
-        this.warningDisplay = this.createInfoDisplay(
-            scene.scale.width / 2,
-            250,
-            '',
-            '#ff0000',
-            400,
-            60
-        );
 
         // Create navigation buttons
         this.navigationButtons = new Map();
@@ -54,14 +46,11 @@ export class MainHubPanel extends AbstractHqPanel {
 
         // Add all displays to container
         this.add([
+            this.retirementDisplay,
             this.fundsDisplay,
             this.yearDisplay,
-            this.expectationsDisplay,
-            this.warningDisplay,
             ...this.navigationButtons.values()
         ]);
-
-        this.updateWarnings();
     }
 
     private createInfoDisplay(x: number, y: number, text: string, color: string = '#ffffff', width: number = 200, height: number = 40): TextBox {
@@ -116,22 +105,6 @@ export class MainHubPanel extends AbstractHqPanel {
         }
     }
 
-    private updateWarnings(): void {
-        const campaignState = CampaignUiState.getInstance();
-        const warnings: string[] = [];
-
-        if (campaignState.getShareholderSatisfaction() < 0.5) {
-            warnings.push('WARNING: Shareholders are dissatisfied!');
-        }
-
-        // Add more warning conditions here
-        if (campaignState.getCurrentFunds() < 100) {
-            warnings.push('WARNING: Low on funds!');
-        }
-
-        this.warningDisplay.setText(warnings.join('\n'));
-    }
-
     private updateTradeRouteButton(): void {
         const campaignState = CampaignUiState.getInstance();
         const tradeButton = this.navigationButtons.get('Trade Routes');
@@ -146,8 +119,6 @@ export class MainHubPanel extends AbstractHqPanel {
         const campaignState = CampaignUiState.getInstance();
         this.fundsDisplay.setText(`Funds: £${campaignState.getCurrentFunds()}`);
         this.yearDisplay.setText(`Year: ${campaignState.currentYear}`);
-        this.expectationsDisplay.setText(`Expected Profit: £${campaignState.shareholderExpectation}`);
-        this.updateWarnings();
         this.updateTradeRouteButton();
     }
 } 

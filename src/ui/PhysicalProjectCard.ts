@@ -39,6 +39,14 @@ export class PhysicalProjectCard extends PhysicalCard {
         this.container.setInteractive()
             .on('pointerover', () => {
                 this.setGlow(true);
+                // Show purchase button if it exists and card is not owned
+                if (this.purchaseButton) {
+                    const project = this.data as AbstractStrategicProject;
+                    if (!project.isOwned) {
+                        this.purchaseButton.setVisible(true);
+                        this.purchaseButton.setAlpha(1); // Ensure full opacity
+                    }
+                }
                 this.scene.events.emit('projectHovered', this.data as AbstractStrategicProject);
                 // Bring the card to the front when hovered
                 if (this.container.parentContainer) {
@@ -47,6 +55,10 @@ export class PhysicalProjectCard extends PhysicalCard {
             })
             .on('pointerout', () => {
                 this.setGlow(false);
+                // Hide purchase button
+                if (this.purchaseButton) {
+                    this.purchaseButton.setVisible(false);
+                }
                 this.scene.events.emit('projectUnhovered');
             })
             .on('pointerdown', () => {
@@ -127,7 +139,7 @@ export class PhysicalProjectCard extends PhysicalCard {
         }).setOrigin(0.5);
         this.container.add(this.priceLabel);
         
-        // Create purchase button without price text
+        // Create purchase button
         this.purchaseButton = this.scene.add.container(0, 0);
         
         const buttonBg = this.scene.add.rectangle(0, 90, 120, 40, 
@@ -142,6 +154,12 @@ export class PhysicalProjectCard extends PhysicalCard {
         
         this.purchaseButton.add([buttonBg, buttonText]);
         this.container.add(this.purchaseButton);
+        
+        // Make sure button is on top of other card elements
+        this.container.bringToTop(this.purchaseButton);
+        
+        // Initially hide the purchase button
+        this.purchaseButton.setVisible(false);
         
         // Add an overlay if the project is not available
         if (!isAvailable) {

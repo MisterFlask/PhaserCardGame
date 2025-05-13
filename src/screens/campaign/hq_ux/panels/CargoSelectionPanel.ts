@@ -593,9 +593,59 @@ export class CargoSelectionPanel extends AbstractHqPanel {
         this.updateLaunchButton();
       }
     } else {
+      // Display error message
       (this.statusLabel.getElement('text') as Phaser.GameObjects.Text).setText(`Cannot afford cargo: Need £${good.surfacePurchaseValue}`);
       (this.statusLabel.getElement('background') as Phaser.GameObjects.Rectangle).setFillStyle(0x8b0000);
+      
+      // Apply shake and glow effect to the funds label
+      this.shakeAndGlowFundsLabel();
     }
+  }
+
+  private shakeAndGlowFundsLabel(): void {
+    // Get the background of the funds label
+    const background = this.fundsLabel.getElement('background') as Phaser.GameObjects.Rectangle;
+    const originalFillColor = 0x444444; // Store the original color
+    
+    // Save original position
+    const originalX = this.fundsLabel.x;
+    const originalY = this.fundsLabel.y;
+    
+    // Stop any existing tweens on this object
+    this.scene.tweens.killTweensOf(this.fundsLabel);
+    this.scene.tweens.killTweensOf(background);
+    
+    // Change to angry red color
+    background.setFillStyle(0xff0000);
+    
+    // Create shake effect
+    this.scene.tweens.add({
+      targets: this.fundsLabel,
+      x: { from: originalX - 5, to: originalX + 5 },
+      ease: 'Sine.easeInOut',
+      duration: 100,
+      repeat: 3,
+      yoyo: true,
+      onComplete: () => {
+        // Reset position exactly
+        this.fundsLabel.setPosition(originalX, originalY);
+      }
+    });
+    
+    // Create glow effect (pulsating)
+    this.scene.tweens.add({
+      targets: background,
+      fillAlpha: { from: 1, to: 0.6 },
+      ease: 'Sine.easeInOut',
+      duration: 200,
+      repeat: 2,
+      yoyo: true,
+      onComplete: () => {
+        // Reset to original color and alpha after 1 second
+        background.setFillStyle(originalFillColor);
+        background.setAlpha(1);
+      }
+    });
   }
 
   private sellCargo(good: PlayableCard): void {
