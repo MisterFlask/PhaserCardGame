@@ -306,7 +306,7 @@ export default class ImageUtils {
                 "Eldritch Corruption Deer.png", "Eldritch Soldier Gunner.png", "Eldritch Corruption Crow.png",
 
                 "veil-capacitor.png", "doris-smith.png",
-                "Worm.png", "Lumberjack.png"
+                "Worm.png", "Lumberjack.png", "symbol_worm.png", "symbol_tick.png", "symbol_deer.png"
             ]
         },
         attributes_and_augments: {
