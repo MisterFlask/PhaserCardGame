@@ -14,7 +14,7 @@ import { CardModifier } from '../rules/modifiers/AbstractCardModifier';
 import { RestEvent } from './events/RestEvent';
 import { FrenchBlindProphetess } from './monsters/act1_boss/FrenchBlindProphetess';
 import { Brigand } from './monsters/act1_segment1/act1_segment0/Brigand';
-import { Hellworm } from './monsters/act1_segment1/act1_segment0/Hellworm';
+import { StyxConstrictor } from './monsters/act1_segment1/act1_segment0/Hellworm';
 import { SorrowmothSwarm } from './monsters/act1_segment1/CaulMoth';
 import { Echophagist } from './monsters/act1_segment1/Echophage';
 import { FrenchCrow } from './monsters/act1_segment1/Marshflutter';
@@ -85,7 +85,7 @@ export class ActSegment {
 
     static readonly Act1_Segment0 = new ActSegmentData("Act 1 - Segment 0", 1, 0, [
         {
-            enemies: [new Hellworm(), new Hellworm(), new Hellworm()]
+            enemies: [new StyxConstrictor(), new StyxConstrictor(), new StyxConstrictor()]
         },
         {
             enemies: [new Brigand(), new Brigand(), new Brigand()]

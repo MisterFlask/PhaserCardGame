@@ -5,17 +5,19 @@ import { AutomatedCharacter } from '../../../../gamecharacters/AutomatedCharacte
 import { Armored } from '../../../../gamecharacters/buffs/standard/Armored';
 import { Vulnerable } from '../../../../gamecharacters/buffs/standard/Vulnerable';
 import { Weak } from '../../../../gamecharacters/buffs/standard/Weak';
+import { CardSize } from '../../../../gamecharacters/Primitives';
 import { TargetingUtils } from '../../../../utils/TargetingUtils';
 
-export class Hellworm extends AutomatedCharacter {
+export class StyxConstrictor extends AutomatedCharacter {
     constructor() {
         super({
-            name: "Hellworm",
+            name: "Styx Constrictor",
             portraitName: "symbol_worm",
             maxHitpoints: 20,
-            description: "A writhing, segmented pest characteristic of the upper Hells."
+            description: "A writhing predator characteristic of the upper Hells."
         });
         
+        this.size = CardSize.LARGE
         // Start with Armored (2)
         this.buffs.push(new Armored(2));
     }

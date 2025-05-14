@@ -1,6 +1,7 @@
 import { AbstractIntent, ApplyBuffToSelfIntent, AttackIntent, IntentListCreator } from '../../../../gamecharacters/AbstractIntent';
 import { AutomatedCharacter } from '../../../../gamecharacters/AutomatedCharacter';
 import { Lethality } from '../../../../gamecharacters/buffs/standard/Lethality';
+import { CardSize } from '../../../../gamecharacters/Primitives';
 import { TargetingUtils } from '../../../../utils/TargetingUtils';
 
 export class Brigand extends AutomatedCharacter {
@@ -11,6 +12,7 @@ export class Brigand extends AutomatedCharacter {
             maxHitpoints: 20,
             description: "A contemptible hooligan of Hell's underclass, looking for an easy score."
         });
+        this.size = CardSize.LARGE
     }
 
     override generateNewIntents(): AbstractIntent[] {
