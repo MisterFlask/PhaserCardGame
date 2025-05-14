@@ -44,7 +44,11 @@ export default class ImageUtils {
                 "planar-gate-oil-painting-1.png",
                 "planar-gate-oil-painting-2.png",
                 "british-office-1.png",
-                "investments-screen-oil-painting.png"
+                "investments-screen-oil-painting.png",
+
+                "swamp-1.png",
+                "swamp-2.png",
+                "swamp-3.png",
               ]
         },
         portraits_npcs: {

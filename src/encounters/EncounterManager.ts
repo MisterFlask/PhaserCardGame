@@ -193,6 +193,19 @@ export class Encounter {
         if (this.backgroundNameOverride) {
             return this.backgroundNameOverride;
         }
+
+        // if this is the first act, take a random name from swamp backgrounds
+        var swampBackgrounds = [
+            "swamp-1.png",
+            "swamp-2.png",
+            "swamp-3.png",
+            "eldritch-jungle-oil-painting",
+            "forest-oil-painting",
+        ]
+        if (GameState.getInstance().currentAct == 1) {
+            return swampBackgrounds[Math.floor(Math.random() * swampBackgrounds.length)];
+        }
+        
         var backgroundsPossible = [
             "backrooms-oil-painting",
             "canyon-oil-painting",
