@@ -79,6 +79,11 @@ export class MapOverlay {
             this.show();
         });
 
+        this.scene.events.on('mapOverlay:ShowRegionTitle', (title: string) => {
+            console.log('mapOverlay:ShowRegionTitle', title);
+            this.showRegionTitle(title);
+        });
+
         this.setupKeyboardListeners();
 
         // Create the MapDebugOverlay with getter functions
@@ -88,6 +93,33 @@ export class MapOverlay {
             () => this.locationCards,
             () => this.currentLocationIcon ?? undefined
         );
+    }
+    showRegionTitle(title: string) {
+        // Create large text in the center of the screen
+        const { width, height } = this.scene.scale;
+        const regionTitle = this.scene.add.text(width / 2, height / 2, title, {
+            fontFamily: 'Arial',
+            fontSize: '256px',
+            color: '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 6,
+        }).setOrigin(0.5)
+            .setShadow(2, 2, '#000000', 5, true, true) 
+            .setAlpha(1)
+            .setDepth(DepthManager.getInstance().MODAL + 100000);
+            // Add to a container that doesn't move with the camera
+            // This ensures the text stays fixed on screen regardless of map scrolling
+            regionTitle.setScrollFactor(0);
+            
+        
+            // tween to hold for 3 sec, then fade out over 3 sec
+            this.scene.tweens.add({
+                targets: regionTitle,
+                alpha: 0,
+                delay: 3000,      // hold for 3 seconds before starting
+                duration: 3000,   // fade out over 3 seconds
+                ease: 'Power2',
+            });
     }
 
 

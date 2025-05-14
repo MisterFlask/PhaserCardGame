@@ -59,6 +59,7 @@ class CombatScene extends Phaser.Scene {
     private characterDeckOverlay!: CharacterDeckOverlay;
     private treasureOverlay!: TreasureOverlay;
     private combatEndHandled: boolean = false;
+    private hasShownRegionTitle: boolean = false;
 
     private eventToRunNext?: AbstractEvent;
     private hasEventBeenRun: boolean = false;
@@ -408,6 +409,10 @@ class CombatScene extends Phaser.Scene {
     private toggleMapOverlay(show: boolean  ): void {
         if (show) {
             this.mapOverlay.show();
+            if (!this.hasShownRegionTitle) {
+                this.mapOverlay.showRegionTitle("STYX DELTA");
+                this.hasShownRegionTitle = true;
+            }
         } else {
             this.mapOverlay.hide();
         }
