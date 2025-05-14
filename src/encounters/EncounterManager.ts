@@ -17,7 +17,7 @@ import { Brigand } from './monsters/act1_segment1/act1_segment0/Brigand';
 import { Hellworm } from './monsters/act1_segment1/act1_segment0/Hellworm';
 import { SorrowmothSwarm } from './monsters/act1_segment1/CaulMoth';
 import { Echophagist } from './monsters/act1_segment1/Echophage';
-import { FrenchCrow } from './monsters/act1_segment1/HymnalOfMeat';
+import { FrenchCrow } from './monsters/act1_segment1/Marshflutter';
 import { VeilCapacitor } from './monsters/act1_segment1/ObeliskOfPentacles';
 import { VesperOfMeat } from './monsters/act1_segment1/VesperOfMeat';
 import { EldritchMime } from './monsters/act1_segment2/FrenchMime';

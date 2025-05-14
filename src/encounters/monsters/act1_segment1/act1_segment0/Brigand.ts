@@ -7,7 +7,7 @@ export class Brigand extends AutomatedCharacter {
     constructor() {
         super({
             name: "Brigand",
-            portraitName: "Bandit",
+            portraitName: "symbol_brigand",
             maxHitpoints: 20,
             description: "A contemptible hooligan of Hell's underclass, looking for an easy score."
         });

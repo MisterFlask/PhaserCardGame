@@ -11,8 +11,8 @@ import { Terrifying } from '../../../gamecharacters/buffs/standard/Terrifying';
 export class FrenchCrow extends AutomatedCharacter {
     constructor() {
         super({
-            name: "Hymnal of Meat",
-            portraitName: "Darkness Wisp",
+            name: "Marshflutter",
+            portraitName: "symbol_bird",
             maxHitpoints: 10,
             description: "it sings, and the choir is made from those who listen."
         });

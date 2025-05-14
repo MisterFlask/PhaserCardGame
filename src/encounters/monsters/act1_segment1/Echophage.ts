@@ -6,7 +6,7 @@ export class Echophagist extends AutomatedCharacter {
     constructor() {
         super({
             name: "Echophage",
-            portraitName: "Eldritch Corruption Deer",
+            portraitName: "symbol_deer",
             maxHitpoints: 30,
             description: "Antlers sharp as philosophy, refracting light into spectral halos that contain glimpses of forgotten monarchies"
         });
