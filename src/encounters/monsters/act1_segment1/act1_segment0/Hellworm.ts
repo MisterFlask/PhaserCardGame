@@ -10,8 +10,8 @@ import { TargetingUtils } from '../../../../utils/TargetingUtils';
 export class Hellworm extends AutomatedCharacter {
     constructor() {
         super({
-            name: "symbol_worm",
-            portraitName: "Worm",
+            name: "Hellworm",
+            portraitName: "symbol_worm",
             maxHitpoints: 20,
             description: "A writhing, segmented pest characteristic of the upper Hells."
         });
