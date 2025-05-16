@@ -16,11 +16,11 @@ import { FrenchBlindProphetess } from './monsters/act1_boss/FrenchBlindProphetes
 import { Brigand } from './monsters/act1_segment1/act1_segment0/Brigand';
 import { StyxConstrictor } from './monsters/act1_segment1/act1_segment0/Hellworm';
 import { SorrowmothSwarm } from './monsters/act1_segment1/CaulMoth';
-import { Echophagist } from './monsters/act1_segment1/Echophage';
 import { FrenchCrow } from './monsters/act1_segment1/Marshflutter';
+import { Echophagist } from './monsters/act1_segment1/MarshStag';
 import { VeilCapacitor } from './monsters/act1_segment1/ObeliskOfPentacles';
 import { VesperOfMeat } from './monsters/act1_segment1/VesperOfMeat';
-import { EldritchMime } from './monsters/act1_segment2/FrenchMime';
+import { EldritchMime } from './monsters/act1_segment2/CensorWisp';
 import { AccursedObelisk } from './monsters/act1_segment2/ObeliskOfCups';
 import { RuminantOfSwords } from './monsters/act1_segment2/RuminantOfSwords';
 import { LuridAutarch } from './monsters/act2_boss/LuridAutarch';
@@ -196,9 +196,9 @@ export class Encounter {
 
         // if this is the first act, take a random name from swamp backgrounds
         var swampBackgrounds = [
-            "swamp-1.png",
-            "swamp-2.png",
-            "swamp-3.png",
+            "swamp-1",
+            "swamp-2",
+            "swamp-3",
             "eldritch-jungle-oil-painting",
             "forest-oil-painting",
         ]
@@ -243,7 +243,7 @@ export class Encounter {
 
 export class ShopGuy extends AutomatedCharacter {
     constructor() {
-        super({ name: 'Arms Dealer', portraitName: 'shopkeeper-spooky', maxHitpoints: 10, description: 'please buy something' });
+        super({ name: 'Arms Dealer', portraitName: 'shopkeeper_shady_symbol', maxHitpoints: 10, description: 'please buy something' });
         this.size = CardSize.LARGE;
         this.tags.push("shop_combat");
     }
@@ -255,7 +255,7 @@ export class ShopGuy extends AutomatedCharacter {
 
 export class CommoditiesGuy extends AutomatedCharacter {
     constructor() {
-        super({ name: 'Commodities Trader', portraitName: 'shopkeeper-professional', maxHitpoints: 10, description: "i'm serious, and i'm a professional"});
+        super({ name: 'Commodities Trader', portraitName: 'capitalist_1', maxHitpoints: 10, description: "i'm serious, and i'm a professional"});
         this.tags.push("shop_sell_imports");
         this.size = CardSize.LARGE;
     }
@@ -268,7 +268,7 @@ export class CommoditiesGuy extends AutomatedCharacter {
 
 export class CursedGoodsTrader extends AutomatedCharacter {
     constructor() {
-        super({ name: 'Artifact Salesman', portraitName: 'shopkeeper-shady', maxHitpoints: 10, description: 'they fell off the back of a wagon' });
+        super({ name: 'Artifact Salesman', portraitName: 'shopkeeper_spicy_symbol', maxHitpoints: 10, description: 'they fell off the back of a wagon' });
         this.tags.push("shop_buy_exports");
         this.size = CardSize.LARGE;
     }

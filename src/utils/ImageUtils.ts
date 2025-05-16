@@ -284,6 +284,32 @@ export default class ImageUtils {
             prefix: 'Backgrounds/Placeholder/',
             files: ['placeholder_event_background_1.png', "placeholder_event_background_2.png"]
         },
+        enemies_v3:{
+            prefix: 'Sprites/Enemies/v3/',
+            files:[
+                "aristocrat_1.png",
+                "aristocrat_2.png",
+                "brigand_symbol_2.png",
+                "brigand_symbol.png",
+                "capitalist_1.png",
+                "capitalist_2.png",
+                "censored_wisp_swarm.png",
+                "coal_golem.png",
+                "environmentalist_1.png",
+                "green_wisp_swarm_2.png",
+                "orange_wisp_swarm.png",
+                "orange_wisp.png",
+                "shopkeeper_shady_symbol.png",
+                "shopkeeper_spicy_symbol.png",
+                "sigil_bird.png",
+                "symbol_head_charon.png",
+                "symbol_hydra.png",
+                "wisp_censored.png",
+                "wood_golem.png",
+                "moose.png",
+                "totem_1.png"
+              ]
+        },
         enemies: {
             prefix: 'Sprites/Enemies/v2/',
             files: [

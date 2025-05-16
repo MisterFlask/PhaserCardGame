@@ -27,6 +27,8 @@ export class PlayerVessel extends PlayerCharacter {
             portraitName: "amphibious_steamer",
             characterClass: new SimpleAmphibiousSteamer(),
         });
+        this.hitpoints = this.characterClass.startingMaxHp;
+        this.maxHitpoints = this.characterClass.startingMaxHp;
     }
 
     public purgeAllCargo(){

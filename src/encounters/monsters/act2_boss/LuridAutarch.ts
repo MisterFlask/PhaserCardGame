@@ -11,7 +11,7 @@ export class LuridAutarch extends AutomatedCharacter {
     constructor() {
         super({
             name: "Lurid Autarch",
-            portraitName: "Boss Shield Knightess",
+            portraitName: "moose",
             maxHitpoints: 300,
             description: "its reign is eternal and jawless"
         });

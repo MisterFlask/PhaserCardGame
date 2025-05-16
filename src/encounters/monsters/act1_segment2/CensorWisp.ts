@@ -10,8 +10,8 @@ export class EldritchMime extends AutomatedCharacter {
 
     constructor() {
         super({
-            name: "...",
-            portraitName: "Golems Eye Golem",
+            name: "Censor Wisp",
+            portraitName: "wisp_censored",
             maxHitpoints: 15,
             description: "Avert your gaze"
         });

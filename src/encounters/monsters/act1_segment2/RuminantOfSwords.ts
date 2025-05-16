@@ -11,7 +11,7 @@ export class RuminantOfSwords extends AutomatedCharacter {
     constructor() {
         super({
             name: "Ruminant of Swords",
-            portraitName: "Lumberjack",
+            portraitName: "wood_golem",
             maxHitpoints: 60,
             description: "Many unsanctioned pine dimensions.  Culling necessary."
         });

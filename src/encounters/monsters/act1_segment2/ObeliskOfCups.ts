@@ -11,9 +11,9 @@ export class AccursedObelisk extends AutomatedCharacter {
     constructor() {
         super({
             name: "Obelisk of Cups",
-            portraitName: "Eldritch Corruption Obelisk",
+            portraitName: "totem_2",
             maxHitpoints: 40,
-            description: "An ancient obelisk radiating dark energy."
+            description: "BWEEEEOW."
         });
         
         this.size = CardSize.LARGE;

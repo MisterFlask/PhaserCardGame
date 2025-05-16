@@ -11,7 +11,7 @@ export class FrenchBlindProphetess extends AutomatedCharacter {
     constructor() {
         super({
             name: "Doris Smith",
-            portraitName: "Boss Grand Sorceress Duessa",
+            portraitName: "hermit",
             maxHitpoints: 200,
             description: "whispers of the Final Argument"
         });
