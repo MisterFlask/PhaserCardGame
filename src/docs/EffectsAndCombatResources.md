@@ -1,6 +1,12 @@
 # Combat Resources
 
-Combat resources represent different types of power that can be accumulated during combat. Each resource has specific mechanical effects when clicked or triggered:
+Combat resources represent different types of power that can be accumulated during combat.
+
+Mechanically, they serve two purposes: first, they provide a SCALING MECHANISM: cards can scale damage or block or special effects based on a specific resource, e.g. a card might have improved damage with Ashes.  Likewise, the Burning status effect ALWAYS scales with Ashes.
+
+Second, the ashes have an effect whereby you can SPEND them at any time to trigger effects.
+
+ Each resource has specific mechanical effects when clicked or triggered:
 
 ## Blood
 - **Icon**: blood_icon
