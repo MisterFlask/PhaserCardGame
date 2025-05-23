@@ -20,9 +20,17 @@ import { Echophagist } from './monsters/act1_segment1/Echophage';
 import { FrenchCrow } from './monsters/act1_segment1/Marshflutter';
 import { VeilCapacitor } from './monsters/act1_segment1/ObeliskOfPentacles';
 import { VesperOfMeat } from './monsters/act1_segment1/VesperOfMeat';
+import { BrimstoneMudskipper } from './monsters/act1_segment1/BrimstoneMudskipper';
+import { SootLungHeron } from './monsters/act1_segment1/SootLungHeron';
+import { DisgruntledFerryman } from './monsters/act1_segment1/DisgruntledFerryman';
+import { TelegraphEel } from './monsters/act1_segment1/TelegraphEel';
+import { BogLampreyOUS } from './monsters/act1_segment1/BogLampreyOUS';
 import { EldritchMime } from './monsters/act1_segment2/FrenchMime';
 import { AccursedObelisk } from './monsters/act1_segment2/ObeliskOfCups';
 import { RuminantOfSwords } from './monsters/act1_segment2/RuminantOfSwords';
+import { RaftPirate } from './monsters/act1_segment2/RaftPirate';
+import { TollCollectorGoneMad } from './monsters/act1_segment2/TollCollectorGoneMad';
+import { RunoffElemental } from './monsters/act1_segment2/RunoffElemental';
 import { LuridAutarch } from './monsters/act2_boss/LuridAutarch';
 import { BureaucraticBehemoth } from './monsters/act2_segment1/BureaucraticBehemoth';
 import { CrawlingInfestation } from './monsters/act2_segment1/CrawlingInfestation';
@@ -105,6 +113,18 @@ export class ActSegment {
         },
         {
             enemies: [new SorrowmothSwarm(), new SorrowmothSwarm()]
+        },
+        {
+            enemies: [new BrimstoneMudskipper(), new SootLungHeron()]
+        },
+        {
+            enemies: [new DisgruntledFerryman(), new DisgruntledFerryman()]
+        },
+        {
+            enemies: [new TelegraphEel()]
+        },
+        {
+            enemies: [new BogLampreyOUS()]
         }
     ]);
 
@@ -117,6 +137,15 @@ export class ActSegment {
         },
         {
             enemies: [new AccursedObelisk()]
+        },
+        {
+            enemies: [new RaftPirate(), new RaftPirate()]
+        },
+        {
+            enemies: [new TollCollectorGoneMad()]
+        },
+        {
+            enemies: [new RunoffElemental()]
         }
     ]);
 
