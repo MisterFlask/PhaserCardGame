@@ -5,7 +5,7 @@ import { Lethality } from '../../../gamecharacters/buffs/standard/Lethality';
 import { Swarm } from '../../../gamecharacters/buffs/standard/Swarm';
 import { StingingInsects } from '../../../gamecharacters/statuses/StingingInsects';
 
-export class SorrowmothSwarm extends AutomatedCharacter {
+export class SkeeterwispSwarm extends AutomatedCharacter {
     constructor() {
         super({
             name: "Skeeterwisp Swarm",

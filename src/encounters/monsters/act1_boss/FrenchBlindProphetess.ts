@@ -1,12 +1,11 @@
 import { AbstractIntent, ApplyDebuffToAllPlayerCharactersIntent, AttackAllPlayerCharactersIntent, AttackIntent, IntentListCreator, SummonIntent } from '../../../gamecharacters/AbstractIntent';
 import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
-import { EggLayer } from '../../../gamecharacters/buffs/enemy_buffs/EggLayer';
 import { Stress } from '../../../gamecharacters/buffs/standard/Stress';
 import { Titan } from '../../../gamecharacters/buffs/standard/Titan';
 import { Vulnerable } from '../../../gamecharacters/buffs/standard/Vulnerable';
 import { CardSize } from '../../../gamecharacters/Primitives';
 import { GameState } from '../../../rules/GameState';
-import { VeilCapacitor } from '../act1_segment1/ObeliskOfPentacles';
+import { VeilCapacitor } from '../act1_segment1/WoodenTotem';
 export class FrenchBlindProphetess extends AutomatedCharacter {
     constructor() {
         super({
@@ -19,8 +18,6 @@ export class FrenchBlindProphetess extends AutomatedCharacter {
         this.portraitOffsetXOverride = -100
         this.portraitOffsetYOverride = 0
         this.size = CardSize.LARGE;
-        // Apply initial MothGod buff
-        this.buffs.push(new EggLayer(2));
         this.buffs.push(new Titan(2))
     }
 

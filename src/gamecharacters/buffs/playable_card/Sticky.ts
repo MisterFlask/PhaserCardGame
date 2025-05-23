@@ -1,5 +1,5 @@
 import { AbstractBuff } from "../AbstractBuff";
-import { SlowBuff } from "./Slow";
+import { StunnedBuff } from "./Stunned";
 
 export class StickyBuff extends AbstractBuff {
     constructor() {
@@ -18,7 +18,7 @@ export class StickyBuff extends AbstractBuff {
     override onInHandAtEndOfTurn(): void {
         const owner = this.getOwnerAsPlayableCard();
         if (owner && owner.owningCharacter) {
-            this.actionManager.applyBuffToCharacterOrCard(owner.owningCharacter, new SlowBuff(this.stacks));
+            this.actionManager.applyBuffToCharacterOrCard(owner.owningCharacter, new StunnedBuff(this.stacks));
         }
     }
 }

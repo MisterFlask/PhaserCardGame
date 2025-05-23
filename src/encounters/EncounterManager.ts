@@ -15,14 +15,14 @@ import { RestEvent } from './events/RestEvent';
 import { FrenchBlindProphetess } from './monsters/act1_boss/FrenchBlindProphetess';
 import { Brigand } from './monsters/act1_segment1/act1_segment0/Brigand';
 import { StyxConstrictor } from './monsters/act1_segment1/act1_segment0/Hellworm';
-import { SorrowmothSwarm } from './monsters/act1_segment1/CaulMoth';
-import { FrenchCrow } from './monsters/act1_segment1/Marshflutter';
+import { VesperOfMeat } from './monsters/act1_segment1/BrineBast';
+import { SkeeterwispSwarm } from './monsters/act1_segment1/CaulMoth';
+import { Marshflutter } from './monsters/act1_segment1/Marshflutter';
 import { Echophagist } from './monsters/act1_segment1/MarshStag';
-import { VeilCapacitor } from './monsters/act1_segment1/ObeliskOfPentacles';
-import { VesperOfMeat } from './monsters/act1_segment1/VesperOfMeat';
+import { VeilCapacitor } from './monsters/act1_segment1/WoodenTotem';
 import { EldritchMime } from './monsters/act1_segment2/CensorWisp';
-import { AccursedObelisk } from './monsters/act1_segment2/ObeliskOfCups';
-import { RuminantOfSwords } from './monsters/act1_segment2/RuminantOfSwords';
+import { AccursedObelisk } from './monsters/act1_segment2/Rootwrithe';
+import { WoodGolem } from './monsters/act1_segment2/WoodGolem';
 import { LuridAutarch } from './monsters/act2_boss/LuridAutarch';
 import { BureaucraticBehemoth } from './monsters/act2_segment1/BureaucraticBehemoth';
 import { CrawlingInfestation } from './monsters/act2_segment1/CrawlingInfestation';
@@ -98,13 +98,13 @@ export class ActSegment {
             enemies: [new VesperOfMeat(), new VesperOfMeat(), new VeilCapacitor()]
         },
         {
-            enemies: [new FrenchCrow(), new FrenchCrow()]
+            enemies: [new Marshflutter(), new Marshflutter()]
         },
         {
             enemies: [new Echophagist(), new Echophagist()]
         },
         {
-            enemies: [new SorrowmothSwarm(), new SorrowmothSwarm()]
+            enemies: [new SkeeterwispSwarm(), new SkeeterwispSwarm()]
         }
     ]);
 
@@ -113,7 +113,7 @@ export class ActSegment {
             enemies: [new EldritchMime(), new EldritchMime()]
         },
         {
-            enemies: [new RuminantOfSwords(), new RuminantOfSwords()]
+            enemies: [new WoodGolem(), new WoodGolem()]
         },
         {
             enemies: [new AccursedObelisk()]
@@ -151,7 +151,7 @@ export class ActSegment {
             enemies: [new HiveBroodmother()]
         },
         {
-            enemies: [new SorrowmothSwarm(), new SorrowmothSwarm()]
+            enemies: [new SkeeterwispSwarm(), new SkeeterwispSwarm()]
         },
         {
             enemies: [new SlothfulSentinel()]

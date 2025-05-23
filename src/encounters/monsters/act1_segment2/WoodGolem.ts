@@ -7,10 +7,10 @@ import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
 import { Regeneration } from '../../../gamecharacters/buffs/enemy_buffs/Regeneration';
 import { CardSize } from '../../../gamecharacters/Primitives';
 
-export class RuminantOfSwords extends AutomatedCharacter {
+export class WoodGolem extends AutomatedCharacter {
     constructor() {
         super({
-            name: "Ruminant of Swords",
+            name: "Rickety Man",
             portraitName: "wood_golem",
             maxHitpoints: 60,
             description: "Many unsanctioned pine dimensions.  Culling necessary."

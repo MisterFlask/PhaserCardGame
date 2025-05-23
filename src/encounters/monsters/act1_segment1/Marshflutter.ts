@@ -8,10 +8,10 @@ import { Flying } from '../../../gamecharacters/buffs/standard/Flying';
 import { Lethality } from '../../../gamecharacters/buffs/standard/Lethality';
 import { Terrifying } from '../../../gamecharacters/buffs/standard/Terrifying';
 
-export class FrenchCrow extends AutomatedCharacter {
+export class Marshflutter extends AutomatedCharacter {
     constructor() {
         super({
-            name: "Marshflutter",
+            name: "Styxflutter",
             portraitName: "symbol_bird",
             maxHitpoints: 10,
             description: "it sings, and the choir is made from those who listen."

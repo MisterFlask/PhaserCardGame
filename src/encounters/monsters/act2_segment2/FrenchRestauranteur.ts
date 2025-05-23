@@ -2,7 +2,7 @@ import { AbstractIntent, AttackAllPlayerCharactersIntent, AttackIntent, IntentLi
 import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
 import { Desirous } from '../../../gamecharacters/buffs/enemy_buffs/Desirous';
 import { Idol } from '../../../gamecharacters/buffs/enemy_buffs/Idol';
-import { VesperOfMeat } from '../act1_segment1/VesperOfMeat';
+import { VesperOfMeat } from '../act1_segment1/BrineBast';
 
 export class FrenchRestauranteur extends AutomatedCharacter {
     constructor() {
