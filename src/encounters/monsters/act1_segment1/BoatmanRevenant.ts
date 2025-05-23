@@ -15,7 +15,7 @@ class Waterlogged extends AbstractBuff {
     constructor() {
         super();
         this.isDebuff = true;
-        this.imageName = "water";
+        this.imageName = "f";
         this.tint = 0x00FFFF;
     }
 

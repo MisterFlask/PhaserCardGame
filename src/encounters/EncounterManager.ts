@@ -15,13 +15,21 @@ import { RestEvent } from './events/RestEvent';
 import { FrenchBlindProphetess } from './monsters/act1_boss/FrenchBlindProphetess';
 import { Brigand } from './monsters/act1_segment1/act1_segment0/Brigand';
 import { StyxConstrictor } from './monsters/act1_segment1/act1_segment0/Hellworm';
+import { BogLampreyOUS } from './monsters/act1_segment1/BogLampreyOUS';
+import { BrimstoneMudskipper } from './monsters/act1_segment1/BrimstoneMudskipper';
 import { VesperOfMeat } from './monsters/act1_segment1/BrineBast';
-import { SkeeterwispSwarm } from './monsters/act1_segment1/CaulMoth';
+import { DisgruntledFerryman } from './monsters/act1_segment1/DisgruntledFerryman';
 import { Marshflutter } from './monsters/act1_segment1/Marshflutter';
 import { Echophagist } from './monsters/act1_segment1/MarshStag';
+import { SkeeterwispSwarm } from './monsters/act1_segment1/SkeeterwispSwarm';
+import { SootLungHeron } from './monsters/act1_segment1/SootLungHeron';
+import { TelegraphEel } from './monsters/act1_segment1/TelegraphEel';
 import { VeilCapacitor } from './monsters/act1_segment1/WoodenTotem';
 import { EldritchMime } from './monsters/act1_segment2/CensorWisp';
+import { RaftPirate } from './monsters/act1_segment2/RaftPirate';
 import { AccursedObelisk } from './monsters/act1_segment2/Rootwrithe';
+import { RunoffElemental } from './monsters/act1_segment2/RunoffElemental';
+import { TollCollectorGoneMad } from './monsters/act1_segment2/TollCollectorGoneMad';
 import { WoodGolem } from './monsters/act1_segment2/WoodGolem';
 import { LuridAutarch } from './monsters/act2_boss/LuridAutarch';
 import { BureaucraticBehemoth } from './monsters/act2_segment1/BureaucraticBehemoth';
@@ -105,6 +113,18 @@ export class ActSegment {
         },
         {
             enemies: [new SkeeterwispSwarm(), new SkeeterwispSwarm()]
+        },
+        {
+            enemies: [new BrimstoneMudskipper(), new SootLungHeron()]
+        },
+        {
+            enemies: [new DisgruntledFerryman(), new DisgruntledFerryman()]
+        },
+        {
+            enemies: [new TelegraphEel()]
+        },
+        {
+            enemies: [new BogLampreyOUS()]
         }
     ]);
 
@@ -117,6 +137,15 @@ export class ActSegment {
         },
         {
             enemies: [new AccursedObelisk()]
+        },
+        {
+            enemies: [new RaftPirate(), new RaftPirate()]
+        },
+        {
+            enemies: [new TollCollectorGoneMad()]
+        },
+        {
+            enemies: [new RunoffElemental()]
         }
     ]);
 
