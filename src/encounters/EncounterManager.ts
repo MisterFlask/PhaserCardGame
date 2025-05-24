@@ -35,6 +35,8 @@ import { RunoffElemental } from './monsters/act1_segment2/RunoffElemental';
 import { TollCollectorGoneMad } from './monsters/act1_segment2/TollCollectorGoneMad';
 import { WoodGolem } from './monsters/act1_segment2/WoodGolem';
 import { LuridAutarch } from './monsters/act2_boss/LuridAutarch';
+import { MarshalMortis } from './monsters/act2_boss/MarshalMortis';
+import { TheFrostChancellor } from './monsters/act2_boss/TheFrostChancellor';
 import { BureaucraticBehemoth } from './monsters/act2_segment1/BureaucraticBehemoth';
 import { CrawlingInfestation } from './monsters/act2_segment1/CrawlingInfestation';
 import { FrenchPoliceman } from './monsters/act2_segment1/FrenchPoliceman';
@@ -225,6 +227,12 @@ export class ActSegment {
     static readonly Boss_Act2 = new ActSegmentData("Boss Fight - Act 2", 2, 3, [
         {
             enemies: [new LuridAutarch()]
+        },
+        {
+            enemies: [new MarshalMortis()]
+        },
+        {
+            enemies: [new TheFrostChancellor()]
         }
     ]);
 }
