@@ -1,8 +1,8 @@
 import { AbstractIntent, AttackAllPlayerCharactersIntent, AttackIntent, IntentListCreator } from '../../../gamecharacters/AbstractIntent';
 import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
-import { Implacable } from '../../../gamecharacters/buffs/standard/Implacable';
 import { Decaying } from '../../../gamecharacters/buffs/enemy_buffs/Decaying';
 import { Minion } from '../../../gamecharacters/buffs/enemy_buffs/Minion';
+import { Implacable } from '../../../gamecharacters/buffs/standard/Implacable';
 
 export class MitrailleuseOrganist extends AutomatedCharacter {
     constructor() {

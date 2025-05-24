@@ -1,6 +1,6 @@
 import { AbstractBuff } from "../AbstractBuff";
 
-export class Transient extends AbstractBuff {
+export class Ethereal extends AbstractBuff {
     constructor() {
         super();
         this.isDebuff = true;

@@ -1,4 +1,5 @@
 import { BaseCharacter } from "../../BaseCharacter";
+import { IBaseCharacter } from "../../IBaseCharacter";
 import { PlayableCard } from "../../PlayableCard";
 import { AbstractBuff } from "../AbstractBuff";
 
@@ -9,33 +10,18 @@ export class Frostbite extends AbstractBuff {
         this.isDebuff = true;
         this.stackable = true;
         this.imageName = "snowflake";
-        this.secondaryStacks = 0;
     }
 
     override getDisplayName(): string { return "Frostbite"; }
     override getDescription(): string {
-        return `Lose 1 Dexterity and 1 Lethality. Playing two cards removes Frostbite.`;
+        return `Lose 1 Dexterity and 1 Lethality.`;
     }
 
-    override getBlockSentModifier(_target?: BaseCharacter): number {
+    override getBlockSentModifier(_target: IBaseCharacter): number {
         return -1 * this.stacks;
     }
 
     override getCombatDamageDealtModifier(_target?: BaseCharacter, _sourceCard?: PlayableCard): number {
         return -1 * this.stacks;
-    }
-
-    override onTurnStart(): void {
-        this.secondaryStacks = 0;
-    }
-
-    override onAnyCardPlayedByAnyone(card: PlayableCard): void {
-        const owner = this.getOwnerAsCharacter();
-        if (owner && card.owningCharacter === owner) {
-            this.secondaryStacks++;
-            if (this.secondaryStacks >= 2) {
-                this.actionManager.removeBuffFromCharacter(owner, this.getDisplayName());
-            }
-        }
     }
 }

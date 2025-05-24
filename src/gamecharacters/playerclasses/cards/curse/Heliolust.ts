@@ -3,8 +3,8 @@ import { EntityRarity } from "../../../EntityRarity";
 import { PlayableCard } from "../../../PlayableCard";
 import { CardType } from "../../../Primitives";
 import { AbstractBuff } from "../../../buffs/AbstractBuff";
+import { Ethereal } from "../../../buffs/playable_card/Ethereal";
 import { ExhaustBuff } from "../../../buffs/playable_card/ExhaustBuff";
-import { Transient } from "../../../buffs/playable_card/Transient";
 import { Burning } from "../../../buffs/standard/Burning";
 import { Stress } from "../../../buffs/standard/Stress";
 
@@ -39,7 +39,7 @@ export class Heliolust extends PlayableCard {
             rarity: EntityRarity.MENACE,
         });
         this.baseEnergyCost = 0;
-        this.buffs.push(new Transient());
+        this.buffs.push(new Ethereal());
         this.buffs.push(new ExhaustBuff());
         this.buffs.push(new StressOnRetainBuff());
     }

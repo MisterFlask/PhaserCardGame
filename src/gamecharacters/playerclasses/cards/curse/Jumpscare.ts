@@ -4,7 +4,7 @@ import { EntityRarity } from "../../../EntityRarity";
 import { PlayableCard } from "../../../PlayableCard";
 import { CardType } from "../../../Primitives";
 import { AbstractBuff } from "../../../buffs/AbstractBuff";
-import { Transient } from "../../../buffs/playable_card/Transient";
+import { Ethereal } from "../../../buffs/playable_card/Ethereal";
 import { Vulnerable } from "../../../buffs/standard/Vulnerable";
 
 class JumpscareBuff extends AbstractBuff {
@@ -42,7 +42,7 @@ export class Jumpscare extends PlayableCard {
         });
         this.baseEnergyCost = 0;
         this.baseMagicNumber = 1;
-        this.buffs.push(new Transient());
+        this.buffs.push(new Ethereal());
         this.buffs.push(new JumpscareBuff());
     }
 

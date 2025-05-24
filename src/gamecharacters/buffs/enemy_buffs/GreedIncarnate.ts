@@ -1,10 +1,10 @@
+import { DamageInfo } from "../../../rules/DamageInfo";
+import { GameState } from "../../../rules/GameState";
 import { BaseCharacter } from "../../BaseCharacter";
 import { PlayableCard } from "../../PlayableCard";
 import { AbstractBuff } from "../AbstractBuff";
 import { Lethality } from "../standard/Lethality";
-import { DamageInfo } from "../../../rules/DamageInfo";
 import { ValuableCargo } from "../standard/ValuableCargo";
-import { GameState } from "../../../rules/GameState";
 
 export class GreedIncarnate extends AbstractBuff {
     private triggeredThisTurn: boolean = false;
@@ -20,7 +20,7 @@ export class GreedIncarnate extends AbstractBuff {
     override getDisplayName(): string { return "Greed Incarnate"; }
 
     override getDescription(): string {
-        return `Cargo cards heal this foe and grant Lethality. If it takes ${this.stacks} or more damage in a single turn, it gains 15 Obols.`;
+        return `Cargo cards heal this foe and grant Lethality. If it takes ${this.stacks} or more damage in a single turn, it gains 15 sovereign infernal notes.`;
     }
 
     override onTurnStart(): void {
@@ -41,7 +41,7 @@ export class GreedIncarnate extends AbstractBuff {
     override onOwnerStruck_CannotModifyDamage(_strikingUnit: BaseCharacter | null, _cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void {
         this.secondaryStacks += damageInfo.unblockedDamageTaken;
         if (!this.triggeredThisTurn && this.secondaryStacks >= this.stacks) {
-            GameState.getInstance().obols += 15;
+            GameState.getInstance().sovereignInfernalNotes += 15;
             this.triggeredThisTurn = true;
         }
     }

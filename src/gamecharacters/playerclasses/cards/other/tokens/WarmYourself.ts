@@ -1,7 +1,7 @@
 import { TargetingType } from "../../../../AbstractCard";
 import { BaseCharacter } from "../../../../BaseCharacter";
+import { Ethereal } from "../../../../buffs/playable_card/Ethereal";
 import { ExhaustBuff } from "../../../../buffs/playable_card/ExhaustBuff";
-import { Transient } from "../../../../buffs/playable_card/Transient";
 import { EntityRarity } from "../../../../EntityRarity";
 import { PlayableCard } from "../../../../PlayableCard";
 import { CardType } from "../../../../Primitives";
@@ -16,7 +16,7 @@ export class WarmYourself extends PlayableCard {
         });
         this.baseEnergyCost = 2;
         this.buffs.push(new ExhaustBuff());
-        this.buffs.push(new Transient());
+        this.buffs.push(new Ethereal());
     }
 
     override get description(): string {
