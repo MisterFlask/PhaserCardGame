@@ -7,10 +7,10 @@ import { Weak } from '../../../gamecharacters/buffs/standard/Weak';
 export class FrenchPoliceman extends AutomatedCharacter {
     constructor() {
         super({
-            name: "Ashcop",
+            name: "Prévôt des Maréchaux",
             portraitName: "Clockwork Iron Maiden",
             maxHitpoints: 175,
-            description: "keeping paris out of the Null Layer"
+            description: "I See You"
         });
         
         // Apply initial Penance and Guilt buffs
@@ -21,7 +21,7 @@ export class FrenchPoliceman extends AutomatedCharacter {
     override generateNewIntents(): AbstractIntent[] {
         const intents: AbstractIntent[][] = [
             [
-                new AttackIntent({ baseDamage: 20, owner: this }).withTitle("I Know What You Did")
+                new AttackIntent({ baseDamage: 20, owner: this }).withTitle("Halt, deserter!")
             ],
             [
                 new ApplyDebuffToAllPlayerCharactersIntent({ debuff: new Weak(2), owner: this }).withTitle("Crushing Guilt")

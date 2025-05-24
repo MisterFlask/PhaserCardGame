@@ -37,15 +37,10 @@ import { CrawlingInfestation } from './monsters/act2_segment1/CrawlingInfestatio
 import { FrenchPoliceman } from './monsters/act2_segment1/FrenchPoliceman';
 import { HiveBroodmother } from './monsters/act2_segment1/HiveBroodmother';
 import { Lexiophage } from './monsters/act2_segment1/Lexiophage';
-import { SlothfulSentinel } from './monsters/act2_segment1/SlothfulSentinel';
-import { WeirdTree } from './monsters/act2_segment1/WeirdTree';
 import { MitrailleuseOrganist } from './monsters/act2_segment1/MitrailleuseOrganist';
 import { OldGuardGrenadier } from './monsters/act2_segment1/OldGuardGrenadier';
 import { Artiste } from './monsters/act2_segment2/Artiste';
-import { EschatonMirror } from './monsters/act2_segment2/EschatonMirror';
 import { FrenchRestauranteur } from './monsters/act2_segment2/FrenchRestauranteur';
-import { VeilSculptor } from './monsters/act2_segment2/VeilSculptor';
-import { ImperialAuditorWraith } from './monsters/act2_segment2/ImperialAuditorWraith';
 // Define new character classes
 export class ClockworkAbomination extends AutomatedCharacter {
     constructor() {
@@ -186,13 +181,7 @@ export class ActSegment {
             enemies: [new SkeeterwispSwarm(), new SkeeterwispSwarm()]
         },
         {
-            enemies: [new SlothfulSentinel()]
-        },
-        {
             enemies: [new BureaucraticBehemoth()]
-        },
-        {
-            enemies: [new WeirdTree(), new WeirdTree()]
         },
         {
             enemies: [new MitrailleuseOrganist()]
@@ -209,15 +198,6 @@ export class ActSegment {
         {
             enemies: [new VesperOfMeat(), new VesperOfMeat(), new FrenchRestauranteur()]
         },
-        {
-            enemies: [new VeilSculptor(), new VeilSculptor()]
-        },
-        {
-            enemies: [new EschatonMirror()]
-        },
-        {
-            enemies: [new ImperialAuditorWraith()]
-        }
     ]);
     
     
