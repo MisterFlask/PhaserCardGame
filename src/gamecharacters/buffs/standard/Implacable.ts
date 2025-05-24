@@ -1,11 +1,14 @@
 import { AbstractBuff } from "../AbstractBuff";
+import type { IBaseCharacter } from "../../IBaseCharacter";
+import type { PlayableCard } from "../../PlayableCard";
+import type { DamageInfo } from "../../../rules/DamageInfo";
 
 export class Implacable extends AbstractBuff {
     constructor(stacks: number = 1) {
         super();
         this.stacks = stacks;
         this.stackable = true;
-        this.imageName = "shield"; // Replace with actual icon name if available
+        this.imageName = "skull";
     }
 
     override getDisplayName(): string {
@@ -13,16 +16,15 @@ export class Implacable extends AbstractBuff {
     }
 
     override getDescription(): string {
-        return `At the start of turn, gain ${this.getStacksDisplayText()} Block.`;
+        return `Revives at ¼ HP when killed, ${this.getStacksDisplayText()} trigger(s) left.`;
     }
 
-    override onTurnStart(): void {
+    override onOwnerStruck_CannotModifyDamage(_strikingUnit: IBaseCharacter | null, _cardPlayedIfAny: PlayableCard | null, _damageInfo: DamageInfo): void {
         const owner = this.getOwnerAsCharacter();
-        if (owner) {
-            this.actionManager.applyBlock({
-                baseBlockValue: this.stacks,
-                blockTargetCharacter: owner
-            });
+        if (owner && owner.hitpoints <= 0 && this.stacks > 0) {
+            owner.hitpoints = Math.ceil(owner.maxHitpoints / 4);
+            this.stacks -= 1;
         }
     }
 }
+

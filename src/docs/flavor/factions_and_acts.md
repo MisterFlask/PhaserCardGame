@@ -11,10 +11,11 @@ here's the concise, cleaned-up summary of your roguelike's acts and faction conc
 
 * **Act 2: Deep France**
 
-  * Environment: Frozen trenches, Napoleonic revivalist "Empire of the Abyss," trench warfare aesthetics with industrial-revolution weaponry.
-  * Enemies: French undead imperialists, Napoleon’s old guard, mitrailleuse-organists, grenadiers, imperial auditor-wraiths, and trench engineers.  Also their German opposition.
+  * Environment: Frozen trenches where necromancers prop up an undead Napoleonic empire.  Trench warfare mixes with grisly rituals and industrial weaponry.
+  * Enemies: Reanimated infantry such as mitrailleuse-organists and old guard grenadiers, plus spectral auditors and trench engineers.  German cryo‑troops and zeppelin grenadiers oppose them.
+  * Default undead traits: **Implacable** (revive at ¼ HP a limited number of times), **Decaying** (lose HP each turn ignoring armor), and **Minion** (dies if only minions remain).
 
-CENTRAL CONFLICT:  The French vs the Germans; the French are led by Napoleon Bonaparte, who has been exiled from the surface.
+CENTRAL CONFLICT:  The necromantic French empire battles the German Reichsinfernokorps; Napoleon Bonaparte commands from exile.
 
 * **Act 3 (options suggested):**
 
