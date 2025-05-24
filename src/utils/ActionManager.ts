@@ -7,6 +7,7 @@ import type { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { AbstractBuff } from "../gamecharacters/buffs/AbstractBuff";
 import { Lethality } from "../gamecharacters/buffs/standard/Lethality";
 import { Stress } from "../gamecharacters/buffs/standard/Stress";
+import { GreedIncarnate } from "../gamecharacters/buffs/enemy_buffs/GreedIncarnate";
 import { CardResourceScaling } from "../gamecharacters/CardResourceScaling";
 import { IBaseCharacter } from "../gamecharacters/IBaseCharacter";
 import { PlayableCard } from "../gamecharacters/PlayableCard";
@@ -61,14 +62,45 @@ export class ActionManager {
     }
     modifySovereignInfernalNotes(amount: number) {
         this.actionQueue.addAction(new GenericAction(async () => {
-            GameState.getInstance().sovereignInfernalNotes += amount;
+            let amt = amount;
+            const combat = GameState.getInstance().combatState;
+            if (amt > 0 && combat) {
+                let greed: GreedIncarnate | undefined = undefined;
+                for (const enemy of combat.enemies) {
+                    const g = enemy.buffs.find(b => b instanceof GreedIncarnate) as GreedIncarnate | undefined;
+                    if (g) { greed = g; break; }
+                }
+                if (greed) {
+                    amt = greed.stealCurrency(amt);
+                }
+            }
+            GameState.getInstance().sovereignInfernalNotes += amt;
             return [];
         }));
     }
 
     modifyPromissoryNotes(amount: number) {
         this.actionQueue.addAction(new GenericAction(async () => {
-            GameState.getInstance().britishPoundsSterling += amount;
+            let amt = amount;
+            const combat = GameState.getInstance().combatState;
+            if (amt > 0 && combat) {
+                let greed: GreedIncarnate | undefined = undefined;
+                for (const enemy of combat.enemies) {
+                    const g = enemy.buffs.find(b => b instanceof GreedIncarnate) as GreedIncarnate | undefined;
+                    if (g) { greed = g; break; }
+                }
+                if (greed) {
+                    amt = greed.stealCurrency(amt);
+                }
+            }
+            GameState.getInstance().britishPoundsSterling += amt;
+            return [];
+        }));
+    }
+
+    modifyObols(amount: number) {
+        this.actionQueue.addAction(new GenericAction(async () => {
+            GameState.getInstance().obols += amount;
             return [];
         }));
     }
