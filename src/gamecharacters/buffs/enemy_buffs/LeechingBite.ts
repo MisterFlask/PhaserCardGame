@@ -1,5 +1,5 @@
-import { ActionManager } from "../../../utils/ActionManager";
 import { DamageInfo } from "../../../rules/DamageInfo";
+import { ActionManager } from "../../../utils/ActionManager";
 import { BaseCharacter } from "../../BaseCharacter";
 import { PlayableCard } from "../../PlayableCard";
 import { AbstractBuff } from "../AbstractBuff";
@@ -22,7 +22,7 @@ export class LeechingBite extends AbstractBuff {
 
     override onOwnerStriking_CannotModifyDamage(struckUnit: BaseCharacter, cardPlayedIfAny: PlayableCard | null, damageInfo: DamageInfo): void {
         const owner = this.getOwnerAsCharacter();
-        if (owner && damageInfo.unblockedDamage > 0) {
+        if (owner && damageInfo.unblockedDamageTaken > 0) {
             ActionManager.getInstance().heal(owner, this.stacks);
         }
     }
