@@ -41,11 +41,14 @@ import { SlothfulSentinel } from './monsters/act2_segment1/SlothfulSentinel';
 import { WeirdTree } from './monsters/act2_segment1/WeirdTree';
 import { MitrailleuseOrganist } from './monsters/act2_segment1/MitrailleuseOrganist';
 import { OldGuardGrenadier } from './monsters/act2_segment1/OldGuardGrenadier';
+import { TrenchEngineer } from './monsters/act2_segment1/TrenchEngineer';
 import { Artiste } from './monsters/act2_segment2/Artiste';
 import { EschatonMirror } from './monsters/act2_segment2/EschatonMirror';
 import { FrenchRestauranteur } from './monsters/act2_segment2/FrenchRestauranteur';
 import { VeilSculptor } from './monsters/act2_segment2/VeilSculptor';
 import { ImperialAuditorWraith } from './monsters/act2_segment2/ImperialAuditorWraith';
+import { Grafter } from './monsters/act2_segment2/Grafter';
+import { ZeppelinGrenadier } from './monsters/act2_segment2/ZeppelinGrenadier';
 // Define new character classes
 export class ClockworkAbomination extends AutomatedCharacter {
     constructor() {
@@ -199,6 +202,9 @@ export class ActSegment {
         },
         {
             enemies: [new OldGuardGrenadier()]
+        },
+        {
+            enemies: [new TrenchEngineer(), new TrenchEngineer()]
         }
     ]);
 
@@ -217,6 +223,12 @@ export class ActSegment {
         },
         {
             enemies: [new ImperialAuditorWraith()]
+        },
+        {
+            enemies: [new ZeppelinGrenadier(), new ZeppelinGrenadier()]
+        },
+        {
+            enemies: [new Grafter()]
         }
     ]);
     
