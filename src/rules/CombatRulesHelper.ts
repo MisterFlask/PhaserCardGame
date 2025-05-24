@@ -1,5 +1,7 @@
 import { IBaseCharacter } from "../gamecharacters/IBaseCharacter";
 import { GameState } from "./GameState";
+import { ProcBroadcaster } from "../gamecharacters/procs/ProcBroadcaster";
+import { CharacterDeathEvent } from "../utils/actions/CombatEvents";
 
 
 import { AutomatedCharacterType, BaseCharacterType, PlayableCardType } from "../Types";
@@ -54,6 +56,8 @@ export class CombatRules {
         combatState.currentHand = removeDeadCharacterCards(combatState.currentHand );
         combatState.currentDiscardPile = removeDeadCharacterCards(combatState.currentDiscardPile );
         combatState.drawPile = removeDeadCharacterCards(combatState.drawPile );
+
+        ProcBroadcaster.getInstance().broadcastCombatEvent(new CharacterDeathEvent(character as BaseCharacterType, killer as BaseCharacterType | null));
     }
 
 

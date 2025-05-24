@@ -1,4 +1,5 @@
 import { PlayableCard } from "../../gamecharacters/PlayableCard";
+import { BaseCharacter } from "../../gamecharacters/BaseCharacter";
 import { AbstractCombatEvent } from "../../rules/AbstractCombatEvent";
 import { AbstractCombatResource } from "../../rules/combatresources/AbstractCombatResource";
 
@@ -22,3 +23,12 @@ export class ExhaustEvent extends AbstractCombatEvent {
         super();
     }
 } 
+export class CharacterDeathEvent extends AbstractCombatEvent {
+    constructor(public deadCharacter: BaseCharacter, public killer: BaseCharacter | null) {
+        super();
+    }
+
+    printJson(): void {
+        console.log(`{"event": "CharacterDeathEvent", "dead": "${this.deadCharacter.name}", "killer": "${this.killer?.name ?? ''}"}`);
+    }
+}
