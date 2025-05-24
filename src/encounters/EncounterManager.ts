@@ -39,10 +39,13 @@ import { HiveBroodmother } from './monsters/act2_segment1/HiveBroodmother';
 import { Lexiophage } from './monsters/act2_segment1/Lexiophage';
 import { SlothfulSentinel } from './monsters/act2_segment1/SlothfulSentinel';
 import { WeirdTree } from './monsters/act2_segment1/WeirdTree';
+import { MitrailleuseOrganist } from './monsters/act2_segment1/MitrailleuseOrganist';
+import { OldGuardGrenadier } from './monsters/act2_segment1/OldGuardGrenadier';
 import { Artiste } from './monsters/act2_segment2/Artiste';
 import { EschatonMirror } from './monsters/act2_segment2/EschatonMirror';
 import { FrenchRestauranteur } from './monsters/act2_segment2/FrenchRestauranteur';
 import { VeilSculptor } from './monsters/act2_segment2/VeilSculptor';
+import { ZeppelinGrenadier } from './monsters/act2_segment2/ZeppelinGrenadier';
 // Define new character classes
 export class ClockworkAbomination extends AutomatedCharacter {
     constructor() {
@@ -190,6 +193,12 @@ export class ActSegment {
         },
         {
             enemies: [new WeirdTree(), new WeirdTree()]
+        },
+        {
+            enemies: [new MitrailleuseOrganist()]
+        },
+        {
+            enemies: [new OldGuardGrenadier()]
         }
     ]);
 
@@ -205,6 +214,9 @@ export class ActSegment {
         },
         {
             enemies: [new EschatonMirror()]
+        },
+        {
+            enemies: [new ZeppelinGrenadier()]
         }
     ]);
     

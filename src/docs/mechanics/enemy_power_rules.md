@@ -58,3 +58,13 @@ In addition to the balance rules above, enemies in Act 2 and Act 3 should have s
 Generally, you'll want to have these in the form of a "when the player does x, cause y effect" trigger (see triggers_and_effects_options for some ideas on this).  NOTE that the goal is for the player to be able to play around the buff/debuff; "the player has one less energy per turn" is an example of a bad concept for a debuff on the player since the player can't really do anything about that.  "Whenever the player plays a card, discard a card at random" is a more interesting buff since it forces the player to reprioritize the cards they play (this is just an example, do not use this specific concept.)  "This enemy takes 2x damage from burning" is also a good option since it pushes the player to use the Burning status effect more often.
 
 NOTE that you may use secondaryStacks on the AbstractBuff object if the buff needs to keep a counter of any sort.
+
+### Negative design example: unused-energy triggers
+
+`Audit Pressure` once penalized players for leaving energy unspent at the end of a turn.  Because unused energy is extremely rare in normal play, the effect almost never fired and therefore failed to influence player choices.  Worse, the buff repeatedly lowered party **Lethality**, stretching fights out rather than adding tension.
+
+### Better approach: card-count audits
+
+Revised `Audit Pressure` now counts how many cards the party plays each turn.  If they play more than three, everyone loses 1 Dexterity at turn end.  Players can choose to hold back cards to avoid the penalty, so the mechanic actually shapes decisions without permanently stifling their damage output.
+
+Repeatedly lowering Lethality is discouraged; if you must scale a stat down over time, hit Dexterity instead so combats don’t drag on interminably.

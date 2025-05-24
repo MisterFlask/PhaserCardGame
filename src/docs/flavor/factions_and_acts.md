@@ -12,7 +12,7 @@ here's the concise, cleaned-up summary of your roguelike's acts and faction conc
 * **Act 2: Deep France**
 
   * Environment: Frozen trenches, Napoleonic revivalist "Empire of the Abyss," trench warfare aesthetics with industrial-revolution weaponry.
-  * Enemies: French undead imperialists, Napoleon’s old guard, mitrailleuse-organists, grenadiers, imperial auditor-wraiths, and trench engineers.  Also their German opposition.
+  * Enemies: French undead imperialists, Napoleon’s old guard, mitrailleuse-organists, grenadiers, and trench engineers. German opposition fields cryo-lancers, zeppelin grenadiers, and uhlan riders.
 
 CENTRAL CONFLICT:  The French vs the Germans; the French are led by Napoleon Bonaparte, who has been exiled from the surface.
 
@@ -43,8 +43,8 @@ CENTRAL CONFLICT:  The French vs the Germans; the French are led by Napoleon Bon
 
 * **Reichsinfernokorps (Germany)**
 
-  * Visuals: Gunmetal greatcoats, spiked Pickelhaube with quartz, zeppelin-inspired aesthetics.
-  * Flavor: Imperial German industrial/scientific-military colonization, rigorous militarized science.
+  * Visuals: Gunmetal greatcoats, spiked Pickelhaube studded with quartz, and personal zeppelin harnesses with cryo-tech condensers.
+  * Flavor: Imperial German industrial/scientific-military colonization backed by experimental cryogenic weaponry and rigorous discipline.
 
 * **Imperial Hell Post (Britain)**
 
