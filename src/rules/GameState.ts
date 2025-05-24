@@ -41,6 +41,7 @@ export class GameState {
 
         this.sovereignInfernalNotes = 40
         this.britishPoundsSterling = 0
+        this.obols = 0
     }
 
     public cleanUpAfterLiquidation(){
@@ -93,6 +94,7 @@ export class GameState {
     public moneyInVault: number = 200
     public sovereignInfernalNotes: number = 0
     public britishPoundsSterling: number = 0
+    public obols: number = 0
 
     public combatState: CombatState = new CombatState()
 

@@ -13,6 +13,9 @@ import { GameState } from '../rules/GameState';
 import { CardModifier } from '../rules/modifiers/AbstractCardModifier';
 import { RestEvent } from './events/RestEvent';
 import { FrenchBlindProphetess } from './monsters/act1_boss/FrenchBlindProphetess';
+import { BloatedTreasurer } from './monsters/act1_boss/BloatedTreasurer';
+import { HermitProphetOfTheDelta } from './monsters/act1_boss/HermitProphetOfTheDelta';
+import { HermitsTreasure } from './monsters/act1_boss/HermitsTreasure';
 import { Brigand } from './monsters/act1_segment1/act1_segment0/Brigand';
 import { StyxConstrictor } from './monsters/act1_segment1/act1_segment0/Hellworm';
 import { BogLampreyOUS } from './monsters/act1_segment1/BogLampreyOUS';
@@ -154,6 +157,12 @@ export class ActSegment {
         {
             enemies: [new FrenchBlindProphetess(), new VeilCapacitor(), new VeilCapacitor()]
         },
+        {
+            enemies: [new BloatedTreasurer()]
+        },
+        {
+            enemies: [new HermitProphetOfTheDelta(), new HermitsTreasure()]
+        }
     ]);
     static readonly Act2_Segment0 = new ActSegmentData("Act 2 - Segment 1", 2, 0, [
         {
