@@ -59,6 +59,11 @@ Generally, you'll want to have these in the form of a "when the player does x, c
 
 NOTE that you may use secondaryStacks on the AbstractBuff object if the buff needs to keep a counter of any sort.
 
+*New rule:* **Do not store private mutable variables on buffs.**  If a buff needs
+to keep temporary state—such as whether it has been triggered this turn—use the
+`secondaryStacks` field instead. This keeps buff data visible and easier to
+debug.
+
 ## Negative example: unused-energy triggers
 
 Buffs that punish players for ending their turn with leftover energy rarely fire. Most players spend all of their energy every round, so a rule like “if you have unused energy, lose Lethality” ends up irrelevant. Instead, track something the party actually does—such as how many cards they played. For example, **Audit Pressure** reduces party Dexterity at turn end only if more than three cards were played that round.
