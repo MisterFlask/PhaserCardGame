@@ -14,7 +14,7 @@ export class StyxConstrictor extends AutomatedCharacter {
             name: "Styx Constrictor",
             portraitName: "symbol_worm",
             maxHitpoints: 20,
-            description: "A writhing predator characteristic of the upper Hells."
+            description: "The ground started moving at dawn. Thought it was an earthquake until Thomson screamed. A worm thick as a ship's mast had taken his leg clean off at the knee."
         });
         
         this.size = CardSize.LARGE

@@ -1,5 +1,5 @@
+import { AbstractCard } from "../../AbstractCard";
 import { AbstractBuff, BuffApplicationResult } from "../AbstractBuff";
-import { AbstractBuff as Buff } from "../AbstractBuff";
 import { Burning } from "./Burning";
 
 export class BurningImmune extends AbstractBuff {
@@ -13,7 +13,7 @@ export class BurningImmune extends AbstractBuff {
 
     override getDescription(): string { return "Immune to Burning."; }
 
-    override interceptBuffApplication(_character: Buff, buffApplied: Buff, _previous: number, change: number): BuffApplicationResult {
+    override interceptBuffApplication(_character: AbstractCard, buffApplied: AbstractBuff, _previous: number, change: number): BuffApplicationResult {
         if (buffApplied instanceof Burning && change > 0) {
             return { logicTriggered: true, newChangeInStacks: 0 };
         }

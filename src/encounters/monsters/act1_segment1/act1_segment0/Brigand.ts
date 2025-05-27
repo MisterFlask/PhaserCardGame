@@ -10,7 +10,7 @@ export class Brigand extends AutomatedCharacter {
             name: "Ferryman Brigand",
             portraitName: "ferryman_mutineer",
             maxHitpoints: 20,
-            description: "A disgruntled member of the ferryman's union, likely was displaced by the Victoria-Stygian Control Gate."
+            description: "They're not brigands by choice, I think - just men whose expedition went wrong and were abandoned by whoever sent them. The delta's full of such wreckage. They melted back into the marsh when the ferrymen brought out their long guns, but I could feel them watching us for miles after."
         });
         this.size = CardSize.LARGE
     }

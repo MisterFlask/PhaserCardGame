@@ -1,5 +1,3 @@
-here's the concise, cleaned-up summary of your roguelike's acts and faction concepts from the lengthy chat dump:
-
 ## Acts Overview
 
 * **Act 1: Styx Delta**

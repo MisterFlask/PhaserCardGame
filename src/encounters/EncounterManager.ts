@@ -17,7 +17,7 @@ import { FrenchBlindProphetess } from './monsters/act1_boss/FrenchBlindProphetes
 import { HermitProphetOfTheDelta } from './monsters/act1_boss/HermitProphetOfTheDelta';
 import { HermitsTreasure } from './monsters/act1_boss/HermitsTreasure';
 import { Brigand } from './monsters/act1_segment1/act1_segment0/Brigand';
-import { StyxConstrictor } from './monsters/act1_segment1/act1_segment0/Hellworm';
+import { StyxConstrictor } from './monsters/act1_segment1/act1_segment0/StyxConstrictor';
 import { BogLampreyOUS } from './monsters/act1_segment1/BogLampreyOUS';
 import { BrimstoneMudskipper } from './monsters/act1_segment1/BrimstoneMudskipper';
 import { VesperOfMeat } from './monsters/act1_segment1/BrineBast';

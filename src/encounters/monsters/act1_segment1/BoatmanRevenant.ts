@@ -50,7 +50,7 @@ export class BoatmanRevenant extends AutomatedCharacter {
             name: "Boatman Revenant",
             portraitName: "ghost_ship",
             maxHitpoints: 45,
-            description: "A spectral ferryman who makes cargo more expensive to transport"
+            description: "Came upon a derelict ferry at dusk, its pilot still at the tiller. We hailed him, but he didn't respond - just kept poling through the marsh with mechanical persistence. As we drew closer, I saw why. Dead for weeks at least, but still working his route."
         });
         
         this.portraitTargetLargestDimension = 300;

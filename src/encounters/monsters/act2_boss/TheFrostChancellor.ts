@@ -1,10 +1,10 @@
 import { AbstractIntent, AddCardToPileIntent, ApplyBuffToSelfIntent, ApplyDebuffToAllPlayerCharactersIntent, AttackIntent, BlockForSelfIntent, IntentListCreator } from '../../../gamecharacters/AbstractIntent';
 import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
 import { AbsoluteZeroDoctrine } from '../../../gamecharacters/buffs/enemy_buffs/AbsoluteZeroDoctrine';
+import { Armored } from '../../../gamecharacters/buffs/standard/Armored';
 import { Frostbite } from '../../../gamecharacters/buffs/standard/Frostbite';
 import { Lethality } from '../../../gamecharacters/buffs/standard/Lethality';
-import { Armored } from '../../../gamecharacters/buffs/standard/Armored';
-import { LoomingBlizzard } from '../../playerclasses/cards/other/tokens/LoomingBlizzard';
+import { LoomingBlizzard } from '../../../gamecharacters/playerclasses/cards/other/tokens/LoomingBlizzard';
 import { CardSize } from '../../../gamecharacters/Primitives';
 
 export class TheFrostChancellor extends AutomatedCharacter {

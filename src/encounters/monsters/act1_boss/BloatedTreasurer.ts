@@ -3,6 +3,7 @@ import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
 import { GreedIncarnate } from '../../../gamecharacters/buffs/enemy_buffs/GreedIncarnate';
 import { Hazardous } from '../../../gamecharacters/buffs/playable_card/Hazardous';
 import { Lethality } from '../../../gamecharacters/buffs/standard/Lethality';
+import { Titan } from '../../../gamecharacters/buffs/standard/Titan';
 import { ValuableCargo } from '../../../gamecharacters/buffs/standard/ValuableCargo';
 import { CardSize } from '../../../gamecharacters/Primitives';
 import { GameState } from '../../../rules/GameState';
@@ -17,6 +18,7 @@ export class BloatedTreasurer extends AutomatedCharacter {
         });
         this.size = CardSize.LARGE;
         this.buffs.push(new GreedIncarnate());
+        this.buffs.push(new Titan(2));
     }
 
     override generateNewIntents(): AbstractIntent[] {
