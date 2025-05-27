@@ -750,6 +750,10 @@ class CombatUIManager {
         if (this.eventWindow) {
             this.eventWindow.destroy();
         }
+        // Initialize the event so any random selections are ready for choices
+        if (event.init) {
+            event.init();
+        }
 
         this.eventWindow = new EventWindow(
             this.scene,
