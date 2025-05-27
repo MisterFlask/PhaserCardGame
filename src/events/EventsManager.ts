@@ -1,6 +1,7 @@
 import { AngelicTattooEvent } from "../encounters/events/AngelicTattooEvent";
 import { DiseaseForMoneyEvent } from "../encounters/events/DiseaseForRewardEvent";
 import { DutchZooEscapeEvent } from "../encounters/events/DutchZooEscapeEvent";
+import { MarshBrigandsTollEvent } from "../encounters/events/MarshBrigandsTollEvent";
 import { AbstractEvent } from "./AbstractEvent";
 
 export class EventsManager {
@@ -9,6 +10,7 @@ export class EventsManager {
         new AngelicTattooEvent(),
         new DiseaseForMoneyEvent(),
         new DutchZooEscapeEvent(),
+        new MarshBrigandsTollEvent(),
     ];
 
     private constructor() {}
