@@ -10,7 +10,7 @@ export class TollCollectorGoneMad extends AutomatedCharacter {
             name: 'Mad Toll Collector',
             portraitName: 'Lost Accountant',
             maxHitpoints: 28,
-            description: 'Ink-stained revenant shrieking about unpaid fares.'
+            description: "At the old toll station, we found him - still at his post after God knows how long. Demanding payment in currencies that no longer exist, consulting rate tables eaten by damp. His eyes never focused on us, just through us, seeing travelers long dead perhaps. We had to pay him in buttons and lint before he'd raise the barrier."
         });
         this.size = CardSize.LARGE;
         this.buffs.push(new TariffAura());

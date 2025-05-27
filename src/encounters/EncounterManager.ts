@@ -12,8 +12,8 @@ import { RelicsLibrary } from '../relics/RelicsLibrary';
 import { GameState } from '../rules/GameState';
 import { CardModifier } from '../rules/modifiers/AbstractCardModifier';
 import { RestEvent } from './events/RestEvent';
-import { FrenchBlindProphetess } from './monsters/act1_boss/FrenchBlindProphetess';
 import { BloatedTreasurer } from './monsters/act1_boss/BloatedTreasurer';
+import { FrenchBlindProphetess } from './monsters/act1_boss/FrenchBlindProphetess';
 import { HermitProphetOfTheDelta } from './monsters/act1_boss/HermitProphetOfTheDelta';
 import { HermitsTreasure } from './monsters/act1_boss/HermitsTreasure';
 import { Brigand } from './monsters/act1_segment1/act1_segment0/Brigand';
@@ -27,10 +27,10 @@ import { Echophagist } from './monsters/act1_segment1/MarshStag';
 import { SkeeterwispSwarm } from './monsters/act1_segment1/SkeeterwispSwarm';
 import { SootLungHeron } from './monsters/act1_segment1/SootLungHeron';
 import { TelegraphEel } from './monsters/act1_segment1/TelegraphEel';
-import { VeilCapacitor } from './monsters/act1_segment1/WoodenTotem';
+import { WoodenTotem } from './monsters/act1_segment1/WoodenTotem';
 import { EldritchMime } from './monsters/act1_segment2/CensorWisp';
 import { RaftPirate } from './monsters/act1_segment2/RaftPirate';
-import { AccursedObelisk } from './monsters/act1_segment2/Rootwrithe';
+import { Rootwrithe } from './monsters/act1_segment2/Rootwrithe';
 import { RunoffElemental } from './monsters/act1_segment2/RunoffElemental';
 import { TollCollectorGoneMad } from './monsters/act1_segment2/TollCollectorGoneMad';
 import { WoodGolem } from './monsters/act1_segment2/WoodGolem';
@@ -109,9 +109,6 @@ export class ActSegment {
 
     static readonly Act1_Segment1 = new ActSegmentData("Act 1 - Segment 1", 1, 1, [
         {
-            enemies: [new VesperOfMeat(), new VesperOfMeat(), new VeilCapacitor()]
-        },
-        {
             enemies: [new Marshflutter(), new Marshflutter()]
         },
         {
@@ -142,7 +139,7 @@ export class ActSegment {
             enemies: [new WoodGolem(), new WoodGolem()]
         },
         {
-            enemies: [new AccursedObelisk()]
+            enemies: [new Rootwrithe()]
         },
         {
             enemies: [new RaftPirate(), new RaftPirate()]
@@ -157,7 +154,7 @@ export class ActSegment {
 
     static readonly Boss_Act1 = new ActSegmentData("Boss Fight - Act 1", 1, 3, [
         {
-            enemies: [new FrenchBlindProphetess(), new VeilCapacitor(), new VeilCapacitor()]
+            enemies: [new FrenchBlindProphetess(), new WoodenTotem(), new WoodenTotem()]
         },
         {
             enemies: [new BloatedTreasurer()]

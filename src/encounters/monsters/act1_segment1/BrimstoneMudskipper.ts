@@ -1,4 +1,4 @@
-import { AbstractIntent, AttackIntent, ApplyDebuffToRandomCharacterIntent } from '../../../gamecharacters/AbstractIntent';
+import { AbstractIntent, ApplyDebuffToRandomCharacterIntent, AttackIntent } from '../../../gamecharacters/AbstractIntent';
 import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
 import { Poisoned } from '../../../gamecharacters/buffs/standard/Poisoned';
 import { CardSize } from '../../../gamecharacters/Primitives';
@@ -10,7 +10,7 @@ export class BrimstoneMudskipper extends AutomatedCharacter {
             name: 'Brimstone Mudskipper',
             portraitName: 'Salamander',
             maxHitpoints: 20,
-            description: 'Once harmless amphibians bloated with pollution.'
+            description: "The pools here reek of sulphur. Saw what I took for ordinary mudskippers until one leaped clear over our boat - three feet, easy. Their skin blisters and pops in the heat, and they watch you with eyes like hot coals. The ferryman won't eat them, though we're down to ship's biscuit."
         });
         this.size = CardSize.LARGE;
     }

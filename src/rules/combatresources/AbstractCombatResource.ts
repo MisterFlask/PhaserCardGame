@@ -19,7 +19,7 @@ export abstract class AbstractCombatResource {
     public abstract onClick(): boolean;
 } 
 
-export class ResourceUsedEvent extends AbstractCombatEvent {
+export class CombatResourceUsedEvent extends AbstractCombatEvent {
     resource: AbstractCombatResource;
     
     printJson(): string {

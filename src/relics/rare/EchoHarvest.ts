@@ -1,5 +1,5 @@
 import { EntityRarity } from "../../gamecharacters/EntityRarity";
-import { ResourceUsedEvent } from "../../rules/combatresources/AbstractCombatResource";
+import { CombatResourceUsedEvent } from "../../rules/combatresources/AbstractCombatResource";
 import { GameState } from "../../rules/GameState";
 import { ActionManager } from "../../utils/ActionManager";
 import { AbstractRelic } from "../AbstractRelic";
@@ -20,8 +20,8 @@ export class EchoHarvest extends AbstractRelic {
         return `Whenever you spend Mettle, duplicate the rightmost card in your hand ${this.getStacksDisplayText()} time${this.stacks === 1 ? '' : 's'}.`;
     }
 
-    override onEvent(event: ResourceUsedEvent): void {
-        if (event instanceof ResourceUsedEvent && event.isMettle()) {
+    override onEvent(event: CombatResourceUsedEvent): void {
+        if (event instanceof CombatResourceUsedEvent && event.isMettle()) {
             const rightmostCard = GameState.getInstance().combatState.getRightmostCardInHand();
             if (rightmostCard) {
                 for (let i = 0; i < this.stacks; i++) {

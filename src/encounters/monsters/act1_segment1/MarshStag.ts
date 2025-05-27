@@ -8,7 +8,7 @@ export class Echophagist extends AutomatedCharacter {
             name: "Marsh Stag",
             portraitName: "symbol_deer",
             maxHitpoints: 30,
-            description: ""
+            description: "Came upon a stag at dawn - massive thing, standing in the mist. Its antlers were draped with marsh moss, and it watched me with an intelligence that made my blood run cold. I've hunted deer at Balmoral, but this... this was different. It moved wrong, too deliberate. When it finally turned away, I swear I heard it wheeze like a consumptive. Didn't dare shoot - ammunition is too precious here."
         });
         
         this.portraitTargetLargestDimension = 300;

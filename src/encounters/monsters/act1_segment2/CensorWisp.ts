@@ -13,7 +13,7 @@ export class EldritchMime extends AutomatedCharacter {
             name: "Censor Wisp",
             portraitName: "wisp_censored",
             maxHitpoints: 15,
-            description: "Avert your gaze"
+            description: "Strange lights in the mist today - pale, drifting things that seemed drawn to conversation. Whenever I tried to discuss our route with the guide, the words would catch in my throat.  Later, I found pages in my journal blacked out, though I swear I never touched them."
         });
         
         this.size = CardSize.LARGE;

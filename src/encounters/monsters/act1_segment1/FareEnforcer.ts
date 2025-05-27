@@ -72,7 +72,7 @@ export class FareEnforcer extends AutomatedCharacter {
             name: "Fare Enforcer",
             portraitName: "fare_enforcer",
             maxHitpoints: 45,
-            description: "A relentless collector of debts, ensuring all pay their fare to cross the river."
+            description: "The ferryman's enforcer was waiting when we reached the other bank. Built like a prize-fighter, carried a cudgel that had seen considerable use. He examined my coinage with the thoroughness of a Bank of England clerk, biting each piece. Found my emergency sovereign hidden in my boot-heel too, the b____d. These Guild men run their operation tighter than the East India Company ever did."
         });
         this.buffs.push(new ObolDebtBuff());
     }

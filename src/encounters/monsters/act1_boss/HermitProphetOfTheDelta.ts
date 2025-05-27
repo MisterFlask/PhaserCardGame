@@ -1,9 +1,9 @@
 import { AbstractIntent, DoSomethingIntent } from '../../../gamecharacters/AbstractIntent';
 import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
-import { Prophet } from '../../../gamecharacters/buffs/enemy_buffs/Prophet';
 import { HarbingerOfFate } from '../../../gamecharacters/buffs/enemy_buffs/HarbingerOfFate';
-import { Lethality } from '../../../gamecharacters/buffs/standard/Lethality';
+import { Prophet } from '../../../gamecharacters/buffs/enemy_buffs/Prophet';
 import { Cursed } from '../../../gamecharacters/buffs/standard/Cursed';
+import { Lethality } from '../../../gamecharacters/buffs/standard/Lethality';
 import { Stress } from '../../../gamecharacters/buffs/standard/Stress';
 import { CardSize } from '../../../gamecharacters/Primitives';
 import { GameState } from '../../../rules/GameState';
@@ -15,7 +15,7 @@ export class HermitProphetOfTheDelta extends AutomatedCharacter {
             name: 'Hermit Prophet',
             portraitName: 'hermit',
             maxHitpoints: 220,
-            description: 'A reclusive seer touched by dark tides.'
+            description: "We needed a guide through the Marrowbone Channels - our ferryman flatly refused to proceed without 'the Prophet's blessing.' Found him on a spit of mud barely worthy of the name island.\n\n The ferryman made me wade out with payment - two bottles of gin and ship's biscuit. The Prophet accepted these without looking, then grabbed my wrist with fingers like wet rope. Knew my name. Knew about Kabul, about Jiselle, about that business in Crimea I've never told anyone."
         });
         this.size = CardSize.LARGE;
         this.buffs.push(new Prophet(2));

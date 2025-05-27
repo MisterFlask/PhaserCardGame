@@ -2,13 +2,13 @@ import { AbstractIntent, ApplyBuffToAllEnemyCharactersIntent, IntentListCreator 
 import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
 import { Lethality } from '../../../gamecharacters/buffs/standard/Lethality';
 
-export class VeilCapacitor extends AutomatedCharacter {
+export class WoodenTotem extends AutomatedCharacter {
     constructor() {
         super({
             name: "Wooden Totem",
             portraitName: "totem_1",
             maxHitpoints: 14,
-            description: "Probably not worth worrying about."
+            description: "These things appear wherever the Guild claims precedence.  Probably not worth worrying about."
         });
         
         this.portraitTargetLargestDimension = 150;

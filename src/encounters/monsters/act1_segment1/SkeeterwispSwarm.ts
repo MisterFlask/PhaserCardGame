@@ -11,7 +11,7 @@ export class SkeeterwispSwarm extends AutomatedCharacter {
             name: "Skeeterwisp Swarm",
             portraitName: "orange_wisp_swarm",
             maxHitpoints: 35,
-            description: "a common pest."
+            description: "The insects here are beyond description. They swarm at dusk, glowing faintly like St. Elmo's fire. Got caught in a cloud of them near the old Canning & Canning Trading Post ruins.  As if the climate weren't enough."
         });
         this.buffs.push(new Swarm(10));
         this.buffs.push(new EggLayer(2));
@@ -25,9 +25,9 @@ export class SkeeterwispSwarm extends AutomatedCharacter {
         const randomChoice = Math.random();
         if (randomChoice < 0.5) {
             // Attack one target for 15 damage
-            return [new AttackIntent({ baseDamage: 5, owner: this }).withTitle("brrrr"),
-                new AddCardToPileIntent({ cardToAdd: new StingingInsects(), pileName: 'draw', owner: this }).withTitle("BZZZZZ"),
-                new AddCardToPileIntent({ cardToAdd: new StingingInsects(), pileName: 'draw', owner: this }).withTitle("BZZZZZ")
+            return [new AttackIntent({ baseDamage: 5, owner: this }).withTitle("Buzz Kill"),
+                new AddCardToPileIntent({ cardToAdd: new StingingInsects(), pileName: 'draw', owner: this }).withTitle("Swarm Warning"),
+                new AddCardToPileIntent({ cardToAdd: new StingingInsects(), pileName: 'draw', owner: this }).withTitle("Swarm Warning")
             ];
         } else {
             // Heal and buff
@@ -39,7 +39,7 @@ export class SkeeterwispSwarm extends AutomatedCharacter {
                         this.actionManager.applyBuffToCharacter(this, new Lethality(4));
                     },
                     imageName: 'heal'
-                }).withTitle("recruit")
+                }).withTitle("BZZZZZZZ")
             ];
         }
 

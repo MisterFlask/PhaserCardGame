@@ -5,7 +5,7 @@ import { Titan } from '../../../gamecharacters/buffs/standard/Titan';
 import { Vulnerable } from '../../../gamecharacters/buffs/standard/Vulnerable';
 import { CardSize } from '../../../gamecharacters/Primitives';
 import { GameState } from '../../../rules/GameState';
-import { VeilCapacitor } from '../act1_segment1/WoodenTotem';
+import { WoodenTotem } from '../act1_segment1/WoodenTotem';
 export class FrenchBlindProphetess extends AutomatedCharacter {
     constructor() {
         super({
@@ -38,7 +38,7 @@ export class FrenchBlindProphetess extends AutomatedCharacter {
     getSummonOrAttackIntent(): AbstractIntent[] {
 
         const gameState = GameState.getInstance();
-        const veilCapacitorCount = gameState.combatState.enemies.filter(enemy => enemy instanceof VeilCapacitor).length;
+        const veilCapacitorCount = gameState.combatState.enemies.filter(enemy => enemy instanceof WoodenTotem).length;
 
         if (veilCapacitorCount >= 3) {
             return [
@@ -47,8 +47,8 @@ export class FrenchBlindProphetess extends AutomatedCharacter {
         }
 
         return [
-            new SummonIntent({monsterToSummon: new VeilCapacitor(), owner: this}).withTitle("Conjure Veil Capacitor"),
-            new SummonIntent({monsterToSummon: new VeilCapacitor(), owner: this}).withTitle("Conjure Veil Capacitor"),
+            new SummonIntent({monsterToSummon: new WoodenTotem(), owner: this}).withTitle("Conjure Veil Capacitor"),
+            new SummonIntent({monsterToSummon: new WoodenTotem(), owner: this}).withTitle("Conjure Veil Capacitor"),
         ];
     }
 }

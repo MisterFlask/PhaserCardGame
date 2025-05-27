@@ -13,7 +13,7 @@ export class GuildJourneyman extends AutomatedCharacter {
             name: "Guild Journeyman",
             portraitName: "symbol_brigand", // Using brigand symbol as placeholder
             maxHitpoints: 35,
-            description: "A novice practitioner of the Guild's arts, alternating between wide strikes and precise concussive blows."
+            description: ""
         });
         
         this.portraitTargetLargestDimension = 300;

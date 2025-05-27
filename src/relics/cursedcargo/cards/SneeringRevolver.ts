@@ -4,7 +4,7 @@ import { Stress } from "../../../gamecharacters/buffs/standard/Stress";
 import { EntityRarity } from "../../../gamecharacters/EntityRarity";
 import { PlayableCard } from "../../../gamecharacters/PlayableCard";
 import { CardType } from "../../../gamecharacters/Primitives";
-import { ResourceUsedEvent } from "../../../rules/combatresources/AbstractCombatResource";
+import { CombatResourceUsedEvent } from "../../../rules/combatresources/AbstractCombatResource";
 
 export class SneeringRevolver extends PlayableCard {
     private mettleSpentThisCombat: boolean = false;
@@ -29,7 +29,7 @@ export class SneeringRevolver extends PlayableCard {
         this.mettleSpentThisCombat = false;
     }
 
-    onEvent(event: ResourceUsedEvent): void {
+    onEvent(event: CombatResourceUsedEvent): void {
         if (event.isMettle()) {
             this.mettleSpentThisCombat = true;
         }

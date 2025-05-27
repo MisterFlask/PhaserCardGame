@@ -4,7 +4,7 @@
 import { Lethality } from "../../gamecharacters/buffs/standard/Lethality";
 import { EntityRarity } from "../../gamecharacters/EntityRarity";
 import { AbstractRelic } from "../../relics/AbstractRelic";
-import { ResourceUsedEvent } from "../../rules/combatresources/AbstractCombatResource";
+import { CombatResourceUsedEvent } from "../../rules/combatresources/AbstractCombatResource";
 import { GameState } from "../../rules/GameState";
 import { ActionManager } from "../../utils/ActionManager";
 
@@ -26,8 +26,8 @@ export class MarrowSpike extends AbstractRelic {
         return `Whenever you spend Blood, all allies gain ${this.BASE_LETHALITY * this.stacks} Lethality`;
     }
 
-    override onEvent(event: ResourceUsedEvent): void {
-        if (event instanceof ResourceUsedEvent && event.isBlood()) {
+    override onEvent(event: CombatResourceUsedEvent): void {
+        if (event instanceof CombatResourceUsedEvent && event.isBlood()) {
             GameState.getInstance().combatState.playerCharacters.forEach(character => {
                 ActionManager.getInstance().applyBuffToCharacterOrCard(character, new Lethality(this.BASE_LETHALITY * this.stacks));
             });

@@ -13,7 +13,7 @@ export class WoodGolem extends AutomatedCharacter {
             name: "Rickety Man",
             portraitName: "wood_golem",
             maxHitpoints: 60,
-            description: "Many unsanctioned pine dimensions.  Culling necessary."
+            description: "I thought it mere superstition until I saw it: a giant constructed from ship timber and bound with rope, moving with purpose through the swamp."
         });
         
         this.size = CardSize.LARGE;

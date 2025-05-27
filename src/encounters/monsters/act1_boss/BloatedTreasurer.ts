@@ -1,8 +1,8 @@
-import { AbstractIntent, AttackAllPlayerCharactersIntent, ApplyBuffToSelfIntent, DoSomethingIntent } from '../../../gamecharacters/AbstractIntent';
+import { AbstractIntent, ApplyBuffToSelfIntent, AttackAllPlayerCharactersIntent, DoSomethingIntent } from '../../../gamecharacters/AbstractIntent';
 import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
 import { GreedIncarnate } from '../../../gamecharacters/buffs/enemy_buffs/GreedIncarnate';
-import { Lethality } from '../../../gamecharacters/buffs/standard/Lethality';
 import { Hazardous } from '../../../gamecharacters/buffs/playable_card/Hazardous';
+import { Lethality } from '../../../gamecharacters/buffs/standard/Lethality';
 import { ValuableCargo } from '../../../gamecharacters/buffs/standard/ValuableCargo';
 import { CardSize } from '../../../gamecharacters/Primitives';
 import { GameState } from '../../../rules/GameState';
@@ -13,7 +13,7 @@ export class BloatedTreasurer extends AutomatedCharacter {
             name: 'Bloated Treasurer',
             portraitName: 'Lost Accountant',
             maxHitpoints: 200,
-            description: 'corpulent guardian of illicit wealth'
+            description: "God in Heaven. We thought the tollhouse abandoned until we heard the counting. Found him in the vault - or what's left of him. The Treasurer, they called him, still at his desk after all these years. Swollen with marsh gas or worse, fingers still tallying coins that turned to rust decades ago. He spoke in numbers, demanding fees in currencies I'd never heard of. \n\n When we couldn't pay, he rose from his desk - Christ, the smell - and pursued us through the ruins. Moved faster than anything that bloated had a right to. We barely escaped, and only because Morrison threw his purse into the bog."
         });
         this.size = CardSize.LARGE;
         this.buffs.push(new GreedIncarnate());

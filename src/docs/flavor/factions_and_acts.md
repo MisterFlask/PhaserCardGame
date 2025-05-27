@@ -17,9 +17,10 @@ here's the concise, cleaned-up summary of your roguelike's acts and faction conc
 
 CENTRAL CONFLICT:  The necromantic French empire battles the German Reichsinfernokorps; Napoleon Bonaparte commands from exile.
 
-* **Act 3 (options suggested):**
+* **Act 3**
 
   * **Dis Foundry Belt**: industrial hellscape, magma factories.
+  * Central conflict is between the Stoker's Union and the capalistic bloodsucking Brimstone Barons
 
 ## Main Factions
 
@@ -69,17 +70,8 @@ CENTRAL CONFLICT:  The necromantic French empire battles the German Reichsinfern
   * Visuals: Delft-blue lab smocks, polished copper piping.
   * Flavor: Curious, experimental scientists with innovative, unstable technology.
 
-* **K.K. Höllenrat (Austro-Habsburg Bureaucrats)**
-
-  * Visuals: Ivory wigs, cream frockcoats, gold scroll-weapons.
-  * Flavor: Bureaucratic dynastic obsession, lineage-based magic, elaborate legalism.
 
 ### Illicit & Independent Actors
-
-* **Nine-tail Syndicate (Asian Smugglers)**
-
-  * Visuals: Silk dusters, lacquered bamboo hats, jade trinkets.
-  * Flavor: Opium-like memory trade, shadowy operations, illicit artifacts.
 
 * **Freeport Corsairs**
 
@@ -87,11 +79,6 @@ CENTRAL CONFLICT:  The necromantic French empire battles the German Reichsinfern
   * Flavor: Pirate freeports, deregulated trade, afterlife-rum runners.
 
 ### Environmentalist Opposition
-
-* **Styxan Conservancy**
-
-  * Visuals: Algae-green chitin armor, teal bioluminescence, swamp druids.
-  * Flavor: Animist ecological rebellion against British industrial pollution and damming projects.
 
 * **Styxian Boatman's Guild**
   * gangly, lanky, soggy demons just out to make a buck

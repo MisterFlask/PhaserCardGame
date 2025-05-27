@@ -10,7 +10,7 @@ export class BogLampreyOUS extends AutomatedCharacter {
             name: 'Bog Lamprey O.U.S.',
             portraitName: 'Horror Worm',
             maxHitpoints: 35,
-            description: 'Parasitic horror gorged on spiritual essence.'
+            description: "Lost Hutchins today. He was washing his face in what seemed a clear pool when they took him. Lampreys, but nothing like the ones in the Thames. These were thick as a man's arm, with too many teeth. They pulled him under before we could react."
         });
         this.size = CardSize.LARGE;
         this.buffs.push(new LeechingBite(3));

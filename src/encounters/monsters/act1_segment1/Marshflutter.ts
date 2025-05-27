@@ -14,7 +14,7 @@ export class Marshflutter extends AutomatedCharacter {
             name: "Styxflutter",
             portraitName: "symbol_bird",
             maxHitpoints: 10,
-            description: "it sings, and the choir is made from those who listen."
+            description: "B___dy moths ate my weekly reports again."
         });
         
         this.portraitTargetLargestDimension = 300;

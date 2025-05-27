@@ -7,13 +7,13 @@ import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
 import { Regeneration } from '../../../gamecharacters/buffs/enemy_buffs/Regeneration';
 import { CardSize } from '../../../gamecharacters/Primitives';
 
-export class AccursedObelisk extends AutomatedCharacter {
+export class Rootwrithe extends AutomatedCharacter {
     constructor() {
         super({
             name: "Obelisk of Cups",
             portraitName: "totem_2",
             maxHitpoints: 40,
-            description: "BWEEEEOW."
+            description: "Passed through a mangrove grove where the roots seemed to reach for us, though there was no wind. One wrapped around Thomson's ankle - we had to hack him free. Where we cut, the wood bled something dark. The ferrymen won't make camp near these groves, just shake their heads and push on."
         });
         
         this.size = CardSize.LARGE;

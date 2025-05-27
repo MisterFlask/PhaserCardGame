@@ -1,4 +1,4 @@
-import { AbstractIntent, AttackIntent, ApplyDebuffToRandomCharacterIntent, IntentListCreator } from '../../../gamecharacters/AbstractIntent';
+import { AbstractIntent, ApplyDebuffToRandomCharacterIntent, AttackIntent, IntentListCreator } from '../../../gamecharacters/AbstractIntent';
 import { AutomatedCharacter } from '../../../gamecharacters/AutomatedCharacter';
 import { ToxicRetaliation } from '../../../gamecharacters/buffs/enemy_buffs/ToxicRetaliation';
 import { Poisoned } from '../../../gamecharacters/buffs/standard/Poisoned';
@@ -11,7 +11,7 @@ export class RunoffElemental extends AutomatedCharacter {
             name: 'Runoff Elemental',
             portraitName: 'Ooze',
             maxHitpoints: 40,
-            description: 'Sentient pollution mixed with Styx water.'
+            description: 'Near the ruins of the Henderson Chemical Works, we encountered... I hardly know how to describe it. A moving mass of liquid that stank of copper and coal tar. It flowed uphill, against nature, leaving dead fish in its wake.  Gave it a wide berth, of course.'
         });
         this.size = CardSize.LARGE;
         this.buffs.push(new ToxicRetaliation(2));

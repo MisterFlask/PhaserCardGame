@@ -1,6 +1,6 @@
 import { Scene } from 'phaser';
 import { ProcBroadcaster } from '../gamecharacters/procs/ProcBroadcaster';
-import { AbstractCombatResource, ResourceUsedEvent } from '../rules/combatresources/AbstractCombatResource';
+import { AbstractCombatResource, CombatResourceUsedEvent } from '../rules/combatresources/AbstractCombatResource';
 import { ShadowedImage } from './ShadowedImage';
 import { TooltipAttachment } from './TooltipAttachment';
 import { UIContext, UIContextManager } from './UIContextManager';
@@ -115,7 +115,7 @@ export class CombatResourceDisplay extends Phaser.GameObjects.Container {
         if (UIContextManager.getInstance().getContext() === UIContext.COMBAT) {
             var used = this.resource.onClick();
             if (used) {
-                ProcBroadcaster.getInstance().broadcastCombatEvent(new ResourceUsedEvent(this.resource));
+                ProcBroadcaster.getInstance().broadcastCombatEvent(new CombatResourceUsedEvent(this.resource));
                 this.pulseIcon();
                 this.pulseButtonBackground();
             }
