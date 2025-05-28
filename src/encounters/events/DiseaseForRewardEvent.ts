@@ -40,7 +40,7 @@ class AcceptDiseaseChoice extends AbstractChoice {
 
     effect(): void {
         const gameState = this.gameState();
-        const character = this.getRandomCharacter(); 
+        const character = this.getEventCharacter(1);
         const actionManager = ActionManager.getInstance();
         
         // Apply random disease debuff

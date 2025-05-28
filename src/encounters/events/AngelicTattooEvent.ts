@@ -23,7 +23,7 @@ class BasicTattooChoice extends AbstractChoice {
 
     effect(): void {
         const gameState = this.gameState();
-        const character = this.getRandomCharacter(); // Assumes first character is the soldier
+        const character = this.getEventCharacter(1); // predetermined soldier
         const actionManager = ActionManager.getInstance();
         
         // Apply angelic tattoo buff and stress
@@ -57,7 +57,7 @@ class ElaborateTattooChoice extends AbstractChoice {
 
     effect(): void {
         const gameState = this.gameState();
-        const character = this.getRandomCharacter();
+        const character = this.getEventCharacter(1);
         const actionManager = ActionManager.getInstance();
         
         // Apply more powerful angelic tattoo buff and stress
