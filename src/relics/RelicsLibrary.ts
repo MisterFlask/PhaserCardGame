@@ -9,6 +9,7 @@ import { MarksmansManual } from './common/MarksmansManual';
 import { MistBottle } from './common/MistBottle';
 import { TornPage } from './common/TornPage';
 import { VialOfBlood } from './common/VialOfBlood';
+import { BelphegorsRounds } from './rare/BelphegorsRounds';
 import { AkashicNewspaper } from './cursedcargo/AkashicNewspaper';
 import { BloomOfSorrow } from './cursedcargo/BloomOfSorrow';
 import { BomberGremlin } from './cursedcargo/BomberGremlin';
@@ -43,6 +44,7 @@ export class RelicsLibrary {
             new GlassCross(),
             new CaskOfErrantSouls(),
             new VialOfBlood(),
+            new BelphegorsRounds(),
         ];
 
         this.cursedCargoRelics = [

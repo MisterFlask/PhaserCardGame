@@ -1,4 +1,4 @@
-const OpenAI = require('openai');
+/* const OpenAI = require('openai');
 const fs = require('fs').promises;
 const path = require('path');
 const { RelicsLibrary } = require('../relics/RelicsLibrary');
@@ -44,3 +44,4 @@ async function generateRelicIcons() {
 }
 
 generateRelicIcons();
+ */
