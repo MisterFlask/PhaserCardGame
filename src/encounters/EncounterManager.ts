@@ -22,6 +22,9 @@ import { BogLampreyOUS } from './monsters/act1_segment1/BogLampreyOUS';
 import { BrimstoneMudskipper } from './monsters/act1_segment1/BrimstoneMudskipper';
 import { VesperOfMeat } from './monsters/act1_segment1/BrineBast';
 import { DisgruntledFerryman } from './monsters/act1_segment1/DisgruntledFerryman';
+import { BoatmanRevenant } from './monsters/act1_segment1/BoatmanRevenant';
+import { FareEnforcer } from './monsters/act1_segment1/FareEnforcer';
+import { GuildJourneyman } from './monsters/act1_segment1/GuildJourneyman';
 import { Marshflutter } from './monsters/act1_segment1/Marshflutter';
 import { Echophagist } from './monsters/act1_segment1/MarshStag';
 import { SkeeterwispSwarm } from './monsters/act1_segment1/SkeeterwispSwarm';
@@ -45,10 +48,19 @@ import { Lexiophage } from './monsters/act2_segment1/Lexiophage';
 import { MitrailleuseOrganist } from './monsters/act2_segment1/MitrailleuseOrganist';
 import { OldGuardGrenadier } from './monsters/act2_segment1/OldGuardGrenadier';
 import { TrenchEngineer } from './monsters/act2_segment1/TrenchEngineer';
+import { SorrowMothSwarm } from './monsters/act2_segment1/SorrowmothSwarm';
 import { Artiste } from './monsters/act2_segment2/Artiste';
 import { FrenchRestauranteur } from './monsters/act2_segment2/FrenchRestauranteur';
 import { Grafter } from './monsters/act2_segment2/Grafter';
 import { ZeppelinGrenadier } from './monsters/act2_segment2/ZeppelinGrenadier';
+import { CompanyOverseer } from './monsters/act3_segment1/CompanyOverseer';
+import { FurnaceForeman } from './monsters/act3_segment1/FurnaceForeman';
+import { MechanicalScab } from './monsters/act3_segment1/MechanicalScab';
+import { MoltenAgitator } from './monsters/act3_segment1/MoltenAgitator';
+import { UnionEnforcer } from './monsters/act3_segment1/UnionEnforcer';
+import { WildcatStriker } from './monsters/act3_segment1/WildcatStriker';
+import { RegionalManager } from './monsters/act3_boss/RegionalManager';
+import { TheRevolutionary } from './monsters/act3_boss/TheRevolutionary';
 // Define new character classes
 export class ClockworkAbomination extends AutomatedCharacter {
     constructor() {
@@ -128,6 +140,15 @@ export class ActSegment {
         },
         {
             enemies: [new BogLampreyOUS()]
+        },
+        {
+            enemies: [new BoatmanRevenant()]
+        },
+        {
+            enemies: [new FareEnforcer()]
+        },
+        {
+            enemies: [new GuildJourneyman()]
         }
     ]);
 
@@ -202,6 +223,9 @@ export class ActSegment {
         },
         {
             enemies: [new TrenchEngineer(), new TrenchEngineer()]
+        },
+        {
+            enemies: [new SorrowMothSwarm()]
         }
     ]);
 
@@ -230,6 +254,51 @@ export class ActSegment {
         },
         {
             enemies: [new TheFrostChancellor()]
+        }
+    ]);
+
+    static readonly Act3_Segment0 = new ActSegmentData("Act 3 - Segment 0", 3, 0, [
+        {
+            enemies: [new MechanicalScab(), new MechanicalScab()]
+        },
+        {
+            enemies: [new ClockworkAbomination()]
+        },
+        {
+            enemies: [new WildcatStriker(), new WildcatStriker()]
+        }
+    ]);
+
+    static readonly Act3_Segment1 = new ActSegmentData("Act 3 - Segment 1", 3, 1, [
+        {
+            enemies: [new UnionEnforcer(), new UnionEnforcer()]
+        },
+        {
+            enemies: [new MoltenAgitator()]
+        },
+        {
+            enemies: [new CompanyOverseer(), new FurnaceForeman()]
+        }
+    ]);
+
+    static readonly Act3_Segment2 = new ActSegmentData("Act 3 - Segment 2", 3, 2, [
+        {
+            enemies: [new BaconBeast()]
+        },
+        {
+            enemies: [new BloodManipulationSlime()]
+        },
+        {
+            enemies: [new CompanyOverseer(), new MechanicalScab()]
+        }
+    ]);
+
+    static readonly Boss_Act3 = new ActSegmentData("Boss Fight - Act 3", 3, 3, [
+        {
+            enemies: [new RegionalManager()]
+        },
+        {
+            enemies: [new TheRevolutionary()]
         }
     ]);
 }
@@ -449,8 +518,8 @@ function getBossSegment(act: number): ActSegmentData {
         return ActSegment.Boss_Act1;
     } else if (act == 2) {
         return ActSegment.Boss_Act2;
-    }else if (act == 3) {
-        // return ActSegment.Boss_Act3;
+    } else if (act == 3) {
+        return ActSegment.Boss_Act3;
     }
     throw new Error(`No boss encounters found for act ${act}`);
 }
