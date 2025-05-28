@@ -2,6 +2,7 @@ import { AngelicTattooEvent } from "../encounters/events/AngelicTattooEvent";
 import { DiseaseForMoneyEvent } from "../encounters/events/DiseaseForRewardEvent";
 import { DutchZooEscapeEvent } from "../encounters/events/DutchZooEscapeEvent";
 import { ArmsDealerPropositionEvent } from "../encounters/events/ArmsDealerProposition";
+import { GamblingChaplainEvent } from "../encounters/events/GamblingChaplainEvent";
 import { AbstractEvent } from "./AbstractEvent";
 
 export class EventsManager {
@@ -11,6 +12,7 @@ export class EventsManager {
         new DiseaseForMoneyEvent(),
         new DutchZooEscapeEvent(),
         new ArmsDealerPropositionEvent(),
+        new GamblingChaplainEvent(),
     ];
 
     private constructor() {}
