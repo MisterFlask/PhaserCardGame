@@ -1,16 +1,18 @@
-import { AbstractChoice, AbstractEvent, DeadEndEvent } from "../../events/AbstractEvent";
+import { AbstractEvent, DeadEndEvent, DeadEndStartEncounterChoice } from "../../events/AbstractEvent";
 import { Lethality } from "../../gamecharacters/buffs/standard/Lethality";
 import { Terrifying } from "../../gamecharacters/buffs/standard/Terrifying";
 import { AbstractRelic } from "../../relics/AbstractRelic";
 import { RelicsLibrary } from "../../relics/RelicsLibrary";
 import { ClockworkAbomination, Encounter } from "../EncounterManager";
 
-class CatchDaemonChoice extends AbstractChoice {
+class CatchDaemonChoice extends DeadEndStartEncounterChoice {
     private selectedRelic: AbstractRelic | null = null;
 
     constructor() {
+        const dummyEncounter = new Encounter([], 0, 0);
         super(
             "Order your men to recapture the beast",
+            dummyEncounter,
             "The artifact might be valuable."
         );
         this.nextEvent = new DeadEndEvent();
@@ -43,21 +45,17 @@ class CatchDaemonChoice extends AbstractChoice {
         escapedDaemon.maxHitpoints = 45;
         escapedDaemon.buffs.push(new Lethality(3));
         escapedDaemon.buffs.push(new Terrifying(2));
-        
-        // Create a custom encounter with the daemon
-        const encounter = new Encounter([escapedDaemon], this.gameState().currentAct, 0);
-        encounter.backgroundNameOverride = "hell-oil-painting";
-        
-        // First store the relic to add after combat
+
+        // Configure the encounter for the base class
+        this.encounter.enemies = [escapedDaemon];
+        this.encounter.act = this.gameState().currentAct;
+        this.encounter.segment = 0;
+        this.encounter.backgroundNameOverride = "hell-oil-painting";
+
         const relicToAdd = this.selectedRelic;
-        
-        // Start combat with the daemon
-        this.actionManager().cleanupAndRestartCombat({ 
-            encounter: encounter, 
-            shouldStartWithMapOverlay: false
-        });
-        
-        // Add the relic right away since we can't use onVictory callback
+
+        super.effect();
+
         if (relicToAdd) {
             this.addLedgerItem(relicToAdd);
             this.actionManager().displaySubtitle(`Received ${relicToAdd.getDisplayName()}`, 2000);

@@ -1,14 +1,16 @@
 // Event: Marsh Brigands demanding toll
-import { AbstractChoice, AbstractEvent, DeadEndEvent } from "../../events/AbstractEvent";
+import { AbstractEvent, DeadEndEvent, DeadEndStartEncounterChoice } from "../../events/AbstractEvent";
 import { Encounter } from "../EncounterManager";
 import { Brigand } from "../monsters/act1_segment1/act1_segment0/Brigand";
 import { ActionManagerFetcher } from "../../utils/ActionManagerFetcher";
 import { AbstractConsumable } from "../../consumables/AbstractConsumable";
 
-class FightThroughChoice extends AbstractChoice {
+class FightThroughChoice extends DeadEndStartEncounterChoice {
     constructor() {
+        const dummyEncounter = new Encounter([], 0, 0);
         super(
             "Fight Through",
+            dummyEncounter,
             "Order the attack. You've faced worse odds. Probably."
         );
         this.nextEvent = new DeadEndEvent();
@@ -26,8 +28,10 @@ class FightThroughChoice extends AbstractChoice {
     }
 
     effect(): void {
-        const encounter = new Encounter([new Brigand(), new Brigand(), new Brigand()], this.gameState().currentAct, 0);
-        this.actionManager().cleanupAndRestartCombat({ encounter, shouldStartWithMapOverlay: false });
+        this.encounter.enemies = [new Brigand(), new Brigand(), new Brigand()];
+        this.encounter.act = this.gameState().currentAct;
+        this.encounter.segment = 0;
+        super.effect();
     }
 }
 

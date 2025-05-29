@@ -346,14 +346,27 @@ export class Encounter {
     segment: integer;
     enemies: AutomatedCharacter[];
     event?: AbstractEvent;
+    /**
+     * If true, the associated event should trigger after combat instead of
+     * immediately when the encounter begins.
+     */
+    eventAfterCombat: boolean = false;
     backgroundNameOverride?: string;
 
-    constructor(enemies: AutomatedCharacter[], act: integer, segment: integer, event?: AbstractEvent, backgroundNameOverride?: string) {
+    constructor(
+        enemies: AutomatedCharacter[],
+        act: integer,
+        segment: integer,
+        event?: AbstractEvent,
+        backgroundNameOverride?: string,
+        eventAfterCombat: boolean = false
+    ) {
         this.enemies = enemies;
         this.act = act;
         this.segment = segment;
         this.event = event;
         this.backgroundNameOverride = backgroundNameOverride;
+        this.eventAfterCombat = eventAfterCombat;
     }
 }
 
