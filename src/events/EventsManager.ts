@@ -1,7 +1,7 @@
 import { AngelicTattooEvent } from "../encounters/events/AngelicTattooEvent";
+import { ArmsDealerPropositionEvent } from "../encounters/events/ArmsDealerProposition";
 import { DiseaseForMoneyEvent } from "../encounters/events/DiseaseForRewardEvent";
 import { DutchZooEscapeEvent } from "../encounters/events/DutchZooEscapeEvent";
-import { ArmsDealerPropositionEvent } from "../encounters/events/ArmsDealerProposition";
 import { AbstractEvent } from "./AbstractEvent";
 
 export class EventsManager {
