@@ -1,7 +1,10 @@
 import { AngelicTattooEvent } from "../encounters/events/AngelicTattooEvent";
 import { ArmsDealerPropositionEvent } from "../encounters/events/ArmsDealerProposition";
+import { CheckpointSmugglerEvent } from "../encounters/events/CheckpointSmugglerEvent";
 import { DiseaseForMoneyEvent } from "../encounters/events/DiseaseForRewardEvent";
 import { DutchZooEscapeEvent } from "../encounters/events/DutchZooEscapeEvent";
+import { GamblingChaplainEvent } from "../encounters/events/GamblingChaplainEvent";
+import { MarshBrigandsTollEvent } from "../encounters/events/MarshBrigandsTollEvent";
 import { AbstractEvent } from "./AbstractEvent";
 
 export class EventsManager {
@@ -10,7 +13,10 @@ export class EventsManager {
         new AngelicTattooEvent(),
         new DiseaseForMoneyEvent(),
         new DutchZooEscapeEvent(),
+        new CheckpointSmugglerEvent(),
+        new MarshBrigandsTollEvent(),
         new ArmsDealerPropositionEvent(),
+        new GamblingChaplainEvent(),
     ];
 
     private constructor() {}

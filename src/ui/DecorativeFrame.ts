@@ -25,15 +25,6 @@ export class DecorativeFrame extends Phaser.GameObjects.Container {
             { x: -width/2, y: height/2, rotation: -Math.PI/2 }
         ];
 
-        cornerPositions.forEach(pos => {
-            const corner = scene.add.image(pos.x, pos.y, 'abstract-001')
-                .setOrigin(0.5)
-                .setRotation(pos.rotation)
-                .setScale(0.5);
-            this.corners.push(corner);
-            this.add(corner);
-        });
-
         // Add inner glow
         const innerGlow = scene.add.rectangle(0, 0, width - 4, height - 4, 0xc0a875, 0.1);
         this.add(innerGlow);

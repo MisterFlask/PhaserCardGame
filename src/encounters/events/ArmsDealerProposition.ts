@@ -10,10 +10,10 @@ class PayForAmmoChoice extends AbstractChoice {
             "Spend 80 Hell Currency to acquire improved rounds."
         );
         const payoff = new DeadEndEvent();
-        payoff.description = "The thought of letting this thing shoot one of my men - even \"non-fatally\" - turned my stomach. Besides, what use is a wounded soldier in this hellscape? Better to pay and be done with it.\n\n" +
-            "[color=white]\"Excellent! A discerning customer. Let me prepare your order.\"[/color]\n\n" +
-            "The price was steep - devilish, one might say - but the ammunition was undeniably superior. Each box was wrapped in waxed paper covered with cramped writing in languages I didn't recognize. The cartridges themselves were works of art, gleaming with purpose.\n\n" +
-            "[color=white]\"Loading instructions,\"[/color] the devil explained, handing over a scroll. [color=white]\"Very important. Load them sunrise-to-sunset, never widdershins. The third chamber should always contain a blessed round, the fourth a cursed one. Maintains balance, you understand.\"[/color]";
+        payoff.description = "The thought of letting this thing shoot one of my men turned my stomach. Better to pay and be done with it.\n\n" +
+            "[color=white]\"Excellent! A discerning customer.\"[/color]\n\n" +
+            "The price was steep, but the ammunition was undeniably superior. Each cartridge gleamed with purpose.\n\n" +
+            "[color=white]\"Loading instructions,\"[/color] he said, handing over a scroll. [color=white]\"Load them sunrise-to-sunset, never widdershins. Third chamber blessed, fourth cursed. Maintains balance.\"[/color]";
         this.nextEvent = payoff;
     }
     canChoose(): boolean { return true; }
@@ -31,10 +31,10 @@ class AcceptTestChoice extends AbstractChoice {
             "One soldier suffers 5 damage and gains 2 Stress. Receive double ammunition."
         );
         const payoff = new DeadEndEvent();
-        payoff.description = "Double ammunition for the price of one man's temporary discomfort? The arithmetic was compelling, even if the ethics were questionable. And in Hell, ethics were a luxury I couldn't afford.\n\n" +
-            "[color=white]\"Marvelous! Oh, this will provide such useful data. If you would just stand there, my good man. Yes, by that rock. Perfect.\"[/color]\n\n" +
-            "The weapon made a sound like a pipe organ being murdered. Thompson screamed and spun to the ground, clutching his thigh where something glowing and unpleasant had lodged itself.\n\n" +
-            "[color=white]\"Fascinating!\"[/color] The devil was already taking notes. [color=white]\"The penetration is less than expected, but the cauterization feature works perfectly. Note how he's not bleeding out? Magnificent.\"[/color]";
+        payoff.description = "Double ammunition for one man's temporary discomfort? The arithmetic was compelling. In Hell, ethics were a luxury I couldn't afford.\n\n" +
+            "[color=white]\"Marvelous! Stand there, my good man. By that rock.\"[/color]\n\n" +
+            "The weapon made a sound like a pipe organ being murdered. Thompson screamed, clutching his thigh where something glowing had lodged itself.\n\n" +
+            "[color=white]\"Fascinating! Note how he's not bleeding out? Magnificent.\"[/color]";
         this.nextEvent = payoff;
     }
     canChoose(): boolean { return true; }
@@ -53,8 +53,8 @@ class DeclineChoice extends AbstractChoice {
             "Some deals aren't worth making."
         );
         const payoff = new DeadEndEvent();
-        payoff.description = "I looked at the devil's experimental weapon, at my nervous men, and at the admittedly impressive ammunition. The calculation was simple: we'd survived this long with Company rounds. We could survive a bit longer.\n\n" +
-            "[color=white]\"Regulations? In Hell? How delightfully... mortal of you.\"[/color] The sigil dimmed with disappointment.";
+        payoff.description = "I looked at the weapon, my nervous men, and the impressive ammunition. We'd survived this long with Company rounds. We could survive longer.\n\n" +
+            "[color=white]\"Regulations? In Hell? How delightfully... mortal.\"[/color] The sigil dimmed with disappointment.";
         this.nextEvent = payoff;
     }
     canChoose(): boolean { return true; }
@@ -66,12 +66,12 @@ export class ArmsDealerPropositionEvent extends AbstractEvent {
         super();
         this.name = "The Arms Dealer's Proposition";
         this.portraitName = "placeholder_event_background_1";
-        this.description = "We'd stopped to clear marsh weed from the crawler's intake when Morrison spotted it - a proper shop tent, complete with display cases and a painted sign: [color=white]\"Belphegor's Ballistics - Ammunition for the Discriminating Marksman.\"[/color]\n\n" +
-            "The proprietor emerged before we could decide whether to investigate or flee. Where his face should have been, a pentagonal bronze sigil rotated slowly, each facet reflecting our images in disturbing ways. He wore a leather apron over what might have been a merchant's waistcoat, if merchants typically had six arms.\n\n" +
-            "[color=white]\"Gentlemen! Company men, I perceive! Still using those dreadful standard-issue revolvers, no doubt? Shocking. Positively shocking.\"[/color]\n\n" +
-            "Before I could respond, he'd produced one of our cartridges from thin air - or possibly from Thompson's ammunition pouch. [color=white]\"Look at this! Mass-produced. Inconsistent powder loads. The bullets aren't even properly blessed! How do you expect to stop anything more substantial than a disgruntled clerk with these?\"[/color]\n\n" +
-            "He produced another cartridge, gleaming with inner fire. [color=white]\"Now THIS is ammunition. Each round hand-crafted. Guaranteed to punch through infernal hide, spectral armor, or bureaucratic immunity. Observe.\"[/color] He fired at a breastplate; the bullet punched through like paper.\n\n" +
-            "[color=white]\"Impressive, no? I can offer you a supply at very reasonable rates. Of course, if liquidity is an issue, I have an alternative arrangement. A new model of hand-cannon, purely theoretical. One shot, non-fatal, on one of your men. In exchange, double the ammunition. What say you?\"[/color]";
+        this.description = "Morrison spotted it while we cleared marsh weed - a proper shop tent with a sign: [color=white]\"Belphegor's Ballistics - Ammunition for the Discriminating Marksman.\"[/color]\n\n" +
+            "The proprietor emerged before we could flee. Where his face should have been, a pentagonal bronze sigil rotated slowly. Six arms protruded from a merchant's waistcoat.\n\n" +
+            "[color=white]\"Company men! Still using those dreadful standard-issue revolvers? Shocking.\"[/color]\n\n" +
+            "He produced one of our cartridges from Thompson's pouch. [color=white]\"Mass-produced rubbish! How do you expect to stop anything substantial with these?\"[/color]\n\n" +
+            "He showed another cartridge, gleaming with inner fire. [color=white]\"THIS is ammunition. Hand-crafted. Guaranteed to punch through infernal hide or bureaucratic immunity.\"[/color] He fired at a breastplate; it punched through like paper.\n\n" +
+            "[color=white]\"Yours for a reasonable price. Or, if liquidity is an issue - let me test my new hand-cannon on one of your men. Non-fatal. In exchange, double ammunition. What say you?\"[/color]";
         this.choices = [
             new PayForAmmoChoice(),
             new AcceptTestChoice(),
