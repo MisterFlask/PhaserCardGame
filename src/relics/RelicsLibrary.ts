@@ -26,6 +26,7 @@ import { ScreamingParasite } from './cursedcargo/ScreamingParasite';
 import { SonorousKlaxon } from './cursedcargo/SonorousKlaxon';
 import { WhisperOfSorrow } from './cursedcargo/WhisperOfSorrow';
 import { WraithInABottle } from './cursedcargo/WraithInABottle';
+import { EcclesiasticalRecommendation } from './special/EcclesiasticalRecommendation';
 
 export class RelicsLibrary {
     private static instance: RelicsLibrary;
@@ -45,6 +46,7 @@ export class RelicsLibrary {
             new CaskOfErrantSouls(),
             new VialOfBlood(),
             new BelphegorsRounds(),
+            new EcclesiasticalRecommendation(),
         ];
 
         this.cursedCargoRelics = [

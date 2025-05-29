@@ -5,6 +5,7 @@ import { CheckpointSmugglerEvent } from "../encounters/events/CheckpointSmuggler
   
 import { MarshBrigandsTollEvent } from "../encounters/events/MarshBrigandsTollEvent";
 import { ArmsDealerPropositionEvent } from "../encounters/events/ArmsDealerProposition";
+import { GamblingChaplainEvent } from "../encounters/events/GamblingChaplainEvent";
 import { AbstractEvent } from "./AbstractEvent";
 
 export class EventsManager {
@@ -16,7 +17,7 @@ export class EventsManager {
         new CheckpointSmugglerEvent(),
         new MarshBrigandsTollEvent(),
         new ArmsDealerPropositionEvent(),
- 
+        new GamblingChaplainEvent(),
     ];
 
     private constructor() {}
