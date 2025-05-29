@@ -63,6 +63,7 @@ class CombatScene extends Phaser.Scene {
 
     private eventToRunNext?: AbstractEvent;
     private hasEventBeenRun: boolean = false;
+    private currentEncounterEventAfterCombat: boolean = false;
     private sceneStartsWithMapOverlayUp: boolean = false;
     private initialData: CombatSceneData = new CombatSceneData();
 
@@ -130,8 +131,15 @@ class CombatScene extends Phaser.Scene {
         ActionManager.getInstance().startCombat();
 
         // Set up event if present in the encounter
+        this.currentEncounterEventAfterCombat = data.encounter.eventAfterCombat;
         if (data.encounter.event) {
             this.setNewEvent(data.encounter.event);
+            if (this.currentEncounterEventAfterCombat) {
+                // Prevent the event from triggering until combat ends
+                this.hasEventBeenRun = true;
+            }
+        } else {
+            this.currentEncounterEventAfterCombat = false;
         }
 
         // Handle map overlay
@@ -377,6 +385,10 @@ class CombatScene extends Phaser.Scene {
             ActionManager.getInstance().endCombat();
             this.cardManager.onCombatEnd();
             this.uiManager.onCombatEnd();
+            if (this.currentEncounterEventAfterCombat && this.eventToRunNext) {
+                // Allow the post-combat event to trigger
+                this.hasEventBeenRun = false;
+            }
         }
 
         // Update DetailsScreenManager
@@ -392,8 +404,10 @@ class CombatScene extends Phaser.Scene {
         this.cardManager.update();
 
         if (this.eventToRunNext && !this.hasEventBeenRun) {
-            this.uiManager.showEvent(this.eventToRunNext);
-            this.hasEventBeenRun = true;
+            if (!this.currentEncounterEventAfterCombat || (this.currentEncounterEventAfterCombat && this.combatEndHandled)) {
+                this.uiManager.showEvent(this.eventToRunNext);
+                this.hasEventBeenRun = true;
+            }
         }
 
         this.mapOverlay.updateDisplay();

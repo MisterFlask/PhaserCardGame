@@ -3,6 +3,7 @@ import { AbstractRelic } from "../relics/AbstractRelic";
 import { GameState } from "../rules/GameState";
 import { ActionManager } from "../utils/ActionManager";
 import { ActionManagerFetcher } from "../utils/ActionManagerFetcher";
+import { Encounter } from "../encounters/EncounterManager";
 
 export abstract class AbstractChoice {
     constructor(
@@ -73,6 +74,26 @@ export class FinishChoice extends AbstractChoice {
 
     effect(): void {
         this.actionManager().emitEvent("showMapOverlay", {});
+    }
+}
+
+// Choice that immediately starts a combat encounter and chains to the next
+// event only after that combat concludes.
+export class DeadEndStartEncounterChoice extends AbstractChoice {
+    constructor(public text: string, public encounter: Encounter, mechanicalInfo: string = "") {
+        super(text, mechanicalInfo);
+    }
+
+    canChoose(): boolean { return true; }
+
+    effect(): void {
+        const afterEvent = this.nextEvent;
+        if (afterEvent) {
+            this.encounter.event = afterEvent;
+            this.encounter.eventAfterCombat = true;
+        }
+        this.nextEvent = null; // Prevent immediate chaining
+        this.actionManager().cleanupAndRestartCombat({ encounter: this.encounter, shouldStartWithMapOverlay: false });
     }
 }
 
