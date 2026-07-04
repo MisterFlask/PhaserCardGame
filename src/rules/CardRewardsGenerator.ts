@@ -1,3 +1,4 @@
+import { SortieManager } from "../campaign/SortieManager";
 import { EntityRarity } from "../gamecharacters/EntityRarity";
 import { PlayableCard } from "../gamecharacters/PlayableCard";
 import { CardLibrary } from "../gamecharacters/playerclasses/cards/CardLibrary";
@@ -96,7 +97,12 @@ export class CardRewardsGenerator {
     public generateCardRewardsForCombat(): PlayableCard[] {
         const gameState = GameState.getInstance();
         const pagesValue = gameState.combatState.combatResources.ashes.value;
-        const currentFloor = gameState.currentLocation?.floor ?? 1;
+        // Reward power scales with contract depth: act/segment map onto the
+        // 1-50 "floor" scale the distribution curve was designed around.
+        const contract = SortieManager.getInstance().activeContract;
+        const currentFloor = contract
+            ? ((contract.act - 1) * 3 + contract.segment + 1) * 5
+            : 1;
         
         let pagesCardsAdded = 0;
         if (pagesValue > 4) {

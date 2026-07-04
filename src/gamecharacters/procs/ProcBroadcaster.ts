@@ -61,14 +61,6 @@ export class ProcBroadcaster {
             });
         }
 
-        GameState.getInstance().currentLocation?.buffs?.forEach(buff => {
-            buffs.push(buff);
-        });
-
-        GameState.getInstance().currentRoute?.buffs?.forEach(modifier => {
-            buffs.push(modifier);
-        });
-
         GameState.getInstance().relicsInventory?.forEach(relic => {
             buffs.push(relic);
         });

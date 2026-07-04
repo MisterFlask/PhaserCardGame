@@ -7,24 +7,14 @@ import ImageUtils from '../../../utils/ImageUtils';
 import { SceneChanger } from '../../SceneChanger';
 import { CampaignUiState } from './CampaignUiState';
 import { AbstractHqPanel } from './panels/AbstractHqPanel';
-import { CargoSelectionPanel } from './panels/CargoSelectionPanel';
 import { ContractBoardPanel } from './panels/ContractBoardPanel';
 import { InvestmentPanel } from './panels/InvestmentPanel';
-import { LiquidationPanel } from './panels/LiquidationPanel';
-import { LoadoutPanel } from './panels/LoadoutPanel';
 import { MainHubPanel } from './panels/MainHubPanel';
-import { PersonnelPanel } from './panels/PersonnelPanel';
-import { TradeRouteSelectionPanel } from './panels/TradeRouteSelectionPanel';
 
 export class HqScene extends Scene {
     private currentPanel?: AbstractHqPanel;
     private mainHubPanel!: MainHubPanel;
     private investmentPanel!: InvestmentPanel;
-    private tradePanel!: TradeRouteSelectionPanel;
-    private personnelPanel!: PersonnelPanel;
-    private loadoutPanel!: LoadoutPanel;
-    private liquidationPanel!: LiquidationPanel;
-    private cargoSelectionPanel!: CargoSelectionPanel;
     private contractBoardPanel!: ContractBoardPanel;
 
     constructor() {
@@ -77,21 +67,11 @@ export class HqScene extends Scene {
         // Create all panels
         this.mainHubPanel = new MainHubPanel(this);
         this.investmentPanel = new InvestmentPanel(this);
-        this.tradePanel = new TradeRouteSelectionPanel(this);
-        this.personnelPanel = new PersonnelPanel(this);
-        this.loadoutPanel = new LoadoutPanel(this);
-        this.liquidationPanel = new LiquidationPanel(this);
-        this.cargoSelectionPanel = new CargoSelectionPanel(this);
         this.contractBoardPanel = new ContractBoardPanel(this);
 
         // Hide all panels initially
         this.mainHubPanel.setVisible(false);
         this.investmentPanel.setVisible(false);
-        this.tradePanel.setVisible(false);
-        this.personnelPanel.setVisible(false);
-        this.loadoutPanel.setVisible(false);
-        this.liquidationPanel.setVisible(false);
-        this.cargoSelectionPanel.setVisible(false);
         this.contractBoardPanel.setVisible(false);
 
         // Show main hub panel by default
@@ -102,24 +82,6 @@ export class HqScene extends Scene {
             switch (destination) {
                 case 'investment':
                     this.showPanel('investment');
-                    break;
-                case 'trade routes':
-                    this.showPanel('trade');
-                    break;
-                case 'personnel':
-                    this.showPanel('personnel');
-                    break;
-                case 'loadout':
-                    this.showPanel('loadout');
-                    break;
-                case 'trade goods':
-                    this.showPanel('tradegoods');
-                    break;
-                case 'liquidation':
-                    this.showPanel('liquidation');
-                    break;
-                case 'cargoselection':
-                    this.showPanel('cargoselection');
                     break;
                 case 'contracts':
                     this.showPanel('contracts');
@@ -142,7 +104,7 @@ export class HqScene extends Scene {
     }
 
     private showPanel(
-        panelKey: 'main' | 'investment' | 'trade' | 'personnel' | 'loadout' | 'tradegoods' | 'liquidation' | 'cargoselection' | 'contracts'
+        panelKey: 'main' | 'investment' | 'contracts'
     ): void {
         if (this.currentPanel) {
             this.currentPanel.setVisible(false);
@@ -157,76 +119,20 @@ export class HqScene extends Scene {
             case 'investment':
                 this.currentPanel = this.investmentPanel;
                 break;
-            case 'trade':
-                this.currentPanel = this.tradePanel;
-                break;
-            case 'personnel':
-                this.currentPanel = this.personnelPanel;
-                break;
-            case 'loadout':
-                this.currentPanel = this.loadoutPanel;
-                break;
-            case 'liquidation':
-                this.currentPanel = this.liquidationPanel;
-                break;
-            case 'cargoselection':
-                this.currentPanel = this.cargoSelectionPanel;
-                break;
             case 'contracts':
                 this.currentPanel = this.contractBoardPanel;
                 break;
         }
-        
+
         this.currentPanel?.setVisible(true);
         this.currentPanel?.show();
         this.currentPanel?.setDepth(999);
-    }
-
-    private handleLaunchExpedition(): void {
-        const gameState = GameState.getInstance();
-        
-        // Validate expedition requirements
-        if (!this.validateExpeditionRequirements()) {
-            return;
-        }
-
-        // Clean up physical cards
-        gameState.eliminatePhysicalCardsBetweenScenes();
-
-        // Transition to the map scene
-        console.log('launching expedition (NOTE: TODO)');
-        // SceneChanger.switchToCombatScene(campaignState.selectedTradeRoute);
-    }
-
-    private validateExpeditionRequirements(): boolean {
-        const gameState = GameState.getInstance();
-        const campaignState = CampaignUiState.getInstance();
-
-        // Check for selected party members
-        if (campaignState.selectedParty.length !== 3) {
-            console.warn('Must select exactly 3 party members');
-            return false;
-        }
-
-        // Check for selected trade route
-        if (!campaignState.selectedTradeRoute) {
-            console.warn('Must select a trade route');
-            return false;
-        }
-
-        // Add any other validation as needed
-        return true;
     }
 
     update(time: number, delta: number): void {
         // Update current panel
         if (this.currentPanel && 'update' in this.currentPanel) {
             (this.currentPanel as any).update(time, delta);
-        }
-
-        if (TransientUiState.getInstance().showLiquidationPanel) {
-            this.showPanel('liquidation');
-            TransientUiState.getInstance().showLiquidationPanel = false;
         }
     }
 

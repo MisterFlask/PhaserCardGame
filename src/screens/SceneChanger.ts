@@ -26,14 +26,8 @@ export class SceneChanger {
         SceneChanger.switchScene('HqScene');
     }
 
-    public static switchToExpeditionFinishedScene(): void {
-        TransientUiState.getInstance().showLiquidationPanel = true;
-        SceneChanger.switchScene('HqScene');
-
-    }
-
-    public static switchToCombatScene(encounter: Encounter, shouldStartWithMapOverlay: boolean = false): void {
-        SceneChanger.switchScene('CombatScene', { encounter, shouldStartWithMapOverlay });
+    public static switchToCombatScene(encounter: Encounter): void {
+        SceneChanger.switchScene('CombatScene', { encounter });
     }
 
     public static setCurrentScene(scene: Phaser.Scene): void {

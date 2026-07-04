@@ -5,10 +5,8 @@ import type { AbstractCard } from '../gamecharacters/AbstractCard';
 import { PlayerVessel } from '../gamecharacters/cargo/PlayerCargoHolder';
 import type { PlayableCard } from '../gamecharacters/PlayableCard';
 import type { PlayerCharacter } from '../gamecharacters/PlayerCharacter';
-import type { LocationCard } from '../maplogic/LocationCard';
 import { AbstractRelic } from '../relics/AbstractRelic';
 import { EmergencyTeleporter } from '../relics/special/EmergencyTeleporter';
-import { AbstractTradeRoute } from '../screens/campaign/hq_ux/AbstractTradeRoute';
 import { AbstractStrategicProject } from '../strategic_projects/AbstractStrategicProject';
 import type { AutomatedCharacterType, BaseCharacterType } from '../Types';
 import type { PhysicalCard } from '../ui/PhysicalCard';
@@ -20,13 +18,11 @@ import { MettleResource } from './combatresources/MettleResource';
 import { PluckResource } from './combatresources/PluckResource';
 import { SmogResource } from './combatresources/SmogResource';
 import { VentureResource } from './combatresources/VentureResource';
-import { ShopPopulator } from './ShopPopulator';
 
 export class GameState {
 
     initializeRun() {
         console.log('initializing run')
-        this.rerollShop();
         this.combatState.playerCharacters = this.currentRunCharacters
 
         this.relicsInventory = []
@@ -43,20 +39,7 @@ export class GameState {
         this.britishPoundsSterling = 0
     }
 
-    public cleanUpAfterLiquidation(){
-        this.relicsInventory = []
-        this.currentRunCharacters.forEach(character => {
-            character.buffs = character.buffs.filter(buff => buff.isPersonaTrait);
-            character.cardsInMasterDeck = character.startingDeck.slice().map(card => card.Copy())
-        });
-        this.currentRunCharacters = []
-        this.currentLocation = null
-        this.locations = []
-        this.mapInitialized = false
-    }
-
     private static instance: GameState;
-    currentRoute: AbstractTradeRoute | null = null;
     ledger: AbstractRelic[] = [];
     public currentAct: number = 1;
     public actRegion : ActRegion = ActRegion.STYX_DELTA;
@@ -73,9 +56,6 @@ export class GameState {
         return this.currentRunCharacters[Math.floor(Math.random() * this.currentRunCharacters.length)];
     }
 
-    combatShopContents: ShopContents = new ShopContents();
-    cursedGoodsShopContents: ShopContents = new ShopContents();
-    importShopContents: ShopContents = new ShopContents();
 
     // player's stuff
     public get masterDeckAllCharacters(): readonly PlayableCard[] {
@@ -95,12 +75,6 @@ export class GameState {
     public britishPoundsSterling: number = 0
 
     public combatState: CombatState = new CombatState()
-
-    // Add tracking for player's current location
-    public currentLocation: LocationCard | null = null;
-    public mapInitialized: boolean = false;
-    // Add all location cards
-    public locations: LocationCard[] = [];
 
     public ownedStrategicProjects: AbstractStrategicProject[] = [];
 
@@ -171,67 +145,10 @@ export class GameState {
         return [...this.currentRunCharacters];
     }
 
-    public rerollShop(): void {
-        console.log('rerolling shop')
-        const shopCards = ShopPopulator.getInstance().getCombatShopCards();
-        const shopRelics = ShopPopulator.getInstance().getCombatShopRelics();
-        console.log('shop cards after reroll', shopCards)
-        console.log('shop relics after reroll', shopRelics)
-        this.combatShopContents.shopCardsForSale = shopCards;
-        this.combatShopContents.shopRelicsForSale = shopRelics;
-        this.combatShopContents.interestInPurchasingImports = false;
-
-        // todo: other shops
-        this.cursedGoodsShopContents.shopCardsForSale = ShopPopulator.getInstance().getCursedGoodsCards();
-        this.cursedGoodsShopContents.shopRelicsForSale = ShopPopulator.getInstance().getCursedGoodsRelics();
-        this.cursedGoodsShopContents.interestInPurchasingImports = false;
-        
-        this.importShopContents.interestInPurchasingImports = true;
-        this.importShopContents.shopCardsForSale = [];
-        this.importShopContents.shopRelicsForSale = [];
-    }
-
     // Reset method
     public reset(): void {
         this.roster = [];
         this.currentRunCharacters = [];
-        this.combatShopContents = new ShopContents();
-        this.cursedGoodsShopContents = new ShopContents();
-        this.importShopContents = new ShopContents();
-    }
-
-    // Serializer function
-    public serialize(): string {
-        const serializableState = {
-            roster: this.roster.map(char => ({
-                type: char.constructor.name,
-                ...char
-            })),
-            currentRunCharacters: this.currentRunCharacters.map(char => ({
-                type: char.constructor.name,
-                ...char
-            })),
-            shopItems: this.combatShopContents.shopCardsForSale,
-            inventory: this.masterDeckAllCharacters
-        };
-        return JSON.stringify(serializableState);
-    }
-
-    // Add methods for managing locations
-    public setCurrentLocation(location: LocationCard): void {
-        this.currentLocation = location;
-    }
-
-    public getCurrentLocation(): LocationCard | null {
-        return this.currentLocation;
-    }
-
-    public setLocations(locations: LocationCard[]): void {
-        this.locations = locations;
-    }
-
-    public getLocations(): LocationCard[] {
-        return [...this.locations];
     }
 
     public addRelic(relic: AbstractRelic, scene: Phaser.Scene): void {

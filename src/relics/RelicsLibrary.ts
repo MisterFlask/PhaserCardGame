@@ -1,9 +1,7 @@
 import { PlayableCard } from '../gamecharacters/PlayableCard';
 import { AbstractRelic } from './AbstractRelic';
-import { CaskOfErrantSouls } from './common/CaskOfErrantSouls';
 import { FrozenDew } from './common/FrozenDew';
 import { GlassCross } from './common/GlassCross';
-import { HopeCandle } from './common/HopeCandle';
 import { IronFilings } from './common/IronFilings';
 import { MarksmansManual } from './common/MarksmansManual';
 import { MistBottle } from './common/MistBottle';
@@ -37,13 +35,11 @@ export class RelicsLibrary {
     private constructor() {
         this.beneficialRelics = [
             new MarksmansManual(),
-            new HopeCandle(),
             new TornPage(),
             new MistBottle(),
             new FrozenDew(),
             new IronFilings(),
             new GlassCross(),
-            new CaskOfErrantSouls(),
             new VialOfBlood(),
             new BelphegorsRounds(),
             new EcclesiasticalRecommendation(),

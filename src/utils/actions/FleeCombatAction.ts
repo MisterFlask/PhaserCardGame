@@ -1,5 +1,4 @@
 // performs the necessary actions to flee combat
-// empty out all location rewards
 // kill all enemies
 // mark combat as "ended"
 
@@ -16,10 +15,6 @@ export class FleeCombatAction extends GameAction {
         gameState.combatState.enemies.forEach(enemy => {
             enemy.hitpoints = 0;
         });
-
-        if (gameState.currentLocation) {
-            gameState.currentLocation!.currentExpectedRewards = []
-        }
 
         return [];
     }

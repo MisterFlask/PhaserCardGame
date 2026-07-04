@@ -93,7 +93,7 @@ export class DeadEndStartEncounterChoice extends AbstractChoice {
             this.encounter.eventAfterCombat = true;
         }
         this.nextEvent = null; // Prevent immediate chaining
-        this.actionManager().cleanupAndRestartCombat({ encounter: this.encounter, shouldStartWithMapOverlay: false });
+        this.actionManager().cleanupAndRestartCombat({ encounter: this.encounter });
     }
 }
 

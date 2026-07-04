@@ -1,1 +1,0 @@
-// Adds a Curse to the character's deck on entrance.

@@ -1,1 +1,0 @@
-// abstract buff that increases the price of goods sold in this location by [stacks]%.  e.g. a value of 100% would represent doubling the price of goods.

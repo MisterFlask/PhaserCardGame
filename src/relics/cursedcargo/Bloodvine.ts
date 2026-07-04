@@ -1,3 +1,4 @@
+import { SortieManager } from "../../campaign/SortieManager";
 import { Regeneration } from "../../gamecharacters/buffs/enemy_buffs/Regeneration";
 import { EntityRarity } from "../../gamecharacters/EntityRarity";
 import { GameState } from "../../rules/GameState";
@@ -16,12 +17,13 @@ export class Bloodvine extends AbstractRelic {
     }
 
     override getDescription(): string {
-        return `At the beginning of boss combats, all enemies gain ${this.REGEN_AMOUNT} Regeneration.`;
+        return `At the beginning of combats on 3-star contracts, all enemies gain ${this.REGEN_AMOUNT} Regeneration.`;
     }
 
     override onCombatStart(): void {
         const gameState = GameState.getInstance();
-        if (!gameState.combatState || !gameState.currentLocation || gameState.currentLocation.segment !== 3) {
+        const contract = SortieManager.getInstance().activeContract;
+        if (!gameState.combatState || !contract || contract.difficultyStars < 3) {
             return;
         }
 

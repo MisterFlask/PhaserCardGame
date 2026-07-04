@@ -15,7 +15,6 @@ export class TransientUiState {
     public hoveredIntent: PhysicalIntent | undefined = undefined;
     public hoveredIncomingIntent: IncomingIntent | undefined = undefined;
     public mouseOverCardDropZone: boolean = false;
-    public showLiquidationPanel: boolean = false;
 
     private constructor() {}
 

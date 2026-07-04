@@ -32,17 +32,13 @@ import CombatInputHandler from './subcomponents/CombatInputHandler';
 import CombatStateService from './subcomponents/CombatStateService';
 import CombatUIManager from './subcomponents/CombatUiManager';
 import { DetailsScreenManager } from './subcomponents/DetailsScreenManager';
-import { MapOverlay } from './subcomponents/MapOverlay';
 import PerformanceMonitor from './subcomponents/PerformanceMonitor';
-import { ShopOverlay } from './subcomponents/ShopOverlay';
-import { TreasureOverlay } from './subcomponents/TreasureOverlay';
 
 /**
  * Interface for initializing CombatScene with necessmorniary data.
  */
 export class CombatSceneData {
     encounter: Encounter = new Encounter([], -1, -1);
-    shouldStartWithMapOverlay: boolean = false;
 }
 
 class CombatScene extends Phaser.Scene {
@@ -53,21 +49,16 @@ class CombatScene extends Phaser.Scene {
     private background!: Phaser.GameObjects.Image;
     private inventoryPanel!: InventoryPanel;
     private detailsScreenManager!: DetailsScreenManager;
-    private shopOverlay!: ShopOverlay;
-    private mapOverlay!: MapOverlay;
     private mapButton!: TextBoxButton;
     private mapButtonGlow!: CheapGlowEffect;
     private lastMapButtonText: string = '';
     private campaignBriefStatus!: CampaignBriefStatus;
     private characterDeckOverlay!: CharacterDeckOverlay;
-    private treasureOverlay!: TreasureOverlay;
     private combatEndHandled: boolean = false;
-    private hasShownRegionTitle: boolean = false;
 
     private eventToRunNext?: AbstractEvent;
     private hasEventBeenRun: boolean = false;
     private currentEncounterEventAfterCombat: boolean = false;
-    private sceneStartsWithMapOverlayUp: boolean = false;
     private initialData: CombatSceneData = new CombatSceneData();
 
     private setNewEvent(event?: AbstractEvent): void {
@@ -121,13 +112,8 @@ class CombatScene extends Phaser.Scene {
         if (this.inputHandler) {
             this.inputHandler.cleanup();
             this.inputHandler = new CombatInputHandler(this, this.cardManager);
-            
-            // Re-add the card click listener
-            this.events.on("card:pointerdown", (card: PhysicalCard) => {
-                this.onCardPointerDown(card);
-            });
         }
-        
+
         // Start new combat
         ActionManager.getInstance().startCombat();
 
@@ -142,17 +128,7 @@ class CombatScene extends Phaser.Scene {
         } else {
             this.currentEncounterEventAfterCombat = false;
         }
-
-        // Handle map overlay
-        this.toggleMapOverlay(data.shouldStartWithMapOverlay);
     }
-    onCardPointerDown(card: PhysicalCard) {
-        if (UIContextManager.getInstance().getContext() !== UIContext.COMBAT) return;
-        this.shopOverlay.handleCardClick(card.data as AbstractCard);
-        this.treasureOverlay.handleCardClickOnTreasureChest(card.data as AbstractCard);
-    }
-
-
 
     create(): void {
         this.createBackground();
@@ -160,8 +136,6 @@ class CombatScene extends Phaser.Scene {
         // Initialize CombatUIManager as a singleton
         CombatUIManager.initialize(this);
         this.uiManager = CombatUIManager.getInstance();
-        this.mapOverlay = new MapOverlay(this);
-        this.mapOverlay.hide();
 
         this.cardManager = new CombatCardManager(this);
         this.inputHandler = new CombatInputHandler(this, this.cardManager);
@@ -169,15 +143,6 @@ class CombatScene extends Phaser.Scene {
 
         // Initialize DetailsScreenManager
         this.detailsScreenManager = new DetailsScreenManager(this);
-
-        // Initialize ShopOverlay
-        this.shopOverlay = new ShopOverlay(this);
-        this.treasureOverlay = new TreasureOverlay(this);
-
-        // Set up the onCardClick handler
-        this.events.on("card:pointerdown", (card: PhysicalCard) => {
-            this.onCardPointerDown(card);
-        });
 
         this.setupResizeHandler();
         GameState.getInstance().combatState.currentTurn = 0;
@@ -188,28 +153,23 @@ class CombatScene extends Phaser.Scene {
         this.events.once('shutdown', this.obliterate, this);
         this.events.once('destroy', this.obliterate, this);
 
-        // Create the map button
+        // Create the sortie-advance button (labeled by update() as the sortie progresses)
         this.mapButton = new TextBoxButton({
             scene: this,
             x: 300,
             y: 100,
             width: 100,
             height: 40,
-            text: 'Map',
+            text: 'Objective',
             style: { fontSize: '24px' },
             textBoxName: 'mapButton',
             fillColor: 0x555555
         });
         this.mapButton
             .onClick(() => {
-                const sortie = SortieManager.getInstance();
-                if (sortie.isActive()) {
-                    // Contract sorties have no map: the button advances the sortie.
-                    if (this.combatEndHandled) {
-                        sortie.advance();
-                    }
-                } else {
-                    this.toggleMapOverlay(true);
+                // The button advances the sortie once combat is won.
+                if (this.combatEndHandled) {
+                    SortieManager.getInstance().advance();
                 }
             });
         this.add.existing(this.mapButton);
@@ -241,10 +201,6 @@ class CombatScene extends Phaser.Scene {
             }
         });
 
-        this.events.on("showMapOverlay", () => {
-            this.toggleMapOverlay(true);
-        });
-
         this.events.on("cleanupAndRestartCombat", (data: CombatSceneData) => {
             this.cleanupAndRestartCombat(data);
         });
@@ -255,9 +211,6 @@ class CombatScene extends Phaser.Scene {
                 this.characterDeckOverlay.showCardInExhaustPile();
             }
         });
-
-        this.setNewEvent(GameState.getInstance().currentLocation?.gameEvent);
-        this.toggleMapOverlay(this.sceneStartsWithMapOverlayUp);
 
         // Add event listener for background changes
         this.events.on('changeBackground', (backgroundName: string) => {
@@ -270,7 +223,6 @@ class CombatScene extends Phaser.Scene {
     private obliterate(): void {
         this.events.off('shutdown', this.obliterate, this);
         this.events.off('destroy', this.obliterate, this);
-        this.events.off('showMapOverlay', this.toggleMapOverlay, this);
         // Remove resize event listener
         this.scale.off('resize', this.resize, this);
         if (this.campaignBriefStatus) {
@@ -292,7 +244,7 @@ class CombatScene extends Phaser.Scene {
     }
 
     private createBackground(): void {
-        const backgroundName = GameState.getInstance().currentLocation?.backgroundName || "hell-oil-painting";
+        const backgroundName = "hell-oil-painting";
 
         this.background = this.add.image(this.scale.width / 2, this.scale.height / 2, backgroundName)
             .setOrigin(0.5)
@@ -440,8 +392,6 @@ class CombatScene extends Phaser.Scene {
                 this.hasEventBeenRun = true;
             }
         }
-
-        this.mapOverlay.updateDisplay();
     }
 
     /**
@@ -449,18 +399,6 @@ class CombatScene extends Phaser.Scene {
      */
     private isCombatFinished(): boolean {
         return GameState.getInstance().combatState.enemies.every(enemy => enemy.isDead());
-    }
-
-    private toggleMapOverlay(show: boolean  ): void {
-        if (show) {
-            this.mapOverlay.show();
-            if (!this.hasShownRegionTitle) {
-                this.mapOverlay.showRegionTitle("STYX DELTA");
-                this.hasShownRegionTitle = true;
-            }
-        } else {
-            this.mapOverlay.hide();
-        }
     }
 
     private setupCharacterClickHandlers(): void {

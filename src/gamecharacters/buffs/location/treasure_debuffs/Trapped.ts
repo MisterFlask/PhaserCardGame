@@ -1,1 +1,0 @@
-// a random character takes [stacks] damage on entrance.

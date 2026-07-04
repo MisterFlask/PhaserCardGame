@@ -203,16 +203,7 @@ export abstract class AbstractCard implements IAbstractCard {
     public surfacePurchaseValue: number = -1;
     public hellPurchaseValue: number = -1;
     public get finalHellSellValue(): number {
-        const baseValue = this.getBuffStacks("HELL_SELL_VALUE");
-        const currentLocation = ActionManagerFetcher.getGameState().getCurrentLocation();
-        if (!currentLocation) return baseValue;
-
-        // Get merchant multiplier from location buffs if it exists
-        const merchantMultiplier = currentLocation.buffs.find(buff => buff.id === "MerchantMultiplier");
-        if (!merchantMultiplier) return baseValue;
-
-        // Apply the percentage increase
-        return Math.floor(baseValue * (1 + merchantMultiplier.stacks / 100));
+        return this.getBuffStacks("HELL_SELL_VALUE");
     }
     public get surfaceSellValue(): number {
         return this.getBuffStacks("Surface Sell Value")

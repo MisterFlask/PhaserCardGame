@@ -581,14 +581,6 @@ class CombatUIManager {
     public onCombatStart(): void {
         this.combatEnded = false;
         this.generalRewardScreen?.hide();
-        if (GameState.getInstance().currentLocation) {
-            GameState.getInstance().currentLocation!.currentExpectedRewards = GameState.getInstance().currentLocation!.determineBaseRewards();
-            // Apply any reward modifiers from location buffs
-            GameState.getInstance().currentLocation!.buffs.forEach(buff => {
-                GameState.getInstance().currentLocation!.currentExpectedRewards = 
-                    buff.alterRewards(GameState.getInstance().currentLocation!.currentExpectedRewards);
-            });
-        }
 
         // Load consumables at combat start
         this.loadConsumablesFromGameState();
@@ -601,28 +593,20 @@ class CombatUIManager {
 
         const rewards = this.determineRewards();
         if (rewards.length > 0) {
-            console.log("Showing rewards for room: " + GameState.getInstance().currentLocation?.name);       
             this.generalRewardScreen = new GeneralRewardScreen(this.scene, rewards);
             this.generalRewardScreen.show();
         } else {
-            console.log("No rewards to show for room: " + GameState.getInstance().currentLocation?.name);
+            console.log("No rewards to show for this combat");
         }
     }
 
     private determineRewards(): AbstractReward[] {
-        // Contract sorties have no location; the sortie provides the rewards.
+        // The active sortie provides rewards for each combat it contains.
         const sortie = SortieManager.getInstance();
         if (sortie.isActive()) {
             return sortie.getRewardsForCurrentCombat();
         }
-
-        const gameState = GameState.getInstance();
-        const currentLocation = gameState.currentLocation;
-        if (!currentLocation) {
-            console.log("No location to determine rewards for");
-            return []; // No rewards if no location
-        }
-        return currentLocation.currentExpectedRewards;
+        return [];
     }
 
     public disableInteractions(): void {

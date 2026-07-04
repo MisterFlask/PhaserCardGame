@@ -67,7 +67,7 @@ export class SortieManager {
         if (!this.activeContract) return;
         const encounter = EncounterManager.getInstance()
             .getRandomCombatEncounter(this.activeContract.act, this.activeContract.segment);
-        SceneChanger.switchToCombatScene(encounter, false);
+        SceneChanger.switchToCombatScene(encounter);
     }
 
     /** Card pick after every combat; the contract's £ settles at resolution. */

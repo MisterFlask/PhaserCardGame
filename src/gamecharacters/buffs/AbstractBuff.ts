@@ -1,4 +1,3 @@
-import { LocationCard } from "../../maplogic/LocationCard";
 import { AbstractReward } from "../../rewards/AbstractReward";
 import type { AbstractCombatEvent } from "../../rules/AbstractCombatEvent";
 import { AbstractCombatResource } from "../../rules/combatresources/AbstractCombatResource";
@@ -303,10 +302,6 @@ export abstract class AbstractBuff implements IAbstractBuff {
 
     energyCostModifier(): number {
         return 0;
-    }
-
-    onLocationEntered(location: LocationCard): void {
-
     }
 
     // this is a FLAT modifier on top of damage taken, not percentage-based.
