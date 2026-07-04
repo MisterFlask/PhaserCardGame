@@ -1,5 +1,6 @@
 import { Scene } from 'phaser';
 import { GameState } from '../../../../rules/GameState';
+import { SaveManager } from '../../../../saveload/SaveManager';
 import { AbstractStrategicProject } from '../../../../strategic_projects/AbstractStrategicProject';
 import { StrategicProjectTechTree } from '../../../../strategic_projects/StrategicProjectTechTree';
 import { PhysicalProjectCard } from '../../../../ui/PhysicalProjectCard';
@@ -180,9 +181,12 @@ export class InvestmentPanel extends AbstractHqPanel {
             
             // Notify other components that funds have changed
             this.scene.events.emit('fundsChanged');
-            
+
             // Update all cards to reflect the change
             this.updateCards();
+
+            // Purchases are permanent: checkpoint immediately.
+            SaveManager.save();
         }
     }
     

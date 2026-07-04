@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import { CHARTER_YEARS } from '../../../../campaign/CampaignCalendar';
 import { SortieManager } from '../../../../campaign/SortieManager';
+import { SaveManager } from '../../../../saveload/SaveManager';
 import { TextBoxButton } from '../../../../ui/Button';
 import { TextBox } from '../../../../ui/TextBox';
 import { CampaignUiState } from '../CampaignUiState';
@@ -100,6 +101,7 @@ export class MainHubPanel extends AbstractHqPanel {
         const buttons = [
             { text: 'Investment', x: 0.2, y: 0.6 },
             { text: 'Contract Board', x: 0.4, y: 0.6},
+            { text: 'New Campaign', x: 0.85, y: 0.92 },
         ];
 
         buttons.forEach(({ text, x, y}) => {
@@ -123,6 +125,10 @@ export class MainHubPanel extends AbstractHqPanel {
         const lowerDest = destination.toLowerCase();
         if (lowerDest === 'contract board') {
             this.scene.events.emit('navigate', 'contracts');
+        } else if (lowerDest === 'new campaign') {
+            // Wipe the save and reboot into a fresh campaign.
+            SaveManager.deleteSave();
+            window.location.reload();
         } else {
             this.scene.events.emit('navigate', lowerDest);
         }

@@ -7,6 +7,7 @@ import ImageUtils from '../../../utils/ImageUtils';
 import { SceneChanger } from '../../SceneChanger';
 import { CampaignUiState } from './CampaignUiState';
 import { AbstractHqPanel } from './panels/AbstractHqPanel';
+import { SaveManager } from '../../../saveload/SaveManager';
 import { ContractBoardPanel } from './panels/ContractBoardPanel';
 import { InvestmentPanel } from './panels/InvestmentPanel';
 import { MainHubPanel } from './panels/MainHubPanel';
@@ -64,6 +65,10 @@ export class HqScene extends Scene {
     }
 
     create(): void {
+        // Restore a saved campaign on first boot (no-op on sortie returns),
+        // then autosave: arriving at HQ is the checkpoint.
+        SaveManager.loadOnceOnBoot();
+
         // Create all panels
         this.mainHubPanel = new MainHubPanel(this);
         this.investmentPanel = new InvestmentPanel(this);
@@ -101,6 +106,9 @@ export class HqScene extends Scene {
                 this.showPanel('main');
             }
         });
+
+        // Arriving at HQ (fresh boot or sortie return) is the save checkpoint.
+        SaveManager.save();
     }
 
     private showPanel(
