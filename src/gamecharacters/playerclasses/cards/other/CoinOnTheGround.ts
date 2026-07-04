@@ -18,10 +18,10 @@ export class CoinOnTheGround extends PlayableCard {
     }
 
     override InvokeCardEffects(): void {
-        GameState.getInstance().britishPoundsSterling += 4;
+        GameState.getInstance().moneyInVault += 4;
     }
 
     override get description(): string {
-        return `Gain 4 Sovereign Infernal Notes. Exhaust.`;
+        return `Gain £4. Exhaust.`;
     }
 } 

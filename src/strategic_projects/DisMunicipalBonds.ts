@@ -6,7 +6,7 @@ export class DisMunicipalBonds extends AbstractStrategicProject {
     constructor() {
         super({
             name: "Dis Municipal Bonds",
-            description: "Gain 25 money in the vault at the end of each run.",
+            description: "Gain £25 in the vault each quarter.",
             portraitName: "dis_municipal_bonds"
         });
         this.surfacePurchaseValue = 250;
@@ -20,7 +20,7 @@ export class DisMunicipalBonds extends AbstractStrategicProject {
         ];
     }
 
-    public override postProcessCampaignStateAfterRun(): void {
+    public override onQuarterEnd(): void {
         const gameState = GameState.getInstance();
         gameState.moneyInVault += 25; // Steady return on investment
     }

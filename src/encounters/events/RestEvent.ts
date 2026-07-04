@@ -91,7 +91,7 @@ export class UpgradeChoice extends AbstractChoice {
 class ScavengeChoice extends AbstractChoice {
     constructor() {
         super(
-            "Scavenge (Gain 30 Hell Currency)",
+            "Scavenge (Gain £30)",
             "Search the area for resources"
         );
         this.nextEvent = new DeadEndEvent();
@@ -104,7 +104,7 @@ class ScavengeChoice extends AbstractChoice {
 
     effect(): void {
         const gameState = this.gameState();
-        gameState.sovereignInfernalNotes += 30;
+        gameState.moneyInVault += 30;
     }
 }
 

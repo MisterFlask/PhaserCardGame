@@ -32,7 +32,7 @@ export class LeviMaxwellAscensionProtocol extends AbstractStrategicProject {
         return [new AbyssalResearchInstitute()];
     }
 
-    public override postProcessCampaignStateAfterRun(): void {
+    public override onQuarterEnd(): void {
         // ALL cargo you bring starts combat with 2 Light
     }
 }

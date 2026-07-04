@@ -86,10 +86,10 @@ class PayTollChoice extends AbstractChoice {
         const price = 50 * heads;
         super(
             "Pay the Toll",
-            `Hand over ${price} Hell Currency to pass.`
+            `Hand over £${price} to pass.`
         );
         this.toll = price;
-        this.mechanicalInformationText = `Lose ${this.toll} Hell Currency.`;
+        this.mechanicalInformationText = `Lose £${this.toll}.`;
         this.nextEvent = new DeadEndEvent();
         this.nextEvent.description = "The mention of a per-head toll made my teeth ache. With our full complement, it would be a painful sum - a significant portion of our remaining operational funds. But I looked at the German chemical slick waiting beneath the water, the brigands' eager faces, and the valuable writs in my pocket, and made the only sensible choice.\n\n" +
             "\"We'll pay,\" I said, trying not to let the words choke me.\n\n" +
@@ -100,11 +100,11 @@ class PayTollChoice extends AbstractChoice {
     }
 
     canChoose(): boolean {
-        return this.gameState().sovereignInfernalNotes >= this.toll;
+        return this.gameState().moneyInVault >= this.toll;
     }
 
     effect(): void {
-        this.actionManager().modifySovereignInfernalNotes(-this.toll);
+        this.actionManager().modifyMoney(-this.toll);
     }
 }
 

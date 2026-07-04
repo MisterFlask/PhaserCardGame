@@ -26,6 +26,6 @@ export class Greedy extends PlayableCard {
 
     override InvokeCardEffects(): void {
         // Decrease SIN by 3
-        this.gameState.sovereignInfernalNotes -= 3;
+        this.gameState.moneyInVault -= 3;
     }
 }

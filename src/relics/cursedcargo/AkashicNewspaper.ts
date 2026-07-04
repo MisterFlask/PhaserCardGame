@@ -12,12 +12,12 @@ export class AkashicNewspaper extends AbstractRelic {
     }
 
     override getDescription(): string {
-        return "At the end of combat, if you have fewer than 5 Ash, lose 20 Sovereign Infernal Notes.";
+        return "At the end of combat, if you have fewer than 5 Ash, lose £20.";
     }
 
     override onCombatEnd(): void {
         if (this.combatResources.ashes.value < 5) {
-            this.gameState.sovereignInfernalNotes -= 20;
+            this.gameState.moneyInVault -= 20;
         }
     }
 

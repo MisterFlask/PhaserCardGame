@@ -25,6 +25,17 @@ export class TransientUiState {
         return TransientUiState.instance;
     }
 
+    /** Drop all hover/drag references. Call on scene transitions so stale
+     *  pointers to destroyed game objects can't leak into the next scene. */
+    public clear(): void {
+        this.draggedCard = undefined;
+        this.draggedConsumable = undefined;
+        this.hoveredCard = undefined;
+        this.hoveredIntent = undefined;
+        this.hoveredIncomingIntent = undefined;
+        this.mouseOverCardDropZone = false;
+    }
+
     public setDraggedCard(card: PhysicalCard | undefined | null): void {
         // only applies to playable card instances
         if (card?.data?.isPlayableCard()) {

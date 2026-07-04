@@ -62,7 +62,7 @@ class TurnInSmugglerChoice extends AbstractChoice {
     constructor() {
         super(
             "Turn In the Smuggler",
-            "Agree to his terms, then seize him for the bounty (gain 50 Hell Currency)."
+            "Agree to his terms, then seize him for the bounty (gain £50)."
         );
         this.nextEvent = new DeadEndEvent();
         this.nextEvent.description = "I smiled warmly at Pemberton, already calculating the bounty. The Ferrymen paid well for smugglers - in writs and permits that could smooth our way through Hell. And here was one, gift-wrapped and desperate.\n\n" +
@@ -86,8 +86,8 @@ class TurnInSmugglerChoice extends AbstractChoice {
 
     effect(): void {
         const reward = 50;
-        this.actionManager().modifySovereignInfernalNotes(reward);
-        this.actionManager().displaySubtitle(`Received ${reward} Hell Currency`, 2000);
+        this.actionManager().modifyMoney(reward);
+        this.actionManager().displaySubtitle(`Received £${reward}`, 2000);
     }
 }
 

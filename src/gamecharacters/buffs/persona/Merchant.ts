@@ -17,7 +17,7 @@ export class Merchant extends AbstractBuff {
     }
 
     override getDescription(): string {
-        return `At the start of your run, a random piece of cargo in your inventory sells for ${this.getStacksDisplayText()} more Hell Currency.`;
+        return `At the start of your run, a random piece of cargo in your inventory sells for £${this.getStacksDisplayText()} more.`;
     }
 
     override onRunStart(): void {

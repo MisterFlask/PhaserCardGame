@@ -7,7 +7,7 @@ class SubtleCheatChoice extends AbstractChoice {
     constructor() {
         super(
             "Employ Subtle Techniques",
-            "Use marked cards and card counting. Gain 50 Hell Currency."
+            "Use marked cards and card counting. Gain £50."
         );
         this.nextEvent = new DeadEndEvent();
         this.nextEvent.description = "Years of regimental card games had taught me the value of subtle advantage. While Mortwright shuffled, I palmed several cards from the spare deck, noting their markings with practiced ease. The other players were clearly amateurs—Guild clerks and junior officers who'd never learned proper technique.\n\n" +
@@ -18,8 +18,8 @@ class SubtleCheatChoice extends AbstractChoice {
     canChoose(): boolean { return true; }
 
     effect(): void {
-        this.actionManager().modifySovereignInfernalNotes(this.goldReward);
-        this.actionManager().displaySubtitle(`Gained ${this.goldReward} Hell Currency`, 2000);
+        this.actionManager().modifyMoney(this.goldReward);
+        this.actionManager().displaySubtitle(`Gained £${this.goldReward}`, 2000);
     }
 }
 
@@ -28,7 +28,7 @@ class BrazenCheatChoice extends AbstractChoice {
     constructor() {
         super(
             "Cheat Outrageously",
-            "Stack the deck openly for 100 Hell Currency. Gain a random curse."
+            "Stack the deck openly for £100. Gain a random curse."
         );
         this.nextEvent = new DeadEndEvent();
         this.nextEvent.description = "When opportunity presents itself wearing clerical clothing, a bold officer seizes it completely. I approached the game with the sort of brazen dishonesty that built the Empire—marked cards, stacked deck, palmed aces, and absolutely no pretense of subtlety.\n\n" +
@@ -44,8 +44,8 @@ class BrazenCheatChoice extends AbstractChoice {
         const curse = TraumaLibrary.getRandomTrauma();
         this.actionManager().addCardToMasterDeck(curse);
         this.actionManager().displaySubtitle(`Received curse: ${curse.name}`, 2000);
-        this.actionManager().modifySovereignInfernalNotes(this.goldReward);
-        this.actionManager().displaySubtitle(`Gained ${this.goldReward} Hell Currency`, 2000);
+        this.actionManager().modifyMoney(this.goldReward);
+        this.actionManager().displaySubtitle(`Gained £${this.goldReward}`, 2000);
     }
 }
 

@@ -15,11 +15,11 @@ export class Undersider extends AbstractBuff {
     }
 
     override getDescription(): string {
-        return `At the start of your run, gain ${this.getStacksDisplayText()} Hell Currency.`;
+        return `At the start of your run, gain £${this.getStacksDisplayText()}.`;
     }
 
     override onRunStart(): void {
         const gameState = GameState.getInstance();
-        gameState.sovereignInfernalNotes += this.stacks;
+        gameState.moneyInVault += this.stacks;
     }
 }

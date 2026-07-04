@@ -39,7 +39,8 @@ export abstract class AbstractStrategicProject extends AbstractCard {
         return [];
     }
 
-    public postProcessCampaignStateAfterRun(): void{
+    /** Fires at each quarterly board meeting (was per-run before the contract pivot). */
+    public onQuarterEnd(): void {
 
     }
 }

@@ -59,16 +59,10 @@ export class ActionManager {
             return [];
         }));
     }
-    modifySovereignInfernalNotes(amount: number) {
+    /** Single currency: everything pays into or out of the vault (£). */
+    modifyMoney(amount: number) {
         this.actionQueue.addAction(new GenericAction(async () => {
-            GameState.getInstance().sovereignInfernalNotes += amount;
-            return [];
-        }));
-    }
-
-    modifyPromissoryNotes(amount: number) {
-        this.actionQueue.addAction(new GenericAction(async () => {
-            GameState.getInstance().britishPoundsSterling += amount;
+            GameState.getInstance().moneyInVault += amount;
             return [];
         }));
     }
@@ -157,20 +151,20 @@ export class ActionManager {
         this.actionQueue.addAction(new StartCombatAction());
     }
 
-    sellItemsForPoundsSterling(item: PlayableCard) {
+    sellCardForMoney(item: PlayableCard) {
         this.removeCardFromMasterDeck(item);
-        
-        GameState.getInstance().britishPoundsSterling += item.finalHellSellValue;
+
+        GameState.getInstance().moneyInVault += item.finalHellSellValue;
     }
-    
-    buyRelicForHellCurrency(relic: AbstractRelic, price: number) : boolean {
-        if (GameState.getInstance().sovereignInfernalNotes < price) {
+
+    buyRelicForMoney(relic: AbstractRelic, price: number) : boolean {
+        if (GameState.getInstance().moneyInVault < price) {
             return false;
         }
         const inventory = GameState.getInstance().relicsInventory;
         inventory.push(relic);
-        
-        GameState.getInstance().sovereignInfernalNotes -= price;
+
+        GameState.getInstance().moneyInVault -= price;
         return true;
     }
 
@@ -184,8 +178,8 @@ export class ActionManager {
     }
 
 
-    buyItemForHellCurrency(item: PlayableCard) : boolean {
-        if (GameState.getInstance().sovereignInfernalNotes < item.hellPurchaseValue) {
+    buyCardForMoney(item: PlayableCard) : boolean {
+        if (GameState.getInstance().moneyInVault < item.hellPurchaseValue) {
             return false;
         }
 
@@ -193,7 +187,7 @@ export class ActionManager {
         item.buffs.forEach(buff => {
             buff.onGainingThisCard();
         });
-        GameState.getInstance().sovereignInfernalNotes -= item.hellPurchaseValue;
+        GameState.getInstance().moneyInVault -= item.hellPurchaseValue;
         return true;
     }
 

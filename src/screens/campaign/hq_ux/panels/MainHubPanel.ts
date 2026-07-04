@@ -40,7 +40,7 @@ export class MainHubPanel extends AbstractHqPanel {
         this.yearDisplay = this.createInfoDisplay(
             scene.scale.width / 2,
             170,
-            `Year: ${campaignState.currentYear}`
+            `Year ${campaignState.calendar.year}`
         );
 
         this.boardDisplay = this.createInfoDisplay(

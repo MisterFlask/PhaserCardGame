@@ -17,11 +17,11 @@ class SoulsuckBuff extends AbstractBuff {
     }
 
     override getDescription(): string {
-        return "When this card kills an enemy, gain 15 Sovereign Infernal Notes.";
+        return "When this card kills an enemy, gain £15.";
     }
 
     override onFatal(killedUnit: BaseCharacter): void {
-        this.actionManager.modifySovereignInfernalNotes(15);
+        this.actionManager.modifyMoney(15);
     }
 }
 
@@ -46,6 +46,6 @@ export class Soulsuck extends PlayableCard {
     }
 
     override get description(): string {
-        return `Deal ${this.getDisplayedDamage()} damage. If this kills an enemy, gain 15 Sovereign Infernal Notes. Exhaust.`;
+        return `Deal ${this.getDisplayedDamage()} damage. If this kills an enemy, gain £15. Exhaust.`;
     }
 }

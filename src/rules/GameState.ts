@@ -7,10 +7,8 @@ import type { PlayableCard } from '../gamecharacters/PlayableCard';
 import type { PlayerCharacter } from '../gamecharacters/PlayerCharacter';
 import { AbstractRelic } from '../relics/AbstractRelic';
 import { EmergencyTeleporter } from '../relics/special/EmergencyTeleporter';
-import { AbstractStrategicProject } from '../strategic_projects/AbstractStrategicProject';
 import type { AutomatedCharacterType, BaseCharacterType } from '../Types';
 import type { PhysicalCard } from '../ui/PhysicalCard';
-import { ActRegion } from './acts/ActRegion';
 import { AbstractCombatResource } from './combatresources/AbstractCombatResource';
 import { AshesResource } from './combatresources/AshesResource';
 import { BloodResource } from './combatresources/BloodResource';
@@ -35,16 +33,14 @@ export class GameState {
             });
         });
 
-        this.sovereignInfernalNotes = 40
-        this.britishPoundsSterling = 0
     }
 
     private static instance: GameState;
     ledger: AbstractRelic[] = [];
     public currentAct: number = 1;
-    public actRegion : ActRegion = ActRegion.STYX_DELTA;
 
-    public roster: PlayerCharacter[] = [];
+    // The campaign roster lives on CampaignUiState; GameState only tracks the
+    // squad deployed on the current sortie.
     public currentRunCharacters: PlayerCharacter[] = [];
 
     public currentVessel: PlayerVessel = new PlayerVessel();
@@ -70,13 +66,11 @@ export class GameState {
     
     public relicsInventory: AbstractRelic[] = [];
 
+    /** The company's single currency (£). Earned by contracts, spent on
+     *  everything, and drained by the quarterly dividend. */
     public moneyInVault: number = 200
-    public sovereignInfernalNotes: number = 0
-    public britishPoundsSterling: number = 0
 
     public combatState: CombatState = new CombatState()
-
-    public ownedStrategicProjects: AbstractStrategicProject[] = [];
 
     private constructor() {}
 
@@ -107,38 +101,10 @@ export class GameState {
 
     public eliminatePhysicalCardsBetweenScenes(){
         // for each physicalCard linked to by each AbstractCard we track, obliterate it and set it to null
-        this.obliteratePhysicalCardsForArray(this.roster);
         this.obliteratePhysicalCardsForArray(this.currentRunCharacters);
         this.obliteratePhysicalCardsForArray(this.combatState.playerCharacters);
         this.obliteratePhysicalCardsForArray(this.combatState.enemies);
-        
-        // Note: Removed the enemyCharacters line as it doesn't exist on CombatState
-        // If you need to handle enemy characters, ensure CombatState has this property
-        // this.obliteratePhysicalCardsForArray(this.combatState.enemyCharacters);
-
         this.obliteratePhysicalCardsForArray(this.masterDeckAllCharacters);
-    }
-
-    // Roster methods
-    public addToRoster(character: PlayerCharacter): void {
-        this.roster.push(character);
-    }
-
-    public removeFromRoster(character: PlayerCharacter): void {
-        this.roster = this.roster.filter(c => c !== character);
-    }
-
-    public getRoster(): PlayerCharacter[] {
-        return [...this.roster];
-    }
-
-    // Current run characters methods
-    public addToCurrentRun(character: PlayerCharacter): void {
-        this.currentRunCharacters.push(character);
-    }
-
-    public removeFromCurrentRun(character: PlayerCharacter): void {
-        this.currentRunCharacters = this.currentRunCharacters.filter(c => c !== character);
     }
 
     public getCurrentRunCharacters(): readonly PlayerCharacter[] {
@@ -147,7 +113,6 @@ export class GameState {
 
     // Reset method
     public reset(): void {
-        this.roster = [];
         this.currentRunCharacters = [];
     }
 

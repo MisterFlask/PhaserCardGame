@@ -1,4 +1,4 @@
-// Open Purse: The first two turns of combat, Rob The Boatman is added to your hand.  It it ethereal/exhaust and gives you 10 hell currency.
+// Open Purse: The first two turns of combat, Rob The Boatman is added to your hand.  It it ethereal/exhaust and gives you £10.
 
 // alternates between attacking all vs attacking one with an ability called Concuss (2 damage, apply stun 1 (stun ))
 

@@ -10,9 +10,6 @@ import { ALL_STRATEGIC_PROJECTS } from '../../../strategic_projects/StrategicPro
 export class CampaignUiState {
     private static instance: CampaignUiState;
 
-    public currentYear: number = 1;
-    public shareholderExpectation: number = 1000;
-
     // --- XCOM-style strategic layer (see src/docs/strategic_layer_redesign.md) ---
     public calendar: CampaignCalendar = new CampaignCalendar();
     public availableContracts: Contract[] = [];
@@ -55,6 +52,8 @@ export class CampaignUiState {
         const gameState = GameState.getInstance();
 
         this.calendar.advanceWeeks(n, (amountDue: number) => {
+            // Project income (bonds, embassies) lands before the dividend is settled.
+            this.ownedStrategicProjects.forEach(project => project.onQuarterEnd());
             const paid = Math.min(amountDue, gameState.moneyInVault);
             gameState.moneyInVault -= paid;
             return paid;
@@ -72,7 +71,5 @@ export class CampaignUiState {
         this.availableContracts = this.availableContracts.filter(c => c.deadlineWeeks > 0);
         this.availableContracts = ContractGenerator.getInstance()
             .refillBoard(this.availableContracts, this.calendar.year);
-
-        this.currentYear = this.calendar.year;
     }
 } 

@@ -7,7 +7,7 @@ class PayForAmmoChoice extends AbstractChoice {
     constructor() {
         super(
             "Pay for the Ammunition",
-            "Spend 80 Hell Currency to acquire improved rounds."
+            "Spend £80 to acquire improved rounds."
         );
         const payoff = new DeadEndEvent();
         payoff.description = "The thought of letting this thing shoot one of my men turned my stomach. Better to pay and be done with it.\n\n" +
@@ -18,7 +18,7 @@ class PayForAmmoChoice extends AbstractChoice {
     }
     canChoose(): boolean { return true; }
     effect(): void {
-        this.actionManager().modifySovereignInfernalNotes(-this.cost);
+        this.actionManager().modifyMoney(-this.cost);
         this.actionManager().addRelicToInventory(new BelphegorsRounds());
     }
 }

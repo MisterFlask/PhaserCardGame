@@ -41,28 +41,28 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
             }
         });
 
-        // Combined hell currency and pounds sterling display
+        // Company funds display
         this.combinedCurrencyText = new TextBox({
             scene: this.scene,
             x: 10,
             y: 45,
             width: this.CURRENCY_WIDTH,
             height: 30,
-            text: `🔥 ${GameState.getInstance().sovereignInfernalNotes} | 💷 ${GameState.getInstance().britishPoundsSterling}`,
+            text: `💷 £${GameState.getInstance().moneyInVault}`,
             style: {
                 fontSize: '16px',
                 color: '#ff4444',
                 fontFamily: 'Arial'
             }
         });
-        // Make the combined currency text interactive so that tooltip hover events are registered
+        // Make the currency text interactive so that tooltip hover events are registered
         this.combinedCurrencyText.setInteractive();
 
-        // Add tooltip to combined currency display
+        // Add tooltip to currency display
         this.combinedCurrencyTooltip = new TooltipAttachment({
             scene: this.scene,
             container: this.combinedCurrencyText,
-            tooltipText: "🔥 Sovereign Infernal Notes (SIN): The official currency of Hell.  Considered contraband on Earth.\n💷 Pounds Sterling: Not infernal legal tender, but some merchants have it on-hand for bulk commodity transactions with mortals.",
+            tooltipText: "💷 Pounds Sterling: the Company's funds. Contracts pay into the vault; the shareholders drain it quarterly.",
             fillColor: 0x440000
         });
 
@@ -143,7 +143,7 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
     private updateCurrencyDisplay(): void {
         const gameState = GameState.getInstance();
         this.actNumberText.setText(`Act ${gameState.currentAct}`);
-        this.combinedCurrencyText.setText(`🔥 ${gameState.sovereignInfernalNotes} | 💷 ${gameState.britishPoundsSterling}`);
+        this.combinedCurrencyText.setText(`💷 £${gameState.moneyInVault}`);
     }
 
     public destroy(fromScene?: boolean): void {

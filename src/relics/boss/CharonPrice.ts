@@ -14,6 +14,6 @@ export class CharonPrice extends AbstractRelic {
     }
 
     override getDescription(): string {
-        return `At the end of your run, you must pay ${this.PRICE} Hell Currency or face Charon's wrath.`;
+        return `At the end of your run, you must pay £${this.PRICE} or face Charon's wrath.`;
     }
 }

@@ -21,7 +21,7 @@ export class LetheExtractionCo extends AbstractStrategicProject {
         ];
     }
 
-    public override postProcessCampaignStateAfterRun(): void {
+    public override onQuarterEnd(): void {
         this.victoryPoints += 100;
     }
 

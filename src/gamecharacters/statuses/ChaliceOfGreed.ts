@@ -40,11 +40,11 @@ export class ChaliceOfGreed extends PlayableCard {
     }
 
     override get description(): string {
-        return "Gain 4 Hell Currency.";
+        return "Gain £4.";
     }
 
     override InvokeCardEffects(): void {
-        this.actionManager.modifySovereignInfernalNotes(4);
+        this.actionManager.modifyMoney(4);
         if (this.owningCharacter) {
             this.actionManager.applyBuffToCharacter(this.owningCharacter, new LoseEnergyNextTurnBuff());
         }

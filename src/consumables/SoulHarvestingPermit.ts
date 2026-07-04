@@ -20,7 +20,7 @@ export class SoulHarvestingPermit extends AbstractConsumable {
     }
 
     override getDescription(): string {
-        return `Deal ${this.damageAmount} damage to target enemy. If this kills them, gain Sovereign Infernal Notes equal to their max HP.`;
+        return `Deal ${this.damageAmount} damage to target enemy. If this kills them, gain £ equal to their max HP.`;
     }
 
     override onUse(target: BaseCharacter): boolean {
@@ -40,9 +40,9 @@ export class SoulHarvestingPermit extends AbstractConsumable {
                 fromAttack: true
             });
             
-            // If the target died, grant Sovereign Infernal Notes equal to their max HP
+            // If the target died, grant £ equal to their max HP
             if (target.isDead()) {
-                this.actionManager.modifySovereignInfernalNotes(maxHp);
+                this.actionManager.modifyMoney(maxHp);
             }
         });
 

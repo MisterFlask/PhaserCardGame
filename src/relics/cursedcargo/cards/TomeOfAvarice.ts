@@ -30,10 +30,10 @@ export class TomeOfAvarice extends PlayableCard {
 
 
     override get description(): string {
-        return `Add a Coin On The Ground to your cargo. Exhaust. Retain: lose 4 Sovereign Infernal Notes.`;
+        return `Add a Coin On The Ground to your cargo. Exhaust. Retain: lose £4.`;
     }
 
     OnRetain(): void {
-        GameState.getInstance().britishPoundsSterling -= 4;
+        GameState.getInstance().moneyInVault -= 4;
     }
 } 

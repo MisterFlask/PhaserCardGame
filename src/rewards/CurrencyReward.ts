@@ -10,11 +10,11 @@ export class CurrencyReward extends AbstractReward {
     }
 
     getDisplayText(): string {
-        return `${this.amount} Hell Currency`;
+        return `£${this.amount}`;
     }
 
     getTooltipText(): string {
-        return `Gain ${this.amount} Hell Currency`;
+        return `Gain £${this.amount}`;
     }
 
     getIconTexture(): string {
@@ -22,6 +22,6 @@ export class CurrencyReward extends AbstractReward {
     }
 
     collect(scene: Phaser.Scene): void {
-        GameState.getInstance().sovereignInfernalNotes += this.amount;
+        GameState.getInstance().moneyInVault += this.amount;
     }
 } 

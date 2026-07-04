@@ -27,7 +27,7 @@ export class AbyssalResearchInstitute extends AbstractStrategicProject {
         ];
     }
 
-    public override postProcessCampaignStateAfterRun(): void {
+    public override onQuarterEnd(): void {
         // Gain a card reward at the beginning of each run
     }
 }

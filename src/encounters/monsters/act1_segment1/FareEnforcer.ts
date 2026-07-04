@@ -1,4 +1,4 @@
-// Buff: Obol Debt.  At the beginning of each turn, add a Ferryman's Fee card to your hand.  It has ethereal and exhaust.  Playing it costs 5 hell currency.  if in hand at end of turn, all enemies gain 2 strength.
+// Buff: Obol Debt.  At the beginning of each turn, add a Ferryman's Fee card to your hand.  It has ethereal and exhaust.  Playing it costs £5.  if in hand at end of turn, all enemies gain 2 strength.
 
 // The Fare Enforcer alternates between blocking and attacking a random character twice.
 

@@ -118,8 +118,8 @@ class SellToManagementChoice extends AbstractChoice {
 
     effect(): void {
         // Give the player immediate gold
-        this.actionManager().modifySovereignInfernalNotes(this.goldReward);
-        this.actionManager().displaySubtitle(`Gained ${this.goldReward} Hell Currency`, 2000);
+        this.actionManager().modifyMoney(this.goldReward);
+        this.actionManager().displaySubtitle(`Gained £${this.goldReward}`, 2000);
     }
 }
 
