@@ -747,8 +747,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
     private setupHoverSound(): void {
         if (!this.scene.cache.audio.exists('rollover6')) {
-            const baseUrl = 'https://raw.githubusercontent.com/MisterFlask/PhaserCardGame/master/resources/';
-            this.scene.load.audio('rollover6', baseUrl + 'Sounds/Effects/rollover6.ogg');
+            this.scene.load.audio('rollover6', 'resources/Sounds/Effects/rollover6.ogg');
             this.scene.load.once('complete', () => {
                 if (this.scene.cache.audio.exists('rollover6')) {
                     this.hoverSound = this.scene.sound.add('rollover6');

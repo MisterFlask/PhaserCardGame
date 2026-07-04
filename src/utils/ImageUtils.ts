@@ -398,7 +398,9 @@ export default class ImageUtils {
         },
     };
 
-    private readonly baseURL: string = 'https://raw.githubusercontent.com/MisterFlask/PhaserCardGame/master/resources/';
+    // Served relative to the page: works for local dev (http-server at repo root)
+    // and gh-pages (deploy merges master, so resources/ sits beside index.html).
+    private readonly baseURL: string = 'resources/';
 
     /**
      * Loads all images from all categories into the Phaser loader.

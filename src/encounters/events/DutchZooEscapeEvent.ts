@@ -1,4 +1,4 @@
-import { AbstractEvent, DeadEndEvent, DeadEndStartEncounterChoice } from "../../events/AbstractEvent";
+import { AbstractChoice, AbstractEvent, DeadEndEvent, DeadEndStartEncounterChoice } from "../../events/AbstractEvent";
 import { Lethality } from "../../gamecharacters/buffs/standard/Lethality";
 import { Terrifying } from "../../gamecharacters/buffs/standard/Terrifying";
 import { AbstractRelic } from "../../relics/AbstractRelic";

@@ -1,5 +1,5 @@
 // Event: Marsh Brigands demanding toll
-import { AbstractEvent, DeadEndEvent, DeadEndStartEncounterChoice } from "../../events/AbstractEvent";
+import { AbstractChoice, AbstractEvent, DeadEndEvent, DeadEndStartEncounterChoice } from "../../events/AbstractEvent";
 import { Encounter } from "../EncounterManager";
 import { Brigand } from "../monsters/act1_segment1/act1_segment0/Brigand";
 import { ActionManagerFetcher } from "../../utils/ActionManagerFetcher";
