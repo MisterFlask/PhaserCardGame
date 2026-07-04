@@ -13,6 +13,7 @@
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4",
+    "vitest": "^4.1.9",
     "webpack": "^5.93.0",
     "webpack-cli": "^5.1.4"
   },
@@ -20,6 +21,9 @@
     "build": "webpack --mode development",
     "watch": "webpack --mode development --watch",
     "dev": "nodemon --watch './**/*.ts' --exec 'ts-node' src/screens/CombatAndMapScene.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
     "generate:relic-icons": "ts-node src/content_pipeline/relic_icon_generation.ts"
   },
   "name": "phaser-game",
