@@ -1,4 +1,6 @@
 import { Scene } from 'phaser';
+import { CHARTER_YEARS } from '../../../../campaign/CampaignCalendar';
+import { SortieManager } from '../../../../campaign/SortieManager';
 import { TextBoxButton } from '../../../../ui/Button';
 import { TextBox } from '../../../../ui/TextBox';
 import { CampaignUiState } from '../CampaignUiState';
@@ -8,6 +10,8 @@ export class MainHubPanel extends AbstractHqPanel {
     private fundsDisplay: TextBox;
     private yearDisplay: TextBox;
     private retirementDisplay: TextBox;
+    private boardDisplay: TextBox;
+    private reportDisplay: TextBox;
     private navigationButtons: Map<string, TextBoxButton>;
 
     constructor(scene: Scene) {
@@ -39,6 +43,24 @@ export class MainHubPanel extends AbstractHqPanel {
             `Year: ${campaignState.currentYear}`
         );
 
+        this.boardDisplay = this.createInfoDisplay(
+            scene.scale.width / 2,
+            220,
+            '',
+            '#ffffff',
+            700,
+            30
+        );
+
+        this.reportDisplay = new TextBox({
+            scene: this.scene,
+            x: scene.scale.width * 0.75,
+            y: scene.scale.height * 0.55,
+            width: 500,
+            height: 300,
+            text: '',
+            style: { fontSize: '15px', color: '#ccccbb', wordWrap: { width: 480 } }
+        });
 
         // Create navigation buttons
         this.navigationButtons = new Map();
@@ -49,6 +71,8 @@ export class MainHubPanel extends AbstractHqPanel {
             this.retirementDisplay,
             this.fundsDisplay,
             this.yearDisplay,
+            this.boardDisplay,
+            this.reportDisplay,
             ...this.navigationButtons.values()
         ]);
     }
@@ -75,7 +99,7 @@ export class MainHubPanel extends AbstractHqPanel {
 
         const buttons = [
             { text: 'Investment', x: 0.2, y: 0.6 },
-            { text: 'New Expedition', x: 0.4, y: 0.6},
+            { text: 'Contract Board', x: 0.4, y: 0.6},
         ];
 
         buttons.forEach(({ text, x, y}) => {
@@ -97,9 +121,8 @@ export class MainHubPanel extends AbstractHqPanel {
 
     private navigateTo(destination: string): void {
         const lowerDest = destination.toLowerCase();
-        // Map 'expedition loadout' to 'loadout'
-        if (lowerDest === 'new expedition') {
-            this.scene.events.emit('navigate', 'trade routes');
+        if (lowerDest === 'contract board') {
+            this.scene.events.emit('navigate', 'contracts');
         } else {
             this.scene.events.emit('navigate', lowerDest);
         }
@@ -117,8 +140,21 @@ export class MainHubPanel extends AbstractHqPanel {
 
     update(): void {
         const campaignState = CampaignUiState.getInstance();
+        const cal = campaignState.calendar;
         this.fundsDisplay.setText(`Funds: £${campaignState.getCurrentFunds()}`);
-        this.yearDisplay.setText(`Year: ${campaignState.currentYear}`);
+        this.yearDisplay.setText(`Year ${cal.year}, Q${cal.quarterOfYear}, Week ${cal.weekOfQuarter}`);
+        this.retirementDisplay.setText(
+            cal.isSacked
+                ? 'THE BOARD HAS LOST CONFIDENCE. YOU ARE SACKED.'
+                : `${Math.max(0, CHARTER_YEARS - cal.year + 1)} Years Until Charter Expiry`
+        );
+        this.boardDisplay.setText(
+            `Dividend of £${cal.currentDividendExpectation} due in ${cal.weeksUntilDividend}w   |   Shareholder satisfaction: ${cal.shareholderSatisfaction}/100`
+        );
+
+        const report = SortieManager.getInstance().lastSortieReport;
+        this.reportDisplay.setText(report.length > 0 ? `— Latest dispatches —\n\n${report.join('\n')}` : '');
+
         this.updateTradeRouteButton();
     }
 } 

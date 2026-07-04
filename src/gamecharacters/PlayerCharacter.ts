@@ -6,7 +6,16 @@ export class PlayerCharacter extends BaseCharacter {
     startingDeck: PlayableCard[] = [];
     cardsInMasterDeck: PlayableCard[];
     characterClass: BaseCharacterClass;
-    
+
+    /** Weeks of infirmary time remaining; 0 = fit for duty. */
+    weeksWoundedRemaining: number = 0;
+    /** Permanently lost to the campaign (killed on a sortie). */
+    isDeceased: boolean = false;
+
+    get isFitForDuty(): boolean {
+        return !this.isDeceased && this.weeksWoundedRemaining <= 0;
+    }
+
     constructor({ name, portraitName, characterClass, description }
         : {name: string; portraitName: string; characterClass: BaseCharacterClass, description?: string}) {
         super({ name, portraitName, maxHitpoints: characterClass.startingMaxHp, description })

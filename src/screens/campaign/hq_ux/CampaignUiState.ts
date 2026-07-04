@@ -1,3 +1,6 @@
+import { CampaignCalendar } from '../../../campaign/CampaignCalendar';
+import { Contract } from '../../../campaign/Contract';
+import { ContractGenerator } from '../../../campaign/ContractGenerator';
 import { PlayableCard } from '../../../gamecharacters/PlayableCard';
 import { PlayerCharacter } from '../../../gamecharacters/PlayerCharacter';
 import { CoalCargo } from '../../../gamecharacters/cargo/CoalCargo';
@@ -15,6 +18,11 @@ export class CampaignUiState {
 
     public currentYear: number = 1;
     public shareholderExpectation: number = 1000;
+
+    // --- XCOM-style strategic layer (see src/docs/strategic_layer_redesign.md) ---
+    public calendar: CampaignCalendar = new CampaignCalendar();
+    public availableContracts: Contract[] = [];
+    public selectedContract: Contract | null = null;
     public availableTradeRoutes: AbstractTradeRoute[] = [new StandardTradeRoute(),new StandardTradeRoute(),new StandardTradeRoute()];
     public ownedStrategicProjects: AbstractStrategicProject[] = [];
     public availableStrategicProjects: AbstractStrategicProject[] = ALL_STRATEGIC_PROJECTS;
@@ -60,6 +68,43 @@ export class CampaignUiState {
     }
 
     public getShareholderSatisfaction(): number {
-        return this.getCurrentFunds() / this.shareholderExpectation;
+        return this.calendar.shareholderSatisfaction;
+    }
+
+    /** Populate the contract board if empty (call when the HQ opens). */
+    public ensureContractsPopulated(): void {
+        if (this.availableContracts.length === 0) {
+            this.availableContracts = ContractGenerator.getInstance()
+                .refillBoard(this.availableContracts, this.calendar.year);
+        }
+    }
+
+    /**
+     * Advance campaign time: settle dividends from the vault, tick wounds,
+     * expire stale contracts, and top the board back up.
+     */
+    public advanceWeeks(n: number): void {
+        const gameState = GameState.getInstance();
+
+        this.calendar.advanceWeeks(n, (amountDue: number) => {
+            const paid = Math.min(amountDue, gameState.moneyInVault);
+            gameState.moneyInVault -= paid;
+            return paid;
+        });
+
+        // Wounded soldiers recuperate.
+        this.roster.forEach(character => {
+            if (character.weeksWoundedRemaining > 0) {
+                character.weeksWoundedRemaining = Math.max(0, character.weeksWoundedRemaining - n);
+            }
+        });
+
+        // Contracts age off the board; fresh ones post.
+        this.availableContracts.forEach(c => c.deadlineWeeks -= n);
+        this.availableContracts = this.availableContracts.filter(c => c.deadlineWeeks > 0);
+        this.availableContracts = ContractGenerator.getInstance()
+            .refillBoard(this.availableContracts, this.calendar.year);
+
+        this.currentYear = this.calendar.year;
     }
 } 

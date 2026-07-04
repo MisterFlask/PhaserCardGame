@@ -9,7 +9,9 @@ import { Encounter } from '../encounters/EncounterManager';
 import { AbstractEvent } from '../events/AbstractEvent';
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
 import { PlayerCharacter } from '../gamecharacters/PlayerCharacter';
+import { SortieManager } from '../campaign/SortieManager';
 import { GameState } from '../rules/GameState';
+import { CampaignUiState } from './campaign/hq_ux/CampaignUiState';
 import { TextBoxButton } from '../ui/Button';
 import { CheapGlowEffect } from '../ui/CheapGlowEffect';
 import { CombatHighlightsManager } from '../ui/CombatHighlightsManager';
@@ -55,6 +57,7 @@ class CombatScene extends Phaser.Scene {
     private mapOverlay!: MapOverlay;
     private mapButton!: TextBoxButton;
     private mapButtonGlow!: CheapGlowEffect;
+    private lastMapButtonText: string = '';
     private campaignBriefStatus!: CampaignBriefStatus;
     private characterDeckOverlay!: CharacterDeckOverlay;
     private treasureOverlay!: TreasureOverlay;
@@ -77,9 +80,7 @@ class CombatScene extends Phaser.Scene {
     }
 
     preload(): void {
-        this.load.setBaseURL('https://raw.githubusercontent.com/');
-        
-        // Add all images to the load queue
+        // Add all images to the load queue (served from local resources/)
         new ImageUtils().loadAllImages(this.load);
         
         this.load.plugin('rexbbcodetextplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbbcodetextplugin.min.js', true);
@@ -201,7 +202,15 @@ class CombatScene extends Phaser.Scene {
         });
         this.mapButton
             .onClick(() => {
-                this.toggleMapOverlay(true);
+                const sortie = SortieManager.getInstance();
+                if (sortie.isActive()) {
+                    // Contract sorties have no map: the button advances the sortie.
+                    if (this.combatEndHandled) {
+                        sortie.advance();
+                    }
+                } else {
+                    this.toggleMapOverlay(true);
+                }
             });
         this.add.existing(this.mapButton);
 
@@ -369,6 +378,18 @@ class CombatScene extends Phaser.Scene {
         } else {
             this.mapButtonGlow.turnOff();
         }
+
+        // During a contract sortie the button advances the sortie instead of opening the map
+        const sortie = SortieManager.getInstance();
+        if (sortie.isActive()) {
+            const desiredText = !this.combatEndHandled
+                ? 'Objective'
+                : (sortie.combatsRemaining() > 1 ? 'Continue' : 'Return to HQ');
+            if (this.lastMapButtonText !== desiredText) {
+                this.lastMapButtonText = desiredText;
+                this.mapButton.setText(desiredText);
+            }
+        }
         
         // Update glow effect
         this.mapButtonGlow.update();
@@ -376,6 +397,16 @@ class CombatScene extends Phaser.Scene {
         // Sync the hand with the game state
         if (this.cardManager) {
             this.cardManager.syncHandWithGameState();
+        }
+
+        // Squad wipe during a sortie: the contract fails and the roster pays.
+        if (!this.combatEndHandled
+            && SortieManager.getInstance().isActive()
+            && GameState.getInstance().combatState.playerCharacters.length > 0
+            && GameState.getInstance().combatState.playerCharacters.every(c => c.isDead())) {
+            this.combatEndHandled = true;
+            SortieManager.getInstance().handleSquadWipe();
+            return;
         }
 
         // Check if combat is finished
@@ -477,12 +508,18 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
     render: {
         antialias: true,
         roundPixels: true,
-        pixelArt: false
+        pixelArt: false,
+        preserveDrawingBuffer: true
     },
     scene: [HqScene, CombatScene]
 };
 
 // Instantiate and start the Phaser game
 const game = new Phaser.Game(gameConfig);
+
+// Debug hooks for automated testing (browser console / test harness access)
+(window as any).game = game;
+(window as any).getGameState = () => GameState.getInstance();
+(window as any).getCampaignState = () => CampaignUiState.getInstance();
 
 export default CombatScene;

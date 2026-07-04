@@ -1,6 +1,7 @@
 // src/subcomponents/CombatUIManager.ts
 
 import Phaser from 'phaser';
+import { SortieManager } from '../../campaign/SortieManager';
 import { AbstractConsumable } from '../../consumables/AbstractConsumable';
 import { AbstractEvent } from '../../events/AbstractEvent';
 import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
@@ -609,6 +610,12 @@ class CombatUIManager {
     }
 
     private determineRewards(): AbstractReward[] {
+        // Contract sorties have no location; the sortie provides the rewards.
+        const sortie = SortieManager.getInstance();
+        if (sortie.isActive()) {
+            return sortie.getRewardsForCurrentCombat();
+        }
+
         const gameState = GameState.getInstance();
         const currentLocation = gameState.currentLocation;
         if (!currentLocation) {

@@ -8,6 +8,7 @@ import { SceneChanger } from '../../SceneChanger';
 import { CampaignUiState } from './CampaignUiState';
 import { AbstractHqPanel } from './panels/AbstractHqPanel';
 import { CargoSelectionPanel } from './panels/CargoSelectionPanel';
+import { ContractBoardPanel } from './panels/ContractBoardPanel';
 import { InvestmentPanel } from './panels/InvestmentPanel';
 import { LiquidationPanel } from './panels/LiquidationPanel';
 import { LoadoutPanel } from './panels/LoadoutPanel';
@@ -24,6 +25,7 @@ export class HqScene extends Scene {
     private loadoutPanel!: LoadoutPanel;
     private liquidationPanel!: LiquidationPanel;
     private cargoSelectionPanel!: CargoSelectionPanel;
+    private contractBoardPanel!: ContractBoardPanel;
 
     constructor() {
         super({ key: 'HqScene' });
@@ -56,9 +58,8 @@ export class HqScene extends Scene {
         });
 
         ActionManagerFetcher.initServicesAsync(this);
-        this.load.setBaseURL('https://raw.githubusercontent.com/');
 
-        // Add all images to the load queue
+        // Add all images to the load queue (served from local resources/)
         new ImageUtils().loadAllImages(this.load);
         
         SceneChanger.setCurrentScene(this);
@@ -81,6 +82,7 @@ export class HqScene extends Scene {
         this.loadoutPanel = new LoadoutPanel(this);
         this.liquidationPanel = new LiquidationPanel(this);
         this.cargoSelectionPanel = new CargoSelectionPanel(this);
+        this.contractBoardPanel = new ContractBoardPanel(this);
 
         // Hide all panels initially
         this.mainHubPanel.setVisible(false);
@@ -90,6 +92,7 @@ export class HqScene extends Scene {
         this.loadoutPanel.setVisible(false);
         this.liquidationPanel.setVisible(false);
         this.cargoSelectionPanel.setVisible(false);
+        this.contractBoardPanel.setVisible(false);
 
         // Show main hub panel by default
         this.showPanel('main');
@@ -118,6 +121,9 @@ export class HqScene extends Scene {
                 case 'cargoselection':
                     this.showPanel('cargoselection');
                     break;
+                case 'contracts':
+                    this.showPanel('contracts');
+                    break;
                 default:
                     this.showPanel('main');
             }
@@ -136,7 +142,7 @@ export class HqScene extends Scene {
     }
 
     private showPanel(
-        panelKey: 'main' | 'investment' | 'trade' | 'personnel' | 'loadout' | 'tradegoods' | 'liquidation' | 'cargoselection'
+        panelKey: 'main' | 'investment' | 'trade' | 'personnel' | 'loadout' | 'tradegoods' | 'liquidation' | 'cargoselection' | 'contracts'
     ): void {
         if (this.currentPanel) {
             this.currentPanel.setVisible(false);
@@ -165,6 +171,9 @@ export class HqScene extends Scene {
                 break;
             case 'cargoselection':
                 this.currentPanel = this.cargoSelectionPanel;
+                break;
+            case 'contracts':
+                this.currentPanel = this.contractBoardPanel;
                 break;
         }
         
