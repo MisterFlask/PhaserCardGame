@@ -38,9 +38,11 @@ import { BlackhandClass } from "../gamecharacters/playerclasses/BlackhandClass";
 import { Defend } from "../gamecharacters/playerclasses/cards/basic/Defend";
 import { FireRevolver } from "../gamecharacters/playerclasses/cards/basic/FireRevolver";
 import { Rummage } from "../gamecharacters/playerclasses/cards/basic/Rummage";
+import { Jumpscare } from "../gamecharacters/playerclasses/cards/curse/Jumpscare";
 import { CoinOnTheGround } from "../gamecharacters/playerclasses/cards/other/CoinOnTheGround";
 import { CogClass } from "../gamecharacters/playerclasses/CogClass";
 import { DiabolistClass } from "../gamecharacters/playerclasses/DiabolistClass";
+import { SoulVacuum } from "../relics/uncommon/SoulBottler";
 
 type BuffCtor = new (...args: any[]) => AbstractBuff;
 
@@ -105,7 +107,12 @@ export class SaveRegistries {
                     characterClass.initialize();
                     characterClass.availableCards.forEach(register);
                 });
-            [new FireRevolver(), new Defend(), new Rummage(), new CoinOnTheGround()].forEach(register);
+            // Basics plus cards that enter decks from outside the class pools
+            // (relic/curse effects). The lint test enforces this list.
+            [
+                new FireRevolver(), new Defend(), new Rummage(),
+                new CoinOnTheGround(), new Jumpscare(), new SoulVacuum(),
+            ].forEach(register);
         }
         const factory = this.cardByName.get(className);
         if (!factory) {

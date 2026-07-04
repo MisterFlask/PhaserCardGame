@@ -88,7 +88,25 @@ export class CampaignSerializer {
         card.baseBlock = dto.baseBlock;
         card.baseEnergyCost = dto.baseEnergyCost;
         card.baseMagicNumber = dto.baseMagicNumber;
-        card.buffs = this.buffsFromDTOs(dto.buffs);
+
+        // Merge buffs rather than replace: the constructor already installed
+        // the card's intrinsic buffs (Exhaust, Ethereal, sell values...) with
+        // correct wiring, so those only need their stacks synced. Only buffs
+        // added after construction (reward modifiers, starting-deck rolls)
+        // are reconstructed through the registry.
+        dto.buffs.forEach(buffDto => {
+            const existing = card.buffs.find(b => b.constructor.name === buffDto.className);
+            if (existing) {
+                existing.stacks = buffDto.stacks;
+                if (buffDto.hidden) existing.moveToMainDescription = true;
+            } else {
+                const rebuilt = SaveRegistries.createBuff(buffDto.className, buffDto.stacks);
+                if (rebuilt) {
+                    if (buffDto.hidden) rebuilt.moveToMainDescription = true;
+                    card.buffs.push(rebuilt);
+                }
+            }
+        });
         return card;
     }
 
