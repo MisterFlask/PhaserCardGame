@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import { TextBoxButton } from '../../../../ui/Button';
 import { TextBox } from '../../../../ui/TextBox';
+import { Fonts, Palette } from '../../../../ui/UIStyle';
 
 export abstract class AbstractHqPanel extends Phaser.GameObjects.Container {
     protected titleText: TextBox;
@@ -38,16 +39,16 @@ export abstract class AbstractHqPanel extends Phaser.GameObjects.Container {
             style: { fontSize: '24px', color: '#ffffff' }
         });
 
-        // Add return button
+        // Add return button (house style: dark wood + brass)
         this.returnButton = new TextBoxButton({
             scene,
             x: 100,
             y: 30,
-            width: 150,
-            height: 40,
+            width: 160,
+            height: 42,
             text: 'Return to Hub',
-            style: { fontSize: '16px', color: '#ffffff' },
-            fillColor: 0x444444
+            style: { fontSize: '18px', color: Palette.BRASS_TEXT, fontFamily: Fonts.DISPLAY },
+            fillColor: Palette.WOOD_PANEL
         });
 
         this.returnButton.onClick(() => this.returnToHub());

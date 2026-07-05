@@ -21,6 +21,7 @@ import InventoryPanel from '../ui/InventoryPanel';
 import CombatSceneLayoutUtils from '../ui/LayoutUtils';
 import { PhysicalCard } from '../ui/PhysicalCard';
 import { UIContext, UIContextManager } from '../ui/UIContextManager';
+import { loadCompanyFonts } from '../ui/UIStyle';
 import { ActionManager } from '../utils/ActionManager';
 import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
 import ImageUtils from '../utils/ImageUtils';
@@ -455,6 +456,9 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
     },
     scene: [HqScene, CombatScene]
 };
+
+// Company typefaces load in parallel with the (much slower) asset preload.
+loadCompanyFonts();
 
 // Instantiate and start the Phaser game
 const game = new Phaser.Game(gameConfig);
