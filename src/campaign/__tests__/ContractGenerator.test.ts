@@ -55,4 +55,36 @@ describe('ContractGenerator', () => {
         expect(board).toHaveLength(5);
         expect(board[0]).toBe(existing[0]);
     });
+
+    it('every generated contract has a non-empty client and payment clause', () => {
+        for (let i = 0; i < 100; i++) {
+            const c = gen.generateContract(5);
+            expect(c.client.length).toBeGreaterThan(0);
+            expect(c.paymentClause.length).toBeGreaterThan(0);
+        }
+    });
+
+    it('payment clause has {payout} replaced with the actual £ amount', () => {
+        for (let i = 0; i < 100; i++) {
+            const c = gen.generateContract(5);
+            expect(c.paymentClause).not.toContain('{payout}');
+            expect(c.paymentClause).toContain(`£${c.payout}`);
+        }
+    });
+
+    it('name/client/description/paymentClause always co-occur as defined in a single template', () => {
+        const templates = ContractGenerator.getAllTemplates();
+        const byName = new Map(templates.map(t => [t.name, t]));
+
+        for (let i = 0; i < 300; i++) {
+            const c = gen.generateContract(10);
+            const template = byName.get(c.name);
+            expect(template).toBeDefined();
+            expect(c.client).toBe(template!.client);
+            expect(c.description).toBe(template!.description);
+            // paymentClause on the contract has {payout} substituted; the
+            // template's raw clause (with the token) must match modulo that.
+            expect(c.paymentClause).toBe(template!.paymentClause.replace('{payout}', `£${c.payout}`));
+        }
+    });
 });

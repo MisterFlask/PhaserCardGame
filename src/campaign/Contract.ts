@@ -18,6 +18,11 @@ export class Contract {
     public description: string;
     public type: ContractType;
 
+    /** The paying party. Every contract must communicate whose money this is. */
+    public client: string;
+    /** One invoice-style sentence describing how/when payment is rendered. */
+    public paymentClause: string;
+
     /** Which encounter table the sortie pulls from. */
     public act: number;
     public segment: number;
@@ -38,6 +43,8 @@ export class Contract {
         name: string;
         description: string;
         type: ContractType;
+        client: string;
+        paymentClause: string;
         act: number;
         segment: number;
         difficultyStars: number;
@@ -50,6 +57,8 @@ export class Contract {
         this.name = args.name;
         this.description = args.description;
         this.type = args.type;
+        this.client = args.client;
+        this.paymentClause = args.paymentClause;
         this.act = args.act;
         this.segment = args.segment;
         this.difficultyStars = args.difficultyStars;

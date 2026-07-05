@@ -157,12 +157,14 @@ export class ContractBoardPanel extends AbstractHqPanel {
             wordWrap: { width: NOTICE_W - 100 },
         }));
 
-        container.add(this.scene.add.text(-NOTICE_W / 2 + 18, -NOTICE_H / 2 + 82, contract.regionName.toUpperCase(), {
+        const clientLine = `CLIENT: ${contract.client.toUpperCase()}`;
+        container.add(this.scene.add.text(-NOTICE_W / 2 + 18, -NOTICE_H / 2 + 82,
+            clientLine.length > 46 ? contract.client.toUpperCase() : clientLine, {
             fontFamily: Fonts.UTILITY, fontSize: '12px', color: Palette.INK_FADED, letterSpacing: 2,
         }));
 
         container.add(this.scene.add.text(-NOTICE_W / 2 + 18, -NOTICE_H / 2 + 104,
-            `${contract.numCombats} engagement${contract.numCombats > 1 ? 's' : ''} · ${contract.durationWeeks} weeks in the field`, {
+            `${contract.numCombats} engagement${contract.numCombats > 1 ? 's' : ''} · ${contract.durationWeeks} weeks · ${contract.regionName}`, {
             fontFamily: Fonts.BODY, fontSize: '16px', color: Palette.INK_FADED,
         }));
 
@@ -287,7 +289,7 @@ export class ContractBoardPanel extends AbstractHqPanel {
         const cal = campaign.calendar;
 
         const briefing = contract
-            ? `"${contract.description}"`
+            ? `"${contract.description}"  ·  ${contract.paymentClause}`
             : `Year ${cal.year}, Q${cal.quarterOfYear}, week ${cal.weekOfQuarter} of 13   ·   ` +
               `Dividend of £${cal.currentDividendExpectation} due in ${cal.weeksUntilDividend}w   ·   ` +
               `Satisfaction ${cal.shareholderSatisfaction}/100`;

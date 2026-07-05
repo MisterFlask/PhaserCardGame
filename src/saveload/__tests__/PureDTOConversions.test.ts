@@ -41,6 +41,8 @@ describe('contract DTO round-trip', () => {
             expect(restored.name).toBe(contract.name);
             expect(restored.description).toBe(contract.description);
             expect(restored.type).toBe(contract.type);
+            expect(restored.client).toBe(contract.client);
+            expect(restored.paymentClause).toBe(contract.paymentClause);
             expect(restored.act).toBe(contract.act);
             expect(restored.segment).toBe(contract.segment);
             expect(restored.difficultyStars).toBe(contract.difficultyStars);

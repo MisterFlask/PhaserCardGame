@@ -3,7 +3,8 @@
 // Class instances are reconstructed via SaveRegistries.
 
 // v2: added contractsCompleted and per-project victory points.
-export const SAVE_FORMAT_VERSION = 2;
+// v3: added contract client and paymentClause (invoice-style flavor fields).
+export const SAVE_FORMAT_VERSION = 3;
 export const SAVE_STORAGE_KEY = 'east-infernal-company-save';
 
 export interface BuffDTO {
@@ -42,6 +43,8 @@ export interface ContractDTO {
     name: string;
     description: string;
     type: string;
+    client: string;
+    paymentClause: string;
     act: number;
     segment: number;
     difficultyStars: number;
