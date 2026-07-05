@@ -89,6 +89,9 @@ Sonnet agents. Division of labor:
   push directly to master from an external lane. Best suited to isolated,
   spec-complete batch work (new enemies, events, card sets).
 
+Standing backlog lives in **TODO.md** — check it when looking for the next
+piece of work; delete items you complete.
+
 ## Known sharp edges
 
 - Phaser's loader stalls in hidden browser tabs; `LoaderWatchdog` works around
