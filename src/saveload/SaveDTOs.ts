@@ -2,7 +2,8 @@
 // no Phaser types — everything here must survive JSON.stringify/parse.
 // Class instances are reconstructed via SaveRegistries.
 
-export const SAVE_FORMAT_VERSION = 1;
+// v2: added contractsCompleted and per-project victory points.
+export const SAVE_FORMAT_VERSION = 2;
 export const SAVE_STORAGE_KEY = 'east-infernal-company-save';
 
 export interface BuffDTO {
@@ -58,14 +59,20 @@ export interface CalendarDTO {
     boardEvents: { week: number; message: string; isWarning: boolean }[];
 }
 
+export interface OwnedProjectDTO {
+    name: string;
+    victoryPoints: number;
+}
+
 export interface CampaignSave {
     version: number;
     savedAtIso: string;
     moneyInVault: number;
     calendar: CalendarDTO;
     contracts: ContractDTO[];
-    /** Project names; matched against availableStrategicProjects on load so
+    contractsCompleted: number;
+    /** Matched by name against the canonical project instances on load so
      *  instance-identity checks in the investment UI keep working. */
-    ownedProjectNames: string[];
+    ownedProjects: OwnedProjectDTO[];
     roster: CharacterDTO[];
 }

@@ -2,12 +2,10 @@ import { AbstractStrategicProject } from "./AbstractStrategicProject";
 import { StrategicResource } from "./strategic_resources.ts/StrategicResources";
 
 export class LetheExtractionCo extends AbstractStrategicProject {
-    private victoryPoints: number = 0;
-
     constructor() {
         super({
             name: "Lethe Extraction Co.",
-            description: "Increases in value by 100 victory points per run.",
+            description: "Increases in value by 100 victory points per quarter.",
             portraitName: "lethe_extraction"
         });
         this.surfacePurchaseValue = 300;
@@ -23,9 +21,5 @@ export class LetheExtractionCo extends AbstractStrategicProject {
 
     public override onQuarterEnd(): void {
         this.victoryPoints += 100;
-    }
-
-    public getVictoryPoints(): number {
-        return this.victoryPoints;
     }
 } 

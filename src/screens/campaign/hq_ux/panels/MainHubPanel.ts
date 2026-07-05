@@ -101,6 +101,7 @@ export class MainHubPanel extends AbstractHqPanel {
         const buttons = [
             { text: 'Investment', x: 0.2, y: 0.6 },
             { text: 'Contract Board', x: 0.4, y: 0.6},
+            { text: 'Barracks', x: 0.6, y: 0.6},
             { text: 'New Campaign', x: 0.85, y: 0.92 },
         ];
 

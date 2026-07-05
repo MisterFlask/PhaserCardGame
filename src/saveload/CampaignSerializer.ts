@@ -61,7 +61,11 @@ export class CampaignSerializer {
             moneyInVault: gameState.moneyInVault,
             calendar: calendarToDTO(cal),
             contracts: campaign.availableContracts.map(contractToDTO),
-            ownedProjectNames: campaign.ownedStrategicProjects.map(p => p.name),
+            contractsCompleted: campaign.contractsCompleted,
+            ownedProjects: campaign.ownedStrategicProjects.map(p => ({
+                name: p.name,
+                victoryPoints: p.getVictoryPoints(),
+            })),
             roster: campaign.roster.map(c => this.characterToDTO(c)),
         };
     }
@@ -145,19 +149,24 @@ export class CampaignSerializer {
         gameState.moneyInVault = save.moneyInVault;
         campaign.calendar = calendarFromDTO(save.calendar);
         campaign.availableContracts = save.contracts.map(contractFromDTO);
+        campaign.contractsCompleted = save.contractsCompleted;
         campaign.selectedContract = null;
         campaign.selectedParty = [];
         // Match by name against the canonical instances so instance-identity
         // checks in the investment UI keep working. Purchasing moves a project
         // from available to owned, so the loader mirrors that split.
+        const ownedByName = new Map(save.ownedProjects.map(p => [p.name, p]));
         const allProjects = [
             ...campaign.availableStrategicProjects,
             ...campaign.ownedStrategicProjects,
         ];
         campaign.ownedStrategicProjects = allProjects
-            .filter(p => save.ownedProjectNames.includes(p.name));
+            .filter(p => ownedByName.has(p.name));
+        campaign.ownedStrategicProjects.forEach(p => {
+            p.victoryPoints = ownedByName.get(p.name)!.victoryPoints;
+        });
         campaign.availableStrategicProjects = allProjects
-            .filter(p => !save.ownedProjectNames.includes(p.name));
+            .filter(p => !ownedByName.has(p.name));
         campaign.roster = save.roster
             .map(c => this.characterFromDTO(c))
             .filter((c): c is PlayerCharacter => c !== null);

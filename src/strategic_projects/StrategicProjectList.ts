@@ -6,8 +6,10 @@ import { LetheExtractionCo } from "./LetheExtractionCo";
 import { LeviMaxwellAscensionProtocol } from "./LeviMaxwellAscensionProtocol";
 import { OurManInDis } from "./OurManInDis";
 import { PhlegethonCoalfalls } from "./PhlegethonCoalfalls";
+import { RetrainingProgram } from "./RetrainingProgram";
 import { RevolutionaryContacts } from "./RevolutionaryContacts";
 import { SmytheBowyerPoppyFields } from "./SmytheBowyerPoppyFields";
+import { TheFoundry } from "./TheFoundry";
 
 export const ALL_STRATEGIC_PROJECTS: AbstractStrategicProject[] = [
     new AbyssalResearchInstitute(),
@@ -18,5 +20,7 @@ export const ALL_STRATEGIC_PROJECTS: AbstractStrategicProject[] = [
     new SmytheBowyerPoppyFields(),
     new BlueRoomReadingSocieties(),
     new RevolutionaryContacts(),
-    new PhlegethonCoalfalls()
+    new PhlegethonCoalfalls(),
+    new TheFoundry(),
+    new RetrainingProgram()
 ];

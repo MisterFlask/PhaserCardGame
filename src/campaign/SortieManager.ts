@@ -121,6 +121,7 @@ export class SortieManager {
         const report: string[] = [];
 
         gameState.moneyInVault += contract.payout;
+        campaign.contractsCompleted++;
         report.push(`Contract "${contract.name}" fulfilled: £${contract.payout} banked.`);
 
         // Time passes first (the sortie took this long); wounds sustained on

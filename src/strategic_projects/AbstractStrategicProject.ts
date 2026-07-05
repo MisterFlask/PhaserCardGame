@@ -9,6 +9,13 @@ export abstract class AbstractStrategicProject extends AbstractCard {
 
     public isOwned: boolean = false;
 
+    /** Accumulated campaign score; tallied at charter expiry. */
+    public victoryPoints: number = 0;
+
+    public getVictoryPoints(): number {
+        return this.victoryPoints;
+    }
+
     constructor({ name, description, portraitName }: { name: string; description: string; portraitName?: string }) {
         super({
             name,
