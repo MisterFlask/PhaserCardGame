@@ -51,9 +51,6 @@ protocol. Ordered within sections by priority. Delete items when done.
   mostly mechanical. Prereq cleanups worth doing sooner: rules code reaching
   into `card.physicalCard` (ActionManager ~line 663, 740) and AbstractIntent
   querying scene texture cache on construction.
-- **DetailsScreenManager SHIFT listeners never cleaned up** — latent leak,
-  becomes real if CombatScene ever restarts within a session.
-  `src/screens/subcomponents/DetailsScreenManager.ts:22`.
 
 ## Cost optimization (verification & delegation)
 

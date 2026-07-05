@@ -10,17 +10,37 @@ export class DetailsScreenManager {
     private detailsContainer: Phaser.GameObjects.Container;
     private isVisible: boolean = false;
 
+    private destroyed: boolean = false;
+
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
         this.detailsContainer = this.scene.add.container(0, 0)
             .setVisible(false)
             .setDepth(DepthManager.getInstance().DETAILS_OVERLAY);
         this.setupKeyboardListener();
+        this.scene.events.once(Phaser.Scenes.Events.SHUTDOWN, this.destroy, this);
+        this.scene.events.once(Phaser.Scenes.Events.DESTROY, this.destroy, this);
     }
 
     private setupKeyboardListener(): void {
         this.scene.input.keyboard?.on('keydown-SHIFT', this.showDetails, this);
         this.scene.input.keyboard?.on('keyup-SHIFT', this.hideDetails, this);
+    }
+
+    /**
+     * Removes the keyboard listeners registered by this manager. Idempotent -
+     * safe to call multiple times (e.g. once via scene SHUTDOWN/DESTROY events,
+     * and again by a caller that wants to tear this manager down manually).
+     */
+    public destroy(): void {
+        if (this.destroyed) {
+            return;
+        }
+        this.destroyed = true;
+        this.scene.input?.keyboard?.off('keydown-SHIFT', this.showDetails, this);
+        this.scene.input?.keyboard?.off('keyup-SHIFT', this.hideDetails, this);
+        this.scene.events.off(Phaser.Scenes.Events.SHUTDOWN, this.destroy, this);
+        this.scene.events.off(Phaser.Scenes.Events.DESTROY, this.destroy, this);
     }
 
     // can be overridden for non-combat scenes
