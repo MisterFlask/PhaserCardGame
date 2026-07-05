@@ -78,8 +78,16 @@ Sonnet agents. Division of labor:
 - **Reserved for the lead:** novel debugging/root-causing, design forks,
   cross-system refactors, the save system, and anything where three failed
   agent attempts would cost more than direct work.
+- **Parallel dispatches get disjoint file ownership.** Every brief names the
+  exact files the agent owns; agents must not touch files owned by a
+  concurrently-running agent (or, if overlap is unavoidable, use worktree
+  isolation).
 - Exploration/survey subagents default to Sonnet (or Haiku for pure grep
   sweeps) — never the lead model.
+- **External agents (Codex etc.)** work on branches and open PRs; CI must be
+  green before merge, and the lead reviews against these house rules. Never
+  push directly to master from an external lane. Best suited to isolated,
+  spec-complete batch work (new enemies, events, card sets).
 
 ## Known sharp edges
 
