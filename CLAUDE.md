@@ -70,6 +70,9 @@ Sonnet agents. Division of labor:
 - **Agents stop on unlisted decisions.** If implementation surfaces a design
   choice the brief didn't anticipate, report it back instead of picking
   silently — silent-but-coherent wrong choices are the main delegation risk.
+- **Agents do the work themselves.** Implementation agents must not
+  sub-delegate to further agents; it breaks the review chain and the
+  notification flow.
 - **Bounce to the same agent** (SendMessage) rather than re-dispatching; it
   keeps context.
 - **Reserved for the lead:** novel debugging/root-causing, design forks,
