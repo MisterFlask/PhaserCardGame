@@ -54,14 +54,11 @@ protocol. Ordered within sections by priority. Delete items when done.
 
 ## Cost optimization (verification & delegation)
 
-- **`window.runSmokeTest()` in-game harness** — replace the 8-12 eval
-  round-trips of manual sortie-loop verification with one debug function that
-  drives fresh-campaign → dispatch → win → payout → save round-trip →
-  listener-count + queue-error assertions internally and returns compact
-  JSON. Shrinks every future agent brief and review pass. Delegable.
 - **CI headless-Chrome smoke job** — run `runSmokeTest()` in CI (the game
   already runs headless thanks to the background stepper) so green CI proves
-  the loop and nobody re-drives it manually. Depends on the item above.
+  the loop and nobody re-drives it manually. `window.runSmokeTest()` now
+  exists (src/utils/SmokeTest.ts); note it runs from "current campaign at
+  HQ", so the CI job just loads the page fresh and calls it.
 - **Try Haiku on the most mechanical briefs** (exact-template boilerplate,
   rename sweeps); measure bounce rate vs Sonnet before adopting.
 - **Codex lane A/B** — hand the next content batch (enemies/events) to both
