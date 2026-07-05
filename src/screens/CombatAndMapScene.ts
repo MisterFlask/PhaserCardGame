@@ -23,6 +23,7 @@ import { UIContext, UIContextManager } from '../ui/UIContextManager';
 import { ActionManager } from '../utils/ActionManager';
 import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
 import ImageUtils from '../utils/ImageUtils';
+import { installLoaderWatchdog } from '../utils/LoaderWatchdog';
 import { HqScene } from './campaign/hq_ux/HqScene';
 import { SceneChanger } from './SceneChanger';
 import { CampaignBriefStatus } from './subcomponents/CampaignBriefStatus';
@@ -71,6 +72,9 @@ class CombatScene extends Phaser.Scene {
     }
 
     preload(): void {
+        // Keep the loader alive if the tab is hidden during boot.
+        installLoaderWatchdog(this);
+
         // Add all images to the load queue (served from local resources/)
         new ImageUtils().loadAllImages(this.load);
         

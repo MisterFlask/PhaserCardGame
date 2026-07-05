@@ -4,11 +4,14 @@ import { GameState } from '../../../rules/GameState';
 import { TransientUiState } from '../../../ui/TransientUiState';
 import { ActionManagerFetcher } from '../../../utils/ActionManagerFetcher';
 import ImageUtils from '../../../utils/ImageUtils';
+import { installLoaderWatchdog } from '../../../utils/LoaderWatchdog';
 import { SceneChanger } from '../../SceneChanger';
 import { CampaignUiState } from './CampaignUiState';
 import { AbstractHqPanel } from './panels/AbstractHqPanel';
 import { SaveManager } from '../../../saveload/SaveManager';
+import { BarracksPanel } from './panels/BarracksPanel';
 import { ContractBoardPanel } from './panels/ContractBoardPanel';
+import { EndOfCampaignPanel } from './panels/EndOfCampaignPanel';
 import { InvestmentPanel } from './panels/InvestmentPanel';
 import { MainHubPanel } from './panels/MainHubPanel';
 
@@ -17,6 +20,8 @@ export class HqScene extends Scene {
     private mainHubPanel!: MainHubPanel;
     private investmentPanel!: InvestmentPanel;
     private contractBoardPanel!: ContractBoardPanel;
+    private barracksPanel!: BarracksPanel;
+    private endOfCampaignPanel!: EndOfCampaignPanel;
 
     constructor() {
         super({ key: 'HqScene' });
@@ -50,6 +55,9 @@ export class HqScene extends Scene {
 
         ActionManagerFetcher.initServicesAsync(this);
 
+        // Keep the loader alive if the tab is hidden during boot.
+        installLoaderWatchdog(this);
+
         // Add all images to the load queue (served from local resources/)
         new ImageUtils().loadAllImages(this.load);
         
@@ -73,23 +81,38 @@ export class HqScene extends Scene {
         this.mainHubPanel = new MainHubPanel(this);
         this.investmentPanel = new InvestmentPanel(this);
         this.contractBoardPanel = new ContractBoardPanel(this);
+        this.barracksPanel = new BarracksPanel(this);
+        this.endOfCampaignPanel = new EndOfCampaignPanel(this);
 
         // Hide all panels initially
         this.mainHubPanel.setVisible(false);
         this.investmentPanel.setVisible(false);
         this.contractBoardPanel.setVisible(false);
+        this.barracksPanel.setVisible(false);
+        this.endOfCampaignPanel.setVisible(false);
 
-        // Show main hub panel by default
-        this.showPanel('main');
+        // Show main hub panel by default — unless the campaign is over.
+        if (this.isCampaignOver()) {
+            this.showPanel('ending');
+        } else {
+            this.showPanel('main');
+        }
 
         // Set up event listeners
         this.events.on('navigate', (destination: string) => {
+            if (this.isCampaignOver()) {
+                this.showPanel('ending');
+                return;
+            }
             switch (destination) {
                 case 'investment':
                     this.showPanel('investment');
                     break;
                 case 'contracts':
                     this.showPanel('contracts');
+                    break;
+                case 'barracks':
+                    this.showPanel('barracks');
                     break;
                 default:
                     this.showPanel('main');
@@ -102,7 +125,7 @@ export class HqScene extends Scene {
 
         // Set up scene-wide keyboard shortcuts
         this.input?.keyboard?.on('keydown-ESC', () => {
-            if (this.currentPanel !== this.mainHubPanel) {
+            if (this.currentPanel !== this.mainHubPanel && !this.isCampaignOver()) {
                 this.showPanel('main');
             }
         });
@@ -111,8 +134,13 @@ export class HqScene extends Scene {
         SaveManager.save();
     }
 
+    private isCampaignOver(): boolean {
+        const cal = CampaignUiState.getInstance().calendar;
+        return cal.isSacked || cal.isCharterExpired;
+    }
+
     private showPanel(
-        panelKey: 'main' | 'investment' | 'contracts'
+        panelKey: 'main' | 'investment' | 'contracts' | 'barracks' | 'ending'
     ): void {
         if (this.currentPanel) {
             this.currentPanel.setVisible(false);
@@ -129,6 +157,12 @@ export class HqScene extends Scene {
                 break;
             case 'contracts':
                 this.currentPanel = this.contractBoardPanel;
+                break;
+            case 'barracks':
+                this.currentPanel = this.barracksPanel;
+                break;
+            case 'ending':
+                this.currentPanel = this.endOfCampaignPanel;
                 break;
         }
 
