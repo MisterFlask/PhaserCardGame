@@ -49,7 +49,7 @@ export class CampaignUiState {
     public ensureContractsPopulated(): void {
         if (this.availableContracts.length === 0) {
             this.availableContracts = ContractGenerator.getInstance()
-                .refillBoard(this.availableContracts, this.calendar.year);
+                .refillBoard(this.availableContracts, this.calendar.year, this.contractsCompleted);
         }
     }
 
@@ -95,10 +95,17 @@ export class CampaignUiState {
             return paid;
         });
 
-        // Wounded soldiers recuperate.
+        // Wounded soldiers recuperate; nerves settle slowly (1 stress/week).
         this.roster.forEach(character => {
             if (character.weeksWoundedRemaining > 0) {
                 character.weeksWoundedRemaining = Math.max(0, character.weeksWoundedRemaining - n);
+            }
+            const stressBuff = character.buffs.find(b => b.id === "stress");
+            if (stressBuff) {
+                stressBuff.stacks = Math.max(0, stressBuff.stacks - n);
+                if (stressBuff.stacks === 0) {
+                    character.buffs = character.buffs.filter(b => b !== stressBuff);
+                }
             }
         });
 
@@ -106,7 +113,7 @@ export class CampaignUiState {
         this.availableContracts.forEach(c => c.deadlineWeeks -= n);
         this.availableContracts = this.availableContracts.filter(c => c.deadlineWeeks > 0);
         this.availableContracts = ContractGenerator.getInstance()
-            .refillBoard(this.availableContracts, this.calendar.year);
+            .refillBoard(this.availableContracts, this.calendar.year, this.contractsCompleted);
 
         // A fresh crop of hopefuls drifts through the recruitment office.
         this.recruitCandidates = [];

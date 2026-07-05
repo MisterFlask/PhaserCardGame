@@ -78,17 +78,19 @@ export class ContractGenerator {
     }
 
     /**
-     * Highest act available given the campaign year (year 1-10).
-     * Years 1-2: act 1 only. Years 3-5: acts 1-2. Year 6+: all acts.
+     * Highest act available. Deeper regions unlock by calendar year OR by
+     * proven competence (contracts completed), whichever comes first — a
+     * fast-playing company sees variety sooner instead of grinding the
+     * Styx Delta for two full years.
      */
-    private maxActForYear(year: number): number {
-        if (year <= 2) return 1;
-        if (year <= 5) return 2;
-        return 3;
+    private maxActUnlocked(year: number, contractsCompleted: number): number {
+        if (year >= 6 || contractsCompleted >= 20) return 3;
+        if (year >= 3 || contractsCompleted >= 8) return 2;
+        return 1;
     }
 
-    public generateContract(year: number): Contract {
-        const maxAct = this.maxActForYear(year);
+    public generateContract(year: number, contractsCompleted: number = 0): Contract {
+        const maxAct = this.maxActUnlocked(year, contractsCompleted);
         const eligibleRegions = REGION_FLAVORS.filter(r => r.act <= maxAct);
         const region = this.pick(eligibleRegions);
 
@@ -111,17 +113,19 @@ export class ContractGenerator {
             difficultyStars,
             numCombats,
             deadlineWeeks: 2 + Math.floor(Math.random() * 3), // 2-4 weeks on the board
-            durationWeeks: numCombats,                        // sortie consumes 1-2 weeks
+            // Mustering and travel cost a week on top of the fighting; this
+            // caps contract throughput so the dividend clock can actually bite.
+            durationWeeks: numCombats + 1,
             payout,
             regionName: region.regionName,
         });
     }
 
     /** Top the board back up to targetCount contracts. */
-    public refillBoard(existing: Contract[], year: number, targetCount: number = 5): Contract[] {
+    public refillBoard(existing: Contract[], year: number, contractsCompleted: number = 0, targetCount: number = 5): Contract[] {
         const board = [...existing];
         while (board.length < targetCount) {
-            board.push(this.generateContract(year));
+            board.push(this.generateContract(year, contractsCompleted));
         }
         return board;
     }

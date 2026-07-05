@@ -15,7 +15,7 @@ const SQUAD_SIZE = 3;
  */
 export class ContractBoardPanel extends AbstractHqPanel {
     private contractButtons: TextBoxButton[] = [];
-    private rosterButtons: TextBoxButton[] = [];
+    private rosterButtons: (TextBoxButton | Phaser.GameObjects.Image)[] = [];
     private contractDetail: TextBox;
     private statusLine: TextBox;
     private launchButton: TextBoxButton;
@@ -108,13 +108,25 @@ export class ContractBoardPanel extends AbstractHqPanel {
         campaign.roster.forEach((character, i) => {
             const inSquad = this.selectedSquad.includes(character);
             const fit = character.isFitForDuty;
+            const unfitReason = character.weeksWoundedRemaining > 0
+                ? ` — WOUNDED ${character.weeksWoundedRemaining}w`
+                : (!fit ? ' — SHAKEN' : '');
             const label = `${character.name} (${character.characterClass.name})`
-                + (fit ? '' : ` — WOUNDED ${character.weeksWoundedRemaining}w`)
+                + (character.stress > 0 ? ` — stress ${character.stress}` : '')
+                + unfitReason
                 + (inSquad ? '  ✓' : '');
+            const y = 420 + i * 55;
+            if (this.scene.textures.exists(character.portraitName)) {
+                const portrait = this.scene.add.image(this.scene.scale.width * 0.72 - 255, y, character.portraitName)
+                    .setDisplaySize(45, 45);
+                if (!fit) portrait.setTint(0x555555);
+                this.rosterButtons.push(portrait);
+                this.add(portrait);
+            }
             const button = new TextBoxButton({
                 scene: this.scene,
                 x: this.scene.scale.width * 0.72,
-                y: 420 + i * 55,
+                y,
                 width: 460,
                 height: 45,
                 text: label,

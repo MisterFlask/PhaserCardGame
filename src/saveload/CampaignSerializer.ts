@@ -45,7 +45,10 @@ export class CampaignSerializer {
             className: character.characterClass.name,
             maxHitpoints: character.maxHitpoints,
             weeksWoundedRemaining: character.weeksWoundedRemaining,
-            traits: character.buffs.filter(b => b.isPersonaTrait).map(b => this.buffToDTO(b)),
+            // Persona traits plus campaign-persistent afflictions (stress).
+            traits: character.buffs
+                .filter(b => b.isPersonaTrait || b.id === "stress")
+                .map(b => this.buffToDTO(b)),
             deck: character.cardsInMasterDeck.map(c => this.cardToDTO(c)),
         };
     }

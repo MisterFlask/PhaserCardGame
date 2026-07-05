@@ -20,6 +20,18 @@ describe('ContractGenerator', () => {
         expect(acts.has(3)).toBe(true);
     });
 
+    it('unlocks deeper regions early for a fast-playing company', () => {
+        const actsAtEightContracts = new Set<number>();
+        const actsAtTwentyContracts = new Set<number>();
+        for (let i = 0; i < 200; i++) {
+            actsAtEightContracts.add(gen.generateContract(1, 8).act);
+            actsAtTwentyContracts.add(gen.generateContract(1, 20).act);
+        }
+        expect(actsAtEightContracts.has(2)).toBe(true);
+        expect(actsAtEightContracts.has(3)).toBe(false);
+        expect(actsAtTwentyContracts.has(3)).toBe(true);
+    });
+
     it('produces well-formed contracts', () => {
         for (let i = 0; i < 100; i++) {
             const c = gen.generateContract(5);
@@ -32,7 +44,7 @@ describe('ContractGenerator', () => {
             expect(c.payout % 5).toBe(0);
             expect(c.deadlineWeeks).toBeGreaterThanOrEqual(2);
             expect(c.deadlineWeeks).toBeLessThanOrEqual(4);
-            expect(c.durationWeeks).toBe(c.numCombats);
+            expect(c.durationWeeks).toBe(c.numCombats + 1); // +1 week mustering overhead
             expect(c.name.length).toBeGreaterThan(0);
         }
     });

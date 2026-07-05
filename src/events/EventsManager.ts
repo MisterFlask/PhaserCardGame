@@ -9,14 +9,18 @@ import { AbstractEvent } from "./AbstractEvent";
 
 export class EventsManager {
     private static instance: EventsManager;
-    private events: AbstractEvent[] = [
-        new AngelicTattooEvent(),
-        new DiseaseForMoneyEvent(),
-        new DutchZooEscapeEvent(),
-        new CheckpointSmugglerEvent(),
-        new MarshBrigandsTollEvent(),
-        new ArmsDealerPropositionEvent(),
-        new GamblingChaplainEvent(),
+
+    // Factories, not instances: events hold per-occurrence state on their
+    // choices (consumable snapshots, nextEvent chains that null themselves),
+    // so each occurrence needs a fresh object graph.
+    private eventFactories: (() => AbstractEvent)[] = [
+        () => new AngelicTattooEvent(),
+        () => new DiseaseForMoneyEvent(),
+        () => new DutchZooEscapeEvent(),
+        () => new CheckpointSmugglerEvent(),
+        () => new MarshBrigandsTollEvent(),
+        () => new ArmsDealerPropositionEvent(),
+        () => new GamblingChaplainEvent(),
     ];
 
     private constructor() {}
@@ -29,11 +33,11 @@ export class EventsManager {
     }
 
     public getRandomEvent(): AbstractEvent {
-        const event = this.events[Math.floor(Math.random() * this.events.length)];
-        return event;
+        const factory = this.eventFactories[Math.floor(Math.random() * this.eventFactories.length)];
+        return factory();
     }
 
     public getAllEvents(): AbstractEvent[] {
-        return this.events;
+        return this.eventFactories.map(factory => factory());
     }
 }

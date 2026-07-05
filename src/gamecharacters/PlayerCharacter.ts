@@ -11,9 +11,13 @@ export class PlayerCharacter extends BaseCharacter {
     weeksWoundedRemaining: number = 0;
     /** Permanently lost to the campaign (killed on a sortie). */
     isDeceased: boolean = false;
+    /** Soldiers at or past this much stress cannot be dispatched. */
+    static readonly STRESS_DEPLOYMENT_LIMIT = 10;
 
     get isFitForDuty(): boolean {
-        return !this.isDeceased && this.weeksWoundedRemaining <= 0;
+        return !this.isDeceased
+            && this.weeksWoundedRemaining <= 0
+            && this.stress < PlayerCharacter.STRESS_DEPLOYMENT_LIMIT;
     }
 
     constructor({ name, portraitName, characterClass, description }

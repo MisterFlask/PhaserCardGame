@@ -1,4 +1,4 @@
-import { Scene } from 'phaser';
+import Phaser, { Scene } from 'phaser';
 import { PlayableCard } from '../../../../gamecharacters/PlayableCard';
 import { PlayerCharacter } from '../../../../gamecharacters/PlayerCharacter';
 import { ModifierContext } from '../../../../rules/modifiers/AbstractCardModifier';
@@ -12,6 +12,8 @@ import { AbstractHqPanel } from './AbstractHqPanel';
 
 const REMOVAL_COST = 40;
 const UPGRADE_COST = 60;
+const THERAPY_COST = 30;
+const THERAPY_RELIEF = 4;
 const REMOVAL_GATE = 'Retraining Program';
 const UPGRADE_GATE = 'The Foundry';
 
@@ -74,11 +76,21 @@ export class BarracksPanel extends AbstractHqPanel {
         campaign.roster.forEach((soldier, i) => {
             const selected = this.selectedSoldier === soldier;
             const trait = soldier.buffs.find(b => b.isPersonaTrait)?.getDisplayName() ?? '';
+            const status = soldier.weeksWoundedRemaining > 0
+                ? ` — WOUNDED ${soldier.weeksWoundedRemaining}w`
+                : (soldier.stress >= PlayerCharacter.STRESS_DEPLOYMENT_LIMIT ? ' — SHAKEN' : '');
             const label = `${soldier.name} (${soldier.characterClass.name})`
                 + (trait ? ` — ${trait}` : '')
-                + (soldier.isFitForDuty ? '' : ` — WOUNDED ${soldier.weeksWoundedRemaining}w`);
+                + (soldier.stress > 0 ? ` — stress ${soldier.stress}` : '')
+                + status;
+            const y = 150 + i * 52;
+            if (this.scene.textures.exists(soldier.portraitName)) {
+                const portrait = this.scene.add.image(width * 0.14 - 225, y, soldier.portraitName)
+                    .setDisplaySize(44, 44);
+                this.addDynamic(portrait);
+            }
             const button = this.addDynamic(new TextBoxButton({
-                scene: this.scene, x: width * 0.14, y: 150 + i * 52, width: 400, height: 44,
+                scene: this.scene, x: width * 0.14, y, width: 400, height: 44,
                 text: label,
                 style: { fontSize: '14px', color: '#ffffff' },
                 fillColor: selected ? 0x226622 : 0x333344
@@ -89,6 +101,33 @@ export class BarracksPanel extends AbstractHqPanel {
                 this.rebuild();
             });
         });
+
+        // Therapy for the selected soldier
+        if (this.selectedSoldier && this.selectedSoldier.stress > 0) {
+            const soldier = this.selectedSoldier;
+            const canTreat = GameState.getInstance().moneyInVault >= THERAPY_COST;
+            const therapyButton = this.addDynamic(new TextBoxButton({
+                scene: this.scene, x: width * 0.14, y: 150 + campaign.roster.length * 52 + 15,
+                width: 400, height: 44,
+                text: `Therapy for ${soldier.name}: -${THERAPY_RELIEF} stress (£${THERAPY_COST})`,
+                style: { fontSize: '14px', color: canTreat ? '#ffffff' : '#888888' },
+                fillColor: canTreat ? 0x224466 : 0x222222
+            }));
+            therapyButton.onClick(() => {
+                if (!canTreat) { this.setStatus('Insufficient funds.'); return; }
+                GameState.getInstance().moneyInVault -= THERAPY_COST;
+                const stressBuff = soldier.buffs.find(b => b.id === 'stress');
+                if (stressBuff) {
+                    stressBuff.stacks = Math.max(0, stressBuff.stacks - THERAPY_RELIEF);
+                    if (stressBuff.stacks === 0) {
+                        soldier.buffs = soldier.buffs.filter(b => b !== stressBuff);
+                    }
+                }
+                SaveManager.save();
+                this.setStatus(`${soldier.name} spends an afternoon with the accredited phrenologists. Stress: ${soldier.stress}.`);
+                this.rebuild();
+            });
+        }
 
         // --- Deck of the selected soldier, middle column ---
         if (this.selectedSoldier) {
@@ -124,6 +163,11 @@ export class BarracksPanel extends AbstractHqPanel {
         }));
         campaign.recruitCandidates.forEach((candidate, i) => {
             const trait = candidate.buffs.find(b => b.isPersonaTrait)?.getDisplayName() ?? '';
+            if (this.scene.textures.exists(candidate.portraitName)) {
+                const portrait = this.scene.add.image(width * 0.78 - 195, 170 + i * 100, candidate.portraitName)
+                    .setDisplaySize(56, 56);
+                this.addDynamic(portrait);
+            }
             this.addDynamic(new TextBox({
                 scene: this.scene, x: width * 0.78, y: 150 + i * 100, width: 340, height: 40,
                 text: `${candidate.name} (${candidate.characterClass.name})${trait ? ' — ' + trait : ''}`,

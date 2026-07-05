@@ -24,8 +24,10 @@ export class CampaignCalendar {
     /** 0-100. The campaign ends if this reaches 0. */
     public shareholderSatisfaction: number = 50;
 
-    /** £ owed at the end of the current quarter. */
-    public currentDividendExpectation: number = 75;
+    /** £ owed at the end of the current quarter. Tuned against a lossless
+     *  simulation: optimal play peaks mid-campaign and feels the squeeze from
+     *  year 7; real play (wounds, recruits, therapy) feels it sooner. */
+    public currentDividendExpectation: number = 120;
 
     /** Log of board meetings and warnings, newest last. */
     public boardEvents: BoardEvent[] = [];

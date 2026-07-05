@@ -1,4 +1,5 @@
 import { EncounterManager } from "../encounters/EncounterManager";
+import { EventsManager } from "../events/EventsManager";
 import { PlayerCharacter } from "../gamecharacters/PlayerCharacter";
 import { AbstractReward } from "../rewards/AbstractReward";
 import { CardReward } from "../rewards/CardReward";
@@ -29,6 +30,8 @@ export class SortieManager {
     public combatsCompleted: number = 0;
     /** Set at resolution so the HQ can show a report. */
     public lastSortieReport: string[] = [];
+    /** True until the debrief screen has been shown once. */
+    public hasUnviewedReport: boolean = false;
 
     public isActive(): boolean {
         return this.activeContract !== null;
@@ -63,10 +66,21 @@ export class SortieManager {
         this.launchNextCombat();
     }
 
+    /** Chance that a narrative event interrupts a sortie combat. */
+    private static readonly EVENT_CHANCE = 0.35;
+
     public launchNextCombat(): void {
         if (!this.activeContract) return;
         const encounter = EncounterManager.getInstance()
             .getRandomCombatEncounter(this.activeContract.act, this.activeContract.segment);
+
+        // Something on the road: the event shows before the fight, and its
+        // choices may replace or extend the combat (tolls, escaped daemons...).
+        if (Math.random() < SortieManager.EVENT_CHANCE) {
+            encounter.event = EventsManager.getInstance().getRandomEvent();
+            encounter.eventAfterCombat = false;
+        }
+
         SceneChanger.switchToCombatScene(encounter);
     }
 
@@ -110,6 +124,7 @@ export class SortieManager {
 
         campaign.advanceWeeks(contract.durationWeeks);
         this.lastSortieReport = report;
+        this.hasUnviewedReport = true;
 
         SceneChanger.switchToCampaignScene();
     }
@@ -135,9 +150,13 @@ export class SortieManager {
         });
         report.push(...casualties.lines);
 
-        // Decks persist between sorties by design; only combat-scoped state clears.
+        // Decks persist between sorties by design; only combat-scoped state
+        // clears. Stress comes home with the soldier (Darkest-Dungeon-style)
+        // and decays at HQ — see CampaignUiState.advanceWeeks.
         this.squad.forEach(character => {
-            character.buffs = character.buffs.filter(buff => buff.isPersonaTrait);
+            character.buffs = character.buffs.filter(
+                buff => buff.isPersonaTrait || buff.id === "stress"
+            );
         });
         gameState.currentRunCharacters = [];
         campaign.selectedParty = [];
@@ -149,6 +168,7 @@ export class SortieManager {
         this.lastSortieReport = [...report, ...campaign.calendar.boardEvents
             .filter(e => e.week > campaign.calendar.week - contract.durationWeeks)
             .map(e => e.message)];
+        this.hasUnviewedReport = true;
 
         SceneChanger.switchToCampaignScene();
     }

@@ -30,6 +30,7 @@ import { IncreaseVenture } from "../gamecharacters/buffs/standard/combatresource
 import { GrowingPowerBuff } from "../gamecharacters/buffs/standard/GrowingPower";
 import { HellSellValue } from "../gamecharacters/buffs/standard/HellSellValue";
 import { Lethality } from "../gamecharacters/buffs/standard/Lethality";
+import { Stress } from "../gamecharacters/buffs/standard/Stress";
 import { SurfaceSellValue } from "../gamecharacters/buffs/standard/SurfaceSellValue";
 import { BaseCharacterClass } from "../gamecharacters/BaseCharacterClass";
 import { PlayableCard } from "../gamecharacters/PlayableCard";
@@ -56,6 +57,8 @@ const BUFF_CLASSES: BuffCtor[] = [
     Doubled, Lightweight, GrowingPowerBuff, Buster,
     SurfaceSellValue, HellSellValue, BloodPriceBuff,
     Damaged, OnSale, Heavy, Painful,
+    // campaign-persistent afflictions carried on soldiers between sorties
+    Stress,
 ];
 
 export class SaveRegistries {
