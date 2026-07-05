@@ -56,6 +56,28 @@ State-layer changes must also survive a save/reload round-trip.
    `src/docs/worldbuilding.md`). Player-facing text uses BBCode formatting,
    £ for money, and the Company's bureaucratic register.
 
+## Working protocol (token economics)
+
+The lead model (Fable) is scarce/expensive; implementation goes to dispatched
+Sonnet agents. Division of labor:
+
+- **Lead plans, reviews, commits.** Task decomposition, specs, final review,
+  integration verification, and all git commits stay with the lead.
+- **Sonnet agents implement.** Dispatch briefs must carry: file pointers, the
+  relevant house rules, explicit decision points, acceptance criteria, and the
+  exact verification commands. Agents run typecheck + tests + the relevant
+  browser smoke BEFORE returning and include the evidence in their report.
+- **Agents stop on unlisted decisions.** If implementation surfaces a design
+  choice the brief didn't anticipate, report it back instead of picking
+  silently — silent-but-coherent wrong choices are the main delegation risk.
+- **Bounce to the same agent** (SendMessage) rather than re-dispatching; it
+  keeps context.
+- **Reserved for the lead:** novel debugging/root-causing, design forks,
+  cross-system refactors, the save system, and anything where three failed
+  agent attempts would cost more than direct work.
+- Exploration/survey subagents default to Sonnet (or Haiku for pure grep
+  sweeps) — never the lead model.
+
 ## Known sharp edges
 
 - Phaser's loader stalls in hidden browser tabs; `LoaderWatchdog` works around
