@@ -8,12 +8,14 @@ import { installLoaderWatchdog } from '../../../utils/LoaderWatchdog';
 import { SceneChanger } from '../../SceneChanger';
 import { CampaignUiState } from './CampaignUiState';
 import { AbstractHqPanel } from './panels/AbstractHqPanel';
+import { SortieManager } from '../../../campaign/SortieManager';
 import { SaveManager } from '../../../saveload/SaveManager';
 import { BarracksPanel } from './panels/BarracksPanel';
 import { ContractBoardPanel } from './panels/ContractBoardPanel';
 import { EndOfCampaignPanel } from './panels/EndOfCampaignPanel';
 import { InvestmentPanel } from './panels/InvestmentPanel';
 import { MainHubPanel } from './panels/MainHubPanel';
+import { SortieReportPanel } from './panels/SortieReportPanel';
 
 export class HqScene extends Scene {
     private currentPanel?: AbstractHqPanel;
@@ -22,6 +24,7 @@ export class HqScene extends Scene {
     private contractBoardPanel!: ContractBoardPanel;
     private barracksPanel!: BarracksPanel;
     private endOfCampaignPanel!: EndOfCampaignPanel;
+    private sortieReportPanel!: SortieReportPanel;
 
     constructor() {
         super({ key: 'HqScene' });
@@ -62,7 +65,6 @@ export class HqScene extends Scene {
         new ImageUtils().loadAllImages(this.load);
         
         SceneChanger.setCurrentScene(this);
-        this.load.plugin('rexbbcodetextplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbbcodetextplugin.min.js', true);
         // Load any required assets
         this.load.scenePlugin({
             key: 'rexUI',
@@ -83,6 +85,7 @@ export class HqScene extends Scene {
         this.contractBoardPanel = new ContractBoardPanel(this);
         this.barracksPanel = new BarracksPanel(this);
         this.endOfCampaignPanel = new EndOfCampaignPanel(this);
+        this.sortieReportPanel = new SortieReportPanel(this);
 
         // Hide all panels initially
         this.mainHubPanel.setVisible(false);
@@ -90,10 +93,13 @@ export class HqScene extends Scene {
         this.contractBoardPanel.setVisible(false);
         this.barracksPanel.setVisible(false);
         this.endOfCampaignPanel.setVisible(false);
+        this.sortieReportPanel.setVisible(false);
 
-        // Show main hub panel by default — unless the campaign is over.
+        // Endings trump everything; a fresh debrief trumps the hub.
         if (this.isCampaignOver()) {
             this.showPanel('ending');
+        } else if (SortieManager.getInstance().hasUnviewedReport) {
+            this.showPanel('report');
         } else {
             this.showPanel('main');
         }
@@ -140,7 +146,7 @@ export class HqScene extends Scene {
     }
 
     private showPanel(
-        panelKey: 'main' | 'investment' | 'contracts' | 'barracks' | 'ending'
+        panelKey: 'main' | 'investment' | 'contracts' | 'barracks' | 'ending' | 'report'
     ): void {
         if (this.currentPanel) {
             this.currentPanel.setVisible(false);
@@ -163,6 +169,9 @@ export class HqScene extends Scene {
                 break;
             case 'ending':
                 this.currentPanel = this.endOfCampaignPanel;
+                break;
+            case 'report':
+                this.currentPanel = this.sortieReportPanel;
                 break;
         }
 

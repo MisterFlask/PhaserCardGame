@@ -11,6 +11,7 @@ import type { AbstractCard } from '../gamecharacters/AbstractCard';
 import { PlayerCharacter } from '../gamecharacters/PlayerCharacter';
 import { SortieManager } from '../campaign/SortieManager';
 import { GameState } from '../rules/GameState';
+import { SaveRegistries } from '../saveload/SaveRegistries';
 import { CampaignUiState } from './campaign/hq_ux/CampaignUiState';
 import { TextBoxButton } from '../ui/Button';
 import { CheapGlowEffect } from '../ui/CheapGlowEffect';
@@ -77,8 +78,7 @@ class CombatScene extends Phaser.Scene {
 
         // Add all images to the load queue (served from local resources/)
         new ImageUtils().loadAllImages(this.load);
-        
-        this.load.plugin('rexbbcodetextplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexbbcodetextplugin.min.js', true);
+
         ActionManagerFetcher.initServicesAsync(this);
     }
 
@@ -459,9 +459,35 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
 // Instantiate and start the Phaser game
 const game = new Phaser.Game(gameConfig);
 
+// Phaser hard-pauses its loop in hidden tabs (rAF suspension + onHidden ->
+// loop.pause()), freezing scene transitions, tweens, and the action queue.
+// Main-thread timers are throttled to ~1Hz in hidden tabs, but Web Worker
+// timers are not — so a worker drives the steps, keeping the game running at
+// near-full speed in the background (and testable while headless).
+function installBackgroundStepper(): void {
+    const step = () => {
+        if (document.hidden && game.isBooted) {
+            (game.loop as any).step(performance.now());
+        }
+    };
+    try {
+        const workerSource = `setInterval(function () { postMessage(0); }, 33);`;
+        const worker = new Worker(URL.createObjectURL(
+            new Blob([workerSource], { type: 'application/javascript' })
+        ));
+        worker.onmessage = step;
+    } catch {
+        // Worker unavailable (e.g. strict CSP): degrade to throttled stepping.
+        setInterval(step, 100);
+    }
+}
+installBackgroundStepper();
+
 // Debug hooks for automated testing (browser console / test harness access)
 (window as any).game = game;
 (window as any).getGameState = () => GameState.getInstance();
 (window as any).getCampaignState = () => CampaignUiState.getInstance();
+// Registry doubles as a console factory for buffs/cards during testing.
+(window as any).SaveRegistries = SaveRegistries;
 
 export default CombatScene;
