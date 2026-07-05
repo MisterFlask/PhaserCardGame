@@ -13,8 +13,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      # package-lock.json is gitignored in this repo, so npm install (not ci).
-      - run: npm install
+          cache: 'npm'
+      # package-lock.json is committed, so use npm ci for reproducible installs.
+      - run: npm ci
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
@@ -31,7 +32,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm install
+          cache: 'npm'
+      - run: npm ci
       - run: npm run build
       - name: Assemble site
         run: |
