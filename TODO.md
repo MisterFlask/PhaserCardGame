@@ -54,9 +54,6 @@ protocol. Ordered within sections by priority. Delete items when done.
 - **DetailsScreenManager SHIFT listeners never cleaned up** — latent leak,
   becomes real if CombatScene ever restarts within a session.
   `src/screens/subcomponents/DetailsScreenManager.ts:22`.
-- **gh-pages deploy weight** — every green master push uploads ~170MB
-  (resources) with force_orphan. Options: path-filter the deploy, or split
-  resources publishing to run only when `resources/` changes.
 
 ## Cost optimization (verification & delegation)
 

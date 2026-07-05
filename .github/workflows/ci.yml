@@ -28,6 +28,8 @@ jobs:
     permissions:
       contents: write
     steps:
+      # Default shallow checkout is fine: the detect step explicitly fetches
+      # the push-base commit it diffs against.
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
@@ -35,15 +37,70 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npm run build
-      - name: Assemble site
+      - name: Detect resources/ changes
+        id: detect
+        # ~170MB of resources/ doesn't need to be re-uploaded (and gh-pages
+        # history reset via force_orphan) on every push. Only do the heavy
+        # deploy when resources/ actually changed in this push. We diff
+        # against the push base (github.event.before), not HEAD^, because a
+        # push often contains several commits and any of them may touch
+        # resources/. Any failure to determine that safely (branch creation,
+        # force push making the base unreachable, diff error) falls back to
+        # "changed" so we never silently drop resources/.
+        run: |
+          BEFORE="${{ github.event.before }}"
+          if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            echo "no usable push base (branch creation?); treating resources/ as changed" >&2
+            echo "resources_changed=true" >> "$GITHUB_OUTPUT"
+          elif ! git fetch --no-tags --depth=1 origin "$BEFORE"; then
+            echo "push base $BEFORE not fetchable (force push?); treating resources/ as changed" >&2
+            echo "resources_changed=true" >> "$GITHUB_OUTPUT"
+          elif git diff --name-only "$BEFORE" HEAD -- resources/ > /tmp/resources_diff 2>/tmp/resources_diff_err; then
+            if [ -s /tmp/resources_diff ]; then
+              echo "resources_changed=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "resources_changed=false" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "git diff failed; treating resources/ as changed" >&2
+            cat /tmp/resources_diff_err >&2
+            echo "resources_changed=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Assemble site (full, with resources)
+        # Full path: resources/ changed (or diff was inconclusive). Ships
+        # resources/ alongside the build.
+        if: steps.detect.outputs.resources_changed == 'true'
         run: |
           mkdir -p site/dist
           cp index.html site/
           cp dist/bundle.js site/dist/
           cp -r resources site/resources
-      - name: Deploy to gh-pages
+      - name: Assemble site (light, code only)
+        # Light path: resources/ unchanged. Ship only the app shell + bundle;
+        # the previously-published resources/ on gh-pages is left in place.
+        if: steps.detect.outputs.resources_changed != 'true'
+        run: |
+          mkdir -p site/dist
+          cp index.html site/
+          cp dist/bundle.js site/dist/
+      - name: Deploy to gh-pages (full, resets history)
+        # force_orphan rewrites gh-pages as a single commit, which is also
+        # how the branch's history gets periodically reset so it doesn't
+        # grow unboundedly from repeated resources/ uploads.
+        if: steps.detect.outputs.resources_changed == 'true'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./site
           force_orphan: true
+      - name: Deploy to gh-pages (light, preserves resources/)
+        # keep_files preserves files already on gh-pages (i.e. resources/)
+        # that aren't in publish_dir this run. Note: peaceiris/actions-gh-pages
+        # docs say keep_files and force_orphan should not be combined, so
+        # these two deploy steps are mutually exclusive by design.
+        if: steps.detect.outputs.resources_changed != 'true'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+          keep_files: true
