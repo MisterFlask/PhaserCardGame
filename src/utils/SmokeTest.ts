@@ -1,0 +1,331 @@
+// SmokeTest.ts
+//
+// A single debug entry point that drives the full sortie loop
+// (HQ -> dispatch -> combat -> payout -> HQ -> save/reload) programmatically
+// and reports a compact JSON result. Replaces the 8-12 manual eval
+// round-trips previously needed to verify the game loop by hand.
+//
+// Scene-level driver code: this file is allowed to touch Phaser (unlike
+// src/campaign/, which must stay Phaser-free). It does not add or change
+// any game rules; it only pokes the existing UI the same way a player would.
+//
+// Usage from the browser console: `await window.runSmokeTest()`.
+
+import { Contract } from '../campaign/Contract';
+import { SortieManager } from '../campaign/SortieManager';
+import { PlayerCharacter } from '../gamecharacters/PlayerCharacter';
+import { GameState } from '../rules/GameState';
+import { CampaignSerializer } from '../saveload/CampaignSerializer';
+import { CampaignUiState } from '../screens/campaign/hq_ux/CampaignUiState';
+import { SceneChanger } from '../screens/SceneChanger';
+import { ActionManager } from './ActionManager';
+
+export interface SmokeTestStep {
+    name: string;
+    ok: boolean;
+    detail: string;
+}
+
+export interface SmokeTestResult {
+    passed: boolean;
+    steps: SmokeTestStep[];
+    errors: string[];
+}
+
+const SQUAD_SIZE = 3;
+const DEFAULT_TIMEOUT_MS = 15000;
+const POLL_INTERVAL_MS = 50;
+
+/** Thrown internally to abort the harness cleanly from any step. */
+class SmokeTestFailure extends Error {}
+
+async function waitFor(predicate: () => boolean, timeoutMs: number, description: string): Promise<void> {
+    const start = Date.now();
+    while (!predicate()) {
+        if (Date.now() - start > timeoutMs) {
+            throw new SmokeTestFailure(`Timed out waiting for: ${description}`);
+        }
+        await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
+    }
+}
+
+/** Finds the live game object anywhere in a scene's display list by predicate (depth-first). */
+function findInScene<T extends Phaser.GameObjects.GameObject>(
+    scene: Phaser.Scene,
+    predicate: (obj: Phaser.GameObjects.GameObject) => boolean
+): T | null {
+    const visit = (list: readonly Phaser.GameObjects.GameObject[]): T | null => {
+        for (const obj of list) {
+            if (predicate(obj)) return obj as T;
+            const children = (obj as unknown as { list?: Phaser.GameObjects.GameObject[] }).list;
+            if (Array.isArray(children)) {
+                const found = visit(children);
+                if (found) return found;
+            }
+        }
+        return null;
+    };
+    return visit(scene.children.list);
+}
+
+function getActiveScene(): Phaser.Scene | null {
+    return SceneChanger.getCurrentScene();
+}
+
+function currentSceneKey(): string {
+    return getActiveScene()?.scene.key ?? '(none)';
+}
+
+/** Dismisses the post-combat card-reward screen and any board event popup that
+ *  may appear (SortieManager has a chance of interrupting a sortie combat
+ *  with a narrative event). Both are plain TextBoxButton-derived buttons that
+ *  respond to a synthetic 'pointerdown' emit, same as the mapButton pattern. */
+function dismissBlockingPopups(scene: Phaser.Scene): string[] {
+    const dismissed: string[] = [];
+
+    // General reward screen's "Done" button (see GeneralRewardScreen.ts).
+    const doneButton = findInScene<Phaser.GameObjects.GameObject>(
+        scene,
+        obj => (obj as unknown as { textBoxName?: string }).textBoxName === 'doneButton'
+    );
+    if (doneButton) {
+        doneButton.emit('pointerdown');
+        dismissed.push('reward-screen-done');
+    }
+
+    // Narrative event window: click the first enabled choice (EventButton
+    // instances are TextBoxButton containers added directly to the scene;
+    // constructor name is the only public tag available without touching
+    // CombatUiManager, which is owned by another agent).
+    const eventChoice = findInScene<Phaser.GameObjects.GameObject>(
+        scene,
+        obj => obj.constructor?.name === 'EventButton'
+    );
+    if (eventChoice) {
+        eventChoice.emit('pointerdown');
+        dismissed.push('event-choice');
+    }
+
+    return dismissed;
+}
+
+/** Picks the first fit-for-duty soldiers off the roster, generically (no
+ *  hard-coded names), enough to fill a squad. */
+function pickSquad(campaign: CampaignUiState): PlayerCharacter[] {
+    return campaign.roster.filter(c => c.isFitForDuty).slice(0, SQUAD_SIZE);
+}
+
+async function runSteps(steps: SmokeTestStep[]): Promise<void> {
+    const record = (name: string, ok: boolean, detail: string) => {
+        steps.push({ name, ok, detail });
+    };
+
+    const listenerCountsAtStart = captureListenerCounts();
+    // ActionQueue.lastErrors is a rolling buffer that persists across harness
+    // runs within the same page session; only errors recorded from this point
+    // on belong to this run.
+    const actionQueueErrorCountAtStart = ActionManager.getInstance().actionQueue.lastErrors.length;
+
+    // --- Step 1: starting point ------------------------------------------------
+    // A true fresh-campaign reset goes through window.location.reload()
+    // (see MainHubPanel.navigateTo, "New Campaign"), which the harness cannot
+    // survive (it would blow away its own JS context mid-run). Per the task's
+    // documented decision point, we instead require "currently at HQ,
+    // mid-campaign" as the clean starting point and note this limitation in
+    // the result detail.
+    const campaign = CampaignUiState.getInstance();
+    const gameState = GameState.getInstance();
+
+    await waitFor(() => currentSceneKey() === 'HqScene', DEFAULT_TIMEOUT_MS, 'HqScene to be active');
+    record('at-hq', true,
+        'Running from current campaign state at HQ (fresh-campaign reset requires a page reload; ' +
+        'harness cannot survive that, so it drives from "current campaign, at HQ" instead).');
+
+    // --- Step 2: dispatch a contract --------------------------------------------
+    campaign.ensureContractsPopulated();
+    const contract: Contract | undefined = campaign.availableContracts[0];
+    if (!contract) {
+        throw new SmokeTestFailure('No contracts available on the board to dispatch.');
+    }
+    const squad = pickSquad(campaign);
+    if (squad.length < SQUAD_SIZE) {
+        throw new SmokeTestFailure(`Roster does not have ${SQUAD_SIZE} fit-for-duty soldiers (found ${squad.length}).`);
+    }
+
+    const moneyBeforeSortie = gameState.moneyInVault;
+    campaign.selectedContract = contract;
+    SortieManager.getInstance().startSortie(contract, squad);
+
+    await waitFor(() => currentSceneKey() === 'CombatScene', DEFAULT_TIMEOUT_MS, 'CombatScene to launch after dispatch');
+    record('dispatch', true, `Dispatched contract "${contract.name}" (${contract.numCombats} combat(s)) with a squad of ${squad.length}.`);
+
+    // --- Step 3: run the sortie's combat(s) to a win -----------------------------
+    let combatsWon = 0;
+    const sortie = SortieManager.getInstance();
+    while (sortie.isActive()) {
+        await waitFor(() => currentSceneKey() === 'CombatScene', DEFAULT_TIMEOUT_MS, 'CombatScene active for next fight');
+        const scene = getActiveScene();
+        if (!scene) throw new SmokeTestFailure('No active scene while combat expected.');
+
+        // Zero every enemy's hitpoints on every poll tick until the win
+        // registers. A single one-shot zero races with cleanupAndRestartCombat
+        // (the encounter's enemies may not be populated into combatState yet
+        // when this scene transition is first observed, and a fresh encounter
+        // for combat #2 of a multi-combat sortie needs its own zeroing pass).
+        const mapButton = await waitForMapButton(scene);
+        await waitFor(() => {
+            GameState.getInstance().combatState.enemies.forEach(enemy => { enemy.hitpoints = 0; });
+            return mapButtonReadyToAdvance(scene);
+        }, DEFAULT_TIMEOUT_MS, 'combat-won state (mapButton glow/advance ready)');
+
+        // A card-reward screen (and possibly a narrative event) may be
+        // blocking the map button; clear them the same way a player would.
+        await waitFor(() => {
+            dismissBlockingPopups(scene);
+            return true;
+        }, DEFAULT_TIMEOUT_MS, 'popup dismissal pass');
+        // Give any tweens/animations a beat to clear before the next click.
+        await new Promise(resolve => setTimeout(resolve, 150));
+        dismissBlockingPopups(scene);
+
+        const sortieCombatsRemainingBefore = sortie.combatsRemaining();
+        mapButton.emit('pointerdown');
+        mapButton.emit('pointerup');
+        combatsWon++;
+
+        if (sortieCombatsRemainingBefore > 1) {
+            // Another combat in this sortie: expect a fresh CombatScene.
+            await waitFor(() => sortie.combatsRemaining() < sortieCombatsRemainingBefore || !sortie.isActive(),
+                DEFAULT_TIMEOUT_MS, 'sortie to advance to next combat');
+        }
+    }
+
+    await waitFor(() => currentSceneKey() === 'HqScene', DEFAULT_TIMEOUT_MS, 'return to HqScene after sortie resolves');
+    record('combat', true, `Won ${combatsWon} combat(s) across the sortie.`);
+
+    // --- Step 4: payout landed, back at HQ --------------------------------------
+    // The debrief panel (SortieReportPanel) may be showing; file it like a player would.
+    const hqScene = getActiveScene();
+    if (hqScene) {
+        const fileReportButton = findInScene<Phaser.GameObjects.GameObject>(
+            hqScene,
+            obj => (obj as unknown as { getText?: () => string }).getText?.()?.includes('File the Report') ?? false
+        );
+        if (fileReportButton) {
+            fileReportButton.emit('pointerdown');
+        }
+    }
+    await waitFor(() => !SortieManager.getInstance().hasUnviewedReport, DEFAULT_TIMEOUT_MS, 'sortie debrief to be filed');
+
+    const moneyAfterSortie = GameState.getInstance().moneyInVault;
+    const moneyChanged = moneyAfterSortie !== moneyBeforeSortie;
+    if (!moneyChanged) {
+        throw new SmokeTestFailure(
+            `moneyInVault did not change after sortie resolution (before=${moneyBeforeSortie}, after=${moneyAfterSortie}).`
+        );
+    }
+    record('payout', true, `moneyInVault ${moneyBeforeSortie} -> ${moneyAfterSortie}.`);
+
+    // --- Step 5: save/reload round-trip, HQ-only per house rule 4 ----------------
+    if (currentSceneKey() !== 'HqScene') {
+        throw new SmokeTestFailure(`Refusing to save/reload outside HqScene (currently ${currentSceneKey()}).`);
+    }
+    const preSave = {
+        vault: GameState.getInstance().moneyInVault,
+        rosterSize: campaign.roster.length,
+        week: campaign.calendar.week,
+    };
+    const save = CampaignSerializer.toSave();
+    CampaignSerializer.applySave(save);
+    const postReload = {
+        vault: GameState.getInstance().moneyInVault,
+        rosterSize: CampaignUiState.getInstance().roster.length,
+        week: CampaignUiState.getInstance().calendar.week,
+    };
+    const roundTripOk = preSave.vault === postReload.vault
+        && preSave.rosterSize === postReload.rosterSize
+        && preSave.week === postReload.week;
+    if (!roundTripOk) {
+        throw new SmokeTestFailure(
+            `Save/reload round-trip mismatch: before=${JSON.stringify(preSave)} after=${JSON.stringify(postReload)}.`
+        );
+    }
+    record('save-reload', true,
+        `Round-trip via CampaignSerializer preserved vault=£${postReload.vault}, roster=${postReload.rosterSize}, week=${postReload.week}.`);
+
+    // --- Step 6: cross-cutting assertions ----------------------------------------
+    // lastErrors is a capped rolling buffer (see ActionQueue.lastErrors); only
+    // count errors that landed after this run started.
+    const newActionQueueErrors = ActionManager.getInstance().actionQueue.lastErrors
+        .slice(actionQueueErrorCountAtStart);
+    if (newActionQueueErrors.length > 0) {
+        throw new SmokeTestFailure(
+            `ActionQueue recorded ${newActionQueueErrors.length} new error(s) during this run: ${JSON.stringify(newActionQueueErrors)}`
+        );
+    }
+
+    const listenerCountsAtEnd = captureListenerCounts();
+    const grew = Object.entries(listenerCountsAtEnd).filter(
+        ([key, count]) => count > (listenerCountsAtStart[key] ?? 0)
+    );
+    if (grew.length > 0) {
+        throw new SmokeTestFailure(
+            `Listener count(s) grew across the loop: ${grew.map(([k, v]) => `${k}: ${listenerCountsAtStart[k] ?? 0} -> ${v}`).join(', ')}`
+        );
+    }
+    record('assertions', true,
+        `No action-queue errors; listener counts stable (${JSON.stringify(listenerCountsAtEnd)}).`);
+}
+
+/** Snapshot of the listener counts previously identified as prone to
+ *  accumulation (commit b8ce9b1): HqScene's navigate/returnToHub handlers. */
+function captureListenerCounts(): Record<string, number> {
+    const hqScene = (window as any).game?.scene?.getScene?.('HqScene') as Phaser.Scene | undefined;
+    if (!hqScene) return {};
+    return {
+        'HqScene.navigate': hqScene.events.listenerCount('navigate'),
+        'HqScene.returnToHub': hqScene.events.listenerCount('returnToHub'),
+    };
+}
+
+async function waitForMapButton(scene: Phaser.Scene): Promise<Phaser.GameObjects.GameObject> {
+    let button: Phaser.GameObjects.GameObject | null = null;
+    await waitFor(() => {
+        button = findInScene<Phaser.GameObjects.GameObject>(
+            scene,
+            obj => (obj as unknown as { textBoxName?: string }).textBoxName === 'mapButton'
+        );
+        return button !== null;
+    }, DEFAULT_TIMEOUT_MS, 'mapButton to exist in the combat scene');
+    return button!;
+}
+
+/** True once the scene has flipped combatEndHandled (mapButton text moves off
+ *  the default "Objective" label — see CombatAndMapScene.update()). */
+function mapButtonReadyToAdvance(scene: Phaser.Scene): boolean {
+    const button = findInScene<Phaser.GameObjects.GameObject>(
+        scene,
+        obj => (obj as unknown as { textBoxName?: string }).textBoxName === 'mapButton'
+    ) as unknown as { getText?: () => string } | null;
+    // getText() returns raw BBCode (e.g. "[stroke]Continue[/stroke]"), so match
+    // on substring rather than exact equality.
+    const label = button?.getText?.() ?? '';
+    return label.includes('Continue') || label.includes('Return to HQ');
+}
+
+export async function runSmokeTest(): Promise<SmokeTestResult> {
+    const steps: SmokeTestStep[] = [];
+    try {
+        await runSteps(steps);
+        return { passed: true, steps, errors: [] };
+    } catch (e) {
+        const message = e instanceof Error ? e.message : String(e);
+        // Steps already recorded before the failure stay in the result;
+        // never throw out of the harness.
+        return {
+            passed: false,
+            steps,
+            errors: [message],
+        };
+    }
+}

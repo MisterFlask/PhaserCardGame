@@ -26,6 +26,7 @@ import { ActionManager } from '../utils/ActionManager';
 import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
 import ImageUtils from '../utils/ImageUtils';
 import { installLoaderWatchdog } from '../utils/LoaderWatchdog';
+import { runSmokeTest } from '../utils/SmokeTest';
 import { HqScene } from './campaign/hq_ux/HqScene';
 import { SceneChanger } from './SceneChanger';
 import { CampaignBriefStatus } from './subcomponents/CampaignBriefStatus';
@@ -496,5 +497,8 @@ installBackgroundStepper();
 // Registry doubles as a console factory for buffs/cards during testing.
 (window as any).SaveRegistries = SaveRegistries;
 (window as any).getActionQueueErrors = () => ActionManager.getInstance().actionQueue.lastErrors;
+// Drives the full sortie loop (HQ -> dispatch -> combat -> payout -> HQ ->
+// save/reload) headlessly and reports compact JSON; see src/utils/SmokeTest.ts.
+(window as any).runSmokeTest = () => runSmokeTest();
 
 export default CombatScene;
