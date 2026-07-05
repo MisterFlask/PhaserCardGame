@@ -82,12 +82,16 @@ export class ActionManager {
     }
 
     emitEvent(eventName: string, args: any) {
-        this.scene.events.emit(eventName, args);
+        if (this.sceneIsLive()) {
+            this.scene.events.emit(eventName, args);
+        }
     }
 
     cleanupAndRestartCombat(data: CombatSceneData) {
         console.log("ActionManager: cleanupAndRestartCombat emitted with ", data);
-        this.scene.events.emit("cleanupAndRestartCombat", data);
+        if (this.sceneIsLive()) {
+            this.scene.events.emit("cleanupAndRestartCombat", data);
+        }
     }
 
     gainEnergy(amount: number) {
@@ -99,8 +103,9 @@ export class ActionManager {
     }
     
     pulseBuff(buff: AbstractBuff) {
-        this.scene.events.emit('pulseBuff', buff.id);
-
+        if (this.sceneIsLive()) {
+            this.scene.events.emit('pulseBuff', buff.id);
+        }
     }
 
     destroyCardInMasterDeck(card: PlayableCard) {
@@ -250,11 +255,25 @@ export class ActionManager {
     }
 
     private static instance: ActionManager;
-    private actionQueue: ActionQueue;
+    private _actionQueue: ActionQueue;
     public scene!: Scene;
 
+    public get actionQueue(): ActionQueue {
+        return this._actionQueue;
+    }
+
     private constructor() { // Modified constructor
-        this.actionQueue = new ActionQueue();
+        this._actionQueue = new ActionQueue();
+    }
+
+    private sceneIsLive(): boolean {
+        return !!this.scene && !!this.scene.sys && this.scene.sys.isActive();
+    }
+
+    public emitActionQueueError(entry: { action: string; message: string; atMs: number }) {
+        if (this.sceneIsLive()) {
+            this.scene.events.emit('actionQueueError', entry);
+        }
     }
 
 
@@ -272,6 +291,11 @@ export class ActionManager {
         }
         this.getInstance().scene = scene;
         this.getInstance().actionQueue.clear();
+        scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+            if (ActionManager.getInstance().scene === scene) {
+                ActionManager.getInstance().actionQueue.clear();
+            }
+        });
     }
 
     public static getInstance(): ActionManager { // Modified getInstance
@@ -838,14 +862,15 @@ export class ActionManager {
     public animateAttackerTilt(attacker: IPhysicalCardInterface): void {
         this.actionQueue.addAction(new GenericAction(async () => {
             // Tilt to the right
-
-            this.scene.tweens.add({
-                targets: attacker.container,
-                angle: 15,
-                duration: 100,
-                yoyo: true,
-                ease: 'Power1'
-            });
+            if (this.sceneIsLive()) {
+                this.scene.tweens.add({
+                    targets: attacker.container,
+                    angle: 15,
+                    duration: 100,
+                    yoyo: true,
+                    ease: 'Power1'
+                });
+            }
 
             // Wait for the tilt animation to complete
             await new WaitAction(200).playAction();
@@ -863,34 +888,36 @@ export class ActionManager {
      */
     private animateDefenderJiggleAndGlow(defender: IPhysicalCardInterface, color: number): void {
         this.actionQueue.addAction(new GenericAction(async () => {
-            // Jiggle the defender
-            this.scene.tweens.add({
-                targets: defender.container,
-                x: defender.container.x + 10,
-                duration: 100,
-                yoyo: true,
-                repeat: 2,
-                ease: 'Power1'
-            });
+            if (this.sceneIsLive()) {
+                // Jiggle the defender
+                this.scene.tweens.add({
+                    targets: defender.container,
+                    x: defender.container.x + 10,
+                    duration: 100,
+                    yoyo: true,
+                    repeat: 2,
+                    ease: 'Power1'
+                });
 
-            var bg = defender.cardBackground;
-            // Glow effect based on damage
-            if (bg instanceof Phaser.GameObjects.Image) {
-                this.scene.tweens.add({
-                    targets: defender.cardBackground,
-                    tint: color,
-                    duration: 100,
-                    yoyo: true,
-                    ease: 'Power1'
-                });
-            } else if (bg instanceof Phaser.GameObjects.Rectangle) {
-                this.scene.tweens.add({
-                    targets: defender.cardBackground,
-                    fillColor: color,
-                    duration: 100,
-                    yoyo: true,
-                    ease: 'Power1'
-                });
+                var bg = defender.cardBackground;
+                // Glow effect based on damage
+                if (bg instanceof Phaser.GameObjects.Image) {
+                    this.scene.tweens.add({
+                        targets: defender.cardBackground,
+                        tint: color,
+                        duration: 100,
+                        yoyo: true,
+                        ease: 'Power1'
+                    });
+                } else if (bg instanceof Phaser.GameObjects.Rectangle) {
+                    this.scene.tweens.add({
+                        targets: defender.cardBackground,
+                        fillColor: color,
+                        duration: 100,
+                        yoyo: true,
+                        ease: 'Power1'
+                    });
+                }
             }
 
             // Wait for the jiggling and glow animation to complete
@@ -1049,28 +1076,30 @@ export class ActionManager {
 
         console.log(`Displaying damage number: ${damageAmount} for ${target.name}`);
         this.actionQueue.addAction(new GenericAction(async () => {
-            const scene = this.scene;
-            const text = scene.add.text(
-                target.physicalCard!.container.x, 
-                target.physicalCard!.container.y - 50, // Position above the card
-                damageAmount.toString(), 
-                {
-                    font: 'bold 32px Arial',
-                    color: '#ffffff',
-                    stroke: color,//'#000000',
-                    strokeThickness: 2
-                }
-            );
-            text.setDepth(2000);
+            if (this.sceneIsLive()) {
+                const scene = this.scene;
+                const text = scene.add.text(
+                    target.physicalCard!.container.x,
+                    target.physicalCard!.container.y - 50, // Position above the card
+                    damageAmount.toString(),
+                    {
+                        font: 'bold 32px Arial',
+                        color: '#ffffff',
+                        stroke: color,//'#000000',
+                        strokeThickness: 2
+                    }
+                );
+                text.setDepth(2000);
 
-            scene.tweens.add({
-                targets: text,
-                y: text.y - 50, // Drift upwards
-                alpha: 0, // Fade out
-                duration: 3000, // 1 second
-                ease: 'Power1',
-                onComplete: () => text.destroy()
-            });
+                scene.tweens.add({
+                    targets: text,
+                    y: text.y - 50, // Drift upwards
+                    alpha: 0, // Fade out
+                    duration: 3000, // 1 second
+                    ease: 'Power1',
+                    onComplete: () => text.destroy()
+                });
+            }
 
             await new WaitAction(1).playAction(); // Not really waiting.
             return [];
@@ -1128,6 +1157,19 @@ export class ActionQueue {
         this.isResolving = false;
     }
 
+    public lastErrors: { action: string; message: string; atMs: number }[] = [];
+
+    private recordError(actionName: string, err: unknown) {
+        this.lastErrors.push({
+            action: actionName,
+            message: err instanceof Error ? (err.stack ?? err.message) : String(err),
+            atMs: Date.now()
+        });
+        if (this.lastErrors.length > 20) {
+            this.lastErrors.shift();
+        }
+    }
+
     private queue: ActionNode[] = [];
     private currentActionNode: ActionNode | null = null;
     private isResolving: boolean = false;
@@ -1141,6 +1183,7 @@ export class ActionQueue {
         if (!this.isResolving) {
             this.resolveActions().catch(err => {
                 console.error("Action Queue encountered an error while resolving actions:", err);
+                this.recordError("ActionQueue.resolveActions", err);
                 this.isResolving = false;
             });
         }
@@ -1165,11 +1208,15 @@ export class ActionQueue {
 
                 newActions = await timedPromise.catch(err => {
                     console.error(`Action "${currentNode.action.constructor.name}" failed and was skipped:`, err);
+                    const actionName = currentNode.action.constructor.name;
+                    this.recordError(actionName, err);
+                    ActionManager.getInstance().emitActionQueueError(this.lastErrors[this.lastErrors.length - 1]);
                     return [];
                 });
 
             } catch (outerErr) {
                 console.error("Unexpected error in resolveActions loop:", outerErr);
+                this.recordError(currentNode.action.constructor.name, outerErr);
             }
 
             try {

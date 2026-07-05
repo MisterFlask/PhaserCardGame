@@ -480,9 +480,11 @@ function installBackgroundStepper(): void {
             new Blob([workerSource], { type: 'application/javascript' })
         ));
         worker.onmessage = step;
+        window.addEventListener('beforeunload', () => worker.terminate());
     } catch {
         // Worker unavailable (e.g. strict CSP): degrade to throttled stepping.
-        setInterval(step, 100);
+        const intervalId = setInterval(step, 100);
+        window.addEventListener('beforeunload', () => clearInterval(intervalId));
     }
 }
 installBackgroundStepper();
@@ -493,5 +495,6 @@ installBackgroundStepper();
 (window as any).getCampaignState = () => CampaignUiState.getInstance();
 // Registry doubles as a console factory for buffs/cards during testing.
 (window as any).SaveRegistries = SaveRegistries;
+(window as any).getActionQueueErrors = () => ActionManager.getInstance().actionQueue.lastErrors;
 
 export default CombatScene;

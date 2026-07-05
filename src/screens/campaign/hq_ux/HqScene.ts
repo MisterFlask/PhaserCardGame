@@ -104,7 +104,11 @@ export class HqScene extends Scene {
             this.showPanel('main');
         }
 
-        // Set up event listeners
+        // Set up event listeners. create() re-runs on every sortie return, so
+        // clear any prior registrations first to avoid stale-closure leaks.
+        this.events.off('navigate');
+        this.events.off('returnToHub');
+
         this.events.on('navigate', (destination: string) => {
             if (this.isCampaignOver()) {
                 this.showPanel('ending');
@@ -185,12 +189,5 @@ export class HqScene extends Scene {
         if (this.currentPanel && 'update' in this.currentPanel) {
             (this.currentPanel as any).update(time, delta);
         }
-    }
-
-    shutdown(): void {
-        // Clean up event listeners
-        this.events.off('navigate');
-        this.events.off('returnToHub');
-        this.events.off('launchExpedition');
     }
 }

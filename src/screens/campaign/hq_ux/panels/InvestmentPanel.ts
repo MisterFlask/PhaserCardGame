@@ -1,4 +1,4 @@
-import { Scene } from 'phaser';
+import Phaser, { Scene } from 'phaser';
 import { GameState } from '../../../../rules/GameState';
 import { SaveManager } from '../../../../saveload/SaveManager';
 import { AbstractStrategicProject } from '../../../../strategic_projects/AbstractStrategicProject';
@@ -50,12 +50,26 @@ export class InvestmentPanel extends AbstractHqPanel {
         this.add(this.uiContainer);
         
         // Listen for funds changed events
-        scene.events.on('fundsChanged', this.updatePoundsDisplay, this);
+        const onFundsChanged = this.updatePoundsDisplay.bind(this);
+        scene.events.on('fundsChanged', onFundsChanged);
 
         // Setup event handlers for project card interactions
-        scene.events.on('projectHovered', this.onProjectHovered, this);
-        scene.events.on('projectUnhovered', this.onProjectUnhovered, this);
-        scene.events.on('projectClicked', this.onProjectClicked, this);
+        const onProjectHovered = this.onProjectHovered.bind(this);
+        const onProjectUnhovered = this.onProjectUnhovered.bind(this);
+        const onProjectClicked = this.onProjectClicked.bind(this);
+        scene.events.on('projectHovered', onProjectHovered);
+        scene.events.on('projectUnhovered', onProjectUnhovered);
+        scene.events.on('projectClicked', onProjectClicked);
+
+        // create() re-runs this constructor on every sortie return; remove
+        // these listeners on scene shutdown so stale panel closures don't
+        // accumulate across sorties.
+        scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+            scene.events.off('fundsChanged', onFundsChanged);
+            scene.events.off('projectHovered', onProjectHovered);
+            scene.events.off('projectUnhovered', onProjectUnhovered);
+            scene.events.off('projectClicked', onProjectClicked);
+        });
 
         // Create the tree container
         this.treeContainer = scene.add.container(120, 300); // Add padding: 120px left, 300px from top
