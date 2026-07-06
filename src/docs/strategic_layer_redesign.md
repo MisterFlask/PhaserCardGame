@@ -124,6 +124,13 @@ The push-your-luck trading identity survives as contract variety:
 
 ## Strategic Projects
 
+> **AMENDED July 2026 — see "Amendment: Standing Orders" below.** The
+> single-track "buy a project, keep it forever" model described in this
+> section is superseded. Projects split into two tracks: permanent **Capital
+> Works** and slot-limited, swappable **Standing Orders**. The six families
+> and the design rule survive; what changed is which track each effect
+> belongs to.
+
 ### Design rule
 
 > A strategic project must do at least one of: (a) change which contracts you can
@@ -181,6 +188,95 @@ Prerequisites gate within families (embassy → faction projects, Foundry → Pa
 Room).
 
 ---
+
+## Amendment: Standing Orders (July 2026)
+
+**Status:** Approved direction. Supersedes the single-track project model
+above. Working name during design was "Edicts"; the in-fiction term is
+**Standing Orders** — policies ratified by the board, on the model of XCOM 2's
+resistance orders.
+
+### Motivation
+
+Two problems with projects-as-pure-purchases:
+
+1. A permanent-passive tree is a second raw-power track that competes with
+   the roster. The design wants **soldiers and their decks to be the power
+   accumulation**; the strategic layer should accumulate *flexibility*.
+2. Five of the eleven shipped projects were cargo unlocks tied to the deleted
+   trade-route layer — purchasable no-ops.
+
+### The two tracks
+
+- **Capital Works** — permanent one-time purchases, deliberately few. A
+  capital work must unlock a *capability* (Foundry: card upgrades;
+  Retraining Program: card removal; Expanded Barracks: roster cap), pay
+  **income** (Dis Municipal Bonds, Our Man in Dis), or bank **VP** (Lethe
+  Extraction Co.). No passive gameplay modifiers — those are Orders.
+- **Standing Orders** — board-ratified policies occupying limited slots,
+  swappable only at the **quarterly board meeting** (the board ratifies
+  policy changes; you cannot fiddle per-sortie). No VP. Each order changes
+  how the campaign plays: contract board shape, dividend math, roster
+  economics, sortie structure, risk/reward toggles.
+
+### Slot economy
+
+- 1 slot at campaign start; +1 at the first board meeting of years 3, 5, 7,
+  and 9 (max 5). Flavor: the board's willingness to indulge standing policy
+  grows with a proven manager.
+- One additional slot purchasable as a Capital Work (*Company Secretariat*).
+- Enacting/swapping at the meeting is free; scarcity is slots + cadence.
+
+### Where orders come from
+
+- A launch pool available from the start (8–12 orders, spanning the six
+  families above).
+- Later orders unlock via Capital Works (embassies unlock faction orders)
+  and — future hook — via repeat business with contract **clients** (e.g.
+  fulfil three Infernal Marine contracts → they offer their *Underwriting
+  Retainer*). Clients were added to contracts July 2026; this is the natural
+  mechanical payoff for them.
+
+### Launch order sketch (names indicative, all £-frame corporate register)
+
+| Order | Effect | Family |
+|---|---|---|
+| Aggressive Tendering | contract board refills to 6, not 5 | board manipulation |
+| Punctuality Clause | contract deadlines +1 week | board manipulation |
+| Hazard Pay Schedule | payouts +20%, wounds heal 1 week slower | risk toggle |
+| Recruiting Sergeants | recruit cost −40% | roster |
+| Phrenology Retainer | therapy −50% cost | roster |
+| Actuarial Review | see enemy composition before dispatch | intelligence |
+| Archives Standing Order | card rewards offer 4 choices, not 3 | sortie shape |
+| Investor Relations Retainer | dividend expectation escalates 25% slower | dividend math |
+| Creative Accounting | 15% of payouts off-ledger (don't raise future expectations); audit risk | dividend math |
+
+### Retrofit of the shipped eleven
+
+| Existing | Disposition |
+|---|---|
+| The Foundry | Capital Work (unchanged) |
+| Retraining Program | Capital Work (unchanged) |
+| Dis Municipal Bonds | Capital Work — income (unchanged) |
+| Our Man in Dis | Capital Work — income; embassy upgrade later |
+| Lethe Extraction Co. | Capital Work — pure VP (unchanged) |
+| Abyssal Research Institute | becomes a Standing Order (extra card reward at sortie start); rewrite "run" → "sortie" |
+| Levi-Maxwell Ascension Protocol | **pulled from pool** (cargo; parked for v2 VP capstone) |
+| Smythe-Bowyer Poppy Fields | **pulled from pool** until trade-run contracts exist |
+| Blue-Room Reading Societies | **pulled from pool**; returns as stress-treatment Capital Work |
+| Revolutionary Contacts | **pulled from pool**; returns as Stoker's Union embassy |
+| Phlegethon Coalfalls | **pulled from pool** until trade-run contracts exist |
+
+### Implementation shape (v1)
+
+1. StandingOrder model (pure, Phaser-free, registry-driven per house rule 6) +
+   slot state on CampaignUiState; save format bump.
+2. Ratification UI at the quarterly board meeting; InvestmentPanel splits
+   into Capital Works and Standing Orders sections.
+3. Launch orders wired through hooks in ContractGenerator, calendar math,
+   barracks costs, and reward flow — effects as injection points, not
+   if-this-order branches.
+4. Pull the five dead cargo projects from the purchasable pool.
 
 ## Roster & Consequences
 

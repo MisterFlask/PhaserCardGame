@@ -20,17 +20,55 @@ protocol. Ordered within sections by priority. Delete items when done.
   BarracksPanel (personnel ledger), SortieReportPanel (typed field report),
   EndOfCampaignPanel (board minutes), InvestmentPanel still use old styling.
   Get owner reaction to the contract board's level of ornament first.
-- **Strategic project retrofits** — the design doc
-  (`src/docs/strategic_layer_redesign.md`) specifies six project families
-  (embassies, intelligence, board management...); most existing projects are
-  income stubs, and "Our Man in Dis" carries an interim £35/quarter effect
-  pending its real design (Dis embassy + free scouted contract).
+- **Standing Orders system** — approved July 2026; full design in
+  `src/docs/strategic_layer_redesign.md` § "Amendment: Standing Orders".
+  Projects split into permanent Capital Works and slot-limited, swappable
+  Standing Orders (XCOM 2 resistance orders). Implementation shape is in the
+  amendment. Includes pulling the five dead cargo projects from the
+  purchasable pool (they currently sell no-op effects).
 - **Contract board hero slot** — art-director critique item: no visual entry
   point among equal-weight notices. Deferred; needs a "priority contract"
   concept.
 - **Recruit pool save-scumming** — recruit candidates aren't serialized, so
   reloading rerolls them. Harmless now; fix by seeding their generation if it
   starts to matter.
+
+## Flavor (from the July 2026 flavor audit)
+
+- **Recruit name generator** — `src/gamecharacters/CharacterNameGenerator.ts`
+  produces modern fantasy names (Luna, Blaze, Knox), no surnames. Replace
+  with period British given names + surnames. Sharpest voice break in the
+  game; cheap fix. (Also: `CharacterGenerator.generateRandomCharacter()`
+  hardcodes `Gender.Female` for all recruits — fix in passing.)
+- **Shipped placeholder/debug text sweep** — Cog class `longDescription =
+  "INSERT DESCRIPTION HERE"` (CogClass.ts); enemy-summoned card named
+  "Afpoiasdoif" (Artiste.ts); `debug:killAllEnemies` /
+  `debug:addTestConsumables` / `Toggle Game Areas` in the player-facing
+  combat pause menu (CombatUiManager.ts); "DEBUG: Reroll" on
+  CardRewardScreen; "Commadore Snow" typo (TheFrostChancellor.ts); persona
+  trait "Badass" needs a period name.
+- **Company name canon** — three names in circulation: "The East Inferno
+  Company" (MainHubPanel), "The Third Circle Company" (worldbuilding.md +
+  ArchonClass), "East Infernal Company" (repo working title). NEEDS OWNER
+  DECISION, then a sweep.
+- **Act 2/3 enemy flavor pass** — Act 1 enemies have first-person
+  Cavendish-journal descriptions; Act 2/3 enemies and both later bosses have
+  one-liners. Bring them up to Act 1's standard (now canonically Cavendish's
+  survey notes — see worldbuilding.md narrator section).
+- **Onboarding letter** — no framing text exists for a new campaign; player
+  boots into live HUD numbers. Approved shape: Cavendish's first letter to
+  the incoming manager (introduces himself, the charter, the dividend
+  clock). Also fits the EndOfCampaignPanel's register.
+- **Player-side flavor lines** — cards, cargo, relics, buffs are
+  mechanics-only text. Add a one-line flavor field where it pays most:
+  cargo first (opium/spicy literature jokes going unused), then relics.
+- **Combat resolution framing** — no victory/defeat acknowledgment text;
+  reward screen closes with bare "Done". Cheap thematic wrappers.
+- **Doc repair** — worldbuilding.md has no Deep France entry (an entire act
+  exists only in code); faction reps reference dead mechanics ("commerce
+  nodes", "future runs"); overall_game_concept.md describes the deleted
+  caravan-run design and says 1880 vs worldbuilding's 1890. Fix so content
+  agents have a true standard.
 
 ## Engineering
 

@@ -116,8 +116,52 @@ demands you bring him rare filaments or smc samples so he can “catalog” them
 
 
 
-# APPENDIX A: EXAMPLES OF EVENTS (for style purposes)
-.. todo.
+# THE NARRATOR: HARRY CAVENDISH
+
+Cavendish is the Company's **field factor**: the certifying officer who
+accompanies every sortie because someone with signing authority must certify
+completion before the client can be invoiced. He is not a soldier, appears on
+no muster roll, and is never wounded — he has a superb instinct for standing
+well back. He is a Flashman expy: a decorated fraud whose reputation rests on
+accidents survived and credit adroitly claimed. His dispatches subtly position
+him for praise if things go well and deniability if they don't. He never
+admits fear in so many words; the reader should nonetheless be able to tell
+he ran first.
+
+His permanent personal staff — NOT roster soldiers, never at risk of
+recruitment or deployment — are **Morrison** (his long-suffering batman),
+**Thompson** and **Jenkins** (clerks).
+
+**Frame:** the player is the Company's manager at HQ. Narrative events are
+Cavendish's field dispatches wired back to HQ mid-sortie; the player's
+choices are the manager's terse replies. The mercenaries are contractually
+barred from decisions above their pay grade — that is why the field waits,
+under fire, for your wire. The comic engine is the contrast between
+Cavendish's rattled prose and the manager's twelve-word authorized reply.
+
+# EVENT STYLE RULES
+
+- **Length is a hard constraint.** Event body ≤ 90 words (aim 60–80). Choice
+  labels ≤ 10 words. Outcome text ≤ 40 words. Players have limited patience
+  for reading; every sentence must earn its place.
+- Events are framed as dispatches from Cavendish (a wire, a report, a
+  marginal note on an expense claim — vary the vehicle, keep the voice).
+- Choices read as the manager's replies (e.g. "WIRE: Authorize. Bill the
+  client.").
+- Angels speak in [color=white]ALL CAPS[/color]. Money is £; "obols" may
+  appear as local coinage color but any mechanical sum is £.
+
+# APPENDIX A: EXAMPLE EVENT (for style purposes)
+
+> DISPATCH — Styx Delta.
+> Found a tattoo parlour in the reeds. The proprietor is an angel — wings,
+> eyes, flame, all occupying the same space; my teeth ache to look at it. It
+> offers its artistry free of charge, which in my experience is the most
+> expensive kind of free. It got as far as [color=yellow]"THE ONLY COST
+> IS—"[/color] before I stepped smartly outside. Morrison, who has no
+> instinct for self-preservation whatever, is rolling up his sleeve.
+> Instructions?
+> — Cavendish
 
 
 # APPENDIX B: FORMATTING TIPS
