@@ -4,6 +4,7 @@ import { EntityRarity } from "../../EntityRarity";
 import { PlayableCard } from '../../PlayableCard';
 import { ArchonClass } from '../ArchonClass';
 import { BlackhandClass } from '../BlackhandClass';
+import { CogClass } from '../CogClass';
 import { DiabolistClass } from '../DiabolistClass';
 
 export class CardLibrary {
@@ -30,6 +31,7 @@ export class CardLibrary {
             new BlackhandClass(),
             new DiabolistClass(),
             new ArchonClass(),
+            new CogClass(),
         ];
 
         for (var c of classes) {
