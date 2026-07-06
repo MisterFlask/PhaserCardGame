@@ -7,7 +7,7 @@ import { GameState } from '../../../../rules/GameState';
 import { SaveManager } from '../../../../saveload/SaveManager';
 import { TextBoxButton } from '../../../../ui/Button';
 import { TextBox } from '../../../../ui/TextBox';
-import { CampaignUiState, RECRUIT_COST, ROSTER_CAP } from '../CampaignUiState';
+import { CampaignUiState, ROSTER_CAP } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
 
 const REMOVAL_COST = 40;
@@ -105,17 +105,18 @@ export class BarracksPanel extends AbstractHqPanel {
         // Therapy for the selected soldier
         if (this.selectedSoldier && this.selectedSoldier.stress > 0) {
             const soldier = this.selectedSoldier;
-            const canTreat = GameState.getInstance().moneyInVault >= THERAPY_COST;
+            const therapyCost = campaign.getTherapyCost(THERAPY_COST);
+            const canTreat = GameState.getInstance().moneyInVault >= therapyCost;
             const therapyButton = this.addDynamic(new TextBoxButton({
                 scene: this.scene, x: width * 0.14, y: 150 + campaign.roster.length * 52 + 15,
                 width: 400, height: 44,
-                text: `Therapy for ${soldier.name}: -${THERAPY_RELIEF} stress (£${THERAPY_COST})`,
+                text: `Therapy for ${soldier.name}: -${THERAPY_RELIEF} stress (£${therapyCost})`,
                 style: { fontSize: '14px', color: canTreat ? '#ffffff' : '#888888' },
                 fillColor: canTreat ? 0x224466 : 0x222222
             }));
             therapyButton.onClick(() => {
                 if (!canTreat) { this.setStatus('Insufficient funds.'); return; }
-                GameState.getInstance().moneyInVault -= THERAPY_COST;
+                GameState.getInstance().moneyInVault -= therapyCost;
                 const stressBuff = soldier.buffs.find(b => b.id === 'stress');
                 if (stressBuff) {
                     stressBuff.stacks = Math.max(0, stressBuff.stacks - THERAPY_RELIEF);
@@ -173,11 +174,12 @@ export class BarracksPanel extends AbstractHqPanel {
                 text: `${candidate.name} (${candidate.characterClass.name})${trait ? ' — ' + trait : ''}`,
                 style: { fontSize: '14px', color: '#ffffff' }
             }));
-            const canHire = GameState.getInstance().moneyInVault >= RECRUIT_COST
+            const recruitCost = campaign.getRecruitCost();
+            const canHire = GameState.getInstance().moneyInVault >= recruitCost
                 && campaign.roster.length < ROSTER_CAP;
             const hireButton = this.addDynamic(new TextBoxButton({
                 scene: this.scene, x: width * 0.78, y: 192 + i * 100, width: 170, height: 38,
-                text: `Hire (£${RECRUIT_COST})`,
+                text: `Hire (£${recruitCost})`,
                 style: { fontSize: '14px', color: canHire ? '#ffffff' : '#888888' },
                 fillColor: canHire ? 0x226622 : 0x222222
             }));

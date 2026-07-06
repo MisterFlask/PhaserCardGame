@@ -1,13 +1,22 @@
 import Phaser, { Scene } from 'phaser';
+import { StandingOrder } from '../../../../campaign/orders/StandingOrder';
+import { STANDING_ORDER_REGISTRY, StandingOrdersState } from '../../../../campaign/orders/StandingOrdersState';
 import { GameState } from '../../../../rules/GameState';
 import { SaveManager } from '../../../../saveload/SaveManager';
 import { AbstractStrategicProject } from '../../../../strategic_projects/AbstractStrategicProject';
 import { StrategicProjectTechTree } from '../../../../strategic_projects/StrategicProjectTechTree';
+import { TextBoxButton } from '../../../../ui/Button';
 import { PhysicalProjectCard } from '../../../../ui/PhysicalProjectCard';
 import { TextBox } from '../../../../ui/TextBox';
+import { Fonts, Palette } from '../../../../ui/UIStyle';
 import { CardGuiUtils } from '../../../../utils/CardGuiUtils';
 import { CampaignUiState } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
+
+type InvestmentTab = 'capital-works' | 'standing-orders';
+
+const ORDER_CARD_W = 480;
+const ORDER_CARD_H = 160;
 
 export class InvestmentPanel extends AbstractHqPanel {
     private projectCards: PhysicalProjectCard[] = [];
@@ -18,12 +27,18 @@ export class InvestmentPanel extends AbstractHqPanel {
     private uiContainer: Phaser.GameObjects.Container;
     private currentLayout: Map<string, { x: number, y: number }> = new Map();
 
+    private activeTab: InvestmentTab = 'capital-works';
+    private capitalWorksTabButton!: TextBoxButton;
+    private standingOrdersTabButton!: TextBoxButton;
+    private standingOrdersContainer!: Phaser.GameObjects.Container;
+    private standingOrdersDynamic: Phaser.GameObjects.GameObject[] = [];
+
     constructor(scene: Scene) {
         super(scene, 'Factory Investments');
-        
+
         // Create UI container
         this.uiContainer = scene.add.container(0, 0);
-        
+
         // Add title TextBox
         this.titleTextBox = new TextBox({
             scene: scene,
@@ -45,10 +60,10 @@ export class InvestmentPanel extends AbstractHqPanel {
             style: { fontSize: '24px', fontFamily: 'verdana', color: '#FFD700', align: 'center' }
         });
         this.uiContainer.add(this.poundsDisplay);
-        
+
         // Add UI container to panel
         this.add(this.uiContainer);
-        
+
         // Listen for funds changed events
         const onFundsChanged = this.updatePoundsDisplay.bind(this);
         scene.events.on('fundsChanged', onFundsChanged);
@@ -74,14 +89,65 @@ export class InvestmentPanel extends AbstractHqPanel {
         // Create the tree container
         this.treeContainer = scene.add.container(120, 300); // Add padding: 120px left, 300px from top
         this.add(this.treeContainer);
-        
+
         this.displayTechTree();
-        
+
+        // Tab toggle: CAPITAL WORKS <-> STANDING ORDERS
+        this.buildTabButtons();
+
+        // Standing Orders view, built on demand
+        this.standingOrdersContainer = scene.add.container(0, 0);
+        this.add(this.standingOrdersContainer);
+
         // Hide initially until explicitly shown
         this.hide();
     }
 
+    private buildTabButtons(): void {
+        const scene = this.scene;
+        const tabY = 165;
+        this.capitalWorksTabButton = new TextBoxButton({
+            scene, x: scene.scale.width / 2 - 130, y: tabY, width: 240, height: 40,
+            text: 'CAPITAL WORKS',
+            style: { fontSize: '16px', color: Palette.BRASS_TEXT, fontFamily: Fonts.DISPLAY },
+            fillColor: Palette.WOOD_PANEL
+        });
+        this.capitalWorksTabButton.onClick(() => this.setTab('capital-works'));
+        this.add(this.capitalWorksTabButton);
+
+        this.standingOrdersTabButton = new TextBoxButton({
+            scene, x: scene.scale.width / 2 + 130, y: tabY, width: 240, height: 40,
+            text: 'STANDING ORDERS',
+            style: { fontSize: '16px', color: Palette.BRASS_TEXT, fontFamily: Fonts.DISPLAY },
+            fillColor: Palette.WOOD_PANEL
+        });
+        this.standingOrdersTabButton.onClick(() => this.setTab('standing-orders'));
+        this.add(this.standingOrdersTabButton);
+
+        this.refreshTabButtons();
+    }
+
+    private refreshTabButtons(): void {
+        this.capitalWorksTabButton.setFillColor(this.activeTab === 'capital-works' ? Palette.VERDIGRIS : Palette.WOOD_PANEL);
+        this.standingOrdersTabButton.setFillColor(this.activeTab === 'standing-orders' ? Palette.VERDIGRIS : Palette.WOOD_PANEL);
+    }
+
+    private setTab(tab: InvestmentTab): void {
+        this.activeTab = tab;
+        this.refreshTabButtons();
+
+        const showCapitalWorks = tab === 'capital-works';
+        this.treeContainer.setVisible(showCapitalWorks);
+        this.poundsDisplay.setVisible(showCapitalWorks);
+        this.standingOrdersContainer.setVisible(!showCapitalWorks);
+
+        if (!showCapitalWorks) {
+            this.rebuildStandingOrders();
+        }
+    }
+
     show(): void {
+        this.setTab(this.activeTab);
         super.show();
     }
 
@@ -248,8 +314,155 @@ export class InvestmentPanel extends AbstractHqPanel {
     update(): void {
         // Update any dynamic content
         this.updatePoundsDisplay();
-        
+
         // Update all cards
         this.updateCards();
     }
-} 
+
+    // --- Standing Orders view ---
+
+    private clearStandingOrdersDynamic(): void {
+        this.standingOrdersDynamic.forEach(o => { this.standingOrdersContainer.remove(o); o.destroy(); });
+        this.standingOrdersDynamic = [];
+    }
+
+    private addStandingOrdersDynamic<T extends Phaser.GameObjects.GameObject>(obj: T): T {
+        this.standingOrdersDynamic.push(obj);
+        this.standingOrdersContainer.add(obj);
+        return obj;
+    }
+
+    private rebuildStandingOrders(): void {
+        this.clearStandingOrdersDynamic();
+        const scene = this.scene;
+        const width = scene.scale.width;
+        const ordersState = StandingOrdersState.getInstance();
+        const campaign = CampaignUiState.getInstance();
+        const year = campaign.calendar.year;
+        const slots = ordersState.slotsForYear(year);
+        const activeCount = ordersState.activeOrderIds.length;
+
+        // Slot status header
+        this.addStandingOrdersDynamic(new TextBox({
+            scene, x: width / 2, y: 210, width: 500, height: 36,
+            text: `STANDING ORDERS · ${activeCount}/${slots}`,
+            style: { fontSize: '22px', fontFamily: Fonts.DISPLAY, color: Palette.BRASS_TEXT }
+        }));
+
+        const orders = Array.from(STANDING_ORDER_REGISTRY.values());
+        const cols = 2;
+        const startY = 260;
+        const colW = ORDER_CARD_W + 40;
+        const rowH = ORDER_CARD_H + 24;
+        const originX = width / 2 - colW / 2;
+
+        orders.forEach((order, i) => {
+            const col = i % cols;
+            const row = Math.floor(i / cols);
+            const x = originX + col * colW;
+            const y = startY + row * rowH + ORDER_CARD_H / 2;
+            this.addStandingOrdersDynamic(this.buildOrderCard(order, x, y, ordersState, year));
+        });
+    }
+
+    /** ACTIVE / PENDING / available state for a single order, plus its card UI. */
+    private buildOrderCard(
+        order: StandingOrder, x: number, y: number, ordersState: StandingOrdersState, year: number
+    ): Phaser.GameObjects.Container {
+        const scene = this.scene;
+        const container = scene.add.container(x, y);
+
+        const isActive = ordersState.activeOrderIds.includes(order.id);
+        const pendingList = ordersState.pendingOrderIds;
+        // Pending state only matters for an order that is currently active and
+        // queued for removal/replacement (not in the post-meeting list), or an
+        // order freshly enacted this quarter that also appears in pendingOrderIds
+        // (see StandingOrdersState.enact doc comment).
+        const isQueuedForRemoval = isActive && pendingList !== null && !pendingList.includes(order.id);
+        const hasFreeSlot = activeSlotsFree(ordersState, year);
+
+        const bg = scene.add.graphics();
+        bg.fillStyle(Palette.PAPER_SHADOW, 0.5);
+        bg.fillRect(-ORDER_CARD_W / 2 + 4, -ORDER_CARD_H / 2 + 5, ORDER_CARD_W, ORDER_CARD_H);
+        bg.fillStyle(isActive ? Palette.VERDIGRIS : Palette.WOOD_PANEL, 0.96);
+        bg.fillRect(-ORDER_CARD_W / 2, -ORDER_CARD_H / 2, ORDER_CARD_W, ORDER_CARD_H);
+        bg.lineStyle(2, isActive ? Palette.BRASS_BRIGHT : Palette.BRASS, 0.9);
+        bg.strokeRect(-ORDER_CARD_W / 2 + 3, -ORDER_CARD_H / 2 + 3, ORDER_CARD_W - 6, ORDER_CARD_H - 6);
+        container.add(bg);
+
+        container.add(scene.add.text(-ORDER_CARD_W / 2 + 16, -ORDER_CARD_H / 2 + 10, order.name, {
+            fontFamily: Fonts.DISPLAY, fontSize: '19px', color: Palette.WHITE,
+            wordWrap: { width: ORDER_CARD_W - 120 },
+        }));
+
+        // State stamp, top right
+        let stampText = 'AVAILABLE';
+        let stampColor: string = Palette.DISABLED_TEXT;
+        if (isQueuedForRemoval) {
+            stampText = `RATIFIES IN ${CampaignUiState.getInstance().calendar.weeksUntilDividend}w`;
+            stampColor = Palette.CRIMSON_TEXT;
+        } else if (isActive) {
+            stampText = 'ACTIVE';
+            stampColor = Palette.GOOD_TEXT;
+        }
+        container.add(scene.add.text(ORDER_CARD_W / 2 - 14, -ORDER_CARD_H / 2 + 10, stampText, {
+            fontFamily: Fonts.UTILITY, fontSize: '12px', fontStyle: 'bold', color: stampColor,
+        }).setOrigin(1, 0));
+
+        // Description (BBCode-capable)
+        const descBox = new TextBox({
+            scene, x: 0, y: -6, width: ORDER_CARD_W - 32, height: 74,
+            text: order.description,
+            style: { fontSize: '13px', fontFamily: 'verdana' }
+        });
+        descBox.setStroke(false);
+        container.add(descBox);
+
+        // Flavor line
+        container.add(scene.add.text(-ORDER_CARD_W / 2 + 16, ORDER_CARD_H / 2 - 46, order.flavor, {
+            fontFamily: Fonts.BODY, fontSize: '12px', color: Palette.INK_FADED, fontStyle: 'italic',
+            wordWrap: { width: ORDER_CARD_W - 32 },
+        }));
+
+        // Action button, bottom right
+        const actionButton = new TextBoxButton({
+            scene, x: ORDER_CARD_W / 2 - 90, y: ORDER_CARD_H / 2 - 20, width: 160, height: 34,
+            text: '...',
+            style: { fontSize: '13px', color: Palette.BRASS_TEXT, fontFamily: Fonts.DISPLAY },
+            fillColor: Palette.WOOD_PANEL
+        });
+
+        if (isQueuedForRemoval) {
+            actionButton.setText(`RESCINDING · ${CampaignUiState.getInstance().calendar.weeksUntilDividend}w`);
+            actionButton.setButtonEnabled(false);
+        } else if (isActive) {
+            actionButton.setText('RESCIND');
+            actionButton.onClick(() => {
+                ordersState.queueRemoval(order.id);
+                SaveManager.save();
+                this.rebuildStandingOrders();
+            });
+        } else if (hasFreeSlot) {
+            actionButton.setText('ENACT');
+            actionButton.onClick(() => {
+                ordersState.enact(order.id, year);
+                SaveManager.save();
+                this.rebuildStandingOrders();
+            });
+        } else {
+            // No free slot and not active: enact/replace is unavailable this
+            // quarter. REPLACE… flow skipped per brief (queueRemoval +
+            // enact-next-quarter covers the loop).
+            actionButton.setText('NO FREE SLOT');
+            actionButton.setButtonEnabled(false);
+        }
+        container.add(actionButton);
+
+        return container;
+    }
+}
+
+/** True if the order slate has room for one more active order this year. */
+function activeSlotsFree(ordersState: StandingOrdersState, year: number): boolean {
+    return ordersState.activeOrderIds.length < ordersState.slotsForYear(year);
+}
