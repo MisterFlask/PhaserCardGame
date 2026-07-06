@@ -20,12 +20,19 @@ protocol. Ordered within sections by priority. Delete items when done.
   BarracksPanel (personnel ledger), SortieReportPanel (typed field report),
   EndOfCampaignPanel (board minutes), InvestmentPanel still use old styling.
   Get owner reaction to the contract board's level of ornament first.
-- **Standing Orders system** — approved July 2026; full design in
-  `src/docs/strategic_layer_redesign.md` § "Amendment: Standing Orders".
-  Projects split into permanent Capital Works and slot-limited, swappable
-  Standing Orders (XCOM 2 resistance orders). Implementation shape is in the
-  amendment. Includes pulling the five dead cargo projects from the
-  purchasable pool (they currently sell no-op effects).
+- **Standing Orders: v1 shipped (July 2026); remaining pieces** — the model,
+  nine launch orders, save v4, ratification UI, and the dead-cargo-project
+  pool pull are live (see `src/campaign/orders/`). Still open, per the
+  design amendment in `src/docs/strategic_layer_redesign.md`:
+  *Company Secretariat* capital work (buys `bonusSlots`), client-unlocked
+  orders (fulfil N contracts for a client → their retainer order becomes
+  available — needs per-client completion tracking), converting Abyssal
+  Research Institute from a Capital Work to an order, and an in-place
+  REPLACE flow in the UI (currently rescind + enact-next-quarter).
+- **Standing Orders balance pass** — the launch numbers (payout +20%,
+  wound +1w, recruit ×0.6, escalation ×0.75 …) are design-doc sketches,
+  untested against the economy sim or human play. Revisit after a few
+  played campaign-years.
 - **Contract board hero slot** — art-director critique item: no visual entry
   point among equal-weight notices. Deferred; needs a "priority contract"
   concept.
