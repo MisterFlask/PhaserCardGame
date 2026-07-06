@@ -217,7 +217,11 @@ Two problems with projects-as-pure-purchases:
   swappable only at the **quarterly board meeting** (the board ratifies
   policy changes; you cannot fiddle per-sortie). No VP. Each order changes
   how the campaign plays: contract board shape, dividend math, roster
-  economics, sortie structure, risk/reward toggles.
+  economics, sortie structure, risk/reward toggles, **and combat/card
+  mechanics** (e.g. "+2 damage to Burning" is a legitimate order). What
+  keeps Orders about flexibility rather than raw power is the slot economy
+  — a combat order occupies a slot that could have held a strategic one —
+  not a ban on combat effects.
 
 ### Slot economy
 
