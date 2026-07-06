@@ -4,6 +4,35 @@ Standing work items for future sessions/agents. Each entry is written to be
 actionable cold — read CLAUDE.md first for house rules and the delegation
 protocol. Ordered within sections by priority. Delete items when done.
 
+## Dangling systems (July 2026 gap audit — half-connected, silently broken today)
+
+- **Relic ownership model post-pivot** — relics earned from events land on
+  `GameState.relicsInventory`, which is never serialized (CampaignSave has no
+  relics field), so they vanish on save/reload. The design doc says relics
+  become assignable equipment (2-3 slots per character, lost on death unless
+  insured) but that was deferred. Decide: (a) quick fix — persist a campaign
+  relic pool on CampaignUiState + save DTO, effects apply squad-wide; or
+  (b) build the equipment-slot system. NEEDS A DESIGN SESSION WITH THE OWNER
+  for (b); (a) is safe to implement cold.
+- **Consumable acquisition path** — bureaucratic consumables (permits,
+  writs; `src/consumables/`, PhysicalConsumable UI, combat input handling)
+  are implemented in combat but the only way to obtain one is the
+  `debug:addTestConsumables` menu entry. The economy table in the design doc
+  has a "Provisioning" row for this. Add an HQ purchase surface (Barracks or
+  a Quartermaster section) + occasional contract/event rewards, and
+  serialize the owned stock.
+- **Character growth (XP/rank)** — the design doc commits to "XP → rank →
+  +deck cap, occasional persona trait, stat bumps"; none of it exists (no
+  xp/rank/deckCap anywhere in src/gamecharacters). Veterans currently differ
+  from recruits only by accumulated cards, and nothing caps deck bloat.
+  NEEDS OWNER SIGN-OFF on the rank curve; the plumbing (xp on
+  PlayerCharacter, award on sortie resolution, save DTO) is mechanical.
+- **New-campaign state reset audit** — "New Campaign" resets via page reload;
+  verify every singleton that now carries campaign state (StandingOrdersState,
+  relic inventory, consumables once persisted) is actually cleared when the
+  save is wiped. Cheap: a unit test that CampaignSerializer round-trips a
+  fresh state to defaults, plus a browser check of the button path.
+
 ## Gameplay & design
 
 - **Trade-run contract type** — the game's original push-your-luck trading
@@ -39,6 +68,55 @@ protocol. Ordered within sections by priority. Delete items when done.
 - **Recruit pool save-scumming** — recruit candidates aren't serialized, so
   reloading rerolls them. Harmless now; fix by seeding their generation if it
   starts to matter.
+- **Region hardening over campaign years** — the design doc says "Hell
+  escalates too (regions harden over time)" but combat difficulty scales
+  only by act/segment; year-8 Styx Delta is identical to year-1 while the
+  dividend clock triples. Without it, late campaigns are decided purely by
+  economics. Options: enemy stat scaling by year, harder encounter tables
+  unlocking per year, or year-scaled enemy count. Tune against the sortie
+  win-rate the economy sim assumes.
+- **Contract squad-size axis** — the redesign doc's contract board lists
+  squad size as a per-contract property; Contract has no such field and
+  every sortie is exactly 3. A 2-soldier "small job" / 4-soldier "big push"
+  axis multiplies roster pressure (the point of the XCOM layer) cheaply.
+  Touches Contract model/DTO, board muster UI, and combat layout.
+- **Wages/upkeep** — the design doc's economy table includes wages ("keeps
+  roster size honest; ongoing drain so hoarding has cost"). Nothing drains
+  the vault passively, so a big roster is free and hoarding is strictly
+  optimal. A per-soldier £/quarter charge at the board meeting (settled
+  before the dividend) is the smallest version. Rebalance the dividend sim
+  after.
+- **VP sources for the endgame pivot** — final score = VP + vault, but VP
+  only comes from Lethe Extraction and per-project trickle. The intended
+  endgame decision ("when do I stop building and start scoring") barely
+  exists. More VP sinks: VP-per-£ conversion late-campaign, VP contracts,
+  the deferred Levi-Maxwell capstone.
+- **Faction reputation + intelligence services** — both deferred in the
+  design doc but queued by shipped systems: the retrofit table wants
+  embassies (Revolutionary Contacts), client-unlocked Standing Orders want
+  per-client tracking, and the cut Actuarial Review order wants enemy-comp
+  scouting. Probably one design session covering "who remembers what you
+  did for them."
+
+## Content breadth
+
+- **Regions 4+** — worldbuilding.md already describes the Brimstone
+  Badlands, Screaming Forests, Clockwork Wastes, and Abyssal Frontier;
+  none are in the game (3 acts only). Each new region = contract templates
+  + encounter tables + enemies. Also the natural fix for late-campaign
+  variety alongside region hardening. Good Codex-lane batch work once the
+  enemy-design spec exists.
+- **Event pool expansion** — 7 pooled events for a full 40-quarter campaign;
+  repeats fast. The new dispatch format is short (≤90 words), so events are
+  now cheap to write: target 20+, spread across regions (most current
+  events are Styx-flavored). Spec-complete batch work; A/B the Codex lane
+  on it (see cost-optimization section).
+- **Act 2/3 enemy roster depth** — act 1 has ~21 enemies, act 2 ~13,
+  act 3 ~11; later acts repeat encounters sooner. (Separate from the
+  flavor-text item above — this is new enemies, not better descriptions.)
+- **Cog class identity** — one of four classes has placeholder lore and the
+  thinnest mechanical identity (Manufactured cards). Either invest (design
+  pass + cards) or consider whether four classes is right at all.
 
 ## Flavor (from the July 2026 flavor audit)
 
@@ -78,6 +156,25 @@ protocol. Ordered within sections by priority. Delete items when done.
   agents have a true standard.
 
 ## Engineering
+
+- **Audio: there is none** — no sound loading, no SFX, no music anywhere in
+  src/. Even a minimal pass (UI clicks, card play, damage, one ambient loop
+  per region, a board-meeting sting) transforms feel. Needs an asset
+  sourcing decision (licensed pack vs. generated) before any code; Phaser's
+  audio API is straightforward once assets exist.
+- **Asset manifest lint** — the console 404s on every boot (doris-smith,
+  shopkeeper-shady-2, roster-screen-stained-glass...) and at least one
+  enemy uses a mislabeled placeholder portrait (SorrowmothSwarm →
+  "Corrupted Fire Dragon"). Write a vitest that walks every portraitName /
+  texture key referenced in content code and asserts the file exists under
+  resources/ — same enforcement pattern as SaveRegistriesLint. Then fix or
+  placeholder the misses.
+- **Deployment target + bundle hygiene** — no deploy pipeline exists;
+  index.html loads two CDN Phaser builds plus the 13.7MB bundled one
+  (known sharp edge), and resources/ is 170MB. Decide the distribution
+  target (itch.io web build?), then: single Phaser instance, asset
+  compression/pruning, and a build that doesn't ship the whole resources
+  tree.
 
 - **DrawCardsAction exceeds the 5s action timeout** under background-tab
   throttling (observed repeatedly via the new
