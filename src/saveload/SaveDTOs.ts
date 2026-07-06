@@ -4,7 +4,8 @@
 
 // v2: added contractsCompleted and per-project victory points.
 // v3: added contract client and paymentClause (invoice-style flavor fields).
-export const SAVE_FORMAT_VERSION = 3;
+// v4: added standingOrders (active/pending order ids + bonus slots).
+export const SAVE_FORMAT_VERSION = 4;
 export const SAVE_STORAGE_KEY = 'east-infernal-company-save';
 
 export interface BuffDTO {
@@ -67,6 +68,12 @@ export interface OwnedProjectDTO {
     victoryPoints: number;
 }
 
+export interface StandingOrdersDTO {
+    active: string[];
+    pending: string[] | null;
+    bonusSlots: number;
+}
+
 export interface CampaignSave {
     version: number;
     savedAtIso: string;
@@ -78,4 +85,5 @@ export interface CampaignSave {
      *  instance-identity checks in the investment UI keep working. */
     ownedProjects: OwnedProjectDTO[];
     roster: CharacterDTO[];
+    standingOrders: StandingOrdersDTO;
 }

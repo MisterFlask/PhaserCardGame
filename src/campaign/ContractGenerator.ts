@@ -1,4 +1,5 @@
 import { Contract, ContractType } from "./Contract";
+import { StandingOrdersState } from "./orders/StandingOrdersState";
 
 /**
  * A contract template bundles name/client/description/paymentClause as one
@@ -212,7 +213,12 @@ export class ContractGenerator {
         // Deeper acts and segments pay more; two-combat sorties pay almost double.
         const basePay = 30 + region.act * 20 + segment * 25;
         const jitter = 0.85 + Math.random() * 0.3;
-        const payout = Math.round((basePay * numCombats * jitter) / 5) * 5;
+        const jitteredPayout = Math.round((basePay * numCombats * jitter) / 5) * 5;
+        // Standing Orders (e.g. Hazard Pay Schedule) apply AFTER the jitter and
+        // re-round to £5, so the final payout is always a clean invoice figure.
+        const payout = Math.round(StandingOrdersState.getInstance().contractPayout(jitteredPayout) / 5) * 5;
+        const deadlineWeeks = StandingOrdersState.getInstance()
+            .contractDeadlineWeeks(2 + Math.floor(Math.random() * 3)); // 2-4 weeks on the board, base
 
         return new Contract({
             name: template.name,
@@ -224,7 +230,7 @@ export class ContractGenerator {
             segment,
             difficultyStars,
             numCombats,
-            deadlineWeeks: 2 + Math.floor(Math.random() * 3), // 2-4 weeks on the board
+            deadlineWeeks,
             // Mustering and travel cost a week on top of the fighting; this
             // caps contract throughput so the dividend clock can actually bite.
             durationWeeks: numCombats + 1,
@@ -233,10 +239,11 @@ export class ContractGenerator {
         });
     }
 
-    /** Top the board back up to targetCount contracts. */
+    /** Top the board back up to targetCount contracts (adjusted by Standing Orders). */
     public refillBoard(existing: Contract[], year: number, contractsCompleted: number = 0, targetCount: number = 5): Contract[] {
         const board = [...existing];
-        while (board.length < targetCount) {
+        const adjustedTarget = StandingOrdersState.getInstance().contractBoardTarget(targetCount);
+        while (board.length < adjustedTarget) {
             board.push(this.generateContract(year, contractsCompleted));
         }
         return board;

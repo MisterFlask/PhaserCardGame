@@ -1,4 +1,5 @@
 import { SortieManager } from "../campaign/SortieManager";
+import { StandingOrdersState } from "../campaign/orders/StandingOrdersState";
 import { EntityRarity } from "../gamecharacters/EntityRarity";
 import { PlayableCard } from "../gamecharacters/PlayableCard";
 import { CardLibrary } from "../gamecharacters/playerclasses/cards/CardLibrary";
@@ -112,7 +113,7 @@ export class CardRewardsGenerator {
             pagesCardsAdded = 2;
         }
 
-        const numCardsToGenerate = 3 + pagesCardsAdded;
+        const numCardsToGenerate = StandingOrdersState.getInstance().cardRewardChoices(3 + pagesCardsAdded);
         const distribution = this.calculatePowerLevelDistribution(currentFloor);
         
         // Generate cards based on power levels

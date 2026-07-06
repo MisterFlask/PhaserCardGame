@@ -1,9 +1,13 @@
+import { StandingOrdersState } from "../campaign/orders/StandingOrdersState";
 import { AbstractBuff } from "../gamecharacters/buffs/AbstractBuff";
 import { PlayableCard } from "../gamecharacters/PlayableCard";
 import { PlayerCharacter } from "../gamecharacters/PlayerCharacter";
 import { GameState } from "../rules/GameState";
 import { CampaignUiState } from "../screens/campaign/hq_ux/CampaignUiState";
-import { calendarFromDTO, calendarToDTO, contractFromDTO, contractToDTO } from "./PureDTOConversions";
+import {
+    applyStandingOrdersDTO, calendarFromDTO, calendarToDTO, contractFromDTO, contractToDTO,
+    standingOrdersToDTO
+} from "./PureDTOConversions";
 import {
     BuffDTO, CampaignSave, CardDTO, CharacterDTO,
     SAVE_FORMAT_VERSION
@@ -70,6 +74,7 @@ export class CampaignSerializer {
                 victoryPoints: p.getVictoryPoints(),
             })),
             roster: campaign.roster.map(c => this.characterToDTO(c)),
+            standingOrders: standingOrdersToDTO(StandingOrdersState.getInstance()),
         };
     }
 
@@ -173,5 +178,7 @@ export class CampaignSerializer {
         campaign.roster = save.roster
             .map(c => this.characterFromDTO(c))
             .filter((c): c is PlayerCharacter => c !== null);
+
+        applyStandingOrdersDTO(StandingOrdersState.getInstance(), save.standingOrders);
     }
 }

@@ -1,12 +1,13 @@
 import { CampaignCalendar } from '../../../campaign/CampaignCalendar';
 import { Contract } from '../../../campaign/Contract';
 import { ContractGenerator } from '../../../campaign/ContractGenerator';
+import { StandingOrdersState } from '../../../campaign/orders/StandingOrdersState';
 import { CharacterGenerator } from '../../../gamecharacters/CharacterGenerator';
 import { PlayerCharacter } from '../../../gamecharacters/PlayerCharacter';
 import { CampaignRules } from '../../../rules/CampaignRulesHelper';
 import { GameState } from '../../../rules/GameState';
 import { AbstractStrategicProject } from '../../../strategic_projects/AbstractStrategicProject';
-import { ALL_STRATEGIC_PROJECTS } from '../../../strategic_projects/StrategicProjectList';
+import { PURCHASABLE_STRATEGIC_PROJECTS } from '../../../strategic_projects/StrategicProjectList';
 
 export const ROSTER_CAP = 8;
 export const RECRUIT_COST = 80;
@@ -20,7 +21,7 @@ export class CampaignUiState {
     public availableContracts: Contract[] = [];
     public selectedContract: Contract | null = null;
     public ownedStrategicProjects: AbstractStrategicProject[] = [];
-    public availableStrategicProjects: AbstractStrategicProject[] = ALL_STRATEGIC_PROJECTS;
+    public availableStrategicProjects: AbstractStrategicProject[] = PURCHASABLE_STRATEGIC_PROJECTS;
     public selectedParty: PlayerCharacter[] = [];
     public roster: PlayerCharacter[] = CampaignRules.getInstance().generateLogicalCharacterRoster();
     /** Hireable candidates at the Barracks; refreshed as weeks pass. */
@@ -63,17 +64,30 @@ export class CampaignUiState {
         return this.ownedStrategicProjects.some(p => p.name === name);
     }
 
+    /** RECRUIT_COST adjusted by any active Standing Orders (e.g. Recruiting Sergeants). */
+    public getRecruitCost(): number {
+        return StandingOrdersState.getInstance().recruitCost(RECRUIT_COST);
+    }
+
+    /** A base therapy £ figure adjusted by any active Standing Orders (e.g.
+     *  Accredited Phrenology Retainer). The base cost itself lives with the
+     *  caller (BarracksPanel) since it's UI-owned. */
+    public getTherapyCost(base: number): number {
+        return StandingOrdersState.getInstance().therapyCost(base);
+    }
+
     /**
      * Hire a candidate onto the roster. Returns false (and does nothing) if
      * the vault or the barracks can't take it.
      */
     public hireRecruit(candidate: PlayerCharacter): boolean {
         const gameState = GameState.getInstance();
-        if (gameState.moneyInVault < RECRUIT_COST) return false;
+        const cost = this.getRecruitCost();
+        if (gameState.moneyInVault < cost) return false;
         if (this.roster.length >= ROSTER_CAP) return false;
         if (!this.recruitCandidates.includes(candidate)) return false;
 
-        gameState.moneyInVault -= RECRUIT_COST;
+        gameState.moneyInVault -= cost;
         this.roster.push(candidate);
         this.recruitCandidates = this.recruitCandidates.filter(c => c !== candidate);
         this.ensureRecruitsPopulated();

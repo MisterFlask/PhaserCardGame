@@ -1,3 +1,5 @@
+import { StandingOrdersState } from "./orders/StandingOrdersState";
+
 export interface BoardEvent {
     week: number;
     message: string;
@@ -90,7 +92,8 @@ export class CampaignCalendar {
             this.log(`Q${settledQuarter} dividend of £${due} paid in full. The board purrs. Satisfaction ${this.shareholderSatisfaction}.`);
         } else {
             const shortfallFraction = (due - paid) / due;
-            const hit = Math.round(10 + 20 * shortfallFraction); // 10-30 point hit
+            const baseHit = Math.round(10 + 20 * shortfallFraction); // 10-30 point hit
+            const hit = StandingOrdersState.getInstance().satisfactionHit(baseHit);
             this.shareholderSatisfaction = Math.max(0, this.shareholderSatisfaction - hit);
             this.log(
                 `Q${settledQuarter} dividend SHORT: £${paid} of £${due}. Satisfaction falls ${hit} to ${this.shareholderSatisfaction}.`,
@@ -100,12 +103,19 @@ export class CampaignCalendar {
 
         // Expectations escalate at each year boundary (after Q4 settles).
         if (this.quarterOfYear === 1) {
-            this.currentDividendExpectation = Math.round(this.currentDividendExpectation * 1.35);
+            const rate = StandingOrdersState.getInstance().dividendEscalationRate(1.35);
+            this.currentDividendExpectation = Math.round(this.currentDividendExpectation * rate);
             this.log(`New fiscal year: the board raises its dividend expectation to £${this.currentDividendExpectation}.`, true);
         }
 
         if (this.isSacked) {
             this.log(`The board has voted. Your services are no longer required.`, true);
         }
+
+        // Standing Orders ratification happens at the board meeting, the same
+        // moment dividends settle — AFTER the dividend/escalation above, so a
+        // queued policy change never retroactively affects the quarter it was
+        // queued in.
+        StandingOrdersState.getInstance().onBoardMeeting();
     }
 }

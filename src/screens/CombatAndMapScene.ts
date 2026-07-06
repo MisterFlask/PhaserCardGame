@@ -12,6 +12,7 @@ import { PlayerCharacter } from '../gamecharacters/PlayerCharacter';
 import { SortieManager } from '../campaign/SortieManager';
 import { GameState } from '../rules/GameState';
 import { SaveRegistries } from '../saveload/SaveRegistries';
+import { StandingOrdersState } from '../campaign/orders/StandingOrdersState';
 import { CampaignUiState } from './campaign/hq_ux/CampaignUiState';
 import { TextBoxButton } from '../ui/Button';
 import { CheapGlowEffect } from '../ui/CheapGlowEffect';
@@ -494,6 +495,7 @@ installBackgroundStepper();
 (window as any).game = game;
 (window as any).getGameState = () => GameState.getInstance();
 (window as any).getCampaignState = () => CampaignUiState.getInstance();
+(window as any).getStandingOrdersState = () => StandingOrdersState.getInstance();
 // Registry doubles as a console factory for buffs/cards during testing.
 (window as any).SaveRegistries = SaveRegistries;
 (window as any).getActionQueueErrors = () => ActionManager.getInstance().actionQueue.lastErrors;

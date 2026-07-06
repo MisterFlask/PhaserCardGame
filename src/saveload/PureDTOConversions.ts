@@ -4,7 +4,8 @@
 
 import { CampaignCalendar } from "../campaign/CampaignCalendar";
 import { Contract, ContractType } from "../campaign/Contract";
-import { CalendarDTO, ContractDTO } from "./SaveDTOs";
+import { STANDING_ORDER_REGISTRY, StandingOrdersState } from "../campaign/orders/StandingOrdersState";
+import { CalendarDTO, ContractDTO, StandingOrdersDTO } from "./SaveDTOs";
 
 export function calendarToDTO(cal: CampaignCalendar): CalendarDTO {
     return {
@@ -58,4 +59,25 @@ export function contractFromDTO(dto: ContractDTO): Contract {
         payout: dto.payout,
         regionName: dto.regionName,
     });
+}
+
+export function standingOrdersToDTO(state: StandingOrdersState): StandingOrdersDTO {
+    return {
+        active: [...state.activeOrderIds],
+        pending: state.pendingOrderIds === null ? null : [...state.pendingOrderIds],
+        bonusSlots: state.bonusSlots,
+    };
+}
+
+/** Unknown order ids are dropped (with a warning) rather than crashing the load. */
+export function applyStandingOrdersDTO(state: StandingOrdersState, dto: StandingOrdersDTO): void {
+    const filterKnown = (ids: string[]): string[] => ids.filter(id => {
+        const known = STANDING_ORDER_REGISTRY.has(id);
+        if (!known) console.warn(`StandingOrdersState: unknown order id "${id}" in save, dropping`);
+        return known;
+    });
+
+    state.activeOrderIds = filterKnown(dto.active);
+    state.pendingOrderIds = dto.pending === null ? null : filterKnown(dto.pending);
+    state.bonusSlots = dto.bonusSlots;
 }
