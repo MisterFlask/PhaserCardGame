@@ -2,6 +2,8 @@ import Phaser, { Scene } from 'phaser';
 import { Contract } from '../../../../campaign/Contract';
 import { SortieManager } from '../../../../campaign/SortieManager';
 import { PlayerCharacter } from '../../../../gamecharacters/PlayerCharacter';
+import { DepthManager } from '../../../../ui/DepthManager';
+import { TextBox } from '../../../../ui/TextBox';
 import {
     drawBackdropDim, drawPaper, drawWaxSeal, drawWoodPanel, Fonts, Palette
 } from '../../../../ui/UIStyle';
@@ -12,6 +14,9 @@ const SQUAD_SIZE = 3;
 
 const NOTICE_W = 380;
 const NOTICE_H = 170;
+
+/** Roman numerals, matching the tally marks drawWaxSeal engraves on the wax. */
+const ROMAN_NUMERALS = ['I', 'II', 'III'];
 
 /**
  * The contract board: a wall of posted notices. Pick one, muster a squad of
@@ -24,6 +29,7 @@ export class ContractBoardPanel extends AbstractHqPanel {
     private launchChrome!: Phaser.GameObjects.Graphics;
     private launchLabel!: Phaser.GameObjects.Text;
     private selectedSquad: PlayerCharacter[] = [];
+    private hoverTooltip: TextBox | null = null;
 
     constructor(scene: Scene) {
         super(scene, 'Contract Board');
@@ -80,6 +86,7 @@ export class ContractBoardPanel extends AbstractHqPanel {
     }
 
     private clearDynamic(): void {
+        this.hideHoverTooltip();
         this.dynamic.forEach(o => { this.remove(o); o.destroy(); });
         this.dynamic = [];
     }
@@ -88,6 +95,46 @@ export class ContractBoardPanel extends AbstractHqPanel {
         this.dynamic.push(obj);
         this.add(obj);
         return obj;
+    }
+
+    /**
+     * Small paper-styled plaque explaining a posted notice's seal or payout.
+     * Positioned near (x, y) in panel-local space, clamped so it never runs
+     * off the right edge. Only one is ever shown at a time.
+     */
+    private showHoverTooltip(bbcodeText: string, x: number, y: number): void {
+        this.hideHoverTooltip();
+        const tooltip = new TextBox({
+            scene: this.scene,
+            x, y,
+            width: 260,
+            text: bbcodeText,
+            fillColor: Palette.PAPER_SHADOW,
+            style: { fontSize: '15px', fontFamily: Fonts.BODY, color: Palette.WHITE },
+        });
+        tooltip.setDepth(DepthManager.getInstance().TOOLTIP);
+        tooltip.disableInteractive();
+
+        // Clamp so it stays on-screen for notices near the right edge.
+        const halfW = tooltip.width / 2;
+        const minX = halfW + 8;
+        const maxX = this.scene.scale.width - halfW - 8;
+        tooltip.x = Phaser.Math.Clamp(tooltip.x, minX, maxX);
+        const minY = tooltip.height / 2 + 8;
+        tooltip.y = Math.max(tooltip.y, minY);
+
+        this.hoverTooltip = tooltip;
+        this.addDynamic(tooltip);
+    }
+
+    private hideHoverTooltip(): void {
+        if (this.hoverTooltip) {
+            const idx = this.dynamic.indexOf(this.hoverTooltip);
+            if (idx >= 0) this.dynamic.splice(idx, 1);
+            this.remove(this.hoverTooltip);
+            this.hoverTooltip.destroy();
+            this.hoverTooltip = null;
+        }
     }
 
     private rebuild(): void {
@@ -173,14 +220,34 @@ export class ContractBoardPanel extends AbstractHqPanel {
         container.add(expiry);
 
         // Payout, ledger-style bottom right
-        container.add(this.scene.add.text(NOTICE_W / 2 - 20, NOTICE_H / 2 - 36, `£${contract.payout}`, {
+        const payoutText = this.scene.add.text(NOTICE_W / 2 - 20, NOTICE_H / 2 - 36, `£${contract.payout}`, {
             fontFamily: Fonts.DISPLAY, fontSize: '30px', color: Palette.INK,
-        }).setOrigin(1, 0.5));
+        }).setOrigin(1, 0.5);
+        container.add(payoutText);
+        payoutText.setInteractive({ useHandCursor: false });
+        payoutText.on('pointerover', () => {
+            this.showHoverTooltip(
+                `Payment on completion: [b]£${contract.payout}[/b], banked directly to the Company vault.`,
+                container.x + payoutText.x, container.y + payoutText.y - 24,
+            );
+        });
+        payoutText.on('pointerout', () => this.hideHoverTooltip());
 
         // Difficulty seal
         const seal = drawWaxSeal(this.scene, 22, contract.difficultyStars);
         seal.setPosition(NOTICE_W / 2 - 34, -NOTICE_H / 2 + 34);
         container.add(seal);
+        seal.setSize(44, 44);
+        seal.setInteractive({ useHandCursor: false });
+        seal.on('pointerover', () => {
+            const numeral = ROMAN_NUMERALS[contract.difficultyStars - 1] ?? ROMAN_NUMERALS[ROMAN_NUMERALS.length - 1];
+            this.showHoverTooltip(
+                `Difficulty [b]${numeral}[/b] of III — the Survey Desk's estimate of local resistance. ` +
+                `Harder postings pay better.`,
+                container.x + seal.x, container.y + seal.y + 30,
+            );
+        });
+        seal.on('pointerout', () => this.hideHoverTooltip());
 
         // A pinned notice hangs slightly askew.
         container.setRotation(((index * 37) % 5 - 2) * 0.008);
