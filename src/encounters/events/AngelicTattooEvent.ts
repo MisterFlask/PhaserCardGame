@@ -6,14 +6,13 @@ import { getRandomAngelicTattooBuff } from "./event_buffs/AngelicTattooBuffs";
 class BasicTattooChoice extends AbstractChoice {
     constructor() {
         super(
-            "Order Morrison to take the small tattoo",
+            "WIRE: Authorize the small mark",
             "What's a bit of stress for a soldier?"
         );
         this.nextEvent = new DeadEndEvent();
-        this.nextEvent.description = "I ordered Morrison forward. Better him than me - that's what subordinates are for, after all.\n\n" +
-            "The angel gestured to a chair that hadn't been there moments before. Its needles traced patterns that hurt to look at - mathematical curves suggesting infinity, geometric forms that made sense from one angle and none from another. Morrison gripped the chair white-knuckled but didn't scream.\n\n" +
-            "When finished, the design glowed like stained glass before settling into his skin. Hours later, Morrison's jumpy as a cat, swearing the lines shift when he's not looking. His reflexes have sharpened considerably though - nearly took Jenkins' head off at dinner.\n\n" +
-            "The ferryman won't look at him now, just crosses himself and mutters about \"heaven's brand.\" But if celestial tattoos give my men an edge in this hellhole, Morrison's discomfort is a small price.";
+        this.nextEvent.description = "Morrison went forward, gripping the chair white-knuckled. The needles traced infinities that hurt to watch. Design settled like stained glass.\n\n" +
+            "He's jumpy now, swears the lines move. Reflexes sharpened, though — nearly took Jenkins' head off at dinner. Small price.\n" +
+            "— Cavendish";
     }
 
     canChoose(): boolean {
@@ -38,15 +37,13 @@ class BasicTattooChoice extends AbstractChoice {
 class ElaborateTattooChoice extends AbstractChoice {
     constructor() {
         super(
-            "Order Morrison to get the full treatment",
+            "WIRE: Authorize the full mark",
             "No point in half measures."
         );
         this.nextEvent = new DeadEndEvent();
-        this.nextEvent.description = "I've always believed in seizing opportunities fully. Morrison actually tried to protest - first time in three years. I reminded him sharply of his duty.\n\n" +
-            "The angel's eyes - all of them - brightened. The payment it extracted... the boy aged five years in as many seconds. Something fundamental was torn from him.\n\n" +
-            "Time stuttered during the process. The angel's arms occupied multiple positions simultaneously, needles tracing patterns not just on Morrison's skin but through it, into spaces that don't properly exist. He screamed then - horrible sounds I'll hear in my nightmares.\n\n" +
-            "The finished design extends past what eyes can see. It pulses to a rhythm that has nothing to do with Morrison's heartbeat. He's been catatonic for hours, muttering in unknown languages. But when he does focus, there's power in his movements that frightens even me.\n\n" +
-            "I tell myself it was necessary. But watching Morrison stare at nothing with those hollow eyes, I wonder if I've created something worse than what we're fighting.";
+        this.nextEvent.description = "Overruled Morrison's protest. The angel's eyes brightened; he aged five years in as many seconds, screaming.\n\n" +
+            "Catatonic now, muttering in tongues. When he focuses, there's a power that frightens even me. Necessary, I tell myself.\n" +
+            "— Cavendish";
     }
 
     canChoose(): boolean {
@@ -71,13 +68,13 @@ class ElaborateTattooChoice extends AbstractChoice {
 class DeclineChoice extends AbstractChoice {
     constructor() {
         super(
-            "Make your excuses",
+            "WIRE: Decline. Withdraw.",
             "You don't like the sound of that soul-weight business."
         );
         this.nextEvent = new DeadEndEvent();
-        this.nextEvent.description = "For once, my instinct for self-preservation extended to my men. That untranslatable sound - the ferryman's expression - told me all I needed. Whatever coin this creature traded in, I couldn't afford it.\n\n" +
-            "I manufactured excuses about regulations. The angel's needles stopped. Without a word, the entire establishment began to collapse - not like a building falling, but like a mathematical proof being disproven. Walls folded through themselves, the whole structure simply ceased.\n\n" +
-            "Where it stood, only scorched marsh grass remains.";
+        this.nextEvent.description = "Cited regulations, backed toward the door. The needles stopped. The whole parlour folded through itself like a disproven theorem and simply ceased.\n\n" +
+            "Only scorched marsh grass remains. Morrison looks vaguely disappointed.\n" +
+            "— Cavendish";
     }
 
     canChoose(): boolean {
@@ -92,13 +89,9 @@ export class AngelicTattooEvent extends AbstractEvent {
         super();
         this.name = "The Seraphic Tattooist";
         this.portraitName = "placeholder_event_background_2";
-        this.description = "I've seen impossibilities - Afghan fakirs, Borneo witch-doctors - but nothing prepared me for this. Morrison spotted what appeared to be a respectable establishment through the marsh mist. Clean marble, silver appointments. In this godforsaken swamp!\n\n" +
-            "Against better judgment (and the ferryman's protests), I ordered an investigation. The moment we crossed the threshold, I knew I'd erred.\n\n" +
-            "The thing inside... Wings. Eyes. Flame. All occupying the same space. A dozen arms holding needles like starlight. It rotated slowly, making my teeth ache.\n\n" +
-            "[color=yellow]\"COME,\"[/color] it said, its voice bypassing our ears entirely. Beautiful and terrible, like a cathedral bell made of screaming. [color=yellow]\"I OFFER MY ARTISTRY. FOR A SMALL TATTOO, NO CHARGE. FOR A GREATER MARK—ALSO NO CHARGE. THE ONLY COST IS—\"[/color]\n\n" +
-            "Here it made a sound I cannot reproduce. The ferryman understood - something about soul-weight, or the part of a man that dreams.\n\n" +
-            "[color=yellow]\"MORE SO FOR THE LARGER TATTOO, OF COURSE. CHOOSE.\"[/color]\n\n" +
-            "Morrison looked at me hoping for sense.";
+        this.description = "DISPATCH — Styx Delta.\n" +
+            "Found a tattoo parlour in the reeds. The proprietor is an angel — wings, eyes, flame, all occupying the same space; my teeth ache to look at it. It offers its artistry free of charge, which in my experience is the most expensive kind of free. It got as far as [color=yellow]\"THE ONLY COST IS—\"[/color] before I stepped smartly outside. Morrison, who has no instinct for self-preservation whatever, is rolling up his sleeve. Instructions?\n" +
+            "— Cavendish";
         
         this.choices = [
             new BasicTattooChoice(),
