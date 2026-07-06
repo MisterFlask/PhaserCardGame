@@ -157,6 +157,14 @@ protocol. Ordered within sections by priority. Delete items when done.
 
 ## Engineering
 
+- **Decide: jsdom/happy-dom vitest environment** — anything importing
+  PlayerCharacter/PlayableCard transitively pulls Phaser, which throws under
+  plain-Node vitest, so character/perk save round-trips can only be
+  verified in the browser today (the leveling work hit this directly).
+  Adding a DOM test environment would let DTO round-trip tests cover
+  characters; it's a build-infra change with cross-cutting effects, so it
+  wants a deliberate pass, not a drive-by.
+
 - **Audio: there is none** — no sound loading, no SFX, no music anywhere in
   src/. Even a minimal pass (UI clicks, card play, damage, one ambient loop
   per region, a board-meeting sting) transforms feel. Needs an asset
