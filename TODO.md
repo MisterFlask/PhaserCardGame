@@ -186,11 +186,6 @@ protocol. Ordered within sections by priority. Delete items when done.
   compression/pruning, and a build that doesn't ship the whole resources
   tree.
 
-- **DrawCardsAction exceeds the 5s action timeout** under background-tab
-  throttling (observed repeatedly via the new
-  `window.getActionQueueErrors()`). Likely the per-card draw animation delays
-  interacting with worker-driven stepping in hidden tabs; could also be a
-  real perf issue. `src/utils/actions/specific/DrawCardsAction.ts`.
 - **Combat-restart race hardening** — `cleanupAndRestartCombat`
   (CombatAndMapScene) recreates managers and re-queues actions while the old
   action queue may still be resolving, and `CombatUIManager.initialize()`'s
