@@ -105,6 +105,22 @@ them immediately eligible for random recruit portraits.
 > Flat 2D game UI icon: <subject>. A single solid off-white glyph with clean
 > bold strokes, style of game-icons.net. The glyph is the ONLY content.
 
+**Card & relic icons** (transparent, 1024x1024): both systems fall back to a
+deterministic abstract placeholder (`ImageUtils.getDeterministicAbstractPlaceholder`,
+hashed from the class name) when no real art is set — that's what the
+`abstract-NNN` icons are. To give one real art:
+
+- *Cards*: `AbstractCard.portraitName` — set it in the card's constructor;
+  the texture must exist or the fallback silently wins. Card art lives in
+  the class's category (`Sprites/Cards/Blackhand/` etc.). Existing card
+  icons are white game-icons.net-style glyphs; use the flat-icon block
+  below. Full-color painted card art would be a new convention — ask the
+  owner first.
+- *Relics*: `AbstractRelic` uses `imageName` (same fallback), and relics
+  get a **seeded color tint applied over the icon** — so relic art must be
+  a white/greyscale glyph or the tint will muddy it. Use the flat-icon
+  block; set `this.imageName` in the relic's constructor.
+
 **The no-background sentence** (append for every transparent asset):
 > The background must be fully transparent alpha — no backdrop, no gradient,
 > no vignette, nothing behind the subject. No text, no watermark.
