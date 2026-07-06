@@ -19,16 +19,10 @@ export default class ImageUtils {
         location_backgrounds: {
             prefix: 'Backgrounds/Location/',
             files: [
-                // screens
-                "roster-screen-stained-glass.png",
-                "route-select-screen-stained-glass.png",
-                "investments-screen-stained-glass.png",
-
                 // battle backgrounds
                 "backrooms-oil-painting.png",
                 "canyon-oil-painting.png",
                 "facility-oil-painting.png",
-                "forest-battle-background-1.png",
                 "forest-oil-painting.png",
                 "heaven-oil-painting.png",
                 "hell-oil-painting-cold.png",
@@ -56,7 +50,6 @@ export default class ImageUtils {
             files: [
                 "shopkeeper-professional.png",
                 "shopkeeper-shady.png",
-                "shopkeeper-shady-2.png",
                 "shopkeeper-spooky.png",
               ]
         },
@@ -335,7 +328,7 @@ export default class ImageUtils {
                 // french
                 "Eldritch Corruption Deer.png", "Eldritch Soldier Gunner.png", "Eldritch Corruption Crow.png",
 
-                "veil-capacitor.png", "doris-smith.png",
+                "veil-capacitor.png", "doris-smith.png", "sorrowmoth-swarm.png",
                 "Worm.png", "Lumberjack.png", 
                 
                 // symbol heads
@@ -393,7 +386,9 @@ export default class ImageUtils {
             files: [
                 'knife-thrust.png', 'magick-trick.png', 'poison-bottle-2.png', 'round-shield.png',
                 'star-swirl.png', 'uncertainty.png', 'unstable-orb.png', 'sword-array.png',
-                'chemical-bolt.png', 'add-card-to-pile.png', 'pentacle.png'
+                // pentacle-intent avoids a key collision with the diabolist
+                // card pentacle icon (keys are filenames sans extension).
+                'chemical-bolt.png', 'add-card-to-pile.png', 'pentacle-intent.png'
             ]
         },
     };

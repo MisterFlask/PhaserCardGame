@@ -10,7 +10,7 @@ export class FrenchBlindProphetess extends AutomatedCharacter {
     constructor() {
         super({
             name: "Doris Smith",
-            portraitName: "hermit",
+            portraitName: "doris-smith",
             maxHitpoints: 200,
             description: "whispers of the Final Argument"
         });

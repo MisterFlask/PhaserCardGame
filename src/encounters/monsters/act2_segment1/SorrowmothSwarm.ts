@@ -7,7 +7,7 @@ export class SorrowMothSwarm extends AutomatedCharacter {
     constructor() {
         super({
             name: "Sorrow-Moth Swarm",
-            portraitName: "Corrupted Fire Dragon",
+            portraitName: "sorrowmoth-swarm",
             maxHitpoints: 70,
             description: "a drifting, jittery cloud of pale wings that feed on hope. their touch saps courage, leaving only weakness."
         });
