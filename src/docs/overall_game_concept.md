@@ -27,11 +27,11 @@ The player controls the **East Infernal Company**, a mercantile expedition desce
 
   1. **Styx Delta**: Swampy, polluted wetlands with environmentalist demons fighting industrial encroachment.
   2. **Deep France**: Fiery Napoleonic warzone with trench warfare, machine guns, and revisionist-undead armies led by Emperor Napoleon Undying.
-  3. **The Dis Foundry Belt** : A sprawling bureaucratic capital that literally runs on infernal paperwork, seals, and red tape, where resource management revolves around using and generating paperwork consumables.
+  3. **The Dis Foundry Belt** : A sprawling bureaucratic-industrial capital that literally runs on infernal paperwork, seals, and red tape — labor unrest, repossessions, and management by memorandum.
 
-* **Consumable System** (Bureaucracy as Potions)
+* **Consumable Equipment ("Field Kit")**
 
-  * Paperwork, permits, contracts, and decrees act as consumables providing temporary bonuses, debuffs, or battlefield effects.
+  * Expendable physical gear — tonics, demolition charges, surveyor's optics, phylacteries — providing temporary bonuses or battlefield effects. (The earlier "bureaucracy as potions" concept was dropped by owner decision, July 2026; documents survive only as physical objects where mechanically load-bearing, e.g. transit writs handed over as a toll.)
 
 * **Faction Dynamics**
 
