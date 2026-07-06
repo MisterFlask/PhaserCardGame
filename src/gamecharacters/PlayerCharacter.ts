@@ -11,6 +11,12 @@ export class PlayerCharacter extends BaseCharacter {
     weeksWoundedRemaining: number = 0;
     /** Permanently lost to the campaign (killed on a sortie). */
     isDeceased: boolean = false;
+    /** Cumulative XP earned on sorties. Pending promotions are always
+     *  derived from this (see src/campaign/Leveling.ts); never store a
+     *  "pending level" field. */
+    xp: number = 0;
+    /** Current soldier level (1-LEVEL_CAP). Promotions increment this. */
+    level: number = 1;
     /** Soldiers at or past this much stress cannot be dispatched. */
     static readonly STRESS_DEPLOYMENT_LIMIT = 10;
 

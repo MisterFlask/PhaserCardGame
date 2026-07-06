@@ -3,13 +3,12 @@ import { EventsManager } from "../events/EventsManager";
 import { Lethality } from "../gamecharacters/buffs/standard/Lethality";
 import { PlayerCharacter } from "../gamecharacters/PlayerCharacter";
 import { AbstractReward } from "../rewards/AbstractReward";
-import { CardReward } from "../rewards/CardReward";
-import { CardRewardsGenerator } from "../rules/CardRewardsGenerator";
 import { GameState } from "../rules/GameState";
 import { CampaignUiState } from "../screens/campaign/hq_ux/CampaignUiState";
 import { SceneChanger } from "../screens/SceneChanger";
 import { applyHpHardening, hardeningForYear } from "./EncounterHardening";
 import { Contract } from "./Contract";
+import { xpForCombatWin } from "./Leveling";
 import { applyCasualties } from "./SortieResolution";
 
 /**
@@ -101,15 +100,38 @@ export class SortieManager {
         SceneChanger.switchToCombatScene(encounter);
     }
 
-    /** Card pick after every combat; the contract's £ settles at resolution. */
+    /**
+     * Post-combat card rewards are dead (Amendment: Soldier Levels &
+     * Promotions supersedes them) — cards are now doled out at promotion,
+     * not after every fight. Kept as an empty-array method rather than
+     * deleted so CombatUiManager.determineRewards() (owned by another
+     * agent) needs no changes: it already skips the reward screen when the
+     * array is empty.
+     */
     public getRewardsForCurrentCombat(): AbstractReward[] {
-        const cards = CardRewardsGenerator.getInstance().generateCardRewardsForCombat();
-        return [new CardReward(cards)];
+        return [];
     }
 
     /** Called when the player clicks Continue/Return after a won combat. */
     public advance(): void {
         if (!this.activeContract) return;
+
+        // XP for the win to every deployed soldier still standing (design
+        // doc: "wounded still earn it; the dead do not"). The old ashes
+        // payoff converts to bonus XP ONCE, at the sortie's final combat:
+        // combatResources persist across a sortie's combats, so a
+        // per-combat read would re-grant earlier combats' ashes.
+        const baseXp = xpForCombatWin(this.activeContract.act);
+        const isFinalCombat = this.combatsRemaining() <= 1;
+        const bonusXp = isFinalCombat
+            ? GameState.getInstance().combatState.combatResources.ashes.value
+            : 0;
+        this.squad.forEach(character => {
+            if (character.hitpoints > 0 && !character.isDeceased) {
+                character.xp += baseXp + bonusXp;
+            }
+        });
+
         this.combatsCompleted++;
         if (this.combatsRemaining() > 0) {
             this.launchNextCombat();

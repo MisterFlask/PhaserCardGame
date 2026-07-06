@@ -10,7 +10,11 @@ import { AbstractEvent } from '../events/AbstractEvent';
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
 import { PlayerCharacter } from '../gamecharacters/PlayerCharacter';
 import { SortieManager } from '../campaign/SortieManager';
+import { levelFromXp, pendingLevels, xpCostForLevel, xpForCombatWin } from '../campaign/Leveling';
+import { applyPromotion } from '../campaign/Promotion';
+import { CardRewardsGenerator } from '../rules/CardRewardsGenerator';
 import { GameState } from '../rules/GameState';
+import { CampaignSerializer } from '../saveload/CampaignSerializer';
 import { SaveRegistries } from '../saveload/SaveRegistries';
 import { StandingOrdersState } from '../campaign/orders/StandingOrdersState';
 import { CampaignUiState } from './campaign/hq_ux/CampaignUiState';
@@ -502,5 +506,13 @@ installBackgroundStepper();
 // Drives the full sortie loop (HQ -> dispatch -> combat -> payout -> HQ ->
 // save/reload) headlessly and reports compact JSON; see src/utils/SmokeTest.ts.
 (window as any).runSmokeTest = () => runSmokeTest();
+// Soldier leveling debug hooks (Amendment: Soldier Levels & Promotions).
+// The promotion UI (card-pick screen, Barracks PROMOTE button) is a later
+// piece of work; until it exists these are the only way to drive a
+// promotion from outside a unit test.
+(window as any).Leveling = { levelFromXp, pendingLevels, xpCostForLevel, xpForCombatWin };
+(window as any).applyPromotion = applyPromotion;
+(window as any).CardRewardsGenerator = CardRewardsGenerator;
+(window as any).CampaignSerializer = CampaignSerializer;
 
 export default CombatScene;

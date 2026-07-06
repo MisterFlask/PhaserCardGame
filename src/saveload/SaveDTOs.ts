@@ -5,7 +5,10 @@
 // v2: added contractsCompleted and per-project victory points.
 // v3: added contract client and paymentClause (invoice-style flavor fields).
 // v4: added standingOrders (active/pending order ids + bonus slots).
-export const SAVE_FORMAT_VERSION = 4;
+// v5: added per-character xp/level (Amendment: Soldier Levels & Promotions).
+//     Perks ride the existing `traits` buff serialization (isPersonaTrait);
+//     no new DTO shape needed for them.
+export const SAVE_FORMAT_VERSION = 5;
 export const SAVE_STORAGE_KEY = 'east-infernal-company-save';
 
 export interface BuffDTO {
@@ -38,6 +41,9 @@ export interface CharacterDTO {
     weeksWoundedRemaining: number;
     traits: BuffDTO[];
     deck: CardDTO[];
+    /** Cumulative XP; pending promotions are always derived (Leveling.ts), never stored. */
+    xp: number;
+    level: number;
 }
 
 export interface ContractDTO {

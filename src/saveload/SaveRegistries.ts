@@ -13,6 +13,22 @@ import { Scholar } from "../gamecharacters/buffs/persona/Scholar";
 import { StrongBack } from "../gamecharacters/buffs/persona/StrongBack";
 import { Undersider } from "../gamecharacters/buffs/persona/Undersider";
 import { WellDrilled } from "../gamecharacters/buffs/persona/WellDrilled";
+import { CommandPresence } from "../gamecharacters/buffs/perks/archon/CommandPresence";
+import { DrilledFormation } from "../gamecharacters/buffs/perks/archon/DrilledFormation";
+import { ReadTheRiotAct } from "../gamecharacters/buffs/perks/archon/ReadTheRiotAct";
+import { StiffUpperLip } from "../gamecharacters/buffs/perks/archon/StiffUpperLip";
+import { ArsonistsInstinct } from "../gamecharacters/buffs/perks/blackhand/ArsonistsInstinct";
+import { HairTriggerNerves } from "../gamecharacters/buffs/perks/blackhand/HairTriggerNerves";
+import { PowderTemper } from "../gamecharacters/buffs/perks/blackhand/PowderTemper";
+import { ScorchedEarthDoctrine } from "../gamecharacters/buffs/perks/blackhand/ScorchedEarthDoctrine";
+import { OverpressuredValves } from "../gamecharacters/buffs/perks/cog/OverpressuredValves";
+import { ReinforcedChassis } from "../gamecharacters/buffs/perks/cog/ReinforcedChassis";
+import { SelfWindingMechanism } from "../gamecharacters/buffs/perks/cog/SelfWindingMechanism";
+import { SurplusRequisitions } from "../gamecharacters/buffs/perks/cog/SurplusRequisitions";
+import { GraveyardShift } from "../gamecharacters/buffs/perks/diabolist/GraveyardShift";
+import { MarkedSoul } from "../gamecharacters/buffs/perks/diabolist/MarkedSoul";
+import { PactWhisper } from "../gamecharacters/buffs/perks/diabolist/PactWhisper";
+import { WardingSigil } from "../gamecharacters/buffs/perks/diabolist/WardingSigil";
 import { Buster } from "../gamecharacters/buffs/playable_card/Buster";
 import { Doubled } from "../gamecharacters/buffs/playable_card/Doubled";
 import { Heavy } from "../gamecharacters/buffs/playable_card/Heavy";
@@ -51,6 +67,12 @@ const BUFF_CLASSES: BuffCtor[] = [
     // persona traits (CharacterGenerator pool)
     Scholar, WellDrilled, StrongBack, Undersider, Merchant,
     Badass, HeavySmoker, CapitalistSoul, Daring, BloodKnight,
+    // class perks (promotion rewards at levels 4/8 — PerkPools.ts); these
+    // ride the same isPersonaTrait serialization path as persona traits.
+    CommandPresence, StiffUpperLip, DrilledFormation, ReadTheRiotAct,
+    PowderTemper, ScorchedEarthDoctrine, HairTriggerNerves, ArsonistsInstinct,
+    SelfWindingMechanism, ReinforcedChassis, OverpressuredValves, SurplusRequisitions,
+    PactWhisper, GraveyardShift, MarkedSoul, WardingSigil,
     // buffs that can land on cards (starting decks + reward modifiers)
     IncreasePages, IncreaseIron, IncreaseVenture, IncreaseSmog,
     IncreaseBlood, IncreasePluck, Lethality,

@@ -50,10 +50,14 @@ export class CampaignSerializer {
             maxHitpoints: character.maxHitpoints,
             weeksWoundedRemaining: character.weeksWoundedRemaining,
             // Persona traits plus campaign-persistent afflictions (stress).
+            // Perks (PerkPools.ts) are isPersonaTrait too, so they ride this
+            // same filter without any perk-specific DTO work.
             traits: character.buffs
                 .filter(b => b.isPersonaTrait || b.id === "stress")
                 .map(b => this.buffToDTO(b)),
             deck: character.cardsInMasterDeck.map(c => this.cardToDTO(c)),
+            xp: character.xp,
+            level: character.level,
         };
     }
 
@@ -135,6 +139,8 @@ export class CampaignSerializer {
         character.maxHitpoints = dto.maxHitpoints;
         character.hitpoints = dto.maxHitpoints; // at HQ, soldiers are rested
         character.weeksWoundedRemaining = dto.weeksWoundedRemaining;
+        character.xp = dto.xp;
+        character.level = dto.level;
         character.buffs = this.buffsFromDTOs(dto.traits);
 
         character.cardsInMasterDeck = [];

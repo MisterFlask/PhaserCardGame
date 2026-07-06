@@ -1,0 +1,87 @@
+import { describe, expect, it } from 'vitest';
+import {
+    LEVEL_CAP, levelFromXp, levelGrantsPerk, PERK_LEVELS,
+    pendingLevels, xpCostForLevel, xpForCombatWin
+} from '../Leveling';
+
+describe('xpCostForLevel', () => {
+    it('follows 20 + 10*(fromLevel-1)', () => {
+        expect(xpCostForLevel(1)).toBe(20);
+        expect(xpCostForLevel(2)).toBe(30);
+        expect(xpCostForLevel(3)).toBe(40);
+        expect(xpCostForLevel(9)).toBe(100);
+    });
+});
+
+describe('levelFromXp', () => {
+    it('starts at level 1 with 0 xp', () => {
+        expect(levelFromXp(0)).toBe(1);
+    });
+
+    it('stays at level 1 just under the level-2 threshold', () => {
+        expect(levelFromXp(19)).toBe(1);
+    });
+
+    it('reaches level 2 exactly at the threshold (cost 20)', () => {
+        expect(levelFromXp(20)).toBe(2);
+    });
+
+    it('reaches level 3 at cumulative 20+30=50', () => {
+        expect(levelFromXp(49)).toBe(2);
+        expect(levelFromXp(50)).toBe(3);
+    });
+
+    it('clamps at LEVEL_CAP no matter how much xp is thrown at it', () => {
+        expect(levelFromXp(1_000_000)).toBe(LEVEL_CAP);
+
+        // Sanity: the cumulative cost to reach the cap should be finite and
+        // reachable; going one xp short of it should NOT yet report the cap.
+        let cumulativeToCap = 0;
+        for (let l = 1; l < LEVEL_CAP; l++) {
+            cumulativeToCap += xpCostForLevel(l);
+        }
+        expect(levelFromXp(cumulativeToCap - 1)).toBe(LEVEL_CAP - 1);
+        expect(levelFromXp(cumulativeToCap)).toBe(LEVEL_CAP);
+    });
+});
+
+describe('pendingLevels', () => {
+    it('is 0 when xp has not caught up to stored level', () => {
+        expect(pendingLevels({ xp: 0, level: 1 })).toBe(0);
+    });
+
+    it('derives pending promotions from xp vs stored level, never stored itself', () => {
+        // Enough xp for level 3 (cumulative 50), but character record says level 1.
+        expect(pendingLevels({ xp: 50, level: 1 })).toBe(2);
+    });
+
+    it('never goes negative if level is ahead of what xp would imply', () => {
+        expect(pendingLevels({ xp: 0, level: 5 })).toBe(0);
+    });
+
+    it('is 0 once level has caught up to what xp supports', () => {
+        expect(pendingLevels({ xp: 20, level: 2 })).toBe(0);
+    });
+});
+
+describe('xpForCombatWin', () => {
+    it('follows 10 + 5*act', () => {
+        expect(xpForCombatWin(1)).toBe(15);
+        expect(xpForCombatWin(2)).toBe(20);
+        expect(xpForCombatWin(3)).toBe(25);
+    });
+});
+
+describe('perk levels', () => {
+    it('PERK_LEVELS is [4, 8]', () => {
+        expect(PERK_LEVELS).toEqual([4, 8]);
+    });
+
+    it('levelGrantsPerk is true only at 4 and 8', () => {
+        expect(levelGrantsPerk(4)).toBe(true);
+        expect(levelGrantsPerk(8)).toBe(true);
+        expect(levelGrantsPerk(1)).toBe(false);
+        expect(levelGrantsPerk(5)).toBe(false);
+        expect(levelGrantsPerk(10)).toBe(false);
+    });
+});

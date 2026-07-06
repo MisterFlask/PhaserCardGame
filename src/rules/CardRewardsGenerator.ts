@@ -1,7 +1,9 @@
 import { SortieManager } from "../campaign/SortieManager";
 import { StandingOrdersState } from "../campaign/orders/StandingOrdersState";
+import { LEVEL_CAP } from "../campaign/Leveling";
 import { EntityRarity } from "../gamecharacters/EntityRarity";
 import { PlayableCard } from "../gamecharacters/PlayableCard";
+import { PlayerCharacter } from "../gamecharacters/PlayerCharacter";
 import { CardLibrary } from "../gamecharacters/playerclasses/cards/CardLibrary";
 import { GameState } from "./GameState";
 import { ModifierContext } from "./modifiers/AbstractCardModifier";
@@ -47,18 +49,31 @@ export class CardRewardsGenerator {
         return 1; // Fallback
     }
 
-    private getCardRewardOfSpecifiedPowerLevel(powerLevel: number): PlayableCard {
+    /**
+     * @param cardPool Restricts the draw to a specific set of candidate
+     * cards (e.g. one character's class pool). Defaults to the whole
+     * current-run squad's combined pool for the legacy combat-reward path.
+     */
+    private getCardRewardOfSpecifiedPowerLevel(powerLevel: number, cardPool?: PlayableCard[]): PlayableCard {
         const library = CardLibrary.getInstance();
         const registry = CardModifierRegistry.getInstance();
+        const pickFrom = (rarity: EntityRarity): PlayableCard => {
+            if (cardPool) {
+                const ofRarity = cardPool.filter(c => c.rarity === rarity);
+                const chosen = ofRarity[Math.floor(Math.random() * ofRarity.length)];
+                return chosen.Copy();
+            }
+            return library.getRandomSelectionOfRelevantClassCards(1, rarity)[0];
+        };
         let card: PlayableCard;
 
         switch (powerLevel) {
             case 3:
                 // Either rare OR uncommon with improvement
                 if (Math.random() < 0.5) {
-                    card = library.getRandomSelectionOfRelevantClassCards(1, EntityRarity.COMMON)[0];
+                    card = pickFrom(EntityRarity.COMMON);
                 } else {
-                    card = library.getRandomSelectionOfRelevantClassCards(1, EntityRarity.UNCOMMON)[0];
+                    card = pickFrom(EntityRarity.UNCOMMON);
                     const positiveModifiers = registry.positiveModifiers
                         .filter(mod => mod.isApplicableInContext(ModifierContext.CARD_REWARD) && mod.eligible(card));
                     const randomModifier = positiveModifiers[Math.floor(Math.random() * positiveModifiers.length)];
@@ -70,15 +85,15 @@ export class CardRewardsGenerator {
                 // Either uncommon OR common with improvement OR rare with detriment
                 const roll = Math.random();
                 if (roll < 0.4) {
-                    card = library.getRandomSelectionOfRelevantClassCards(1, EntityRarity.UNCOMMON)[0];
+                    card = pickFrom(EntityRarity.UNCOMMON);
                 } else if (roll < 0.8) {
-                    card = library.getRandomSelectionOfRelevantClassCards(1, EntityRarity.COMMON)[0];
+                    card = pickFrom(EntityRarity.COMMON);
                     const positiveModifiers = registry.positiveModifiers
                         .filter(mod => mod.isApplicableInContext(ModifierContext.CARD_REWARD) && mod.eligible(card));
                     const randomModifier = positiveModifiers[Math.floor(Math.random() * positiveModifiers.length)];
                     randomModifier.applyModification(card);
                 } else {
-                    card = library.getRandomSelectionOfRelevantClassCards(1, EntityRarity.RARE)[0];
+                    card = pickFrom(EntityRarity.RARE);
                     const negativeModifiers = registry.negativeModifiers
                         .filter(mod => mod.isApplicableInContext(ModifierContext.CARD_REWARD) && mod.eligible(card));
                     const randomModifier = negativeModifiers[Math.floor(Math.random() * negativeModifiers.length)];
@@ -88,7 +103,7 @@ export class CardRewardsGenerator {
 
             case 1:
             default:
-                card = library.getRandomSelectionOfRelevantClassCards(1, EntityRarity.COMMON)[0];
+                card = pickFrom(EntityRarity.COMMON);
                 break;
         }
 
@@ -104,7 +119,7 @@ export class CardRewardsGenerator {
         const currentFloor = contract
             ? ((contract.act - 1) * 3 + contract.segment + 1) * 5
             : 1;
-        
+
         let pagesCardsAdded = 0;
         if (pagesValue > 4) {
             pagesCardsAdded = 1;
@@ -115,11 +130,35 @@ export class CardRewardsGenerator {
 
         const numCardsToGenerate = StandingOrdersState.getInstance().cardRewardChoices(3 + pagesCardsAdded);
         const distribution = this.calculatePowerLevelDistribution(currentFloor);
-        
+
         // Generate cards based on power levels
         return Array(numCardsToGenerate)
             .fill(0)
             .map(() => this.getRandomPowerLevel(distribution))
             .map(powerLevel => this.getCardRewardOfSpecifiedPowerLevel(powerLevel));
+    }
+
+    /**
+     * Level-up card choices (Amendment: Soldier Levels & Promotions). Runs
+     * at HQ, not during combat — deliberately does NOT read combatState (no
+     * ashes bonus here; that's a combat-only mechanic that no longer applies
+     * once post-combat rewards are gone). Cards are restricted to the
+     * promoted character's own class pool, not the whole squad's.
+     *
+     * Rarity weighting reuses calculatePowerLevelDistribution's 1-50 "floor"
+     * curve. Balance-pass sketch mapping: newLevel (1-10) * 5, so a level-10
+     * promotion reaches the curve's most rare-heavy point (floor 50) the
+     * same as a deep-Act combat reward would.
+     */
+    public generateCardRewardsForLevelUp(character: PlayerCharacter, newLevel: number): PlayableCard[] {
+        const pool = CardLibrary.getInstance().getCardsForClass(character.characterClass);
+        const currentFloor = Math.min(newLevel, LEVEL_CAP) * 5;
+        const distribution = this.calculatePowerLevelDistribution(currentFloor);
+        const numCardsToGenerate = StandingOrdersState.getInstance().cardRewardChoices(3);
+
+        return Array(numCardsToGenerate)
+            .fill(0)
+            .map(() => this.getRandomPowerLevel(distribution))
+            .map(powerLevel => this.getCardRewardOfSpecifiedPowerLevel(powerLevel, pool));
     }
 }
