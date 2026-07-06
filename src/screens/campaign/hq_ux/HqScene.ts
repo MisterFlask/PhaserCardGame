@@ -16,9 +16,11 @@ import { ContractBoardPanel } from './panels/ContractBoardPanel';
 import { EndOfCampaignPanel } from './panels/EndOfCampaignPanel';
 import { InvestmentPanel } from './panels/InvestmentPanel';
 import { LedgerPanel } from './panels/LedgerPanel';
+import { PromotionPanel } from './panels/PromotionPanel';
 import { SortieReportPanel } from './panels/SortieReportPanel';
+import { pendingLevels } from '../../../campaign/Leveling';
 
-type PanelKey = 'contracts' | 'investment' | 'barracks' | 'ledger' | 'ending' | 'report';
+type PanelKey = 'contracts' | 'investment' | 'barracks' | 'ledger' | 'ending' | 'report' | 'promotion';
 
 export class HqScene extends Scene {
     private currentPanel?: AbstractHqPanel;
@@ -30,6 +32,7 @@ export class HqScene extends Scene {
     private ledgerPanel!: LedgerPanel;
     private endOfCampaignPanel!: EndOfCampaignPanel;
     private sortieReportPanel!: SortieReportPanel;
+    private promotionPanel!: PromotionPanel;
 
     constructor() {
         super({ key: 'HqScene' });
@@ -91,6 +94,7 @@ export class HqScene extends Scene {
         this.ledgerPanel = new LedgerPanel(this);
         this.endOfCampaignPanel = new EndOfCampaignPanel(this);
         this.sortieReportPanel = new SortieReportPanel(this);
+        this.promotionPanel = new PromotionPanel(this);
 
         // Hide all panels initially
         this.investmentPanel.setVisible(false);
@@ -99,6 +103,7 @@ export class HqScene extends Scene {
         this.ledgerPanel.setVisible(false);
         this.endOfCampaignPanel.setVisible(false);
         this.sortieReportPanel.setVisible(false);
+        this.promotionPanel.setVisible(false);
 
         // The chrome (status bar + tab rail) persists above every normal
         // panel; it is created once and never destroyed across sortie
@@ -107,11 +112,15 @@ export class HqScene extends Scene {
         this.chrome?.destroy();
         this.chrome = new HqChrome(this);
 
-        // Endings trump everything; a fresh debrief trumps the board.
+        // Endings trump everything; a fresh debrief trumps the board; a
+        // still-pending promotion queue (player quit mid-queue and reloaded —
+        // pendingLevels is derived from xp, so it survives) trumps the board too.
         if (this.isCampaignOver()) {
             this.showPanel('ending');
         } else if (SortieManager.getInstance().hasUnviewedReport) {
             this.showPanel('report');
+        } else if (CampaignUiState.getInstance().roster.some(c => pendingLevels(c) > 0)) {
+            this.showPanel('promotion');
         } else {
             this.showPanel('contracts');
         }
@@ -137,6 +146,9 @@ export class HqScene extends Scene {
                     break;
                 case 'ledger':
                     this.showPanel('ledger');
+                    break;
+                case 'promotion':
+                    this.showPanel('promotion');
                     break;
                 default:
                     this.showPanel('contracts');
@@ -186,6 +198,9 @@ export class HqScene extends Scene {
                 break;
             case 'report':
                 this.currentPanel = this.sortieReportPanel;
+                break;
+            case 'promotion':
+                this.currentPanel = this.promotionPanel;
                 break;
         }
         this.currentPanelKey = panelKey;

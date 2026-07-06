@@ -1,4 +1,5 @@
 import Phaser, { Scene } from 'phaser';
+import { pendingLevels } from '../../../../campaign/Leveling';
 import { PlayableCard } from '../../../../gamecharacters/PlayableCard';
 import { PlayerCharacter } from '../../../../gamecharacters/PlayerCharacter';
 import { ModifierContext } from '../../../../rules/modifiers/AbstractCardModifier';
@@ -82,7 +83,7 @@ export class BarracksPanel extends AbstractHqPanel {
             const status = soldier.weeksWoundedRemaining > 0
                 ? ` — WOUNDED ${soldier.weeksWoundedRemaining}w`
                 : (soldier.stress >= PlayerCharacter.STRESS_DEPLOYMENT_LIMIT ? ' — SHAKEN' : '');
-            const label = `${soldier.name} (${soldier.characterClass.name})`
+            const label = `${soldier.name} (${soldier.characterClass.name}) — Lv ${soldier.level}`
                 + (trait ? ` — ${trait}` : '')
                 + (soldier.stress > 0 ? ` — stress ${soldier.stress}` : '')
                 + status;
@@ -103,6 +104,19 @@ export class BarracksPanel extends AbstractHqPanel {
                 this.selectedCard = null;
                 this.rebuild();
             });
+
+            const pending = pendingLevels(soldier);
+            if (pending > 0) {
+                const promoteButton = this.addDynamic(new TextBoxButton({
+                    scene: this.scene, x: width * 0.14 + 260, y, width: 140, height: 40,
+                    text: `PROMOTE (${pending})`,
+                    style: { fontSize: '14px', color: '#ffffff' },
+                    fillColor: 0x886600
+                }));
+                promoteButton.onClick(() => {
+                    this.scene.events.emit('navigate', 'promotion');
+                });
+            }
         });
 
         // Therapy for the selected soldier

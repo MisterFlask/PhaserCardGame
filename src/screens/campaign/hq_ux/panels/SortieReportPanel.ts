@@ -1,7 +1,9 @@
 import { Scene } from 'phaser';
+import { pendingLevels } from '../../../../campaign/Leveling';
 import { SortieManager } from '../../../../campaign/SortieManager';
 import { TextBoxButton } from '../../../../ui/Button';
 import { TextBox } from '../../../../ui/TextBox';
+import { CampaignUiState } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
 
 /**
@@ -41,7 +43,8 @@ export class SortieReportPanel extends AbstractHqPanel {
         });
         continueButton.onClick(() => {
             SortieManager.getInstance().hasUnviewedReport = false;
-            this.scene.events.emit('navigate', 'contracts');
+            const hasPendingPromotion = CampaignUiState.getInstance().roster.some(c => pendingLevels(c) > 0);
+            this.scene.events.emit('navigate', hasPendingPromotion ? 'promotion' : 'contracts');
         });
 
         this.add([this.reportText, continueButton]);
