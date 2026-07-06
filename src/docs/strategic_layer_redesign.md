@@ -282,6 +282,46 @@ Two problems with projects-as-pure-purchases:
    if-this-order branches.
 4. Pull the five dead cargo projects from the purchasable pool.
 
+## Amendment: Soldier Levels & Promotions (July 2026)
+
+**Status:** Approved direction. Supersedes post-combat card rewards and the
+"XP → rank" sketch under Roster & Consequences.
+
+Card rewards stop dropping after combats. Instead, soldiers earn **XP** on
+sorties and are **promoted at the debrief**; the level-up is where cards
+are doled out:
+
+- **Every level (2–10):** the promoted soldier picks 1 of 3 cards,
+  class-eligible **for that soldier** (no more mashed-squad pools), rarity
+  weighted by level. The Archives Standing Order raises choices to 4.
+- **Levels 4 and 8:** the soldier additionally receives a **randomized
+  perk** — a class-specific passive ability (implemented as a trait buff,
+  drawn without replacement from that class's perk pool of 4+).
+- **Level cap 10.** A veteran is starting kit (~8) + 9 picked cards — the
+  "curated 15-17 card machine" the deckbuilding section wants, with no
+  separate deck-cap rule needed: acquisition is level-gated.
+
+### XP economics (sketch numbers, balance-pass flagged like all others)
+
+- Each combat won: XP = 10 + 5×act to every deployed surviving soldier
+  (wounded still earn it; the dead do not).
+- Ashes (combat resource): its post-combat bonus-card payoff dies with
+  post-combat rewards; instead ashes.value converts to bonus XP per squad
+  member at combat end.
+- Cost from level L to L+1: 20 + 10×(L−1). (~1 sortie to level 2; ~16
+  sorties to cap.)
+
+### Flow & persistence
+
+- Pending promotions are **derived** (levelFromXp(xp) − level), never
+  stored: quit mid-promotion and the prompt simply reappears. Save carries
+  only `xp` and `level` per character (+ perks riding the existing traits
+  serialization); save format bump.
+- After the sortie debrief is filed, a promotion sequence resolves each
+  pending level one at a time (card pick; perk reveal at 4/8). The
+  Barracks also surfaces a PROMOTE action for any soldier with pending
+  levels, as the fallback path.
+
 ## Roster & Consequences
 
 - **Roster**: starts 5, cap 8 (12 with Barracks). Recruits generated with class,
