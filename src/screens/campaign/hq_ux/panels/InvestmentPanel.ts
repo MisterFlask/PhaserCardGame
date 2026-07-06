@@ -20,7 +20,6 @@ const ORDER_CARD_H = 160;
 
 export class InvestmentPanel extends AbstractHqPanel {
     private projectCards: PhysicalProjectCard[] = [];
-    private titleTextBox: TextBox;
     private poundsDisplay: TextBox;
     private connectionLines: Phaser.GameObjects.Line[] = [];
     private treeContainer: Phaser.GameObjects.Container;
@@ -35,29 +34,21 @@ export class InvestmentPanel extends AbstractHqPanel {
 
     constructor(scene: Scene) {
         super(scene, 'Factory Investments');
+        this.titleText.setVisible(false); // tab rail (BOARDROOM) names the view
 
         // Create UI container
         this.uiContainer = scene.add.container(0, 0);
 
-        // Add title TextBox
-        this.titleTextBox = new TextBox({
-            scene: scene,
-            x: scene.scale.width / 2,
-            y: 50,
-            width: 400,
-            text: 'STRATEGIC INVESTMENTS',
-            style: { fontSize: '28px', fontFamily: 'verdana' }
-        });
-        this.uiContainer.add(this.titleTextBox);
-
-        // Add British Pounds Sterling display below the title
+        // Working-capital display. Chrome (status bar + tab rail) occupies
+        // y 0-100; this sits just below the tab rail, above the CAPITAL
+        // WORKS / STANDING ORDERS toggle.
         this.poundsDisplay = new TextBox({
             scene: scene,
             x: scene.scale.width / 2,
-            y: 120,
+            y: 122,
             width: 250,
             text: `Current Working Capital: £${GameState.getInstance().moneyInVault}`,
-            style: { fontSize: '24px', fontFamily: 'verdana', color: '#FFD700', align: 'center' }
+            style: { fontSize: '22px', fontFamily: 'verdana', color: '#FFD700', align: 'center' }
         });
         this.uiContainer.add(this.poundsDisplay);
 

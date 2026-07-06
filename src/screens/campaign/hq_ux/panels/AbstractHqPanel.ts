@@ -1,11 +1,8 @@
 import { Scene } from 'phaser';
-import { TextBoxButton } from '../../../../ui/Button';
 import { TextBox } from '../../../../ui/TextBox';
-import { Fonts, Palette } from '../../../../ui/UIStyle';
 
 export abstract class AbstractHqPanel extends Phaser.GameObjects.Container {
     protected titleText: TextBox;
-    protected returnButton: TextBoxButton;
     protected title: string;
     protected backgroundImage?: Phaser.GameObjects.Image;
 
@@ -16,7 +13,7 @@ export abstract class AbstractHqPanel extends Phaser.GameObjects.Container {
         if (!backgroundImageKey) {
             backgroundImageKey = "investments-screen-oil-painting"
         }
-        
+
         this.title = title;
 
         // Add background image if provided
@@ -28,7 +25,9 @@ export abstract class AbstractHqPanel extends Phaser.GameObjects.Container {
             this.add(this.backgroundImage);
         }
 
-        // Add title
+        // Add title (the tab rail now names the current view for most
+        // panels; individual panels may hide this via titleText.setVisible(false)
+        // if the chrome already covers it).
         this.titleText = new TextBox({
             scene,
             x: scene.scale.width / 2,
@@ -39,25 +38,7 @@ export abstract class AbstractHqPanel extends Phaser.GameObjects.Container {
             style: { fontSize: '24px', color: '#ffffff' }
         });
 
-        // Add return button (house style: dark wood + brass)
-        this.returnButton = new TextBoxButton({
-            scene,
-            x: 100,
-            y: 30,
-            width: 160,
-            height: 42,
-            text: 'Return to Hub',
-            style: { fontSize: '18px', color: Palette.BRASS_TEXT, fontFamily: Fonts.DISPLAY },
-            fillColor: Palette.WOOD_PANEL
-        });
-
-        this.returnButton.onClick(() => this.returnToHub());
-
-        this.add([this.titleText, this.returnButton]);
-    }
-
-    protected returnToHub(): void {
-        this.scene.events.emit('returnToHub');
+        this.add([this.titleText]);
     }
 
     public show(): void {

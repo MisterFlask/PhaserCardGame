@@ -14,8 +14,10 @@ export class SortieReportPanel extends AbstractHqPanel {
 
     constructor(scene: Scene) {
         super(scene, 'Expedition Debrief');
-
-        this.returnButton.setVisible(false);
+        // The chrome (status bar) renders above this panel and would occlude
+        // the title at its default y=30; nudge it below the chrome instead
+        // of hiding it outright, since no tab names this debrief screen.
+        this.titleText.setPosition(scene.scale.width / 2, 118);
 
         this.reportText = new TextBox({
             scene,
@@ -39,7 +41,7 @@ export class SortieReportPanel extends AbstractHqPanel {
         });
         continueButton.onClick(() => {
             SortieManager.getInstance().hasUnviewedReport = false;
-            this.scene.events.emit('returnToHub');
+            this.scene.events.emit('navigate', 'contracts');
         });
 
         this.add([this.reportText, continueButton]);

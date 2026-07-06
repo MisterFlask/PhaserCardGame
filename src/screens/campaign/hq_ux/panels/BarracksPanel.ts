@@ -30,6 +30,7 @@ export class BarracksPanel extends AbstractHqPanel {
 
     constructor(scene: Scene) {
         super(scene, 'Barracks');
+        this.titleText.setVisible(false); // tab rail names the view
 
         this.statusLine = new TextBox({
             scene,
@@ -68,8 +69,10 @@ export class BarracksPanel extends AbstractHqPanel {
         const width = this.scene.scale.width;
 
         // --- Roster, left column ---
+        // Chrome (status bar + tab rail) occupies y 0-100; column headers
+        // start below it with headroom to spare.
         this.addDynamic(new TextBox({
-            scene: this.scene, x: width * 0.14, y: 100, width: 200, height: 35,
+            scene: this.scene, x: width * 0.14, y: 130, width: 200, height: 35,
             text: `Roster (${campaign.roster.length}/${ROSTER_CAP})`,
             style: { fontSize: '20px', color: '#ffffff' }
         }));
@@ -83,7 +86,7 @@ export class BarracksPanel extends AbstractHqPanel {
                 + (trait ? ` — ${trait}` : '')
                 + (soldier.stress > 0 ? ` — stress ${soldier.stress}` : '')
                 + status;
-            const y = 150 + i * 52;
+            const y = 180 + i * 52;
             if (this.scene.textures.exists(soldier.portraitName)) {
                 const portrait = this.scene.add.image(width * 0.14 - 225, y, soldier.portraitName)
                     .setDisplaySize(44, 44);
@@ -108,7 +111,7 @@ export class BarracksPanel extends AbstractHqPanel {
             const therapyCost = campaign.getTherapyCost(THERAPY_COST);
             const canTreat = GameState.getInstance().moneyInVault >= therapyCost;
             const therapyButton = this.addDynamic(new TextBoxButton({
-                scene: this.scene, x: width * 0.14, y: 150 + campaign.roster.length * 52 + 15,
+                scene: this.scene, x: width * 0.14, y: 180 + campaign.roster.length * 52 + 15,
                 width: 400, height: 44,
                 text: `Therapy for ${soldier.name}: -${THERAPY_RELIEF} stress (£${therapyCost})`,
                 style: { fontSize: '14px', color: canTreat ? '#ffffff' : '#888888' },
@@ -133,14 +136,14 @@ export class BarracksPanel extends AbstractHqPanel {
         // --- Deck of the selected soldier, middle column ---
         if (this.selectedSoldier) {
             this.addDynamic(new TextBox({
-                scene: this.scene, x: width * 0.45, y: 100, width: 300, height: 35,
+                scene: this.scene, x: width * 0.45, y: 130, width: 300, height: 35,
                 text: `${this.selectedSoldier.name}'s deck (${this.selectedSoldier.cardsInMasterDeck.length} cards)`,
                 style: { fontSize: '20px', color: '#ffffff' }
             }));
             this.selectedSoldier.cardsInMasterDeck.forEach((card, i) => {
                 const selected = this.selectedCard === card;
                 const button = this.addDynamic(new TextBoxButton({
-                    scene: this.scene, x: width * 0.45, y: 150 + i * 46, width: 340, height: 40,
+                    scene: this.scene, x: width * 0.45, y: 180 + i * 46, width: 340, height: 40,
                     text: card.name,
                     style: { fontSize: '14px', color: '#ffffff' },
                     fillColor: selected ? 0x226622 : 0x333344
@@ -158,19 +161,19 @@ export class BarracksPanel extends AbstractHqPanel {
 
         // --- Recruits, right column ---
         this.addDynamic(new TextBox({
-            scene: this.scene, x: width * 0.8, y: 100, width: 200, height: 35,
+            scene: this.scene, x: width * 0.8, y: 130, width: 200, height: 35,
             text: 'Recruits',
             style: { fontSize: '20px', color: '#ffffff' }
         }));
         campaign.recruitCandidates.forEach((candidate, i) => {
             const trait = candidate.buffs.find(b => b.isPersonaTrait)?.getDisplayName() ?? '';
             if (this.scene.textures.exists(candidate.portraitName)) {
-                const portrait = this.scene.add.image(width * 0.78 - 195, 170 + i * 100, candidate.portraitName)
+                const portrait = this.scene.add.image(width * 0.78 - 195, 200 + i * 100, candidate.portraitName)
                     .setDisplaySize(56, 56);
                 this.addDynamic(portrait);
             }
             this.addDynamic(new TextBox({
-                scene: this.scene, x: width * 0.78, y: 150 + i * 100, width: 340, height: 40,
+                scene: this.scene, x: width * 0.78, y: 180 + i * 100, width: 340, height: 40,
                 text: `${candidate.name} (${candidate.characterClass.name})${trait ? ' — ' + trait : ''}`,
                 style: { fontSize: '14px', color: '#ffffff' }
             }));
@@ -178,7 +181,7 @@ export class BarracksPanel extends AbstractHqPanel {
             const canHire = GameState.getInstance().moneyInVault >= recruitCost
                 && campaign.roster.length < ROSTER_CAP;
             const hireButton = this.addDynamic(new TextBoxButton({
-                scene: this.scene, x: width * 0.78, y: 192 + i * 100, width: 170, height: 38,
+                scene: this.scene, x: width * 0.78, y: 222 + i * 100, width: 170, height: 38,
                 text: `Hire (£${recruitCost})`,
                 style: { fontSize: '14px', color: canHire ? '#ffffff' : '#888888' },
                 fillColor: canHire ? 0x226622 : 0x222222
@@ -204,7 +207,7 @@ export class BarracksPanel extends AbstractHqPanel {
         const gameState = GameState.getInstance();
         const card = this.selectedCard!;
         const soldier = this.selectedSoldier!;
-        const actionsY = 150 + soldier.cardsInMasterDeck.length * 46 + 20;
+        const actionsY = 180 + soldier.cardsInMasterDeck.length * 46 + 20;
 
         // Removal (Retraining Program)
         const removalUnlocked = campaign.ownsProject(REMOVAL_GATE);

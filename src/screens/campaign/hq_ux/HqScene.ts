@@ -7,6 +7,7 @@ import ImageUtils from '../../../utils/ImageUtils';
 import { installLoaderWatchdog } from '../../../utils/LoaderWatchdog';
 import { SceneChanger } from '../../SceneChanger';
 import { CampaignUiState } from './CampaignUiState';
+import { HqChrome, HqTabKey } from './HqChrome';
 import { AbstractHqPanel } from './panels/AbstractHqPanel';
 import { SortieManager } from '../../../campaign/SortieManager';
 import { SaveManager } from '../../../saveload/SaveManager';
@@ -14,15 +15,19 @@ import { BarracksPanel } from './panels/BarracksPanel';
 import { ContractBoardPanel } from './panels/ContractBoardPanel';
 import { EndOfCampaignPanel } from './panels/EndOfCampaignPanel';
 import { InvestmentPanel } from './panels/InvestmentPanel';
-import { MainHubPanel } from './panels/MainHubPanel';
+import { LedgerPanel } from './panels/LedgerPanel';
 import { SortieReportPanel } from './panels/SortieReportPanel';
+
+type PanelKey = 'contracts' | 'investment' | 'barracks' | 'ledger' | 'ending' | 'report';
 
 export class HqScene extends Scene {
     private currentPanel?: AbstractHqPanel;
-    private mainHubPanel!: MainHubPanel;
+    private currentPanelKey?: PanelKey;
+    private chrome!: HqChrome;
     private investmentPanel!: InvestmentPanel;
     private contractBoardPanel!: ContractBoardPanel;
     private barracksPanel!: BarracksPanel;
+    private ledgerPanel!: LedgerPanel;
     private endOfCampaignPanel!: EndOfCampaignPanel;
     private sortieReportPanel!: SortieReportPanel;
 
@@ -80,34 +85,40 @@ export class HqScene extends Scene {
         SaveManager.loadOnceOnBoot();
 
         // Create all panels
-        this.mainHubPanel = new MainHubPanel(this);
         this.investmentPanel = new InvestmentPanel(this);
         this.contractBoardPanel = new ContractBoardPanel(this);
         this.barracksPanel = new BarracksPanel(this);
+        this.ledgerPanel = new LedgerPanel(this);
         this.endOfCampaignPanel = new EndOfCampaignPanel(this);
         this.sortieReportPanel = new SortieReportPanel(this);
 
         // Hide all panels initially
-        this.mainHubPanel.setVisible(false);
         this.investmentPanel.setVisible(false);
         this.contractBoardPanel.setVisible(false);
         this.barracksPanel.setVisible(false);
+        this.ledgerPanel.setVisible(false);
         this.endOfCampaignPanel.setVisible(false);
         this.sortieReportPanel.setVisible(false);
 
-        // Endings trump everything; a fresh debrief trumps the hub.
+        // The chrome (status bar + tab rail) persists above every normal
+        // panel; it is created once and never destroyed across sortie
+        // returns... except create() DOES re-run on every sortie return, so
+        // an old chrome instance (with stale timers/listeners) must go first.
+        this.chrome?.destroy();
+        this.chrome = new HqChrome(this);
+
+        // Endings trump everything; a fresh debrief trumps the board.
         if (this.isCampaignOver()) {
             this.showPanel('ending');
         } else if (SortieManager.getInstance().hasUnviewedReport) {
             this.showPanel('report');
         } else {
-            this.showPanel('main');
+            this.showPanel('contracts');
         }
 
         // Set up event listeners. create() re-runs on every sortie return, so
         // clear any prior registrations first to avoid stale-closure leaks.
         this.events.off('navigate');
-        this.events.off('returnToHub');
 
         this.events.on('navigate', (destination: string) => {
             if (this.isCampaignOver()) {
@@ -124,19 +135,20 @@ export class HqScene extends Scene {
                 case 'barracks':
                     this.showPanel('barracks');
                     break;
+                case 'ledger':
+                    this.showPanel('ledger');
+                    break;
                 default:
-                    this.showPanel('main');
+                    this.showPanel('contracts');
             }
         });
 
-        this.events.on('returnToHub', () => {
-            this.showPanel('main');
-        });
-
-        // Set up scene-wide keyboard shortcuts
+        // Set up scene-wide keyboard shortcuts. The node-map-era hub is gone;
+        // ESC now returns to the contract board (the new home screen).
+        this.input?.keyboard?.off('keydown-ESC');
         this.input?.keyboard?.on('keydown-ESC', () => {
-            if (this.currentPanel !== this.mainHubPanel && !this.isCampaignOver()) {
-                this.showPanel('main');
+            if (this.currentPanelKey !== 'contracts' && !this.isCampaignOver()) {
+                this.showPanel('contracts');
             }
         });
 
@@ -149,9 +161,7 @@ export class HqScene extends Scene {
         return cal.isSacked || cal.isCharterExpired;
     }
 
-    private showPanel(
-        panelKey: 'main' | 'investment' | 'contracts' | 'barracks' | 'ending' | 'report'
-    ): void {
+    private showPanel(panelKey: PanelKey): void {
         if (this.currentPanel) {
             this.currentPanel.setVisible(false);
             this.currentPanel.hide();
@@ -159,9 +169,6 @@ export class HqScene extends Scene {
         }
 
         switch (panelKey) {
-            case 'main':
-                this.currentPanel = this.mainHubPanel;
-                break;
             case 'investment':
                 this.currentPanel = this.investmentPanel;
                 break;
@@ -171,6 +178,9 @@ export class HqScene extends Scene {
             case 'barracks':
                 this.currentPanel = this.barracksPanel;
                 break;
+            case 'ledger':
+                this.currentPanel = this.ledgerPanel;
+                break;
             case 'ending':
                 this.currentPanel = this.endOfCampaignPanel;
                 break;
@@ -178,13 +188,25 @@ export class HqScene extends Scene {
                 this.currentPanel = this.sortieReportPanel;
                 break;
         }
+        this.currentPanelKey = panelKey;
 
         this.currentPanel?.setVisible(true);
         this.currentPanel?.show();
         this.currentPanel?.setDepth(999);
+
+        // The ending screen is terminal and gets the whole frame to itself;
+        // every other panel (including the sortie debrief) keeps the
+        // persistent chrome visible above it.
+        this.chrome.setVisible(panelKey !== 'ending');
+        if (panelKey === 'contracts' || panelKey === 'investment'
+            || panelKey === 'barracks' || panelKey === 'ledger') {
+            this.chrome.setActiveTab(panelKey as HqTabKey);
+        }
     }
 
     update(time: number, delta: number): void {
+        this.chrome?.update();
+
         // Update current panel
         if (this.currentPanel && 'update' in this.currentPanel) {
             (this.currentPanel as any).update(time, delta);

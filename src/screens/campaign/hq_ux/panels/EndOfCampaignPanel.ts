@@ -19,9 +19,6 @@ export class EndOfCampaignPanel extends AbstractHqPanel {
     constructor(scene: Scene) {
         super(scene, 'The Board Convenes');
 
-        // No escaping to the hub from an ending.
-        this.returnButton.setVisible(false);
-
         this.headline = new TextBox({
             scene,
             x: scene.scale.width / 2,

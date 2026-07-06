@@ -32,13 +32,7 @@ export class ContractBoardPanel extends AbstractHqPanel {
         const dim = drawBackdropDim(scene, 0.5);
         this.add(dim);
 
-        // Header plaque
-        const header = scene.add.container(scene.scale.width / 2, 48);
-        header.add(drawWoodPanel(scene, 460, 62));
-        header.add(scene.add.text(0, 0, 'THE CONTRACT BOARD', {
-            fontFamily: Fonts.DISPLAY, fontSize: '34px', color: Palette.BRASS_TEXT,
-        }).setOrigin(0.5));
-        this.add(header);
+        // No header plaque: the tab rail (chrome, above) names this view.
 
         // Ledger strip along the bottom
         const strip = scene.add.container(scene.scale.width / 2, scene.scale.height - 42);
@@ -105,13 +99,15 @@ export class ContractBoardPanel extends AbstractHqPanel {
             const col = i % 2;
             const row = Math.floor(i / 2);
             const x = 310 + col * (NOTICE_W + 56);
-            const y = 210 + row * (NOTICE_H + 40) + (col === 1 ? 46 : 0);
+            const y = 225 + row * (NOTICE_H + 40) + (col === 1 ? 46 : 0);
             this.addDynamic(this.buildNotice(contract, x, y, i));
         });
 
         // --- Personnel ledger, right third ---
+        // Chrome (status bar + tab rail) occupies y 0-100; the muster header
+        // sits below it with headroom to spare.
         const ledgerX = this.scene.scale.width * 0.82;
-        const ledgerHeader = this.scene.add.container(ledgerX, 120);
+        const ledgerHeader = this.scene.add.container(ledgerX, 135);
         ledgerHeader.add(drawWoodPanel(this.scene, 340, 46));
         ledgerHeader.add(this.scene.add.text(0, 0,
             `MUSTER ROLL · ${this.selectedSquad.length}/${SQUAD_SIZE}`, {
@@ -120,7 +116,7 @@ export class ContractBoardPanel extends AbstractHqPanel {
         this.addDynamic(ledgerHeader);
 
         campaign.roster.forEach((soldier, i) => {
-            this.addDynamic(this.buildMusterCard(soldier, ledgerX, 190 + i * 84));
+            this.addDynamic(this.buildMusterCard(soldier, ledgerX, 205 + i * 84));
         });
 
         this.refreshStatus();
@@ -286,13 +282,10 @@ export class ContractBoardPanel extends AbstractHqPanel {
     private refreshStatus(): void {
         const campaign = CampaignUiState.getInstance();
         const contract = campaign.selectedContract;
-        const cal = campaign.calendar;
 
         const briefing = contract
             ? `"${contract.description}"  ·  ${contract.paymentClause}`
-            : `Year ${cal.year}, Q${cal.quarterOfYear}, week ${cal.weekOfQuarter} of 13   ·   ` +
-              `Dividend of £${cal.currentDividendExpectation} due in ${cal.weeksUntilDividend}w   ·   ` +
-              `Satisfaction ${cal.shareholderSatisfaction}/100`;
+            : `Select a notice and muster ${SQUAD_SIZE} soldiers.`;
         this.statusText.setText(`${briefing}   ·   Squad ${this.selectedSquad.length}/${SQUAD_SIZE}`);
 
         const ready = contract !== null && this.selectedSquad.length === SQUAD_SIZE;
