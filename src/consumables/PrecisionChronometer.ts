@@ -5,7 +5,7 @@ import { EntityRarity } from "../gamecharacters/EntityRarity";
 import { GameState } from "../rules/GameState";
 import { AbstractConsumable } from "./AbstractConsumable";
 
-export class CombatPerformanceAppraisal extends AbstractConsumable {
+export class PrecisionChronometer extends AbstractConsumable {
     private lethalityAmount: number = 1;
 
     constructor() {
@@ -18,20 +18,24 @@ export class CombatPerformanceAppraisal extends AbstractConsumable {
     }
 
     override getDisplayName(): string {
-        return "Form 3-c: Combat Performance Appraisal";
+        return "Precision Chronometer";
     }
 
     override getDescription(): string {
         return `At the start of combat, all allies gain ${this.lethalityAmount} Lethality.`;
     }
 
+    getTooltip(): string {
+        return `${this.getDescription()}\n[i]Railway-grade timepiece, adjusted for infernal time dilation. Makes every opening swing feel rehearsed.[/i]`;
+    }
+
     onCombatStart(): void {
         if (this.uses <= 0) {
             return;
         }
-        
+
         const gameState = GameState.getInstance();
-        this.actionManager.DoAThing("Apply Combat Performance Appraisal", () => {
+        this.actionManager.DoAThing("Apply Precision Chronometer", () => {
             gameState.combatState.playerCharacters.forEach((character: BaseCharacter) => {
                 this.actionManager.applyBuffToCharacterOrCard(character, new Lethality(this.lethalityAmount));
             });
@@ -45,6 +49,6 @@ export class CombatPerformanceAppraisal extends AbstractConsumable {
     }
 
     override onPurchase(): void {
-        console.log("Combat Performance Appraisal purchased!");
+        console.log("Precision Chronometer purchased!");
     }
-} 
+}

@@ -3,7 +3,7 @@ import { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { EntityRarity } from "../gamecharacters/EntityRarity";
 import { AbstractConsumable } from "./AbstractConsumable";
 
-export class DamageMitigationFiling extends AbstractConsumable {
+export class ReinforcedTrenchCoat extends AbstractConsumable {
     private blockAmount: number = 12;
 
     constructor() {
@@ -16,11 +16,15 @@ export class DamageMitigationFiling extends AbstractConsumable {
     }
 
     override getDisplayName(): string {
-        return "Form 404-z: Damage Mitigation Filing";
+        return "Reinforced Trench Coat";
     }
 
     override getDescription(): string {
         return `Apply ${this.blockAmount} block.`;
+    }
+
+    getTooltip(): string {
+        return `${this.getDescription()}\n[i]Waxed canvas over demon-hide plate. Standard issue, once you know which quartermaster to ask.[/i]`;
     }
 
     override onUse(target: BaseCharacter): boolean {
@@ -29,7 +33,7 @@ export class DamageMitigationFiling extends AbstractConsumable {
             return false;
         }
 
-        this.actionManager.DoAThing("Use Damage Mitigation Filing", () => {
+        this.actionManager.DoAThing("Use Reinforced Trench Coat", () => {
             target.block += this.blockAmount;
         });
 
@@ -37,6 +41,6 @@ export class DamageMitigationFiling extends AbstractConsumable {
     }
 
     override onPurchase(): void {
-        console.log("Damage Mitigation Filing purchased!");
+        console.log("Reinforced Trench Coat purchased!");
     }
-} 
+}

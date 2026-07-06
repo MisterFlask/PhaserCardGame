@@ -7,7 +7,7 @@ import { PlayableCard } from "../gamecharacters/PlayableCard";
 import { GameState } from "../rules/GameState";
 import { AbstractConsumable } from "./AbstractConsumable";
 
-export class BloodPriceAuthorization extends AbstractConsumable {
+export class BloodlettingKit extends AbstractConsumable {
     private bloodpriceAmount: number = 2;
 
     constructor() {
@@ -20,16 +20,20 @@ export class BloodPriceAuthorization extends AbstractConsumable {
     }
 
     override getDisplayName(): string {
-        return "Form 8-e: Blood Price Authorization";
+        return "Bloodletting Kit";
     }
 
     override getDescription(): string {
         return `All cards in hand gain Bloodprice (${this.bloodpriceAmount}).`;
     }
 
+    getTooltip(): string {
+        return `${this.getDescription()}\n[i]Lancet, tourniquet, and a small brass bowl. The manual calls it "encouraging the merchandise."[/i]`;
+    }
+
     override onUse(target: BaseCharacter): boolean {
         const gameState = GameState.getInstance();
-        this.actionManager.DoAThing("Apply Blood Price Authorization", () => {
+        this.actionManager.DoAThing("Apply Bloodletting Kit", () => {
             gameState.combatState.currentHand.forEach((card: PlayableCard) => {
                 // Only add Bloodprice if the card doesn't already have it
                 if (!card.buffs.some((buff: AbstractBuff) => buff instanceof BloodPriceBuff)) {
@@ -41,6 +45,6 @@ export class BloodPriceAuthorization extends AbstractConsumable {
     }
 
     override onPurchase(): void {
-        console.log("Blood Price Authorization purchased!");
+        console.log("Bloodletting Kit purchased!");
     }
-} 
+}

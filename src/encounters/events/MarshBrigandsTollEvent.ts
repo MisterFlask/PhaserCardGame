@@ -37,14 +37,14 @@ class PresentDocumentationChoice extends AbstractChoice {
         const consumable = gameState.consumables[0] ?? null;
         const desc = consumable
             ? `Hand over ${consumable.getDisplayName()}.`
-            : "You have no documents to present.";
+            : "You have no kit to spare.";
         super(
-            "WIRE: Hand over the writs.",
+            "WIRE: Buy passage with kit.",
             desc
         );
         this.consumable = consumable;
         this.nextEvent = new DeadEndEvent();
-        this.nextEvent.description = "Produced the Pemberton writs. The leader's demeanor changed at once — \"Tollkeeper's Division stamps, proper official\" — and waved us through, already planning to trade them on. Paperwork, again, worth more than coin.\n" +
+        this.nextEvent.description = "Handed it across. The leader turned it over twice, weighing resale over spite, and waved us through. \"Fence it in Dis by Friday.\" Cheaper than coin, dearer than pride.\n" +
             "— Cavendish";
     }
 
@@ -95,7 +95,7 @@ export class MarshBrigandsTollEvent extends AbstractEvent {
         this.name = "Marsh Toll Ambush";
         this.portraitName = "placeholder_event_background_1";
         this.description = "DISPATCH — marsh channel.\n" +
-            "Barricade of scavenged junk blocks the crossing. Brigand leader, three uniforms' worth of deserter, gives us three options: ram the mined water, pay a toll per head, or produce papers — \"even outcasts respect the paperwork.\" Thompson's counting ammunition. Instructions?\n" +
+            "Barricade of scavenged junk blocks the crossing. Brigand leader, three uniforms' worth of deserter, gives us three options: ram the mined water, pay a toll per head, or surrender kit — \"even outcasts respect good equipment.\" Thompson's counting ammunition. Instructions?\n" +
             "— Cavendish";
         this.choices = [
             new FightThroughChoice(),

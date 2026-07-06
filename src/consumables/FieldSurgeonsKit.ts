@@ -3,7 +3,7 @@ import { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { EntityRarity } from "../gamecharacters/EntityRarity";
 import { AbstractConsumable } from "./AbstractConsumable";
 
-export class RequisitionOfSupplementalVigor extends AbstractConsumable {
+export class FieldSurgeonsKit extends AbstractConsumable {
     private healAmount: number = 15;
 
     constructor() {
@@ -16,11 +16,15 @@ export class RequisitionOfSupplementalVigor extends AbstractConsumable {
     }
 
     override getDisplayName(): string {
-        return "Form 256-f: Requisition of Supplemental Vigor";
+        return "Field Surgeon's Kit";
     }
 
     override getDescription(): string {
         return `Heal ${this.healAmount} HP.`;
+    }
+
+    getTooltip(): string {
+        return `${this.getDescription()}\n[i]Carbolic, catgut, and a hip flask of something stronger than either. Company-approved, if barely.[/i]`;
     }
 
     override onUse(target: BaseCharacter): boolean {
@@ -29,7 +33,7 @@ export class RequisitionOfSupplementalVigor extends AbstractConsumable {
             return false;
         }
 
-        this.actionManager.DoAThing("Use Requisition of Supplemental Vigor", () => {
+        this.actionManager.DoAThing("Use Field Surgeon's Kit", () => {
             this.actionManager.heal(target, this.healAmount);
         });
 
@@ -37,6 +41,6 @@ export class RequisitionOfSupplementalVigor extends AbstractConsumable {
     }
 
     override onPurchase(): void {
-        console.log("Requisition of Supplemental Vigor purchased!");
+        console.log("Field Surgeon's Kit purchased!");
     }
-} 
+}

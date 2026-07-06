@@ -5,7 +5,7 @@ import { EntityRarity } from "../gamecharacters/EntityRarity";
 import { GameState } from "../rules/GameState";
 import { AbstractConsumable } from "./AbstractConsumable";
 
-export class TacticalAssessmentForm extends AbstractConsumable {
+export class SurveyorsFieldGlasses extends AbstractConsumable {
     private lethalityAmount: number = 1;
 
     constructor() {
@@ -18,16 +18,20 @@ export class TacticalAssessmentForm extends AbstractConsumable {
     }
 
     override getDisplayName(): string {
-        return "Form 7-d: Tactical Assessment";
+        return "Surveyor's Field Glasses";
     }
 
     override getDescription(): string {
         return `At the start of combat, all allies gain ${this.lethalityAmount} Lethality.`;
     }
 
+    getTooltip(): string {
+        return `${this.getDescription()}\n[i]Brass-barreled optics, Ordnance Survey pattern. Finds the gap in a demon's hide before the demon does.[/i]`;
+    }
+
     onCombatStart(): void {
         const gameState = GameState.getInstance();
-        this.actionManager.DoAThing("Apply Tactical Assessment", () => {
+        this.actionManager.DoAThing("Apply Surveyor's Field Glasses", () => {
             gameState.combatState.playerCharacters.forEach((character: BaseCharacter) => {
                 this.actionManager.applyBuffToCharacterOrCard(character, new Lethality(this.lethalityAmount));
             });
@@ -40,6 +44,6 @@ export class TacticalAssessmentForm extends AbstractConsumable {
     }
 
     override onPurchase(): void {
-        console.log("Tactical Assessment Form purchased!");
+        console.log("Surveyor's Field Glasses purchased!");
     }
-} 
+}

@@ -4,7 +4,7 @@ import { Lethality } from "../gamecharacters/buffs/standard/Lethality";
 import { EntityRarity } from "../gamecharacters/EntityRarity";
 import { AbstractConsumable } from "./AbstractConsumable";
 
-export class TemporaryEmpowermentPermit extends AbstractConsumable {
+export class StokersTonic extends AbstractConsumable {
     private lethalityAmount: number = 2;
 
     constructor() {
@@ -17,11 +17,15 @@ export class TemporaryEmpowermentPermit extends AbstractConsumable {
     }
 
     override getDisplayName(): string {
-        return "Form 1-aa: Temporary Empowerment Permit";
+        return "Stoker's Tonic";
     }
 
     override getDescription(): string {
         return `Gain ${this.lethalityAmount} Lethality this turn.`;
+    }
+
+    getTooltip(): string {
+        return `${this.getDescription()}\n[i]Furnace-brewed, unlabeled, and off the books. Tastes of brimstone and bad decisions.[/i]`;
     }
 
     override onUse(target: BaseCharacter): boolean {
@@ -30,7 +34,7 @@ export class TemporaryEmpowermentPermit extends AbstractConsumable {
             return false;
         }
 
-        this.actionManager.DoAThing("Use Temporary Empowerment Permit", () => {
+        this.actionManager.DoAThing("Use Stoker's Tonic", () => {
             this.actionManager.applyBuffToCharacterOrCard(target, new Lethality(this.lethalityAmount));
         });
 
@@ -38,6 +42,6 @@ export class TemporaryEmpowermentPermit extends AbstractConsumable {
     }
 
     override onPurchase(): void {
-        console.log("Temporary Empowerment Permit purchased!");
+        console.log("Stoker's Tonic purchased!");
     }
-} 
+}

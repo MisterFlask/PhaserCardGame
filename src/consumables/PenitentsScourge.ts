@@ -8,7 +8,7 @@ import { PlayableCard } from "../gamecharacters/PlayableCard";
 import { GameState } from "../rules/GameState";
 import { AbstractConsumable } from "./AbstractConsumable";
 
-export class GrowthThroughSuffering extends AbstractConsumable {
+export class PenitentsScourge extends AbstractConsumable {
     private growingPowerAmount: number = 1;
     private painfulAmount: number = 2;
 
@@ -22,16 +22,20 @@ export class GrowthThroughSuffering extends AbstractConsumable {
     }
 
     override getDisplayName(): string {
-        return "Form 9-f: Growth Through Suffering";
+        return "Penitent's Scourge";
     }
 
     override getDescription(): string {
         return `All cards in hand gain Growing Power (${this.growingPowerAmount}) and Painful (${this.painfulAmount}).`;
     }
 
+    getTooltip(): string {
+        return `${this.getDescription()}\n[i]Knotted cord, blessed by someone who clearly meant it unkindly. Suffering builds character. Also builds Lethality.[/i]`;
+    }
+
     override onUse(target: BaseCharacter): boolean {
         const gameState = GameState.getInstance();
-        this.actionManager.DoAThing("Apply Growth Through Suffering", () => {
+        this.actionManager.DoAThing("Apply Penitent's Scourge", () => {
             gameState.combatState.currentHand.forEach((card: PlayableCard) => {
                 // Only add Growing Power if the card doesn't already have it
                 if (!card.buffs.some((buff: AbstractBuff) => buff instanceof GrowingPowerBuff)) {
@@ -47,6 +51,6 @@ export class GrowthThroughSuffering extends AbstractConsumable {
     }
 
     override onPurchase(): void {
-        console.log("Growth Through Suffering purchased!");
+        console.log("Penitent's Scourge purchased!");
     }
-} 
+}

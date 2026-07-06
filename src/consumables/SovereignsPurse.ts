@@ -4,7 +4,7 @@ import { EntityRarity } from "../gamecharacters/EntityRarity";
 import { GameState } from "../rules/GameState";
 import { AbstractConsumable } from "./AbstractConsumable";
 
-export class VentureCapitalAuthorization extends AbstractConsumable {
+export class SovereignsPurse extends AbstractConsumable {
     private ventureAmount: number = 2;
 
     constructor() {
@@ -17,22 +17,26 @@ export class VentureCapitalAuthorization extends AbstractConsumable {
     }
 
     override getDisplayName(): string {
-        return "Form 10-g: Venture Capital Authorization";
+        return "Sovereign's Purse";
     }
 
     override getDescription(): string {
         return `Gain ${this.ventureAmount} Venture.`;
     }
 
+    getTooltip(): string {
+        return `${this.getDescription()}\n[i]A drawstring purse of pre-signed letters of credit. Spends the same as gold, weighs considerably less on the conscience.[/i]`;
+    }
+
     override onUse(target: BaseCharacter): boolean {
         const gameState = GameState.getInstance();
-        this.actionManager.DoAThing("Apply Venture Capital Authorization", () => {
+        this.actionManager.DoAThing("Apply Sovereign's Purse", () => {
             this.actionManager.modifyVenture(this.ventureAmount);
         });
         return true;
     }
 
     override onPurchase(): void {
-        console.log("Venture Capital Authorization purchased!");
+        console.log("Sovereign's Purse purchased!");
     }
-} 
+}

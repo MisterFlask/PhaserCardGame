@@ -1,5 +1,5 @@
 import { AbstractConsumable } from '../consumables/AbstractConsumable';
-import { SoulHarvestingPermit } from '../consumables/SoulHarvestingPermit';
+import { SoulCollectionPhylactery } from '../consumables/SoulCollectionPhylactery';
 import { Encounter } from '../encounters/EncounterManager';
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
 import { PlayerVessel } from '../gamecharacters/cargo/PlayerCargoHolder';
@@ -45,7 +45,7 @@ export class GameState {
 
     public currentVessel: PlayerVessel = new PlayerVessel();
 
-    public consumables: AbstractConsumable[] = [new SoulHarvestingPermit()];
+    public consumables: AbstractConsumable[] = [new SoulCollectionPhylactery()];
     public maxConsumables: number = 3;
 
     public getRandomAllyCharacter(): PlayerCharacter {

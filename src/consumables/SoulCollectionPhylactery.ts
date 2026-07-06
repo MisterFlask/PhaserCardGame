@@ -3,7 +3,7 @@ import { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { EntityRarity } from "../gamecharacters/EntityRarity";
 import { AbstractConsumable } from "./AbstractConsumable";
 
-export class SoulHarvestingPermit extends AbstractConsumable {
+export class SoulCollectionPhylactery extends AbstractConsumable {
     private damageAmount: number = 5;
 
     constructor() {
@@ -16,11 +16,15 @@ export class SoulHarvestingPermit extends AbstractConsumable {
     }
 
     override getDisplayName(): string {
-        return "Form 666-a: Soul Harvesting Permit";
+        return "Soul-Collection Phylactery";
     }
 
     override getDescription(): string {
         return `Deal ${this.damageAmount} damage to target enemy. If this kills them, gain £ equal to their max HP.`;
+    }
+
+    getTooltip(): string {
+        return `${this.getDescription()}\n[i]A lead-lined reliquary, Company-issue. Screws shut. Best not to ask what's rattling inside on the walk home.[/i]`;
     }
 
     override onUse(target: BaseCharacter): boolean {
@@ -29,17 +33,17 @@ export class SoulHarvestingPermit extends AbstractConsumable {
             return false;
         }
 
-        this.actionManager.DoAThing("Use Soul Harvesting Permit", () => {
+        this.actionManager.DoAThing("Use Soul-Collection Phylactery", () => {
             // Store the target's max HP before dealing damage
             const maxHp = target.maxHitpoints;
-            
+
             // Deal damage
             this.actionManager.dealDamage({
                 baseDamageAmount: this.damageAmount,
                 target: target,
                 fromAttack: true
             });
-            
+
             // If the target died, grant £ equal to their max HP
             if (target.isDead()) {
                 this.actionManager.modifyMoney(maxHp);
@@ -50,6 +54,6 @@ export class SoulHarvestingPermit extends AbstractConsumable {
     }
 
     override onPurchase(): void {
-        console.log("Soul Harvesting Permit purchased!");
+        console.log("Soul-Collection Phylactery purchased!");
     }
-} 
+}

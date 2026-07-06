@@ -1,52 +1,43 @@
 import { AbstractConsumable } from "./AbstractConsumable";
-import { BloodPriceAuthorization } from "./BloodPriceAuthorization";
-import { CombatPerformanceAppraisal } from "./CombatPerformanceAppraisal";
-import { DamageMitigationFiling } from "./DamageMitigationFiling";
-import { EmergencyCardDraw } from "./EmergencyCardDraw";
-import { GrowthThroughSuffering } from "./GrowthThroughSuffering";
+import { AdrenalineCharge } from "./AdrenalineCharge";
+import { BloodlettingKit } from "./BloodlettingKit";
+import { FieldSurgeonsKit } from "./FieldSurgeonsKit";
 import { HealthPotion } from "./HealthPotion";
-import { OvertimeAuthorization } from "./OvertimeAuthorization";
-import { RequisitionOfSupplementalVigor } from "./RequisitionOfSupplementalVigor";
-import { SoulHarvestingPermit } from "./SoulHarvestingPermit";
+import { PenitentsScourge } from "./PenitentsScourge";
+import { PrecisionChronometer } from "./PrecisionChronometer";
+import { ReinforcedTrenchCoat } from "./ReinforcedTrenchCoat";
+import { SignalFlare } from "./SignalFlare";
+import { SoulCollectionPhylactery } from "./SoulCollectionPhylactery";
+import { SovereignsPurse } from "./SovereignsPurse";
+import { StokersTonic } from "./StokersTonic";
 import { StrengthElixir } from "./StrengthElixir";
-import { TacticalAssessmentForm } from "./TacticalAssessmentForm";
-import { TemporaryEmpowermentPermit } from "./TemporaryEmpowermentPermit";
-import { VentureCapitalAuthorization } from "./VentureCapitalAuthorization";
+import { SurveyorsFieldGlasses } from "./SurveyorsFieldGlasses";
 
 /**
  * Library for managing all consumables in the game
  */
 export class ConsumablesLibrary {
     private static instance: ConsumablesLibrary;
-    
+
     private consumableConstructors: (new () => AbstractConsumable)[] = [
         HealthPotion,
         StrengthElixir,
         // Add more consumables here as they're implemented
-        OvertimeAuthorization,
-        RequisitionOfSupplementalVigor,
-        EmergencyCardDraw,
-        DamageMitigationFiling,
-        TemporaryEmpowermentPermit,
-        CombatPerformanceAppraisal,
-        SoulHarvestingPermit,
-        TacticalAssessmentForm,
-        BloodPriceAuthorization,
-        GrowthThroughSuffering,
-        VentureCapitalAuthorization
-    
+        AdrenalineCharge,
+        FieldSurgeonsKit,
+        SignalFlare,
+        ReinforcedTrenchCoat,
+        StokersTonic,
+        PrecisionChronometer,
+        SoulCollectionPhylactery,
+        SurveyorsFieldGlasses,
+        BloodlettingKit,
+        PenitentsScourge,
+        SovereignsPurse
+
         /**
-         * To be added:
-         * | form | effect | micro-flavor |
-|------|--------|--------------|
-| **form 17-b: overtime authorization** | gain 2 energy immediately | "mandatory enthusiasm enforced." |
-| **form 256-f: requisition of supplemental vigor** | heal 15 hp | "officially sanctioned second wind." |
-| **form 42-a: duplication request** | duplicate next card played | "see also: redundancy, redundancy." |
-| **form 99-x: application for emergency card draw** | draw 3 cards | "must be completed in panic." |
-| **form 404-z: damage mitigation filing** | gain 12 block | "if form not found, damage not mitigated." |
-| **form 1-aa: temporary empowerment permit** | gain 2 lethality this turn | "valid until revoked mid-combat." |
-| **form 3-c: combat performance appraisal** | upgrade all cards in hand this combat | "you've exceeded expectations—adjusting expectations." |
-| **form 808-e: intangible asset declaration** | gain 1 intangible this turn | "property of infernal asset management." |
+         * Expedition field kit — physical Victorian military/occult gear the
+         * squad expends in combat. See each class's getTooltip() for flavor.
          */
 
     ];
@@ -81,7 +72,7 @@ export class ConsumablesLibrary {
     public getRandomConsumablesForShop(count: number): AbstractConsumable[] {
         // Get all consumables
         const allConsumables = this.getAllConsumables();
-        
+
         // Shuffle and take the requested number
         return this.shuffleArray(allConsumables).slice(0, Math.min(count, allConsumables.length));
     }
@@ -106,4 +97,4 @@ export class ConsumablesLibrary {
         }
         return result;
     }
-} 
+}
