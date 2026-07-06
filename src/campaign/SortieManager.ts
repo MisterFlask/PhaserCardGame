@@ -1,5 +1,6 @@
 import { EncounterManager } from "../encounters/EncounterManager";
 import { EventsManager } from "../events/EventsManager";
+import { Lethality } from "../gamecharacters/buffs/standard/Lethality";
 import { PlayerCharacter } from "../gamecharacters/PlayerCharacter";
 import { AbstractReward } from "../rewards/AbstractReward";
 import { CardReward } from "../rewards/CardReward";
@@ -7,6 +8,7 @@ import { CardRewardsGenerator } from "../rules/CardRewardsGenerator";
 import { GameState } from "../rules/GameState";
 import { CampaignUiState } from "../screens/campaign/hq_ux/CampaignUiState";
 import { SceneChanger } from "../screens/SceneChanger";
+import { applyHpHardening, hardeningForYear } from "./EncounterHardening";
 import { Contract } from "./Contract";
 import { applyCasualties } from "./SortieResolution";
 
@@ -73,6 +75,21 @@ export class SortieManager {
         if (!this.activeContract) return;
         const encounter = EncounterManager.getInstance()
             .getRandomCombatEncounter(this.activeContract.act, this.activeContract.segment);
+
+        // Hell hardens with campaign time: scale this fresh batch of enemies
+        // by the current year before anything else touches them (design doc:
+        // "Hell escalates too — regions harden over time"). Narrative-event
+        // combats (e.g. DutchZooEscape) spawn enemies via a different path
+        // and are NOT covered by this — a known gap, not fixed here.
+        const campaign = CampaignUiState.getInstance();
+        const year = campaign.calendar.year;
+        applyHpHardening(encounter.enemies, year);
+        const { lethalityBonus } = hardeningForYear(year);
+        if (lethalityBonus > 0) {
+            encounter.enemies.forEach(enemy => {
+                enemy.applyBuffs_useFromActionManager([new Lethality(lethalityBonus)]);
+            });
+        }
 
         // Something on the road: the event shows before the fight, and its
         // choices may replace or extend the combat (tolls, escaped daemons...).

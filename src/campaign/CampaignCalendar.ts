@@ -106,6 +106,7 @@ export class CampaignCalendar {
             const rate = StandingOrdersState.getInstance().dividendEscalationRate(1.35);
             this.currentDividendExpectation = Math.round(this.currentDividendExpectation * rate);
             this.log(`New fiscal year: the board raises its dividend expectation to £${this.currentDividendExpectation}.`, true);
+            this.log(`The Survey Desk notes deteriorating conditions in the field; no corresponding revision to field pay is planned.`, true);
         }
 
         if (this.isSacked) {

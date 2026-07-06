@@ -57,6 +57,16 @@ describe('CampaignCalendar', () => {
         expect(cal.currentDividendExpectation).toBe(Math.round(initial * 1.35));
     });
 
+    it('logs a field-hardening warning alongside the new-fiscal-year escalation', () => {
+        const cal = new CampaignCalendar();
+        cal.advanceWeeks(WEEKS_PER_QUARTER * 4, richVault()); // crosses into year 2
+        const hardeningEvent = cal.boardEvents.find(e =>
+            e.message.includes('Survey Desk') && e.message.includes('deteriorating conditions')
+        );
+        expect(hardeningEvent).toBeDefined();
+        expect(hardeningEvent!.isWarning).toBe(true);
+    });
+
     it('handles multi-week jumps that cross a boundary mid-jump', () => {
         const cal = new CampaignCalendar();
         let payments = 0;
