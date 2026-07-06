@@ -80,6 +80,7 @@ export default class ImageUtils {
             files: [
                 "archon_female_1.png",
                 "archon_female_2.png",
+                "archon_female_3.png",
               ]
         },
         portraits_cog_female: {
@@ -87,6 +88,7 @@ export default class ImageUtils {
             files: [
                 "cog_female_1.png",
                 "cog_female_2.png",
+                "cog_female_3.png",
               ]
         },
         ui: {

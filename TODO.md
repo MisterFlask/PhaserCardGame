@@ -162,13 +162,15 @@ protocol. Ordered within sections by priority. Delete items when done.
   per region, a board-meeting sting) transforms feel. Needs an asset
   sourcing decision (licensed pack vs. generated) before any code; Phaser's
   audio API is straightforward once assets exist.
-- **Asset manifest lint** — the console 404s on every boot (doris-smith,
-  shopkeeper-shady-2, roster-screen-stained-glass...) and at least one
-  enemy uses a mislabeled placeholder portrait (SorrowmothSwarm →
-  "Corrupted Fire Dragon"). Write a vitest that walks every portraitName /
-  texture key referenced in content code and asserts the file exists under
-  resources/ — same enforcement pattern as SaveRegistriesLint. Then fix or
-  placeholder the misses.
+- **Asset manifest lint** — boot 404s and mislabeled portraits are FIXED
+  (July 2026 art pass; manifest diffs clean against disk). Remaining:
+  promote `.claude/skills/generate-game-art/scripts/check-assets.js` into
+  a vitest (same enforcement pattern as SaveRegistriesLint), extend it to
+  walk portraitName/imageName references in content code (it currently
+  only checks manifest-vs-disk, and FrenchBlindProphetess's "hermit" bug
+  was a reference to a key that was never declared), and triage the 8
+  pre-existing texture-key collisions it reports (duplicate filenames
+  across categories; last-loaded silently wins).
 - **Deployment target + bundle hygiene** — no deploy pipeline exists;
   index.html loads two CDN Phaser builds plus the 13.7MB bundled one
   (known sharp edge), and resources/ is 170MB. Decide the distribution
