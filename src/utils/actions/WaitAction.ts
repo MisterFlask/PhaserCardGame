@@ -1,3 +1,4 @@
+import { backgroundResistantDelay } from "../BackgroundResistantDelay";
 import { GameAction } from "./GameAction";
 
 export class WaitAction extends GameAction {
@@ -6,7 +7,7 @@ export class WaitAction extends GameAction {
     }
 
     async playAction(): Promise<GameAction[]> {
-        await new Promise(resolve => setTimeout(resolve, this.milliseconds));
+        await backgroundResistantDelay(this.milliseconds);
         return [];
     }
-} 
+}

@@ -1,6 +1,7 @@
 import { PlayableCardType } from "../../../Types";
 import { ProcBroadcaster } from "../../../gamecharacters/procs/ProcBroadcaster";
 import { DeckLogic, PileName } from "../../../rules/DeckLogicHelper";
+import { backgroundResistantDelay } from "../../BackgroundResistantDelay";
 import { GameAction } from "../GameAction";
 import { WaitAction } from "../WaitAction";
 
@@ -25,12 +26,12 @@ export class ExhaustCardAction extends GameAction {
             });
 
             // Fallback in case burnUp never calls the callback
-            setTimeout(() => {
+            backgroundResistantDelay(200).then(() => { // 200ms fallback; adjust as needed
                 if (!resolved) {
                     console.error("burnUp callback not fired, continuing...");
                     resolve();
                 }
-            }, 200); // 200ms fallback; adjust as needed
+            });
         });
 
         // Move card to exhaust pile

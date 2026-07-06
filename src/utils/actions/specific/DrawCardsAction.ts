@@ -2,6 +2,7 @@ import { PlayableCard } from "../../../gamecharacters/PlayableCard";
 import { ProcBroadcaster } from "../../../gamecharacters/procs/ProcBroadcaster";
 import { DeckLogic } from "../../../rules/DeckLogicHelper";
 import { GameState } from "../../../rules/GameState";
+import { backgroundResistantDelay } from "../../BackgroundResistantDelay";
 import { GameAction } from "../GameAction";
 import { WaitAction } from "../WaitAction";
 
@@ -55,11 +56,9 @@ export class DrawCardsAction extends GameAction {
     }
 
     private animateDrawCard(card: PlayableCard): Promise<void> {
-        return new Promise<void>((resolve) => {
-            // Implement draw animation logic here
-            console.log(`Animating draw for card: ${card.name}`);
-            // Example animation delay
-            setTimeout(() => resolve(), 20);
-        });
+        // Implement draw animation logic here
+        console.log(`Animating draw for card: ${card.name}`);
+        // Example animation delay
+        return backgroundResistantDelay(20);
     }
-} 
+}

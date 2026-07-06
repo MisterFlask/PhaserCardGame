@@ -46,6 +46,7 @@ import { RequireCardSelectionFromHandAction } from "./actions/specific/RequireCa
 import { SelectFromCardPoolAction } from "./actions/specific/SelectFromCardPoolAction";
 import { StartCombatAction } from "./actions/specific/StartCombatAction";
 import { WaitAction } from "./actions/WaitAction";
+import { backgroundResistantDelay } from "./BackgroundResistantDelay";
 import { CardOwnershipManager } from "./CardOwnershipManager";
 
 export class ActionManager {
@@ -652,26 +653,21 @@ export class ActionManager {
     }
 
     private animateDrawCard(card: PlayableCard): Promise<void> {
-        return new Promise<void>((resolve) => {
-            // Implement draw animation logic here
-            console.log(`Animating draw for card: ${card.name}`);
-            // Example animation delay
-            setTimeout(() => resolve(), 20);
-        });
+        // Implement draw animation logic here
+        console.log(`Animating draw for card: ${card.name}`);
+        // Example animation delay
+        return backgroundResistantDelay(20);
     }
 
     private animateDiscardCard(card: IPhysicalCardInterface): Promise<void> {
-        return new Promise<void>((resolve) => {
-            if (!card?.data){
-                console.info("No physical card found for " + card);
-                resolve();
-                return;
-            }
-            // Implement discard animation logic here
-            console.log(`Animating discard for card: ${card.data.name}`);
-            // Example animation delay
-            setTimeout(() => resolve(), 20);
-        });
+        if (!card?.data){
+            console.info("No physical card found for " + card);
+            return Promise.resolve();
+        }
+        // Implement discard animation logic here
+        console.log(`Animating discard for card: ${card.data.name}`);
+        // Example animation delay
+        return backgroundResistantDelay(20);
     }
 
     public basicDiscardCard = (card: PlayableCard): void => {
@@ -743,14 +739,14 @@ export class ActionManager {
                 physicalCardOfTarget.cardBackground.setFillStyle(0xff0000);
             }
 
-            setTimeout(() => {
+            backgroundResistantDelay(300).then(() => {
                 if (physicalCardOfTarget.cardBackground instanceof Phaser.GameObjects.Image) {
                     physicalCardOfTarget.cardBackground.setTint(originalTint);
                 } else if (physicalCardOfTarget.cardBackground instanceof Phaser.GameObjects.Rectangle) {
                     physicalCardOfTarget.cardBackground.setFillStyle(originalTint);
                 }
                 resolve();
-            }, 300);
+            });
 
         });
     }
@@ -1255,7 +1251,7 @@ export class ActionQueue {
                 this.queue.push(new ActionNode(action));
             }
 
-            await new Promise(resolve => setTimeout(resolve, 50));
+            await backgroundResistantDelay(50);
         }
 
         try {
