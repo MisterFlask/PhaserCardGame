@@ -116,10 +116,13 @@ hashed from the class name) when no real art is set — that's what the
   icons are white game-icons.net-style glyphs; use the flat-icon block
   below. Full-color painted card art would be a new convention — ask the
   owner first.
-- *Relics*: `AbstractRelic` uses `imageName` (same fallback), and relics
-  get a **seeded color tint applied over the icon** — so relic art must be
-  a white/greyscale glyph or the tint will muddy it. Use the flat-icon
-  block; set `this.imageName` in the relic's constructor.
+- *Relics*: `AbstractRelic` uses `imageName` (same fallback). Set
+  `this.imageName` in the relic's constructor. The seeded color tint
+  applies ONLY to placeholder icons (`usesPlaceholderIcon`) — relics with
+  real artwork render untinted, so **full-color relic art is fine**. Match
+  the game's register: painted-object style (the cursed-cargo set in
+  `Sprites/Cards/CursedCargo/` is the closest existing full-color example)
+  or a flat glyph, your judgment per relic.
 
 **The no-background sentence** (append for every transparent asset):
 > The background must be fully transparent alpha — no backdrop, no gradient,

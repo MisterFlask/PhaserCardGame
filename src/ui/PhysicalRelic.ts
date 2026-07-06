@@ -58,7 +58,9 @@ export class PhysicalRelic extends Phaser.GameObjects.Container {
             texture: textureName,
             displaySize: baseSize,
             shadowOffset: 2,
-            tint: abstractRelic.tint
+            // Seeded tint distinguishes identical abstract placeholders;
+            // real relic artwork renders in its own colors.
+            tint: abstractRelic.usesPlaceholderIcon ? abstractRelic.tint : 0xFFFFFF
         });
         this.add(shadowedImage);
         
