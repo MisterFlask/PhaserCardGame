@@ -3,8 +3,8 @@ import { CampaignCalendar, WEEKS_PER_QUARTER } from '../CampaignCalendar';
 import { ContractGenerator } from '../ContractGenerator';
 import {
     AggressiveTendering, ArchivesStandingOrder, BarristersOnRetainer, HazardPaySchedule,
-    InvestorRelationsRetainer, LAUNCH_ORDERS, PhrenologyRetainer, PunctualityClause,
-    RecruitingSergeants
+    IncendiaryDoctrine, InvestorRelationsRetainer, LAUNCH_ORDERS, PhrenologyRetainer,
+    PunctualityClause, RecruitingSergeants
 } from '../orders/LaunchOrders';
 import { StandingOrdersState } from '../orders/StandingOrdersState';
 import { applyCasualties, CasualtySubject } from '../SortieResolution';
@@ -131,8 +131,8 @@ describe('StandingOrdersState', () => {
     });
 
     describe('launch pool', () => {
-        it('has exactly 8 orders with stable kebab-case ids', () => {
-            expect(LAUNCH_ORDERS).toHaveLength(8);
+        it('has exactly 9 orders with stable kebab-case ids', () => {
+            expect(LAUNCH_ORDERS).toHaveLength(9);
             LAUNCH_ORDERS.forEach(order => {
                 expect(order.id).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/);
                 expect(order.name.length).toBeGreaterThan(0);
@@ -140,7 +140,7 @@ describe('StandingOrdersState', () => {
                 expect(order.flavor.length).toBeGreaterThan(0);
             });
             const ids = new Set(LAUNCH_ORDERS.map(o => o.id));
-            expect(ids.size).toBe(8);
+            expect(ids.size).toBe(9);
         });
     });
 
@@ -252,6 +252,45 @@ describe('StandingOrdersState', () => {
         });
     });
 
+    describe('effect wiring: status application stacks (Incendiary Doctrine)', () => {
+        it('adds 1 stack when an ally applies Burning to an enemy, with the order active', () => {
+            const state = StandingOrdersState.getInstance();
+            state.enact('incendiary-doctrine', 5);
+            expect(state.statusApplicationStacks('Burning', 2, true, false)).toBe(3);
+        });
+
+        it('leaves stacks unchanged when the source is an enemy', () => {
+            const state = StandingOrdersState.getInstance();
+            state.enact('incendiary-doctrine', 5);
+            expect(state.statusApplicationStacks('Burning', 2, false, true)).toBe(2);
+        });
+
+        it('leaves stacks unchanged when an ally self-inflicts Burning on an ally', () => {
+            const state = StandingOrdersState.getInstance();
+            state.enact('incendiary-doctrine', 5);
+            expect(state.statusApplicationStacks('Burning', 2, true, true)).toBe(2);
+        });
+
+        it('leaves stacks unchanged for a different buff entirely', () => {
+            const state = StandingOrdersState.getInstance();
+            state.enact('incendiary-doctrine', 5);
+            expect(state.statusApplicationStacks('Weak', 2, true, false)).toBe(2);
+        });
+
+        it('leaves stacks unchanged when the order is not active', () => {
+            const state = StandingOrdersState.getInstance();
+            expect(state.statusApplicationStacks('Burning', 2, true, false)).toBe(2);
+        });
+
+        it('IncendiaryDoctrine.modifyStatusApplicationStacks matches the aggregate', () => {
+            const order = new IncendiaryDoctrine();
+            expect(order.modifyStatusApplicationStacks('Burning', 2, true, false)).toBe(3);
+            expect(order.modifyStatusApplicationStacks('Burning', 2, true, true)).toBe(2);
+            expect(order.modifyStatusApplicationStacks('Burning', 2, false, false)).toBe(2);
+            expect(order.modifyStatusApplicationStacks('Weak', 2, true, false)).toBe(2);
+        });
+    });
+
     describe('order classes referenced (sanity against unused-import drift)', () => {
         it('are all present in the registry', () => {
             const ids = LAUNCH_ORDERS.map(o => o.id);
@@ -262,6 +301,7 @@ describe('StandingOrdersState', () => {
             expect(ids).toContain(new InvestorRelationsRetainer().id);
             expect(ids).toContain(new BarristersOnRetainer().id);
             expect(ids).toContain(new ArchivesStandingOrder().id);
+            expect(ids).toContain(new IncendiaryDoctrine().id);
         });
     });
 });

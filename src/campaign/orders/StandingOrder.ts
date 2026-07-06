@@ -29,4 +29,16 @@ export abstract class StandingOrder {
     /** hit is the shareholder-satisfaction point loss from a short dividend. */
     public modifySatisfactionHit(hit: number): number { return hit; }
     public modifyCardRewardChoices(n: number): number { return n; }
+    /**
+     * Combat/card-mechanics hook (see strategic_layer_redesign.md, "Amendment:
+     * Standing Orders" — "+2 damage to Burning" is a legitimate order). Called
+     * whenever a status/buff is applied to a combat character, before stacks
+     * are committed. `buffId` is the buff's stable canonical name (e.g.
+     * "Burning", from AbstractBuff.getBuffCanonicalName()); `sourceIsAlly` /
+     * `targetIsAlly` describe who is applying and who is receiving, so an
+     * order can distinguish offense from self-affliction. The order checks
+     * buffId itself — combat code must never branch on which order is active
+     * (house rule 6).
+     */
+    public modifyStatusApplicationStacks(buffId: string, stacks: number, sourceIsAlly: boolean, targetIsAlly: boolean): number { return stacks; }
 }

@@ -1,7 +1,7 @@
 import { CombatState, GameState, ShopContents } from "../rules/GameState";
 
 import Phaser, { Scene } from 'phaser';
-import { AbstractCard, IPhysicalCardInterface } from '../gamecharacters/AbstractCard';
+import { AbstractCard, IPhysicalCardInterface, Team } from '../gamecharacters/AbstractCard';
 import { AutomatedCharacter } from "../gamecharacters/AutomatedCharacter";
 import type { BaseCharacter } from "../gamecharacters/BaseCharacter";
 import { AbstractBuff } from "../gamecharacters/buffs/AbstractBuff";
@@ -9,6 +9,7 @@ import { Lethality } from "../gamecharacters/buffs/standard/Lethality";
 import { Stress } from "../gamecharacters/buffs/standard/Stress";
 import { CardResourceScaling } from "../gamecharacters/CardResourceScaling";
 import { IBaseCharacter } from "../gamecharacters/IBaseCharacter";
+import { StandingOrdersState } from "../campaign/orders/StandingOrdersState";
 import { PlayableCard } from "../gamecharacters/PlayableCard";
 import { CardType } from "../gamecharacters/Primitives";
 import { ProcBroadcaster } from "../gamecharacters/procs/ProcBroadcaster";
@@ -335,11 +336,26 @@ export class ActionManager {
 
 
 
+    /**
+     * Standing Orders can modify status-application stack counts (e.g.
+     * Incendiary Doctrine adds +1 Burning stack from allied sources) without
+     * combat code knowing which order is active — see
+     * StandingOrder.modifyStatusApplicationStacks (house rule 6).
+     */
+    private applyStandingOrderStackModifiers(buff: AbstractBuff, target: { team?: Team }, sourceCharacter?: IBaseCharacter): void {
+        const sourceIsAlly = sourceCharacter?.team === Team.ALLY;
+        const targetIsAlly = target?.team === Team.ALLY;
+        buff.stacks = StandingOrdersState.getInstance().statusApplicationStacks(
+            buff.getBuffCanonicalName(), buff.stacks, sourceIsAlly, targetIsAlly
+        );
+    }
+
     public applyBuffToCharacterOrCard(card: AbstractCard, buff: AbstractBuff, sourceCharacter?: IBaseCharacter): void {
         buff = buff.copy();
         if (card == null || buff == null) {
             return;
         }
+        this.applyStandingOrderStackModifiers(buff, card, sourceCharacter);
         this.actionQueue.addAction(new GenericAction(async () => {
             AbstractBuff._applyBuffToCharacterOrCard(card, buff);
             console.log(`Applied buff ${buff.getDisplayName()} to ${card.name}`);
@@ -353,6 +369,10 @@ export class ActionManager {
         if (character == null || buff == null) {
             return;
         }
+        // Copy before mutating stacks: callers may reuse one buff instance
+        // across several targets (the sibling method above already copies).
+        buff = buff.copy();
+        this.applyStandingOrderStackModifiers(buff, character, sourceCharacter);
         this.actionQueue.addAction(new GenericAction(async () => {
             AbstractBuff._applyBuffToCharacterOrCard(character as BaseCharacterType, buff);
             console.log(`Applied buff ${buff.getDisplayName()} to ${character.name}`);

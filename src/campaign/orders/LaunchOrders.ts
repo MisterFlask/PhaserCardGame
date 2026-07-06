@@ -1,4 +1,4 @@
-// The launch pool of 8 Standing Orders (see strategic_layer_redesign.md,
+// The launch pool of 9 Standing Orders (see strategic_layer_redesign.md,
 // "Amendment: Standing Orders" -> "Launch order sketch"). Each class owns its
 // own hook overrides; no if-this-order-id branching lives outside this file
 // (house rule 6). Rounding conventions follow ContractGenerator (nearest £5).
@@ -84,6 +84,20 @@ export class ArchivesStandingOrder extends StandingOrder {
     public modifyCardRewardChoices(n: number): number { return n + 1; }
 }
 
+export class IncendiaryDoctrine extends StandingOrder {
+    public readonly id = "incendiary-doctrine";
+    public readonly name = "Incendiary Doctrine";
+    public readonly description = "Field manuals are reissued with a chapter on thorough combustion. Whenever a member of your squad applies [b]Burning[/b] to an enemy, apply [b]1 additional stack[/b].";
+    public readonly flavor = "Field manual, addendum: \"If the client is not sufficiently alight, the application was insufficient.\" — Ordnance Directorate";
+
+    public modifyStatusApplicationStacks(buffId: string, stacks: number, sourceIsAlly: boolean, targetIsAlly: boolean): number {
+        if (buffId === "Burning" && sourceIsAlly && !targetIsAlly) {
+            return stacks + 1;
+        }
+        return stacks;
+    }
+}
+
 /** Launch pool, in a stable order. Add new orders here, never by id-branch. */
 export const LAUNCH_ORDERS: StandingOrder[] = [
     new AggressiveTendering(),
@@ -94,4 +108,5 @@ export const LAUNCH_ORDERS: StandingOrder[] = [
     new InvestorRelationsRetainer(),
     new BarristersOnRetainer(),
     new ArchivesStandingOrder(),
+    new IncendiaryDoctrine(),
 ];

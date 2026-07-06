@@ -26,7 +26,8 @@ type OrderHookName =
     | "modifyWoundWeeks"
     | "modifyDividendEscalationRate"
     | "modifySatisfactionHit"
-    | "modifyCardRewardChoices";
+    | "modifyCardRewardChoices"
+    | "modifyStatusApplicationStacks";
 
 export class StandingOrdersState {
     private static instance: StandingOrdersState;
@@ -150,4 +151,12 @@ export class StandingOrdersState {
     public dividendEscalationRate(base: number): number { return this.apply("modifyDividendEscalationRate", base); }
     public satisfactionHit(base: number): number { return this.apply("modifySatisfactionHit", base); }
     public cardRewardChoices(base: number): number { return this.apply("modifyCardRewardChoices", base); }
+
+    /** buffId is a stable canonical buff name (AbstractBuff.getBuffCanonicalName()). */
+    public statusApplicationStacks(buffId: string, stacks: number, sourceIsAlly: boolean, targetIsAlly: boolean): number {
+        return this.getActiveOrders().reduce(
+            (value, order) => order.modifyStatusApplicationStacks(buffId, value, sourceIsAlly, targetIsAlly),
+            stacks
+        );
+    }
 }
