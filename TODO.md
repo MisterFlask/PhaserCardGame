@@ -112,15 +112,12 @@ protocol. Ordered within sections by priority. Delete items when done.
   thud/board-sting via SoundUtils registry, persisted mute toggle.
   Residual: per-region ambient loops (bigger files, wants taste), volume
   settings, and more event-specific stings (victory, promotion, wipe).
-- **Burn down the 145 missing-art references** — AssetManifestLint.test.ts
-  (July 2026) found 145 imageName/portraitName references to texture keys
-  that were never declared; every one silently renders placeholder art
-  (the "hermit" bug class — e.g. HermitProphetOfTheDelta). All are pinned
-  in the test's EXPECTED_MISSING_IMAGE_REFS allowlist, so the count can
-  only shrink. Work through them with the generate-game-art skill (needs
-  OPENAI_API_KEY), removing allowlist entries as art lands — good
-  incremental batch work, prioritize enemies the player actually meets
-  (act 1 first).
+- **Burn down the missing-art allowlist (131 left)** — batch 1 (July 2026)
+  resolved all 15 act-1 portrait refs; the composite style prompt that
+  passed the lead's taste gate is recorded in that batch's agent report and
+  commit 06bb963. Continue in ~15-image batches with the same prompt:
+  act-2 enemies next, then act-3, then non-enemy refs (buff/intent icons
+  need a different, simpler style — flag for a fresh taste gate).
 - **Image pipeline pass** — deployment is settled (gh-pages, prod bundle
   2.9MB as of July 2026); the remaining payload problem is resources/
   (~170MB of PNGs). A dedicated pass: lossy-compress sprites (pngquant/
