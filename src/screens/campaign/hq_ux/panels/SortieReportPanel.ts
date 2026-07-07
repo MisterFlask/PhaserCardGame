@@ -1,55 +1,75 @@
-import { Scene } from 'phaser';
+import Phaser, { Scene } from 'phaser';
 import { pendingLevels } from '../../../../campaign/Leveling';
 import { SortieManager } from '../../../../campaign/SortieManager';
 import { ConsumablesLibrary } from '../../../../consumables/ConsumablesLibrary';
 import { GameState } from '../../../../rules/GameState';
 import { TextBoxButton } from '../../../../ui/Button';
-import { TextBox } from '../../../../ui/TextBox';
+import { drawBackdropDim, drawPaper, Fonts, Palette } from '../../../../ui/UIStyle';
 import { CampaignUiState } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
 
+const REPORT_W = 900;
+const REPORT_H = 560;
+
 /**
  * Post-sortie debrief: shown once on returning to the HQ, before the hub.
- * The emotional beat of the loop — payouts, wounds, and the dead get a
- * moment on screen instead of a sidebar footnote.
+ * Presented as a typed field report on Company letterhead — the emotional
+ * beat of the loop (payouts, wounds, the dead) gets a moment on the page
+ * instead of a sidebar footnote.
  */
 export class SortieReportPanel extends AbstractHqPanel {
-    private reportText: TextBox;
+    private reportText: Phaser.GameObjects.Text;
 
     constructor(scene: Scene) {
         super(scene, 'Expedition Debrief');
-        // The chrome (status bar) renders above this panel and would occlude
-        // the title at its default y=30; nudge it below the chrome instead
-        // of hiding it outright, since no tab names this debrief screen.
-        this.titleText.setPosition(scene.scale.width / 2, 118);
+        this.titleText.setVisible(false); // replaced by the letterhead below
 
-        this.reportText = new TextBox({
-            scene,
-            x: scene.scale.width / 2,
-            y: scene.scale.height / 2 - 40,
-            width: 900,
-            height: 400,
-            text: '',
-            style: { fontSize: '20px', color: '#ffffff', wordWrap: { width: 880 } }
+        const dim = drawBackdropDim(scene, 0.55);
+        this.add(dim);
+
+        const sheet = scene.add.container(scene.scale.width / 2, scene.scale.height / 2 + 10);
+        sheet.add(drawPaper(scene, REPORT_W, REPORT_H, false));
+
+        sheet.add(scene.add.text(-REPORT_W / 2 + 30, -REPORT_H / 2 + 24,
+            'FIELD REPORT — EXPEDITIONARY DEBRIEF', {
+            fontFamily: Fonts.DISPLAY, fontSize: '20px', color: Palette.INK,
+        }));
+        sheet.add(scene.add.text(REPORT_W / 2 - 30, -REPORT_H / 2 + 26, 'FOR COMPANY RECORDS ONLY', {
+            fontFamily: Fonts.UTILITY, fontSize: '11px', color: Palette.INK_FADED, letterSpacing: 1,
+        }).setOrigin(1, 0));
+
+        const rule = scene.add.graphics();
+        rule.lineStyle(1, Palette.PAPER_SHADOW, 0.5);
+        rule.lineBetween(-REPORT_W / 2 + 30, -REPORT_H / 2 + 56, REPORT_W / 2 - 30, -REPORT_H / 2 + 56);
+        sheet.add(rule);
+
+        // Plain rexBBCodeText (not the TextBox wrapper) so the paper shows
+        // through and the box doesn't reflow/reposition to fit its content
+        // — see OnboardingLetter for the same pattern.
+        this.reportText = (scene.add as any).rexBBCodeText(-REPORT_W / 2 + 30, -REPORT_H / 2 + 78, '', {
+            fontFamily: Fonts.BODY, fontSize: '18px', color: Palette.INK,
+            wrap: { mode: 'word', width: REPORT_W - 60 },
         });
+        sheet.add(this.reportText);
 
         const continueButton = new TextBoxButton({
             scene,
-            x: scene.scale.width / 2,
-            y: scene.scale.height - 170,
+            x: 0,
+            y: REPORT_H / 2 - 44,
             width: 260,
-            height: 55,
+            height: 52,
             text: 'File the Report',
-            style: { fontSize: '20px', color: '#ffffff' },
-            fillColor: 0x226622
+            style: { fontSize: '19px', fontFamily: Fonts.DISPLAY, color: Palette.WHITE },
+            fillColor: Palette.VERDIGRIS
         });
         continueButton.onClick(() => {
             SortieManager.getInstance().hasUnviewedReport = false;
             const hasPendingPromotion = CampaignUiState.getInstance().roster.some(c => pendingLevels(c) > 0);
             this.scene.events.emit('navigate', hasPendingPromotion ? 'promotion' : 'contracts');
         });
+        sheet.add(continueButton);
 
-        this.add([this.reportText, continueButton]);
+        this.add(sheet);
     }
 
     public show(): void {

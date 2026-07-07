@@ -8,6 +8,7 @@ import { GameState } from '../../../../rules/GameState';
 import { SaveManager } from '../../../../saveload/SaveManager';
 import { TextBoxButton } from '../../../../ui/Button';
 import { TextBox } from '../../../../ui/TextBox';
+import { drawBackdropDim, drawWoodPanel, Fonts, Palette } from '../../../../ui/UIStyle';
 import { CampaignUiState, ROSTER_CAP } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
 
@@ -20,7 +21,9 @@ const UPGRADE_GATE = 'The Foundry';
 
 /**
  * Roster management: inspect a soldier's deck, remove or upgrade cards
- * (gated by strategic projects), and hire recruits.
+ * (gated by strategic projects), and hire recruits. Presented as a
+ * personnel ledger — three columns of ruled entries (roster, deck,
+ * recruits) on the Company's headed paper.
  */
 export class BarracksPanel extends AbstractHqPanel {
     private dynamicElements: Phaser.GameObjects.GameObject[] = [];
@@ -33,16 +36,24 @@ export class BarracksPanel extends AbstractHqPanel {
         super(scene, 'Barracks');
         this.titleText.setVisible(false); // tab rail names the view
 
+        const dim = drawBackdropDim(scene, 0.5);
+        this.add(dim);
+
+        const statusStrip = scene.add.container(scene.scale.width / 2, scene.scale.height - 60);
+        statusStrip.add(drawWoodPanel(scene, 1100, 44));
         this.statusLine = new TextBox({
             scene,
-            x: scene.scale.width / 2,
-            y: scene.scale.height - 60,
-            width: 1100,
+            x: 0,
+            y: 0,
+            width: 1080,
             height: 40,
             text: '',
-            style: { fontSize: '18px', color: '#ffff88' }
+            fillColor: Palette.WOOD_PANEL,
+            style: { fontSize: '17px', fontFamily: Fonts.BODY, color: Palette.BRASS_TEXT }
         });
-        this.add(this.statusLine);
+        this.statusLine.setStroke(false);
+        statusStrip.add(this.statusLine);
+        this.add(statusStrip);
     }
 
     public show(): void {
@@ -72,11 +83,7 @@ export class BarracksPanel extends AbstractHqPanel {
         // --- Roster, left column ---
         // Chrome (status bar + tab rail) occupies y 0-100; column headers
         // start below it with headroom to spare.
-        this.addDynamic(new TextBox({
-            scene: this.scene, x: width * 0.14, y: 130, width: 200, height: 35,
-            text: `Roster (${campaign.roster.length}/${ROSTER_CAP})`,
-            style: { fontSize: '20px', color: '#ffffff' }
-        }));
+        this.addDynamic(this.buildColumnHeader(`ROSTER · ${campaign.roster.length}/${ROSTER_CAP}`, width * 0.14, 130, 420));
         campaign.roster.forEach((soldier, i) => {
             const selected = this.selectedSoldier === soldier;
             const trait = soldier.buffs.find(b => b.isPersonaTrait)?.getDisplayName() ?? '';
@@ -96,8 +103,8 @@ export class BarracksPanel extends AbstractHqPanel {
             const button = this.addDynamic(new TextBoxButton({
                 scene: this.scene, x: width * 0.14, y, width: 400, height: 44,
                 text: label,
-                style: { fontSize: '14px', color: '#ffffff' },
-                fillColor: selected ? 0x226622 : 0x333344
+                style: { fontSize: '14px', fontFamily: Fonts.BODY, color: Palette.WHITE },
+                fillColor: selected ? Palette.VERDIGRIS : Palette.WOOD_PANEL
             }));
             button.onClick(() => {
                 this.selectedSoldier = soldier;
@@ -110,8 +117,8 @@ export class BarracksPanel extends AbstractHqPanel {
                 const promoteButton = this.addDynamic(new TextBoxButton({
                     scene: this.scene, x: width * 0.14 + 260, y, width: 140, height: 40,
                     text: `PROMOTE (${pending})`,
-                    style: { fontSize: '14px', color: '#ffffff' },
-                    fillColor: 0x886600
+                    style: { fontSize: '13px', fontFamily: Fonts.DISPLAY, color: Palette.WHITE },
+                    fillColor: Palette.BRASS
                 }));
                 promoteButton.onClick(() => {
                     this.scene.events.emit('navigate', 'promotion');
@@ -128,8 +135,8 @@ export class BarracksPanel extends AbstractHqPanel {
                 scene: this.scene, x: width * 0.14, y: 180 + campaign.roster.length * 52 + 15,
                 width: 400, height: 44,
                 text: `Therapy for ${soldier.name}: -${THERAPY_RELIEF} stress (£${therapyCost})`,
-                style: { fontSize: '14px', color: canTreat ? '#ffffff' : '#888888' },
-                fillColor: canTreat ? 0x224466 : 0x222222
+                style: { fontSize: '14px', fontFamily: Fonts.BODY, color: canTreat ? Palette.WHITE : Palette.DISABLED_TEXT },
+                fillColor: canTreat ? Palette.VERDIGRIS : Palette.DISABLED
             }));
             therapyButton.onClick(() => {
                 if (!canTreat) { this.setStatus('Insufficient funds.'); return; }
@@ -149,18 +156,17 @@ export class BarracksPanel extends AbstractHqPanel {
 
         // --- Deck of the selected soldier, middle column ---
         if (this.selectedSoldier) {
-            this.addDynamic(new TextBox({
-                scene: this.scene, x: width * 0.45, y: 130, width: 300, height: 35,
-                text: `${this.selectedSoldier.name}'s deck (${this.selectedSoldier.cardsInMasterDeck.length} cards)`,
-                style: { fontSize: '20px', color: '#ffffff' }
-            }));
+            this.addDynamic(this.buildColumnHeader(
+                `${this.selectedSoldier.name.toUpperCase()}'S DECK · ${this.selectedSoldier.cardsInMasterDeck.length}`,
+                width * 0.45, 130, 360
+            ));
             this.selectedSoldier.cardsInMasterDeck.forEach((card, i) => {
                 const selected = this.selectedCard === card;
                 const button = this.addDynamic(new TextBoxButton({
                     scene: this.scene, x: width * 0.45, y: 180 + i * 46, width: 340, height: 40,
                     text: card.name,
-                    style: { fontSize: '14px', color: '#ffffff' },
-                    fillColor: selected ? 0x226622 : 0x333344
+                    style: { fontSize: '14px', fontFamily: Fonts.BODY, color: Palette.WHITE },
+                    fillColor: selected ? Palette.VERDIGRIS : Palette.WOOD_PANEL
                 }));
                 button.onClick(() => {
                     this.selectedCard = card;
@@ -174,11 +180,7 @@ export class BarracksPanel extends AbstractHqPanel {
         }
 
         // --- Recruits, right column ---
-        this.addDynamic(new TextBox({
-            scene: this.scene, x: width * 0.8, y: 130, width: 200, height: 35,
-            text: 'Recruits',
-            style: { fontSize: '20px', color: '#ffffff' }
-        }));
+        this.addDynamic(this.buildColumnHeader('RECRUITS', width * 0.8, 130, 300));
         campaign.recruitCandidates.forEach((candidate, i) => {
             const trait = candidate.buffs.find(b => b.isPersonaTrait)?.getDisplayName() ?? '';
             if (this.scene.textures.exists(candidate.portraitName)) {
@@ -189,7 +191,8 @@ export class BarracksPanel extends AbstractHqPanel {
             this.addDynamic(new TextBox({
                 scene: this.scene, x: width * 0.78, y: 180 + i * 100, width: 340, height: 40,
                 text: `${candidate.name} (${candidate.characterClass.name})${trait ? ' — ' + trait : ''}`,
-                style: { fontSize: '14px', color: '#ffffff' }
+                fillColor: Palette.WOOD_DARK,
+                style: { fontSize: '14px', fontFamily: Fonts.BODY, color: Palette.WHITE }
             }));
             const recruitCost = campaign.getRecruitCost();
             const canHire = GameState.getInstance().moneyInVault >= recruitCost
@@ -197,8 +200,8 @@ export class BarracksPanel extends AbstractHqPanel {
             const hireButton = this.addDynamic(new TextBoxButton({
                 scene: this.scene, x: width * 0.78, y: 222 + i * 100, width: 170, height: 38,
                 text: `Hire (£${recruitCost})`,
-                style: { fontSize: '14px', color: canHire ? '#ffffff' : '#888888' },
-                fillColor: canHire ? 0x226622 : 0x222222
+                style: { fontSize: '14px', fontFamily: Fonts.DISPLAY, color: canHire ? Palette.WHITE : Palette.DISABLED_TEXT },
+                fillColor: canHire ? Palette.VERDIGRIS : Palette.DISABLED
             }));
             hireButton.onClick(() => {
                 if (campaign.hireRecruit(candidate)) {
@@ -216,6 +219,16 @@ export class BarracksPanel extends AbstractHqPanel {
         this.refreshStatusDefault();
     }
 
+    /** A brass-bordered wood plaque used as a ledger column heading. */
+    private buildColumnHeader(text: string, x: number, y: number, width: number): Phaser.GameObjects.Container {
+        const container = this.scene.add.container(x, y);
+        container.add(drawWoodPanel(this.scene, width, 38));
+        container.add(this.scene.add.text(0, 0, text, {
+            fontFamily: Fonts.DISPLAY, fontSize: '19px', color: Palette.BRASS_TEXT,
+        }).setOrigin(0.5));
+        return container;
+    }
+
     private buildCardActions(width: number): void {
         const campaign = CampaignUiState.getInstance();
         const gameState = GameState.getInstance();
@@ -231,8 +244,8 @@ export class BarracksPanel extends AbstractHqPanel {
         const removeButton = this.addDynamic(new TextBoxButton({
             scene: this.scene, x: width * 0.45, y: actionsY, width: 340, height: 40,
             text: removalUnlocked ? `Remove card (£${REMOVAL_COST})` : `Remove — requires ${REMOVAL_GATE}`,
-            style: { fontSize: '14px', color: canRemove ? '#ffffff' : '#888888' },
-            fillColor: canRemove ? 0x662222 : 0x222222
+            style: { fontSize: '14px', fontFamily: Fonts.BODY, color: canRemove ? Palette.WHITE : Palette.DISABLED_TEXT },
+            fillColor: canRemove ? Palette.WAX_RED : Palette.DISABLED
         }));
         removeButton.onClick(() => {
             if (!canRemove) {
@@ -257,8 +270,8 @@ export class BarracksPanel extends AbstractHqPanel {
         const upgradeButton = this.addDynamic(new TextBoxButton({
             scene: this.scene, x: width * 0.45, y: actionsY + 48, width: 340, height: 40,
             text: upgradeUnlocked ? `Upgrade card (£${UPGRADE_COST})` : `Upgrade — requires ${UPGRADE_GATE}`,
-            style: { fontSize: '14px', color: canUpgrade ? '#ffffff' : '#888888' },
-            fillColor: canUpgrade ? 0x226622 : 0x222222
+            style: { fontSize: '14px', fontFamily: Fonts.BODY, color: canUpgrade ? Palette.WHITE : Palette.DISABLED_TEXT },
+            fillColor: canUpgrade ? Palette.VERDIGRIS : Palette.DISABLED
         }));
         upgradeButton.onClick(() => {
             if (!canUpgrade) {

@@ -8,7 +8,7 @@ import { StrategicProjectTechTree } from '../../../../strategic_projects/Strateg
 import { TextBoxButton } from '../../../../ui/Button';
 import { PhysicalProjectCard } from '../../../../ui/PhysicalProjectCard';
 import { TextBox } from '../../../../ui/TextBox';
-import { Fonts, Palette } from '../../../../ui/UIStyle';
+import { drawBackdropDim, drawWoodPanel, Fonts, Palette } from '../../../../ui/UIStyle';
 import { CardGuiUtils } from '../../../../utils/CardGuiUtils';
 import { CampaignUiState } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
@@ -36,21 +36,29 @@ export class InvestmentPanel extends AbstractHqPanel {
         super(scene, 'Factory Investments');
         this.titleText.setVisible(false); // tab rail (BOARDROOM) names the view
 
+        const dim = drawBackdropDim(scene, 0.5);
+        this.add(dim);
+
         // Create UI container
         this.uiContainer = scene.add.container(0, 0);
 
-        // Working-capital display. Chrome (status bar + tab rail) occupies
-        // y 0-100; this sits just below the tab rail, above the CAPITAL
-        // WORKS / STANDING ORDERS toggle.
+        // Working-capital display, on a brass-bordered plaque. Chrome
+        // (status bar + tab rail) occupies y 0-100; this sits just below
+        // the tab rail, above the CAPITAL WORKS / STANDING ORDERS toggle.
+        const poundsPlaque = scene.add.container(scene.scale.width / 2, 122);
+        poundsPlaque.add(drawWoodPanel(scene, 420, 44));
         this.poundsDisplay = new TextBox({
             scene: scene,
-            x: scene.scale.width / 2,
-            y: 122,
-            width: 250,
-            text: `Current Working Capital: £${GameState.getInstance().moneyInVault}`,
-            style: { fontSize: '22px', fontFamily: 'verdana', color: '#FFD700', align: 'center' }
+            x: 0,
+            y: 0,
+            width: 400,
+            text: `WORKING CAPITAL: £${GameState.getInstance().moneyInVault}`,
+            fillColor: Palette.WOOD_PANEL,
+            style: { fontSize: '20px', fontFamily: Fonts.DISPLAY, color: Palette.BRASS_TEXT, align: 'center' }
         });
-        this.uiContainer.add(this.poundsDisplay);
+        this.poundsDisplay.setStroke(false);
+        poundsPlaque.add(this.poundsDisplay);
+        this.uiContainer.add(poundsPlaque);
 
         // Add UI container to panel
         this.add(this.uiContainer);
@@ -147,7 +155,7 @@ export class InvestmentPanel extends AbstractHqPanel {
     }
 
     private updatePoundsDisplay(): void {
-        this.poundsDisplay.setText(`£${GameState.getInstance().moneyInVault}`);
+        this.poundsDisplay.setText(`WORKING CAPITAL: £${GameState.getInstance().moneyInVault}`);
     }
 
     private clearCards(): void {
@@ -191,7 +199,7 @@ export class InvestmentPanel extends AbstractHqPanel {
                     0, 0,
                     sourcePos.x, sourcePos.y,
                     targetPos.x, targetPos.y,
-                    0xCCCCCC, 0.7
+                    Palette.BRASS, 0.7
                 );
                 line.setOrigin(0, 0);
                 this.treeContainer.add(line);
@@ -266,9 +274,9 @@ export class InvestmentPanel extends AbstractHqPanel {
         const prerequisites = project.getPrerequisites();
         
         this.connectionLines.forEach(line => {
-            line.setStrokeStyle(1, 0xCCCCCC, 0.7); // Reset to default
+            line.setStrokeStyle(1, Palette.BRASS, 0.7); // Reset to default
         });
-        
+
         if (prerequisites.length > 0) {
             const campaignState = CampaignUiState.getInstance();
             const allProjects = [
@@ -282,7 +290,7 @@ export class InvestmentPanel extends AbstractHqPanel {
             edges.forEach((edge, index) => {
                 if (edge.target === project.name) {
                     // This is a prerequisite connection
-                    this.connectionLines[index]?.setStrokeStyle(3, 0xFFFF00, 1); // Yellow, thicker, fully opaque
+                    this.connectionLines[index]?.setStrokeStyle(3, Palette.BRASS_BRIGHT, 1); // Brass, thicker, fully opaque
                 }
             });
         }
@@ -291,7 +299,7 @@ export class InvestmentPanel extends AbstractHqPanel {
     private resetConnectionHighlights(): void {
         // Reset all connection lines to default appearance
         this.connectionLines.forEach(line => {
-            line.setStrokeStyle(1, 0xCCCCCC, 0.7);
+            line.setStrokeStyle(1, Palette.BRASS, 0.7);
         });
     }
 
