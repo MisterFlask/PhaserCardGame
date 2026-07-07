@@ -107,9 +107,8 @@ export class SortieManager {
 
         // Hell hardens with campaign time: scale this fresh batch of enemies
         // by the current year before anything else touches them (design doc:
-        // "Hell escalates too — regions harden over time"). Narrative-event
-        // combats (e.g. DutchZooEscape) spawn enemies via a different path
-        // and are NOT covered by this — a known gap, not fixed here.
+        // "Hell escalates too — regions harden over time"). Event-spawned
+        // combats are hardened at DeadEndStartEncounterChoice.effect().
         const campaign = CampaignUiState.getInstance();
         const year = campaign.calendar.year;
         applyHpHardening(encounter.enemies, year);
