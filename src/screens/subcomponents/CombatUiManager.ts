@@ -4,6 +4,7 @@ import Phaser from 'phaser';
 import { SortieManager } from '../../campaign/SortieManager';
 import { AbstractConsumable } from '../../consumables/AbstractConsumable';
 import { AbstractEvent } from '../../events/AbstractEvent';
+import { EventsManager } from '../../events/EventsManager';
 import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
 import { AbstractReward } from '../../rewards/AbstractReward';
 import { GameState } from '../../rules/GameState';
@@ -203,6 +204,14 @@ class CombatUIManager {
                 text: 'debug:addTestConsumables',
                 callback: () => {
                     this.addTestConsumables();
+                }
+            },
+            {
+                text: 'debug:showRandomEvent',
+                callback: () => {
+                    // QA debug hook to display a random event on demand
+                    const event = EventsManager.getInstance().getRandomEvent();
+                    this.showEvent(event);
                 }
             }
         ];

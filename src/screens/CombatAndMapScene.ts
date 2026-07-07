@@ -7,6 +7,7 @@ import CameraControllerPlugin from 'phaser3-rex-plugins/plugins/cameracontroller
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin';
 import { Encounter } from '../encounters/EncounterManager';
 import { AbstractEvent } from '../events/AbstractEvent';
+import { EventsManager } from '../events/EventsManager';
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
 import { PlayerCharacter } from '../gamecharacters/PlayerCharacter';
 import { SortieManager } from '../campaign/SortieManager';
@@ -506,6 +507,27 @@ installBackgroundStepper();
 // Drives the full sortie loop (HQ -> dispatch -> combat -> payout -> HQ ->
 // save/reload) headlessly and reports compact JSON; see src/utils/SmokeTest.ts.
 (window as any).runSmokeTest = () => runSmokeTest();
+// Debug/QA hook: display a narrative event by name (case-insensitive)
+(window as any).showEventByName = (name: string) => {
+    if (SceneChanger.getCurrentScene()?.scene.key !== 'CombatScene') {
+        console.warn('showEventByName: no active CombatScene; events render via the combat UI manager only.');
+        return null;
+    }
+    const uiManager = CombatUIManager.getInstance();
+    const allEvents = EventsManager.getInstance().getAllEvents();
+    const matchedEvent = allEvents.find(e => e.name.toLowerCase() === name.toLowerCase());
+    if (!matchedEvent) {
+        console.warn(`No event found with name: ${name}`);
+        return null;
+    }
+    uiManager.showEvent(matchedEvent);
+    return matchedEvent;
+};
+// Debug/QA hook: list all available event names
+(window as any).listEventNames = () => {
+    const allEvents = EventsManager.getInstance().getAllEvents();
+    return allEvents.map(e => e.name);
+};
 // Soldier leveling debug hooks (Amendment: Soldier Levels & Promotions).
 // The promotion UI (card-pick screen, Barracks PROMOTE button) is a later
 // piece of work; until it exists these are the only way to drive a
