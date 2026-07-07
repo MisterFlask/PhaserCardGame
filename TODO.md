@@ -44,11 +44,6 @@ protocol. Ordered within sections by priority. Delete items when done.
   against a lossless simulation (see commit history: +1wk sortie overhead,
   £120 dividend base). The sim validates the shape, not the fun. Someone has
   to actually play a few years and report.
-- **UX phase 2: propagate the design language** — `src/ui/UIStyle.ts` +
-  the restyled ContractBoardPanel are the pattern; MainHubPanel (desk/ledger),
-  BarracksPanel (personnel ledger), SortieReportPanel (typed field report),
-  EndOfCampaignPanel (board minutes), InvestmentPanel still use old styling.
-  Get owner reaction to the contract board's level of ornament first.
 - **Standing Orders: v1 shipped (July 2026); remaining pieces** — the model,
   nine launch orders, save v4, ratification UI, and the dead-cargo-project
   pool pull are live (see `src/campaign/orders/`). Still open, per the
@@ -75,11 +70,6 @@ protocol. Ordered within sections by priority. Delete items when done.
   spawn enemies via a different path and are NOT hardened (known gap,
   commented in SortieManager), and the numbers are balance sketches
   untested against play.
-- **Contract squad-size axis** — the redesign doc's contract board lists
-  squad size as a per-contract property; Contract has no such field and
-  every sortie is exactly 3. A 2-soldier "small job" / 4-soldier "big push"
-  axis multiplies roster pressure (the point of the XCOM layer) cheaply.
-  Touches Contract model/DTO, board muster UI, and combat layout.
 - **VP sources for the endgame pivot** — final score = VP + vault, but VP
   only comes from Lethe Extraction and per-project trickle. The intended
   endgame decision ("when do I stop building and start scoring") barely
@@ -147,15 +137,15 @@ protocol. Ordered within sections by priority. Delete items when done.
   Phaser audio wiring for UI clicks, card play, damage, a board-meeting
   sting, and per-region ambience. Volume settings can wait; a mute toggle
   cannot.
-- **Asset manifest lint** — boot 404s and mislabeled portraits are FIXED
-  (July 2026 art pass; manifest diffs clean against disk). Remaining:
-  promote `.claude/skills/generate-game-art/scripts/check-assets.js` into
-  a vitest (same enforcement pattern as SaveRegistriesLint), extend it to
-  walk portraitName/imageName references in content code (it currently
-  only checks manifest-vs-disk, and FrenchBlindProphetess's "hermit" bug
-  was a reference to a key that was never declared), and triage the 8
-  pre-existing texture-key collisions it reports (duplicate filenames
-  across categories; last-loaded silently wins).
+- **Burn down the 145 missing-art references** — AssetManifestLint.test.ts
+  (July 2026) found 145 imageName/portraitName references to texture keys
+  that were never declared; every one silently renders placeholder art
+  (the "hermit" bug class — e.g. HermitProphetOfTheDelta). All are pinned
+  in the test's EXPECTED_MISSING_IMAGE_REFS allowlist, so the count can
+  only shrink. Work through them with the generate-game-art skill (needs
+  OPENAI_API_KEY), removing allowlist entries as art lands — good
+  incremental batch work, prioritize enemies the player actually meets
+  (act 1 first).
 - **Deployment target + bundle hygiene** — no deploy pipeline exists;
   index.html loads two CDN Phaser builds plus the 13.7MB bundled one
   (known sharp edge), and resources/ is 170MB. Decide the distribution
