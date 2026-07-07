@@ -52,11 +52,12 @@ protocol. Ordered within sections by priority. Delete items when done.
   HP/year, +1 Lethality/3yr) are balance sketches untested against human
   play; the sim models difficulty only as win rate, so this is playtest
   material.
-- **VP sources for the endgame pivot** — final score = VP + vault, but VP
-  only comes from Lethe Extraction and per-project trickle. The intended
-  endgame decision ("when do I stop building and start scoring") barely
-  exists. More VP sinks: VP-per-£ conversion late-campaign, VP contracts,
-  the deferred Levi-Maxwell capstone.
+- **VP endgame: v1 shipped (July 2026, save v11)** — Prestige Commissions
+  (year 3+) and Charter Buyback (year 8+, 1.3:1) per
+  `src/docs/vp_endgame_design.md`; sim-ratcheted (convert-late wins score
+  52.5% of pairs with better survival). Residual: the Levi-Maxwell
+  three-stage capstone stays spec'd-deferred until strategic projects
+  support staged purchases; balance numbers are sketches pending play.
 - **Faction reputation v2** — v1 shipped July 2026 per
   `src/docs/faction_reputation_design.md` (tiers from completion counts, six
   retainer orders, Chartered Partner +10%). Explicitly deferred there:
