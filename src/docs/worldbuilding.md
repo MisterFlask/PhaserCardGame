@@ -63,6 +63,9 @@ A vast, primeval wilderness of twisted, sentient trees that wail and moan in ago
 ### The Clockwork Wastes
 A barren, windswept region where the ruins of ancient, infernal machines litter the landscape. The wastes are home to a variety of scavenger tribes and nomadic bands who pick through the ruins in search of valuable components and arcane technologies. Strange, half-mechanical creatures roam the wastes, the products of long-forgotten experiments in infernal cybernetics. The British have taken a particular interest in the Clockwork Wastes, hoping to uncover lost technologies that could give them an edge in their negotiations with the Iron Choir.
 
+### Deep France
+A frozen trench-line that should not exist this far into Hell, and does anyway, because Napoleon Bonaparte declined to stay dead and declined twice more when the British asked politely. The Emperor Undying commands the Grand Armée Eternal from exile: reanimated infantry, old guard grenadiers who march on bayonets long since rusted through, and mitrailleuse-organists who fire in time to hymns nobody living wrote. The trenches themselves are propped up by grisly necromantic ritual as much as by sandbag and sapper; the dead here do not know how to stop entrenching. The Reichsinfernokorps has moved in to oppose the Bonapartistes on Berlin's behalf, dropping zeppelin shrapnel on both sides and fielding cryo-troops built for the cold — ostensibly liberation, functionally a second occupying army. Deep France Concession Holdings, a British-chartered land company, claims title to several parishes of mined-out trench frontage and is extremely serious about the paperwork proving it, even as revenant auditors from the Emperor's own service make off with the boundary ledgers. Behind the lines, Maison Vachon still runs supply carts and officers' mess contracts to a front that has been "temporary" for decades, because somebody has to feed a war that refuses to end. The Company's interest is contractual, not political: clear a picquet, recover a ledger, demonstrate resolve for a client's benefit — the war itself is not the Company's business, only its billable hours.
+
 ### The Abyssal Frontier
 A vast, unexplored region on the edge of Hell, where the infernal realms give way to the infinite darkness of the abyss. The frontier is a place of unsettling silence and strange, alien geometries, where the laws of physics and reason break down. Brave (or foolish) explorers venture into the abyss in search of forbidden knowledge and cosmic secrets, but few return unchanged, if they return at all.
 
@@ -100,15 +103,15 @@ eyes reflect hollow humor.
 
 dons a slender obsidian mask, polished to a mirror finish. behind it, you glimpse shifting reflections of impossible landscapes.
 her accent is soft, each syllable dripping with half-smothered laughter.
-trades in ephemeral abyssal curios; with enough resources, she’ll craft you “cultural anomalies” that grant uncanny bargains in future runs.
+trades in ephemeral abyssal curios; with enough resources, she’ll craft you “cultural anomalies” that grant uncanny bargains on standing orders yet to be ratified.
 known for producing wine that makes entire trade deals more pliable, but might fragment your reality if overused.
 
 # de helrader maatschappij rep: professor johan de veer
 
 bespectacled, wearing a reinforced leather greatcoat spattered with luminous dust.
 always pushing a portable specimen cabinet on wheels, full of oddities floating in jarred solutions.
-offers taxonomic charts that let you predict encounter types or stable commerce nodes.
-demands you bring him rare filaments or smc samples so he can “catalog” them, granting you subtle long-term navigational advantages.
+offers taxonomic charts that let you preview a contract's enemy composition before you dispatch a squad.
+demands you bring him rare filaments or smc samples so he can “catalog” them, granting you subtle long-term intelligence advantages on the contract board.
 
 
 

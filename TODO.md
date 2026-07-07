@@ -14,20 +14,32 @@ protocol. Ordered within sections by priority. Delete items when done.
   character, lost on death unless insured — NEEDS A DESIGN SESSION WITH THE
   OWNER; campaign-level relic persistence should ride that design, not
   precede it.
-- **Character growth (XP/rank)** — the design doc commits to "XP → rank →
-  +deck cap, occasional persona trait, stat bumps"; none of it exists (no
-  xp/rank/deckCap anywhere in src/gamecharacters). Veterans currently differ
-  from recruits only by accumulated cards, and nothing caps deck bloat.
-  NEEDS OWNER SIGN-OFF on the rank curve; the plumbing (xp on
-  PlayerCharacter, award on sortie resolution, save DTO) is mechanical.
+- **Deck cap (leveling residual)** — (corrected July 2026: the old entry
+  claimed XP/rank didn't exist; soldier leveling shipped in save v5 —
+  xp/level on PlayerCharacter, LEVEL_CAP 10, perks at levels 4/8,
+  PromotionPanel. See src/campaign/Leveling.ts.) The one unbuilt piece of
+  the design-doc commitment is the deck cap: nothing limits deck bloat, so
+  veterans accumulate unbounded cards. Needs a small design call (cap curve
+  by level + behavior at cap: block card grants vs force a removal choice),
+  then mechanical plumbing.
 
 ## Gameplay & design
 
-- **Trade-run contract type** — the game's original push-your-luck trading
-  identity (cargo cards clogging the squad's deck for profit) is absent.
-  `ContractType.TRADE_RUN` is stubbed in `src/campaign/Contract.ts`; cargo
-  cards exist in `src/gamecharacters/cargo/`. NEEDS A DESIGN SESSION WITH THE
-  OWNER FIRST (explicitly flagged) — do not implement from guesswork.
+- **Trade-run contract type — design DONE, ready to implement** — the
+  push-your-luck trading identity returns as a contract type: freight
+  stepper at muster, cargo cards clog squad decks for the sortie, base +
+  per-crate payout. Full implementation-ready spec (numbers, seams, house-
+  rule notes, verification bar): `src/docs/trade_run_design.md` (July 2026,
+  lead-authored under delegated authority). Good next dispatch; note it
+  builds on the squad-size axis (trade runs roll squadSize 3-4 only).
+- **Campaign autoplay economy harness** — extend the pure-test pattern into
+  a campaign simulator: play N quarters headlessly with parameterized sortie
+  win rate, wound distribution, and contract-selection policy; assert vault
+  trajectory and dividend satisfaction stay viable across policies. Would
+  catch dominant strategies mechanically (the wages gap sat unnoticed for
+  weeks) and de-risk every balance pass that currently waits on a human
+  playtest. Combat abstracts to win%/wounds; everything else (contracts,
+  payouts, wages, dividends, healing) is already Phaser-free.
 - **Human playtest of the economy tuning** — payouts/dividends were calibrated
   against a lossless simulation (see commit history: +1wk sortie overhead,
   £120 dividend base). The sim validates the shape, not the fun. Someone has
@@ -56,13 +68,13 @@ protocol. Ordered within sections by priority. Delete items when done.
 - **Recruit pool save-scumming** — recruit candidates aren't serialized, so
   reloading rerolls them. Harmless now; fix by seeding their generation if it
   starts to matter.
-- **Region hardening over campaign years** — the design doc says "Hell
-  escalates too (regions harden over time)" but combat difficulty scales
-  only by act/segment; year-8 Styx Delta is identical to year-1 while the
-  dividend clock triples. Without it, late campaigns are decided purely by
-  economics. Options: enemy stat scaling by year, harder encounter tables
-  unlocking per year, or year-scaled enemy count. Tune against the sortie
-  win-rate the economy sim assumes.
+- **Region hardening: shipped; residual gap** — (corrected July 2026: the
+  old entry claimed no year scaling existed; `EncounterHardening.ts` ships
+  +8% enemy HP/year and +1 Lethality per 3 years, applied in
+  `SortieManager.launchNextCombat`.) Residual: narrative-event combats
+  spawn enemies via a different path and are NOT hardened (known gap,
+  commented in SortieManager), and the numbers are balance sketches
+  untested against play.
 - **Contract squad-size axis** — the redesign doc's contract board lists
   squad size as a per-contract property; Contract has no such field and
   every sortie is exactly 3. A 2-soldier "small job" / 4-soldier "big push"
@@ -117,11 +129,6 @@ protocol. Ordered within sections by priority. Delete items when done.
   for something (consumable drops? £ spoils line?) or delete it. Separately,
   a squad wipe still shows no combat-side acknowledgment before the debrief —
   a small defeat overlay ("The Company regrets...") is the missing piece.
-- **Doc repair** — worldbuilding.md has no Deep France entry (an entire act
-  exists only in code); faction reps reference dead mechanics ("commerce
-  nodes", "future runs"); overall_game_concept.md describes the deleted
-  caravan-run design and says 1880 vs worldbuilding's 1890. Fix so content
-  agents have a true standard.
 
 ## Engineering
 
@@ -133,11 +140,13 @@ protocol. Ordered within sections by priority. Delete items when done.
   characters; it's a build-infra change with cross-cutting effects, so it
   wants a deliberate pass, not a drive-by.
 
-- **Audio: there is none** — no sound loading, no SFX, no music anywhere in
-  src/. Even a minimal pass (UI clicks, card play, damage, one ambient loop
-  per region, a board-meeting sting) transforms feel. Needs an asset
-  sourcing decision (licensed pack vs. generated) before any code; Phaser's
-  audio API is straightforward once assets exist.
+- **Audio: sourcing DECIDED (July 2026, delegated authority) — CC0 packs** —
+  use CC0 sources (Kenney UI/impact packs + one ambient loop per region from
+  freesound CC0), no licensing risk, individually replaceable later.
+  Implementation pass: download into resources/Sounds/, manifest entries,
+  Phaser audio wiring for UI clicks, card play, damage, a board-meeting
+  sting, and per-region ambience. Volume settings can wait; a mute toggle
+  cannot.
 - **Asset manifest lint** — boot 404s and mislabeled portraits are FIXED
   (July 2026 art pass; manifest diffs clean against disk). Remaining:
   promote `.claude/skills/generate-game-art/scripts/check-assets.js` into

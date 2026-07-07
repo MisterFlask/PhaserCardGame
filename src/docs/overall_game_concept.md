@@ -2,49 +2,50 @@
 
 ### **Flavor Overview**
 
-A roguelike deckbuilder set in an alternate-history 1880, where Hell has become a contested colonial frontier fought over by European imperialists, demon bureaucrats, and revolutionary movements. Picture a grimly humorous infernal landscape—part Victorian industrial nightmare, part colonial battleground, and part Kafkaesque bureaucracy.
+A roguelike deckbuilder set in an alternate-history 1890, where Hell has become a contested colonial frontier fought over by European imperialists, demon bureaucrats, and revolutionary movements. Picture a grimly humorous infernal landscape—part Victorian industrial nightmare, part colonial battleground, and part Kafkaesque bureaucracy.
 
-The player controls the **East Infernal Company**, a mercantile expedition descending into Hell. You'll encounter corrupted wildlife in polluted swamps, Napoleonic undead entrenched in fiery trenches, anarcho-syndicalist demon revolutionaries, and imperialist factions including Germans field-testing artillery, British building telegraph lines, and Americans laying infernal railways.
+The player runs **The East Infernal Company** from a London office, not as an adventurer but as its manager. You dispatch squads of hired soldiers through the Buckingham Rift to fulfil contracts: escort jobs, repossessions, punitive raids, favors for client factions. Along the way your soldiers fight corrupted wildlife in polluted swamps, undead Napoleonic infantry entrenched in frozen trenches, and the industrial-bureaucratic horrors of Dis, while European rivals (Germans field-testing artillery, British damming the Styx, Americans laying infernal railways) work the same territory for their own ends.
 
 ### **Gameplay and Mechanics**
 
-* **Deckbuilding Roguelike Overlaid With An Overarching Campaign**
+* **Strategic layer: the contract board**
 
-  * The campaign is composed of 10 different *caravan runs* into Hell.
-  * Each caravan run is, basically, its own roguelike run, where the character takes a selection of three characters from their roster.  The player's goal is to survive the run while making as much profit as possible in the meantime.
-  * BETWEEN runs the player can invest their profits in "Strategic Projects."  Strategic Projects embed Victory Points (tallied up at the end of the campaign) and also contain passive effects that trigger on every caravan run into hell from that point onward.
-  * Players start with a deck of cards based on the characters they chose for the run; think Slay the Spire.  They add a card (selected from a pool of three) after each combat to their deck from the list of cards eligible for each of the characters in their party.
-  * Similar to slay the spire, there is a relic system by which the player can gain passive effects over the course of a run.
-  * Each run starts fresh; new cards and relics do not generally persist from run to run.
-  * Revenue is made in two main ways:
-    (1) The player can bring mundane goods, like coffee, from the surface down into Hell.  They have opportunities to sell these goods after each boss; the further you go into hell the more the mundane goods are worth.  The tradeoff here is that each cargo takes up a slot in your combat deck and most of them are a bit worse than your average basic card.  Take too many and you won't be able to finish the run.
-    (2) The player can also acquire Infernal goods (either cards or relics) which can be sold for money at the end of the run but which are extremely disadvantageous to the player in the meantime.  This forms a bit of a push-your-luck mechanic-- the player wants to take as much cargo in and bring as many infernal goods out as possible WITHOUT dying.
-  * Card play is tactical: managing cards, energy, combat resources (new mechanic!), and exploiting status effects.
-  * Combat resources are an overlay meant to enable easy cross-class synergies; each one (blood, venture, mettle, pluck, smog) cards can either add combat resources or scale off them.
-  * It's party-based; the way the party system works is taht the classes of character you take into your party create the card pool you have access to as you continue the run.  The draw pile in combat is simply the cards each character has, which are then mashed together into a deck.  Energy is shared between characters for each turn; you get three energy per turn.
+  * HQ presents a rotating board of contracts — each with a client, a deadline, a region, a difficulty, and a payout. Contracts expire; you cannot take them all.
+  * The player assigns a squad of 3 from a persistent roster and dispatches them on a **sortie**: a short fixed sequence of combats (and the occasional event), not an open map. Full design in `strategic_layer_redesign.md`.
+  * Soldiers are persistent company assets, not disposable run characters. They carry HP, XP, level, a personal deck, wounds, and stress from sortie to sortie. Wounded soldiers recover in the infirmary over game-weeks; death is permanent (barring specific mitigation). This XCOM-style scarcity — not a single run's survival — is what forces roster rotation and hard calls.
+  * Card play within a sortie is tactical Slay-the-Spire-style deckbuilding: managing cards, energy, and combat resources (blood, venture, mettle, pluck, smog) that enable cross-class synergies. Energy is shared across the squad each turn.
+  * Soldiers level up and are promoted at the sortie debrief, picking new cards for their personal deck and, at key levels, a class perk. A recruit starts with a basic kit; a veteran is a curated deck built up over many sorties.
 
-* **Acts & Progression**
+* **Regions**
 
-  1. **Styx Delta**: Swampy, polluted wetlands with environmentalist demons fighting industrial encroachment.
-  2. **Deep France**: Fiery Napoleonic warzone with trench warfare, machine guns, and revisionist-undead armies led by Emperor Napoleon Undying.
-  3. **The Dis Foundry Belt** : A sprawling bureaucratic-industrial capital that literally runs on infernal paperwork, seals, and red tape — labor unrest, repossessions, and management by memorandum.
+  1. **Styx Delta**: Swampy, industrially polluted wetlands — the Styx Boatman's Guild vs. the British damming project.
+  2. **Deep France**: Frozen trenches where an undead Napoleonic empire, propped up by necromancy, fights the German Reichsinfernokorps.
+  3. **The Dis Foundry Belt**: A bureaucratic-industrial capital run on paperwork and red tape, where the Stoker's Union faces off against the Brimstone Barons.
+
+  See `worldbuilding.md` for the full regional and faction writeups.
+
+* **The doom clock: quarterly dividends**
+
+  * The Company's shareholders expect a dividend every quarter, paid from the vault in pounds sterling — the only currency in the game. Every pound not paid out can instead be reinvested in recruits, wages, healing, deck services, equipment, or strategic projects.
+  * Miss or shortchange a dividend and shareholder satisfaction drops; run it to zero and the player is sacked — campaign over. Expectations escalate as the charter's ten years (forty quarters) run their course.
+  * Between sorties, the player also commits to **strategic projects** (permanent Capital Works) and **standing orders** (swappable, slot-limited policies ratified at the quarterly board meeting) that reshape the contract board, the roster, or the sortie itself. Full detail in `strategic_layer_redesign.md`.
 
 * **Consumable Equipment ("Field Kit")**
 
-  * Expendable physical gear — tonics, demolition charges, surveyor's optics, phylacteries — providing temporary bonuses or battlefield effects. (The earlier "bureaucracy as potions" concept was dropped by owner decision, July 2026; documents survive only as physical objects where mechanically load-bearing, e.g. transit writs handed over as a toll.)
+  * Expendable physical gear — tonics, demolition charges, surveyor's optics, phylacteries — providing temporary bonuses or battlefield effects.
 
-* **Faction Dynamics**
+### **Faction Dynamics**
 
-  * Multiple competing factions: imperialists, revolutionaries, various European continental powers, demonic capitalists, and demonic marxists.  Every once in a while, an angel.
-  * The player does NOT take a starring role in these conflicts; they are simply the background which informs random events and enemies the player encounters for each run.
+* Multiple competing factions occupy Hell: imperialists, revolutionaries, various European continental powers, demonic capitalists, and demonic marxists. Every once in a while, an angel.
+* The player does not take a starring role in these conflicts; they are the backdrop against which contracts, clients, and encounters are generated. See `worldbuilding.md` for factions and their representatives.
 
 ### **Visual & Narrative Style**
 
 * Visual aesthetic mixes Victorian military regalia, Napoleonic uniforms, industrial machinery, and demonic surrealism. Each faction has unique, instantly recognizable color schemes and silhouettes.
-* Darkly humorous, satirical tone reminiscent of *Fallen London*, punctuated by bureaucratic absurdity, industrial horrors, and historical parody.
+* Dry corporate humor over Lovecraftian dread: bureaucratic absurdity and industrial horror played with a straight face, narrated via the field dispatches of the Company's field factor, Harry Cavendish (see `worldbuilding.md`).
 
 ---
 
 ### **Conclusion**
 
-The goal is to deliver a sharply thematic deckbuilder that engages players with both strategic depth and narrative absurdity in a uniquely twisted alternate-history Hellscape.
+The goal is a sharply thematic XCOM-over-deckbuilder: strategic-layer tension between paying the dividend and building the Company, resolved sortie by sortie in tactical Slay-the-Spire combat, all narrated in a uniquely twisted alternate-history Hellscape.
