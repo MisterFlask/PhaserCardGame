@@ -162,6 +162,13 @@ protocol. Ordered within sections by priority. Delete items when done.
   compression/pruning, and a build that doesn't ship the whole resources
   tree.
 
+- **Clamp consumable transfer-back to the cap** — `debug:addTestConsumables`
+  (CombatUiManager) fills the loadout with all 12 consumables; since the
+  consumable-stock work (July 2026), unused loadout items transfer back into
+  persistent `CampaignUiState.consumables` on sortie resolution with no cap
+  check, so the debug tool can push saved stock far past MAX_CONSUMABLE_STOCK.
+  Normal play can't (purchases/grants respect the cap). One-line defensive
+  clamp in `SortieManager.resolveSortie` + a unit test.
 - **Combat-restart race hardening** — `cleanupAndRestartCombat`
   (CombatAndMapScene) recreates managers and re-queues actions while the old
   action queue may still be resolving, and `CombatUIManager.initialize()`'s
