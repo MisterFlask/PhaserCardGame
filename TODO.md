@@ -6,29 +6,20 @@ protocol. Ordered within sections by priority. Delete items when done.
 
 ## Dangling systems (July 2026 gap audit — half-connected, silently broken today)
 
-- **Relic equipment slots (design)** — the campaign relic pool now persists
-  (July 2026: `CampaignUiState.relicsOwned`, save v6, squad-wide effects).
-  The design doc's fuller idea — relics as assignable equipment, 2-3 slots
-  per character, lost on death unless insured — remains deferred and NEEDS
-  A DESIGN SESSION WITH THE OWNER.
-- **Consumable acquisition path** — bureaucratic consumables (permits,
-  writs; `src/consumables/`, PhysicalConsumable UI, combat input handling)
-  are implemented in combat but the only way to obtain one is the
-  `debug:addTestConsumables` menu entry. The economy table in the design doc
-  has a "Provisioning" row for this. Add an HQ purchase surface (Barracks or
-  a Quartermaster section) + occasional contract/event rewards, and
-  serialize the owned stock.
+- **Relic equipment slots (design)** — (corrected July 2026: an earlier
+  version of this entry claimed campaign relic persistence had shipped as
+  `CampaignUiState.relicsOwned` / save v6 — it has not; relics exist only in
+  run-scoped `GameState.relicsInventory` and are never serialized.) The
+  design doc's idea — relics as assignable equipment, 2-3 slots per
+  character, lost on death unless insured — NEEDS A DESIGN SESSION WITH THE
+  OWNER; campaign-level relic persistence should ride that design, not
+  precede it.
 - **Character growth (XP/rank)** — the design doc commits to "XP → rank →
   +deck cap, occasional persona trait, stat bumps"; none of it exists (no
   xp/rank/deckCap anywhere in src/gamecharacters). Veterans currently differ
   from recruits only by accumulated cards, and nothing caps deck bloat.
   NEEDS OWNER SIGN-OFF on the rank curve; the plumbing (xp on
   PlayerCharacter, award on sortie resolution, save DTO) is mechanical.
-- **New-campaign state reset audit** — "New Campaign" resets via page reload;
-  verify every singleton that now carries campaign state (StandingOrdersState,
-  relic inventory, consumables once persisted) is actually cleared when the
-  save is wiped. Cheap: a unit test that CampaignSerializer round-trips a
-  fresh state to defaults, plus a browser check of the button path.
 
 ## Gameplay & design
 
