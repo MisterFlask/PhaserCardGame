@@ -14,8 +14,52 @@ export const CHARTER_YEARS = 10;
 /** £ owed per rostered soldier at each quarterly board meeting — wounded
  *  included, since the Company honors its payroll regardless of fitness for
  *  duty. Keeps roster size honest: ongoing drain so hoarding has a cost
- *  (see src/docs/strategic_layer_redesign.md, "What money buys"). */
-export const WAGE_PER_SOLDIER_PER_QUARTER = 15;
+ *  (see src/docs/strategic_layer_redesign.md, "What money buys"). Raised
+ *  from £15 in the economy balance pass (see CampaignSimulator.test.ts's
+ *  "no-free-hoarding" describe block): at £15 a hoarded roster netted MORE
+ *  vault on average than a lean one (avg £2510 at ROSTER_CAP vs £2095 at
+ *  roster 6, 20 seeds) because wound-attrition throughput starvation on
+ *  small rosters dwarfed the wage drag. £25 is the flat-wage frontier this
+ *  pass landed on: a roster-5-vs-roster-8 head-to-head lands within 10% (or
+ *  ahead) in ~40% of seed pairs (target ~45%; see the sim's measured
+ *  before/after table) without making a healthy year-1 roster of 5
+ *  actually cashflow-negative in practice — real sim throughput for a
+ *  roster of 5 is ~3.7 sorties/quarter (£1000+ vault after year 1), well
+ *  above the conservative "2 average contracts/quarter" floor case Wages.
+ *  test.ts's baseline-economics sanity check uses, which is intentionally
+ *  pessimistic and does go negative at this wage level — see that test's
+ *  comment. Higher flat wages (30, the permitted ceiling) nudge T2 further
+ *  but overshoot T1: at £30, roster-6's 40-quarter survival rate collapses
+ *  well below the 50-80% band (measured ~25/60) while roster-8's barely
+ *  moves — a flat wage bites proportionally harder on mid-size rosters
+ *  than it closes the roster-5-vs-8 gap, so £25 was kept as the better
+ *  overall fit against both targets rather than pushed to the ceiling. */
+export const WAGE_PER_SOLDIER_PER_QUARTER = 25;
+
+/** Balance-pass sketch numbers, tuned against CampaignSimulator.test.ts (see
+ *  "baseline viability" describe block for the measured before/after). A
+ *  flat 1.35x/year compounding escalation made the 40-quarter charter
+ *  unwinnable at any roster size (0/10 seeds survived at winRate 0.9, even
+ *  with an artificially generous £2000 starting vault — see the pre-fix
+ *  `.skip`ped finding in CampaignSimulator.test.ts for the exact numbers).
+ *  DIVIDEND_ESCALATION_RATE_BY_YEAR keeps the escalation INTO years 2-4
+ *  untouched at 1.35x (the brief's "year-1-to-3 shape" must stay intact —
+ *  the doc's "feels the squeeze from year 7" is intended), then decays the
+ *  rate for later years so the clock still bites (every late year still
+ *  escalates, never flat) without compounding into a guaranteed cliff.
+ *  Keyed by the fiscal year being escalated INTO (2..CHARTER_YEARS); years
+ *  not present fall back to the last defined entry. */
+const DIVIDEND_ESCALATION_RATE_BY_YEAR: Record<number, number> = {
+    2: 1.35,
+    3: 1.35,
+    4: 1.35,
+    5: 1.24,
+    6: 1.20,
+    7: 1.16,
+    8: 1.13,
+    9: 1.10,
+    10: 1.08,
+};
 
 /**
  * Campaign time and the shareholder doom clock.
@@ -153,7 +197,9 @@ export class CampaignCalendar {
 
         // Expectations escalate at each year boundary (after Q4 settles).
         if (this.quarterOfYear === 1) {
-            const rate = StandingOrdersState.getInstance().dividendEscalationRate(1.35);
+            const baseRate = DIVIDEND_ESCALATION_RATE_BY_YEAR[this.year]
+                ?? DIVIDEND_ESCALATION_RATE_BY_YEAR[CHARTER_YEARS];
+            const rate = StandingOrdersState.getInstance().dividendEscalationRate(baseRate);
             this.currentDividendExpectation = Math.round(this.currentDividendExpectation * rate);
             this.log(`New fiscal year: the board raises its dividend expectation to £${this.currentDividendExpectation}.`, true);
             this.log(`The Survey Desk notes deteriorating conditions in the field; no corresponding revision to field pay is planned.`, true);

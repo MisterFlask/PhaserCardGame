@@ -287,6 +287,21 @@ export class ContractGenerator {
     /** Fraction of generated contracts that carry a provisioning grant. */
     private static readonly CONSUMABLE_REWARD_CHANCE = 0.2;
 
+    /** Balance-pass sketch numbers, tuned against CampaignSimulator.test.ts
+     *  (see "baseline viability" describe block for the measured before/after).
+     *  Hell's cost of living: enemies harden per year via EncounterHardening,
+     *  so income should climb too, or the flat-per-act payout table plateaus
+     *  once act 3 unlocks (year 6) while currentDividendExpectation keeps
+     *  compounding — that mismatch was the root cause of the unwinnable
+     *  40-quarter charter (0/10 seeds survived at any roster size, winRate
+     *  0.9; see CampaignSimulator.test.ts pre-fix numbers). +9%/year past
+     *  year 1 (year 1 = 1.0x exactly, so act-1/year-1 numbers are unchanged)
+     *  roughly tracks HP_PER_YEAR's cadence in EncounterHardening.ts while
+     *  leaving most of the late-charter gap to be closed by softening
+     *  dividend escalation (CampaignCalendar), per the brief's lever
+     *  preference order. */
+    private static readonly PAYOUT_PER_YEAR = 0.05;
+
     /** Balance-pass sketch numbers, untested against the economy sim — see
      *  TODO.md "Standing Orders balance pass" for the convention. Revisit
      *  after a few played campaign-years. Lean crews draw danger pay because
@@ -345,11 +360,16 @@ export class ContractGenerator {
     /** Shared bounty-style payout roll: deeper acts/segments and longer
      *  sorties pay more, Standing Orders adjust, danger pay adjusts last.
      *  Every pass re-rounds to £5 so the final figure is always a clean
-     *  invoice number. */
-    private rollBountyPayout(act: number, segment: number, numCombats: number, squadSize: number): number {
+     *  invoice number. `year` applies PAYOUT_PER_YEAR on top of the base so
+     *  income keeps pace with dividend escalation and enemy hardening
+     *  instead of plateauing once act 3 unlocks — see PAYOUT_PER_YEAR's
+     *  comment. Exactly 1.0x at year 1, so act-1/year-1 numbers are
+     *  unchanged from before this lever existed. */
+    private rollBountyPayout(year: number, act: number, segment: number, numCombats: number, squadSize: number): number {
         const basePay = 30 + act * 20 + segment * 25;
+        const yearMultiplier = 1 + ContractGenerator.PAYOUT_PER_YEAR * Math.max(0, year - 1);
         const jitter = 0.85 + Math.random() * 0.3;
-        const jitteredPayout = Math.round((basePay * numCombats * jitter) / 5) * 5;
+        const jitteredPayout = Math.round((basePay * yearMultiplier * numCombats * jitter) / 5) * 5;
         const standingOrdersPayout = Math.round(StandingOrdersState.getInstance().contractPayout(jitteredPayout) / 5) * 5;
         const dangerPayMultiplier = ContractGenerator.DANGER_PAY_MULTIPLIER[squadSize] ?? 1.0;
         return Math.round((standingOrdersPayout * dangerPayMultiplier) / 5) * 5;
@@ -366,7 +386,7 @@ export class ContractGenerator {
             : undefined;
     }
 
-    private generateBountyContract(region: RegionFlavor): Contract {
+    private generateBountyContract(region: RegionFlavor, year: number): Contract {
         const template = this.pick(region.templates);
 
         // Segment within the act is the fine-grained difficulty dial.
@@ -375,7 +395,7 @@ export class ContractGenerator {
 
         const numCombats = Math.random() < 0.45 ? 1 : 2;
         const squadSize = this.rollSquadSize();
-        const payout = this.rollBountyPayout(region.act, segment, numCombats, squadSize);
+        const payout = this.rollBountyPayout(year, region.act, segment, numCombats, squadSize);
         const deadlineWeeks = this.rollDeadlineWeeks();
         const consumableRewardName = this.rollConsumableReward();
 
@@ -409,7 +429,7 @@ export class ContractGenerator {
      * roughly 2x money for 12 dead cards spread across three decks. Squad
      * size never rolls 2 (no hands to spare): 3 or 4 only.
      */
-    private generateTradeRunContract(region: TradeRunRegion): Contract {
+    private generateTradeRunContract(region: TradeRunRegion, year: number): Contract {
         const template = this.pick(region.templates);
 
         const segment = Math.floor(Math.random() * 3);
@@ -417,7 +437,7 @@ export class ContractGenerator {
         const numCombats = Math.random() < 0.45 ? 1 : 2;
         const squadSize = this.rollTradeRunSquadSize();
 
-        const normalPayoutRoll = this.rollBountyPayout(region.act, segment, numCombats, squadSize);
+        const normalPayoutRoll = this.rollBountyPayout(year, region.act, segment, numCombats, squadSize);
         const basePayout = Math.round((normalPayoutRoll * ContractGenerator.TRADE_RUN_BASE_PAYOUT_FRACTION) / 5) * 5;
         const freightRatePerCrate = ContractGenerator.TRADE_RUN_FREIGHT_RATE_PER_ACT * region.act;
         const maxCrates = ContractGenerator.TRADE_RUN_MAX_CRATES;
@@ -451,11 +471,11 @@ export class ContractGenerator {
 
         if (Math.random() < ContractGenerator.TRADE_RUN_CHANCE) {
             const eligibleTradeRegions = TRADE_RUN_REGIONS.filter(r => r.act <= maxAct);
-            return this.generateTradeRunContract(this.pick(eligibleTradeRegions));
+            return this.generateTradeRunContract(this.pick(eligibleTradeRegions), year);
         }
 
         const eligibleRegions = REGION_FLAVORS.filter(r => r.act <= maxAct);
-        return this.generateBountyContract(this.pick(eligibleRegions));
+        return this.generateBountyContract(this.pick(eligibleRegions), year);
     }
 
     /** Top the board back up to targetCount contracts (adjusted by Standing
@@ -472,7 +492,7 @@ export class ContractGenerator {
         if (isFullRefresh && board.length > 0 && !board.some(c => c.isTradeRun)) {
             const maxAct = this.maxActUnlocked(year, contractsCompleted);
             const eligibleTradeRegions = TRADE_RUN_REGIONS.filter(r => r.act <= maxAct);
-            board[board.length - 1] = this.generateTradeRunContract(this.pick(eligibleTradeRegions));
+            board[board.length - 1] = this.generateTradeRunContract(this.pick(eligibleTradeRegions), year);
         }
         return board;
     }

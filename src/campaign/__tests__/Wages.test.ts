@@ -2,9 +2,22 @@ import { describe, expect, it } from 'vitest';
 import { CampaignCalendar, WAGE_PER_SOLDIER_PER_QUARTER, WEEKS_PER_QUARTER } from '../CampaignCalendar';
 
 /**
- * Wages: £15/soldier/quarter, settled at the board meeting BEFORE the
+ * Wages: £25/soldier/quarter, settled at the board meeting BEFORE the
  * dividend draw (see src/docs/strategic_layer_redesign.md, "What money
  * buys" — "keeps roster size honest; ongoing drain so hoarding has cost").
+ * Raised from £15 in the economy balance pass (see CampaignCalendar.ts's
+ * WAGE_PER_SOLDIER_PER_QUARTER comment and CampaignSimulator.test.ts's
+ * "no-free-hoarding" describe block) — £15 was too small relative to
+ * per-sortie payouts to make a hoarded roster net-negative versus a lean
+ * one. £25 is the frontier this pass landed on: pushing further to the
+ * permitted ceiling (£30) over-penalizes mid-size rosters (roster-6's
+ * 40-quarter survival collapses well below the design band) without
+ * meaningfully improving the roster-5-vs-8 comparison further, so £25 was
+ * kept rather than maxed out. See the "baseline economics" test below for
+ * the one place this shows up as a real tradeoff: at £25 a purely
+ * conservative "2 average contracts/quarter" floor case is barely
+ * cashflow-negative even though the sim shows actual roster-5 throughput
+ * (~3.7 sorties/quarter) is comfortably positive in practice.
  *
  * Wages are derived state (roster size × WAGE_PER_SOLDIER_PER_QUARTER) —
  * CampaignCalendar itself holds no roster; callers (CampaignUiState in
@@ -36,7 +49,7 @@ describe('Wages', () => {
         );
 
         const expectedWages = rosterSize * WAGE_PER_SOLDIER_PER_QUARTER;
-        expect(expectedWages).toBe(75);
+        expect(expectedWages).toBe(125);
         // Started at 10,000; wages then the full £120 dividend both clear, in order.
         expect(vault).toBe(10_000 - expectedWages - 120);
         expect(order).toEqual(['wages', 'dividend']);
@@ -45,7 +58,7 @@ describe('Wages', () => {
     it('floors the vault at 0 under wages and never goes negative', () => {
         const cal = new CampaignCalendar();
         const rosterSize = 8; // ROSTER_CAP
-        let vault = 50; // less than the wage bill (8 * 15 = 120)
+        let vault = 50; // less than the wage bill (8 * 25 = 200)
 
         cal.advanceWeeks(
             WEEKS_PER_QUARTER,
@@ -80,7 +93,7 @@ describe('Wages', () => {
 
         const wageEvent = cal.boardEvents.find(e => e.message.includes('field wages'));
         expect(wageEvent).toBeDefined();
-        expect(wageEvent!.message).toContain('£75');
+        expect(wageEvent!.message).toContain('£125');
         expect(wageEvent!.isWarning).toBe(false);
     });
 
@@ -88,7 +101,7 @@ describe('Wages', () => {
         const cal = new CampaignCalendar();
         let vault = 0;              // broke going into the meeting
         const projectIncome = 100;  // bond coupon arrives at the meeting
-        const wagesDue = 75;        // 5 soldiers x £15
+        const wagesDue = 75;        // fixed test value (not tied to WAGE_PER_SOLDIER_PER_QUARTER)
         // dividend due is the £120 default
 
         let wagesPaid = -1;
@@ -130,11 +143,18 @@ describe('Wages', () => {
         expect(cal.boardEvents.some(e => e.message.includes('field wages'))).toBe(false);
     });
 
-    it('baseline economics: roster of 5 stays cashflow-positive after wages + base dividend, ' +
-        'against income from ~2 average contracts/quarter (act 1: avg payout ~£116, derived from ' +
-        'ContractGenerator.generateContract\'s basePay/numCombats/jitter math)', () => {
+    it('baseline economics: a roster of 5 running a conservative "2 average contracts/quarter" ' +
+        '(act 1, year 1: avg payout ~£116, derived from ContractGenerator.generateContract\'s ' +
+        'basePay/numCombats/jitter math; the year-scaling multiplier added in the balance pass ' +
+        'is exactly 1.0 at year 1, so this baseline year-1 figure is unchanged) is only barely ' +
+        'in the red against wages + the base dividend — NOT strictly positive as it was at the ' +
+        'old £15 wage. This is intentional post-balance-pass: 2 contracts/quarter is a ' +
+        'deliberately pessimistic floor case (the sim shows actual roster-5 throughput is closer ' +
+        'to 3.7 sorties/quarter in year 1, comfortably cashflow-positive — see ' +
+        'CampaignSimulator.test.ts). Report the numbers so a future rebalance can see them ' +
+        'without rerunning.', () => {
         const rosterSize = 5;
-        const wageBill = rosterSize * WAGE_PER_SOLDIER_PER_QUARTER; // £75
+        const wageBill = rosterSize * WAGE_PER_SOLDIER_PER_QUARTER; // £125
         const baseDividend = 120; // CampaignCalendar's currentDividendExpectation starting value
 
         // Average act-1 contract payout, derived (not guessed) from
@@ -147,9 +167,9 @@ describe('Wages', () => {
 
         const netQuarterlyCashflow = quarterlyContractIncome - wageBill - baseDividend;
 
-        // Report the numbers so a future rebalance can see them without rerunning.
         expect(averageContractPayout).toBeCloseTo(116.25, 2);
-        expect(wageBill).toBe(75);
-        expect(netQuarterlyCashflow).toBeGreaterThan(0);
+        expect(wageBill).toBe(125);
+        // -12.5: a slim floor-case deficit, not a cliff — see the test title.
+        expect(netQuarterlyCashflow).toBeCloseTo(-12.5, 2);
     });
 });
