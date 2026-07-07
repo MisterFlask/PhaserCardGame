@@ -19,6 +19,12 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      - name: Headless smoke test (full sortie loop)
+        # Drives window.runSmokeTest() (src/utils/SmokeTest.ts) in headless
+        # Chromium via puppeteer: HQ -> dispatch -> combat -> payout ->
+        # save/reload. Proves the built bundle actually runs, not just that
+        # it compiles. See scripts/ci-smoke.mjs.
+        run: npm run smoke
 
   deploy:
     # Publish the playable build to gh-pages on every green master push.

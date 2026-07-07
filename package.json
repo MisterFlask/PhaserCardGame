@@ -10,6 +10,7 @@
   "devDependencies": {
     "@types/lodash": "^4.17.7",
     "nodemon": "^3.1.4",
+    "puppeteer": "^25.3.0",
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4",
@@ -24,7 +25,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "generate:relic-icons": "ts-node src/content_pipeline/relic_icon_generation.ts"
+    "generate:relic-icons": "ts-node src/content_pipeline/relic_icon_generation.ts",
+    "smoke": "node scripts/ci-smoke.mjs"
   },
   "name": "phaser-game",
   "version": "1.0.0",

@@ -68,12 +68,6 @@ protocol. Ordered within sections by priority. Delete items when done.
   every sortie is exactly 3. A 2-soldier "small job" / 4-soldier "big push"
   axis multiplies roster pressure (the point of the XCOM layer) cheaply.
   Touches Contract model/DTO, board muster UI, and combat layout.
-- **Wages/upkeep** — the design doc's economy table includes wages ("keeps
-  roster size honest; ongoing drain so hoarding has cost"). Nothing drains
-  the vault passively, so a big roster is free and hoarding is strictly
-  optimal. A per-soldier £/quarter charge at the board meeting (settled
-  before the dividend) is the smallest version. Rebalance the dividend sim
-  after.
 - **VP sources for the endgame pivot** — final score = VP + vault, but VP
   only comes from Lethe Extraction and per-project trickle. The intended
   endgame decision ("when do I stop building and start scoring") barely
@@ -108,23 +102,21 @@ protocol. Ordered within sections by priority. Delete items when done.
 
 ## Flavor (from the July 2026 flavor audit)
 
-- **Company name canon** — three names in circulation: "The East Inferno
-  Company" (MainHubPanel), "The Third Circle Company" (worldbuilding.md +
-  ArchonClass), "East Infernal Company" (repo working title). NEEDS OWNER
-  DECISION, then a sweep.
 - **Act 2/3 enemy flavor pass** — Act 1 enemies have first-person
   Cavendish-journal descriptions; Act 2/3 enemies and both later bosses have
   one-liners. Bring them up to Act 1's standard (now canonically Cavendish's
   survey notes — see worldbuilding.md narrator section).
-- **Onboarding letter** — no framing text exists for a new campaign; player
-  boots into live HUD numbers. Approved shape: Cavendish's first letter to
-  the incoming manager (introduces himself, the charter, the dividend
-  clock). Also fits the EndOfCampaignPanel's register.
 - **Player-side flavor lines** — cards, cargo, relics, buffs are
   mechanics-only text. Add a one-line flavor field where it pays most:
   cargo first (opium/spicy literature jokes going unused), then relics.
-- **Combat resolution framing** — no victory/defeat acknowledgment text;
-  reward screen closes with bare "Done". Cheap thematic wrappers.
+- **Defeat framing + reward-screen decision** — victory framing shipped
+  (July 2026: GeneralRewardScreen title + CLAIM & CONTINUE), BUT that screen
+  is currently dead code: `SortieManager.getRewardsForCurrentCombat()` is
+  hardcoded to `[]` since promotions superseded per-combat card rewards, so
+  the framing never renders in normal play. Decide: revive the reward screen
+  for something (consumable drops? £ spoils line?) or delete it. Separately,
+  a squad wipe still shows no combat-side acknowledgment before the debrief —
+  a small defeat overlay ("The Company regrets...") is the missing piece.
 - **Doc repair** — worldbuilding.md has no Deep France entry (an entire act
   exists only in code); faction reps reference dead mechanics ("commerce
   nodes", "future runs"); overall_game_concept.md describes the deleted
@@ -162,13 +154,6 @@ protocol. Ordered within sections by priority. Delete items when done.
   compression/pruning, and a build that doesn't ship the whole resources
   tree.
 
-- **Clamp consumable transfer-back to the cap** — `debug:addTestConsumables`
-  (CombatUiManager) fills the loadout with all 12 consumables; since the
-  consumable-stock work (July 2026), unused loadout items transfer back into
-  persistent `CampaignUiState.consumables` on sortie resolution with no cap
-  check, so the debug tool can push saved stock far past MAX_CONSUMABLE_STOCK.
-  Normal play can't (purchases/grants respect the cap). One-line defensive
-  clamp in `SortieManager.resolveSortie` + a unit test.
 - **Combat-restart race hardening** — `cleanupAndRestartCombat`
   (CombatAndMapScene) recreates managers and re-queues actions while the old
   action queue may still be resolving, and `CombatUIManager.initialize()`'s
@@ -184,13 +169,12 @@ protocol. Ordered within sections by priority. Delete items when done.
 
 ## Cost optimization (verification & delegation)
 
-- **CI headless-Chrome smoke job** — run `runSmokeTest()` in CI (the game
-  already runs headless thanks to the background stepper) so green CI proves
-  the loop and nobody re-drives it manually. `window.runSmokeTest()` now
-  exists (src/utils/SmokeTest.ts); note it runs from "current campaign at
-  HQ", so the CI job just loads the page fresh and calls it.
-- **Try Haiku on the most mechanical briefs** (exact-template boilerplate,
-  rename sweeps); measure bounce rate vs Sonnet before adopting.
+- **Haiku lane for mechanical briefs — first trial passed** (July 2026: the
+  consumable cap clamp ran on Haiku: correct first try, 0 bounces, ~32k
+  tokens / 83s vs a typical Sonnet feature at ~220k). Keep routing
+  exact-template briefs (boilerplate, rename sweeps, single-function+test)
+  to Haiku and keep noting bounce rates; escalate to Sonnet on the first
+  bounce.
 - **Codex lane A/B** — hand the next content batch (enemies/events) to both
   the Sonnet lane and Codex (branch+PR, AGENTS.md, green CI) with the same
   brief; compare bounce rates and review load.

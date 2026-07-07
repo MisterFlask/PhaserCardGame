@@ -121,12 +121,6 @@ async function runSteps(steps: SmokeTestStep[]): Promise<void> {
         steps.push({ name, ok, detail });
     };
 
-    const listenerCountsAtStart = captureListenerCounts();
-    // ActionQueue.lastErrors is a rolling buffer that persists across harness
-    // runs within the same page session; only errors recorded from this point
-    // on belong to this run.
-    const actionQueueErrorCountAtStart = ActionManager.getInstance().actionQueue.lastErrors.length;
-
     // --- Step 1: starting point ------------------------------------------------
     // A true fresh-campaign reset goes through window.location.reload()
     // (see MainHubPanel.navigateTo, "New Campaign"), which the harness cannot
@@ -138,6 +132,18 @@ async function runSteps(steps: SmokeTestStep[]): Promise<void> {
     const gameState = GameState.getInstance();
 
     await waitFor(() => currentSceneKey() === 'HqScene', DEFAULT_TIMEOUT_MS, 'HqScene to be active');
+    // window.runSmokeTest exists from module load, so a CI runner can call it
+    // BEFORE HqScene.create() has registered its event listeners. Capture the
+    // leak baselines only once create() has demonstrably finished (navigate
+    // listener present), or a boot-time run records 0 and the end-of-loop
+    // count of 1 reads as a leak.
+    await waitFor(() => (captureListenerCounts()['HqScene.navigate'] ?? 0) >= 1,
+        DEFAULT_TIMEOUT_MS, "HqScene create() to finish (navigate listener registered)");
+    const listenerCountsAtStart = captureListenerCounts();
+    // ActionQueue.lastErrors is a rolling buffer that persists across harness
+    // runs within the same page session; only errors recorded from this point
+    // on belong to this run.
+    const actionQueueErrorCountAtStart = ActionManager.getInstance().actionQueue.lastErrors.length;
     record('at-hq', true,
         'Running from current campaign state at HQ (fresh-campaign reset requires a page reload; ' +
         'harness cannot survive that, so it drives from "current campaign, at HQ" instead).');
@@ -168,37 +174,50 @@ async function runSteps(steps: SmokeTestStep[]): Promise<void> {
         const scene = getActiveScene();
         if (!scene) throw new SmokeTestFailure('No active scene while combat expected.');
 
-        // Zero every enemy's hitpoints on every poll tick until the win
-        // registers. A single one-shot zero races with cleanupAndRestartCombat
-        // (the encounter's enemies may not be populated into combatState yet
-        // when this scene transition is first observed, and a fresh encounter
-        // for combat #2 of a multi-combat sortie needs its own zeroing pass).
-        const mapButton = await waitForMapButton(scene);
-        await waitFor(() => {
-            GameState.getInstance().combatState.enemies.forEach(enemy => { enemy.hitpoints = 0; });
-            return mapButtonReadyToAdvance(scene);
-        }, DEFAULT_TIMEOUT_MS, 'combat-won state (mapButton glow/advance ready)');
+        // Winning one combat can take several press attempts: dismissing a
+        // narrative event choice right before the click can SWAP a fresh
+        // combat in (cleanupAndRestartCombat resets combatEndHandled, so the
+        // mapButton silently ignores the press — the player-facing behavior
+        // is "an event ambushed you with another fight"). A human just wins
+        // the replacement combat; the harness must too.
+        const combatsRemainingBefore = sortie.combatsRemaining();
+        const advanced = () => sortie.combatsRemaining() < combatsRemainingBefore || !sortie.isActive();
+        const PRESS_ATTEMPTS = 5;
+        for (let attempt = 1; attempt <= PRESS_ATTEMPTS && !advanced(); attempt++) {
+            // Zero every enemy's hitpoints on every poll tick until the win
+            // registers. A single one-shot zero races with cleanupAndRestartCombat
+            // (the encounter's enemies may not be populated into combatState yet
+            // when this scene transition is first observed, and a swapped-in
+            // encounter needs its own zeroing pass).
+            const mapButton = await waitForMapButton(scene);
+            await waitFor(() => {
+                GameState.getInstance().combatState.enemies.forEach(enemy => { enemy.hitpoints = 0; });
+                return mapButtonReadyToAdvance(scene);
+            }, DEFAULT_TIMEOUT_MS, 'combat-won state (mapButton glow/advance ready)');
 
-        // A card-reward screen (and possibly a narrative event) may be
-        // blocking the map button; clear them the same way a player would.
-        await waitFor(() => {
+            // A card-reward screen (and possibly a narrative event) may be
+            // blocking the map button; clear them the same way a player would.
             dismissBlockingPopups(scene);
-            return true;
-        }, DEFAULT_TIMEOUT_MS, 'popup dismissal pass');
-        // Give any tweens/animations a beat to clear before the next click.
-        await new Promise(resolve => setTimeout(resolve, 150));
-        dismissBlockingPopups(scene);
+            // Give any tweens/animations a beat to clear before the next click.
+            await new Promise(resolve => setTimeout(resolve, 150));
+            dismissBlockingPopups(scene);
 
-        const sortieCombatsRemainingBefore = sortie.combatsRemaining();
-        mapButton.emit('pointerdown');
-        mapButton.emit('pointerup');
-        combatsWon++;
+            mapButton.emit('pointerdown');
+            mapButton.emit('pointerup');
 
-        if (sortieCombatsRemainingBefore > 1) {
-            // Another combat in this sortie: expect a fresh CombatScene.
-            await waitFor(() => sortie.combatsRemaining() < sortieCombatsRemainingBefore || !sortie.isActive(),
-                DEFAULT_TIMEOUT_MS, 'sortie to advance to next combat');
+            // Either the press advanced the sortie, or an event swap pulled
+            // the win state out from under it (label back to 'Objective') and
+            // the next attempt re-wins the replacement combat. A swallowed
+            // press with the label still ready just retries after the wait.
+            await waitFor(() => advanced() || !mapButtonReadyToAdvance(scene),
+                5000, 'press to advance the sortie (or a swapped-in combat to appear)')
+                .catch(() => { /* neither observed: retry the full press cycle */ });
         }
+        if (!advanced()) {
+            throw new SmokeTestFailure(
+                `mapButton press did not advance the sortie after ${PRESS_ATTEMPTS} attempts.`);
+        }
+        combatsWon++;
     }
 
     await waitFor(() => currentSceneKey() === 'HqScene', DEFAULT_TIMEOUT_MS, 'return to HqScene after sortie resolves');
