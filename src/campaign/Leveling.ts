@@ -80,3 +80,13 @@ export function deckCap(soldier: { level: number }, startingDeckSize: number): n
 export function isAtDeckCap(soldier: { level: number }, startingDeckSize: number, currentDeckSize: number): boolean {
     return currentDeckSize >= deckCap(soldier, startingDeckSize);
 }
+
+/**
+ * Relic equipment slot cap (src/docs/relic_equipment_design.md): every
+ * soldier starts with 2 slots; a third opens at level 6 as a leveling
+ * reward. Deliberately not tied to PERK_LEVELS — this is a flat capacity
+ * bump, not a randomized perk roll.
+ */
+export function relicSlots(level: number): number {
+    return 2 + (level >= 6 ? 1 : 0);
+}

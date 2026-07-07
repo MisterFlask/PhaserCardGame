@@ -2,15 +2,21 @@ import { CampaignCalendar, WAGE_PER_SOLDIER_PER_QUARTER } from '../../../campaig
 import { Contract } from '../../../campaign/Contract';
 import { ContractGenerator } from '../../../campaign/ContractGenerator';
 import { MAX_CONSUMABLE_STOCK } from '../../../campaign/ConsumableStock';
+import { relicSlots } from '../../../campaign/Leveling';
 import { _wireRetainerUnlockCheck, StandingOrdersState } from '../../../campaign/orders/StandingOrdersState';
 import { AbstractConsumable } from '../../../consumables/AbstractConsumable';
 import { CharacterGenerator } from '../../../gamecharacters/CharacterGenerator';
 import { PlayerCharacter } from '../../../gamecharacters/PlayerCharacter';
+import { AbstractRelic } from '../../../relics/AbstractRelic';
+import { EmergencyTeleporter } from '../../../relics/special/EmergencyTeleporter';
 import { CampaignRules } from '../../../rules/CampaignRulesHelper';
 import { GameState } from '../../../rules/GameState';
 import { AbstractStrategicProject } from '../../../strategic_projects/AbstractStrategicProject';
 import { CompanySecretariat } from '../../../strategic_projects/CompanySecretariat';
 import { PURCHASABLE_STRATEGIC_PROJECTS } from '../../../strategic_projects/StrategicProjectList';
+
+/** £ cost to underwrite one equipped relic against loss (one-time, per relic). */
+export const RELIC_INSURANCE_COST = 40;
 
 export const ROSTER_CAP = 8;
 export const RECRUIT_COST = 80;
@@ -94,6 +100,13 @@ export class CampaignUiState {
      *  projects VP + charterVictoryPoints + vault (EndOfCampaignPanel). See
      *  src/docs/vp_endgame_design.md. */
     public charterVictoryPoints: number = 0;
+    /** The Company's owned, unassigned relics (src/docs/relic_equipment_design.md).
+     *  The one owner of this fact (house rule 3). SortieManager transfers
+     *  deployed soldiers' equipped relics into GameState.relicsInventory on
+     *  dispatch and banks newly-acquired ones back here on resolution.
+     *  Starts with the EmergencyTeleporter that used to seed
+     *  GameState.relicsInventory every run (see GameState.initializeRun). */
+    public armoury: AbstractRelic[] = [new EmergencyTeleporter()];
 
     private constructor() {}
 
@@ -201,6 +214,48 @@ export class CampaignUiState {
         consumable.init();
         consumable.onPurchase();
         this.consumables.push(consumable);
+        return true;
+    }
+
+    /**
+     * Equip an armoury relic onto a soldier's slot. Returns false (and does
+     * nothing) if the relic isn't in the armoury or the soldier's slots
+     * (Leveling.relicSlots(level)) are already full.
+     */
+    public equipRelic(soldier: PlayerCharacter, relic: AbstractRelic): boolean {
+        if (!this.armoury.includes(relic)) return false;
+        if (soldier.equippedRelics.length >= relicSlots(soldier.level)) return false;
+
+        this.armoury = this.armoury.filter(r => r !== relic);
+        soldier.equippedRelics.push(relic);
+        return true;
+    }
+
+    /** Unequip a soldier's relic back to the armoury. Insurance lapses
+     *  (there's nothing left to underwrite once it's not deployed) — the
+     *  Company doesn't refund the premium; re-insure on next equip. */
+    public unequipRelic(soldier: PlayerCharacter, relic: AbstractRelic): boolean {
+        if (!soldier.equippedRelics.includes(relic)) return false;
+
+        soldier.equippedRelics = soldier.equippedRelics.filter(r => r !== relic);
+        soldier.insuredRelics = soldier.insuredRelics.filter(r => r !== relic);
+        this.armoury.push(relic);
+        return true;
+    }
+
+    /**
+     * Underwrite an equipped, not-yet-insured relic for RELIC_INSURANCE_COST.
+     * Returns false (and does nothing) if the vault can't cover it, the
+     * relic isn't equipped on this soldier, or it's already insured.
+     */
+    public insureRelic(soldier: PlayerCharacter, relic: AbstractRelic): boolean {
+        if (!soldier.equippedRelics.includes(relic)) return false;
+        if (soldier.insuredRelics.includes(relic)) return false;
+        const gameState = GameState.getInstance();
+        if (gameState.moneyInVault < RELIC_INSURANCE_COST) return false;
+
+        gameState.moneyInVault -= RELIC_INSURANCE_COST;
+        soldier.insuredRelics.push(relic);
         return true;
     }
 

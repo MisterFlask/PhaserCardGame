@@ -20,6 +20,13 @@
 //   - CampaignUiState.roster reseeds via CampaignRules.generateLogicalCharacterRoster()
 //     and CampaignUiState.consumables/availableContracts/ownedStrategicProjects
 //     reset to empty arrays by class-field initializers — browser-only.
+//   - CampaignUiState.armoury seeds with one EmergencyTeleporter (relic
+//     classes are Phaser-tainted the same way — see
+//     src/docs/relic_equipment_design.md's Migration section). Its DTO shape
+//     ({name: "Emergency Teleporter", stacks: 2}) is hardcoded below as a
+//     documented literal (EmergencyTeleporter.MAX_USES_PER_RUN = 2, the
+//     constructor's initial stacks value) rather than constructed, and is
+//     browser-verified for the actual instance.
 //   - The full CampaignSerializer.toSave()/applySave() round-trip (which
 //     touches all of the above) is likewise browser-only.
 // What this test *does* lock down purely: CalendarDTO and StandingOrdersDTO
@@ -68,7 +75,7 @@ describe('CampaignSave shape-lock (fresh-state defaults)', () => {
     function buildFreshSave(): CampaignSave {
         StandingOrdersState.getInstance().reset();
         return {
-            version: 11,
+            version: 12,
             savedAtIso: new Date(0).toISOString(),
             moneyInVault: 200, // GameState.moneyInVault default (src/rules/GameState.ts) — browser-verified in deliverable 2
             calendar: calendarToDTO(new CampaignCalendar()),
@@ -81,6 +88,11 @@ describe('CampaignSave shape-lock (fresh-state defaults)', () => {
             standingOrders: standingOrdersToDTO(StandingOrdersState.getInstance()),
             consumables: [], // CampaignUiState.consumables starts empty
             charterVictoryPoints: 0, // CampaignUiState.charterVictoryPoints starts at 0 (VP endgame pivot)
+            // CampaignUiState.armoury seeds with one EmergencyTeleporter
+            // (migrated from the old GameState.relicsInventory run seed —
+            // see relic_equipment_design.md's Migration section). Hardcoded
+            // literal per the Phaser-taint note above.
+            armoury: [{ name: 'Emergency Teleporter', stacks: 2 }],
         };
     }
 
@@ -90,6 +102,7 @@ describe('CampaignSave shape-lock (fresh-state defaults)', () => {
         // Explicit key-set assertion: catches a field being added to
         // CampaignSave without a corresponding decision recorded here.
         expect(Object.keys(save).sort()).toEqual([
+            'armoury',
             'calendar',
             'charterVictoryPoints',
             'consumables',
@@ -113,6 +126,7 @@ describe('CampaignSave shape-lock (fresh-state defaults)', () => {
         expect(save.recruitCandidates).toEqual([]);
         expect(save.consumables).toEqual([]);
         expect(save.charterVictoryPoints).toBe(0);
+        expect(save.armoury).toEqual([{ name: 'Emergency Teleporter', stacks: 2 }]);
         expect(save.standingOrders).toEqual({ active: [], pending: null, bonusSlots: 0 });
         expect(save.calendar).toEqual({
             week: 1,

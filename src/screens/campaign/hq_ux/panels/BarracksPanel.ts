@@ -1,16 +1,18 @@
 import Phaser, { Scene } from 'phaser';
-import { deckCap, pendingLevels } from '../../../../campaign/Leveling';
+import { deckCap, pendingLevels, relicSlots } from '../../../../campaign/Leveling';
 import { RUSH_TREATMENT_COST_PER_WEEK } from '../../../../campaign/RushTreatment';
 import { PlayableCard } from '../../../../gamecharacters/PlayableCard';
 import { PlayerCharacter } from '../../../../gamecharacters/PlayerCharacter';
+import { AbstractRelic } from '../../../../relics/AbstractRelic';
 import { ModifierContext } from '../../../../rules/modifiers/AbstractCardModifier';
 import { CardModifierRegistry } from '../../../../rules/modifiers/CardModifierRegistry';
 import { GameState } from '../../../../rules/GameState';
 import { SaveManager } from '../../../../saveload/SaveManager';
 import { TextBoxButton } from '../../../../ui/Button';
+import { DepthManager } from '../../../../ui/DepthManager';
 import { TextBox } from '../../../../ui/TextBox';
 import { drawBackdropDim, drawWoodPanel, Fonts, Palette } from '../../../../ui/UIStyle';
-import { CampaignUiState, ROSTER_CAP } from '../CampaignUiState';
+import { CampaignUiState, RELIC_INSURANCE_COST, ROSTER_CAP } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
 
 const REMOVAL_COST = 40;
@@ -19,6 +21,7 @@ const THERAPY_COST = 30;
 const THERAPY_RELIEF = 4;
 const REMOVAL_GATE = 'Retraining Program';
 const UPGRADE_GATE = 'The Foundry';
+const ARMOURY_PICKER_DEPTH = DepthManager.getInstance().REWARD_SCREEN + 2000;
 
 /**
  * Roster management: inspect a soldier's deck, remove or upgrade cards
@@ -32,6 +35,9 @@ export class BarracksPanel extends AbstractHqPanel {
 
     private selectedSoldier: PlayerCharacter | null = null;
     private selectedCard: PlayableCard | null = null;
+
+    /** Armoury picker overlay: shown after clicking an empty equipment slot. */
+    private armouryPickerElements: Phaser.GameObjects.GameObject[] = [];
 
     constructor(scene: Scene) {
         super(scene, 'Barracks');
@@ -61,6 +67,7 @@ export class BarracksPanel extends AbstractHqPanel {
         CampaignUiState.getInstance().ensureRecruitsPopulated();
         this.selectedSoldier = null;
         this.selectedCard = null;
+        this.clearArmouryPicker();
         this.rebuild();
         super.show();
     }
@@ -78,6 +85,7 @@ export class BarracksPanel extends AbstractHqPanel {
 
     private rebuild(): void {
         this.clearDynamic();
+        this.clearArmouryPicker();
         const campaign = CampaignUiState.getInstance();
         const width = this.scene.scale.width;
 
@@ -183,6 +191,14 @@ export class BarracksPanel extends AbstractHqPanel {
                 this.rebuild();
             });
             belowRosterY += 52;
+        }
+
+        // EQUIPMENT strip for the selected soldier (Relic Equipment Slots,
+        // src/docs/relic_equipment_design.md): slot boxes (n/cap), click an
+        // empty slot to open the armoury picker, click an equipped slot to
+        // unequip, INSURE button per equipped-uninsured relic.
+        if (this.selectedSoldier) {
+            belowRosterY = this.buildEquipmentStrip(this.selectedSoldier, width, belowRosterY);
         }
 
         // --- Deck of the selected soldier, middle column ---
@@ -316,6 +332,146 @@ export class BarracksPanel extends AbstractHqPanel {
             this.setStatus(`${soldier.name}'s card reworked at the Foundry: ${card.name}.`);
             this.rebuild();
         });
+    }
+
+    /**
+     * EQUIPMENT strip: one row per slot (Leveling.relicSlots(soldier.level)).
+     * An empty slot opens the armoury picker; an equipped slot unequips on
+     * click and shows an INSURE button beside it when not yet underwritten.
+     * Returns the y-coordinate just past the strip, for whatever's stacked below.
+     */
+    private buildEquipmentStrip(soldier: PlayerCharacter, width: number, startY: number): number {
+        const campaign = CampaignUiState.getInstance();
+        const cap = relicSlots(soldier.level);
+        const headerY = startY;
+        this.addDynamic(new TextBox({
+            scene: this.scene, x: width * 0.14, y: headerY, width: 400, height: 32,
+            text: `EQUIPMENT · ${soldier.equippedRelics.length}/${cap} · Armoury: ${campaign.armoury.length}`,
+            fillColor: Palette.WOOD_DARK,
+            style: { fontSize: '14px', fontFamily: Fonts.DISPLAY, color: Palette.BRASS_TEXT }
+        }));
+
+        let y = headerY + 40;
+        for (let slot = 0; slot < cap; slot++) {
+            const relic = soldier.equippedRelics[slot];
+            if (relic) {
+                const insured = soldier.insuredRelics.includes(relic);
+                const slotButton = this.addDynamic(new TextBoxButton({
+                    scene: this.scene, x: width * 0.14 - 65, y, width: 270, height: 40,
+                    text: `${relic.getDisplayName()}${insured ? ' [color=gold](underwritten)[/color]' : ''}`,
+                    style: { fontSize: '13px', fontFamily: Fonts.BODY, color: Palette.WHITE },
+                    fillColor: Palette.WOOD_PANEL
+                }));
+                slotButton.onClick(() => {
+                    campaign.unequipRelic(soldier, relic);
+                    SaveManager.save();
+                    this.setStatus(`${relic.getDisplayName()} struck off ${soldier.name}'s kit and returned to the armoury.`);
+                    this.rebuild();
+                });
+
+                if (!insured) {
+                    const canInsure = GameState.getInstance().moneyInVault >= RELIC_INSURANCE_COST;
+                    const insureButton = this.addDynamic(new TextBoxButton({
+                        scene: this.scene, x: width * 0.14 + 130, y, width: 130, height: 40,
+                        text: `Insure (£${RELIC_INSURANCE_COST})`,
+                        style: { fontSize: '12px', fontFamily: Fonts.DISPLAY, color: canInsure ? Palette.WHITE : Palette.DISABLED_TEXT },
+                        fillColor: canInsure ? Palette.VERDIGRIS : Palette.DISABLED
+                    }));
+                    insureButton.onClick(() => {
+                        if (!campaign.insureRelic(soldier, relic)) {
+                            this.setStatus('Insufficient funds to underwrite this relic.');
+                            return;
+                        }
+                        SaveManager.save();
+                        this.setStatus(`${relic.getDisplayName()} underwritten for £${RELIC_INSURANCE_COST}. Infernal Marine & Postal thanks you for your custom.`);
+                        this.rebuild();
+                    });
+                }
+            } else {
+                const emptyButton = this.addDynamic(new TextBoxButton({
+                    scene: this.scene, x: width * 0.14, y, width: 400, height: 40,
+                    text: '[ empty slot — click to assign from armoury ]',
+                    style: { fontSize: '13px', fontFamily: Fonts.BODY, color: Palette.DISABLED_TEXT },
+                    fillColor: Palette.WOOD_DARK
+                }));
+                emptyButton.onClick(() => {
+                    this.showArmouryPicker(soldier);
+                });
+            }
+            y += 46;
+        }
+        return y + 8;
+    }
+
+    private clearArmouryPicker(): void {
+        this.armouryPickerElements.forEach(e => { this.remove(e); e.destroy(); });
+        this.armouryPickerElements = [];
+    }
+
+    /** Full-screen overlay listing the armoury's unassigned relics (name +
+     *  one-line effect + flavor); picking one equips it onto `soldier`. */
+    private showArmouryPicker(soldier: PlayerCharacter): void {
+        const campaign = CampaignUiState.getInstance();
+        const centerX = this.scene.scale.width / 2;
+        const centerY = this.scene.scale.height / 2;
+
+        const backdrop = this.scene.add.rectangle(centerX, centerY, 1100, 620, 0x000000, 0.9)
+            .setStrokeStyle(4, 0xC9A227)
+            .setDepth(ARMOURY_PICKER_DEPTH);
+        this.armouryPickerElements.push(backdrop);
+
+        const instructions = new TextBox({
+            scene: this.scene, x: centerX, y: centerY - 270, width: 1000, height: 60,
+            text: `[color=gold]THE ARMOURY[/color]\nAssign a relic to ${soldier.name}'s kit.`,
+            style: { fontSize: '20px', fontFamily: Fonts.BODY, color: Palette.WHITE, align: 'center', wordWrap: { width: 960 } },
+            fillColor: Palette.WOOD_DARK
+        }).setDepth(ARMOURY_PICKER_DEPTH + 1);
+        this.armouryPickerElements.push(instructions);
+
+        if (campaign.armoury.length === 0) {
+            const empty = new TextBox({
+                scene: this.scene, x: centerX, y: centerY, width: 700, height: 60,
+                text: 'The armoury is bare. Acquire relics on sortie to stock it.',
+                style: { fontSize: '16px', fontFamily: Fonts.BODY, color: Palette.DISABLED_TEXT, align: 'center' },
+                fillColor: Palette.WOOD_PANEL
+            }).setDepth(ARMOURY_PICKER_DEPTH + 1);
+            this.armouryPickerElements.push(empty);
+        } else {
+            campaign.armoury.forEach((relic, i) => {
+                const col = i % 2;
+                const row = Math.floor(i / 2);
+                const x = centerX - 260 + col * 520;
+                const y = centerY - 190 + row * 70;
+                const entry = new TextBoxButton({
+                    scene: this.scene, x, y, width: 500, height: 60,
+                    text: `[color=gold]${relic.getDisplayName()}[/color]\n${relic.getDescription()}`,
+                    style: { fontSize: '13px', fontFamily: Fonts.BODY, color: Palette.WHITE, align: 'center', wordWrap: { width: 470 } },
+                    fillColor: Palette.WOOD_PANEL
+                }).setDepth(ARMOURY_PICKER_DEPTH + 1);
+                entry.onClick(() => {
+                    if (!campaign.equipRelic(soldier, relic)) {
+                        this.setStatus('That slot is already full.');
+                        return;
+                    }
+                    SaveManager.save();
+                    this.clearArmouryPicker();
+                    this.setStatus(`${relic.getDisplayName()} assigned to ${soldier.name}'s kit.`);
+                    this.rebuild();
+                });
+                this.armouryPickerElements.push(entry);
+            });
+        }
+
+        const closeButton = new TextBoxButton({
+            scene: this.scene, x: centerX, y: centerY + 270, width: 220, height: 50,
+            text: 'Close',
+            style: { fontSize: '18px', fontFamily: Fonts.DISPLAY, color: Palette.WHITE },
+            fillColor: Palette.WAX_RED
+        }).setDepth(ARMOURY_PICKER_DEPTH + 1);
+        closeButton.onClick(() => this.clearArmouryPicker());
+        this.armouryPickerElements.push(closeButton);
+
+        this.add(this.armouryPickerElements);
     }
 
     private setStatus(message: string): void {

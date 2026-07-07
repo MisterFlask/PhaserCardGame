@@ -4,6 +4,8 @@ import { ConsumablesLibrary } from "../consumables/ConsumablesLibrary";
 import { AbstractBuff } from "../gamecharacters/buffs/AbstractBuff";
 import { PlayableCard } from "../gamecharacters/PlayableCard";
 import { PlayerCharacter } from "../gamecharacters/PlayerCharacter";
+import { AbstractRelic } from "../relics/AbstractRelic";
+import { RelicsLibrary } from "../relics/RelicsLibrary";
 import { GameState } from "../rules/GameState";
 import { CampaignUiState } from "../screens/campaign/hq_ux/CampaignUiState";
 import {
@@ -11,7 +13,7 @@ import {
     standingOrdersToDTO
 } from "./PureDTOConversions";
 import {
-    BuffDTO, CampaignSave, CardDTO, CharacterDTO, ConsumableDTO,
+    BuffDTO, CampaignSave, CardDTO, CharacterDTO, ConsumableDTO, RelicDTO,
     SAVE_FORMAT_VERSION
 } from "./SaveDTOs";
 import { SaveRegistries } from "./SaveRegistries";
@@ -62,6 +64,8 @@ export class CampaignSerializer {
             deck: character.cardsInMasterDeck.map(c => this.cardToDTO(c)),
             xp: character.xp,
             level: character.level,
+            equippedRelics: character.equippedRelics.map(r => this.relicToDTO(r)),
+            insuredRelicNames: character.insuredRelics.map(r => r.getDisplayName()),
         };
     }
 
@@ -69,6 +73,13 @@ export class CampaignSerializer {
         return {
             name: consumable.getDisplayName(),
             usesLeft: consumable.uses,
+        };
+    }
+
+    private static relicToDTO(relic: AbstractRelic): RelicDTO {
+        return {
+            name: relic.getDisplayName(),
+            stacks: relic.stacks,
         };
     }
 
@@ -94,6 +105,7 @@ export class CampaignSerializer {
             standingOrders: standingOrdersToDTO(StandingOrdersState.getInstance()),
             consumables: campaign.consumables.map(c => this.consumableToDTO(c)),
             charterVictoryPoints: campaign.charterVictoryPoints,
+            armoury: campaign.armoury.map(r => this.relicToDTO(r)),
         };
     }
 
@@ -167,6 +179,13 @@ export class CampaignSerializer {
             }
         });
         character.startingDeck = character.cardsInMasterDeck.map(c => c.Copy());
+
+        character.equippedRelics = dto.equippedRelics
+            .map(r => this.relicFromDTO(r))
+            .filter((r): r is AbstractRelic => r !== null);
+        const insuredNames = new Set(dto.insuredRelicNames);
+        character.insuredRelics = character.equippedRelics.filter(r => insuredNames.has(r.getDisplayName()));
+
         return character;
     }
 
@@ -178,6 +197,16 @@ export class CampaignSerializer {
         }
         consumable.uses = dto.usesLeft;
         return consumable;
+    }
+
+    private static relicFromDTO(dto: RelicDTO): AbstractRelic | null {
+        const relic = RelicsLibrary.getInstance().getRelicByName(dto.name);
+        if (!relic) {
+            console.warn(`CampaignSerializer: unknown relic "${dto.name}" in save, dropping`);
+            return null;
+        }
+        relic.stacks = dto.stacks;
+        return relic;
     }
 
     /** Overwrites the live singletons with the saved campaign. HQ-scope only. */
@@ -247,6 +276,9 @@ export class CampaignSerializer {
             .map(c => this.consumableFromDTO(c))
             .filter((c): c is AbstractConsumable => c !== null);
         campaign.charterVictoryPoints = save.charterVictoryPoints ?? 0;
+        campaign.armoury = save.armoury
+            .map(r => this.relicFromDTO(r))
+            .filter((r): r is AbstractRelic => r !== null);
 
         applyStandingOrdersDTO(StandingOrdersState.getInstance(), save.standingOrders);
         campaign.syncStandingOrderBonusSlots();

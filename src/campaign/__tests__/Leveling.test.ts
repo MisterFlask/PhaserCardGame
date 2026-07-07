@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
     deckCap, isAtDeckCap,
     LEVEL_CAP, levelFromXp, levelGrantsPerk, PERK_LEVELS,
-    pendingLevels, xpCostForLevel, xpForCombatWin
+    pendingLevels, relicSlots, xpCostForLevel, xpForCombatWin
 } from '../Leveling';
 
 describe('xpCostForLevel', () => {
@@ -112,6 +112,24 @@ describe('isAtDeckCap', () => {
         const rawCountIncludingCargo = 6;
         expect(isAtDeckCap({ level: 1 }, 4, realCardCountExcludingCargo)).toBe(false);
         expect(isAtDeckCap({ level: 1 }, 4, rawCountIncludingCargo)).toBe(true);
+    });
+});
+
+describe('relicSlots', () => {
+    it('is 2 for a fresh level-1 recruit', () => {
+        expect(relicSlots(1)).toBe(2);
+    });
+
+    it('stays 2 up to level 5', () => {
+        expect(relicSlots(5)).toBe(2);
+    });
+
+    it('opens a third slot at level 6', () => {
+        expect(relicSlots(6)).toBe(3);
+    });
+
+    it('stays 3 through the level cap', () => {
+        expect(relicSlots(10)).toBe(3);
     });
 });
 

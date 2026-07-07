@@ -25,12 +25,22 @@ import { SonorousKlaxon } from './cursedcargo/SonorousKlaxon';
 import { WhisperOfSorrow } from './cursedcargo/WhisperOfSorrow';
 import { WraithInABottle } from './cursedcargo/WraithInABottle';
 import { EcclesiasticalRecommendation } from './special/EcclesiasticalRecommendation';
+import { EmergencyTeleporter } from './special/EmergencyTeleporter';
 
 export class RelicsLibrary {
     private static instance: RelicsLibrary;
     private beneficialRelics: AbstractRelic[];
     private cursedCargoRelics: AbstractRelic[];
     private cursedCargoCards: PlayableCard[];
+    /**
+     * Relics that never appear in a shop/event random pool but still need
+     * name resolution for the save round-trip: currently just
+     * EmergencyTeleporter, which seeds the fresh-campaign armoury directly
+     * (CampaignUiState.armoury) rather than being acquired in play. Only
+     * consulted by getRelicByName — getRandomBeneficialRelics/
+     * getAllBeneficialRelics deliberately don't include this pool.
+     */
+    private specialRelics: AbstractRelic[];
 
     private constructor() {
         this.beneficialRelics = [
@@ -58,6 +68,10 @@ export class RelicsLibrary {
             new SonorousKlaxon(),
             new WhisperOfSorrow(),
             new WraithInABottle()
+        ];
+
+        this.specialRelics = [
+            new EmergencyTeleporter(),
         ];
 
         this.cursedCargoCards = [
@@ -119,5 +133,23 @@ export class RelicsLibrary {
             .map(card => card.Copy());
         cards.forEach(card => card.initialize());
         return cards;
+    }
+
+    /**
+     * Resolve a relic by its getDisplayName() literal, for the armoury save
+     * round-trip (src/docs/relic_equipment_design.md) — mirrors
+     * ConsumablesLibrary.getConsumableByName. Searches both beneficial and
+     * cursed-cargo pools so any relic that ever reached a player's inventory
+     * (shop, event, cursed cargo) can be reconstructed from a save. Returns
+     * a fresh init()'d copy; undefined (with a caller-side warning) for an
+     * unknown name rather than throwing.
+     */
+    public getRelicByName(name: string): AbstractRelic | undefined {
+        const allRelics = [...this.beneficialRelics, ...this.cursedCargoRelics, ...this.specialRelics];
+        const template = allRelics.find(relic => relic.getDisplayName() === name);
+        if (!template) return undefined;
+        const relic = template.copy();
+        relic.init();
+        return relic;
     }
 }

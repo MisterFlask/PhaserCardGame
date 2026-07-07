@@ -6,7 +6,6 @@ import { PlayerVessel } from '../gamecharacters/cargo/PlayerCargoHolder';
 import type { PlayableCard } from '../gamecharacters/PlayableCard';
 import type { PlayerCharacter } from '../gamecharacters/PlayerCharacter';
 import { AbstractRelic } from '../relics/AbstractRelic';
-import { EmergencyTeleporter } from '../relics/special/EmergencyTeleporter';
 import type { AutomatedCharacterType, BaseCharacterType } from '../Types';
 import type { PhysicalCard } from '../ui/PhysicalCard';
 import { AbstractCombatResource } from './combatresources/AbstractCombatResource';
@@ -23,8 +22,13 @@ export class GameState {
         console.log('initializing run')
         this.combatState.playerCharacters = this.currentRunCharacters
 
+        // The old run-scoped EmergencyTeleporter seed is gone (Relic
+        // Equipment Slots, src/docs/relic_equipment_design.md): it now lives
+        // in the fresh-campaign armoury (CampaignUiState.armoury) and
+        // reaches relicsInventory, if equipped, via SortieManager.startSortie
+        // like any other equipped relic — which runs immediately after this
+        // method and repopulates the array from the deployed squad's slots.
         this.relicsInventory = []
-        this.relicsInventory.push(new EmergencyTeleporter())
 
         // Run onRunStart for each buff on each character
         this.currentRunCharacters.forEach(character => {

@@ -1,3 +1,4 @@
+import { AbstractRelic } from "../relics/AbstractRelic";
 import { BaseCharacter } from "./BaseCharacter";
 import { BaseCharacterClass } from "./BaseCharacterClass";
 import { PlayableCard } from "./PlayableCard";
@@ -11,6 +12,21 @@ export class PlayerCharacter extends BaseCharacter {
     weeksWoundedRemaining: number = 0;
     /** Permanently lost to the campaign (killed on a sortie). */
     isDeceased: boolean = false;
+    /**
+     * Relic equipment slots (src/docs/relic_equipment_design.md). Cap is
+     * Leveling.relicSlots(level); enforcement of the cap lives with callers
+     * (CampaignUiState.equipRelic), not here — this is just storage.
+     */
+    equippedRelics: AbstractRelic[] = [];
+    /**
+     * Subset of equippedRelics that has been underwritten (£40 one-time,
+     * purchased at the Barracks). A relic here is always also present in
+     * equippedRelics; unequipping drops it from both arrays. Modeled as a
+     * parallel array (membership = insured) rather than a field on
+     * AbstractRelic itself, since AbstractRelic is outside this change's
+     * file ownership.
+     */
+    insuredRelics: AbstractRelic[] = [];
     /** Cumulative XP earned on sorties. Pending promotions are always
      *  derived from this (see src/campaign/Leveling.ts); never store a
      *  "pending level" field. */

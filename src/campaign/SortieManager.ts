@@ -94,6 +94,15 @@ export class SortieManager {
         gameState.consumables = [...campaign.consumables];
         campaign.consumables = [];
 
+        // Deployed soldiers' equipped relics ride along too (same transfer
+        // pattern as consumables): they never leave their owner's slots
+        // conceptually, but the combat-facing inventory needs them present.
+        // gameState.relicsInventory was just reset to [] by initializeRun()
+        // above; this appends the squad's equipped relics on top of it.
+        squad.forEach(character => {
+            gameState.relicsInventory.push(...character.equippedRelics);
+        });
+
         this.launchNextCombat();
     }
 
@@ -192,6 +201,7 @@ export class SortieManager {
             character.isDeceased = true;
             campaign.roster = campaign.roster.filter(c => c !== character);
             report.push(`${character.name}: lost in the field.`);
+            this.settleEquipmentForCasualty(character, report);
         });
 
         // Underwriting Retainer (wipe insurance, faction_reputation_design.md
@@ -215,9 +225,14 @@ export class SortieManager {
         }
 
         // The squad's carried consumables go down with them — lost, not
-        // returned to campaign stock.
+        // returned to campaign stock. Same for whatever's left in
+        // relicsInventory: settleEquipmentForCasualty already pulled insured
+        // equipped relics out into the armoury above, so anything still here
+        // is either an uninsured equipped relic or a mid-sortie acquisition —
+        // both lost with the squad per design (relic_equipment_design.md).
         GameState.getInstance().currentRunCharacters = [];
         GameState.getInstance().consumables = [];
+        GameState.getInstance().relicsInventory = [];
         campaign.selectedParty = [];
         this.activeContract = null;
         this.squad = [];
@@ -228,6 +243,34 @@ export class SortieManager {
         this.hasUnviewedReport = true;
 
         SceneChanger.switchToCampaignScene();
+    }
+
+    /**
+     * Settles a dead character's equipped relics (src/docs/relic_equipment_design.md):
+     * insured ones return to the armoury (insurance consumed, a debrief line
+     * recorded) and are pulled out of the combat inventory; uninsured ones
+     * are simply dropped from the character's slots and left in
+     * relicsInventory for the caller to deal with as "lost" (resolveSortie
+     * banks it, handleSquadWipe discards it — see each call site's own
+     * comment on why they differ). Shared between both death paths so the
+     * insured/uninsured split logic exists exactly once (house rule 6).
+     */
+    private settleEquipmentForCasualty(character: PlayerCharacter, report: string[]): void {
+        const campaign = CampaignUiState.getInstance();
+        const gameState = GameState.getInstance();
+
+        character.equippedRelics.forEach(relic => {
+            const insured = character.insuredRelics.includes(relic);
+            gameState.relicsInventory = gameState.relicsInventory.filter(r => r !== relic);
+            if (insured) {
+                campaign.armoury.push(relic);
+                report.push(`${character.name}'s ${relic.getDisplayName()} recovered under the Company's underwriting policy.`);
+            } else {
+                report.push(`${character.name}'s ${relic.getDisplayName()} is lost with them, uninsured.`);
+            }
+        });
+        character.equippedRelics = [];
+        character.insuredRelics = [];
     }
 
     private resolveSortie(): void {
@@ -277,6 +320,19 @@ export class SortieManager {
         });
         report.push(...casualties.lines);
 
+        // Per-soldier equipment loss (src/docs/relic_equipment_design.md,
+        // "Individual death on a won sortie: same per-soldier rule" as a
+        // wipe). applyCasualties just set isDeceased on the objects in
+        // this.squad (they satisfy CasualtySubject structurally, so it
+        // mutates the real PlayerCharacter instances) — filter on that
+        // rather than casualties.deaths, which is typed as the narrower
+        // interface and loses the relic fields.
+        this.squad
+            .filter(character => character.isDeceased)
+            .forEach(character => {
+                this.settleEquipmentForCasualty(character, report);
+            });
+
         // Ossuary Death Benefit retainer (faction_reputation_design.md "NEW
         // HOOK (death benefit)"): £ credited to the vault per Company death
         // this sortie. 0 unless that client's retainer is active.
@@ -313,6 +369,23 @@ export class SortieManager {
         // cannot).
         campaign.consumables = mergeStockWithLoadout(campaign.consumables, gameState.consumables);
         gameState.consumables = [];
+
+        // Equipped relics on living soldiers return to their slots (they
+        // never really left — just remove them from the combat inventory);
+        // dead soldiers already had theirs settled above. Anything left in
+        // relicsInventory after that is a mid-sortie acquisition (event/shop)
+        // and banks to the armoury. Living-soldier pass must run before dead
+        // soldiers' relics (already removed from equippedRelics by
+        // settleEquipmentForCasualty) so this loop only sees survivors' gear.
+        this.squad
+            .filter(character => !character.isDeceased)
+            .forEach(character => {
+                character.equippedRelics.forEach(relic => {
+                    gameState.relicsInventory = gameState.relicsInventory.filter(r => r !== relic);
+                });
+            });
+        campaign.armoury.push(...gameState.relicsInventory);
+        gameState.relicsInventory = [];
 
         this.activeContract = null;
         this.squad = [];

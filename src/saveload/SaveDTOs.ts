@@ -36,7 +36,17 @@
 //      Prestige Commissions + Charter Buyback) and Contract.vpReward
 //      (Prestige Commissions only; 0/undefined on every other contract
 //      type). Fresh-campaign value for charterVictoryPoints is 0.
-export const SAVE_FORMAT_VERSION = 11;
+// v12: Relic equipment slots (src/docs/relic_equipment_design.md). Added
+//      CampaignUiState.armoury (RelicDTO[]: the Company's owned, unassigned
+//      relics) and CharacterDTO.equippedRelics/insuredRelicNames (a soldier's
+//      slotted relics plus which of those are underwritten). RelicDTO
+//      serializes by getDisplayName() (resolved through
+//      RelicsLibrary.getRelicByName, mirroring ConsumableDTO) plus stacks
+//      (every acquirable relic's only mutable state — see
+//      RelicEquipment.test.ts's constructor-state lint). Fresh-campaign
+//      value for armoury is a single EmergencyTeleporter (migrated from
+//      GameState.relicsInventory's old run-scoped seed; see GameState.ts).
+export const SAVE_FORMAT_VERSION = 12;
 export const SAVE_STORAGE_KEY = 'east-infernal-company-save';
 
 export interface BuffDTO {
@@ -72,6 +82,24 @@ export interface CharacterDTO {
     /** Cumulative XP; pending promotions are always derived (Leveling.ts), never stored. */
     xp: number;
     level: number;
+    /** Relic equipment slots (src/docs/relic_equipment_design.md). Cap is
+     *  Leveling.relicSlots(level); this array is not itself clamped on load
+     *  (a save from before a level-down, if that ever existed, would just
+     *  round-trip whatever it has). */
+    equippedRelics: RelicDTO[];
+    /** Display names (RelicDTO.name) of the subset of equippedRelics that
+     *  has been underwritten (£40 one-time). Names, not indices, since
+     *  array order isn't a stable identity. */
+    insuredRelicNames: string[];
+}
+
+export interface RelicDTO {
+    /** Display name, resolved through RelicsLibrary.getRelicByName. */
+    name: string;
+    /** Every acquirable relic's only mutable state (charge counters,
+     *  stack-based bonuses) — see AbstractBuff.stacks and the constructor-
+     *  state lint in RelicEquipment.test.ts. */
+    stacks: number;
 }
 
 export interface ContractDTO {
@@ -149,4 +177,8 @@ export interface CampaignSave {
      *  Buyback). See src/docs/vp_endgame_design.md and
      *  CampaignUiState.charterVictoryPoints (the one owner of this fact). */
     charterVictoryPoints: number;
+    /** The Company's owned, unassigned relics (src/docs/relic_equipment_design.md).
+     *  The in-sortie loadout on GameState.relicsInventory never serializes
+     *  (saves are HQ-only) — mirrors the `consumables` field's contract. */
+    armoury: RelicDTO[];
 }
