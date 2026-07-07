@@ -10,7 +10,10 @@ import { PhysicalProjectCard } from '../../../../ui/PhysicalProjectCard';
 import { TextBox } from '../../../../ui/TextBox';
 import { drawBackdropDim, drawWoodPanel, Fonts, Palette } from '../../../../ui/UIStyle';
 import { CardGuiUtils } from '../../../../utils/CardGuiUtils';
-import { CampaignUiState, CLIENT_RETAINER_ORDER_IDS, CLIENT_RETAINER_UNLOCK_THRESHOLD } from '../CampaignUiState';
+import {
+    CampaignUiState, CHARTER_BUYBACK_MIN_YEAR, CHARTER_BUYBACK_MONEY_COST, CHARTER_BUYBACK_VP_REWARD,
+    CLIENT_RETAINER_ORDER_IDS, CLIENT_RETAINER_UNLOCK_THRESHOLD
+} from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
 
 type InvestmentTab = 'capital-works' | 'standing-orders';
@@ -21,6 +24,7 @@ const ORDER_CARD_H = 160;
 export class InvestmentPanel extends AbstractHqPanel {
     private projectCards: PhysicalProjectCard[] = [];
     private poundsDisplay: TextBox;
+    private retireSharesButton!: TextBoxButton;
     private connectionLines: Phaser.GameObjects.Line[] = [];
     private treeContainer: Phaser.GameObjects.Container;
     private uiContainer: Phaser.GameObjects.Container;
@@ -62,6 +66,20 @@ export class InvestmentPanel extends AbstractHqPanel {
         this.poundsDisplay.setStroke(false);
         poundsPlaque.add(this.poundsDisplay);
         this.uiContainer.add(poundsPlaque);
+
+        // Charter Buyback (RETIRE SHARES): one row, visible regardless of
+        // tab (it isn't a Capital Work or a Standing Order — a standalone
+        // late-charter conversion). Sits just below the pounds plaque.
+        // See src/docs/vp_endgame_design.md.
+        this.retireSharesButton = new TextBoxButton({
+            scene, x: scene.scale.width / 2, y: 166, width: 420, height: 36,
+            text: '...',
+            style: { fontSize: '15px', color: Palette.BRASS_TEXT, fontFamily: Fonts.DISPLAY },
+            fillColor: Palette.WOOD_PANEL
+        });
+        this.retireSharesButton.onClick(() => this.onRetireSharesClicked());
+        this.uiContainer.add(this.retireSharesButton);
+        this.refreshRetireSharesButton();
 
         // Add UI container to panel
         this.add(this.uiContainer);
@@ -107,7 +125,9 @@ export class InvestmentPanel extends AbstractHqPanel {
 
     private buildTabButtons(): void {
         const scene = this.scene;
-        const tabY = 165;
+        // Shifted down from 165 to clear the RETIRE SHARES row (Charter
+        // Buyback) at y=166, just below the pounds plaque.
+        const tabY = 210;
         this.capitalWorksTabButton = new TextBoxButton({
             scene, x: scene.scale.width / 2 - 130, y: tabY, width: 240, height: 40,
             text: 'CAPITAL WORKS',
@@ -159,6 +179,41 @@ export class InvestmentPanel extends AbstractHqPanel {
 
     private updatePoundsDisplay(): void {
         this.poundsDisplay.setText(`WORKING CAPITAL: £${GameState.getInstance().moneyInVault}`);
+        this.refreshRetireSharesButton();
+    }
+
+    /** RETIRE SHARES (Charter Buyback): £100 -> 130 VP, repeatable,
+     *  irreversible, unlocked from calendar year CHARTER_BUYBACK_MIN_YEAR.
+     *  Disabled with a dry note before then. See
+     *  src/docs/vp_endgame_design.md. */
+    private refreshRetireSharesButton(): void {
+        const campaign = CampaignUiState.getInstance();
+        const unlocked = campaign.isCharterBuybackUnlocked();
+        const runningTotal = campaign.charterVictoryPoints;
+
+        if (unlocked) {
+            this.retireSharesButton.setText(
+                `RETIRE SHARES: £${CHARTER_BUYBACK_MONEY_COST} -> ${CHARTER_BUYBACK_VP_REWARD} VP  ·  Charter VP: ${runningTotal}`
+            );
+            this.retireSharesButton.setButtonEnabled(GameState.getInstance().moneyInVault >= CHARTER_BUYBACK_MONEY_COST);
+        } else {
+            this.retireSharesButton.setText(
+                `The Court does not entertain retirement of shares before the charter's eighth year.`
+            );
+            this.retireSharesButton.setButtonEnabled(false);
+        }
+    }
+
+    private onRetireSharesClicked(): void {
+        const converted = CampaignUiState.getInstance().retireSharesForVp();
+        if (!converted) return;
+
+        this.scene.events.emit('fundsChanged');
+        this.refreshRetireSharesButton();
+
+        // Conversions are permanent: checkpoint immediately, same discipline
+        // as a Capital Work purchase.
+        SaveManager.save();
     }
 
     private clearCards(): void {

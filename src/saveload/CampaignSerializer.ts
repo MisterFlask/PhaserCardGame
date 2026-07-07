@@ -93,6 +93,7 @@ export class CampaignSerializer {
             recruitCandidates: campaign.recruitCandidates.map(c => this.characterToDTO(c)),
             standingOrders: standingOrdersToDTO(StandingOrdersState.getInstance()),
             consumables: campaign.consumables.map(c => this.consumableToDTO(c)),
+            charterVictoryPoints: campaign.charterVictoryPoints,
         };
     }
 
@@ -245,6 +246,7 @@ export class CampaignSerializer {
         campaign.consumables = save.consumables
             .map(c => this.consumableFromDTO(c))
             .filter((c): c is AbstractConsumable => c !== null);
+        campaign.charterVictoryPoints = save.charterVictoryPoints ?? 0;
 
         applyStandingOrdersDTO(StandingOrdersState.getInstance(), save.standingOrders);
         campaign.syncStandingOrderBonusSlots();

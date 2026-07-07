@@ -31,7 +31,12 @@
 //      CampaignUiState.ensureRecruitsPopulated() lazily tops it up to
 //      RECRUIT_POOL_SIZE on next Barracks visit and never discards existing
 //      entries, so a loaded non-empty pool survives untouched.
-export const SAVE_FORMAT_VERSION = 10;
+// v11: VP endgame pivot (src/docs/vp_endgame_design.md). Added
+//      CampaignUiState.charterVictoryPoints (VP earned outside projects:
+//      Prestige Commissions + Charter Buyback) and Contract.vpReward
+//      (Prestige Commissions only; 0/undefined on every other contract
+//      type). Fresh-campaign value for charterVictoryPoints is 0.
+export const SAVE_FORMAT_VERSION = 11;
 export const SAVE_STORAGE_KEY = 'east-infernal-company-save';
 
 export interface BuffDTO {
@@ -89,6 +94,10 @@ export interface ContractDTO {
     maxCrates?: number;
     /** Trade Run only (0/absent on combat contracts). */
     freightRatePerCrate?: number;
+    /** Prestige Commissions only (0/absent on every other contract type):
+     *  Victory Points granted on completion instead of £ (payout is always 0
+     *  on these). See src/docs/vp_endgame_design.md. */
+    vpReward?: number;
 }
 
 export interface ConsumableDTO {
@@ -136,4 +145,8 @@ export interface CampaignSave {
     /** Campaign-owned consumable stock. The in-sortie loadout on
      *  GameState.consumables never serializes (saves are HQ-only). */
     consumables: ConsumableDTO[];
+    /** VP earned outside strategic projects (Prestige Commissions, Charter
+     *  Buyback). See src/docs/vp_endgame_design.md and
+     *  CampaignUiState.charterVictoryPoints (the one owner of this fact). */
+    charterVictoryPoints: number;
 }

@@ -237,13 +237,20 @@ export class SortieManager {
         const report: string[] = [];
 
         // Trade runs bank base + freight; combat contracts have cratesLoaded
-        // 0 so projectedPayout collapses to the plain payout.
+        // 0 so projectedPayout collapses to the plain payout. Prestige
+        // Commissions always project to £0 (payout is always 0 on these) —
+        // handled as its own report line below rather than a "£0 banked"
+        // line, which would read as a bug rather than the intended trade.
         const totalPayout = contract.projectedPayout;
         gameState.moneyInVault += totalPayout;
         campaign.contractsCompleted++;
         campaign.contractsCompletedByClient[contract.client] =
             (campaign.contractsCompletedByClient[contract.client] ?? 0) + 1;
-        if (contract.isTradeRun && contract.cratesLoaded > 0) {
+        if (contract.isPrestige) {
+            campaign.charterVictoryPoints += contract.vpReward;
+            report.push(`Contract "${contract.name}" fulfilled: ${contract.vpReward} VP banked. ` +
+                `The Court of Directors notes its satisfaction. It does not pay in anything so vulgar as money.`);
+        } else if (contract.isTradeRun && contract.cratesLoaded > 0) {
             report.push(`Contract "${contract.name}" fulfilled: £${contract.payout} base + `
                 + `${contract.cratesLoaded} crate(s) x £${contract.freightRatePerCrate} freight = £${totalPayout} banked.`);
         } else {

@@ -171,6 +171,41 @@ const REGION_FLAVORS: RegionFlavor[] = [
     },
 ];
 
+/** The Court of Directors: an internal client for Prestige Commissions only.
+ *  Not a real trading partner — exempt from Chartered Partner/retainer
+ *  tracking (CLIENT_RETAINER_ORDER_IDS has no entry for it, and it never
+ *  will; house rule 6 keeps that registry the one place client->order
+ *  mappings live, so simply never adding an entry here is sufficient — no
+ *  exemption branch needed elsewhere). Contract.client bookkeeping
+ *  (contractsCompletedByClient) still counts these completions harmlessly,
+ *  per the design doc. */
+const COURT_OF_DIRECTORS_CLIENT = "The Court of Directors";
+
+/** Prestige Commission flavor: name + description only (payoutClause is
+ *  fixed — see PRESTIGE_PAYMENT_CLAUSE — since these never pay in £). One
+ *  table, not region-keyed: prestige work is commissioned directly by the
+ *  Court, not tied to a region's local economy. */
+const PRESTIGE_TEMPLATES: { name: string; description: string }[] = [
+    {
+        name: "Recover the Founders' Seal",
+        description: "The Court wishes a matter of provenance settled: a seal of the Company's original charter, mislaid somewhere unbecoming. Its recovery reflects well on everyone who signs their name near it.",
+    },
+    {
+        name: "Chart the Unclaimed Marches",
+        description: "The Court's cartographers require a corridor of contested territory walked, mapped, and made presentable for the next shareholders' prospectus. Presentable, not necessarily pacified.",
+    },
+    {
+        name: "Attend the Court's Correspondence",
+        description: "A courier matter the Court considers beneath a formal contract but above ignoring: certain letters must arrive, certain parties must understand why. No invoice will be raised.",
+    },
+    {
+        name: "Stand as the Court's Witness",
+        description: "The Court requires a credible party present at a negotiation it would rather not be seen attending itself. Your presence is the entire service rendered.",
+    },
+];
+
+const PRESTIGE_PAYMENT_CLAUSE = "The Court of Directors notes its satisfaction. It does not pay in anything so vulgar as money.";
+
 interface TradeRunTemplate extends ContractTemplate {
     /** Cargo flavor, folded into the notice footer (e.g. "reagent barrels"). */
     cargoLabel: string;
@@ -323,6 +358,22 @@ export class ContractGenerator {
     private static readonly TRADE_RUN_BASE_PAYOUT_FRACTION = 0.5;
     private static readonly TRADE_RUN_FREIGHT_RATE_PER_ACT = 30;
     private static readonly TRADE_RUN_MAX_CRATES = 6;
+
+    /** Prestige Commissions (src/docs/vp_endgame_design.md) unlock year 3+,
+     *  trophies rather than a lane: at most one per full board refresh. */
+    private static readonly PRESTIGE_MIN_YEAR = 3;
+    /** Balance sketch (convention: EncounterHardening.ts:12-14): 150 base at
+     *  year 3, +25 VP per year past that, rounded to £5-equivalent (nearest
+     *  5 VP) — see the design doc's "Balance sketch" section for the
+     *  vs-average-payout comparison this was sized against. Untested
+     *  against the sim's actual VP economy; revisit after a few played
+     *  campaign-years. */
+    private static readonly PRESTIGE_VP_BASE = 150;
+    private static readonly PRESTIGE_VP_PER_YEAR = 25;
+    /** Chance a full board refresh (existing.length === 0) rolls a prestige
+     *  slot at all, once past the year gate — "~1 per refresh at most", not
+     *  guaranteed every refresh (these are rare trophies, not a lane). */
+    private static readonly PRESTIGE_REFRESH_CHANCE = 0.5;
 
     /** Rolls squad size: 20% two-man, 60% three-man, 20% four-man. */
     private rollSquadSize(): number {
@@ -478,6 +529,53 @@ export class ContractGenerator {
         });
     }
 
+    /**
+     * Prestige Commission: £0 payout, vpReward instead. Draws act/segment
+     * from the same unlocked-region pool as a bounty contract (it still
+     * needs a real encounter table and a squad-size/danger-pay roll), but
+     * its client, description, and payment clause are fixed to the Court of
+     * Directors rather than drawn from REGION_FLAVORS — this is a trophy
+     * commissioned directly by the Court, not a region's local economy.
+     * vpReward scales with year (PRESTIGE_VP_BASE + PRESTIGE_VP_PER_YEAR per
+     * year past PRESTIGE_MIN_YEAR) and gets the same danger-pay multiplier a
+     * bounty payout would (DANGER_PAY_MULTIPLIER), applied to VP instead of
+     * £, then rounded to the nearest 5 — see design doc "Payout: £0" clause.
+     */
+    private generatePrestigeContract(year: number, maxAct: number): Contract {
+        const region = this.pick(REGION_FLAVORS.filter(r => r.act <= maxAct));
+        const template = this.pick(PRESTIGE_TEMPLATES);
+
+        const segment = Math.floor(Math.random() * 3);
+        const difficultyStars = segment + 1;
+        const numCombats = Math.random() < 0.45 ? 1 : 2;
+        const squadSize = this.rollSquadSize();
+
+        const baseVp = ContractGenerator.PRESTIGE_VP_BASE
+            + ContractGenerator.PRESTIGE_VP_PER_YEAR * Math.max(0, year - ContractGenerator.PRESTIGE_MIN_YEAR);
+        const dangerPayMultiplier = ContractGenerator.DANGER_PAY_MULTIPLIER[squadSize] ?? 1.0;
+        const vpReward = Math.round((baseVp * dangerPayMultiplier) / 5) * 5;
+
+        const deadlineWeeks = this.rollDeadlineWeeks();
+
+        return new Contract({
+            name: template.name,
+            description: template.description,
+            type: ContractType.PRESTIGE,
+            client: COURT_OF_DIRECTORS_CLIENT,
+            paymentClause: PRESTIGE_PAYMENT_CLAUSE,
+            act: region.act,
+            segment,
+            difficultyStars,
+            numCombats,
+            deadlineWeeks,
+            durationWeeks: numCombats + 1,
+            payout: 0,
+            squadSize,
+            regionName: region.regionName,
+            vpReward,
+        });
+    }
+
     public generateContract(year: number, contractsCompleted: number = 0, contractsCompletedByClient: Record<string, number> = {}): Contract {
         const maxAct = this.maxActUnlocked(year, contractsCompleted);
 
@@ -509,12 +607,32 @@ export class ContractGenerator {
             const eligibleTradeRegions = TRADE_RUN_REGIONS.filter(r => r.act <= maxAct);
             board[board.length - 1] = this.generateTradeRunContract(this.pick(eligibleTradeRegions), year, contractsCompletedByClient);
         }
+
+        // Prestige Commissions: year 3+, ~1 per full board refresh at most
+        // (rare trophies, not a lane — see design doc). Never displaces the
+        // guaranteed trade run above; only rolled on a full refresh from
+        // empty, and only if the board doesn't already carry one (a partial
+        // top-up of an existing board with a prestige contract still on it
+        // does not roll another).
+        if (isFullRefresh && board.length > 0 && year >= ContractGenerator.PRESTIGE_MIN_YEAR
+            && !board.some(c => c.isPrestige) && Math.random() < ContractGenerator.PRESTIGE_REFRESH_CHANCE) {
+            const maxAct = this.maxActUnlocked(year, contractsCompleted);
+            const replaceIdx = board.findIndex(c => !c.isTradeRun);
+            if (replaceIdx >= 0) {
+                board[replaceIdx] = this.generatePrestigeContract(year, maxAct);
+            }
+        }
         return board;
     }
 
     /** Exposed for tests. */
     public static getAllTradeRunTemplates(): TradeRunTemplate[] {
         return TRADE_RUN_REGIONS.flatMap(r => r.templates);
+    }
+
+    /** Exposed for tests. */
+    public static getAllPrestigeTemplates(): { name: string; description: string }[] {
+        return PRESTIGE_TEMPLATES;
     }
 
     /**

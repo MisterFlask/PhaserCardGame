@@ -5,7 +5,11 @@ import { generateWordGuid } from "../utils/Guid";
 export enum ContractType {
     BOUNTY = "Bounty",          // straight combat: clear the target, get paid
     TRADE_RUN = "Trade Run",    // freight: crates pay per-unit but clog the deck with cargo cards.
-    PROCUREMENT = "Procurement" // payout in cards/resources rather than cash. v2.
+    PROCUREMENT = "Procurement", // payout in cards/resources rather than cash. v2.
+    /** A trophy commission from the Court of Directors (year 3+, ~1 per
+     *  board refresh): £0 payout, vpReward instead. See
+     *  src/docs/vp_endgame_design.md. */
+    PRESTIGE = "Prestige Commission"
 }
 
 /**
@@ -62,6 +66,11 @@ export class Contract {
      */
     public cratesLoaded: number = 0;
 
+    /** Prestige Commissions only: VP granted on completion instead of £
+     *  (payout is always 0 on these). 0/absent on every other contract type.
+     *  See src/docs/vp_endgame_design.md. */
+    public vpReward: number;
+
     constructor(args: {
         name: string;
         description: string;
@@ -80,6 +89,7 @@ export class Contract {
         consumableRewardName?: string;
         maxCrates?: number;
         freightRatePerCrate?: number;
+        vpReward?: number;
     }) {
         this.name = args.name;
         this.description = args.description;
@@ -98,12 +108,18 @@ export class Contract {
         this.consumableRewardName = args.consumableRewardName;
         this.maxCrates = args.maxCrates ?? 0;
         this.freightRatePerCrate = args.freightRatePerCrate ?? 0;
+        this.vpReward = args.vpReward ?? 0;
     }
 
     /** True for trade-run contracts: the muster UI shows a freight stepper
      *  and payout includes cratesLoaded * freightRatePerCrate. */
     public get isTradeRun(): boolean {
         return this.type === ContractType.TRADE_RUN;
+    }
+
+    /** True for Prestige Commissions: £0 payout, vpReward instead. */
+    public get isPrestige(): boolean {
+        return this.type === ContractType.PRESTIGE;
     }
 
     /** Projected payout at the current cratesLoaded (base contract's payout

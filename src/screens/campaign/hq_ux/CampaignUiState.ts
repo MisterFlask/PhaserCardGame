@@ -16,6 +16,17 @@ export const ROSTER_CAP = 8;
 export const RECRUIT_COST = 80;
 const RECRUIT_POOL_SIZE = 3;
 
+/** Charter Buyback (src/docs/vp_endgame_design.md): from year 8, the
+ *  Investment panel's RETIRE SHARES row converts £ into VP at this rate,
+ *  repeatable, irreversible. "1.3:1 beats hoarding by exactly 30% — strong
+ *  enough to force the decision, weak enough that solvency still dominates
+ *  mid-game" (design doc). */
+export const CHARTER_BUYBACK_MONEY_COST = 100;
+export const CHARTER_BUYBACK_VP_REWARD = 130;
+/** Final charter year (of CHARTER_YEARS) the buyback becomes available:
+ *  "final 8 quarters" = the last 2 years of a 10-year charter. */
+export const CHARTER_BUYBACK_MIN_YEAR = 8;
+
 /** Contracts fulfilled for the same client before their retainer Standing
  *  Order unlocks (design doc, "Amendment: Standing Orders" -> "Where orders
  *  come from" -> "future hook"). */
@@ -77,6 +88,12 @@ export class CampaignUiState {
      *  (house rule 3). SortieManager transfers these into GameState.consumables
      *  (the active loadout) on dispatch and back on successful resolution. */
     public consumables: AbstractConsumable[] = [];
+    /** VP earned outside strategic projects: Prestige Commissions
+     *  (SortieManager.resolveSortie) and Charter Buyback (retireSharesForVp
+     *  below). The one owner of this fact (house rule 3). Final score =
+     *  projects VP + charterVictoryPoints + vault (EndOfCampaignPanel). See
+     *  src/docs/vp_endgame_design.md. */
+    public charterVictoryPoints: number = 0;
 
     private constructor() {}
 
@@ -184,6 +201,36 @@ export class CampaignUiState {
         consumable.init();
         consumable.onPurchase();
         this.consumables.push(consumable);
+        return true;
+    }
+
+    /** True from calendar year CHARTER_BUYBACK_MIN_YEAR onward: the
+     *  Investment panel's RETIRE SHARES row (Charter Buyback) only trades
+     *  once the charter's final years are underway (design doc: "converting
+     *  too early gets you sacked"). */
+    public isCharterBuybackUnlocked(): boolean {
+        return this.calendar.year >= CHARTER_BUYBACK_MIN_YEAR;
+    }
+
+    /**
+     * Charter Buyback (RETIRE SHARES): convert one £100 block into 130 VP,
+     * irreversible. Returns false (and does nothing) if the buyback isn't
+     * unlocked yet or the vault can't cover a block. Money retired this way
+     * cannot cover dividends — the whole point of the late-charter trade.
+     */
+    public retireSharesForVp(): boolean {
+        const gameState = GameState.getInstance();
+        if (!this.isCharterBuybackUnlocked()) return false;
+        if (gameState.moneyInVault < CHARTER_BUYBACK_MONEY_COST) return false;
+
+        gameState.moneyInVault -= CHARTER_BUYBACK_MONEY_COST;
+        this.charterVictoryPoints += CHARTER_BUYBACK_VP_REWARD;
+        this.calendar.boardEvents.push({
+            week: this.calendar.week,
+            message: `The Court retires £${CHARTER_BUYBACK_MONEY_COST} of working capital as ${CHARTER_BUYBACK_VP_REWARD} shares of` +
+                ` charter prestige. Running total: ${this.charterVictoryPoints} VP.`,
+            isWarning: false,
+        });
         return true;
     }
 

@@ -56,7 +56,27 @@ describe('contract DTO round-trip', () => {
             expect(restored.consumableRewardName).toBe(contract.consumableRewardName);
             expect(restored.maxCrates).toBe(contract.maxCrates);
             expect(restored.freightRatePerCrate).toBe(contract.freightRatePerCrate);
+            expect(restored.vpReward).toBe(contract.vpReward);
         }
+    });
+
+    it('preserves a Prestige Commission\'s £0 payout and vpReward through the round-trip', () => {
+        let sawPrestige = false;
+        for (let i = 0; i < 200 && !sawPrestige; i++) {
+            const board = ContractGenerator.getInstance().refillBoard([], 6);
+            const prestige = board.find(c => c.isPrestige);
+            if (!prestige) continue;
+            sawPrestige = true;
+            expect(prestige.payout).toBe(0);
+            expect(prestige.vpReward).toBeGreaterThan(0);
+            const restored = contractFromDTO(JSON.parse(JSON.stringify(contractToDTO(prestige))));
+            expect(restored.type).toBe(prestige.type);
+            expect(restored.isPrestige).toBe(true);
+            expect(restored.payout).toBe(0);
+            expect(restored.vpReward).toBe(prestige.vpReward);
+            expect(restored.client).toBe('The Court of Directors');
+        }
+        expect(sawPrestige).toBe(true);
     });
 
     it('preserves Trade Run maxCrates/freightRatePerCrate through the round-trip', () => {

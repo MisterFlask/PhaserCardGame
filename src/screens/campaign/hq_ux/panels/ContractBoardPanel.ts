@@ -406,7 +406,8 @@ export class ContractBoardPanel extends AbstractHqPanel {
         });
         seal.on('pointerout', () => this.hideHoverTooltip());
 
-        // Small parchment tag beneath the pin: name + payout.
+        // Small parchment tag beneath the pin: name + payout (VP, for a
+        // Prestige Commission — see design doc "Payout: £0").
         const tagY = PIN_TAG_H / 2 + 14;
         const tag = this.scene.add.container(0, tagY);
         tag.add(drawPaper(this.scene, PIN_TAG_W, PIN_TAG_H));
@@ -415,8 +416,9 @@ export class ContractBoardPanel extends AbstractHqPanel {
             wordWrap: { width: PIN_TAG_W - 16 },
             maxLines: 2,
         }));
-        tag.add(this.scene.add.text(PIN_TAG_W / 2 - 8, PIN_TAG_H / 2 - 8, `£${contract.payout}`, {
-            fontFamily: Fonts.DISPLAY, fontSize: '18px', color: Palette.INK,
+        const tagPayoutLabel = contract.isPrestige ? `${contract.vpReward} VP` : `£${contract.payout}`;
+        tag.add(this.scene.add.text(PIN_TAG_W / 2 - 8, PIN_TAG_H / 2 - 8, tagPayoutLabel, {
+            fontFamily: Fonts.DISPLAY, fontSize: '18px', color: contract.isPrestige ? Palette.GOOD_TEXT : Palette.INK,
         }).setOrigin(1, 1));
         container.add(tag);
 
@@ -487,15 +489,19 @@ export class ContractBoardPanel extends AbstractHqPanel {
             wordWrap: { width: NOTICE_W - 100 },
         }));
 
-        // Chartered Partner tag (faction_reputation_design.md): once a client
-        // has fulfilled 6+ contracts, their notices carry the tag and (per
-        // ContractGenerator's applyCharteredPartnerBonus) a +10%-ish payout.
-        const chartered = isCharteredPartner(contract.client, campaign.contractsCompletedByClient);
-        const clientLine = `CLIENT: ${contract.client.toUpperCase()}${chartered ? ' · CHARTERED PARTNER' : ''}`;
-        container.add(this.scene.add.text(-NOTICE_W / 2 + 18, -NOTICE_H / 2 + 82,
-            clientLine.length > 46 ? `${contract.client.toUpperCase()}${chartered ? ' · CHARTERED PARTNER' : ''}` : clientLine, {
+        // Prestige Commissions (src/docs/vp_endgame_design.md) are styled as
+        // a commendation: the Court of Directors client tag reads distinctly
+        // from an ordinary Chartered Partner tag, and never carries one
+        // (it's an internal client, exempt from retainer tracking — see
+        // ContractGenerator's COURT_OF_DIRECTORS_CLIENT doc).
+        const chartered = !contract.isPrestige && isCharteredPartner(contract.client, campaign.contractsCompletedByClient);
+        const clientLine = contract.isPrestige
+            ? `COMMENDATION · ${contract.client.toUpperCase()}`
+            : `CLIENT: ${contract.client.toUpperCase()}${chartered ? ' · CHARTERED PARTNER' : ''}`;
+        container.add(this.scene.add.text(-NOTICE_W / 2 + 18, -NOTICE_H / 2 + 82, clientLine, {
             fontFamily: Fonts.UTILITY, fontSize: '12px',
-            color: chartered ? Palette.GOOD_TEXT : Palette.INK_FADED, letterSpacing: 2,
+            color: contract.isPrestige ? Palette.GOOD_TEXT : (chartered ? Palette.GOOD_TEXT : Palette.INK_FADED),
+            letterSpacing: 2,
             wordWrap: { width: NOTICE_W - 36 },
         }));
 
@@ -508,9 +514,11 @@ export class ContractBoardPanel extends AbstractHqPanel {
         const freightLabel = contract.isTradeRun
             ? ` · £${contract.freightRatePerCrate} per crate delivered, carriage of up to ${contract.maxCrates}`
             : '';
-        const noticeFooterLine = contract.consumableRewardName
-            ? `${crewLabel}${freightLabel} · Provisioning grant included: ${contract.consumableRewardName}`
-            : `${crewLabel}${freightLabel}`;
+        const noticeFooterLine = contract.isPrestige
+            ? `${crewLabel} · The Court of Directors notes its satisfaction. It does not pay in anything so vulgar as money.`
+            : contract.consumableRewardName
+                ? `${crewLabel}${freightLabel} · Provisioning grant included: ${contract.consumableRewardName}`
+                : `${crewLabel}${freightLabel}`;
         container.add(this.scene.add.text(-NOTICE_W / 2 + 18, -NOTICE_H / 2 + 124, noticeFooterLine, {
             fontFamily: Fonts.BODY, fontSize: '13px', fontStyle: 'italic', color: Palette.INK_FADED,
             wordWrap: { width: NOTICE_W - 40 },
@@ -526,16 +534,21 @@ export class ContractBoardPanel extends AbstractHqPanel {
 
         // Payout, ledger-style bottom right. Trade runs quote the low base
         // here — the freight stepper shows the projected total once selected.
-        const payoutLabel = contract.isTradeRun ? `£${contract.payout}+` : `£${contract.payout}`;
+        // Prestige Commissions show VP instead of £ (payout is always 0).
+        const payoutLabel = contract.isPrestige
+            ? `${contract.vpReward} VP`
+            : (contract.isTradeRun ? `£${contract.payout}+` : `£${contract.payout}`);
         const payoutText = this.scene.add.text(NOTICE_W / 2 - 20, NOTICE_H / 2 - 36, payoutLabel, {
-            fontFamily: Fonts.DISPLAY, fontSize: '30px', color: Palette.INK,
+            fontFamily: Fonts.DISPLAY, fontSize: '30px', color: contract.isPrestige ? Palette.GOOD_TEXT : Palette.INK,
         }).setOrigin(1, 0.5);
         container.add(payoutText);
         payoutText.setInteractive({ useHandCursor: false });
         payoutText.on('pointerover', () => {
-            const tooltip = contract.isTradeRun
-                ? `Base payment on delivery: [b]£${contract.payout}[/b], plus [b]£${contract.freightRatePerCrate}[/b] per crate carried, banked directly to the Company vault.`
-                : `Payment on completion: [b]£${contract.payout}[/b], banked directly to the Company vault.`;
+            const tooltip = contract.isPrestige
+                ? `Commission fee on completion: [b]${contract.vpReward} VP[/b], entered directly into the charter's honors. No £ changes hands.`
+                : contract.isTradeRun
+                    ? `Base payment on delivery: [b]£${contract.payout}[/b], plus [b]£${contract.freightRatePerCrate}[/b] per crate carried, banked directly to the Company vault.`
+                    : `Payment on completion: [b]£${contract.payout}[/b], banked directly to the Company vault.`;
             this.showHoverTooltip(
                 tooltip,
                 container.x + payoutText.x, container.y + payoutText.y - 24,

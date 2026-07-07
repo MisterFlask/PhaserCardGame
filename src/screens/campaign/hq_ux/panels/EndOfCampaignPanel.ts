@@ -90,16 +90,21 @@ export class EndOfCampaignPanel extends AbstractHqPanel {
         const gameState = GameState.getInstance();
         const cal = campaign.calendar;
 
-        const victoryPoints = campaign.ownedStrategicProjects
+        // Three-component score (src/docs/vp_endgame_design.md): project VP
+        // + charter VP (Prestige Commissions, Charter Buyback) + vault, £1
+        // treated as 1 VP.
+        const projectVictoryPoints = campaign.ownedStrategicProjects
             .reduce((sum, p) => sum + p.getVictoryPoints(), 0);
-        const finalScore = victoryPoints + gameState.moneyInVault;
+        const charterVictoryPoints = campaign.charterVictoryPoints;
+        const finalScore = projectVictoryPoints + charterVictoryPoints + gameState.moneyInVault;
 
         const stats =
             `Weeks in charge: ${cal.week - 1}\n` +
             `Contracts fulfilled: ${campaign.contractsCompleted}\n` +
             `Soldiers on the books: ${campaign.roster.length}\n\n` +
             `Vault: £${gameState.moneyInVault}\n` +
-            `Victory points from ventures: ${victoryPoints}\n\n` +
+            `Victory points from ventures: ${projectVictoryPoints}\n` +
+            `Charter victory points (Prestige Commissions, Charter Buyback): ${charterVictoryPoints}\n\n` +
             `FINAL SCORE: ${finalScore}`;
 
         if (cal.isSacked) {

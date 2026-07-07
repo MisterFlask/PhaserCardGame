@@ -171,4 +171,73 @@ describe('ContractGenerator', () => {
             expect(c.paymentClause).toBe(template!.paymentClause.replace('{payout}', `£${c.payout}`));
         }
     });
+
+    describe('Prestige Commissions (src/docs/vp_endgame_design.md)', () => {
+        it('never appear before year 3', () => {
+            for (let i = 0; i < 30; i++) {
+                const board = gen.refillBoard([], 1);
+                expect(board.some(c => c.isPrestige)).toBe(false);
+                const board2 = gen.refillBoard([], 2);
+                expect(board2.some(c => c.isPrestige)).toBe(false);
+            }
+        });
+
+        it('appear at most once per full board refresh from year 3+', () => {
+            for (let i = 0; i < 60; i++) {
+                const board = gen.refillBoard([], 5);
+                const prestigeCount = board.filter(c => c.isPrestige).length;
+                expect(prestigeCount).toBeLessThanOrEqual(1);
+            }
+        });
+
+        it('eventually appear across enough refreshes at year 5', () => {
+            let sawPrestige = false;
+            for (let i = 0; i < 60; i++) {
+                const board = gen.refillBoard([], 5);
+                if (board.some(c => c.isPrestige)) {
+                    sawPrestige = true;
+                    break;
+                }
+            }
+            expect(sawPrestige).toBe(true);
+        });
+
+        it('pay £0 with vpReward = 150 + 25*(year-3), rounded to 5, scaled by danger pay', () => {
+            let seen = 0;
+            for (let i = 0; i < 200; i++) {
+                const board = gen.refillBoard([], 7);
+                const prestige = board.find(c => c.isPrestige);
+                if (!prestige) continue;
+                seen++;
+                expect(prestige.payout).toBe(0);
+                expect(prestige.projectedPayout).toBe(0);
+                expect(prestige.client).toBe('The Court of Directors');
+                expect(prestige.vpReward).toBeGreaterThan(0);
+                expect(prestige.vpReward % 5).toBe(0);
+
+                const dangerMultiplier: Record<number, number> = { 2: 1.3, 3: 1.0, 4: 0.85 };
+                const baseVp = 150 + 25 * (7 - 3);
+                const expected = Math.round((baseVp * dangerMultiplier[prestige.squadSize]) / 5) * 5;
+                expect(prestige.vpReward).toBe(expected);
+            }
+            expect(seen).toBeGreaterThan(0);
+        });
+
+        it('name/description always co-occur as defined in a single template', () => {
+            const templates = ContractGenerator.getAllPrestigeTemplates();
+            const byName = new Map(templates.map(t => [t.name, t]));
+
+            let seen = 0;
+            for (let i = 0; i < 200; i++) {
+                const board = gen.refillBoard([], 8);
+                const prestige = board.find(c => c.isPrestige);
+                if (!prestige) continue;
+                seen++;
+                const template = byName.get(prestige.name);
+                expect(template).toBeDefined();
+                expect(prestige.description).toBe(template!.description);
+            }
+            expect(seen).toBeGreaterThan(0);
+        });
+    });
 });

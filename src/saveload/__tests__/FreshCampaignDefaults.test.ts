@@ -68,7 +68,7 @@ describe('CampaignSave shape-lock (fresh-state defaults)', () => {
     function buildFreshSave(): CampaignSave {
         StandingOrdersState.getInstance().reset();
         return {
-            version: 10,
+            version: 11,
             savedAtIso: new Date(0).toISOString(),
             moneyInVault: 200, // GameState.moneyInVault default (src/rules/GameState.ts) — browser-verified in deliverable 2
             calendar: calendarToDTO(new CampaignCalendar()),
@@ -80,6 +80,7 @@ describe('CampaignSave shape-lock (fresh-state defaults)', () => {
             recruitCandidates: [], // CampaignUiState.recruitCandidates starts empty; lazily filled by ensureRecruitsPopulated()
             standingOrders: standingOrdersToDTO(StandingOrdersState.getInstance()),
             consumables: [], // CampaignUiState.consumables starts empty
+            charterVictoryPoints: 0, // CampaignUiState.charterVictoryPoints starts at 0 (VP endgame pivot)
         };
     }
 
@@ -90,6 +91,7 @@ describe('CampaignSave shape-lock (fresh-state defaults)', () => {
         // CampaignSave without a corresponding decision recorded here.
         expect(Object.keys(save).sort()).toEqual([
             'calendar',
+            'charterVictoryPoints',
             'consumables',
             'contracts',
             'contractsCompleted',
@@ -110,6 +112,7 @@ describe('CampaignSave shape-lock (fresh-state defaults)', () => {
         expect(save.roster).toEqual([]);
         expect(save.recruitCandidates).toEqual([]);
         expect(save.consumables).toEqual([]);
+        expect(save.charterVictoryPoints).toBe(0);
         expect(save.standingOrders).toEqual({ active: [], pending: null, bonusSlots: 0 });
         expect(save.calendar).toEqual({
             week: 1,
@@ -134,5 +137,12 @@ describe('CampaignSave shape-lock (fresh-state defaults)', () => {
         };
         const restored: CampaignSave = JSON.parse(JSON.stringify(save));
         expect(restored.contractsCompletedByClient).toEqual(save.contractsCompletedByClient);
+    });
+
+    it('preserves a non-zero charterVictoryPoints (VP endgame pivot) through JSON', () => {
+        const save = buildFreshSave();
+        save.charterVictoryPoints = 430; // e.g. one Prestige Commission + two Charter Buyback blocks
+        const restored: CampaignSave = JSON.parse(JSON.stringify(save));
+        expect(restored.charterVictoryPoints).toBe(430);
     });
 });

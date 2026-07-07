@@ -44,6 +44,7 @@ export function contractToDTO(c: Contract): ContractDTO {
         consumableRewardName: c.consumableRewardName,
         maxCrates: c.maxCrates,
         freightRatePerCrate: c.freightRatePerCrate,
+        vpReward: c.vpReward,
     };
 }
 
@@ -66,6 +67,7 @@ export function contractFromDTO(dto: ContractDTO): Contract {
         consumableRewardName: dto.consumableRewardName,
         maxCrates: dto.maxCrates,
         freightRatePerCrate: dto.freightRatePerCrate,
+        vpReward: dto.vpReward,
     });
 }
 

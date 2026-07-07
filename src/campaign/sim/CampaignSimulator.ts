@@ -236,7 +236,28 @@ export interface SimulatorConfig {
      * unaffected.
      */
     useRushHealing?: boolean;
+    /**
+     * Charter Buyback policy knob (VP endgame pivot, src/docs/vp_endgame_design.md).
+     * When true, at each quarter boundary from calendar year
+     * CHARTER_BUYBACK_MIN_YEAR onward, the sim retires as many £100 blocks
+     * as it can while the vault stays above 2x the next quarter's dividend
+     * expectation (mirrors the design doc's sim-support policy: "retire
+     * shares each quarter from year 8 while vault > 2x next dividend
+     * expectation"). Off by default so existing callers/tests are
+     * unaffected. Mirrors CampaignUiState.retireSharesForVp/
+     * CHARTER_BUYBACK_MONEY_COST/CHARTER_BUYBACK_VP_REWARD/
+     * CHARTER_BUYBACK_MIN_YEAR by hand (that module is Phaser-tainted — see
+     * SIM_RECRUIT_COST's doc for the same duplication rationale).
+     */
+    convertLateToVP?: boolean;
 }
+
+/** Mirrors CampaignUiState.CHARTER_BUYBACK_MONEY_COST/VP_REWARD/MIN_YEAR
+ *  (src/screens/campaign/hq_ux/CampaignUiState.ts). Same duplication
+ *  rationale as SIM_RECRUIT_COST. */
+export const SIM_CHARTER_BUYBACK_MONEY_COST = 100;
+export const SIM_CHARTER_BUYBACK_VP_REWARD = 130;
+export const SIM_CHARTER_BUYBACK_MIN_YEAR = 8;
 
 export interface SimulatorResult {
     quartersSurvived: number;
@@ -246,6 +267,12 @@ export interface SimulatorResult {
     deaths: number;
     sacked: boolean;
     charterExpired: boolean;
+    /** VP banked outside projects: Prestige Commissions (vpReward on won
+     *  sorties) + Charter Buyback (convertLateToVP). */
+    charterVictoryPoints: number;
+    /** finalVault + charterVictoryPoints (project VP is not modeled by this
+     *  sim — see design doc "Sim support" clause). */
+    score: number;
 }
 
 /**
@@ -262,7 +289,7 @@ export interface SimulatorResult {
  * so at the start of every call so it's self-contained by default).
  */
 export function runCampaignSimulation(config: SimulatorConfig): SimulatorResult {
-    const { combatModel, policy, targetRosterSize, quarters, rng, useRushHealing } = config;
+    const { combatModel, policy, targetRosterSize, quarters, rng, useRushHealing, convertLateToVP } = config;
 
     // Standing Orders are a process-wide singleton; the sim doesn't exercise
     // orders (no policy enacts any), so reset to a clean/neutral baseline
@@ -285,6 +312,7 @@ export function runCampaignSimulation(config: SimulatorConfig): SimulatorResult 
     let sortiesRun = 0;
     let deaths = 0;
     let quartersSurvived = 0;
+    let charterVictoryPoints = 0;
 
     for (let q = 0; q < quarters; q++) {
         if (calendar.isSacked || calendar.isCharterExpired) break;
@@ -323,6 +351,13 @@ export function runCampaignSimulation(config: SimulatorConfig): SimulatorResult 
             const won = rng() < combatModel.sortieWinRate;
             if (won) {
                 vault += choice.contract.projectedPayout;
+                // Prestige Commissions pay £0 (projectedPayout collapses to
+                // 0) and grant vpReward instead — see design doc "Sim
+                // support": "Prestige contracts: sim policies treat vpReward
+                // as payout×1.0 for selection but bank it as VP".
+                if (choice.contract.isPrestige) {
+                    charterVictoryPoints += choice.contract.vpReward;
+                }
                 contractsCompleted++;
                 choice.squad.forEach(soldier => {
                     if (rng() < combatModel.deathChancePerSoldier) {
@@ -365,6 +400,37 @@ export function runCampaignSimulation(config: SimulatorConfig): SimulatorResult 
             },
         );
 
+        // Charter Buyback policy (convertLateToVP): from year
+        // SIM_CHARTER_BUYBACK_MIN_YEAR, retire a £100 block into 130 VP
+        // while the vault comfortably clears next quarter's obligations —
+        // mirrors the design doc's headline trigger ("vault > 2x next
+        // dividend expectation") plus a wage-bill reserve, tuned against
+        // CampaignSimulator.test.ts's "Charter Buyback" ratchet:
+        //  - The floor reserves 2x next quarter's wage bill on top of the
+        //    2x-dividend trigger. Converting down to exactly 2x the
+        //    dividend with no wage reserve measured as a real survival-rate
+        //    loss (wages settle before the dividend the same meeting —
+        //    CampaignCalendar's accounting order — so a bare-dividend floor
+        //    starves that meeting's wage bill).
+        //  - At most one block converts per quarter (not a greedy drain to
+        //    the floor). ContractGenerator's board generation uses
+        //    uncontrolled Math.random() internally (see this file's
+        //    RNG-discipline note at the top); a larger single-quarter vault
+        //    delta between the convert/never-convert runs was measured to
+        //    cascade into a materially different sortie sequence entirely
+        //    independent of the buyback's own economics, swinging survival
+        //    by 20-40 percentage points seed-to-seed noise alone. Capping to
+        //    one block/quarter keeps the perturbation small enough for a
+        //    stable, repeatable measurement.
+        if (convertLateToVP && calendar.year >= SIM_CHARTER_BUYBACK_MIN_YEAR) {
+            const nextWageBill = roster.length * WAGE_PER_SOLDIER_PER_QUARTER;
+            const solvencyFloor = 2 * calendar.currentDividendExpectation + 2 * nextWageBill;
+            if (vault - SIM_CHARTER_BUYBACK_MONEY_COST > solvencyFloor) {
+                vault -= SIM_CHARTER_BUYBACK_MONEY_COST;
+                charterVictoryPoints += SIM_CHARTER_BUYBACK_VP_REWARD;
+            }
+        }
+
         satisfactionTrajectory.push(calendar.shareholderSatisfaction);
         if (!calendar.isSacked) {
             quartersSurvived++;
@@ -375,6 +441,8 @@ export function runCampaignSimulation(config: SimulatorConfig): SimulatorResult 
         quartersSurvived,
         finalVault: vault,
         satisfactionTrajectory,
+        charterVictoryPoints,
+        score: vault + charterVictoryPoints,
         sortiesRun,
         deaths,
         sacked: calendar.isSacked,
