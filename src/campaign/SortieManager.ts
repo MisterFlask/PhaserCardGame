@@ -10,6 +10,7 @@ import { applyHpHardening, hardeningForYear } from "./EncounterHardening";
 import { Contract } from "./Contract";
 import { xpForCombatWin } from "./Leveling";
 import { applyCasualties } from "./SortieResolution";
+import { mergeStockWithLoadout } from "./ConsumableStock";
 
 /**
  * Runs a contract sortie: a fixed sequence of 1-2 combats with no node map.
@@ -231,8 +232,11 @@ export class SortieManager {
 
         // Unused consumables come home: transfer ownership back to campaign
         // stock (move, not copy — GameState.consumables is the sortie-scoped
-        // loadout and must end the sortie empty).
-        campaign.consumables = [...campaign.consumables, ...gameState.consumables];
+        // loadout and must end the sortie empty). Clamp to the stock cap,
+        // keeping campaign items first and dropping overflow from the end
+        // (the debug-only test tool can overfill the loadout; normal play
+        // cannot).
+        campaign.consumables = mergeStockWithLoadout(campaign.consumables, gameState.consumables);
         gameState.consumables = [];
 
         this.activeContract = null;

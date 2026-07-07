@@ -32,3 +32,18 @@ export const CONSUMABLE_REWARD_NAMES: readonly string[] = [
     "Penitent's Scourge",
     "Sovereign's Purse",
 ];
+
+/**
+ * Merge campaign stock with sortie loadout, respecting the cap.
+ * Generic over item type T (no consumable-specific knowledge).
+ *
+ * Returns a new array of at most MAX_CONSUMABLE_STOCK items, keeping
+ * stock items first and loadout items after (to preserve campaign stock
+ * priority). Discards overflow from the end. Used at sortie resolution
+ * to transfer unused loadout consumables back to campaign stock — the
+ * debug-only test tool can overfill the loadout, so clamping is necessary
+ * (normal play never exceeds the cap).
+ */
+export function mergeStockWithLoadout<T>(stock: T[], loadout: T[]): T[] {
+    return [...stock, ...loadout].slice(0, MAX_CONSUMABLE_STOCK);
+}
