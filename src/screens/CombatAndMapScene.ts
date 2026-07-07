@@ -37,6 +37,7 @@ import { HqScene } from './campaign/hq_ux/HqScene';
 import { SceneChanger } from './SceneChanger';
 import { CampaignBriefStatus } from './subcomponents/CampaignBriefStatus';
 import { CharacterDeckOverlay } from './subcomponents/CharacterDeckOverlay';
+import { DefeatOverlay } from './subcomponents/DefeatOverlay';
 import CombatCardManager from './subcomponents/CombatCardManager';
 import CombatInputHandler from './subcomponents/CombatInputHandler';
 import CombatStateService from './subcomponents/CombatStateService';
@@ -65,6 +66,7 @@ class CombatScene extends Phaser.Scene {
     private campaignBriefStatus!: CampaignBriefStatus;
     private characterDeckOverlay!: CharacterDeckOverlay;
     private combatEndHandled: boolean = false;
+    private defeatOverlayShown: boolean = false;
 
     private eventToRunNext?: AbstractEvent;
     private hasEventBeenRun: boolean = false;
@@ -95,6 +97,7 @@ class CombatScene extends Phaser.Scene {
         ActionManager.init(this);
 
         this.combatEndHandled = false;
+        this.defeatOverlayShown = false;
         this.initialData = data;
     }
 
@@ -113,7 +116,8 @@ class CombatScene extends Phaser.Scene {
         
         // Reset combat flags
         this.combatEndHandled = false;
-        
+        this.defeatOverlayShown = false;
+
         // Recreate all combat-related objects
         if (this.cardManager) {
             this.cardManager.cleanup();
@@ -364,12 +368,19 @@ class CombatScene extends Phaser.Scene {
         }
 
         // Squad wipe during a sortie: the contract fails and the roster pays.
+        // The overlay gates the actual handleSquadWipe call (which mutates
+        // the roster and switches to HqScene synchronously) behind a button,
+        // so the wipe gets a beat of ceremony instead of an instant cut.
         if (!this.combatEndHandled
+            && !this.defeatOverlayShown
             && SortieManager.getInstance().isActive()
             && GameState.getInstance().combatState.playerCharacters.length > 0
             && GameState.getInstance().combatState.playerCharacters.every(c => c.isDead())) {
             this.combatEndHandled = true;
-            SortieManager.getInstance().handleSquadWipe();
+            this.defeatOverlayShown = true;
+            new DefeatOverlay(this, () => {
+                SortieManager.getInstance().handleSquadWipe();
+            });
             return;
         }
 
