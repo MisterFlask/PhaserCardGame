@@ -306,7 +306,10 @@ export default class ImageUtils {
 
                 // act-1 art burndown batch 1 (July 2026)
                 "hermit.png", "ferryman_mutineer.png", "totem_2.png",
-                "ghost_ship.png", "fare_enforcer.png", "treasure.png"
+                "ghost_ship.png", "fare_enforcer.png", "treasure.png",
+
+                // act-2 art burndown batch 2 (July 2026)
+                "frost_knight.png"
               ]
         },
         enemies: {
@@ -347,7 +350,10 @@ export default class ImageUtils {
 
                 // act-1 art burndown batch 1 (July 2026)
                 "Horror Worm.png", "Salamander.png", "Drowned Sailor.png", "Corrupted Bird.png",
-                "Electric Eel.png", "Pirate.png", "Ooze.png", "Lost Accountant.png"
+                "Electric Eel.png", "Pirate.png", "Ooze.png", "Lost Accountant.png",
+
+                // act-2 art burndown batch 2 (July 2026)
+                "Napoleonic Zombie.png", "Bureaucratic Beast.png", "Machine Gunner Demon.png"
             ]
         },
         attributes_and_augments: {
