@@ -12,10 +12,83 @@
 
 import { StandingOrder } from "./StandingOrder";
 import { LAUNCH_ORDERS } from "./LaunchOrders";
+import { CLIENT_RETAINER_ORDERS } from "./ClientRetainerOrders";
 
-export const STANDING_ORDER_REGISTRY: Map<string, StandingOrder> = new Map(
-    LAUNCH_ORDERS.map(order => [order.id, order])
+/** Every known order, launch pool and client retainers alike, always
+ *  resolvable regardless of a retainer's unlock state. Internal resolution
+ *  (getActiveOrders, save-load id lookup) must use this rather than the
+ *  gated STANDING_ORDER_REGISTRY below, so an already-ratified retainer
+ *  order is never "forgotten". */
+const ALL_ORDERS_BY_ID: Map<string, StandingOrder> = new Map(
+    [...LAUNCH_ORDERS, ...CLIENT_RETAINER_ORDERS].map(order => [order.id, order])
 );
+
+/** Client-retainer order ids, for the visibility gate below. Kept in this
+ *  file (rather than re-deriving from CampaignUiState, which would create an
+ *  import cycle: CampaignUiState -> ContractGenerator -> StandingOrdersState)
+ *  as the set of ids ClientRetainerOrders.ts itself defines. */
+const CLIENT_RETAINER_ORDER_ID_SET: Set<string> = new Set(CLIENT_RETAINER_ORDERS.map(o => o.id));
+
+/**
+ * Predicate the UI consults to decide whether a client-retainer order should
+ * appear in the main Standing Orders grid yet (vs. InvestmentPanel's locked
+ * placeholder row). Wired by CampaignUiState at module init (see the bottom
+ * of that file) to CampaignUiState.isClientRetainerUnlockedForOrder, since
+ * CampaignUiState owns CLIENT_RETAINER_ORDER_IDS and the completion counts
+ * (house rule 3/6) and this module cannot import it directly without a load
+ * cycle. Defaults to "always unlocked" so a direct StandingOrdersState test
+ * that never wires this still sees every order (matches pre-retainer
+ * behavior for the launch pool, and is the permissive default for tests that
+ * don't care about retainer gating).
+ */
+let isRetainerOrderUnlocked: (orderId: string) => boolean = () => true;
+
+/** Called once by CampaignUiState to supply the live unlock check. Not part
+ *  of the public API surface other modules should call. */
+export function _wireRetainerUnlockCheck(check: (orderId: string) => boolean): void {
+    isRetainerOrderUnlocked = check;
+}
+
+function isVisible(orderId: string, order: StandingOrder): boolean {
+    if (!CLIENT_RETAINER_ORDER_ID_SET.has(orderId)) return true; // launch pool: always visible
+    const state = StandingOrdersState.getInstance();
+    if (state.activeOrderIds.includes(orderId)) return true; // never hide an already-ratified order
+    if (state.pendingOrderIds?.includes(orderId)) return true;
+    return isRetainerOrderUnlocked(orderId);
+}
+
+class GatedStandingOrderRegistry {
+    private visibleEntries(): [string, StandingOrder][] {
+        return [...ALL_ORDERS_BY_ID.entries()].filter(([id, order]) => isVisible(id, order));
+    }
+    public get(id: string): StandingOrder | undefined {
+        const order = ALL_ORDERS_BY_ID.get(id);
+        return order && isVisible(id, order) ? order : undefined;
+    }
+    public has(id: string): boolean { return this.get(id) !== undefined; }
+    public values(): IterableIterator<StandingOrder> { return this.visibleEntries().map(([, o]) => o)[Symbol.iterator](); }
+    public keys(): IterableIterator<string> { return this.visibleEntries().map(([id]) => id)[Symbol.iterator](); }
+    public [Symbol.iterator](): IterableIterator<[string, StandingOrder]> { return this.visibleEntries()[Symbol.iterator](); }
+}
+
+/**
+ * The board's currently-offerable Standing Orders: the launch pool, always,
+ * plus client-retainer orders once unlocked for their client (or already
+ * ratified/pending). Behaves like a read-only Map (values()/has()/get()),
+ * recomputed on every access since unlock state changes as contracts
+ * complete. InvestmentPanel's main order grid iterates
+ * STANDING_ORDER_REGISTRY.values() and relies on exactly this gating to keep
+ * not-yet-unlocked retainers out of the grid — its locked-row placeholder
+ * covers them instead — and StandingOrdersState.enact/queueReplace rely on
+ * STANDING_ORDER_REGISTRY.has() to refuse enacting a locked retainer.
+ */
+export const STANDING_ORDER_REGISTRY: {
+    get(id: string): StandingOrder | undefined;
+    has(id: string): boolean;
+    values(): IterableIterator<StandingOrder>;
+    keys(): IterableIterator<string>;
+    [Symbol.iterator](): IterableIterator<[string, StandingOrder]>;
+} = new GatedStandingOrderRegistry();
 
 type OrderHookName =
     | "modifyContractPayout"
@@ -28,7 +101,8 @@ type OrderHookName =
     | "modifySatisfactionHit"
     | "modifyCardRewardChoices"
     | "modifyStatusApplicationStacks"
-    | "modifyXpGain";
+    | "modifyXpGain"
+    | "modifyFreightRatePerCrate";
 
 export class StandingOrdersState {
     private static instance: StandingOrdersState;
@@ -153,6 +227,21 @@ export class StandingOrdersState {
     public satisfactionHit(base: number): number { return this.apply("modifySatisfactionHit", base); }
     public cardRewardChoices(base: number): number { return this.apply("modifyCardRewardChoices", base); }
     public xpGain(base: number): number { return this.apply("modifyXpGain", base); }
+    public freightRatePerCrate(base: number): number { return this.apply("modifyFreightRatePerCrate", base); }
+
+    /** Wipe insurance (Underwriting Retainer): £ recovered on a squad-wipe
+     *  contract failure, summed across any active orders that grant it
+     *  (in practice at most one — see LaunchOrders). */
+    public wipeInsurancePayout(contractPayout: number): number {
+        return this.getActiveOrders().reduce((total, order) => total + order.wipeInsurancePayout(contractPayout), 0);
+    }
+
+    /** Death benefit (Ossuary Death Benefit retainer): £ credited to the
+     *  vault per Company soldier death, summed across any active orders that
+     *  grant it. */
+    public deathBenefitPerCasualty(): number {
+        return this.getActiveOrders().reduce((total, order) => total + order.deathBenefitPerCasualty(), 0);
+    }
 
     /** buffId is a stable canonical buff name (AbstractBuff.getBuffCanonicalName()). */
     public statusApplicationStacks(buffId: string, stacks: number, sourceIsAlly: boolean, targetIsAlly: boolean): number {

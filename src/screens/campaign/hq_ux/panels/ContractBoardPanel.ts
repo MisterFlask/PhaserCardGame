@@ -1,4 +1,5 @@
 import Phaser, { Scene } from 'phaser';
+import { isCharteredPartner } from '../../../../campaign/ClientReputation';
 import { Contract } from '../../../../campaign/Contract';
 import { SortieManager } from '../../../../campaign/SortieManager';
 import { PlayerCharacter } from '../../../../gamecharacters/PlayerCharacter';
@@ -224,10 +225,16 @@ export class ContractBoardPanel extends AbstractHqPanel {
             wordWrap: { width: NOTICE_W - 100 },
         }));
 
-        const clientLine = `CLIENT: ${contract.client.toUpperCase()}`;
+        // Chartered Partner tag (faction_reputation_design.md): once a client
+        // has fulfilled 6+ contracts, their notices carry the tag and (per
+        // ContractGenerator's applyCharteredPartnerBonus) a +10%-ish payout.
+        const chartered = isCharteredPartner(contract.client, campaign.contractsCompletedByClient);
+        const clientLine = `CLIENT: ${contract.client.toUpperCase()}${chartered ? ' · CHARTERED PARTNER' : ''}`;
         container.add(this.scene.add.text(-NOTICE_W / 2 + 18, -NOTICE_H / 2 + 82,
-            clientLine.length > 46 ? contract.client.toUpperCase() : clientLine, {
-            fontFamily: Fonts.UTILITY, fontSize: '12px', color: Palette.INK_FADED, letterSpacing: 2,
+            clientLine.length > 46 ? `${contract.client.toUpperCase()}${chartered ? ' · CHARTERED PARTNER' : ''}` : clientLine, {
+            fontFamily: Fonts.UTILITY, fontSize: '12px',
+            color: chartered ? Palette.GOOD_TEXT : Palette.INK_FADED, letterSpacing: 2,
+            wordWrap: { width: NOTICE_W - 36 },
         }));
 
         container.add(this.scene.add.text(-NOTICE_W / 2 + 18, -NOTICE_H / 2 + 104,

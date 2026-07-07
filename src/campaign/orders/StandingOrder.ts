@@ -48,4 +48,19 @@ export abstract class StandingOrder {
      * (house rule 6).
      */
     public modifyStatusApplicationStacks(buffId: string, stacks: number, sourceIsAlly: boolean, targetIsAlly: boolean): number { return stacks; }
+
+    // --- Client-retainer hooks (src/docs/faction_reputation_design.md) ---
+
+    /** Wipe insurance (Infernal Marine & Postal Underwriters retainer): given
+     *  the failed contract's payout, returns £ recovered by the Company on a
+     *  squad wipe. 0 unless an order overrides this. */
+    public wipeInsurancePayout(contractPayout: number): number { return 0; }
+    /** Freight bump (Styx Delta Ferry & Lighterage retainer): flat £ added to
+     *  a trade run's freightRatePerCrate at generation. 0 unless an order
+     *  overrides this. */
+    public modifyFreightRatePerCrate(rate: number): number { return rate; }
+    /** Death benefit (Continental Casualty & Ossuary retainer): £ credited to
+     *  the vault per Company soldier death on sortie resolution. 0 unless an
+     *  order overrides this. */
+    public deathBenefitPerCasualty(): number { return 0; }
 }

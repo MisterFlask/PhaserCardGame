@@ -194,6 +194,26 @@ export class SortieManager {
             report.push(`${character.name}: lost in the field.`);
         });
 
+        // Underwriting Retainer (wipe insurance, faction_reputation_design.md
+        // "NEW HOOK (wipe insurance)"): the Company recovers a fraction of
+        // the failed contract's payout. 0 unless that client's retainer is
+        // active.
+        const insurancePayout = StandingOrdersState.getInstance().wipeInsurancePayout(contract.payout);
+        if (insurancePayout > 0) {
+            GameState.getInstance().moneyInVault += insurancePayout;
+            report.push(`Indemnity settlement received: £${insurancePayout}. The underwriters regret your loss.`);
+        }
+
+        // Ossuary Death Benefit retainer: every squad-wipe death is still a
+        // Company death, so it pays out here too (house rule 6 — no special
+        // case exempting a wipe from the same per-death benefit resolveSortie
+        // pays for ordinary casualties).
+        const deathBenefitTotal = StandingOrdersState.getInstance().deathBenefitPerCasualty() * this.squad.length;
+        if (deathBenefitTotal > 0) {
+            GameState.getInstance().moneyInVault += deathBenefitTotal;
+            report.push(`Casualty benefit remitted: £${deathBenefitTotal}. The Company thanks the deceased for their custom.`);
+        }
+
         // The squad's carried consumables go down with them — lost, not
         // returned to campaign stock.
         GameState.getInstance().currentRunCharacters = [];
@@ -249,6 +269,17 @@ export class SortieManager {
             campaign.roster = campaign.roster.filter(c => c !== dead);
         });
         report.push(...casualties.lines);
+
+        // Ossuary Death Benefit retainer (faction_reputation_design.md "NEW
+        // HOOK (death benefit)"): £ credited to the vault per Company death
+        // this sortie. 0 unless that client's retainer is active.
+        if (casualties.deaths.length > 0) {
+            const deathBenefitTotal = StandingOrdersState.getInstance().deathBenefitPerCasualty() * casualties.deaths.length;
+            if (deathBenefitTotal > 0) {
+                gameState.moneyInVault += deathBenefitTotal;
+                report.push(`Casualty benefit remitted: £${deathBenefitTotal}. The Company thanks the deceased for their custom.`);
+            }
+        }
 
         // Decks persist between sorties by design; only combat-scoped state
         // clears. Stress comes home with the soldier (Darkest-Dungeon-style)
