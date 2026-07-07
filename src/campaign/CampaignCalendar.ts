@@ -11,6 +11,12 @@ export const WEEKS_PER_QUARTER = 13;
 export const QUARTERS_PER_YEAR = 4;
 export const CHARTER_YEARS = 10;
 
+/** £ owed per rostered soldier at each quarterly board meeting — wounded
+ *  included, since the Company honors its payroll regardless of fitness for
+ *  duty. Keeps roster size honest: ongoing drain so hoarding has a cost
+ *  (see src/docs/strategic_layer_redesign.md, "What money buys"). */
+export const WAGE_PER_SOLDIER_PER_QUARTER = 15;
+
 /**
  * Campaign time and the shareholder doom clock.
  *
@@ -67,23 +73,67 @@ export class CampaignCalendar {
      * Advance time by N weeks. Returns the number of quarter boundaries
      * crossed (dividends are settled by the caller via settleDividend,
      * which needs access to the vault).
+     *
+     * getWageBillDue/payWagesFromVault, if supplied together, run at each
+     * board meeting BEFORE the dividend draw: getWageBillDue computes the
+     * quarter's wage bill (roster size × WAGE_PER_SOLDIER_PER_QUARTER — the
+     * caller owns the roster) and payWagesFromVault takes that amount and
+     * returns the amount actually paid (limited by vault contents, same
+     * contract as payDividendFromVault). Callers that omit them (saves/tests
+     * with no roster context) simply skip wages for that advance.
+     *
+     * onBoardMeetingStart, if supplied, runs FIRST at each board meeting —
+     * before wages, before the dividend. It is the seam for quarterly income
+     * (strategic-project bonds, embassies): money landing at the meeting is
+     * available to the wage bill and the dividend alike. Accounting order is
+     * income -> wages -> dividend.
      */
-    public advanceWeeks(n: number, payDividendFromVault: (amountDue: number) => number): void {
+    public advanceWeeks(
+        n: number,
+        payDividendFromVault: (amountDue: number) => number,
+        getWageBillDue?: () => number,
+        payWagesFromVault?: (amountDue: number) => number,
+        onBoardMeetingStart?: () => void,
+    ): void {
         for (let i = 0; i < n; i++) {
             const crossingQuarter = this.weekOfQuarter === WEEKS_PER_QUARTER;
             const settledQuarter = this.quarterOfYear;
             this.week++;
             if (crossingQuarter) {
-                this.settleDividend(payDividendFromVault, settledQuarter);
+                this.settleDividend(payDividendFromVault, settledQuarter, getWageBillDue, payWagesFromVault, onBoardMeetingStart);
             }
         }
     }
 
     /**
-     * Quarterly board meeting. payFromVault takes the amount due and returns
-     * the amount actually paid (limited by vault contents).
+     * Quarterly board meeting. onBoardMeetingStart (quarterly income) runs
+     * first, then wages settle (getWageBillDue/payWagesFromVault), then the
+     * dividend: payFromVault takes the amount due and returns the amount
+     * actually paid (limited by vault contents).
      */
-    private settleDividend(payFromVault: (amountDue: number) => number, settledQuarter: number): void {
+    private settleDividend(
+        payFromVault: (amountDue: number) => number,
+        settledQuarter: number,
+        getWageBillDue?: () => number,
+        payWagesFromVault?: (amountDue: number) => number,
+        onBoardMeetingStart?: () => void,
+    ): void {
+        // Quarterly income lands before any money leaves the vault, so a
+        // same-meeting bond coupon can cover the wage bill it arrives with.
+        onBoardMeetingStart?.();
+
+        if (getWageBillDue && payWagesFromVault) {
+            const wagesDue = getWageBillDue();
+            if (wagesDue > 0) {
+                const wagesPaid = payWagesFromVault(wagesDue);
+                if (wagesPaid >= wagesDue) {
+                    this.log(`Q${settledQuarter} field wages: £${wagesPaid} paid to the roster.`);
+                } else {
+                    this.log(`Q${settledQuarter} field wages: only £${wagesPaid} of £${wagesDue} could be found. The roster notices.`, true);
+                }
+            }
+        }
+
         const due = this.currentDividendExpectation;
         const paid = payFromVault(due);
 

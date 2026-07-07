@@ -1,4 +1,4 @@
-import { CampaignCalendar } from '../../../campaign/CampaignCalendar';
+import { CampaignCalendar, WAGE_PER_SOLDIER_PER_QUARTER } from '../../../campaign/CampaignCalendar';
 import { Contract } from '../../../campaign/Contract';
 import { ContractGenerator } from '../../../campaign/ContractGenerator';
 import { MAX_CONSUMABLE_STOCK } from '../../../campaign/ConsumableStock';
@@ -130,13 +130,31 @@ export class CampaignUiState {
     public advanceWeeks(n: number): void {
         const gameState = GameState.getInstance();
 
-        this.calendar.advanceWeeks(n, (amountDue: number) => {
-            // Project income (bonds, embassies) lands before the dividend is settled.
-            this.ownedStrategicProjects.forEach(project => project.onQuarterEnd());
-            const paid = Math.min(amountDue, gameState.moneyInVault);
-            gameState.moneyInVault -= paid;
-            return paid;
-        });
+        this.calendar.advanceWeeks(
+            n,
+            (amountDue: number) => {
+                // Dividend draw: whatever the vault still holds after income
+                // and wages have settled.
+                const paid = Math.min(amountDue, gameState.moneyInVault);
+                gameState.moneyInVault -= paid;
+                return paid;
+            },
+            () => this.roster.length * WAGE_PER_SOLDIER_PER_QUARTER,
+            (amountDue: number) => {
+                // Wages settle before the dividend draw; the vault floors at 0
+                // (never negative) and any shortfall is absorbed by the
+                // existing dividend-shortfall consequences, not a new penalty.
+                const paid = Math.min(amountDue, gameState.moneyInVault);
+                gameState.moneyInVault -= paid;
+                return paid;
+            },
+            () => {
+                // Project income (bonds, embassies) lands at the top of the
+                // board meeting — before wages and the dividend — so money
+                // arriving that quarter can pay that quarter's bills.
+                this.ownedStrategicProjects.forEach(project => project.onQuarterEnd());
+            },
+        );
 
         // Wounded soldiers recuperate; nerves settle slowly (1 stress/week).
         this.roster.forEach(character => {
