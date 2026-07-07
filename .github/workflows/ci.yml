@@ -42,7 +42,7 @@ jobs:
           node-version: 22
           cache: 'npm'
       - run: npm ci
-      - run: npm run build
+      - run: npm run build:prod
       - name: Detect resources/ changes
         id: detect
         # ~170MB of resources/ doesn't need to be re-uploaded (and gh-pages

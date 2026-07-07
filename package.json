@@ -9,6 +9,7 @@
   },
   "devDependencies": {
     "@types/lodash": "^4.17.7",
+    "happy-dom": "^20.10.6",
     "nodemon": "^3.1.4",
     "puppeteer": "^25.3.0",
     "ts-loader": "^9.5.1",
@@ -20,6 +21,7 @@
   },
   "scripts": {
     "build": "webpack --mode development",
+    "build:prod": "webpack --mode production",
     "watch": "webpack --mode development --watch",
     "dev": "nodemon --watch './**/*.ts' --exec 'ts-node' src/screens/CombatAndMapScene.ts",
     "test": "vitest run",

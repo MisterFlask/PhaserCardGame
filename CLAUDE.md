@@ -100,7 +100,9 @@ piece of work; delete items you complete.
 
 - Phaser's loader stalls in hidden browser tabs; `LoaderWatchdog` works around
   it — keep it installed in every scene's `preload`.
-- `index.html` loads two CDN Phaser builds plus the bundled one; don't rely on
-  `window.Phaser` being the bundle's instance.
+- `index.html` loads a single bundled script; Phaser and the rex plugins ship
+  inside `dist/bundle.js` (no CDN dependencies, no `window.Phaser` reliance).
+  `npm run build:prod` produces the 2.9MB production bundle the deploy uses;
+  dev builds are ~14MB.
 - Combat itself (ActionManager, action queue) is scene-bound and cannot run
   headless yet; verify combat behavior in the browser.
