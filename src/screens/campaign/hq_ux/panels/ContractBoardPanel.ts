@@ -461,6 +461,7 @@ export class ContractBoardPanel extends AbstractHqPanel {
      *  currently selected. Display + tooltips only — clicking it does not
      *  re-select or trim (that only happens via the map pin). */
     private buildNotice(contract: Contract, x: number, y: number): Phaser.GameObjects.Container {
+        const campaign = CampaignUiState.getInstance();
         const container = this.scene.add.container(x, y);
 
         const paper = drawPaper(this.scene, NOTICE_W, NOTICE_H, false);
