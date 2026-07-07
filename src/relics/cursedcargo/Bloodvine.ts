@@ -10,6 +10,7 @@ export class Bloodvine extends AbstractRelic {
     constructor() {
         super();
         this.rarity = EntityRarity.COMMON;
+        this.imageName = "bloodvine";
     }
 
     override getDisplayName(): string {

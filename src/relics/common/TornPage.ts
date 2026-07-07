@@ -9,6 +9,7 @@ export class TornPage extends AbstractRelic {
         this.rarity = EntityRarity.COMMON;
         this.stackable = true;
         this.stacks = 1;
+        this.imageName = "torn-page";
     }
 
     getDisplayName(): string {

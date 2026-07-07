@@ -42,7 +42,7 @@ export class Lexiophage extends AutomatedCharacter {
     constructor() {
         super({
             name: "Lexiophage",
-            portraitName: "Clockwork Seer",
+            portraitName: "lexiophage-bureaucrat",
             maxHitpoints: 120,
             description: "responsible for three out of four paperwork errors within the Lowerarchy"
         });

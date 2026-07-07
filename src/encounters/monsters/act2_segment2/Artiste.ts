@@ -86,7 +86,7 @@ export class Artiste extends AutomatedCharacter {
     constructor() {
         super({
             name: "L'Artiste Moderne",
-            portraitName: "Eldritch Slime Spawn A",
+            portraitName: "artiste-slime-painter",
             maxHitpoints: 120,
             description: "creates art that hurts to look at"
         });

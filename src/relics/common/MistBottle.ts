@@ -9,6 +9,7 @@ export class MistBottle extends AbstractRelic {
         this.rarity = EntityRarity.COMMON;
         this.stackable = true;
         this.stacks = 1;
+        this.imageName = "bottle-of-mist";
     }
 
     getDisplayName(): string {

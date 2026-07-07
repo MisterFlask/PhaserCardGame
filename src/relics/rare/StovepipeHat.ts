@@ -7,6 +7,7 @@ export class StovepipeHat extends AbstractRelic {
     constructor() {
         super();
         this.rarity = EntityRarity.RARE;
+        this.imageName = "stovepipe-hat";
     }
 
     getDisplayName(): string {

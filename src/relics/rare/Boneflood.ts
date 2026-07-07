@@ -12,6 +12,7 @@ export class Boneflood extends AbstractRelic {
         this.rarity = EntityRarity.RARE;
         this.stackable = true;
         this.stacks = 1;
+        this.imageName = "boneflood";
     }
 
     override getDisplayName(): string {

@@ -9,6 +9,7 @@ export class Nightshard extends AbstractRelic {
         this.rarity = EntityRarity.COMMON;
         this.clickable = true;
         this.stacks = 2; // Base number of uses per combat
+        this.imageName = "nightshard";
     }
 
     override getDisplayName(): string {

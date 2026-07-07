@@ -46,6 +46,7 @@ export class SirenDaguerreotype extends PlayableCard {
             rarity: EntityRarity.UNCOMMON,
         });
         this.baseEnergyCost = 2;
+        this.portraitName = "cursed_cargo_6";
         this.buffs.push(new SirenDaguerreotypeBuff());
     }
 

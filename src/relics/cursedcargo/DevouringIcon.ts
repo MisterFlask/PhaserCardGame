@@ -7,6 +7,7 @@ export class DevouringIcon extends AbstractRelic {
     constructor() {
         super();
         this.rarity = EntityRarity.UNCOMMON;
+        this.imageName = "devouring-icon";
     }
 
     override getDisplayName(): string {

@@ -9,6 +9,7 @@ export class WraithInABottle extends AbstractRelic {
     constructor() {
         super();
         this.rarity = EntityRarity.UNCOMMON;
+        this.imageName = "wraith-in-a-bottle";
     }
 
     override getDisplayName(): string {

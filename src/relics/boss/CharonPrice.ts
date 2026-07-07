@@ -7,6 +7,7 @@ export class CharonPrice extends AbstractRelic {
     constructor() {
         super();
         this.rarity = EntityRarity.BOSS;
+        this.imageName = "charons-price";
     }
 
     override getDisplayName(): string {

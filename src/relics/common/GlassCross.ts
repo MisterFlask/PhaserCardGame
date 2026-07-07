@@ -36,6 +36,7 @@ export class GlassCross extends AbstractRelic {
         super();
         this.rarity = EntityRarity.COMMON;
         this.stacks = 3;
+        this.imageName = "glass-cross";
     }
 
     override getDisplayName(): string {

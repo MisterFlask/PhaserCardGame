@@ -8,7 +8,7 @@ export class FrenchPoliceman extends AutomatedCharacter {
     constructor() {
         super({
             name: "Prévôt des Maréchaux",
-            portraitName: "Clockwork Iron Maiden",
+            portraitName: "french-policeman-gendarme",
             maxHitpoints: 175,
             description: "I See You"
         });

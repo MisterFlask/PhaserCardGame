@@ -10,6 +10,7 @@ export class HemomancyTome extends AbstractRelic {
     constructor() {
         super();
         this.rarity = EntityRarity.RARE;
+        this.imageName = "hemomancy-tome";
     }
 
     override getDisplayName(): string {

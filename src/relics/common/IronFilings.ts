@@ -9,6 +9,7 @@ export class IronFilings extends AbstractRelic {
         this.rarity = EntityRarity.COMMON;
         this.stackable = true;
         this.stacks = 1;
+        this.imageName = "iron-filings";
     }
 
     getDisplayName(): string {

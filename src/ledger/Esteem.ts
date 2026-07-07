@@ -8,7 +8,7 @@ export class StokersUnionEsteem extends AbstractRelic {
         super();
         this.isLedgerItem = true;
         this.id = "stokers_union_esteem";
-        this.imageName = "stokers_union";
+        this.imageName = "stokers-union-crest";
         this.canGoNegative = true;
         this.init();
     }
@@ -30,7 +30,7 @@ export class ArtisanalGuildsEsteem extends AbstractRelic {
         super();
         this.isLedgerItem = true;
         this.id = "artisanal_guilds_esteem";
-        this.imageName = "artisanal_guilds";
+        this.imageName = "artisanal-guilds-crest";
         this.canGoNegative = true;
         this.init();
     }
@@ -52,7 +52,7 @@ export class BrimstoneBaronsEsteem extends AbstractRelic {
         super();
         this.isLedgerItem = true;
         this.id = "brimstone_barons_esteem";
-        this.imageName = "brimstone_barons";
+        this.imageName = "brimstone-barons-crest";
         this.canGoNegative = true;
         this.init();
     }
@@ -74,7 +74,7 @@ export class CinderCourtEsteem extends AbstractRelic {
         super();
         this.isLedgerItem = true;
         this.id = "cinder_court_esteem";
-        this.imageName = "cinder_court";
+        this.imageName = "cinder-court-crest";
         this.canGoNegative = true;
         this.init();
     }
@@ -96,7 +96,7 @@ export class InvasionCultEsteem extends AbstractRelic {
         super();
         this.isLedgerItem = true;
         this.id = "invasion_cult_esteem";
-        this.imageName = "invasion_cult";
+        this.imageName = "invasion-cult-crest";
         this.canGoNegative = true;
         this.init();
     }

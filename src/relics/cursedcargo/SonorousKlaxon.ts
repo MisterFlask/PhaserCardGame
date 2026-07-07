@@ -5,6 +5,7 @@ export class SonorousKlaxon extends AbstractRelic {
     constructor() {
         super();
         this.rarity = EntityRarity.COMMON;
+        this.imageName = "sonorous-klaxon";
     }
 
     override getDisplayName(): string {

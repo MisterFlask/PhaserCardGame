@@ -11,6 +11,7 @@ export class BelphegorsRounds extends AbstractRelic {
         this.rarity = EntityRarity.UNCOMMON;
         this.stackable = true;
         this.stacks = stacks;
+        this.imageName = "belphegors-rounds";
     }
 
     override getDisplayName(): string {

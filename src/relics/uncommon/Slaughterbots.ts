@@ -32,6 +32,7 @@ export class Slaughterbots extends AbstractRelic {
     constructor() {
         super();
         this.rarity = EntityRarity.UNCOMMON;
+        this.imageName = "slaughterbots-figurine";
     }
 
     getDisplayName(): string {

@@ -10,6 +10,7 @@ export class SentientSmoke extends AbstractRelic {
         super();
         this.rarity = EntityRarity.UNCOMMON;
         this.stackable = false;
+        this.imageName = "sentient-smoke";
     }
 
     getDisplayName(): string {

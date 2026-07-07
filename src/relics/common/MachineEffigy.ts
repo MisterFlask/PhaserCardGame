@@ -11,6 +11,7 @@ export class MachineEffigy extends AbstractRelic {
         this.rarity = EntityRarity.COMMON;
         this.stackable = true;
         this.stacks = 1;
+        this.imageName = "machine-effigy";
     }
 
     getDisplayName(): string {

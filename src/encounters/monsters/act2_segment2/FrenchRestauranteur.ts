@@ -8,7 +8,7 @@ export class FrenchRestauranteur extends AutomatedCharacter {
     constructor() {
         super({
             name: "Le Restaurateur",
-            portraitName: "Clockwork Slime",
+            portraitName: "french-restauranteur-chef",
             maxHitpoints: 150,
             description: "retains access to the Gastronome Codex"
         });

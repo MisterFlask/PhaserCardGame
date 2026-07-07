@@ -10,6 +10,7 @@ export class Shatterkiss extends AbstractRelic {
         this.rarity = EntityRarity.RARE;
         this.stackable = true;
         this.stacks = 1;
+        this.imageName = "shatterkiss";
     }
 
     override getDisplayName(): string {

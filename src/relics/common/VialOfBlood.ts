@@ -9,6 +9,7 @@ export class VialOfBlood extends AbstractRelic {
         this.rarity = EntityRarity.COMMON;
         this.stackable = true;
         this.stacks = 1;
+        this.imageName = "vial-of-blood";
     }
 
     getDisplayName(): string {

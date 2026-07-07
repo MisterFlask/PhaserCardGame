@@ -4,6 +4,7 @@ export class BasicEnergyRelic extends AbstractRelic {
     constructor() {
         super();
         this.rarity = EntityRarity.BOSS;
+        this.imageName = "basic-energy-relic";
     }
 
     override getDisplayName(): string {

@@ -334,7 +334,12 @@ export default class ImageUtils {
                 "Worm.png", "Lumberjack.png", 
                 
                 // symbol heads
-                "symbol_worm.png", "symbol_tick.png", "symbol_deer.png", "symbol_brigand.png", "symbol_bird.png"
+                "symbol_worm.png", "symbol_tick.png", "symbol_deer.png", "symbol_brigand.png", "symbol_bird.png",
+
+                // replacements for mismatched stock-art portraits (July 2026)
+                "artiste-slime-painter.png", "brine-bast-meat-beast.png", "french-policeman-gendarme.png",
+                "french-restauranteur-chef.png", "grafter-trench-medic.png", "hive-broodmother-louse.png",
+                "lexiophage-bureaucrat.png"
             ]
         },
         attributes_and_augments: {
@@ -382,6 +387,31 @@ export default class ImageUtils {
         ui_elements: {
             prefix: 'Sprites/UIElements/',
             files: ['Circle.png', 'cheap_glow_effect.png', 'play-button.png']
+        },
+        relics: {
+            prefix: 'Sprites/Relics/',
+            files: [
+                'torn-page.png', 'vial-of-blood.png', 'bottle-of-mist.png', 'nightshard.png',
+                'marksmans-manual.png', 'marrow-spike.png', 'iron-filings.png', 'machine-effigy.png',
+                'frozen-dew.png', 'glass-cross.png',
+                'sentient-smoke.png', 'slaughterbots-figurine.png', 'soul-bottler.png',
+                'stovepipe-hat.png', 'hemomancy-tome.png', 'shatterkiss.png', 'belphegors-rounds.png',
+                'boneflood.png', 'echo-harvest.png',
+                'emergency-teleporter.png', 'ecclesiastical-recommendation.png',
+                'dainty-gloves.png', 'fancy-hat.png', 'burning-antlers.png', 'charons-price.png',
+                'basic-energy-relic.png',
+                'whisper-of-sorrow.png', 'wraith-in-a-bottle.png', 'oubliette-flower.png',
+                'screaming-parasite.png', 'sonorous-klaxon.png', 'devouring-icon.png',
+                'greedy-parasite.png', 'bloom-of-sorrow.png', 'bomber-gremlin.png',
+                'akashic-newspaper.png', 'bloodvine.png'
+            ]
+        },
+        relics_esteem: {
+            prefix: 'Sprites/Relics/Esteem/',
+            files: [
+                'stokers-union-crest.png', 'artisanal-guilds-crest.png', 'brimstone-barons-crest.png',
+                'cinder-court-crest.png', 'invasion-cult-crest.png'
+            ]
         },
         intent_icons: {
             prefix: 'Sprites/IntentIcons/',

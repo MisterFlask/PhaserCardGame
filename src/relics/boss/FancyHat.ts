@@ -5,6 +5,7 @@ export class FancyHat extends AbstractRelic {
     constructor() {
         super();
         this.rarity = EntityRarity.BOSS;
+        this.imageName = "fancy-hat";
     }
 
     override getDisplayName(): string {

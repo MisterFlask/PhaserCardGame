@@ -7,6 +7,7 @@ export class OublietteFlower extends AbstractRelic {
     constructor() {
         super();
         this.rarity = EntityRarity.RARE;
+        this.imageName = "oubliette-flower";
     }
 
     getDisplayName(): string {

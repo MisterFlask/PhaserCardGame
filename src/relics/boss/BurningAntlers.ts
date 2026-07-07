@@ -6,6 +6,7 @@ export class BurningAntlers extends AbstractRelic {
     constructor() {
         super();
         this.rarity = EntityRarity.BOSS;
+        this.imageName = "burning-antlers";
     }
 
     override getDisplayName(): string {

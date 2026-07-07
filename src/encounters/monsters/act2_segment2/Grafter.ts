@@ -32,7 +32,7 @@ export class Grafter extends AutomatedCharacter {
     constructor() {
         super({
             name: 'Grafter',
-            portraitName: 'Clockwork Abomination',
+            portraitName: 'grafter-trench-medic',
             maxHitpoints: 90,
             description: 'A trench medic stitching the fallen into grisly servitors.'
         });

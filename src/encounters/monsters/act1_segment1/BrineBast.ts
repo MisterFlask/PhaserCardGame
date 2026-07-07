@@ -6,7 +6,7 @@ export class VesperOfMeat extends AutomatedCharacter {
     constructor() {
         super({
             name: "Brine-Bast",
-            portraitName: "Breakfast Nightmares Bacon Beast",
+            portraitName: "brine-bast-meat-beast",
             maxHitpoints: 25,
             description: "you will be baked, and then there will be cake"
         });

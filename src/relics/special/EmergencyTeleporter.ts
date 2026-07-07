@@ -12,6 +12,7 @@ export class EmergencyTeleporter extends AbstractRelic {
         this.stackable = true;
         this.clickable = true;
         this.stacks = this.MAX_USES_PER_RUN; // Use stacks to track remaining uses
+        this.imageName = "emergency-teleporter";
     }
 
     override getDisplayName(): string {

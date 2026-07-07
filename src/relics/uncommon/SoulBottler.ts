@@ -65,6 +65,7 @@ export class SoulBottler extends AbstractRelic {
     constructor() {
         super();
         this.rarity = EntityRarity.UNCOMMON;
+        this.imageName = "soul-bottler";
     }
 
     override getDisplayName(): string {

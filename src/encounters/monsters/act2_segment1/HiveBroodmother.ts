@@ -32,7 +32,7 @@ export class HiveBroodmother extends AutomatedCharacter {
     constructor() {
         super({
             name: "Psalter-Louse",
-            portraitName: "Corrupted Spider",
+            portraitName: "hive-broodmother-louse",
             maxHitpoints: 50,
             description: "a pulsating mass of carapace and ooze, surrounded by countless larvae. each strike feels muffled, as if absorbed by a living swarm."
         });

@@ -10,6 +10,7 @@ export class WhisperOfSorrow extends AbstractRelic {
     constructor() {
         super();
         this.rarity = EntityRarity.UNCOMMON;
+        this.imageName = "whisper-of-sorrow";
     }
 
     override getDisplayName(): string {

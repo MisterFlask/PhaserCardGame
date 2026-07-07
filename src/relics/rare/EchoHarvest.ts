@@ -10,6 +10,7 @@ export class EchoHarvest extends AbstractRelic {
         this.rarity = EntityRarity.RARE;
         this.stackable = true;
         this.stacks = 1;
+        this.imageName = "echo-harvest";
     }
 
     override getDisplayName(): string {

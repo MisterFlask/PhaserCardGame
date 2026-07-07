@@ -16,6 +16,7 @@ export class BomberGremlin extends AbstractRelic {
         super();
         this.rarity = EntityRarity.UNCOMMON;
         this.stacks = 0; // Used to track turns
+        this.imageName = "bomber-gremlin";
     }
 
     override getDisplayName(): string {

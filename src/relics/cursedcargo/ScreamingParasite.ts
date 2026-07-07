@@ -8,6 +8,7 @@ export class ScreamingParasite extends AbstractRelic {
     constructor() {
         super();
         this.rarity = EntityRarity.RARE;
+        this.imageName = "screaming-parasite";
     }
 
     override getDisplayName(): string {

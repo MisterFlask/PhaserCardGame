@@ -6,6 +6,7 @@ export class EcclesiasticalRecommendation extends AbstractRelic {
         super();
         this.rarity = EntityRarity.SPECIAL;
         this.isLedgerItem = true;
+        this.imageName = "ecclesiastical-recommendation";
     }
 
     override getDisplayName(): string {
