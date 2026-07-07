@@ -74,11 +74,6 @@ protocol. Ordered within sections by priority. Delete items when done.
   + encounter tables + enemies. Also the natural fix for late-campaign
   variety alongside region hardening. Good Codex-lane batch work once the
   enemy-design spec exists.
-- **Event pool: 23 shipped (July 2026); browser render pass pending** — the
-  16 new events were verified statically but not rendered live. QA is now
-  cheap: in any combat, use the debug menu's `showRandomEvent` or console
-  `showEventByName(name)` / `listEventNames()`. Next combat session, page
-  through the new ones and eyeball text fit/BBCode rendering.
 - **Enemy spawn QA residual** — 10 new act 2/3 enemies shipped July 2026
   (rosters now ~21/21/16); `scripts/qa-spawn.mjs` runtime-verified 6 of 10
   across 15 error-free forced sorties. Unsampled by the random tables:
@@ -91,17 +86,15 @@ protocol. Ordered within sections by priority. Delete items when done.
 
 ## Flavor (from the July 2026 flavor audit)
 
-- **Player-side flavor lines** — cards, cargo, relics, buffs are
-  mechanics-only text. Add a one-line flavor field where it pays most:
-  cargo first (opium/spicy literature jokes going unused), then relics.
-- **Defeat framing + reward-screen decision** — victory framing shipped
-  (July 2026: GeneralRewardScreen title + CLAIM & CONTINUE), BUT that screen
-  is currently dead code: `SortieManager.getRewardsForCurrentCombat()` is
-  hardcoded to `[]` since promotions superseded per-combat card rewards, so
-  the framing never renders in normal play. Decide: revive the reward screen
-  for something (consumable drops? £ spoils line?) or delete it. Separately,
-  a squad wipe still shows no combat-side acknowledgment before the debrief —
-  a small defeat overlay ("The Company regrets...") is the missing piece.
+- **Flavor lines: cargo + reachable relics shipped (July 2026)** — residual:
+  regular player CARDS and buffs remain mechanics-only (flavorText renders
+  already; it's pure writing, per-class batch work), and the ~15
+  unreachable boss/rare relics get lines when they actually ship.
+- **Reward screen: dormant by ruling (July 2026, delegated)** — defeat
+  overlay shipped (SERVICES RENDERED IN FULL gate at squad wipe); the
+  GeneralRewardScreen stays dormant-but-styled (getRewardsForCurrentCombat
+  hardcoded []) as a free hook for future per-combat drops (consumables?
+  £ spoils?). Delete it only if two more quarters pass with no use found.
 
 ## Engineering
 
