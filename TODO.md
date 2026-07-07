@@ -32,22 +32,17 @@ protocol. Ordered within sections by priority. Delete items when done.
   spec's deferred spice (breakage/theft events targeting cargo, in-combat
   cargo effects like explosive crates) is good follow-on once the base
   mechanic proves fun.
-- **BALANCE: the charter is unwinnable (sim-proven, July 2026)** — the new
-  CampaignSimulator (src/campaign/sim/) shows 0/10 seeded runs survive the
-  40-quarter charter at ANY roster size, even at 0.9 win rate with a £2000
-  head start: dividend expectation compounds 1.35×/year (£120 → ~£1787 by
-  year 10) while contract payouts stay flat per act. Enemies harden by year
-  but income doesn't. Candidate levers: payouts scale by year (Hell's cost
-  of living), flatter dividend curve, or the VP endgame pivot absorbing
-  late-charter pressure. The two `.skip` tests in CampaignSimulator.test.ts
-  carry exact numbers and become the ratchet once fixed.
-- **BALANCE: hoarding still beats lean rosters (sim-proven)** — wound
-  attrition throughput-starves small rosters (one 2-4 week wound drops
-  availability below squadSize), dwarfing the £15/soldier/quarter wage
-  drain; roster-8 beats roster-4 £2510 vs £2095 avg over 20 seeds. Wages
-  alone don't achieve "hoarding has cost." Levers: higher wages, wage
-  scaling by roster size, or making healing throughput purchasable so lean
-  rosters can compete. Same ratchet tests apply.
+- **Healing throughput as a purchasable lever** — the July 2026 balance
+  pass (payouts +5%/year, decaying dividend escalation, wages £25) made the
+  charter winnable (~56-72% at 0.9 win rate, ratcheted in
+  CampaignSimulator.test.ts) and narrowed but did not close the hoarding
+  edge: lean roster-5 reaches parity with roster-8 in only ~40% of seed
+  pairs because wound attrition throughput-starves small rosters — a
+  structural effect flat wages can't price. The design doc's
+  Infirmary/chapel row ("rush wound healing, converts £ into time") is the
+  missing lever: implement rush-healing purchases, then re-tune the T2
+  ratchet toward true roster parity. The sim needs a matching knob
+  (healing spend policy) to model it.
 - **Human playtest of the economy tuning** — payouts/dividends were calibrated
   against a lossless simulation (see commit history: +1wk sortie overhead,
   £120 dividend base). The sim validates the shape, not the fun. Someone has
