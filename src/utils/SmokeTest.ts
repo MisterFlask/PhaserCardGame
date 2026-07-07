@@ -33,7 +33,6 @@ export interface SmokeTestResult {
     errors: string[];
 }
 
-const SQUAD_SIZE = 3;
 const DEFAULT_TIMEOUT_MS = 15000;
 const POLL_INTERVAL_MS = 50;
 
@@ -111,9 +110,9 @@ function dismissBlockingPopups(scene: Phaser.Scene): string[] {
 }
 
 /** Picks the first fit-for-duty soldiers off the roster, generically (no
- *  hard-coded names), enough to fill a squad. */
-function pickSquad(campaign: CampaignUiState): PlayerCharacter[] {
-    return campaign.roster.filter(c => c.isFitForDuty).slice(0, SQUAD_SIZE);
+ *  hard-coded names), enough to fill a squad of the given size. */
+function pickSquad(campaign: CampaignUiState, squadSize: number): PlayerCharacter[] {
+    return campaign.roster.filter(c => c.isFitForDuty).slice(0, squadSize);
 }
 
 async function runSteps(steps: SmokeTestStep[]): Promise<void> {
@@ -154,9 +153,10 @@ async function runSteps(steps: SmokeTestStep[]): Promise<void> {
     if (!contract) {
         throw new SmokeTestFailure('No contracts available on the board to dispatch.');
     }
-    const squad = pickSquad(campaign);
-    if (squad.length < SQUAD_SIZE) {
-        throw new SmokeTestFailure(`Roster does not have ${SQUAD_SIZE} fit-for-duty soldiers (found ${squad.length}).`);
+    const squad = pickSquad(campaign, contract.squadSize);
+    if (squad.length < contract.squadSize) {
+        throw new SmokeTestFailure(
+            `Roster does not have ${contract.squadSize} fit-for-duty soldiers for this contract (found ${squad.length}).`);
     }
 
     const moneyBeforeSortie = gameState.moneyInVault;
@@ -164,7 +164,8 @@ async function runSteps(steps: SmokeTestStep[]): Promise<void> {
     SortieManager.getInstance().startSortie(contract, squad);
 
     await waitFor(() => currentSceneKey() === 'CombatScene', DEFAULT_TIMEOUT_MS, 'CombatScene to launch after dispatch');
-    record('dispatch', true, `Dispatched contract "${contract.name}" (${contract.numCombats} combat(s)) with a squad of ${squad.length}.`);
+    record('dispatch', true,
+        `Dispatched contract "${contract.name}" (${contract.numCombats} combat(s)) with a squad of ${squad.length} (contract requires ${contract.squadSize}).`);
 
     // --- Step 3: run the sortie's combat(s) to a win -----------------------------
     let combatsWon = 0;

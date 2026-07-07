@@ -10,8 +10,6 @@ import {
 import { CampaignUiState } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
 
-const SQUAD_SIZE = 3;
-
 const NOTICE_W = 380;
 const NOTICE_H = 170;
 
@@ -83,6 +81,23 @@ export class ContractBoardPanel extends AbstractHqPanel {
         CampaignUiState.getInstance().selectedContract = null;
         this.rebuild();
         super.show();
+    }
+
+    /** The squad size the currently-selected contract requires. No contract
+     *  selected yet: the standard complement of three, purely for the
+     *  placeholder status line (the launch gate always re-checks against the
+     *  actually-selected contract before dispatch). */
+    private requiredSquadSize(): number {
+        return CampaignUiState.getInstance().selectedContract?.squadSize ?? 3;
+    }
+
+    /** Short Company-register phrase for a notice's crew requirement. */
+    private static crewRequirementLabel(squadSize: number): string {
+        switch (squadSize) {
+            case 2: return 'Crew of two, danger rates.';
+            case 4: return 'Full push: crew of four.';
+            default: return 'Standard complement of three.';
+        }
     }
 
     private clearDynamic(): void {
@@ -157,7 +172,7 @@ export class ContractBoardPanel extends AbstractHqPanel {
         const ledgerHeader = this.scene.add.container(ledgerX, 135);
         ledgerHeader.add(drawWoodPanel(this.scene, 340, 46));
         ledgerHeader.add(this.scene.add.text(0, 0,
-            `MUSTER ROLL · ${this.selectedSquad.length}/${SQUAD_SIZE}`, {
+            `MUSTER ROLL · ${this.selectedSquad.length}/${this.requiredSquadSize()}`, {
             fontFamily: Fonts.DISPLAY, fontSize: '24px', color: Palette.BRASS_TEXT,
         }).setOrigin(0.5));
         this.addDynamic(ledgerHeader);
@@ -211,13 +226,13 @@ export class ContractBoardPanel extends AbstractHqPanel {
             fontFamily: Fonts.BODY, fontSize: '16px', color: Palette.INK_FADED,
         }));
 
-        if (contract.consumableRewardName) {
-            container.add(this.scene.add.text(-NOTICE_W / 2 + 18, -NOTICE_H / 2 + 124,
-                `Provisioning grant included: ${contract.consumableRewardName}`, {
-                fontFamily: Fonts.BODY, fontSize: '13px', fontStyle: 'italic', color: Palette.INK_FADED,
-                wordWrap: { width: NOTICE_W - 40 },
-            }));
-        }
+        const noticeFooterLine = contract.consumableRewardName
+            ? `${ContractBoardPanel.crewRequirementLabel(contract.squadSize)} · Provisioning grant included: ${contract.consumableRewardName}`
+            : ContractBoardPanel.crewRequirementLabel(contract.squadSize);
+        container.add(this.scene.add.text(-NOTICE_W / 2 + 18, -NOTICE_H / 2 + 124, noticeFooterLine, {
+            fontFamily: Fonts.BODY, fontSize: '13px', fontStyle: 'italic', color: Palette.INK_FADED,
+            wordWrap: { width: NOTICE_W - 40 },
+        }));
 
         const expiry = this.scene.add.text(-NOTICE_W / 2 + 18, NOTICE_H / 2 - 36,
             `EXPIRES IN ${contract.deadlineWeeks} WEEK${contract.deadlineWeeks > 1 ? 'S' : ''}`, {
@@ -266,6 +281,12 @@ export class ContractBoardPanel extends AbstractHqPanel {
         container.on('pointerout', () => container.setScale(1));
         container.on('pointerdown', () => {
             campaign.selectedContract = contract;
+            // Switching to a notice with fewer slots than currently selected:
+            // trim the overflow off the end rather than wiping the whole
+            // selection (keeps as much of a careful muster as still fits).
+            if (this.selectedSquad.length > contract.squadSize) {
+                this.selectedSquad = this.selectedSquad.slice(0, contract.squadSize);
+            }
             this.rebuild();
         });
         return container;
@@ -327,7 +348,7 @@ export class ContractBoardPanel extends AbstractHqPanel {
             if (!fit) return;
             if (inSquad) {
                 this.selectedSquad = this.selectedSquad.filter(c => c !== soldier);
-            } else if (this.selectedSquad.length < SQUAD_SIZE) {
+            } else if (this.selectedSquad.length < this.requiredSquadSize()) {
                 this.selectedSquad.push(soldier);
             }
             this.rebuild();
@@ -357,19 +378,20 @@ export class ContractBoardPanel extends AbstractHqPanel {
     private refreshStatus(): void {
         const campaign = CampaignUiState.getInstance();
         const contract = campaign.selectedContract;
+        const required = this.requiredSquadSize();
 
         const briefing = contract
             ? `"${contract.description}"  ·  ${contract.paymentClause}`
-            : `Select a notice and muster ${SQUAD_SIZE} soldiers.`;
-        this.statusText.setText(`${briefing}   ·   Squad ${this.selectedSquad.length}/${SQUAD_SIZE}`);
+            : `Select a notice and muster your squad.`;
+        this.statusText.setText(`${briefing}   ·   Squad ${this.selectedSquad.length}/${required}`);
 
-        const ready = contract !== null && this.selectedSquad.length === SQUAD_SIZE;
+        const ready = contract !== null && this.selectedSquad.length === required;
         this.drawLaunchChrome(ready);
     }
 
     private handleLaunch(): void {
         const campaign = CampaignUiState.getInstance();
-        if (!campaign.selectedContract || this.selectedSquad.length !== SQUAD_SIZE) {
+        if (!campaign.selectedContract || this.selectedSquad.length !== campaign.selectedContract.squadSize) {
             return;
         }
         SortieManager.getInstance().startSortie(campaign.selectedContract, [...this.selectedSquad]);

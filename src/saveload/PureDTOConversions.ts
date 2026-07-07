@@ -39,6 +39,7 @@ export function contractToDTO(c: Contract): ContractDTO {
         deadlineWeeks: c.deadlineWeeks,
         durationWeeks: c.durationWeeks,
         payout: c.payout,
+        squadSize: c.squadSize,
         regionName: c.regionName,
         consumableRewardName: c.consumableRewardName,
     };
@@ -58,6 +59,7 @@ export function contractFromDTO(dto: ContractDTO): Contract {
         deadlineWeeks: dto.deadlineWeeks,
         durationWeeks: dto.durationWeeks,
         payout: dto.payout,
+        squadSize: dto.squadSize,
         regionName: dto.regionName,
         consumableRewardName: dto.consumableRewardName,
     });

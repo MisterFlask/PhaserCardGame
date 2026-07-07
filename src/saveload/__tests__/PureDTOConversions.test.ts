@@ -51,6 +51,7 @@ describe('contract DTO round-trip', () => {
             expect(restored.deadlineWeeks).toBe(contract.deadlineWeeks);
             expect(restored.durationWeeks).toBe(contract.durationWeeks);
             expect(restored.payout).toBe(contract.payout);
+            expect(restored.squadSize).toBe(contract.squadSize);
             expect(restored.regionName).toBe(contract.regionName);
             expect(restored.consumableRewardName).toBe(contract.consumableRewardName);
         }
@@ -70,5 +71,22 @@ describe('contract DTO round-trip', () => {
         const rate = withReward / trials;
         expect(rate).toBeGreaterThan(0.1);
         expect(rate).toBeLessThan(0.32);
+    });
+
+    it('rolls squadSize 2/3/4 at roughly the 20/60/20 target distribution', () => {
+        const trials = 1000;
+        const counts: Record<number, number> = { 2: 0, 3: 0, 4: 0 };
+        for (let i = 0; i < trials; i++) {
+            const contract = ContractGenerator.getInstance().generateContract(5);
+            expect([2, 3, 4]).toContain(contract.squadSize);
+            counts[contract.squadSize]++;
+        }
+        // Generous tolerance since this is a random sample.
+        expect(counts[2] / trials).toBeGreaterThan(0.1);
+        expect(counts[2] / trials).toBeLessThan(0.32);
+        expect(counts[4] / trials).toBeGreaterThan(0.1);
+        expect(counts[4] / trials).toBeLessThan(0.32);
+        expect(counts[3] / trials).toBeGreaterThan(0.45);
+        expect(counts[3] / trials).toBeLessThan(0.72);
     });
 });

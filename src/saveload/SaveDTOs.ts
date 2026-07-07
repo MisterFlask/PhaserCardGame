@@ -10,7 +10,8 @@
 //     no new DTO shape needed for them.
 // v6: added consumables (campaign-owned consumable stock; the per-sortie
 //     loadout on GameState never serializes) and Contract.consumableRewardName.
-export const SAVE_FORMAT_VERSION = 6;
+// v7: added Contract.squadSize (2/3/4 muster requirement per contract).
+export const SAVE_FORMAT_VERSION = 7;
 export const SAVE_STORAGE_KEY = 'east-infernal-company-save';
 
 export interface BuffDTO {
@@ -61,6 +62,7 @@ export interface ContractDTO {
     deadlineWeeks: number;
     durationWeeks: number;
     payout: number;
+    squadSize: number;
     regionName: string;
     consumableRewardName?: string;
 }

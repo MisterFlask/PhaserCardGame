@@ -36,6 +36,8 @@ export class Contract {
     public durationWeeks: number;
     /** £ paid into the vault on completion. */
     public payout: number;
+    /** Soldiers required to muster for this contract: 2, 3, or 4. */
+    public squadSize: number;
 
     public regionName: string;
 
@@ -57,6 +59,7 @@ export class Contract {
         deadlineWeeks: number;
         durationWeeks: number;
         payout: number;
+        squadSize: number;
         regionName: string;
         consumableRewardName?: string;
     }) {
@@ -72,6 +75,7 @@ export class Contract {
         this.deadlineWeeks = args.deadlineWeeks;
         this.durationWeeks = args.durationWeeks;
         this.payout = args.payout;
+        this.squadSize = args.squadSize;
         this.regionName = args.regionName;
         this.consumableRewardName = args.consumableRewardName;
     }

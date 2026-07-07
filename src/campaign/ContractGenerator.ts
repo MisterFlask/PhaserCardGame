@@ -187,6 +187,27 @@ export class ContractGenerator {
     /** Fraction of generated contracts that carry a provisioning grant. */
     private static readonly CONSUMABLE_REWARD_CHANCE = 0.2;
 
+    /** Balance-pass sketch numbers, untested against the economy sim — see
+     *  TODO.md "Standing Orders balance pass" for the convention. Revisit
+     *  after a few played campaign-years. Lean crews draw danger pay because
+     *  the same encounters get harder with fewer soldiers; big pushes dilute
+     *  payout per head since the job is comparatively safer. */
+    private static readonly SQUAD_SIZE_TWO_CHANCE = 0.2;
+    private static readonly SQUAD_SIZE_FOUR_CHANCE = 0.2; // remainder (0.6) is squadSize 3
+    private static readonly DANGER_PAY_MULTIPLIER: Record<number, number> = {
+        2: 1.3,
+        3: 1.0,
+        4: 0.85,
+    };
+
+    /** Rolls squad size: 20% two-man, 60% three-man, 20% four-man. */
+    private rollSquadSize(): number {
+        const roll = Math.random();
+        if (roll < ContractGenerator.SQUAD_SIZE_TWO_CHANCE) return 2;
+        if (roll < ContractGenerator.SQUAD_SIZE_TWO_CHANCE + ContractGenerator.SQUAD_SIZE_FOUR_CHANCE) return 4;
+        return 3;
+    }
+
     private pick<T>(arr: T[]): T {
         return arr[Math.floor(Math.random() * arr.length)];
     }
@@ -214,13 +235,19 @@ export class ContractGenerator {
         const difficultyStars = segment + 1;
 
         const numCombats = Math.random() < 0.45 ? 1 : 2;
+        const squadSize = this.rollSquadSize();
         // Deeper acts and segments pay more; two-combat sorties pay almost double.
         const basePay = 30 + region.act * 20 + segment * 25;
         const jitter = 0.85 + Math.random() * 0.3;
         const jitteredPayout = Math.round((basePay * numCombats * jitter) / 5) * 5;
         // Standing Orders (e.g. Hazard Pay Schedule) apply AFTER the jitter and
         // re-round to £5, so the final payout is always a clean invoice figure.
-        const payout = Math.round(StandingOrdersState.getInstance().contractPayout(jitteredPayout) / 5) * 5;
+        const standingOrdersPayout = Math.round(StandingOrdersState.getInstance().contractPayout(jitteredPayout) / 5) * 5;
+        // Danger pay: the same encounters are harder with fewer soldiers, so
+        // lean crews draw a premium and big pushes dilute payout per head.
+        // Applied last, re-rounded to £5 like every other pass over payout.
+        const dangerPayMultiplier = ContractGenerator.DANGER_PAY_MULTIPLIER[squadSize] ?? 1.0;
+        const payout = Math.round((standingOrdersPayout * dangerPayMultiplier) / 5) * 5;
         const deadlineWeeks = StandingOrdersState.getInstance()
             .contractDeadlineWeeks(2 + Math.floor(Math.random() * 3)); // 2-4 weeks on the board, base
 
@@ -243,6 +270,7 @@ export class ContractGenerator {
             // caps contract throughput so the dividend clock can actually bite.
             durationWeeks: numCombats + 1,
             payout,
+            squadSize,
             regionName: region.regionName,
             consumableRewardName,
         });
