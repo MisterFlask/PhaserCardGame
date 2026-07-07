@@ -57,9 +57,11 @@ protocol. Ordered within sections by priority. Delete items when done.
   wound +1w, recruit ×0.6, escalation ×0.75 …) are design-doc sketches,
   untested against the economy sim or human play. Revisit after a few
   played campaign-years.
-- **Contract board hero slot** — art-director critique item: no visual entry
-  point among equal-weight notices. Deferred; needs a "priority contract"
-  concept.
+- **Contract board hero slot** — art-director critique item, originally "no
+  visual entry point among equal-weight notices." The July 2026 survey-map
+  rework (pins scattered by region, wax-seal difficulty) partially answers
+  this; revisit whether a "priority contract" pin treatment (larger seal,
+  ribbon) is still wanted.
 - **Recruit pool save-scumming** — recruit candidates aren't serialized, so
   reloading rerolls them. Harmless now; fix by seeding their generation if it
   starts to matter.

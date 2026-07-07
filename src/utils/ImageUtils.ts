@@ -13,7 +13,7 @@ export default class ImageUtils {
         },
         backgrounds: {
             prefix: 'Backgrounds/',
-            files: ['greyscale.png', 'mapbackground1.png'
+            files: ['greyscale.png', 'mapbackground1.png', 'contract-map-hell.png'
             ]
         },
         location_backgrounds: {
