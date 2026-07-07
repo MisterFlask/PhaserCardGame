@@ -49,16 +49,26 @@ import { MitrailleuseOrganist } from './monsters/act2_segment1/MitrailleuseOrgan
 import { OldGuardGrenadier } from './monsters/act2_segment1/OldGuardGrenadier';
 import { TrenchEngineer } from './monsters/act2_segment1/TrenchEngineer';
 import { SorrowMothSwarm } from './monsters/act2_segment1/SorrowmothSwarm';
+import { RevenantAuditor } from './monsters/act2_segment1/RevenantAuditor';
+import { MaxwellCoilTrooper } from './monsters/act2_segment1/MaxwellCoilTrooper';
+import { GrandArmeeDuelist } from './monsters/act2_segment1/GrandArmeeDuelist';
 import { Artiste } from './monsters/act2_segment2/Artiste';
 import { FrenchRestauranteur } from './monsters/act2_segment2/FrenchRestauranteur';
 import { Grafter } from './monsters/act2_segment2/Grafter';
 import { ZeppelinGrenadier } from './monsters/act2_segment2/ZeppelinGrenadier';
+import { MaisonVachonQuartermaster } from './monsters/act2_segment2/MaisonVachonQuartermaster';
+import { ReichsinfernokorpsLineBreaker } from './monsters/act2_segment2/ReichsinfernokorpsLineBreaker';
 import { CompanyOverseer } from './monsters/act3_segment1/CompanyOverseer';
 import { FurnaceForeman } from './monsters/act3_segment1/FurnaceForeman';
 import { MechanicalScab } from './monsters/act3_segment1/MechanicalScab';
 import { MoltenAgitator } from './monsters/act3_segment1/MoltenAgitator';
 import { UnionEnforcer } from './monsters/act3_segment1/UnionEnforcer';
 import { WildcatStriker } from './monsters/act3_segment1/WildcatStriker';
+import { FoundryTick } from './monsters/act3_segment1/FoundryTick';
+import { OverpressureStoker } from './monsters/act3_segment1/OverpressureStoker';
+import { CompanyBailiff } from './monsters/act3_segment1/CompanyBailiff';
+import { UnionRunner } from './monsters/act3_segment1/UnionRunner';
+import { IroncladPicket } from './monsters/act3_segment1/IroncladPicket';
 import { RegionalManager } from './monsters/act3_boss/RegionalManager';
 import { TheRevolutionary } from './monsters/act3_boss/TheRevolutionary';
 // Define new character classes
@@ -226,6 +236,15 @@ export class ActSegment {
         },
         {
             enemies: [new SorrowMothSwarm()]
+        },
+        {
+            enemies: [new RevenantAuditor()]
+        },
+        {
+            enemies: [new MaxwellCoilTrooper(), new MaxwellCoilTrooper()]
+        },
+        {
+            enemies: [new GrandArmeeDuelist(), new TrenchEngineer()]
         }
     ]);
 
@@ -241,6 +260,12 @@ export class ActSegment {
         },
         {
             enemies: [new Grafter()]
+        },
+        {
+            enemies: [new MaisonVachonQuartermaster()]
+        },
+        {
+            enemies: [new ReichsinfernokorpsLineBreaker()]
         }
     ]);
     
@@ -266,6 +291,12 @@ export class ActSegment {
         },
         {
             enemies: [new WildcatStriker(), new WildcatStriker()]
+        },
+        {
+            enemies: [new FoundryTick(), new FoundryTick()]
+        },
+        {
+            enemies: [new UnionRunner(), new WildcatStriker()]
         }
     ]);
 
@@ -278,6 +309,12 @@ export class ActSegment {
         },
         {
             enemies: [new CompanyOverseer(), new FurnaceForeman()]
+        },
+        {
+            enemies: [new OverpressureStoker()]
+        },
+        {
+            enemies: [new CompanyBailiff()]
         }
     ]);
 
@@ -290,6 +327,9 @@ export class ActSegment {
         },
         {
             enemies: [new CompanyOverseer(), new MechanicalScab()]
+        },
+        {
+            enemies: [new IroncladPicket()]
         }
     ]);
 
