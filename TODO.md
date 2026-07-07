@@ -6,14 +6,12 @@ protocol. Ordered within sections by priority. Delete items when done.
 
 ## Dangling systems (July 2026 gap audit — half-connected, silently broken today)
 
-- **Relic equipment slots (design)** — (corrected July 2026: an earlier
-  version of this entry claimed campaign relic persistence had shipped as
-  `CampaignUiState.relicsOwned` / save v6 — it has not; relics exist only in
-  run-scoped `GameState.relicsInventory` and are never serialized.) The
-  design doc's idea — relics as assignable equipment, 2-3 slots per
-  character, lost on death unless insured — NEEDS A DESIGN SESSION WITH THE
-  OWNER; campaign-level relic persistence should ride that design, not
-  precede it.
+- **Relic equipment: v1 shipped (July 2026, save v12)** — armoury, 2 slots
+  (+1 at level 6), £40 insurance, lost-with-the-body, per
+  `src/docs/relic_equipment_design.md`. Residual: a relic SHOP/acquisition
+  surface at HQ (acquisition is still sortie-only), selling relics, and the
+  CampaignSimulator Monte Carlo baseline test flaked once at its 89/90
+  threshold — if it flakes again, widen that band one notch.
 
 ## Gameplay & design
 
@@ -107,13 +105,10 @@ protocol. Ordered within sections by priority. Delete items when done.
   characters; it's a build-infra change with cross-cutting effects, so it
   wants a deliberate pass, not a drive-by.
 
-- **Audio: sourcing DECIDED (July 2026, delegated authority) — CC0 packs** —
-  use CC0 sources (Kenney UI/impact packs + one ambient loop per region from
-  freesound CC0), no licensing risk, individually replaceable later.
-  Implementation pass: download into resources/Sounds/, manifest entries,
-  Phaser audio wiring for UI clicks, card play, damage, a board-meeting
-  sting, and per-region ambience. Volume settings can wait; a mute toggle
-  cannot.
+- **Audio: minimal pass shipped (July 2026)** — Kenney CC0 clicks/whoosh/
+  thud/board-sting via SoundUtils registry, persisted mute toggle.
+  Residual: per-region ambient loops (bigger files, wants taste), volume
+  settings, and more event-specific stings (victory, promotion, wipe).
 - **Burn down the 145 missing-art references** — AssetManifestLint.test.ts
   (July 2026) found 145 imageName/portraitName references to texture keys
   that were never declared; every one silently renders placeholder art
