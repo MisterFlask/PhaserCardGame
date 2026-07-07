@@ -23,6 +23,7 @@ export class BloodShield extends PlayableCard {
             blockScaling: 2
         });
         this.buffs.push(new BloodPriceBuff(2));
+        this.flavorText = "The contract's collateral clause is written in a font that will not translate.";
     }
 
     override get description(): string {

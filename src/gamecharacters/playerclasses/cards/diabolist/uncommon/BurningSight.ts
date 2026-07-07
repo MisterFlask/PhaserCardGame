@@ -16,6 +16,7 @@ export class BurningSight extends PlayableCard {
         this.baseEnergyCost = 2;
         this.buffs.push(new BloodPriceBuff(2));
         this.baseMagicNumber = 3
+        this.flavorText = "To see clearly down here, something must first be given up.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

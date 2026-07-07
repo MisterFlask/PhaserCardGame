@@ -21,6 +21,7 @@ export class ScrapShield extends PlayableCard {
             resource: this.venture,
             blockScaling: 1,
         });
+        this.flavorText = "Salvage welded to salvage. Holds together better than it should.";
     }
 
     override get description(): string {

@@ -17,6 +17,7 @@ export class Pyrestarter extends PlayableCard {
         this.baseBlock = 6;
         this.baseMagicNumber = 3;
         this.baseEnergyCost = 2;
+        this.flavorText = "Every strike after this one burns a little brighter. That is the whole plan.";
     }
 
     override get description(): string {

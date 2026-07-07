@@ -37,6 +37,7 @@ export class Soulsuck extends PlayableCard {
         this.baseDamage = 15;
         this.buffs.push(new ExhaustBuff());
         this.buffs.push(new SoulsuckBuff());
+        this.flavorText = "The Company monetizes everything. Souls simply clear faster than most assets.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

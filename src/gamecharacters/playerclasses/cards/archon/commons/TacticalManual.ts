@@ -23,6 +23,7 @@ export class TacticalManual extends PlayableCard {
             resource: this.pluck,
             magicNumberScaling: 1,
         });
+        this.flavorText = "Chapter Four: On the Proper Motivation of Subordinates.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

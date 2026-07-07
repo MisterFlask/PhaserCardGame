@@ -15,6 +15,7 @@ export class Glower extends PlayableCard {
         });
         this.baseEnergyCost = 0;
         this.baseMagicNumber = 8; // Amount of Intimidation gained
+        this.flavorText = "The look Her Majesty's officers reserve for underperformers and devils alike.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

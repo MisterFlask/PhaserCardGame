@@ -22,6 +22,7 @@ export class FlamePistol extends PlayableCard {
             resource: GameState.getInstance().combatState.combatResources.smog,
             magicNumberScaling: 1
         })
+        this.flavorText = "Aim is optional. The spray finds someone regardless.";
     }
 
     override get description(): string {

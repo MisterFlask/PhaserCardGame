@@ -33,6 +33,7 @@ export class BlessedBuzzsword extends PlayableCard {
             resource: this.blood,
             attackScaling: 1,
         });
+        this.flavorText = "Consecrated by a chaplain who did not ask what it would be used for.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

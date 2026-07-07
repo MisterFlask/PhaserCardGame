@@ -18,6 +18,7 @@ export class InspireFear extends PlayableCard {
             resource: this.pluck,
             magicNumberScaling: 1
         });
+        this.flavorText = "The Company finds reputation cheaper to maintain than morale.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

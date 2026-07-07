@@ -15,6 +15,7 @@ export class SorcerousDisplay extends PlayableCard {
         });
         this.baseEnergyCost = 2;
         this.baseMagicNumber = 2;
+        this.flavorText = "Impressive at parties. Alarming everywhere else.";
     }
 
     override get description(): string {

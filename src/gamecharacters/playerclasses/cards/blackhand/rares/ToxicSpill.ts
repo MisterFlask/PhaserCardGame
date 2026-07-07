@@ -23,6 +23,7 @@ export class ToxicSpill extends PlayableCard {
             resource: new AshesResource(),
             magicNumberScaling: 3
         })
+        this.flavorText = "The Company's environmental impact reports are, by policy, unwritten.";
     }
 
     override get description(): string {

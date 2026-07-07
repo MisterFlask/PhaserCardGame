@@ -44,6 +44,7 @@ export class Jumpscare extends PlayableCard {
         this.baseMagicNumber = 1;
         this.buffs.push(new Ethereal());
         this.buffs.push(new JumpscareBuff());
+        this.flavorText = "It was already in the deck. Nobody recalls dealing it in.";
     }
 
     override InvokeCardEffects(): void {

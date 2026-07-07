@@ -25,6 +25,7 @@ export class ForceShield extends PlayableCard {
             resource: this.mettle,
             blockScaling: 2,
         });
+        this.flavorText = "Physics is a set of guidelines. This device treats them as such.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

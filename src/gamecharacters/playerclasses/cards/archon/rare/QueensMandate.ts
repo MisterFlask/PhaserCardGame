@@ -13,6 +13,7 @@ export class QueensMandate extends PlayableCard {
             rarity: EntityRarity.RARE,
         });
         this.baseEnergyCost = 2;
+        this.flavorText = "Signed, sealed, and entirely beside the point down here.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

@@ -14,6 +14,7 @@ export class ReIgnition extends PlayableCard {
         this.baseBlock = 5;
         this.baseMagicNumber = 4;
         this.baseEnergyCost = 1;
+        this.flavorText = "Whatever went out, put it back. Preferably on someone else.";
     }
 
     override get description(): string {

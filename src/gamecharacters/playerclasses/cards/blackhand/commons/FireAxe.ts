@@ -19,6 +19,7 @@ export class FireAxe extends PlayableCard {
             resource: new PluckResource(),
             attackScaling: 2
         })
+        this.flavorText = "Standard-issue firefighting equipment, requisitioned for the opposite purpose.";
     }
 
     override get description(): string {

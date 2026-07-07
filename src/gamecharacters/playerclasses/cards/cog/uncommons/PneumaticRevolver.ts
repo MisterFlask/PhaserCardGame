@@ -17,6 +17,7 @@ export class PneumaticRevolver extends PlayableCard {
         this.baseEnergyCost = 2;
         this.baseDamage = 6;
         this.baseMagicNumber = 3; // Number of times to deal damage
+        this.flavorText = "Cycles faster than the hand pulling its trigger.";
     }
 
     override get description(): string {

@@ -22,6 +22,7 @@ export class EldritchBlast extends PlayableCard {
         this.baseBlock = 0; // Assuming no block is needed
         this.baseMagicNumber = 3; // Bloodprice value
         this.buffs.push(new BloodPriceBuff(3));
+        this.flavorText = "Borrowed from somewhere that does not observe the concept of interest rates.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

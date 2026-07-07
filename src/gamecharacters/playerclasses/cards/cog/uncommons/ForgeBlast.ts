@@ -16,6 +16,7 @@ export class ForgeBlast extends PlayableCard {
             rarity: EntityRarity.UNCOMMON,
         });
         this.baseDamage = 10;
+        this.flavorText = "The forge does not stop giving simply because the shot has left the barrel.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

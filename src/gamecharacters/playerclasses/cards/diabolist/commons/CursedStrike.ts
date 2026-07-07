@@ -18,8 +18,9 @@ export class CursedStrike extends PlayableCard {
         });
         this.baseDamage = 7;
         this.baseEnergyCost = 1;
-        this.baseMagicNumber = 1; 
+        this.baseMagicNumber = 1;
         this.rarity = EntityRarity.COMMON;
+        this.flavorText = "The wound outlives the blow. That's the part nobody signs up for knowingly.";
     }
 
     override get description(): string {

@@ -16,6 +16,7 @@ export class TheLash extends PlayableCard {
         this.baseDamage = 8;
         this.baseEnergyCost = 1;
         this.baseMagicNumber = 8; // Amount of intimidation gained
+        this.flavorText = "An old discipline. The Company merely modernized the paperwork.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

@@ -17,6 +17,7 @@ export class InfernaliteCache extends PlayableCard {
         this.baseMagicNumber = 4;
         this.baseEnergyCost = 2;
         this.buffs.push(new VolatileBuff());
+        this.flavorText = "Marked HANDLE WITH CARE in a hand that was clearly shaking.";
     }
 
     override get description(): string {

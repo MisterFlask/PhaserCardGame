@@ -15,9 +15,10 @@ export class HorrificRegeneration extends PlayableCard {
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.RARE,
         });
-        this.baseEnergyCost = 0; 
+        this.baseEnergyCost = 0;
         this.baseMagicNumber = 15;
         this.buffs.push(new ExhaustBuff());
+        this.flavorText = "The wounds close. Everyone present remembers watching it happen.";
     }
     override get description(): string {
         return `All party members heal ${this.getDisplayedMagicNumber()} HP. They also gain 1 stress.`;

@@ -15,6 +15,7 @@ export class Incoming extends PlayableCard {
         });
         this.baseEnergyCost = 1;
         this.baseMagicNumber = 2; // Number of Take Cover cards to add
+        this.flavorText = "Officer's shout, translated for the men: get down.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

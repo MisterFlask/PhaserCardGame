@@ -14,6 +14,7 @@ export class InspiringPresence extends PlayableCard {
         });
         this.baseEnergyCost = 1;
         this.baseMagicNumber = 1; // Amount of Pluck gained
+        this.flavorText = "Stand tall. Someone above you is watching, and it isn't God.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

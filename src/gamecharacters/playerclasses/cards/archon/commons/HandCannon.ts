@@ -21,6 +21,7 @@ export class HandCannon extends PlayableCard {
             resource: this.mettle,
             attackScaling: 1,
         });
+        this.flavorText = "Recoil like a mule and paperwork to match.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

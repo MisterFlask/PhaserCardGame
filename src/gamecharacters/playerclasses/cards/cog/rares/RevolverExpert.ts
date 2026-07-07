@@ -45,6 +45,7 @@ export class RevolverExpert extends PlayableCard {
             rarity: EntityRarity.RARE,
         });
         this.baseEnergyCost = 2;
+        this.flavorText = "Knows every revolver on the manifest by serial number and temperament.";
     }
 
     override get description(): string {
@@ -53,7 +54,7 @@ export class RevolverExpert extends PlayableCard {
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         if (!this.owningCharacter) return;
-        
+
         this.actionManager.applyBuffToCharacterOrCard(
             this.owningCharacter,
             new RevolverExpertBuff()

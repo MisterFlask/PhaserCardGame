@@ -15,6 +15,7 @@ export class ToughItOut extends PlayableCard {
         this.baseEnergyCost = 1;
         this.baseBlock = 13;
         this.buffs.push(new Painful(1)); // Starts with Painful(1) debuff
+        this.flavorText = "Stiff upper lip. Everything else can bruise.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

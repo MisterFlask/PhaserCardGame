@@ -46,6 +46,7 @@ export class MidnightOil extends PlayableCard {
             rarity: EntityRarity.RARE,
         });
         this.baseEnergyCost = 2;
+        this.flavorText = "The workshop never fully closes. Neither, lately, does the worker.";
     }
 
     override get description(): string {
@@ -54,7 +55,7 @@ export class MidnightOil extends PlayableCard {
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         if (!this.owningCharacter) return;
-        
+
         this.actionManager.applyBuffToCharacterOrCard(
             this.owningCharacter,
             new MidnightOilBuff()

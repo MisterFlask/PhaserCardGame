@@ -38,6 +38,7 @@ export class Comrades extends PlayableCard {
             rarity: EntityRarity.RARE,
         });
         this.baseEnergyCost = 1;
+        this.flavorText = "Brothers in arms. The Company prefers the term 'human capital.'";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

@@ -15,6 +15,7 @@ export class TheLaw extends PlayableCard {
             rarity: EntityRarity.UNCOMMON,
         });
         this.baseEnergyCost = 1;
+        this.flavorText = "Her Majesty's writ extends, on paper, to every circle of Hell.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

@@ -15,6 +15,7 @@ export class Phlogistonist extends PlayableCard {
         });
         this.baseMagicNumber = 3;
         this.baseEnergyCost = 0;
+        this.flavorText = "A discredited theory of combustion. It works anyway, which is the annoying part.";
     }
 
     override get description(): string {

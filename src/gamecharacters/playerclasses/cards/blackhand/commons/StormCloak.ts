@@ -21,6 +21,7 @@ export class StormCloak extends PlayableCard {
             resource: GameState.getInstance().combatState.combatResources.pluck,
             blockScaling: 2
         })
+        this.flavorText = "Soot-blackened canvas. Smells worse than it protects.";
     }
 
 

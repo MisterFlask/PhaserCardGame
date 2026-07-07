@@ -78,6 +78,7 @@ export class IllFatedBlade extends PlayableCard {
             attackScaling: 1,
         });
         this.buffs.push(new IllFatedBladeBuff(10));
+        this.flavorText = "It drinks first and settles the bill with its owner later.";
     }
 
     override get description(): string {

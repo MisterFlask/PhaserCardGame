@@ -22,6 +22,7 @@ export class AndThenHeExploded extends PlayableCardWithHelpers {
             resource: new AshesResource(),
             attackScaling: 4
         })
+        this.flavorText = "The incident report writes itself. It always does.";
     }
 
     override get description(): string {

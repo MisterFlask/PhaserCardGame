@@ -18,6 +18,7 @@ export class GaussRifle extends PlayableCard {
         this.baseEnergyCost = 2;
         this.baseDamage = 20;
         this.buffs.push(new Buster(1));
+        this.flavorText = "Coils charged with more current than the manual recommends.";
     }
 
     override get description(): string {

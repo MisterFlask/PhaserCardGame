@@ -18,6 +18,7 @@ export class PneumaticBarrier extends PlayableCard {
         this.baseEnergyCost = 1;
         this.baseBlock = 7;
         this.buffs.push(new ExhaustBuff());
+        this.flavorText = "Plating stamped from a template. The template does not tire.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

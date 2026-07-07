@@ -16,6 +16,7 @@ export class GenerateCharge extends PlayableCard {
         });
         this.baseEnergyCost = 0;
         this.baseMagicNumber = 2; // Amount of Strength to grant
+        this.flavorText = "Wind the spring. The spring does not ask why.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

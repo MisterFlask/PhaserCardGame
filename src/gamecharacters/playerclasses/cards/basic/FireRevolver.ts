@@ -15,6 +15,7 @@ export class FireRevolver extends PlayableCard {
         this.baseDamage = 6;
         this.baseEnergyCost = 1;
         this.rarity = EntityRarity.BASIC;
+        this.flavorText = "Standard side arm. The Company issues one to everyone who asks nicely.";
     }
 
     override get description(): string {

@@ -29,6 +29,7 @@ export class Balefire extends PlayableCard {
             resource: this.blood,
             attackScaling: 1,
         });
+        this.flavorText = "The old contracts specify payment in kind. This is the kind.";
     }
 
     override get description(): string {

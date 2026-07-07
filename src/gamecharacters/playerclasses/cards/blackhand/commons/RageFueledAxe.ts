@@ -16,6 +16,7 @@ export class RageFueledAxe extends PlayableCard {
     this.baseDamage = 8;
     this.baseEnergyCost = 1;
     this.buffs.push(new StressReliefFinisher());
+    this.flavorText = "Swings harder the more things are already on fire. This is not a coincidence.";
   }
 
   override get description(): string {

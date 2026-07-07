@@ -11,6 +11,7 @@ export class Rummage extends PlayableCard {
     });
     this.baseEnergyCost = 1;
     this.buffs.push(new IncreaseVenture());
+    this.flavorText = "One man's rubbish, another man's requisition.";
   }
 
   override get description(): string {

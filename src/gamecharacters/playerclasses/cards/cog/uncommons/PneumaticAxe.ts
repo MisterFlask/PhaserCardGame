@@ -42,6 +42,7 @@ export class PneumaticAxe extends PlayableCard {
             resource: this.venture,
             attackScaling: 1,
         });
+        this.flavorText = "Compressed air does the swinging. The operator merely aims.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

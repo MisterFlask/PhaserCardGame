@@ -15,6 +15,7 @@ export class ReplicateArmaments extends PlayableCard {
         });
         this.baseEnergyCost = 1;
         this.baseMagicNumber = 2; // Amount of Lethality to grant
+        this.flavorText = "Patents are for people who expect to be sued.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

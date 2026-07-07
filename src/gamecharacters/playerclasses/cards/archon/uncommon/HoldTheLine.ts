@@ -17,6 +17,7 @@ export class HoldTheLine extends PlayableCard {
         this.baseEnergyCost = 2;
         this.baseBlock = 5;
         this.baseMagicNumber = 1;
+        this.flavorText = "Nobody breaks formation. Nobody. That is a direct order.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

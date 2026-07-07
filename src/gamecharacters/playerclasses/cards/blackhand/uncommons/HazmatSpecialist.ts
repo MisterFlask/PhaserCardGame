@@ -16,6 +16,7 @@ export class HazmatSpecialist extends PlayableCard {
 		this.baseBlock = 6;
 		this.baseMagicNumber = 3;
 		this.baseEnergyCost = 1;
+		this.flavorText = "The suit is rated for hellfire. The rating is theoretical.";
 	}
 
 	override get description(): string {

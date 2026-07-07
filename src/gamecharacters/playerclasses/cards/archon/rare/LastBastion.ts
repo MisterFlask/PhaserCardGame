@@ -18,6 +18,7 @@ export class LastBastion extends PlayableCard {
         this.baseEnergyCost = 2;
         this.baseBlock = 20;
         this.buffs.push(new ExhaustBuff());
+        this.flavorText = "Hold the line. Someone will write a very moving report about it.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

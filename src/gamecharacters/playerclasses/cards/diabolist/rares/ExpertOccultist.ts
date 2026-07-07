@@ -44,6 +44,7 @@ export class ExpertOccultist extends PlayableCard {
         });
         this.baseEnergyCost = 1;
         this.baseMagicNumber = 1; // Amount of Blood gained per sacrifice
+        this.flavorText = "Nothing is wasted in the Company's ledgers. Least of all this.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

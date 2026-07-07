@@ -15,6 +15,7 @@ export class Smokescreen extends PlayableCard {
 		this.baseBlock = 6;
 		this.baseEnergyCost = 1;
 		this.buffs.push(new ExhaustBuff());
+		this.flavorText = "Cover is cover, even when it's mostly your own smoke inhalation.";
 	}
 
 	override get description(): string {

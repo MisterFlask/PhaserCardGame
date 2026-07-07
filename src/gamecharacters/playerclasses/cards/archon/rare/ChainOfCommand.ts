@@ -20,6 +20,7 @@ export class ChainOfCommand extends PlayableCard {
             resource: this.mettle,
             attackScaling: 1,
         });
+        this.flavorText = "One order, relayed down the line until everyone is shooting at once.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

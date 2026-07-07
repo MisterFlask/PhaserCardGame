@@ -12,6 +12,7 @@ export class Orders extends PlayableCard {
             rarity: EntityRarity.UNCOMMON,
         });
         this.baseEnergyCost = 1;
+        this.flavorText = "Delivered at volume, brooking no interpretation.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

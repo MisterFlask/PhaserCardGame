@@ -13,6 +13,7 @@ export class Hemomancer extends PlayableCard {
             rarity: EntityRarity.RARE,
         });
         this.baseEnergyCost = 1;
+        this.flavorText = "Blood remembers being doubled. It rarely forgives it.";
     }
 
     override get description(): string {

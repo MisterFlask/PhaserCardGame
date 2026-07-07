@@ -20,6 +20,7 @@ export class DarkWhisper extends PlayableCard {
         this.baseMagicNumber = 2;
         this.baseEnergyCost = 1;
         this.rarity = EntityRarity.COMMON;
+        this.flavorText = "Some words comfort the listener. These were not chosen for that purpose.";
     }
 
     override get description(): string {

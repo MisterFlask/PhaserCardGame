@@ -45,6 +45,7 @@ export class ObsidianCandles extends PlayableCard {
             rarity: EntityRarity.COMMON,
         });
         this.baseEnergyCost = 2;
+        this.flavorText = "Lit in a circle. Never explained to Accounting.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

@@ -35,6 +35,7 @@ export class IronWill extends PlayableCard {
         });
         this.buffs.push(new ExhaustBuff());
         this.baseEnergyCost = 1;
+        this.flavorText = "Officers do not flinch. It is unbecoming, and it startles the men.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

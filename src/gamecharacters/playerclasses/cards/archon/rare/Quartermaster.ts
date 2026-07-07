@@ -16,6 +16,7 @@ export class Quartermaster extends PlayableCard {
             rarity: EntityRarity.RARE,
         });
         this.baseEnergyCost = 1;
+        this.flavorText = "Requisitions never run out. They just get itemized differently.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

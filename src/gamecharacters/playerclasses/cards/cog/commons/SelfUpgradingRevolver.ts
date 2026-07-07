@@ -15,6 +15,7 @@ export class SelfUpgradingRevolver extends PlayableCard {
         this.baseEnergyCost = 1;
         this.baseDamage = 6;
         this.baseMagicNumber = 2; // Amount of damage increase
+        this.flavorText = "Recalibrates itself between shots. Nobody asked it to.";
     }
 
     override get description(): string {

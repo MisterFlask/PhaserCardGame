@@ -16,6 +16,7 @@ export class Defend extends PlayableCardWithHelpers {
         this.baseBlock = 5;
         this.rarity = EntityRarity.BASIC;
         this.baseEnergyCost = 1;
+        this.flavorText = "Company-issue. Blocks the first blow reliably and every blow afterward optimistically.";
     }
 
     override get description(): string {

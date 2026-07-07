@@ -17,6 +17,7 @@ export class CorrosiveAccelerant extends PlayableCardWithHelpers {
         this.baseDamage = 5;
         this.baseMagicNumber = 1;
         this.baseEnergyCost = 1;
+        this.flavorText = "Eats through boiler plate, boot leather, and most objections.";
     }
 
     override get description(): string {

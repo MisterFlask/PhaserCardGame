@@ -16,6 +16,7 @@ export class DeathOrGlory extends PlayableCard {
         });
         this.baseEnergyCost = 1;
         this.buffs.push(new ExhaustBuff());
+        this.flavorText = "There is no third option. The Company saw to that in the fine print.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

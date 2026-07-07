@@ -49,6 +49,7 @@ export class MasterEngineer extends PlayableCard {
             rarity: EntityRarity.RARE,
         });
         this.baseEnergyCost = 2;
+        this.flavorText = "The prototype outperforms the original. This is meant to be reassuring.";
     }
 
     override get description(): string {

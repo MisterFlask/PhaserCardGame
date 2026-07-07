@@ -46,6 +46,7 @@ export class PowerCore extends PlayableCard {
             rarity: EntityRarity.UNCOMMON,
         });
         this.baseEnergyCost = 1;
+        this.flavorText = "Hums at a frequency the engineers describe, off the record, as 'wrong.'";
     }
 
     override get description(): string {
@@ -57,7 +58,7 @@ export class PowerCore extends PlayableCard {
 
         // Draw a card
         this.actionManager.drawCards(1);
-        
+
         // Apply the buff that triggers on Power card plays
         this.actionManager.applyBuffToCharacterOrCard(this.owningCharacter, new PowerCoreBuff());
     }

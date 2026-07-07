@@ -18,6 +18,7 @@ export class UnnaturalVigor extends PlayableCard {
         this.baseEnergyCost = 1;
         this.baseMagicNumber = 2;
         this.buffs.push(new SacrificeBuff());
+        this.flavorText = "The energy is real. Where it comes from is not a question anyone wants answered.";
     }
 
     override get description(): string {

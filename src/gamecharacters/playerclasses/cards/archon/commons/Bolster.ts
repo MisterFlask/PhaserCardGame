@@ -17,6 +17,7 @@ export class Bolster extends PlayableCard {
             resource: this.pluck,
             blockScaling: 1,
         });
+        this.flavorText = "Form up. The Company's insurers insist on it.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

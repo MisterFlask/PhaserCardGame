@@ -16,6 +16,7 @@ export class Shadowflame extends PlayableCard {
         });
         this.baseDamage = 15;
         this.baseEnergyCost = 2;
+        this.flavorText = "One good spell, spent entirely. Diabolism runs on consumables.";
     }
 
     override get description(): string {

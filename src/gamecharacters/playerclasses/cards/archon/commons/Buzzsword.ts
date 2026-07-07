@@ -25,13 +25,14 @@ export class Buzzsword extends PlayableCard {
             resource: this.venture,
             attackScaling: 1,
         });
+        this.flavorText = "Standard-issue sidearm. Regulations require it be sheathed, never sharpened.";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
         if (targetCard instanceof BaseCharacter) {
             this.dealDamageToTarget(targetCard);
         }
-        
+
         BasicProcs.getInstance().Exert(this, 1, (energyExerted) => {
             if (energyExerted > 0) {
                 this.dealDamageToTarget(targetCard);
