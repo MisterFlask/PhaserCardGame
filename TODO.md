@@ -32,27 +32,34 @@ protocol. Ordered within sections by priority. Delete items when done.
   spec's deferred spice (breakage/theft events targeting cargo, in-combat
   cargo effects like explosive crates) is good follow-on once the base
   mechanic proves fun.
-- **Campaign autoplay economy harness** — extend the pure-test pattern into
-  a campaign simulator: play N quarters headlessly with parameterized sortie
-  win rate, wound distribution, and contract-selection policy; assert vault
-  trajectory and dividend satisfaction stay viable across policies. Would
-  catch dominant strategies mechanically (the wages gap sat unnoticed for
-  weeks) and de-risk every balance pass that currently waits on a human
-  playtest. Combat abstracts to win%/wounds; everything else (contracts,
-  payouts, wages, dividends, healing) is already Phaser-free.
+- **BALANCE: the charter is unwinnable (sim-proven, July 2026)** — the new
+  CampaignSimulator (src/campaign/sim/) shows 0/10 seeded runs survive the
+  40-quarter charter at ANY roster size, even at 0.9 win rate with a £2000
+  head start: dividend expectation compounds 1.35×/year (£120 → ~£1787 by
+  year 10) while contract payouts stay flat per act. Enemies harden by year
+  but income doesn't. Candidate levers: payouts scale by year (Hell's cost
+  of living), flatter dividend curve, or the VP endgame pivot absorbing
+  late-charter pressure. The two `.skip` tests in CampaignSimulator.test.ts
+  carry exact numbers and become the ratchet once fixed.
+- **BALANCE: hoarding still beats lean rosters (sim-proven)** — wound
+  attrition throughput-starves small rosters (one 2-4 week wound drops
+  availability below squadSize), dwarfing the £15/soldier/quarter wage
+  drain; roster-8 beats roster-4 £2510 vs £2095 avg over 20 seeds. Wages
+  alone don't achieve "hoarding has cost." Levers: higher wages, wage
+  scaling by roster size, or making healing throughput purchasable so lean
+  rosters can compete. Same ratchet tests apply.
 - **Human playtest of the economy tuning** — payouts/dividends were calibrated
   against a lossless simulation (see commit history: +1wk sortie overhead,
   £120 dividend base). The sim validates the shape, not the fun. Someone has
   to actually play a few years and report.
-- **Standing Orders: v1 shipped (July 2026); remaining pieces** — the model,
-  nine launch orders, save v4, ratification UI, and the dead-cargo-project
-  pool pull are live (see `src/campaign/orders/`). Still open, per the
-  design amendment in `src/docs/strategic_layer_redesign.md`:
-  *Company Secretariat* capital work (buys `bonusSlots`), client-unlocked
-  orders (fulfil N contracts for a client → their retainer order becomes
-  available — needs per-client completion tracking), converting Abyssal
-  Research Institute from a Capital Work to an order, and an in-place
-  REPLACE flow in the UI (currently rescind + enact-next-quarter).
+- **Populate the client retainer registry** — the full client-unlocked-order
+  MECHANISM shipped July 2026 (save v9: per-client completion tracking,
+  threshold 3, locked greyed rows, `CLIENT_RETAINER_ORDER_IDS` in
+  CampaignUiState) but the registry is deliberately EMPTY: which of the 12
+  real clients unlocks which retainer order is canon the design amendment
+  never wrote (its one example names a nonexistent client). Fold into the
+  faction-reputation design session, then it's a data-table fill plus one
+  order class per client.
 - **Standing Orders balance pass** — the launch numbers (payout +20%,
   wound +1w, recruit ×0.6, escalation ×0.75 …) are design-doc sketches,
   untested against the economy sim or human play. Revisit after a few
@@ -91,11 +98,10 @@ protocol. Ordered within sections by priority. Delete items when done.
   variety alongside region hardening. Good Codex-lane batch work once the
   enemy-design spec exists.
 - **Event pool: 23 shipped (July 2026); browser render pass pending** — the
-  16 new events were verified statically (BBCode balance, word counts,
-  portrait keys via asset lint) but not rendered in a live combat; there is
-  no HQ-side hook to display an AbstractEvent without entering combat.
-  Next time someone is driving combat anyway, roll a few events and eyeball
-  them. Consider adding a `debug:showEvent` hook to make event QA cheap.
+  16 new events were verified statically but not rendered live. QA is now
+  cheap: in any combat, use the debug menu's `showRandomEvent` or console
+  `showEventByName(name)` / `listEventNames()`. Next combat session, page
+  through the new ones and eyeball text fit/BBCode rendering.
 - **Act 2/3 enemy roster depth** — act 1 has ~21 enemies, act 2 ~13,
   act 3 ~11; later acts repeat encounters sooner. (Separate from the
   flavor-text item above — this is new enemies, not better descriptions.)
