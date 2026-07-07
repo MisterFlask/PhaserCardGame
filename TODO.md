@@ -6,14 +6,11 @@ protocol. Ordered within sections by priority. Delete items when done.
 
 ## Dangling systems (July 2026 gap audit — half-connected, silently broken today)
 
-- **Relic ownership model post-pivot** — relics earned from events land on
-  `GameState.relicsInventory`, which is never serialized (CampaignSave has no
-  relics field), so they vanish on save/reload. The design doc says relics
-  become assignable equipment (2-3 slots per character, lost on death unless
-  insured) but that was deferred. Decide: (a) quick fix — persist a campaign
-  relic pool on CampaignUiState + save DTO, effects apply squad-wide; or
-  (b) build the equipment-slot system. NEEDS A DESIGN SESSION WITH THE OWNER
-  for (b); (a) is safe to implement cold.
+- **Relic equipment slots (design)** — the campaign relic pool now persists
+  (July 2026: `CampaignUiState.relicsOwned`, save v6, squad-wide effects).
+  The design doc's fuller idea — relics as assignable equipment, 2-3 slots
+  per character, lost on death unless insured — remains deferred and NEEDS
+  A DESIGN SESSION WITH THE OWNER.
 - **Consumable acquisition path** — bureaucratic consumables (permits,
   writs; `src/consumables/`, PhysicalConsumable UI, combat input handling)
   are implemented in combat but the only way to obtain one is the
@@ -120,18 +117,6 @@ protocol. Ordered within sections by priority. Delete items when done.
 
 ## Flavor (from the July 2026 flavor audit)
 
-- **Recruit name generator** — `src/gamecharacters/CharacterNameGenerator.ts`
-  produces modern fantasy names (Luna, Blaze, Knox), no surnames. Replace
-  with period British given names + surnames. Sharpest voice break in the
-  game; cheap fix. (Also: `CharacterGenerator.generateRandomCharacter()`
-  hardcodes `Gender.Female` for all recruits — fix in passing.)
-- **Shipped placeholder/debug text sweep** — Cog class `longDescription =
-  "INSERT DESCRIPTION HERE"` (CogClass.ts); enemy-summoned card named
-  "Afpoiasdoif" (Artiste.ts); `debug:killAllEnemies` /
-  `debug:addTestConsumables` / `Toggle Game Areas` in the player-facing
-  combat pause menu (CombatUiManager.ts); "DEBUG: Reroll" on
-  CardRewardScreen; "Commadore Snow" typo (TheFrostChancellor.ts); persona
-  trait "Badass" needs a period name.
 - **Company name canon** — three names in circulation: "The East Inferno
   Company" (MainHubPanel), "The Third Circle Company" (worldbuilding.md +
   ArchonClass), "East Infernal Company" (repo working title). NEEDS OWNER
