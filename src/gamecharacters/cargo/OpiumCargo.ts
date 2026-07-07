@@ -17,6 +17,7 @@ export class OpiumCargo extends PlayableCard {
         this.surfacePurchaseValue = 40;
         this.hellPurchaseValue = 160;
         this.buffs.push(new HellSellValue(150));
+        this.flavorText = "Medicinal. The paperwork says medicinal.";
     }
 
     override get description(): string {

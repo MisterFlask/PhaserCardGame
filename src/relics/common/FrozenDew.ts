@@ -10,6 +10,7 @@ export class FrozenDew extends AbstractRelic {
         this.stackable = true;
         this.stacks = 1;
         this.imageName = "frozen-dew";
+        this.flavorText = "Never melts. The Company advises against asking why.";
     }
 
     getDisplayName(): string {

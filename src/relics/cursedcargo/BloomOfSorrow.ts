@@ -8,6 +8,7 @@ export class BloomOfSorrow extends AbstractRelic {
         super();
         this.rarity = EntityRarity.COMMON;
         this.imageName = "bloom-of-sorrow";
+        this.flavorText = "It wilts if you're happy. It has not wilted since acquisition.";
     }
 
     override getDisplayName(): string {

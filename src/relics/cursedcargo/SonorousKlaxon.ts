@@ -6,6 +6,7 @@ export class SonorousKlaxon extends AbstractRelic {
         super();
         this.rarity = EntityRarity.COMMON;
         this.imageName = "sonorous-klaxon";
+        this.flavorText = "Sounds a warning. Somehow, the enemy hears it as encouragement.";
     }
 
     override getDisplayName(): string {

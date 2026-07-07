@@ -12,6 +12,7 @@ export class BelphegorsRounds extends AbstractRelic {
         this.stackable = true;
         this.stacks = stacks;
         this.imageName = "belphegors-rounds";
+        this.flavorText = "Blessed by a demon of sloth. Somehow, they still find their mark on time.";
     }
 
     override getDisplayName(): string {

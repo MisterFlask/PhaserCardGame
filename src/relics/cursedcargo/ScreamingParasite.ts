@@ -9,6 +9,7 @@ export class ScreamingParasite extends AbstractRelic {
         super();
         this.rarity = EntityRarity.RARE;
         this.imageName = "screaming-parasite";
+        this.flavorText = "Feeds on Blood and voices its opinion of the arrangement at length.";
     }
 
     override getDisplayName(): string {

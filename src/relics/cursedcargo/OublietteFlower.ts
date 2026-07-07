@@ -8,6 +8,7 @@ export class OublietteFlower extends AbstractRelic {
         super();
         this.rarity = EntityRarity.RARE;
         this.imageName = "oubliette-flower";
+        this.flavorText = "It counts your card plays. Nobody asked it to. Nobody can make it stop.";
     }
 
     getDisplayName(): string {

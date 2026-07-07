@@ -10,6 +10,7 @@ export class MistBottle extends AbstractRelic {
         this.stackable = true;
         this.stacks = 1;
         this.imageName = "bottle-of-mist";
+        this.flavorText = "Bottled fog, sold at a markup that would make a Baron blush.";
     }
 
     getDisplayName(): string {

@@ -17,6 +17,7 @@ export class BomberGremlin extends AbstractRelic {
         this.rarity = EntityRarity.UNCOMMON;
         this.stacks = 0; // Used to track turns
         this.imageName = "bomber-gremlin";
+        this.flavorText = "It counts to seven. After that, it stops being your problem in a very literal sense.";
     }
 
     override getDisplayName(): string {

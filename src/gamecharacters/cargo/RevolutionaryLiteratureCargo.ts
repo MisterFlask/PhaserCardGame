@@ -15,7 +15,8 @@ export class RevolutionaryLiteratureCargo extends PlayableCard {
         this.baseEnergyCost = 1;
         this.surfacePurchaseValue = 30;
         this.hellPurchaseValue = 50;
-        this.buffs.push(new HellSellValue(120));   
+        this.buffs.push(new HellSellValue(120));
+        this.flavorText = "The Company does not endorse the contents. The Company does enjoy the margins.";
     }
 
     override get description(): string {

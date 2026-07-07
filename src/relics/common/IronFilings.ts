@@ -10,6 +10,7 @@ export class IronFilings extends AbstractRelic {
         this.stackable = true;
         this.stacks = 1;
         this.imageName = "iron-filings";
+        this.flavorText = "Swallow before combat. The Company's physician does not recommend this.";
     }
 
     getDisplayName(): string {

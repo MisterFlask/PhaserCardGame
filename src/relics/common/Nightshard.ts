@@ -10,6 +10,7 @@ export class Nightshard extends AbstractRelic {
         this.clickable = true;
         this.stacks = 2; // Base number of uses per combat
         this.imageName = "nightshard";
+        this.flavorText = "A splinter of a night that never ended. It's still trying to finish the thought.";
     }
 
     override getDisplayName(): string {

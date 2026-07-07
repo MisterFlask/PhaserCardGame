@@ -10,6 +10,7 @@ export class WraithInABottle extends AbstractRelic {
         super();
         this.rarity = EntityRarity.UNCOMMON;
         this.imageName = "wraith-in-a-bottle";
+        this.flavorText = "It rides along on the first card of the day, eager and unhelpful.";
     }
 
     override getDisplayName(): string {

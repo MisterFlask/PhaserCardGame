@@ -12,6 +12,7 @@ export class MachineEffigy extends AbstractRelic {
         this.stackable = true;
         this.stacks = 1;
         this.imageName = "machine-effigy";
+        this.flavorText = "A small brass idol of a large brass god. The resemblance is the point.";
     }
 
     getDisplayName(): string {

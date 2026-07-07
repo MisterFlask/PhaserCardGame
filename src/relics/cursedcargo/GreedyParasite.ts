@@ -9,6 +9,7 @@ export class GreedyParasite extends AbstractRelic {
         super();
         this.rarity = EntityRarity.RARE;
         this.imageName = "greedy-parasite";
+        this.flavorText = "It shares generously. It also bites. The Company classifies this as a wash.";
     }
 
     override getDisplayName(): string {

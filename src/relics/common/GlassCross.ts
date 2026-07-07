@@ -37,6 +37,7 @@ export class GlassCross extends AbstractRelic {
         this.rarity = EntityRarity.COMMON;
         this.stacks = 3;
         this.imageName = "glass-cross";
+        this.flavorText = "Blessed once. Reloadable three times. The math checked out at the time.";
     }
 
     override getDisplayName(): string {

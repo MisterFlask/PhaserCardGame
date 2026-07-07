@@ -17,6 +17,7 @@ export class CopperIngot extends PlayableCard {
         this.baseDamage = 4;
         this.surfacePurchaseValue = 10;
         this.buffs.push(new HellSellValue(40));
+        this.flavorText = "Throws admirably. Insured poorly.";
     }
 
     override get description(): string {

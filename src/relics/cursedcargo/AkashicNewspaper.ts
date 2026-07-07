@@ -6,6 +6,7 @@ export class AkashicNewspaper extends AbstractRelic {
         super();
         this.rarity = EntityRarity.RARE;
         this.imageName = "akashic-newspaper";
+        this.flavorText = "Tomorrow's edition, delivered yesterday. The obituaries are especially reliable.";
     }
 
     override getDisplayName(): string {

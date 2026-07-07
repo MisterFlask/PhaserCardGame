@@ -7,6 +7,7 @@ export class EcclesiasticalRecommendation extends AbstractRelic {
         this.rarity = EntityRarity.SPECIAL;
         this.isLedgerItem = true;
         this.imageName = "ecclesiastical-recommendation";
+        this.flavorText = "Signed by a bishop who has never met you and never will.";
     }
 
     override getDisplayName(): string {

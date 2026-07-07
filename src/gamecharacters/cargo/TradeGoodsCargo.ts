@@ -13,6 +13,14 @@ import { CardType } from "../Primitives";
  * table in ContractGenerator can name region-appropriate freight without a
  * new class per good.
  */
+/** Per-name flavor lines for the cosmetic freight labels below. Keyed off
+ *  the exact display name so each crate variant gets its own line. */
+const CARGO_FLAVOR_TEXT_BY_NAME: Readonly<Record<string, string>> = {
+    "Reagent Barrel (Dis-bound)": "Manifest lists the contents as \"reagents.\" The manifest is being diplomatic.",
+    "Opium Consignment (Brimstone Barons)": "The Barons pay on delivery and ask no questions. Best keep it that way.",
+    "Crate of Spicy Literature (Garrison Order)": "The Garrison insists it's for troop morale. The troops are not complaining.",
+};
+
 export class TradeGoodsCargo extends PlayableCard {
     constructor(displayName: string = "Freight Crate") {
         super({
@@ -22,6 +30,7 @@ export class TradeGoodsCargo extends PlayableCard {
             rarity: EntityRarity.COMMON,
         });
         this.baseEnergyCost = 0;
+        this.flavorText = CARGO_FLAVOR_TEXT_BY_NAME[displayName] ?? "";
     }
 
     override get description(): string {

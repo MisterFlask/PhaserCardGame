@@ -11,6 +11,7 @@ export class WhisperOfSorrow extends AbstractRelic {
         super();
         this.rarity = EntityRarity.UNCOMMON;
         this.imageName = "whisper-of-sorrow";
+        this.flavorText = "It murmurs suggestions during the upgrade ceremony. The armorers have learned not to listen.";
     }
 
     override getDisplayName(): string {

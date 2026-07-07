@@ -8,6 +8,7 @@ export class DevouringIcon extends AbstractRelic {
         super();
         this.rarity = EntityRarity.UNCOMMON;
         this.imageName = "devouring-icon";
+        this.flavorText = "It has opinions about your spending habits, and the opinions are teeth.";
     }
 
     override getDisplayName(): string {

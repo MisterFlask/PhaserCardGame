@@ -12,6 +12,7 @@ export class MarksmansManual extends AbstractRelic {
         this.stackable = true;
         this.stacks = 1;
         this.imageName = "marksmans-manual";
+        this.flavorText = "Chapter Four, \"Leading the Target,\" is stained in a manner best not examined.";
     }
 
     getDisplayName(): string {

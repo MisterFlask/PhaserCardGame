@@ -51,6 +51,13 @@ export class RelicTooltipGenerator {
             tooltip += `\n[color=gold]Export Value: ${relic.surfaceSellValue}[/color]`;
         }
 
+        // flavor text
+        if (relic.flavorText) {
+            tooltip += `\n[i][color=gold]\n`;
+            tooltip += `- ${relic.flavorText}\n`;
+            tooltip += `[/i][/color]\n`;
+        }
+
         return tooltip;
     }
 }

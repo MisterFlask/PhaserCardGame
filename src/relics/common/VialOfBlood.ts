@@ -10,6 +10,7 @@ export class VialOfBlood extends AbstractRelic {
         this.stackable = true;
         this.stacks = 1;
         this.imageName = "vial-of-blood";
+        this.flavorText = "Provenance withheld for the donor's comfort, and yours.";
     }
 
     getDisplayName(): string {

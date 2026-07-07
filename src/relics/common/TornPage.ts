@@ -10,6 +10,7 @@ export class TornPage extends AbstractRelic {
         this.stackable = true;
         this.stacks = 1;
         this.imageName = "torn-page";
+        this.flavorText = "Torn from a hymnal. The rest of the hymnal is not available for comment.";
     }
 
     getDisplayName(): string {
