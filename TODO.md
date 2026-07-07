@@ -37,14 +37,6 @@ protocol. Ordered within sections by priority. Delete items when done.
   against a lossless simulation (see commit history: +1wk sortie overhead,
   £120 dividend base). The sim validates the shape, not the fun. Someone has
   to actually play a few years and report.
-- **Populate the client retainer registry** — the full client-unlocked-order
-  MECHANISM shipped July 2026 (save v9: per-client completion tracking,
-  threshold 3, locked greyed rows, `CLIENT_RETAINER_ORDER_IDS` in
-  CampaignUiState) but the registry is deliberately EMPTY: which of the 12
-  real clients unlocks which retainer order is canon the design amendment
-  never wrote (its one example names a nonexistent client). Fold into the
-  faction-reputation design session, then it's a data-table fill plus one
-  order class per client.
 - **Standing Orders balance pass** — the launch numbers (payout +20%,
   wound +1w, recruit ×0.6, escalation ×0.75 …) are design-doc sketches,
   untested against the economy sim or human play. Revisit after a few
@@ -65,12 +57,14 @@ protocol. Ordered within sections by priority. Delete items when done.
   endgame decision ("when do I stop building and start scoring") barely
   exists. More VP sinks: VP-per-£ conversion late-campaign, VP contracts,
   the deferred Levi-Maxwell capstone.
-- **Faction reputation + intelligence services** — both deferred in the
-  design doc but queued by shipped systems: the retrofit table wants
-  embassies (Revolutionary Contacts), client-unlocked Standing Orders want
-  per-client tracking, and the cut Actuarial Review order wants enemy-comp
-  scouting. Probably one design session covering "who remembers what you
-  did for them."
+- **Faction reputation v2** — v1 shipped July 2026 per
+  `src/docs/faction_reputation_design.md` (tiers from completion counts, six
+  retainer orders, Chartered Partner +10%). Explicitly deferred there:
+  retainers for the remaining six clients, embassies/Revolutionary
+  Contacts, recruitment gating by reputation, and intelligence products
+  (Actuarial Review / de Veer enemy-comp preview — wants a pre-dispatch
+  scouting UI first). Revisit after human play shows whether players
+  actually specialize in clients.
 
 ## Content breadth
 
@@ -85,9 +79,12 @@ protocol. Ordered within sections by priority. Delete items when done.
   cheap: in any combat, use the debug menu's `showRandomEvent` or console
   `showEventByName(name)` / `listEventNames()`. Next combat session, page
   through the new ones and eyeball text fit/BBCode rendering.
-- **Act 2/3 enemy roster depth** — act 1 has ~21 enemies, act 2 ~13,
-  act 3 ~11; later acts repeat encounters sooner. (Separate from the
-  flavor-text item above — this is new enemies, not better descriptions.)
+- **Enemy spawn QA residual** — 10 new act 2/3 enemies shipped July 2026
+  (rosters now ~21/21/16); `scripts/qa-spawn.mjs` runtime-verified 6 of 10
+  across 15 error-free forced sorties. Unsampled by the random tables:
+  Maxwell-Coil Trooper, Foundry Tick, Union Runner, Ironclad Picket — same
+  construction idioms as verified siblings, low risk; a couple more
+  qa-spawn runs (or targeted encounter forcing) closes it.
 - **Cog class identity** — one of four classes has placeholder lore and the
   thinnest mechanical identity (Manufactured cards). Either invest (design
   pass + cards) or consider whether four classes is right at all.
