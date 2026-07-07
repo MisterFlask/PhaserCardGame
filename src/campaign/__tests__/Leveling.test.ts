@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+    deckCap, isAtDeckCap,
     LEVEL_CAP, levelFromXp, levelGrantsPerk, PERK_LEVELS,
     pendingLevels, xpCostForLevel, xpForCombatWin
 } from '../Leveling';
@@ -69,6 +70,48 @@ describe('xpForCombatWin', () => {
         expect(xpForCombatWin(1)).toBe(15);
         expect(xpForCombatWin(2)).toBe(20);
         expect(xpForCombatWin(3)).toBe(25);
+    });
+});
+
+describe('deckCap', () => {
+    it('is startingDeckSize + level for a fresh level-1 recruit', () => {
+        expect(deckCap({ level: 1 }, 4)).toBe(5);
+    });
+
+    it('grants one more slot per promotion', () => {
+        expect(deckCap({ level: 2 }, 4)).toBe(6);
+        expect(deckCap({ level: 5 }, 4)).toBe(9);
+    });
+
+    it('tracks whatever starting kit size the soldier actually had', () => {
+        expect(deckCap({ level: 1 }, 6)).toBe(7);
+        expect(deckCap({ level: 3 }, 3)).toBe(6);
+    });
+});
+
+describe('isAtDeckCap', () => {
+    it('is false below cap', () => {
+        expect(isAtDeckCap({ level: 1 }, 4, 4)).toBe(false);
+    });
+
+    it('is true exactly at cap', () => {
+        expect(isAtDeckCap({ level: 1 }, 4, 5)).toBe(true);
+    });
+
+    it('is true over cap (defensive, should not normally happen)', () => {
+        expect(isAtDeckCap({ level: 1 }, 4, 6)).toBe(true);
+    });
+
+    it('excludes cargo: below cap on real cards even though raw count (incl. cargo) would read at/over cap', () => {
+        // Simulates: soldier under cap on real cards (4/5), plus 2 sortie-scoped
+        // cargo cards riding along (CargoInjection.injectCargoIntoSquad). The
+        // caller must pass the cargo-excluded count, not raw
+        // cardsInMasterDeck.length — isAtDeckCap itself does no filtering, it
+        // trusts the caller the way CargoInjection.stripCargoFromSquad expects.
+        const realCardCountExcludingCargo = 4;
+        const rawCountIncludingCargo = 6;
+        expect(isAtDeckCap({ level: 1 }, 4, realCardCountExcludingCargo)).toBe(false);
+        expect(isAtDeckCap({ level: 1 }, 4, rawCountIncludingCargo)).toBe(true);
     });
 });
 

@@ -28,5 +28,54 @@ export class ActionManagerFetcher {
         const { GameState } = await import('../rules/GameState');
         this._actionManager = ActionManager.getInstance();
         this._gameState = GameState.getInstance();
+
+        // Year-based hardening for event-spawned combats, registered here
+        // via dynamic import for the same reason this class exists at all:
+        // AbstractEvent is evaluated very early in the module graph (every
+        // event imports it), and a top-level CampaignUiState/Lethality
+        // import there reorders webpack module init so PlayerCharacter's
+        // class-extends runs before BaseCharacter is defined — the game
+        // then dies at boot with "Class extends value undefined"
+        // (root-caused July 2026; do not "simplify" this into a static
+        // import in AbstractEvent).
+        const { CampaignUiState } = await import('../screens/campaign/hq_ux/CampaignUiState');
+        const { applyHpHardening, hardeningForYear } = await import('../campaign/EncounterHardening');
+        const { Lethality } = await import('../gamecharacters/buffs/standard/Lethality');
+        this._encounterHardener = (enemies) => {
+            const year = CampaignUiState.getInstance().calendar.year;
+            applyHpHardening(enemies, year);
+            const { lethalityBonus } = hardeningForYear(year);
+            if (lethalityBonus > 0) {
+                enemies.forEach(enemy => {
+                    enemy.applyBuffs_useFromActionManager([new Lethality(lethalityBonus)]);
+                });
+            }
+        };
+    }
+
+    private static _encounterHardener:
+        | ((enemies: {
+              maxHitpoints: number;
+              hitpoints: number;
+              applyBuffs_useFromActionManager: (buffs: any[]) => void;
+          }[]) => void)
+        | null = null;
+
+    /** Applies year-based combat hardening (same numbers as
+     *  SortieManager.launchNextCombat) to event-spawned enemies. Safe no-op
+     *  with a warning if called before initServicesAsync — events only fire
+     *  mid-combat, long after init. */
+    public static applyEventCombatHardening(
+        enemies: {
+            maxHitpoints: number;
+            hitpoints: number;
+            applyBuffs_useFromActionManager: (buffs: any[]) => void;
+        }[]
+    ): void {
+        if (!this._encounterHardener) {
+            console.warn('applyEventCombatHardening called before initServicesAsync; enemies not hardened.');
+            return;
+        }
+        this._encounterHardener(enemies);
     }
 }

@@ -90,6 +90,7 @@ export class CampaignSerializer {
                 victoryPoints: p.getVictoryPoints(),
             })),
             roster: campaign.roster.map(c => this.characterToDTO(c)),
+            recruitCandidates: campaign.recruitCandidates.map(c => this.characterToDTO(c)),
             standingOrders: standingOrdersToDTO(StandingOrdersState.getInstance()),
             consumables: campaign.consumables.map(c => this.consumableToDTO(c)),
         };
@@ -236,6 +237,9 @@ export class CampaignSerializer {
         campaign.availableStrategicProjects = allProjects
             .filter(p => !ownedByName.has(p.name));
         campaign.roster = save.roster
+            .map(c => this.characterFromDTO(c))
+            .filter((c): c is PlayerCharacter => c !== null);
+        campaign.recruitCandidates = save.recruitCandidates
             .map(c => this.characterFromDTO(c))
             .filter((c): c is PlayerCharacter => c !== null);
         campaign.consumables = save.consumables

@@ -5,9 +5,6 @@ import { ActionManager } from "../utils/ActionManager";
 import { ActionManagerFetcher } from "../utils/ActionManagerFetcher";
 import { Encounter } from "../encounters/EncounterManager";
 import { AbstractConsumable } from "../consumables/AbstractConsumable";
-import { CampaignUiState } from "../screens/campaign/hq_ux/CampaignUiState";
-import { applyHpHardening, hardeningForYear } from "../campaign/EncounterHardening";
-import { Lethality } from "../gamecharacters/buffs/standard/Lethality";
 
 export abstract class AbstractChoice {
     constructor(
@@ -114,17 +111,14 @@ export class DeadEndStartEncounterChoice extends AbstractChoice {
         }
         this.nextEvent = null; // Prevent immediate chaining
 
-        // Apply year-based combat hardening to event-spawned enemies
-        // (same pattern as SortieManager.launchNextCombat).
-        const campaign = CampaignUiState.getInstance();
-        const year = campaign.calendar.year;
-        applyHpHardening(this.encounter.enemies, year);
-        const { lethalityBonus } = hardeningForYear(year);
-        if (lethalityBonus > 0) {
-            this.encounter.enemies.forEach(enemy => {
-                enemy.applyBuffs_useFromActionManager([new Lethality(lethalityBonus)]);
-            });
-        }
+        // Apply year-based combat hardening to event-spawned enemies (same
+        // numbers as SortieManager.launchNextCombat). Deliberately routed
+        // through ActionManagerFetcher's lazy registration: importing
+        // CampaignUiState/Lethality at this module's top level reorders
+        // webpack module init and kills the boot with "Class extends value
+        // undefined" (AbstractEvent evaluates before BaseCharacter) — see
+        // the registration comment in ActionManagerFetcher.initServicesAsync.
+        ActionManagerFetcher.applyEventCombatHardening(this.encounter.enemies);
 
         this.actionManager().cleanupAndRestartCombat({ encounter: this.encounter });
     }

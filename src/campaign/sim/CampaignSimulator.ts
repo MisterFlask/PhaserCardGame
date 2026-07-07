@@ -25,6 +25,10 @@ import { CampaignCalendar, WAGE_PER_SOLDIER_PER_QUARTER, WEEKS_PER_QUARTER } fro
 import { Contract } from "../Contract";
 import { ContractGenerator } from "../ContractGenerator";
 import { StandingOrdersState } from "../orders/StandingOrdersState";
+// Real constant (Phaser-free, src/campaign/RushTreatment.ts) — imported
+// directly rather than hand-mirrored like SIM_RECRUIT_COST/SIM_ROSTER_CAP
+// below, since it already lives somewhere legal for this module to import.
+import { RUSH_TREATMENT_COST_PER_WEEK } from "../RushTreatment";
 
 /**
  * Mirrors CampaignUiState.RECRUIT_COST (src/screens/campaign/hq_ux/CampaignUiState.ts).
@@ -100,6 +104,68 @@ function pickSquad(soldiers: SimSoldier[], size: number): SimSoldier[] {
     return soldiers.slice(0, size);
 }
 
+/**
+ * Healing-spend policy (useRushHealing config knob): only spends when the
+ * available (unwounded) roster has dropped to zero, i.e. the roster is
+ * completely stalled and cannot muster even the cheapest possible contract
+ * (minimum squadSize 2) for the rest of the quarter otherwise. Two earlier,
+ * looser triggers were measured and rejected as net-negative for T2 parity
+ * (worse than doing nothing): chasing the LARGEST musterable board
+ * contract's squad size (paying to marginally upsize a squad that could
+ * already muster something), and chasing the SMALLEST musterable board
+ * contract's squad size (reacting to a board that happens to be trade-run-
+ * heavy, squadSize 3-4 only). Both fired often enough that the RNG-stream/
+ * board-refill coupling documented at this file's top (ContractGenerator
+ * uses uncontrolled Math.random() internally) dominated: shifting *when*
+ * sorties fire cascades into materially different win/wound/death rolls for
+ * everything after, so eagerly buying back partial availability didn't
+ * reliably pay for itself. Restricting to the true stall floor (zero
+ * available) fires far less often (~1-2 times per 16-quarter run) and only
+ * when the alternative is certain idle weeks with no income at all — the
+ * scenario the T2 gap analysis actually describes ("wound-attrition
+ * throughput starvation") — which measured as a small, real, price-
+ * insensitive parity nudge (see RushTreatment.ts's cost comment for the
+ * £20/£15/£10 frontier measured).
+ *
+ * Spends RUSH_TREATMENT_COST_PER_WEEK per wound-week (mirrors the Barracks
+ * rush-treatment purchase — see src/campaign/RushTreatment.ts) on the
+ * nearest-to-fit-for-duty wounded soldier, stopping as soon as that soldier
+ * is available again or the vault can't afford another week. Returns the
+ * (possibly reduced) vault; mutates the soldier's woundedUntilWeek in place.
+ */
+function rushHealStalledRoster(
+    roster: SimSoldier[],
+    board: Contract[],
+    currentWeek: number,
+    weeksLeftInQuarter: number,
+    vault: number,
+): number {
+    if (board.length === 0) return vault;
+    const available = roster.filter(s => s.woundedUntilWeek <= currentWeek);
+    // Absolute stall floor only: nobody is fit for duty, so every contract
+    // on the board (minimum squadSize 2) is unreachable without healing.
+    if (available.length > 0) return vault;
+    // Don't spend if nothing on the board could complete in the weeks left
+    // this quarter anyway (e.g. the quarter is nearly over) — that would be
+    // pure waste, buying availability with no sortie left to spend it on.
+    if (!board.some(c => c.durationWeeks <= weeksLeftInQuarter)) return vault;
+
+    // Nearest-to-fit-for-duty first: cheapest to fully clear, so the vault
+    // buys back an available soldier for the least spend.
+    const wounded = roster
+        .filter(s => s.woundedUntilWeek > currentWeek)
+        .sort((a, b) => a.woundedUntilWeek - b.woundedUntilWeek);
+    const soldier = wounded[0];
+    if (!soldier) return vault;
+
+    while (soldier.woundedUntilWeek > currentWeek && vault >= RUSH_TREATMENT_COST_PER_WEEK) {
+        vault -= RUSH_TREATMENT_COST_PER_WEEK;
+        soldier.woundedUntilWeek -= 1;
+    }
+
+    return vault;
+}
+
 /** Highest-payout contract the available roster can muster (greedy). */
 export const greedyPayout: ContractPolicy = {
     name: "greedyPayout",
@@ -157,6 +223,19 @@ export interface SimulatorConfig {
     /** Starting roster size. */
     startingRosterSize: number;
     rng: () => number;
+    /**
+     * Healing-spend policy knob (economy balance pass, T2 lever). When true,
+     * before each muster attempt the sim checks whether the roster has zero
+     * soldiers fit for duty (a full stall — no contract, not even the
+     * cheapest, is musterable); if so and the vault can afford it, it
+     * spends RUSH_TREATMENT_COST_PER_WEEK per wound-week (mirrors the
+     * Barracks' rush-treatment purchase) on the soldier closest to
+     * recovery, clearing just enough weeksWoundedRemaining to unstall.
+     * See rushHealStalledRoster's doc comment for the (measured, rejected)
+     * looser trigger designs. Off by default so existing callers/tests are
+     * unaffected.
+     */
+    useRushHealing?: boolean;
 }
 
 export interface SimulatorResult {
@@ -183,7 +262,7 @@ export interface SimulatorResult {
  * so at the start of every call so it's self-contained by default).
  */
 export function runCampaignSimulation(config: SimulatorConfig): SimulatorResult {
-    const { combatModel, policy, targetRosterSize, quarters, rng } = config;
+    const { combatModel, policy, targetRosterSize, quarters, rng, useRushHealing } = config;
 
     // Standing Orders are a process-wide singleton; the sim doesn't exercise
     // orders (no policy enacts any), so reset to a clean/neutral baseline
@@ -228,6 +307,9 @@ export function runCampaignSimulation(config: SimulatorConfig): SimulatorResult 
         // Run sorties for as many weeks as fit in this quarter.
         let weeksLeftInQuarter = WEEKS_PER_QUARTER;
         while (weeksLeftInQuarter > 0) {
+            if (useRushHealing) {
+                vault = rushHealStalledRoster(roster, board, calendar.week, weeksLeftInQuarter, vault);
+            }
             const available = roster.filter(s => s.woundedUntilWeek <= calendar.week);
             const choice = policy.selectContract(board, available, rng);
             if (!choice) break;

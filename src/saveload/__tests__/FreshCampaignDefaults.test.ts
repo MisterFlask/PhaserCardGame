@@ -68,7 +68,7 @@ describe('CampaignSave shape-lock (fresh-state defaults)', () => {
     function buildFreshSave(): CampaignSave {
         StandingOrdersState.getInstance().reset();
         return {
-            version: 9,
+            version: 10,
             savedAtIso: new Date(0).toISOString(),
             moneyInVault: 200, // GameState.moneyInVault default (src/rules/GameState.ts) — browser-verified in deliverable 2
             calendar: calendarToDTO(new CampaignCalendar()),
@@ -77,6 +77,7 @@ describe('CampaignSave shape-lock (fresh-state defaults)', () => {
             contractsCompletedByClient: {}, // CampaignUiState.contractsCompletedByClient starts empty
             ownedProjects: [], // CampaignUiState.ownedStrategicProjects starts empty
             roster: [], // CampaignUiState.roster reseeds via CharacterGenerator; Phaser-tainted, browser-verified only
+            recruitCandidates: [], // CampaignUiState.recruitCandidates starts empty; lazily filled by ensureRecruitsPopulated()
             standingOrders: standingOrdersToDTO(StandingOrdersState.getInstance()),
             consumables: [], // CampaignUiState.consumables starts empty
         };
@@ -95,6 +96,7 @@ describe('CampaignSave shape-lock (fresh-state defaults)', () => {
             'contractsCompletedByClient',
             'moneyInVault',
             'ownedProjects',
+            'recruitCandidates',
             'roster',
             'savedAtIso',
             'standingOrders',
@@ -106,6 +108,7 @@ describe('CampaignSave shape-lock (fresh-state defaults)', () => {
         expect(save.contracts).toEqual([]);
         expect(save.ownedProjects).toEqual([]);
         expect(save.roster).toEqual([]);
+        expect(save.recruitCandidates).toEqual([]);
         expect(save.consumables).toEqual([]);
         expect(save.standingOrders).toEqual({ active: [], pending: null, bonusSlots: 0 });
         expect(save.calendar).toEqual({

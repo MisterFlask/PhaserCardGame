@@ -327,7 +327,9 @@ export class ActionManager {
     }
 
     public tiltCharacter(character: BaseCharacterType){
-        this.animateAttackerTilt(character.physicalCard!);
+        if (character.physicalCard) {
+            this.animateAttackerTilt(character.physicalCard);
+        }
     }
 
 
@@ -660,10 +662,6 @@ export class ActionManager {
     }
 
     private animateDiscardCard(card: IPhysicalCardInterface): Promise<void> {
-        if (!card?.data){
-            console.info("No physical card found for " + card);
-            return Promise.resolve();
-        }
         // Implement discard animation logic here
         console.log(`Animating discard for card: ${card.data.name}`);
         // Example animation delay
@@ -673,7 +671,9 @@ export class ActionManager {
     public basicDiscardCard = (card: PlayableCard): void => {
         this.actionQueue.addAction(new GenericAction(async () => {
             DeckLogic.moveCardToPile(card, PileName.Discard);
-            await this.animateDiscardCard(card.physicalCard!);
+            if (card.physicalCard) {
+                await this.animateDiscardCard(card.physicalCard);
+            }
             await new WaitAction(20).playAction();
             return [];
         }));
@@ -777,16 +777,14 @@ export class ActionManager {
         ignoresBlock?: boolean
     }): void => {
         this.actionQueue.addAction(new GenericAction(async () => {
-            const physicalCardOfTarget = target?.physicalCard;
-
             if (!target){
                 console.warn("No target found for damage!");
                 throw new Error("No target found for damage!");
             }
 
+            const physicalCardOfTarget = target.physicalCard;
             if (!physicalCardOfTarget) {
-                console.warn("No physical card found for " + target);
-                return [];
+                console.info("No physical card found for " + target + "; applying damage headlessly.");
             }
 
             if (fromAttack === undefined){
@@ -855,13 +853,15 @@ export class ActionManager {
                 isBlocked: damageResult.unblockedDamage === 0
             });
 
-            // Animate the defender jiggle and glow based on unblocked damage
-            if (damageResult.unblockedDamage > 0) {
-                // Unblocked damage dealt: glow red
-                this.animateDefenderJiggleAndGlow(physicalCardOfTarget, 0xff0000); // Red color
-            } else {
-                // No unblocked damage: glow white
-                this.animateDefenderJiggleAndGlow(physicalCardOfTarget, 0xffffff); // White color
+            // Animate the defender jiggle and glow based on unblocked damage (visual only; no-op headlessly)
+            if (physicalCardOfTarget) {
+                if (damageResult.unblockedDamage > 0) {
+                    // Unblocked damage dealt: glow red
+                    this.animateDefenderJiggleAndGlow(physicalCardOfTarget, 0xff0000); // Red color
+                } else {
+                    // No unblocked damage: glow white
+                    this.animateDefenderJiggleAndGlow(physicalCardOfTarget, 0xffffff); // White color
+                }
             }
 
             callback?.(damageResult);

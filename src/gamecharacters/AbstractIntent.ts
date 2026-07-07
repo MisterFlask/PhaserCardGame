@@ -68,15 +68,18 @@ export abstract class AbstractIntent implements JsonRepresentable {
 
 
     public isUsingPlaceholderImage(): boolean {
-        return !this.imageName || !ActionManager.getInstance().scene.textures.exists(this.imageName);
+        // No live scene (e.g. headless simulation) means there's no texture cache to check
+        // against; treat the requested image as present rather than crashing.
+        const scene = ActionManager.getInstance().scene;
+        if (!scene) {
+            return false;
+        }
+        return !this.imageName || !scene.textures.exists(this.imageName);
     }
 
     public getImageNameOrPlaceholderIfNoneExists(): string {
-        // Check if the image exists in the texture cache
-        const scene = ActionManager.getInstance().scene
-        if (!scene) {
-            throw new Error('Scene not set; probably you changed scenes and messed up handling deletion of old actions.');
-        }
+        // Check if the image exists in the texture cache (render-time only; this is purely
+        // a display concern and must not be required for headless rules evaluation).
         if (this.isUsingPlaceholderImage()) {
             var placeholder = ImageUtils.getDeterministicAbstractPlaceholder(this.imageName);
             return placeholder;

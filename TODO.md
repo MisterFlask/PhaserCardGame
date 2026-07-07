@@ -14,14 +14,6 @@ protocol. Ordered within sections by priority. Delete items when done.
   character, lost on death unless insured — NEEDS A DESIGN SESSION WITH THE
   OWNER; campaign-level relic persistence should ride that design, not
   precede it.
-- **Deck cap (leveling residual)** — (corrected July 2026: the old entry
-  claimed XP/rank didn't exist; soldier leveling shipped in save v5 —
-  xp/level on PlayerCharacter, LEVEL_CAP 10, perks at levels 4/8,
-  PromotionPanel. See src/campaign/Leveling.ts.) The one unbuilt piece of
-  the design-doc commitment is the deck cap: nothing limits deck bloat, so
-  veterans accumulate unbounded cards. Needs a small design call (cap curve
-  by level + behavior at cap: block card grants vs force a removal choice),
-  then mechanical plumbing.
 
 ## Gameplay & design
 
@@ -32,17 +24,15 @@ protocol. Ordered within sections by priority. Delete items when done.
   spec's deferred spice (breakage/theft events targeting cargo, in-combat
   cargo effects like explosive crates) is good follow-on once the base
   mechanic proves fun.
-- **Healing throughput as a purchasable lever** — the July 2026 balance
-  pass (payouts +5%/year, decaying dividend escalation, wages £25) made the
-  charter winnable (~56-72% at 0.9 win rate, ratcheted in
-  CampaignSimulator.test.ts) and narrowed but did not close the hoarding
-  edge: lean roster-5 reaches parity with roster-8 in only ~40% of seed
-  pairs because wound attrition throughput-starves small rosters — a
-  structural effect flat wages can't price. The design doc's
-  Infirmary/chapel row ("rush wound healing, converts £ into time") is the
-  missing lever: implement rush-healing purchases, then re-tune the T2
-  ratchet toward true roster parity. The sim needs a matching knob
-  (healing spend policy) to model it.
+- **Roster-economy equilibrium — RULED (July 2026, delegated): accepted as
+  shipped** — rush treatment (£20/wound-week) shipped and browser-verified,
+  but the sim proved it cannot close the lean-vs-hoard gap at any price:
+  whole-squad wipes cost a lean roster proportionally more, structurally.
+  Ruling: legitimate XCOM texture, not a bug — hoarding is no longer FREE
+  (wages £25, idle bleed), lean play is viable (~40% parity) with real
+  mid-quarter agency. Future lever ONLY if human play disagrees: partial
+  survival on squad wipe (weakens the roster-pays-the-price stakes; take
+  reluctantly).
 - **Human playtest of the economy tuning** — payouts/dividends were calibrated
   against a lossless simulation (see commit history: +1wk sortie overhead,
   £120 dividend base). The sim validates the shape, not the fun. Someone has
@@ -64,16 +54,12 @@ protocol. Ordered within sections by priority. Delete items when done.
   rework (pins scattered by region, wax-seal difficulty) partially answers
   this; revisit whether a "priority contract" pin treatment (larger seal,
   ribbon) is still wanted.
-- **Recruit pool save-scumming** — recruit candidates aren't serialized, so
-  reloading rerolls them. Harmless now; fix by seeding their generation if it
-  starts to matter.
-- **Region hardening: shipped; residual gap** — (corrected July 2026: the
-  old entry claimed no year scaling existed; `EncounterHardening.ts` ships
-  +8% enemy HP/year and +1 Lethality per 3 years, applied in
-  `SortieManager.launchNextCombat`.) Residual: narrative-event combats
-  spawn enemies via a different path and are NOT hardened (known gap,
-  commented in SortieManager), and the numbers are balance sketches
-  untested against play.
+- **Region hardening: fully shipped (July 2026)** — year scaling applies in
+  both `SortieManager.launchNextCombat` and event-spawned combats
+  (`DeadEndStartEncounterChoice.effect()`). Residual: the numbers (+8%
+  HP/year, +1 Lethality/3yr) are balance sketches untested against human
+  play; the sim models difficulty only as win rate, so this is playtest
+  material.
 - **VP sources for the endgame pivot** — final score = VP + vault, but VP
   only comes from Lethe Extraction and per-project trickle. The intended
   endgame decision ("when do I stop building and start scoring") barely
@@ -162,9 +148,12 @@ protocol. Ordered within sections by priority. Delete items when done.
   review, July 2026): four seams — HeadlessActionManager (override animation/
   emit methods), IPlayPolicy interface (replaces the two UI-blocking card
   selection actions), stub CombatUiManager + CombatCardManager. ~35-40 files,
-  mostly mechanical. Prereq cleanups worth doing sooner: rules code reaching
-  into `card.physicalCard` (ActionManager ~line 663, 740) and AbstractIntent
-  querying scene texture cache on construction.
+  mostly mechanical. PREREQS DONE (July 2026): rules/animation split in
+  ActionManager (incidentally fixed a latent bug — dealDamage skipped all
+  rules effects for targets without a physicalCard) and scene-optional
+  intent texture checks. Ready for the main extraction whenever a session
+  wants a big mechanical push; payoff is combat balance ratchets in the
+  economy sim (real fights instead of win-rate scalars).
 
 ## Cost optimization (verification & delegation)
 

@@ -59,3 +59,24 @@ export function pendingLevels(char: { xp: number; level: number }): number {
 export function xpForCombatWin(act: number): number {
     return 10 + 5 * act;
 }
+
+/**
+ * Master-deck cap: starting kit size + one card of room per promotion. A
+ * level-1 recruit already has +1 card of slack over their starting kit;
+ * every subsequent level grants another slot. `startingDeckSize` is the
+ * soldier's own starting-kit size (PlayerCharacter.startingDeck.length),
+ * not a hardcoded per-class constant — kit size can vary by roll, and the
+ * cap simply tracks whatever that soldier actually started with.
+ */
+export function deckCap(soldier: { level: number }, startingDeckSize: number): number {
+    return startingDeckSize + soldier.level;
+}
+
+/**
+ * Whether a soldier's master deck (excluding sortie-scoped cargo, which the
+ * caller must already have filtered out — see CargoInjection.ts) is at or
+ * over its cap.
+ */
+export function isAtDeckCap(soldier: { level: number }, startingDeckSize: number, currentDeckSize: number): boolean {
+    return currentDeckSize >= deckCap(soldier, startingDeckSize);
+}

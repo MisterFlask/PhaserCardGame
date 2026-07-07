@@ -24,7 +24,14 @@
 //     Secretariat (bonus Standing Order slot) is a Capital Work like any
 //     other and needs no DTO change either (StandingOrdersDTO.bonusSlots is
 //     re-synced from ownership on load, not read as ground truth from disk).
-export const SAVE_FORMAT_VERSION = 9;
+// v10: added recruitCandidates (Barracks hireable pool), closing a
+//      save-scumming hole where reloading rerolled the recruits for free.
+//      Reuses CharacterDTO/characterToDTO/characterFromDTO verbatim — same
+//      shape as roster. Fresh-campaign value is an empty array;
+//      CampaignUiState.ensureRecruitsPopulated() lazily tops it up to
+//      RECRUIT_POOL_SIZE on next Barracks visit and never discards existing
+//      entries, so a loaded non-empty pool survives untouched.
+export const SAVE_FORMAT_VERSION = 10;
 export const SAVE_STORAGE_KEY = 'east-infernal-company-save';
 
 export interface BuffDTO {
@@ -122,6 +129,9 @@ export interface CampaignSave {
      *  instance-identity checks in the investment UI keep working. */
     ownedProjects: OwnedProjectDTO[];
     roster: CharacterDTO[];
+    /** Barracks hireable pool (CampaignUiState.recruitCandidates). Same DTO
+     *  shape as roster; kept as a separate field since it is a distinct list. */
+    recruitCandidates: CharacterDTO[];
     standingOrders: StandingOrdersDTO;
     /** Campaign-owned consumable stock. The in-sortie loadout on
      *  GameState.consumables never serializes (saves are HQ-only). */
