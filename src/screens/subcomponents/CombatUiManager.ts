@@ -21,6 +21,7 @@ import { TextBox } from '../../ui/TextBox';
 import { TransientUiState } from '../../ui/TransientUiState';
 import { UIContext, UIContextManager } from '../../ui/UIContextManager';
 import { ActionManager } from '../../utils/ActionManager';
+import SoundUtils from '../../utils/SoundUtils';
 import GeneralRewardScreen from './GeneralRewardScreen';
 
 interface MenuOption {
@@ -160,11 +161,8 @@ class CombatUIManager {
         }
     }
 
-    private createMenu(): void {
-        const gameWidth = this.scene.scale.width;
-        const gameHeight = this.scene.scale.height;
-
-        const menuOptions: MenuOption[] = [
+    private buildMenuOptions(): MenuOption[] {
+        return [
             {
                 text: 'Start New Game',
                 callback: () => {
@@ -191,6 +189,20 @@ class CombatUIManager {
                 callback: () => this.toggleGameAreas()
             },
             {
+                // Static label (not "Mute"/"Unmute") deliberately: Menu has
+                // no way to relabel a single option in place, and rebuilding
+                // the whole option list via updateOptions would drop the
+                // "Deck Contents" entry that Menu's constructor auto-appends
+                // (updateOptions doesn't repeat that step). The speaker icon
+                // still flips at HqChrome; here the current console log and
+                // the icon's own state (checked fresh each click) are enough.
+                text: '\u{1F50A} Toggle Sound',
+                callback: () => {
+                    const nowMuted = SoundUtils.toggleMuted();
+                    console.log(`Sound ${nowMuted ? 'muted' : 'unmuted'}.`);
+                }
+            },
+            {
                 text: 'debug:killAllEnemies',
                 callback: () => {
                     const gameState = GameState.getInstance();
@@ -215,6 +227,13 @@ class CombatUIManager {
                 }
             }
         ];
+    }
+
+    private createMenu(): void {
+        const gameWidth = this.scene.scale.width;
+        const gameHeight = this.scene.scale.height;
+
+        const menuOptions: MenuOption[] = this.buildMenuOptions();
 
         const menuHeight = menuOptions.length * 60 + 100;
 

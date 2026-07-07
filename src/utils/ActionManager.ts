@@ -48,6 +48,7 @@ import { StartCombatAction } from "./actions/specific/StartCombatAction";
 import { WaitAction } from "./actions/WaitAction";
 import { backgroundResistantDelay } from "./BackgroundResistantDelay";
 import { CardOwnershipManager } from "./CardOwnershipManager";
+import SoundUtils from "./SoundUtils";
 
 export class ActionManager {
 
@@ -465,6 +466,7 @@ export class ActionManager {
             }
             return false;
         }
+        SoundUtils.play(this.scene, 'card_whoosh', 0.35);
         const playableCard = card.data as PlayableCardType;
         const gameState = GameState.getInstance();
         const combatState = gameState.combatState;
@@ -858,6 +860,7 @@ export class ActionManager {
                 if (damageResult.unblockedDamage > 0) {
                     // Unblocked damage dealt: glow red
                     this.animateDefenderJiggleAndGlow(physicalCardOfTarget, 0xff0000); // Red color
+                    SoundUtils.play(this.scene, 'damage_thud', 0.4);
                 } else {
                     // No unblocked damage: glow white
                     this.animateDefenderJiggleAndGlow(physicalCardOfTarget, 0xffffff); // White color

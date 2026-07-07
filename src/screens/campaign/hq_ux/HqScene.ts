@@ -5,6 +5,7 @@ import { TransientUiState } from '../../../ui/TransientUiState';
 import { ActionManagerFetcher } from '../../../utils/ActionManagerFetcher';
 import ImageUtils from '../../../utils/ImageUtils';
 import { installLoaderWatchdog } from '../../../utils/LoaderWatchdog';
+import SoundUtils from '../../../utils/SoundUtils';
 import { SceneChanger } from '../../SceneChanger';
 import { CampaignUiState } from './CampaignUiState';
 import { HqChrome, HqTabKey } from './HqChrome';
@@ -74,7 +75,8 @@ export class HqScene extends Scene {
 
         // Add all images to the load queue (served from local resources/)
         new ImageUtils().loadAllImages(this.load);
-        
+        SoundUtils.loadAllSounds(this.load);
+
         SceneChanger.setCurrentScene(this);
         // Load any required assets
         this.load.scenePlugin({

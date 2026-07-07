@@ -3,6 +3,7 @@ import { CampaignUiState } from './CampaignUiState';
 import { CHARTER_YEARS } from '../../../campaign/CampaignCalendar';
 import { SaveManager } from '../../../saveload/SaveManager';
 import { drawWoodPanel, Fonts, Palette } from '../../../ui/UIStyle';
+import SoundUtils from '../../../utils/SoundUtils';
 
 /** Depth chrome sits above panels (panels show at 999). */
 const CHROME_DEPTH = 1500;
@@ -41,6 +42,8 @@ export class HqChrome extends Phaser.GameObjects.Container {
     private wipeButtonBg!: Phaser.GameObjects.Graphics;
     private wipeButtonLabel!: Phaser.GameObjects.Text;
 
+    private muteButtonLabel!: Phaser.GameObjects.Text;
+
     constructor(scene: Scene) {
         super(scene, 0, 0);
         scene.add.existing(this);
@@ -50,6 +53,7 @@ export class HqChrome extends Phaser.GameObjects.Container {
         this.buildTabRail();
         this.buildHoldPostButton();
         this.buildNewCampaignButton();
+        this.buildMuteButton();
     }
 
     // --- Status bar ---------------------------------------------------------
@@ -136,6 +140,38 @@ export class HqChrome extends Phaser.GameObjects.Container {
     public setActiveTab(tab: HqTabKey): void {
         this.activeTab = tab;
         this.redrawTabs();
+    }
+
+    // --- MUTE TOGGLE -------------------------------------------------------
+
+    /** Small speaker icon at the left edge of the tab rail. Persists via
+     *  SoundUtils' own localStorage key, deliberately outside the campaign
+     *  save. */
+    private buildMuteButton(): void {
+        const scene = this.scene;
+        const size = TAB_RAIL_HEIGHT - 8;
+        const container = scene.add.container(size / 2 + 12, TAB_RAIL_Y);
+
+        this.muteButtonLabel = scene.add.text(0, 0, '', {
+            fontFamily: Fonts.DISPLAY, fontSize: '20px', color: Palette.BRASS_TEXT,
+        }).setOrigin(0.5);
+        container.add(this.muteButtonLabel);
+
+        container.setSize(size, size);
+        container.setInteractive();
+        container.on('pointerover', () => container.setScale(1.1));
+        container.on('pointerout', () => container.setScale(1));
+        container.on('pointerdown', () => {
+            SoundUtils.toggleMuted();
+            this.redrawMuteButton();
+        });
+
+        this.redrawMuteButton();
+        this.add(container);
+    }
+
+    private redrawMuteButton(): void {
+        this.muteButtonLabel.setText(SoundUtils.isMuted() ? '\u{1F507}' : '\u{1F50A}');
     }
 
     // --- HOLD POST -------------------------------------------------------

@@ -5,6 +5,7 @@ import { ConsumablesLibrary } from '../../../../consumables/ConsumablesLibrary';
 import { GameState } from '../../../../rules/GameState';
 import { TextBoxButton } from '../../../../ui/Button';
 import { drawBackdropDim, drawPaper, Fonts, Palette } from '../../../../ui/UIStyle';
+import SoundUtils from '../../../../utils/SoundUtils';
 import { CampaignUiState } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
 
@@ -76,6 +77,14 @@ export class SortieReportPanel extends AbstractHqPanel {
         this.grantPendingConsumableReward();
         const report = SortieManager.getInstance().lastSortieReport;
         this.reportText.setText(report.length > 0 ? report.join('\n\n') : 'Nothing to report.');
+        // A quarter's board meeting settled sometime during this sortie (see
+        // CampaignCalendar.settleDividend's "dividend" log lines, folded
+        // into lastSortieReport by SortieManager). This debrief is the first
+        // UI the player sees back at HQ, so it's the seam for the one
+        // quarterly sting — pure campaign code can't play sound itself.
+        if (report.some(line => line.includes('dividend'))) {
+            SoundUtils.play(this.scene, 'board_meeting_sting', 0.5);
+        }
         super.show();
     }
 

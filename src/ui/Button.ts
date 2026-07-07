@@ -1,4 +1,5 @@
 import { TextBox } from './TextBox';
+import SoundUtils from '../utils/SoundUtils';
 
 export class TextBoxButton extends TextBox {
     private isEnabled: boolean = true;
@@ -83,6 +84,7 @@ export class TextBoxButton extends TextBox {
 
     private onPointerDown(): void {
         if (this.isEnabled && this.clickCallback) {
+            SoundUtils.play(this.scene, 'ui_click', 0.3);
             this.clickCallback();
         }
     }

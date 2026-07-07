@@ -32,6 +32,7 @@ import { ActionManager } from '../utils/ActionManager';
 import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
 import ImageUtils from '../utils/ImageUtils';
 import { installLoaderWatchdog } from '../utils/LoaderWatchdog';
+import SoundUtils from '../utils/SoundUtils';
 import { runSmokeTest } from '../utils/SmokeTest';
 import { HqScene } from './campaign/hq_ux/HqScene';
 import { SceneChanger } from './SceneChanger';
@@ -88,6 +89,7 @@ class CombatScene extends Phaser.Scene {
 
         // Add all images to the load queue (served from local resources/)
         new ImageUtils().loadAllImages(this.load);
+        SoundUtils.loadAllSounds(this.load);
 
         ActionManagerFetcher.initServicesAsync(this);
     }
