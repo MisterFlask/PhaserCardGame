@@ -97,13 +97,16 @@ protocol. Ordered within sections by priority. Delete items when done.
 
 ## Engineering
 
-- **Decide: jsdom/happy-dom vitest environment** — anything importing
-  PlayerCharacter/PlayableCard transitively pulls Phaser, which throws under
-  plain-Node vitest, so character/perk save round-trips can only be
-  verified in the browser today (the leveling work hit this directly).
-  Adding a DOM test environment would let DTO round-trip tests cover
-  characters; it's a build-infra change with cross-cutting effects, so it
-  wants a deliberate pass, not a drive-by.
+- **DOM test environment: CLOSED NEGATIVE (July 2026 spike)** — happy-dom
+  cannot host Phaser under vitest: after stubbing canvas 2D, Phaser's
+  WebGLRenderer hits `if (typeof WEBGL_DEBUG) require('phaser3spectorjs')`
+  — webpack DefinePlugin dead-code syntax that is unconditionally truthy
+  under raw Node (typeof an undeclared global is a non-empty string) and
+  unfixable via vitest alias (node_modules requires bypass Vite). Do not
+  retry without patching Phaser. Character round-trips stay browser-only;
+  the real fix arrives with the headless combat simulator extraction
+  (stubs at OUR layer, not Phaser's). happy-dom stays installed as a
+  devDependency for non-Phaser DOM needs.
 
 - **Audio: minimal pass shipped (July 2026)** — Kenney CC0 clicks/whoosh/
   thud/board-sting via SoundUtils registry, persisted mute toggle.
@@ -118,12 +121,12 @@ protocol. Ordered within sections by priority. Delete items when done.
   OPENAI_API_KEY), removing allowlist entries as art lands — good
   incremental batch work, prioritize enemies the player actually meets
   (act 1 first).
-- **Deployment target + bundle hygiene** — no deploy pipeline exists;
-  index.html loads two CDN Phaser builds plus the 13.7MB bundled one
-  (known sharp edge), and resources/ is 170MB. Decide the distribution
-  target (itch.io web build?), then: single Phaser instance, asset
-  compression/pruning, and a build that doesn't ship the whole resources
-  tree.
+- **Image pipeline pass** — deployment is settled (gh-pages, prod bundle
+  2.9MB as of July 2026); the remaining payload problem is resources/
+  (~170MB of PNGs). A dedicated pass: lossy-compress sprites (pngquant/
+  webp), consider downscaling the oversized enemy art, and teach the
+  deploy's change-detection to ship only referenced assets (the manifest
+  knows exactly which files the game loads).
 
 - **Combat-restart race hardening** — `cleanupAndRestartCombat`
   (CombatAndMapScene) recreates managers and re-queues actions while the old
