@@ -75,12 +75,12 @@ protocol. Ordered within sections by priority. Delete items when done.
   + encounter tables + enemies. Also the natural fix for late-campaign
   variety alongside region hardening. Good Codex-lane batch work once the
   enemy-design spec exists.
-- **Enemy spawn QA residual** — 10 new act 2/3 enemies shipped July 2026
-  (rosters now ~21/21/16); `scripts/qa-spawn.mjs` runtime-verified 6 of 10
-  across 15 error-free forced sorties. Unsampled by the random tables:
-  Maxwell-Coil Trooper, Foundry Tick, Union Runner, Ironclad Picket — same
-  construction idioms as verified siblings, low risk; a couple more
-  qa-spawn runs (or targeted encounter forcing) closes it.
+- **Enemy spawn QA residual** — 7 of 10 new act 2/3 enemies runtime-verified
+  via `scripts/qa-spawn.mjs` across ~30 error-free forced sorties; Foundry
+  Tick, Union Runner, Ironclad Picket (all registered, idiom-identical to
+  verified siblings) keep missing the random draws. Low risk; closes
+  naturally next time anyone plays act 3, or add a target-encounter
+  override to qa-spawn if it nags.
 - **Cog class identity** — one of four classes has placeholder lore and the
   thinnest mechanical identity (Manufactured cards). Either invest (design
   pass + cards) or consider whether four classes is right at all.

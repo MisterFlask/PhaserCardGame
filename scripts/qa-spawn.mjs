@@ -71,7 +71,7 @@ async function main() {
             const findIn = (list, pred) => { for (const o of list) { if (pred(o)) return o; if (Array.isArray(o.list)) { const f = findIn(o.list, pred); if (f) return f; } } return null; };
             const scene = () => window.game.scene.getScenes(true)[0];
             const gs = window.getGameState(); const cs = window.getCampaignState();
-            const seen = new Set(); const failures = []; const configs = [[3,1],[3,1],[3,1],[3,1],[3,1],[3,1],[3,1],[3,1]];
+            const seen = new Set(); const failures = []; const configs = [[3,1],[3,1],[3,1],[2,1],[2,1],[3,1],[3,1],[2,1]];
             for (let i = 0; i < configs.length; i++) {
                 const [act, seg] = configs[i];
                 try {
