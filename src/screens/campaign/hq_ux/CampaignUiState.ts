@@ -2,7 +2,7 @@ import { CampaignCalendar, WAGE_PER_SOLDIER_PER_QUARTER } from '../../../campaig
 import { Contract } from '../../../campaign/Contract';
 import { ContractGenerator } from '../../../campaign/ContractGenerator';
 import { MAX_CONSUMABLE_STOCK } from '../../../campaign/ConsumableStock';
-import { StandingOrdersState } from '../../../campaign/orders/StandingOrdersState';
+import { _wireRetainerUnlockCheck, StandingOrdersState } from '../../../campaign/orders/StandingOrdersState';
 import { AbstractConsumable } from '../../../consumables/AbstractConsumable';
 import { CharacterGenerator } from '../../../gamecharacters/CharacterGenerator';
 import { PlayerCharacter } from '../../../gamecharacters/PlayerCharacter';
@@ -25,21 +25,33 @@ export const CLIENT_RETAINER_UNLOCK_THRESHOLD = 3;
  * Maps a contract client string (Contract.client, e.g. "The Styx Dam Project
  * Office") to the Standing Order id it unlocks after
  * CLIENT_RETAINER_UNLOCK_THRESHOLD completed contracts for that client.
- *
- * INTENTIONALLY EMPTY at present: the design amendment names this mechanism
- * as a "future hook" and gives exactly one illustrative example ("fulfil
- * three Infernal Marine contracts -> Underwriting Retainer") using a client
- * name that does not match any client in ContractGenerator.ts's actual
- * REGION_FLAVORS/TRADE_RUN_REGIONS tables. Which of the twelve real clients
- * get bespoke retainer orders, and what those orders do, is an unresolved
- * design decision (see TODO.md "Faction reputation + intelligence services"
- * — flagged as its own design session). The tracking/unlock/UI mechanism
- * below is fully wired and ready; populate this map (and register the
- * corresponding StandingOrder subclasses in LaunchOrders.ts) once that
- * design pass happens. House rule 6: this registry is the only place a
- * client-to-order mapping may live — no per-client branches elsewhere.
+ * Client strings must match ContractGenerator's templates byte-for-byte —
+ * enforced by ClientReputation.test.ts. House rule 6: this registry is the
+ * only place a client-to-order mapping may live — no per-client branches
+ * elsewhere. Canon and per-order specs: src/docs/faction_reputation_design.md
+ * ("Retainer canon"); order classes live in
+ * src/campaign/orders/ClientRetainerOrders.ts.
  */
-export const CLIENT_RETAINER_ORDER_IDS: Record<string, string> = {};
+export const CLIENT_RETAINER_ORDER_IDS: Record<string, string> = {
+    "The Styx Dam Project Office": "civil-works-schedule",
+    "Infernal Marine & Postal Underwriters, Ltd.": "underwriting-retainer",
+    "Styx Delta Ferry & Lighterage Company": "preferred-lading-rates",
+    "Maison Vachon, Purveyors to the Front": "officers-mess-account",
+    "Brimstone Barons Equipment Leasing Consortium": "plant-and-equipment-lease",
+    "Continental Casualty & Ossuary Underwriters": "ossuary-death-benefit",
+};
+
+// Wires StandingOrdersState's gated registry view to the live unlock check
+// (see StandingOrdersState._wireRetainerUnlockCheck doc: it can't import
+// CampaignUiState directly without a load cycle, since CampaignUiState
+// imports ContractGenerator, which imports StandingOrdersState). Module-init
+// side effect, deliberately narrow — this is the one seam where the two
+// modules touch.
+_wireRetainerUnlockCheck((orderId: string) => {
+    const client = Object.keys(CLIENT_RETAINER_ORDER_IDS).find(c => CLIENT_RETAINER_ORDER_IDS[c] === orderId);
+    if (!client) return true; // not a client-retainer order id; nothing to gate
+    return CampaignUiState.getInstance().isClientRetainerUnlocked(client);
+});
 
 export class CampaignUiState {
     private static instance: CampaignUiState;
@@ -87,7 +99,7 @@ export class CampaignUiState {
     public ensureContractsPopulated(): void {
         if (this.availableContracts.length === 0) {
             this.availableContracts = ContractGenerator.getInstance()
-                .refillBoard(this.availableContracts, this.calendar.year, this.contractsCompleted);
+                .refillBoard(this.availableContracts, this.calendar.year, this.contractsCompleted, 5, this.contractsCompletedByClient);
         }
     }
 
@@ -226,7 +238,7 @@ export class CampaignUiState {
         this.availableContracts.forEach(c => c.deadlineWeeks -= n);
         this.availableContracts = this.availableContracts.filter(c => c.deadlineWeeks > 0);
         this.availableContracts = ContractGenerator.getInstance()
-            .refillBoard(this.availableContracts, this.calendar.year, this.contractsCompleted);
+            .refillBoard(this.availableContracts, this.calendar.year, this.contractsCompleted, 5, this.contractsCompletedByClient);
 
         // A fresh crop of hopefuls drifts through the recruitment office.
         this.recruitCandidates = [];

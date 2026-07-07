@@ -1,6 +1,7 @@
 import { Contract, ContractType } from "./Contract";
 import { CONSUMABLE_REWARD_NAMES } from "./ConsumableStock";
 import { StandingOrdersState } from "./orders/StandingOrdersState";
+import { applyCharteredPartnerBonus } from "./ClientReputation";
 
 /**
  * A contract template bundles name/client/description/paymentClause as one
@@ -386,7 +387,7 @@ export class ContractGenerator {
             : undefined;
     }
 
-    private generateBountyContract(region: RegionFlavor, year: number): Contract {
+    private generateBountyContract(region: RegionFlavor, year: number, contractsCompletedByClient: Record<string, number>): Contract {
         const template = this.pick(region.templates);
 
         // Segment within the act is the fine-grained difficulty dial.
@@ -395,7 +396,11 @@ export class ContractGenerator {
 
         const numCombats = Math.random() < 0.45 ? 1 : 2;
         const squadSize = this.rollSquadSize();
-        const payout = this.rollBountyPayout(year, region.act, segment, numCombats, squadSize);
+        const rolledPayout = this.rollBountyPayout(year, region.act, segment, numCombats, squadSize);
+        // Chartered Partner (faction_reputation_design.md): applied after all
+        // other payout passes (danger pay included, via rollBountyPayout),
+        // re-rounded to £5.
+        const payout = applyCharteredPartnerBonus(rolledPayout, template.client, contractsCompletedByClient);
         const deadlineWeeks = this.rollDeadlineWeeks();
         const consumableRewardName = this.rollConsumableReward();
 
@@ -429,7 +434,7 @@ export class ContractGenerator {
      * roughly 2x money for 12 dead cards spread across three decks. Squad
      * size never rolls 2 (no hands to spare): 3 or 4 only.
      */
-    private generateTradeRunContract(region: TradeRunRegion, year: number): Contract {
+    private generateTradeRunContract(region: TradeRunRegion, year: number, contractsCompletedByClient: Record<string, number>): Contract {
         const template = this.pick(region.templates);
 
         const segment = Math.floor(Math.random() * 3);
@@ -438,8 +443,15 @@ export class ContractGenerator {
         const squadSize = this.rollTradeRunSquadSize();
 
         const normalPayoutRoll = this.rollBountyPayout(year, region.act, segment, numCombats, squadSize);
-        const basePayout = Math.round((normalPayoutRoll * ContractGenerator.TRADE_RUN_BASE_PAYOUT_FRACTION) / 5) * 5;
-        const freightRatePerCrate = ContractGenerator.TRADE_RUN_FREIGHT_RATE_PER_ACT * region.act;
+        const rolledBasePayout = Math.round((normalPayoutRoll * ContractGenerator.TRADE_RUN_BASE_PAYOUT_FRACTION) / 5) * 5;
+        // Chartered Partner (faction_reputation_design.md): applied after all
+        // other payout passes, re-rounded to £5 — same pass as the bounty path.
+        const basePayout = applyCharteredPartnerBonus(rolledBasePayout, template.client, contractsCompletedByClient);
+        // Preferred Lading Rates retainer (freight bump, faction_reputation_design.md
+        // "NEW HOOK (freight)"): flat £ added at generation, same
+        // consult-StandingOrdersState pattern as every other generator lever.
+        const freightRatePerCrate = StandingOrdersState.getInstance()
+            .freightRatePerCrate(ContractGenerator.TRADE_RUN_FREIGHT_RATE_PER_ACT * region.act);
         const maxCrates = ContractGenerator.TRADE_RUN_MAX_CRATES;
 
         const deadlineWeeks = this.rollDeadlineWeeks();
@@ -466,33 +478,36 @@ export class ContractGenerator {
         });
     }
 
-    public generateContract(year: number, contractsCompleted: number = 0): Contract {
+    public generateContract(year: number, contractsCompleted: number = 0, contractsCompletedByClient: Record<string, number> = {}): Contract {
         const maxAct = this.maxActUnlocked(year, contractsCompleted);
 
         if (Math.random() < ContractGenerator.TRADE_RUN_CHANCE) {
             const eligibleTradeRegions = TRADE_RUN_REGIONS.filter(r => r.act <= maxAct);
-            return this.generateTradeRunContract(this.pick(eligibleTradeRegions), year);
+            return this.generateTradeRunContract(this.pick(eligibleTradeRegions), year, contractsCompletedByClient);
         }
 
         const eligibleRegions = REGION_FLAVORS.filter(r => r.act <= maxAct);
-        return this.generateBountyContract(this.pick(eligibleRegions), year);
+        return this.generateBountyContract(this.pick(eligibleRegions), year, contractsCompletedByClient);
     }
 
     /** Top the board back up to targetCount contracts (adjusted by Standing
      *  Orders). At least one trade run per full board refresh (starting
      *  from an empty board) so the axis is always available, even though
      *  each contract only independently rolls ~20% odds. */
-    public refillBoard(existing: Contract[], year: number, contractsCompleted: number = 0, targetCount: number = 5): Contract[] {
+    public refillBoard(
+        existing: Contract[], year: number, contractsCompleted: number = 0, targetCount: number = 5,
+        contractsCompletedByClient: Record<string, number> = {}
+    ): Contract[] {
         const board = [...existing];
         const adjustedTarget = StandingOrdersState.getInstance().contractBoardTarget(targetCount);
         const isFullRefresh = existing.length === 0;
         while (board.length < adjustedTarget) {
-            board.push(this.generateContract(year, contractsCompleted));
+            board.push(this.generateContract(year, contractsCompleted, contractsCompletedByClient));
         }
         if (isFullRefresh && board.length > 0 && !board.some(c => c.isTradeRun)) {
             const maxAct = this.maxActUnlocked(year, contractsCompleted);
             const eligibleTradeRegions = TRADE_RUN_REGIONS.filter(r => r.act <= maxAct);
-            board[board.length - 1] = this.generateTradeRunContract(this.pick(eligibleTradeRegions), year);
+            board[board.length - 1] = this.generateTradeRunContract(this.pick(eligibleTradeRegions), year, contractsCompletedByClient);
         }
         return board;
     }
