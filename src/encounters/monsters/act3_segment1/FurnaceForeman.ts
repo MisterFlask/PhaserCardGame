@@ -13,7 +13,7 @@ export class FurnaceForeman extends AutomatedCharacter {
             name: 'Furnace Foreman',
             portraitName: 'foreman',
             maxHitpoints: 80,
-            description: 'Master of the blistering forges.'
+            description: "Runs his stretch of the Furnace like a man who has personally never been burned by it, which seems statistically improbable given the surroundings. Armoured in overlapping forge-plate that turns most blows, and free with the bellows-blast when conversation fails, which it did almost immediately. Brought in a scab automaton to break the picket line the moment we started winning, a move I found professionally impressive and personally very inconvenient."
         });
         this.buffs.push(new Armored(2));
         this.buffs.push(new Exploitation(2));

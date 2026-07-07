@@ -10,7 +10,7 @@ export class FrenchRestauranteur extends AutomatedCharacter {
             name: "Le Restaurateur",
             portraitName: "french-restauranteur-chef",
             maxHitpoints: 150,
-            description: "retains access to the Gastronome Codex"
+            description: "A chef of the old Imperial school, still in immaculate whites despite the surroundings, who regards the trench war as an unfortunate interruption to service. He carries a codex of recipes I devoutly hope never to see completed and summons ingredients - if that is the word - directly from whatever unlucky flesh is nearest. Offered us a tasting menu at gunpoint, essentially. Declined, obviously, though Jenkins admits the smell was better than anything in the officers' mess."
         });
         
         this.buffs.push(new Idol(1));

@@ -13,7 +13,7 @@ export class UnionEnforcer extends AutomatedCharacter {
             name: 'Union Enforcer',
             portraitName: 'tough-worker',
             maxHitpoints: 165,
-            description: 'Heavy muscle for the cause.'
+            description: "The Stoker's Union keeps men like this for what they term 'wage disputes,' a phrase I now understand to mean considerably more than strongly worded correspondence. Built like a boiler himself, plated in scavenged armour, and slow enough that you'd think him manageable right up until his fist finds you regardless. Alternates between simple violence and a very effective line in intimidation - stress and doubt in roughly equal measure, delivered with a look that suggests he's disappointed rather than angry, which is somehow worse."
         });
         this.buffs.push(new RevolutionaryFervor(9));
         this.buffs.push(new Armored(3));

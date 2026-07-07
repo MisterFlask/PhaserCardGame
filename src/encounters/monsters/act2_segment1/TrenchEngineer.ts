@@ -50,7 +50,7 @@ export class TrenchEngineer extends AutomatedCharacter {
             name: 'Trench Engineer',
             portraitName: 'Napoleonic Zombie',
             maxHitpoints: 80,
-            description: 'Undead sapper laying fortifications and traps.'
+            description: "A sapper, dead these many years, who has not been informed of the fact and continues fortifying regardless. Leave him unmolested for even a turn and he'll have sandbags stacked to the chin and his strength quietly doubled before you've noticed the shovel moving; strike him and the work stops, briefly, while he remembers he's under attack. Methodical to a fault - I suspect he was an insufferable colleague even before he died."
         });
         this.buffs.push(new Entrench());
     }

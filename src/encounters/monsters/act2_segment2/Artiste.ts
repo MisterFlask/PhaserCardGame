@@ -88,7 +88,7 @@ export class Artiste extends AutomatedCharacter {
             name: "L'Artiste Moderne",
             portraitName: "artiste-slime-painter",
             maxHitpoints: 120,
-            description: "creates art that hurts to look at"
+            description: "A deserter of the artistic persuasion, working in a medium best described as 'trench slime, applied liberally.' He insisted on showing us the full portfolio before attacking, which was, I maintain, the more painful of the two ordeals. Each canvas he finishes seems to leave a physical residue behind - the wretched things simply appear in one's pack, unbidden, and every one of them stings faintly to touch. Morrison called it derivative. This did not improve our situation."
         });
 
         this.buffs.push(new Muse(1));

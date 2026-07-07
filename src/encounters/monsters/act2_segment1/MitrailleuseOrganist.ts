@@ -10,7 +10,7 @@ export class MitrailleuseOrganist extends AutomatedCharacter {
             name: 'Mitrailleuse Organist',
             portraitName: 'Machine Gunner Demon',
             maxHitpoints: 100,
-            description: 'A frenzied gunner pounding a demonic organ that spits bullets.'
+            description: "A converted church organ, or the corpse of one, strapped to a gun-carriage and played by something that used to be a man of the cloth. Each hymn triggers a different bank of barrels; he favours the more triumphant registers, unfortunately, and fires accordingly. Rotting badly and does not seem to mind, or notice, or in fact be entirely present - the hands keep time regardless. We are assured by the locals that killing the instrument does rather more good than killing the organist."
         });
         this.buffs.push(new Implacable(1));
         this.buffs.push(new Decaying(2));

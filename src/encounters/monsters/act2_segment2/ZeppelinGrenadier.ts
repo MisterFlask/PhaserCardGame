@@ -34,7 +34,7 @@ export class ZeppelinGrenadier extends AutomatedCharacter {
             name: 'Zeppelin Grenadier',
             portraitName: 'Napoleonic Zombie',
             maxHitpoints: 85,
-            description: 'German aerial trooper dropping shrapnel from above.'
+            description: "A Reichsinfernokorps trooper, dropped - literally - from one of the airships that patrol this stretch of the front on Berlin's behalf. Ostensibly he is here to liberate Deep France from the Emperor's revenants; in practice he seeds the air with drifting shrapnel that finds you the moment you reach for a card, liberation apparently requiring rather more collateral damage than advertised. Landed badly and didn't seem to mind. I did not ask why."
         });
         this.buffs.push(new ShrapnelClouds(1));
     }
