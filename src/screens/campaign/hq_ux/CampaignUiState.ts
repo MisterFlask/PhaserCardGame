@@ -1,7 +1,9 @@
 import { CampaignCalendar } from '../../../campaign/CampaignCalendar';
 import { Contract } from '../../../campaign/Contract';
 import { ContractGenerator } from '../../../campaign/ContractGenerator';
+import { MAX_CONSUMABLE_STOCK } from '../../../campaign/ConsumableStock';
 import { StandingOrdersState } from '../../../campaign/orders/StandingOrdersState';
+import { AbstractConsumable } from '../../../consumables/AbstractConsumable';
 import { CharacterGenerator } from '../../../gamecharacters/CharacterGenerator';
 import { PlayerCharacter } from '../../../gamecharacters/PlayerCharacter';
 import { CampaignRules } from '../../../rules/CampaignRulesHelper';
@@ -28,6 +30,10 @@ export class CampaignUiState {
     public recruitCandidates: PlayerCharacter[] = [];
     /** Campaign stat, shown on the end-of-campaign screen. */
     public contractsCompleted: number = 0;
+    /** Canonical owned consumable stock — the one owner of this fact
+     *  (house rule 3). SortieManager transfers these into GameState.consumables
+     *  (the active loadout) on dispatch and back on successful resolution. */
+    public consumables: AbstractConsumable[] = [];
 
     private constructor() {}
 
@@ -91,6 +97,29 @@ export class CampaignUiState {
         this.roster.push(candidate);
         this.recruitCandidates = this.recruitCandidates.filter(c => c !== candidate);
         this.ensureRecruitsPopulated();
+        return true;
+    }
+
+    /** True when owned stock is at the shared cap; purchases and grants are
+     *  blocked/redirected once this holds. */
+    public isConsumableStockFull(): boolean {
+        return this.consumables.length >= MAX_CONSUMABLE_STOCK;
+    }
+
+    /**
+     * Purchase a consumable for the Quartermaster's price, adding it to
+     * campaign stock. Returns false (and does nothing) if the vault can't
+     * cover it or stock is already at cap.
+     */
+    public purchaseConsumable(consumable: AbstractConsumable, price: number): boolean {
+        const gameState = GameState.getInstance();
+        if (this.isConsumableStockFull()) return false;
+        if (gameState.moneyInVault < price) return false;
+
+        gameState.moneyInVault -= price;
+        consumable.init();
+        consumable.onPurchase();
+        this.consumables.push(consumable);
         return true;
     }
 

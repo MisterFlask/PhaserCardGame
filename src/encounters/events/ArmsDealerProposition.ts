@@ -1,4 +1,5 @@
 import { AbstractChoice, AbstractEvent, DeadEndEvent } from "../../events/AbstractEvent";
+import { StokersTonic } from "../../consumables/StokersTonic";
 import { Stress } from "../../gamecharacters/buffs/standard/Stress";
 import { BelphegorsRounds } from "../../relics/rare/BelphegorsRounds";
 
@@ -29,7 +30,7 @@ class AcceptTestChoice extends AbstractChoice {
             "One soldier suffers 5 damage and gains 2 Stress. Receive double ammunition."
         );
         const payoff = new DeadEndEvent();
-        payoff.description = "Double ammunition for one man's discomfort — compelling arithmetic. [color=white]\"Stand there, by that rock,\"[/color] it said. The weapon sounded like a pipe organ being murdered. Thompson screamed, glowing shrapnel in his thigh. Not fatal, apparently.\n" +
+        payoff.description = "Double ammunition for one man's discomfort — compelling arithmetic. [color=white]\"Stand there, by that rock,\"[/color] it said. The weapon sounded like a pipe organ being murdered. Thompson screamed, glowing shrapnel in his thigh. Not fatal, apparently. The sigil tossed over a hip flask by way of apology. [color=white]\"For the shakes,\"[/color] it said.\n" +
             "— Cavendish";
         this.nextEvent = payoff;
     }
@@ -39,6 +40,7 @@ class AcceptTestChoice extends AbstractChoice {
         character.hitpoints = Math.max(1, character.hitpoints - this.damage);
         this.actionManager().applyBuffToCharacter(character, new Stress(2));
         this.actionManager().addRelicToInventory(new BelphegorsRounds(2));
+        this.addConsumable(new StokersTonic());
     }
 }
 

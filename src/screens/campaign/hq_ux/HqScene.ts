@@ -17,10 +17,11 @@ import { EndOfCampaignPanel } from './panels/EndOfCampaignPanel';
 import { InvestmentPanel } from './panels/InvestmentPanel';
 import { LedgerPanel } from './panels/LedgerPanel';
 import { PromotionPanel } from './panels/PromotionPanel';
+import { QuartermasterPanel } from './panels/QuartermasterPanel';
 import { SortieReportPanel } from './panels/SortieReportPanel';
 import { pendingLevels } from '../../../campaign/Leveling';
 
-type PanelKey = 'contracts' | 'investment' | 'barracks' | 'ledger' | 'ending' | 'report' | 'promotion';
+type PanelKey = 'contracts' | 'investment' | 'barracks' | 'ledger' | 'ending' | 'report' | 'promotion' | 'quartermaster';
 
 export class HqScene extends Scene {
     private currentPanel?: AbstractHqPanel;
@@ -33,6 +34,7 @@ export class HqScene extends Scene {
     private endOfCampaignPanel!: EndOfCampaignPanel;
     private sortieReportPanel!: SortieReportPanel;
     private promotionPanel!: PromotionPanel;
+    private quartermasterPanel!: QuartermasterPanel;
 
     constructor() {
         super({ key: 'HqScene' });
@@ -95,6 +97,7 @@ export class HqScene extends Scene {
         this.endOfCampaignPanel = new EndOfCampaignPanel(this);
         this.sortieReportPanel = new SortieReportPanel(this);
         this.promotionPanel = new PromotionPanel(this);
+        this.quartermasterPanel = new QuartermasterPanel(this);
 
         // Hide all panels initially
         this.investmentPanel.setVisible(false);
@@ -104,6 +107,7 @@ export class HqScene extends Scene {
         this.endOfCampaignPanel.setVisible(false);
         this.sortieReportPanel.setVisible(false);
         this.promotionPanel.setVisible(false);
+        this.quartermasterPanel.setVisible(false);
 
         // The chrome (status bar + tab rail) persists above every normal
         // panel; it is created once and never destroyed across sortie
@@ -149,6 +153,9 @@ export class HqScene extends Scene {
                     break;
                 case 'promotion':
                     this.showPanel('promotion');
+                    break;
+                case 'quartermaster':
+                    this.showPanel('quartermaster');
                     break;
                 default:
                     this.showPanel('contracts');
@@ -202,6 +209,9 @@ export class HqScene extends Scene {
             case 'promotion':
                 this.currentPanel = this.promotionPanel;
                 break;
+            case 'quartermaster':
+                this.currentPanel = this.quartermasterPanel;
+                break;
         }
         this.currentPanelKey = panelKey;
 
@@ -214,7 +224,7 @@ export class HqScene extends Scene {
         // persistent chrome visible above it.
         this.chrome.setVisible(panelKey !== 'ending');
         if (panelKey === 'contracts' || panelKey === 'investment'
-            || panelKey === 'barracks' || panelKey === 'ledger') {
+            || panelKey === 'barracks' || panelKey === 'ledger' || panelKey === 'quartermaster') {
             this.chrome.setActiveTab(panelKey as HqTabKey);
         }
     }

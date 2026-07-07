@@ -1,4 +1,6 @@
 import { StandingOrdersState } from "../campaign/orders/StandingOrdersState";
+import { AbstractConsumable } from "../consumables/AbstractConsumable";
+import { ConsumablesLibrary } from "../consumables/ConsumablesLibrary";
 import { AbstractBuff } from "../gamecharacters/buffs/AbstractBuff";
 import { PlayableCard } from "../gamecharacters/PlayableCard";
 import { PlayerCharacter } from "../gamecharacters/PlayerCharacter";
@@ -9,7 +11,7 @@ import {
     standingOrdersToDTO
 } from "./PureDTOConversions";
 import {
-    BuffDTO, CampaignSave, CardDTO, CharacterDTO,
+    BuffDTO, CampaignSave, CardDTO, CharacterDTO, ConsumableDTO,
     SAVE_FORMAT_VERSION
 } from "./SaveDTOs";
 import { SaveRegistries } from "./SaveRegistries";
@@ -61,6 +63,13 @@ export class CampaignSerializer {
         };
     }
 
+    private static consumableToDTO(consumable: AbstractConsumable): ConsumableDTO {
+        return {
+            name: consumable.getDisplayName(),
+            usesLeft: consumable.uses,
+        };
+    }
+
     public static toSave(): CampaignSave {
         const campaign = CampaignUiState.getInstance();
         const gameState = GameState.getInstance();
@@ -79,6 +88,7 @@ export class CampaignSerializer {
             })),
             roster: campaign.roster.map(c => this.characterToDTO(c)),
             standingOrders: standingOrdersToDTO(StandingOrdersState.getInstance()),
+            consumables: campaign.consumables.map(c => this.consumableToDTO(c)),
         };
     }
 
@@ -155,6 +165,16 @@ export class CampaignSerializer {
         return character;
     }
 
+    private static consumableFromDTO(dto: ConsumableDTO): AbstractConsumable | null {
+        const consumable = ConsumablesLibrary.getInstance().getConsumableByName(dto.name);
+        if (!consumable) {
+            console.warn(`CampaignSerializer: unknown consumable "${dto.name}" in save, dropping`);
+            return null;
+        }
+        consumable.uses = dto.usesLeft;
+        return consumable;
+    }
+
     /** Overwrites the live singletons with the saved campaign. HQ-scope only. */
     public static applySave(save: CampaignSave): void {
         const campaign = CampaignUiState.getInstance();
@@ -184,6 +204,9 @@ export class CampaignSerializer {
         campaign.roster = save.roster
             .map(c => this.characterFromDTO(c))
             .filter((c): c is PlayerCharacter => c !== null);
+        campaign.consumables = save.consumables
+            .map(c => this.consumableFromDTO(c))
+            .filter((c): c is AbstractConsumable => c !== null);
 
         applyStandingOrdersDTO(StandingOrdersState.getInstance(), save.standingOrders);
     }

@@ -8,7 +8,9 @@
 // v5: added per-character xp/level (Amendment: Soldier Levels & Promotions).
 //     Perks ride the existing `traits` buff serialization (isPersonaTrait);
 //     no new DTO shape needed for them.
-export const SAVE_FORMAT_VERSION = 5;
+// v6: added consumables (campaign-owned consumable stock; the per-sortie
+//     loadout on GameState never serializes) and Contract.consumableRewardName.
+export const SAVE_FORMAT_VERSION = 6;
 export const SAVE_STORAGE_KEY = 'east-infernal-company-save';
 
 export interface BuffDTO {
@@ -60,6 +62,13 @@ export interface ContractDTO {
     durationWeeks: number;
     payout: number;
     regionName: string;
+    consumableRewardName?: string;
+}
+
+export interface ConsumableDTO {
+    /** Display name, resolved through ConsumablesLibrary.getConsumableByName. */
+    name: string;
+    usesLeft: number;
 }
 
 export interface CalendarDTO {
@@ -92,4 +101,7 @@ export interface CampaignSave {
     ownedProjects: OwnedProjectDTO[];
     roster: CharacterDTO[];
     standingOrders: StandingOrdersDTO;
+    /** Campaign-owned consumable stock. The in-sortie loadout on
+     *  GameState.consumables never serializes (saves are HQ-only). */
+    consumables: ConsumableDTO[];
 }

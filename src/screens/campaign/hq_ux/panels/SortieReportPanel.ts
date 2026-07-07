@@ -1,6 +1,8 @@
 import { Scene } from 'phaser';
 import { pendingLevels } from '../../../../campaign/Leveling';
 import { SortieManager } from '../../../../campaign/SortieManager';
+import { ConsumablesLibrary } from '../../../../consumables/ConsumablesLibrary';
+import { GameState } from '../../../../rules/GameState';
 import { TextBoxButton } from '../../../../ui/Button';
 import { TextBox } from '../../../../ui/TextBox';
 import { CampaignUiState } from '../CampaignUiState';
@@ -51,9 +53,44 @@ export class SortieReportPanel extends AbstractHqPanel {
     }
 
     public show(): void {
+        this.grantPendingConsumableReward();
         const report = SortieManager.getInstance().lastSortieReport;
         this.reportText.setText(report.length > 0 ? report.join('\n\n') : 'Nothing to report.');
         super.show();
+    }
+
+    /**
+     * D7 seam: SortieManager.resolveSortie (src/campaign/, Phaser-free per
+     * house rule 1) cannot import ConsumablesLibrary, so it only records the
+     * reward's name on pendingConsumableRewardName. This panel is the first
+     * Phaser-bound code to run after resolution, so it performs the actual
+     * grant here: push to campaign stock if under cap, otherwise bank half
+     * the consumable's price as resale (a spare consumable earns something
+     * rather than evaporating silently at a full stockroom).
+     */
+    private grantPendingConsumableReward(): void {
+        const sortieManager = SortieManager.getInstance();
+        const name = sortieManager.pendingConsumableRewardName;
+        sortieManager.pendingConsumableRewardName = null;
+        if (!name) return;
+
+        const consumable = ConsumablesLibrary.getInstance().getConsumableByName(name);
+        if (!consumable) {
+            console.warn(`SortieReportPanel: unknown consumable reward "${name}", skipping grant`);
+            return;
+        }
+        consumable.init();
+
+        const campaign = CampaignUiState.getInstance();
+        if (!campaign.isConsumableStockFull()) {
+            campaign.consumables.push(consumable);
+        } else {
+            const resale = Math.floor(consumable.basePrice / 2);
+            GameState.getInstance().moneyInVault += resale;
+            sortieManager.lastSortieReport.push(
+                `Provisioning stores full: ${name} sold back to the Company for £${resale}.`
+            );
+        }
     }
 
     update(): void {

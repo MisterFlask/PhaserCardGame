@@ -14,11 +14,12 @@ const TAB_RAIL_Y = STATUS_BAR_Y + STATUS_BAR_HEIGHT / 2 + TAB_RAIL_HEIGHT / 2;
 
 const DISARM_MS = 3000;
 
-export type HqTabKey = 'contracts' | 'barracks' | 'investment' | 'ledger';
+export type HqTabKey = 'contracts' | 'barracks' | 'investment' | 'ledger' | 'quartermaster';
 
 const TABS: { key: HqTabKey; label: string }[] = [
     { key: 'contracts', label: 'CONTRACTS' },
     { key: 'barracks', label: 'BARRACKS' },
+    { key: 'quartermaster', label: 'PROVISIONS' },
     { key: 'investment', label: 'BOARDROOM' },
     { key: 'ledger', label: 'LEDGER' },
 ];

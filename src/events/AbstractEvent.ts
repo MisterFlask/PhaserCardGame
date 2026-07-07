@@ -4,6 +4,7 @@ import { GameState } from "../rules/GameState";
 import { ActionManager } from "../utils/ActionManager";
 import { ActionManagerFetcher } from "../utils/ActionManagerFetcher";
 import { Encounter } from "../encounters/EncounterManager";
+import { AbstractConsumable } from "../consumables/AbstractConsumable";
 
 export abstract class AbstractChoice {
     constructor(
@@ -31,6 +32,22 @@ export abstract class AbstractChoice {
 
     protected addLedgerItem(ledgerItem: AbstractRelic): void {
         this.actionManager().createLedgerItem(ledgerItem);
+    }
+
+    /**
+     * Grants a consumable to the active sortie loadout. Events fire
+     * mid-sortie, so this targets GameState.consumables directly (not
+     * campaign stock — see CLAUDE.md D1/D6). Respects the shared cap
+     * silently: at cap, the consumable is not granted and nothing is added
+     * to the loadout. Callers whose flavor text promises an item may want to
+     * branch on the cap themselves for narrative purposes; this helper does
+     * not build any UI for the full-stores case.
+     */
+    protected addConsumable(consumable: AbstractConsumable): void {
+        const gameState = this.gameState();
+        if (gameState.consumables.length >= gameState.maxConsumables) return;
+        consumable.init();
+        gameState.consumables.push(consumable);
     }
 
     ///helper methods
@@ -176,7 +193,15 @@ export class AbstractEvent {
         this.actionManager().createLedgerItem(ledgerItem);
     }
 
-} 
+    /** See AbstractChoice.addConsumable — same semantics, active loadout only. */
+    protected addConsumable(consumable: AbstractConsumable): void {
+        const gameState = this.gameState();
+        if (gameState.consumables.length >= gameState.maxConsumables) return;
+        consumable.init();
+        gameState.consumables.push(consumable);
+    }
+
+}
 
 
 /// an event that tells the player the textual outcome of the encounter.

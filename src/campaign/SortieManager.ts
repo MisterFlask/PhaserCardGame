@@ -33,6 +33,16 @@ export class SortieManager {
     public lastSortieReport: string[] = [];
     /** True until the debrief screen has been shown once. */
     public hasUnviewedReport: boolean = false;
+    /**
+     * Name of a consumable owed to the player from the just-resolved
+     * contract's reward, or null. SortieManager stays Phaser-free (house
+     * rule 1) and cannot import ConsumablesLibrary to instantiate or price
+     * it, so it only records the name here; the HQ UI layer (which already
+     * reads lastSortieReport post-resolution) resolves the name, grants it
+     * to campaign stock if under cap, or banks half its price as resale if
+     * at cap, then clears this field.
+     */
+    public pendingConsumableRewardName: string | null = null;
 
     public isActive(): boolean {
         return this.activeContract !== null;
@@ -63,6 +73,13 @@ export class SortieManager {
         gameState.currentRunCharacters = squad;
         gameState.initializeRun();
         gameState.currentAct = contract.act;
+
+        // Every owned consumable rides along on every sortie (no loadout
+        // picker in v1): transfer ownership from campaign stock into the
+        // active loadout. A move, not a copy — CampaignUiState.consumables
+        // is empty for the sortie's duration (house rule 3: one owner).
+        gameState.consumables = [...campaign.consumables];
+        campaign.consumables = [];
 
         this.launchNextCombat();
     }
@@ -155,7 +172,10 @@ export class SortieManager {
             report.push(`${character.name}: lost in the field.`);
         });
 
+        // The squad's carried consumables go down with them — lost, not
+        // returned to campaign stock.
         GameState.getInstance().currentRunCharacters = [];
+        GameState.getInstance().consumables = [];
         campaign.selectedParty = [];
         this.activeContract = null;
         this.squad = [];
@@ -178,6 +198,15 @@ export class SortieManager {
         campaign.contractsCompleted++;
         report.push(`Contract "${contract.name}" fulfilled: £${contract.payout} banked.`);
 
+        // Provisioning grant, if this contract carried one. Recorded as a
+        // name only (house rule 1 — see pendingConsumableRewardName doc);
+        // the HQ UI layer performs the actual grant/resale after this method
+        // returns, since it alone may import ConsumablesLibrary.
+        this.pendingConsumableRewardName = contract.consumableRewardName ?? null;
+        if (this.pendingConsumableRewardName) {
+            report.push(`Provisioning grant included: ${this.pendingConsumableRewardName}.`);
+        }
+
         // Time passes first (the sortie took this long); wounds sustained on
         // this sortie are applied after, so they don't tick during it.
         campaign.advanceWeeks(contract.durationWeeks);
@@ -199,6 +228,12 @@ export class SortieManager {
         });
         gameState.currentRunCharacters = [];
         campaign.selectedParty = [];
+
+        // Unused consumables come home: transfer ownership back to campaign
+        // stock (move, not copy — GameState.consumables is the sortie-scoped
+        // loadout and must end the sortie empty).
+        campaign.consumables = [...campaign.consumables, ...gameState.consumables];
+        gameState.consumables = [];
 
         this.activeContract = null;
         this.squad = [];

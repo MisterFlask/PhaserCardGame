@@ -1,4 +1,5 @@
 import { Contract, ContractType } from "./Contract";
+import { CONSUMABLE_REWARD_NAMES } from "./ConsumableStock";
 import { StandingOrdersState } from "./orders/StandingOrdersState";
 
 /**
@@ -183,6 +184,9 @@ export class ContractGenerator {
     }
     private constructor() {}
 
+    /** Fraction of generated contracts that carry a provisioning grant. */
+    private static readonly CONSUMABLE_REWARD_CHANCE = 0.2;
+
     private pick<T>(arr: T[]): T {
         return arr[Math.floor(Math.random() * arr.length)];
     }
@@ -220,6 +224,10 @@ export class ContractGenerator {
         const deadlineWeeks = StandingOrdersState.getInstance()
             .contractDeadlineWeeks(2 + Math.floor(Math.random() * 3)); // 2-4 weeks on the board, base
 
+        const consumableRewardName = Math.random() < ContractGenerator.CONSUMABLE_REWARD_CHANCE
+            ? this.pick([...CONSUMABLE_REWARD_NAMES])
+            : undefined;
+
         return new Contract({
             name: template.name,
             description: template.description,
@@ -236,6 +244,7 @@ export class ContractGenerator {
             durationWeeks: numCombats + 1,
             payout,
             regionName: region.regionName,
+            consumableRewardName,
         });
     }
 

@@ -1,5 +1,5 @@
 import { AbstractConsumable } from '../consumables/AbstractConsumable';
-import { SoulCollectionPhylactery } from '../consumables/SoulCollectionPhylactery';
+import { MAX_CONSUMABLE_STOCK } from '../campaign/ConsumableStock';
 import { Encounter } from '../encounters/EncounterManager';
 import type { AbstractCard } from '../gamecharacters/AbstractCard';
 import { PlayerVessel } from '../gamecharacters/cargo/PlayerCargoHolder';
@@ -45,8 +45,16 @@ export class GameState {
 
     public currentVessel: PlayerVessel = new PlayerVessel();
 
-    public consumables: AbstractConsumable[] = [new SoulCollectionPhylactery()];
-    public maxConsumables: number = 3;
+    // The active sortie loadout. Canonical campaign-lifetime stock lives on
+    // CampaignUiState.consumables; SortieManager transfers ownership into
+    // this array on dispatch and back out on successful resolution (lost on
+    // squad wipe). A fresh campaign starts with zero — no default seed.
+    public consumables: AbstractConsumable[] = [];
+    /** Alias for the shared cap, kept so combat UI (slot rendering) doesn't
+     *  need to import ConsumableStock directly. */
+    public get maxConsumables(): number {
+        return MAX_CONSUMABLE_STOCK;
+    }
 
     public getRandomAllyCharacter(): PlayerCharacter {
         return this.currentRunCharacters[Math.floor(Math.random() * this.currentRunCharacters.length)];

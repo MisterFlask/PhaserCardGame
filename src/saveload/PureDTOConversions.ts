@@ -40,6 +40,7 @@ export function contractToDTO(c: Contract): ContractDTO {
         durationWeeks: c.durationWeeks,
         payout: c.payout,
         regionName: c.regionName,
+        consumableRewardName: c.consumableRewardName,
     };
 }
 
@@ -58,6 +59,7 @@ export function contractFromDTO(dto: ContractDTO): Contract {
         durationWeeks: dto.durationWeeks,
         payout: dto.payout,
         regionName: dto.regionName,
+        consumableRewardName: dto.consumableRewardName,
     });
 }
 

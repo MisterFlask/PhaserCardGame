@@ -483,11 +483,7 @@ class CombatInputHandler {
             if (this.isValidConsumableTarget(consumable.abstractConsumable, target)) {
                 const used = consumable.abstractConsumable.onUse(target);
                 if (used) {
-                    consumable.usesLeft = Math.max(0, (consumable.usesLeft || 0) - 1);
-                    consumable.updateUsesDisplay();
-                    if (consumable.usesLeft <= 0) {
-                        consumable.obliterate();
-                    }
+                    consumable.consumeOneUse();
                 } else {
                     ActionManager.getInstance().displaySubtitle_NoQueue('Cannot use consumable', 2000);
                 }

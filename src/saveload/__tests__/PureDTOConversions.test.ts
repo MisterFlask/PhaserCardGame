@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CampaignCalendar, WEEKS_PER_QUARTER } from '../../campaign/CampaignCalendar';
+import { CONSUMABLE_REWARD_NAMES } from '../../campaign/ConsumableStock';
 import { ContractGenerator } from '../../campaign/ContractGenerator';
 import { calendarFromDTO, calendarToDTO, contractFromDTO, contractToDTO } from '../PureDTOConversions';
 
@@ -51,6 +52,23 @@ describe('contract DTO round-trip', () => {
             expect(restored.durationWeeks).toBe(contract.durationWeeks);
             expect(restored.payout).toBe(contract.payout);
             expect(restored.regionName).toBe(contract.regionName);
+            expect(restored.consumableRewardName).toBe(contract.consumableRewardName);
         }
+    });
+
+    it('generates a consumable reward on roughly 20% of contracts, always from the reward name table', () => {
+        let withReward = 0;
+        const trials = 500;
+        for (let i = 0; i < trials; i++) {
+            const contract = ContractGenerator.getInstance().generateContract(5);
+            if (contract.consumableRewardName) {
+                withReward++;
+                expect(CONSUMABLE_REWARD_NAMES).toContain(contract.consumableRewardName);
+            }
+        }
+        // 20% target; generous tolerance since this is a random sample.
+        const rate = withReward / trials;
+        expect(rate).toBeGreaterThan(0.1);
+        expect(rate).toBeLessThan(0.32);
     });
 });

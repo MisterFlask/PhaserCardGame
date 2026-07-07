@@ -211,6 +211,14 @@ export class ContractBoardPanel extends AbstractHqPanel {
             fontFamily: Fonts.BODY, fontSize: '16px', color: Palette.INK_FADED,
         }));
 
+        if (contract.consumableRewardName) {
+            container.add(this.scene.add.text(-NOTICE_W / 2 + 18, -NOTICE_H / 2 + 124,
+                `Provisioning grant included: ${contract.consumableRewardName}`, {
+                fontFamily: Fonts.BODY, fontSize: '13px', fontStyle: 'italic', color: Palette.INK_FADED,
+                wordWrap: { width: NOTICE_W - 40 },
+            }));
+        }
+
         const expiry = this.scene.add.text(-NOTICE_W / 2 + 18, NOTICE_H / 2 - 36,
             `EXPIRES IN ${contract.deadlineWeeks} WEEK${contract.deadlineWeeks > 1 ? 'S' : ''}`, {
             fontFamily: Fonts.UTILITY, fontSize: '13px', fontStyle: 'bold',

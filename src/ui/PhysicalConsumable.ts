@@ -205,25 +205,33 @@ export class PhysicalConsumable extends Phaser.GameObjects.Container {
         if (this.currentlyActivatable && this.target) {
             const used = this.abstractConsumable.onUse(this.target);
             if (used) {
-                this.usesLeft = Math.max(0, (this.usesLeft || 0) - 1);
-                // Update the abstract consumable uses to reflect UI state
-                this.abstractConsumable.uses = this.usesLeft;
-                this.updateUsesDisplay();
-                
-                if (this.usesLeft <= 0) {
-                    // Remove consumable from game state
-                    const gameState = GameState.getInstance();
-                    gameState.consumables = gameState.consumables.filter(c => c !== this.abstractConsumable);
-                    // Immediately remove this UI element
-                    this.obliterate();
-                    // Notify UI manager to clear and reload consumable slots
-                    this.scene.events.emit('consumable_depleted', this.abstractConsumable);
-                    return;
-                }
-                
-                // Clear target after use
+                this.consumeOneUse();
                 this.target = undefined;
             }
+        }
+    }
+
+    /**
+     * Records one successful use. The decrement must reach the
+     * AbstractConsumable itself, not just this UI wrapper — the abstract
+     * instance outlives combat (unused loadout returns to campaign stock and
+     * serializes). Both use paths (click here, drag in CombatInputHandler)
+     * go through this.
+     */
+    public consumeOneUse(): void {
+        this.usesLeft = Math.max(0, (this.usesLeft || 0) - 1);
+        this.abstractConsumable.uses = this.usesLeft;
+        this.updateUsesDisplay();
+
+        if (this.usesLeft <= 0) {
+            const scene = this.scene;
+            // Remove consumable from game state
+            const gameState = GameState.getInstance();
+            gameState.consumables = gameState.consumables.filter(c => c !== this.abstractConsumable);
+            // Immediately remove this UI element
+            this.obliterate();
+            // Notify UI manager to clear and reload consumable slots
+            scene.events.emit('consumable_depleted', this.abstractConsumable);
         }
     }
 

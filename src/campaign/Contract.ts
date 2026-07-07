@@ -39,6 +39,11 @@ export class Contract {
 
     public regionName: string;
 
+    /** Name of an AbstractConsumable to grant on completion (resolved to an
+     *  instance by the UI layer via ConsumablesLibrary — src/campaign/ stores
+     *  only the string, never the instance, per house rule 1). */
+    public consumableRewardName?: string;
+
     constructor(args: {
         name: string;
         description: string;
@@ -53,6 +58,7 @@ export class Contract {
         durationWeeks: number;
         payout: number;
         regionName: string;
+        consumableRewardName?: string;
     }) {
         this.name = args.name;
         this.description = args.description;
@@ -67,5 +73,6 @@ export class Contract {
         this.durationWeeks = args.durationWeeks;
         this.payout = args.payout;
         this.regionName = args.regionName;
+        this.consumableRewardName = args.consumableRewardName;
     }
 }
