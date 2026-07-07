@@ -54,7 +54,28 @@ describe('contract DTO round-trip', () => {
             expect(restored.squadSize).toBe(contract.squadSize);
             expect(restored.regionName).toBe(contract.regionName);
             expect(restored.consumableRewardName).toBe(contract.consumableRewardName);
+            expect(restored.maxCrates).toBe(contract.maxCrates);
+            expect(restored.freightRatePerCrate).toBe(contract.freightRatePerCrate);
         }
+    });
+
+    it('preserves Trade Run maxCrates/freightRatePerCrate through the round-trip', () => {
+        let sawTradeRun = false;
+        for (let i = 0; i < 200; i++) {
+            const contract = ContractGenerator.getInstance().generateContract(10);
+            if (!contract.isTradeRun) continue;
+            sawTradeRun = true;
+            expect(contract.maxCrates).toBeGreaterThan(0);
+            expect(contract.freightRatePerCrate).toBeGreaterThan(0);
+            const restored = contractFromDTO(JSON.parse(JSON.stringify(contractToDTO(contract))));
+            expect(restored.type).toBe(contract.type);
+            expect(restored.maxCrates).toBe(contract.maxCrates);
+            expect(restored.freightRatePerCrate).toBe(contract.freightRatePerCrate);
+            // cratesLoaded deliberately never serializes; a contract restored
+            // from the board (year always 0 on save) must come back at 0.
+            expect(restored.cratesLoaded).toBe(0);
+        }
+        expect(sawTradeRun).toBe(true);
     });
 
     it('generates a consumable reward on roughly 20% of contracts, always from the reward name table', () => {

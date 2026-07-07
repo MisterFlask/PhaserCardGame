@@ -1,5 +1,6 @@
 import { EncounterManager } from "../encounters/EncounterManager";
 import { EventsManager } from "../events/EventsManager";
+import { injectCargoIntoSquad, stripCargoFromSquad } from "../gamecharacters/cargo/CargoInjection";
 import { Lethality } from "../gamecharacters/buffs/standard/Lethality";
 import { PlayerCharacter } from "../gamecharacters/PlayerCharacter";
 import { AbstractReward } from "../rewards/AbstractReward";
@@ -74,6 +75,16 @@ export class SortieManager {
         gameState.currentRunCharacters = squad;
         gameState.initializeRun();
         gameState.currentAct = contract.act;
+
+        // Trade Run: freight the player loaded at muster clogs the squad's
+        // decks for the sortie. cratesLoaded is chosen at dispatch (never
+        // serialized — see Contract.cratesLoaded doc); injection round-robins
+        // 2 cargo cards per crate across the deployed squad. Stripped again
+        // on every exit path (resolveSortie / handleSquadWipe below) so
+        // cargo never survives to the next sortie or a save.
+        if (contract.isTradeRun && contract.cratesLoaded > 0) {
+            injectCargoIntoSquad(squad, contract.cratesLoaded);
+        }
 
         // Every owned consumable rides along on every sortie (no loadout
         // picker in v1): transfer ownership from campaign stock into the
@@ -167,6 +178,12 @@ export class SortieManager {
             `Contract "${contract.name}" FAILED. The squad did not return.`
         ];
 
+        // Cargo cards are sortie-scoped only and must never reach a save
+        // (see Contract.cratesLoaded doc) — strip them before anything else,
+        // even though the squad is about to leave the roster entirely (they
+        // died hauling it; the crates are as lost as the contract).
+        stripCargoFromSquad(this.squad);
+
         this.squad.forEach(character => {
             character.isDeceased = true;
             campaign.roster = campaign.roster.filter(c => c !== character);
@@ -195,9 +212,17 @@ export class SortieManager {
         const campaign = CampaignUiState.getInstance();
         const report: string[] = [];
 
-        gameState.moneyInVault += contract.payout;
+        // Trade runs bank base + freight; combat contracts have cratesLoaded
+        // 0 so projectedPayout collapses to the plain payout.
+        const totalPayout = contract.projectedPayout;
+        gameState.moneyInVault += totalPayout;
         campaign.contractsCompleted++;
-        report.push(`Contract "${contract.name}" fulfilled: £${contract.payout} banked.`);
+        if (contract.isTradeRun && contract.cratesLoaded > 0) {
+            report.push(`Contract "${contract.name}" fulfilled: £${contract.payout} base + `
+                + `${contract.cratesLoaded} crate(s) x £${contract.freightRatePerCrate} freight = £${totalPayout} banked.`);
+        } else {
+            report.push(`Contract "${contract.name}" fulfilled: £${totalPayout} banked.`);
+        }
 
         // Provisioning grant, if this contract carried one. Recorded as a
         // name only (house rule 1 — see pendingConsumableRewardName doc);
@@ -227,6 +252,12 @@ export class SortieManager {
                 buff => buff.isPersonaTrait || buff.id === "stress"
             );
         });
+        // Cargo cards are sortie-scoped only (spec: "no SaveRegistries entry
+        // is needed" because they can never persist) — strip them back out
+        // of the squad's decks now, win or lose is irrelevant here since a
+        // squad wipe takes the separate handleSquadWipe path below, which
+        // strips independently.
+        stripCargoFromSquad(this.squad);
         gameState.currentRunCharacters = [];
         campaign.selectedParty = [];
 
