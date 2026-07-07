@@ -73,6 +73,10 @@ Sonnet agents. Division of labor:
 - **Agents do the work themselves.** Implementation agents must not
   sub-delegate to further agents; it breaks the review chain and the
   notification flow.
+- **Agents never stage or commit.** No `git add`, no `git mv` (it stages
+  implicitly — rename via the filesystem instead). Staged agent work rides
+  along silently with the lead's next commit; the lead runs `git status`
+  before every commit to catch strays.
 - **Bounce to the same agent** (SendMessage) rather than re-dispatching; it
   keeps context.
 - **Reserved for the lead:** novel debugging/root-causing, design forks,
