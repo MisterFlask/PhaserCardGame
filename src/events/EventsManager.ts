@@ -5,6 +5,22 @@ import { DiseaseForMoneyEvent } from "../encounters/events/DiseaseForRewardEvent
 import { DutchZooEscapeEvent } from "../encounters/events/DutchZooEscapeEvent";
 import { GamblingChaplainEvent } from "../encounters/events/GamblingChaplainEvent";
 import { MarshBrigandsTollEvent } from "../encounters/events/MarshBrigandsTollEvent";
+import { DeepFranceTrenchAuditEvent } from "../encounters/events/DeepFranceTrenchAuditEvent";
+import { MaisonVachonMessBillEvent } from "../encounters/events/MaisonVachonMessBillEvent";
+import { ReichsinfernokorpsCryoTruceEvent } from "../encounters/events/ReichsinfernokorpsCryoTruceEvent";
+import { EmperorUndyingConscriptEvent } from "../encounters/events/EmperorUndyingConscriptEvent";
+import { StokersSafetyInspectionEvent } from "../encounters/events/StokersSafetyInspectionEvent";
+import { BrassTitheCollectorEvent } from "../encounters/events/BrassTitheCollectorEvent";
+import { FurnaceOvertimeRequestEvent } from "../encounters/events/FurnaceOvertimeRequestEvent";
+import { FerrymansTollDisputeEvent } from "../encounters/events/FerrymansTollDisputeEvent";
+import { BioluminescentEelTradeEvent } from "../encounters/events/BioluminescentEelTradeEvent";
+import { FloatingIslandSquattersEvent } from "../encounters/events/FloatingIslandSquattersEvent";
+import { ShareholdersNephewEvent } from "../encounters/events/ShareholdersNephewEvent";
+import { SurpriseAuditEvent } from "../encounters/events/SurpriseAuditEvent";
+import { InsuranceAdjusterEvent } from "../encounters/events/InsuranceAdjusterEvent";
+import { ExpenseClaimDisputeEvent } from "../encounters/events/ExpenseClaimDisputeEvent";
+import { ChaplainsReplacementEvent } from "../encounters/events/ChaplainsReplacementEvent";
+import { CartographersCommissionEvent } from "../encounters/events/CartographersCommissionEvent";
 import { AbstractEvent } from "./AbstractEvent";
 
 export class EventsManager {
@@ -21,6 +37,22 @@ export class EventsManager {
         () => new MarshBrigandsTollEvent(),
         () => new ArmsDealerPropositionEvent(),
         () => new GamblingChaplainEvent(),
+        () => new DeepFranceTrenchAuditEvent(),
+        () => new MaisonVachonMessBillEvent(),
+        () => new ReichsinfernokorpsCryoTruceEvent(),
+        () => new EmperorUndyingConscriptEvent(),
+        () => new StokersSafetyInspectionEvent(),
+        () => new BrassTitheCollectorEvent(),
+        () => new FurnaceOvertimeRequestEvent(),
+        () => new FerrymansTollDisputeEvent(),
+        () => new BioluminescentEelTradeEvent(),
+        () => new FloatingIslandSquattersEvent(),
+        () => new ShareholdersNephewEvent(),
+        () => new SurpriseAuditEvent(),
+        () => new InsuranceAdjusterEvent(),
+        () => new ExpenseClaimDisputeEvent(),
+        () => new ChaplainsReplacementEvent(),
+        () => new CartographersCommissionEvent(),
     ];
 
     private constructor() {}
