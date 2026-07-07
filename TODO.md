@@ -25,13 +25,13 @@ protocol. Ordered within sections by priority. Delete items when done.
 
 ## Gameplay & design
 
-- **Trade-run contract type — design DONE, ready to implement** — the
-  push-your-luck trading identity returns as a contract type: freight
-  stepper at muster, cargo cards clog squad decks for the sortie, base +
-  per-crate payout. Full implementation-ready spec (numbers, seams, house-
-  rule notes, verification bar): `src/docs/trade_run_design.md` (July 2026,
-  lead-authored under delegated authority). Good next dispatch; note it
-  builds on the squad-size axis (trade runs roll squadSize 3-4 only).
+- **Trade-run balance + spice pass** — v1 shipped (July 2026, save v8) per
+  `src/docs/trade_run_design.md`: freight stepper, cargo dead-draws, base +
+  £30×act/crate. Launch numbers are sketches (full load ≈ 2× a combat
+  contract for 12 dead cards across 3 decks) — revisit after play. The
+  spec's deferred spice (breakage/theft events targeting cargo, in-combat
+  cargo effects like explosive crates) is good follow-on once the base
+  mechanic proves fun.
 - **Campaign autoplay economy harness** — extend the pure-test pattern into
   a campaign simulator: play N quarters headlessly with parameterized sortie
   win rate, wound distribution, and contract-selection policy; assert vault
@@ -90,11 +90,12 @@ protocol. Ordered within sections by priority. Delete items when done.
   + encounter tables + enemies. Also the natural fix for late-campaign
   variety alongside region hardening. Good Codex-lane batch work once the
   enemy-design spec exists.
-- **Event pool expansion** — 7 pooled events for a full 40-quarter campaign;
-  repeats fast. The new dispatch format is short (≤90 words), so events are
-  now cheap to write: target 20+, spread across regions (most current
-  events are Styx-flavored). Spec-complete batch work; A/B the Codex lane
-  on it (see cost-optimization section).
+- **Event pool: 23 shipped (July 2026); browser render pass pending** — the
+  16 new events were verified statically (BBCode balance, word counts,
+  portrait keys via asset lint) but not rendered in a live combat; there is
+  no HQ-side hook to display an AbstractEvent without entering combat.
+  Next time someone is driving combat anyway, roll a few events and eyeball
+  them. Consider adding a `debug:showEvent` hook to make event QA cheap.
 - **Act 2/3 enemy roster depth** — act 1 has ~21 enemies, act 2 ~13,
   act 3 ~11; later acts repeat encounters sooner. (Separate from the
   flavor-text item above — this is new enemies, not better descriptions.)
@@ -104,10 +105,6 @@ protocol. Ordered within sections by priority. Delete items when done.
 
 ## Flavor (from the July 2026 flavor audit)
 
-- **Act 2/3 enemy flavor pass** — Act 1 enemies have first-person
-  Cavendish-journal descriptions; Act 2/3 enemies and both later bosses have
-  one-liners. Bring them up to Act 1's standard (now canonically Cavendish's
-  survey notes — see worldbuilding.md narrator section).
 - **Player-side flavor lines** — cards, cargo, relics, buffs are
   mechanics-only text. Add a one-line flavor field where it pays most:
   cargo first (opium/spicy literature jokes going unused), then relics.
