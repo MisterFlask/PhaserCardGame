@@ -103,6 +103,12 @@ export class PromotionPanel extends AbstractHqPanel {
                 y: centerY,
                 data: cardReward,
                 onCardCreatedEventCallback: (cardInstance: PhysicalCard) => {
+                    // Stable tag for the smoke-test harness (see SmokeTest.ts's
+                    // findInScene pattern) so it can locate and click a card
+                    // choice the same way it locates mapButton/doneButton via
+                    // textBoxName. Plain Phaser GameObject.name works here since
+                    // PhysicalCard's container isn't a TextBox subclass.
+                    cardInstance.container.name = 'promotionCardChoice';
                     cardInstance.setDepth(PROMOTION_DEPTH + 100);
                     cardInstance.container.on('pointerover', () => {
                         cardInstance.setDepth(PROMOTION_DEPTH + 3000);
@@ -190,7 +196,9 @@ export class PromotionPanel extends AbstractHqPanel {
             height: 55,
             text: 'Continue',
             style: { fontSize: '20px', color: '#ffffff' },
-            fillColor: 0x226622
+            fillColor: 0x226622,
+            // Stable tag for the smoke-test harness, same pattern as mapButton/doneButton.
+            textBoxName: 'promotionContinue'
         }).setDepth(PROMOTION_DEPTH + 201);
 
         continueButton.onClick(() => {

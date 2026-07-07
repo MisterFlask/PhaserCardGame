@@ -12,6 +12,7 @@
 // Usage from the browser console: `await window.runSmokeTest()`.
 
 import { Contract } from '../campaign/Contract';
+import { pendingLevels } from '../campaign/Leveling';
 import { SortieManager } from '../campaign/SortieManager';
 import { PlayerCharacter } from '../gamecharacters/PlayerCharacter';
 import { GameState } from '../rules/GameState';
@@ -204,18 +205,28 @@ async function runSteps(steps: SmokeTestStep[]): Promise<void> {
     record('combat', true, `Won ${combatsWon} combat(s) across the sortie.`);
 
     // --- Step 4: payout landed, back at HQ --------------------------------------
-    // The debrief panel (SortieReportPanel) may be showing; file it like a player would.
-    const hqScene = getActiveScene();
-    if (hqScene) {
+    // The debrief panel (SortieReportPanel) may be showing; file it like a player
+    // would. The panel may not have mounted yet on the first poll tick, so retry
+    // the find-and-click INSIDE the waitFor loop (mirrors dismissBlockingPopups'
+    // approach) rather than clicking once before polling. Check hasUnviewedReport
+    // FIRST and only look for/click the button while it's still true: findInScene
+    // ignores visibility, so SortieReportPanel's button is still discoverable
+    // (just hidden) after HqScene navigates away from it, and re-clicking it on
+    // every poll tick would keep firing its onClick handler (which re-emits
+    // 'navigate' and resets whatever panel is now showing, e.g. PromotionPanel).
+    await waitFor(() => {
+        if (!SortieManager.getInstance().hasUnviewedReport) return true;
+        const scene = getActiveScene();
+        if (!scene) return false;
         const fileReportButton = findInScene<Phaser.GameObjects.GameObject>(
-            hqScene,
+            scene,
             obj => (obj as unknown as { getText?: () => string }).getText?.()?.includes('File the Report') ?? false
         );
         if (fileReportButton) {
             fileReportButton.emit('pointerdown');
         }
-    }
-    await waitFor(() => !SortieManager.getInstance().hasUnviewedReport, DEFAULT_TIMEOUT_MS, 'sortie debrief to be filed');
+        return !SortieManager.getInstance().hasUnviewedReport;
+    }, DEFAULT_TIMEOUT_MS, 'sortie debrief to be filed');
 
     const moneyAfterSortie = GameState.getInstance().moneyInVault;
     const moneyChanged = moneyAfterSortie !== moneyBeforeSortie;
@@ -225,6 +236,63 @@ async function runSteps(steps: SmokeTestStep[]): Promise<void> {
         );
     }
     record('payout', true, `moneyInVault ${moneyBeforeSortie} -> ${moneyAfterSortie}.`);
+
+    // --- Step 4b: resolve any pending promotions ---------------------------------
+    // Filing the debrief may have surfaced HqScene's automatic route to the
+    // 'promotion' panel (see HqScene: pendingLevels(c) > 0 trumps the contract
+    // board). It's a mandatory pick-1-of-3 card choice per pending level, with
+    // an occasional perk-reveal overlay (levels 4/8) gated behind a Continue
+    // button. Resolve it the way a player would: click the first card choice,
+    // dismiss any perk overlay, repeat until no soldier has a pending level.
+    const startingPendingLevels = campaign.roster.reduce((sum, c) => sum + pendingLevels(c), 0);
+    let levelsResolved = 0;
+    if (startingPendingLevels === 0) {
+        record('promotions', true, 'none pending.');
+    } else {
+        // Each pending level needs its own card-render + click (+ a perk-continue
+        // click at levels 4/8) round trip, so a flat DEFAULT_TIMEOUT_MS budget
+        // (sized for a single UI wait elsewhere in this file) is too tight once
+        // several levels queue up across soldiers. Scale with the queue size,
+        // GENEROUSLY: in a hidden tab (the harness's usual habitat) setTimeout
+        // polls clamp to ~1s and the panel's card rebuilds ride throttled
+        // timers, so one level has been observed to cost 25-50 REAL seconds
+        // even though the mechanism is instant in a visible tab. The loop
+        // early-exits when the queue empties, so a fat ceiling costs nothing
+        // on healthy runs.
+        const promotionsTimeoutMs = DEFAULT_TIMEOUT_MS * Math.max(4, startingPendingLevels * 4);
+        await waitFor(() => {
+            const scene = getActiveScene();
+            if (!scene) return false;
+
+            const continueButton = findInScene<Phaser.GameObjects.GameObject>(
+                scene,
+                obj => (obj as unknown as { textBoxName?: string }).textBoxName === 'promotionContinue'
+            );
+            if (continueButton) {
+                continueButton.emit('pointerdown');
+                return false;
+            }
+
+            const cardChoice = findInScene<Phaser.GameObjects.GameObject>(
+                scene,
+                obj => obj.name === 'promotionCardChoice'
+            );
+            if (cardChoice) {
+                cardChoice.emit('pointerdown');
+                levelsResolved++;
+                return false;
+            }
+
+            // Neither a card choice nor a continue button is showing: either the
+            // panel hasn't mounted yet (keep polling) or the queue is empty and
+            // HqScene has routed away from 'promotion' (done).
+            return currentSceneKey() === 'HqScene'
+                && campaign.roster.every(c => pendingLevels(c) === 0);
+        }, promotionsTimeoutMs, 'all pending promotions to resolve');
+
+        record('promotions', true,
+            `Resolved ${levelsResolved} pending level(s) (${startingPendingLevels} were pending after this sortie).`);
+    }
 
     // --- Step 5: save/reload round-trip, HQ-only per house rule 4 ----------------
     if (currentSceneKey() !== 'HqScene') {
