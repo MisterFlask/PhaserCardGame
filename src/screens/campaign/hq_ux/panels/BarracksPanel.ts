@@ -1,5 +1,6 @@
 import Phaser, { Scene } from 'phaser';
-import { pendingLevels } from '../../../../campaign/Leveling';
+import { deckCap, pendingLevels } from '../../../../campaign/Leveling';
+import { RUSH_TREATMENT_COST_PER_WEEK } from '../../../../campaign/RushTreatment';
 import { PlayableCard } from '../../../../gamecharacters/PlayableCard';
 import { PlayerCharacter } from '../../../../gamecharacters/PlayerCharacter';
 import { ModifierContext } from '../../../../rules/modifiers/AbstractCardModifier';
@@ -126,13 +127,16 @@ export class BarracksPanel extends AbstractHqPanel {
             }
         });
 
-        // Therapy for the selected soldier
+        // Therapy and rush-treatment actions for the selected soldier stack
+        // beneath the roster list, one row each, in order.
+        let belowRosterY = 180 + campaign.roster.length * 52 + 15;
+
         if (this.selectedSoldier && this.selectedSoldier.stress > 0) {
             const soldier = this.selectedSoldier;
             const therapyCost = campaign.getTherapyCost(THERAPY_COST);
             const canTreat = GameState.getInstance().moneyInVault >= therapyCost;
             const therapyButton = this.addDynamic(new TextBoxButton({
-                scene: this.scene, x: width * 0.14, y: 180 + campaign.roster.length * 52 + 15,
+                scene: this.scene, x: width * 0.14, y: belowRosterY,
                 width: 400, height: 44,
                 text: `Therapy for ${soldier.name}: -${THERAPY_RELIEF} stress (£${therapyCost})`,
                 style: { fontSize: '14px', fontFamily: Fonts.BODY, color: canTreat ? Palette.WHITE : Palette.DISABLED_TEXT },
@@ -152,12 +156,39 @@ export class BarracksPanel extends AbstractHqPanel {
                 this.setStatus(`${soldier.name} spends an afternoon with the accredited phrenologists. Stress: ${soldier.stress}.`);
                 this.rebuild();
             });
+            belowRosterY += 52;
+        }
+
+        // Rush treatment for the selected soldier: £RUSH_TREATMENT_COST_PER_WEEK
+        // removes one week of weeksWoundedRemaining per click, repeatable
+        // down to zero. Dry Company register — the Infirmary bills by the week.
+        if (this.selectedSoldier && this.selectedSoldier.weeksWoundedRemaining > 0) {
+            const soldier = this.selectedSoldier;
+            const canAfford = GameState.getInstance().moneyInVault >= RUSH_TREATMENT_COST_PER_WEEK;
+            const rushButton = this.addDynamic(new TextBoxButton({
+                scene: this.scene, x: width * 0.14, y: belowRosterY,
+                width: 400, height: 44,
+                text: `[b]Rush Treatment[/b] for ${soldier.name}: -1 week (£${RUSH_TREATMENT_COST_PER_WEEK}) — ${soldier.weeksWoundedRemaining}w remaining`,
+                style: { fontSize: '14px', fontFamily: Fonts.BODY, color: canAfford ? Palette.WHITE : Palette.DISABLED_TEXT },
+                fillColor: canAfford ? Palette.VERDIGRIS : Palette.DISABLED
+            }));
+            rushButton.onClick(() => {
+                if (!canAfford) { this.setStatus('Insufficient funds for the Infirmary\'s rush surcharge.'); return; }
+                GameState.getInstance().moneyInVault -= RUSH_TREATMENT_COST_PER_WEEK;
+                soldier.weeksWoundedRemaining = Math.max(0, soldier.weeksWoundedRemaining - 1);
+                SaveManager.save();
+                this.setStatus(soldier.weeksWoundedRemaining > 0
+                    ? `The Infirmary bills the Company £${RUSH_TREATMENT_COST_PER_WEEK} to hasten ${soldier.name}'s recovery. ${soldier.weeksWoundedRemaining}w remaining.`
+                    : `${soldier.name} is discharged from the Infirmary, fit for duty ahead of schedule.`);
+                this.rebuild();
+            });
+            belowRosterY += 52;
         }
 
         // --- Deck of the selected soldier, middle column ---
         if (this.selectedSoldier) {
             this.addDynamic(this.buildColumnHeader(
-                `${this.selectedSoldier.name.toUpperCase()}'S DECK · ${this.selectedSoldier.cardsInMasterDeck.length}`,
+                `${this.selectedSoldier.name.toUpperCase()}'S DECK · ${this.selectedSoldier.cardsInMasterDeck.length}/${deckCap(this.selectedSoldier, this.selectedSoldier.startingDeck.length)}`,
                 width * 0.45, 130, 360
             ));
             this.selectedSoldier.cardsInMasterDeck.forEach((card, i) => {
