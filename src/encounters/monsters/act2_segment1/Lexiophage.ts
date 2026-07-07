@@ -44,7 +44,7 @@ export class Lexiophage extends AutomatedCharacter {
             name: "Lexiophage",
             portraitName: "lexiophage-bureaucrat",
             maxHitpoints: 120,
-            description: "responsible for three out of four paperwork errors within the Lowerarchy"
+            description: "A creature that feeds, so far as I can determine, on unresolved arguments. It ignores blows entirely while the debate is purely physical - shrugged off Morrison's cudgel without so much as blinking - but the instant anyone attempts actual reasoning with it, philosophy, doctrine, a well-argued point of procedure, it becomes gruesomely vulnerable, as though the syllogism itself had found the joint in its armor. Small wonder it thrives here; three-quarters of the Lowerarchy's clerical errors trace back to something very like it."
         });
         
         // Apply initial Philosophical Shield buff

@@ -159,13 +159,24 @@ async function runSteps(steps: SmokeTestStep[]): Promise<void> {
             `Roster does not have ${contract.squadSize} fit-for-duty soldiers for this contract (found ${squad.length}).`);
     }
 
+    // Trade Run: muster at maxCrates (the freight stepper's full-load
+    // position) so this harness run exercises cargo injection end to end,
+    // same as a player pushing the stepper to its cap before dispatch.
+    if (contract.isTradeRun) {
+        contract.cratesLoaded = contract.maxCrates;
+    }
+
     const moneyBeforeSortie = gameState.moneyInVault;
     campaign.selectedContract = contract;
     SortieManager.getInstance().startSortie(contract, squad);
 
     await waitFor(() => currentSceneKey() === 'CombatScene', DEFAULT_TIMEOUT_MS, 'CombatScene to launch after dispatch');
+    const cargoDetail = contract.isTradeRun
+        ? ` Trade Run: ${contract.cratesLoaded}/${contract.maxCrates} crates loaded, projected payout £${contract.projectedPayout}.`
+        : '';
     record('dispatch', true,
-        `Dispatched contract "${contract.name}" (${contract.numCombats} combat(s)) with a squad of ${squad.length} (contract requires ${contract.squadSize}).`);
+        `Dispatched contract "${contract.name}" (${contract.numCombats} combat(s)) with a squad of ${squad.length} `
+        + `(contract requires ${contract.squadSize}).${cargoDetail}`);
 
     // --- Step 3: run the sortie's combat(s) to a win -----------------------------
     let combatsWon = 0;

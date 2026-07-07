@@ -1,5 +1,6 @@
 import { EncounterManager } from "../encounters/EncounterManager";
 import { EventsManager } from "../events/EventsManager";
+import { injectCargoIntoSquad, stripCargoFromSquad } from "../gamecharacters/cargo/CargoInjection";
 import { Lethality } from "../gamecharacters/buffs/standard/Lethality";
 import { PlayerCharacter } from "../gamecharacters/PlayerCharacter";
 import { AbstractReward } from "../rewards/AbstractReward";
@@ -9,6 +10,7 @@ import { SceneChanger } from "../screens/SceneChanger";
 import { applyHpHardening, hardeningForYear } from "./EncounterHardening";
 import { Contract } from "./Contract";
 import { xpForCombatWin } from "./Leveling";
+import { StandingOrdersState } from "./orders/StandingOrdersState";
 import { applyCasualties } from "./SortieResolution";
 import { mergeStockWithLoadout } from "./ConsumableStock";
 
@@ -75,6 +77,16 @@ export class SortieManager {
         gameState.initializeRun();
         gameState.currentAct = contract.act;
 
+        // Trade Run: freight the player loaded at muster clogs the squad's
+        // decks for the sortie. cratesLoaded is chosen at dispatch (never
+        // serialized — see Contract.cratesLoaded doc); injection round-robins
+        // 2 cargo cards per crate across the deployed squad. Stripped again
+        // on every exit path (resolveSortie / handleSquadWipe below) so
+        // cargo never survives to the next sortie or a save.
+        if (contract.isTradeRun && contract.cratesLoaded > 0) {
+            injectCargoIntoSquad(squad, contract.cratesLoaded);
+        }
+
         // Every owned consumable rides along on every sortie (no loadout
         // picker in v1): transfer ownership from campaign stock into the
         // active loadout. A move, not a copy — CampaignUiState.consumables
@@ -95,9 +107,8 @@ export class SortieManager {
 
         // Hell hardens with campaign time: scale this fresh batch of enemies
         // by the current year before anything else touches them (design doc:
-        // "Hell escalates too — regions harden over time"). Narrative-event
-        // combats (e.g. DutchZooEscape) spawn enemies via a different path
-        // and are NOT covered by this — a known gap, not fixed here.
+        // "Hell escalates too — regions harden over time"). Event-spawned
+        // combats are hardened at DeadEndStartEncounterChoice.effect().
         const campaign = CampaignUiState.getInstance();
         const year = campaign.calendar.year;
         applyHpHardening(encounter.enemies, year);
@@ -144,9 +155,13 @@ export class SortieManager {
         const bonusXp = isFinalCombat
             ? GameState.getInstance().combatState.combatResources.ashes.value
             : 0;
+        // Standing Orders (e.g. converted Abyssal Research Institute) can
+        // scale the combat-win XP; the ashes bonus is a flat carryover, not
+        // itself scaled, to keep its accounting a simple 1:1 conversion.
+        const orderAdjustedXp = StandingOrdersState.getInstance().xpGain(baseXp);
         this.squad.forEach(character => {
             if (character.hitpoints > 0 && !character.isDeceased) {
-                character.xp += baseXp + bonusXp;
+                character.xp += orderAdjustedXp + bonusXp;
             }
         });
 
@@ -166,6 +181,12 @@ export class SortieManager {
         const report: string[] = [
             `Contract "${contract.name}" FAILED. The squad did not return.`
         ];
+
+        // Cargo cards are sortie-scoped only and must never reach a save
+        // (see Contract.cratesLoaded doc) — strip them before anything else,
+        // even though the squad is about to leave the roster entirely (they
+        // died hauling it; the crates are as lost as the contract).
+        stripCargoFromSquad(this.squad);
 
         this.squad.forEach(character => {
             character.isDeceased = true;
@@ -195,9 +216,19 @@ export class SortieManager {
         const campaign = CampaignUiState.getInstance();
         const report: string[] = [];
 
-        gameState.moneyInVault += contract.payout;
+        // Trade runs bank base + freight; combat contracts have cratesLoaded
+        // 0 so projectedPayout collapses to the plain payout.
+        const totalPayout = contract.projectedPayout;
+        gameState.moneyInVault += totalPayout;
         campaign.contractsCompleted++;
-        report.push(`Contract "${contract.name}" fulfilled: £${contract.payout} banked.`);
+        campaign.contractsCompletedByClient[contract.client] =
+            (campaign.contractsCompletedByClient[contract.client] ?? 0) + 1;
+        if (contract.isTradeRun && contract.cratesLoaded > 0) {
+            report.push(`Contract "${contract.name}" fulfilled: £${contract.payout} base + `
+                + `${contract.cratesLoaded} crate(s) x £${contract.freightRatePerCrate} freight = £${totalPayout} banked.`);
+        } else {
+            report.push(`Contract "${contract.name}" fulfilled: £${totalPayout} banked.`);
+        }
 
         // Provisioning grant, if this contract carried one. Recorded as a
         // name only (house rule 1 — see pendingConsumableRewardName doc);
@@ -227,6 +258,12 @@ export class SortieManager {
                 buff => buff.isPersonaTrait || buff.id === "stress"
             );
         });
+        // Cargo cards are sortie-scoped only (spec: "no SaveRegistries entry
+        // is needed" because they can never persist) — strip them back out
+        // of the squad's decks now, win or lose is irrelevant here since a
+        // squad wipe takes the separate handleSquadWipe path below, which
+        // strips independently.
+        stripCargoFromSquad(this.squad);
         gameState.currentRunCharacters = [];
         campaign.selectedParty = [];
 

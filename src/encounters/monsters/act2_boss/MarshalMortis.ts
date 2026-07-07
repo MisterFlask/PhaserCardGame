@@ -13,7 +13,7 @@ export class MarshalMortis extends AutomatedCharacter {
             name: 'Marshal Mortis',
             portraitName: 'Napoleonic Zombie',
             maxHitpoints: 280,
-            description: 'undying master of the imperial legions'
+            description: "The senior surviving officer of the Grand Armée Eternal, though 'surviving' does him no particular credit; he has been dead considerably longer than he was ever alive, and commands with the crisp, unbothered authority of a man who no longer has anything left to lose by way of blood. He does not fight so much as administrate a fight, summoning fresh grenadiers from the reserve trenches the way a quartermaster summons fresh boots, and his presence alone seems to stiffen every corpse in earshot. Told us, quite civilly, that the war would end when Paris said it could end, and not before. I found this more frightening than any amount of shouting would have managed."
         });
         this.size = CardSize.LARGE;
         this.buffs.push(new GrandArmeeEternal());

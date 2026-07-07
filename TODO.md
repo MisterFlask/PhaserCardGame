@@ -25,34 +25,36 @@ protocol. Ordered within sections by priority. Delete items when done.
 
 ## Gameplay & design
 
-- **Trade-run contract type — design DONE, ready to implement** — the
-  push-your-luck trading identity returns as a contract type: freight
-  stepper at muster, cargo cards clog squad decks for the sortie, base +
-  per-crate payout. Full implementation-ready spec (numbers, seams, house-
-  rule notes, verification bar): `src/docs/trade_run_design.md` (July 2026,
-  lead-authored under delegated authority). Good next dispatch; note it
-  builds on the squad-size axis (trade runs roll squadSize 3-4 only).
-- **Campaign autoplay economy harness** — extend the pure-test pattern into
-  a campaign simulator: play N quarters headlessly with parameterized sortie
-  win rate, wound distribution, and contract-selection policy; assert vault
-  trajectory and dividend satisfaction stay viable across policies. Would
-  catch dominant strategies mechanically (the wages gap sat unnoticed for
-  weeks) and de-risk every balance pass that currently waits on a human
-  playtest. Combat abstracts to win%/wounds; everything else (contracts,
-  payouts, wages, dividends, healing) is already Phaser-free.
+- **Trade-run balance + spice pass** — v1 shipped (July 2026, save v8) per
+  `src/docs/trade_run_design.md`: freight stepper, cargo dead-draws, base +
+  £30×act/crate. Launch numbers are sketches (full load ≈ 2× a combat
+  contract for 12 dead cards across 3 decks) — revisit after play. The
+  spec's deferred spice (breakage/theft events targeting cargo, in-combat
+  cargo effects like explosive crates) is good follow-on once the base
+  mechanic proves fun.
+- **Healing throughput as a purchasable lever** — the July 2026 balance
+  pass (payouts +5%/year, decaying dividend escalation, wages £25) made the
+  charter winnable (~56-72% at 0.9 win rate, ratcheted in
+  CampaignSimulator.test.ts) and narrowed but did not close the hoarding
+  edge: lean roster-5 reaches parity with roster-8 in only ~40% of seed
+  pairs because wound attrition throughput-starves small rosters — a
+  structural effect flat wages can't price. The design doc's
+  Infirmary/chapel row ("rush wound healing, converts £ into time") is the
+  missing lever: implement rush-healing purchases, then re-tune the T2
+  ratchet toward true roster parity. The sim needs a matching knob
+  (healing spend policy) to model it.
 - **Human playtest of the economy tuning** — payouts/dividends were calibrated
   against a lossless simulation (see commit history: +1wk sortie overhead,
   £120 dividend base). The sim validates the shape, not the fun. Someone has
   to actually play a few years and report.
-- **Standing Orders: v1 shipped (July 2026); remaining pieces** — the model,
-  nine launch orders, save v4, ratification UI, and the dead-cargo-project
-  pool pull are live (see `src/campaign/orders/`). Still open, per the
-  design amendment in `src/docs/strategic_layer_redesign.md`:
-  *Company Secretariat* capital work (buys `bonusSlots`), client-unlocked
-  orders (fulfil N contracts for a client → their retainer order becomes
-  available — needs per-client completion tracking), converting Abyssal
-  Research Institute from a Capital Work to an order, and an in-place
-  REPLACE flow in the UI (currently rescind + enact-next-quarter).
+- **Populate the client retainer registry** — the full client-unlocked-order
+  MECHANISM shipped July 2026 (save v9: per-client completion tracking,
+  threshold 3, locked greyed rows, `CLIENT_RETAINER_ORDER_IDS` in
+  CampaignUiState) but the registry is deliberately EMPTY: which of the 12
+  real clients unlocks which retainer order is canon the design amendment
+  never wrote (its one example names a nonexistent client). Fold into the
+  faction-reputation design session, then it's a data-table fill plus one
+  order class per client.
 - **Standing Orders balance pass** — the launch numbers (payout +20%,
   wound +1w, recruit ×0.6, escalation ×0.75 …) are design-doc sketches,
   untested against the economy sim or human play. Revisit after a few
@@ -92,11 +94,11 @@ protocol. Ordered within sections by priority. Delete items when done.
   + encounter tables + enemies. Also the natural fix for late-campaign
   variety alongside region hardening. Good Codex-lane batch work once the
   enemy-design spec exists.
-- **Event pool expansion** — 7 pooled events for a full 40-quarter campaign;
-  repeats fast. The new dispatch format is short (≤90 words), so events are
-  now cheap to write: target 20+, spread across regions (most current
-  events are Styx-flavored). Spec-complete batch work; A/B the Codex lane
-  on it (see cost-optimization section).
+- **Event pool: 23 shipped (July 2026); browser render pass pending** — the
+  16 new events were verified statically but not rendered live. QA is now
+  cheap: in any combat, use the debug menu's `showRandomEvent` or console
+  `showEventByName(name)` / `listEventNames()`. Next combat session, page
+  through the new ones and eyeball text fit/BBCode rendering.
 - **Act 2/3 enemy roster depth** — act 1 has ~21 enemies, act 2 ~13,
   act 3 ~11; later acts repeat encounters sooner. (Separate from the
   flavor-text item above — this is new enemies, not better descriptions.)
@@ -106,10 +108,6 @@ protocol. Ordered within sections by priority. Delete items when done.
 
 ## Flavor (from the July 2026 flavor audit)
 
-- **Act 2/3 enemy flavor pass** — Act 1 enemies have first-person
-  Cavendish-journal descriptions; Act 2/3 enemies and both later bosses have
-  one-liners. Bring them up to Act 1's standard (now canonically Cavendish's
-  survey notes — see worldbuilding.md narrator section).
 - **Player-side flavor lines** — cards, cargo, relics, buffs are
   mechanics-only text. Add a one-line flavor field where it pays most:
   cargo first (opium/spicy literature jokes going unused), then relics.

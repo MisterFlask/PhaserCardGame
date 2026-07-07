@@ -10,7 +10,7 @@ import { PhysicalProjectCard } from '../../../../ui/PhysicalProjectCard';
 import { TextBox } from '../../../../ui/TextBox';
 import { drawBackdropDim, drawWoodPanel, Fonts, Palette } from '../../../../ui/UIStyle';
 import { CardGuiUtils } from '../../../../utils/CardGuiUtils';
-import { CampaignUiState } from '../CampaignUiState';
+import { CampaignUiState, CLIENT_RETAINER_ORDER_IDS, CLIENT_RETAINER_UNLOCK_THRESHOLD } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
 
 type InvestmentTab = 'capital-works' | 'standing-orders';
@@ -31,6 +31,9 @@ export class InvestmentPanel extends AbstractHqPanel {
     private standingOrdersTabButton!: TextBoxButton;
     private standingOrdersContainer!: Phaser.GameObjects.Container;
     private standingOrdersDynamic: Phaser.GameObjects.GameObject[] = [];
+    /** Non-null while the REPLACE picker is open: the id of the order the
+     *  player wants to enact in place of one currently active/pending. */
+    private replacePickerForOrderId: string | null = null;
 
     constructor(scene: Scene) {
         super(scene, 'Factory Investments');
@@ -257,7 +260,11 @@ export class InvestmentPanel extends AbstractHqPanel {
             
             // Deduct funds from GameState
             GameState.getInstance().moneyInVault -= project.getMoneyCost();
-            
+
+            // Company Secretariat (and any future bonus-slot Capital Work)
+            // takes effect immediately on purchase.
+            campaignState.syncStandingOrderBonusSlots();
+
             // Notify other components that funds have changed
             this.scene.events.emit('fundsChanged');
 
@@ -362,6 +369,25 @@ export class InvestmentPanel extends AbstractHqPanel {
             const y = startY + row * rowH + ORDER_CARD_H / 2;
             this.addStandingOrdersDynamic(this.buildOrderCard(order, x, y, ordersState, year));
         });
+
+        // Locked client-retainer rows: orders gated on repeat business with a
+        // client (see CampaignUiState.CLIENT_RETAINER_ORDER_IDS). Drawn below
+        // the main grid so the launch pool's layout is untouched. A retainer
+        // order id that IS in the registry (i.e. its Standing Order has been
+        // implemented) is shown as a normal card above instead of here once
+        // unlocked — this row is purely the "not yet unlocked" placeholder.
+        const lockedClientOrders = Object.entries(CLIENT_RETAINER_ORDER_IDS)
+            .filter(([client, orderId]) => !STANDING_ORDER_REGISTRY.has(orderId) || !campaign.isClientRetainerUnlocked(client));
+        const lockedStartY = startY + Math.ceil(orders.length / cols) * rowH + 20;
+        lockedClientOrders.forEach(([client, orderId], i) => {
+            const y = lockedStartY + i * (ORDER_CARD_H / 2 + 12);
+            this.addStandingOrdersDynamic(this.buildLockedRetainerRow(client, orderId, width / 2, y, campaign));
+        });
+
+        // REPLACE picker overlay, drawn last so it sits above everything.
+        if (this.replacePickerForOrderId) {
+            this.addStandingOrdersDynamic(this.buildReplacePicker(this.replacePickerForOrderId, ordersState));
+        }
     }
 
     /** ACTIVE / PENDING / available state for a single order, plus its card UI. */
@@ -449,14 +475,118 @@ export class InvestmentPanel extends AbstractHqPanel {
                 this.rebuildStandingOrders();
             });
         } else {
-            // No free slot and not active: enact/replace is unavailable this
-            // quarter. REPLACE… flow skipped per brief (queueRemoval +
-            // enact-next-quarter covers the loop).
-            actionButton.setText('NO FREE SLOT');
-            actionButton.setButtonEnabled(false);
+            // No free slot and not active: offer a direct REPLACE (swap one
+            // active/pending order for this one in a single ratification
+            // action) instead of forcing rescind-then-enact-next-quarter.
+            actionButton.setText('REPLACE...');
+            actionButton.onClick(() => {
+                this.replacePickerForOrderId = order.id;
+                this.rebuildStandingOrders();
+            });
         }
         container.add(actionButton);
 
+        return container;
+    }
+
+    /** A greyed row for a client-retainer order that hasn't unlocked yet. */
+    private buildLockedRetainerRow(
+        client: string, orderId: string, x: number, y: number, campaign: CampaignUiState
+    ): Phaser.GameObjects.Container {
+        const scene = this.scene;
+        const container = scene.add.container(x, y);
+        const rowW = ORDER_CARD_W * 2 + 40;
+        const rowH = ORDER_CARD_H / 2;
+        const completed = campaign.contractsCompletedByClient[client] ?? 0;
+
+        const bg = scene.add.graphics();
+        bg.fillStyle(Palette.PAPER_SHADOW, 0.4);
+        bg.fillRect(-rowW / 2, -rowH / 2, rowW, rowH);
+        bg.lineStyle(1, Palette.DISABLED, 0.6);
+        bg.strokeRect(-rowW / 2 + 2, -rowH / 2 + 2, rowW - 4, rowH - 4);
+        container.add(bg);
+
+        container.add(scene.add.text(-rowW / 2 + 16, -rowH / 2 + 8, 'LOCKED', {
+            fontFamily: Fonts.UTILITY, fontSize: '11px', fontStyle: 'bold', color: Palette.DISABLED_TEXT,
+        }));
+
+        const remaining = Math.max(0, CLIENT_RETAINER_UNLOCK_THRESHOLD - completed);
+        const noticeText = new TextBox({
+            scene, x: 0, y: 4, width: rowW - 32, height: rowH - 20,
+            text: `[i]Retainer: fulfil ${remaining} more contract(s) for ${client} (${completed}/${CLIENT_RETAINER_UNLOCK_THRESHOLD}).[/i]`,
+            style: { fontSize: '13px', fontFamily: 'verdana', color: Palette.DISABLED_TEXT }
+        });
+        noticeText.setStroke(false);
+        container.add(noticeText);
+
+        return container;
+    }
+
+    /** Inline overlay: pick which active/pending order to replace with
+     *  `newOrderId`. Cancel closes it without changing anything. */
+    private buildReplacePicker(newOrderId: string, ordersState: StandingOrdersState): Phaser.GameObjects.Container {
+        const scene = this.scene;
+        const width = scene.scale.width;
+        const height = scene.scale.height;
+        const newOrder = STANDING_ORDER_REGISTRY.get(newOrderId);
+        // The post-meeting configuration is what REPLACE actually swaps
+        // within (StandingOrdersState.queueReplace operates on
+        // pendingOrderIds ?? activeOrderIds) — offer those, not raw
+        // activeOrderIds, so a slate with an already-queued change picks
+        // consistently with what will actually ratify.
+        const candidateIds = ordersState.pendingOrderIds ?? ordersState.activeOrderIds;
+        const candidates = candidateIds
+            .map(id => STANDING_ORDER_REGISTRY.get(id))
+            .filter((o): o is StandingOrder => o !== undefined);
+
+        const container = scene.add.container(0, 0);
+        container.add(drawBackdropDim(scene, 0.75));
+
+        const panelW = 460;
+        const panelH = 80 + candidates.length * 44 + 60;
+        const panelX = width / 2;
+        const panelY = height / 2;
+        const panel = scene.add.container(panelX, panelY);
+        panel.add(drawWoodPanel(scene, panelW, panelH));
+
+        const title = new TextBox({
+            scene, x: 0, y: -panelH / 2 + 30, width: panelW - 40, height: 40,
+            text: `Replace which order with ${newOrder?.name ?? newOrderId}?`,
+            style: { fontSize: '16px', fontFamily: Fonts.DISPLAY, color: Palette.BRASS_TEXT, align: 'center' }
+        });
+        title.setStroke(false);
+        panel.add(title);
+
+        candidates.forEach((candidate, i) => {
+            const rowY = -panelH / 2 + 70 + i * 44;
+            const rowButton = new TextBoxButton({
+                scene, x: 0, y: rowY, width: panelW - 60, height: 36,
+                text: candidate.name,
+                style: { fontSize: '14px', color: Palette.BRASS_TEXT, fontFamily: Fonts.DISPLAY },
+                fillColor: Palette.WOOD_PANEL
+            });
+            rowButton.onClick(() => {
+                ordersState.queueReplace(candidate.id, newOrderId);
+                SaveManager.save();
+                this.replacePickerForOrderId = null;
+                this.rebuildStandingOrders();
+            });
+            panel.add(rowButton);
+        });
+
+        const cancelButton = new TextBoxButton({
+            scene, x: 0, y: panelH / 2 - 30, width: 160, height: 34,
+            text: 'CANCEL',
+            style: { fontSize: '13px', color: Palette.BRASS_TEXT, fontFamily: Fonts.DISPLAY },
+            fillColor: Palette.WOOD_PANEL
+        });
+        cancelButton.onClick(() => {
+            this.replacePickerForOrderId = null;
+            this.rebuildStandingOrders();
+        });
+        panel.add(cancelButton);
+
+        container.add(panel);
         return container;
     }
 }

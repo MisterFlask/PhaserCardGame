@@ -170,6 +170,106 @@ const REGION_FLAVORS: RegionFlavor[] = [
     },
 ];
 
+interface TradeRunTemplate extends ContractTemplate {
+    /** Cargo flavor, folded into the notice footer (e.g. "reagent barrels"). */
+    cargoLabel: string;
+}
+
+interface TradeRunRegion {
+    regionName: string;
+    act: number;
+    templates: TradeRunTemplate[];
+}
+
+/**
+ * Freight-consignment flavor, one region-appropriate table per act. Trade
+ * runs never mix a template's client/description/paymentClause across
+ * entries (same discipline as REGION_FLAVORS above).
+ */
+const TRADE_RUN_REGIONS: TradeRunRegion[] = [
+    {
+        regionName: "Styx Delta",
+        act: 1,
+        templates: [
+            {
+                name: "Reagent Barrels to the Dam Works",
+                client: "The Styx Dam Project Office",
+                description: "The Project Office has over-ordered curing reagent again and needs it moved before the quartermaster notices the invoice. Barge space is available; escort is not, officially.",
+                paymentClause: "{payout} on delivery, plus carriage per barrel, invoiced against the Project's works budget.",
+                cargoLabel: "reagent barrels",
+            },
+            {
+                name: "Opium for the Brimstone Barons",
+                client: "The Brimstone Barons, jointly",
+                description: "A discreet consignment the Barons would rather arrive by contractor than by their own liveried barges, which draw attention the cargo cannot afford.",
+                paymentClause: "{payout} on delivery, plus carriage per crate, paid in cash, no minute taken.",
+                cargoLabel: "opium crates",
+            },
+            {
+                name: "Fittings for the Ferry Company",
+                client: "Styx Delta Ferry & Lighterage Company",
+                description: "Replacement fittings for the barges the fare-dodgers keep stripping. The Company would like them to arrive before the next boarding, not after.",
+                paymentClause: "{payout} on delivery, plus carriage per crate, per cargo-loss schedule 2.",
+                cargoLabel: "crated fittings",
+            },
+        ],
+    },
+    {
+        regionName: "Deep France",
+        act: 2,
+        templates: [
+            {
+                name: "Crates of Spicy Literature for the Garrisons",
+                client: "Maison Vachon, Purveyors to the Front",
+                description: "Morale material the officers' mess will not requisition through proper channels but will absolutely pay for through improper ones.",
+                paymentClause: "{payout} on delivery, plus carriage per crate, per the Maison's standing supply agreement.",
+                cargoLabel: "crates of spicy literature",
+            },
+            {
+                name: "Revenant-Grade Coal to the Front",
+                client: "Reichsinfernokorps Liaison Office",
+                description: "The trenches burn coal faster than the Liaison Office can admit to Berlin. A contractor delivery leaves no requisition trail back to the discretionary fund.",
+                paymentClause: "{payout} on delivery, plus carriage per sack, paid in cash, per the Office's usual arrangement: no paperwork.",
+                cargoLabel: "coal sacks",
+            },
+            {
+                name: "Ledger Copies for Concession Holdings",
+                client: "Deep France Concession Holdings",
+                description: "Duplicate boundary ledgers, in case the originals meet the Spectral Auditors again. Holdings would like a second copy somewhere the revenants cannot subpoena.",
+                paymentClause: "{payout} on delivery, plus carriage per case, invoiced against the concession's title-defense reserve.",
+                cargoLabel: "ledger cases",
+            },
+        ],
+    },
+    {
+        regionName: "Dis Foundry Belt",
+        act: 3,
+        templates: [
+            {
+                name: "Copper Ingots off Furnace Row",
+                client: "Brimstone Barons Equipment Leasing Consortium",
+                description: "Smelted stock the Consortium wants off the books before the Stoker's Union works out it can be melted down into something more useful than ingots.",
+                paymentClause: "{payout} on delivery, plus carriage per ingot crate, per lease-recovery schedule 1.",
+                cargoLabel: "copper ingots",
+            },
+            {
+                name: "Sacred Relics for the Overseers",
+                client: "Dis Foundry Belt Board of Overseers",
+                description: "Reclaimed devotional relics from the Overseer's office, wanted upstairs before the Union decides they're evidence rather than heirlooms.",
+                paymentClause: "{payout} on delivery, plus carriage per case, invoiced against the Board's production contingency.",
+                cargoLabel: "relic cases",
+            },
+            {
+                name: "Alcohol Consignment for the Strikebreakers",
+                client: "Dis Foundry Belt Board of Overseers",
+                description: "Ration liquor for the replacement crews, who have made clear through their foreman that morale is a line item too.",
+                paymentClause: "{payout} on delivery, plus carriage per barrel, invoiced against the Board's production contingency.",
+                cargoLabel: "liquor barrels",
+            },
+        ],
+    },
+];
+
 /**
  * Generates the weekly contract board. Difficulty scales with campaign year:
  * later years unlock deeper regions and harder encounter segments.
@@ -187,6 +287,21 @@ export class ContractGenerator {
     /** Fraction of generated contracts that carry a provisioning grant. */
     private static readonly CONSUMABLE_REWARD_CHANCE = 0.2;
 
+    /** Balance-pass sketch numbers, tuned against CampaignSimulator.test.ts
+     *  (see "baseline viability" describe block for the measured before/after).
+     *  Hell's cost of living: enemies harden per year via EncounterHardening,
+     *  so income should climb too, or the flat-per-act payout table plateaus
+     *  once act 3 unlocks (year 6) while currentDividendExpectation keeps
+     *  compounding — that mismatch was the root cause of the unwinnable
+     *  40-quarter charter (0/10 seeds survived at any roster size, winRate
+     *  0.9; see CampaignSimulator.test.ts pre-fix numbers). +9%/year past
+     *  year 1 (year 1 = 1.0x exactly, so act-1/year-1 numbers are unchanged)
+     *  roughly tracks HP_PER_YEAR's cadence in EncounterHardening.ts while
+     *  leaving most of the late-charter gap to be closed by softening
+     *  dividend escalation (CampaignCalendar), per the brief's lever
+     *  preference order. */
+    private static readonly PAYOUT_PER_YEAR = 0.05;
+
     /** Balance-pass sketch numbers, untested against the economy sim — see
      *  TODO.md "Standing Orders balance pass" for the convention. Revisit
      *  after a few played campaign-years. Lean crews draw danger pay because
@@ -200,12 +315,30 @@ export class ContractGenerator {
         4: 0.85,
     };
 
+    /** Fraction of generated contracts that are trade runs (src/docs/trade_run_design.md). */
+    private static readonly TRADE_RUN_CHANCE = 0.2;
+    /** Trade runs pay a low base (half a normal contract's roll) plus a
+     *  per-crate freight rate that scales with act. */
+    private static readonly TRADE_RUN_BASE_PAYOUT_FRACTION = 0.5;
+    private static readonly TRADE_RUN_FREIGHT_RATE_PER_ACT = 30;
+    private static readonly TRADE_RUN_MAX_CRATES = 6;
+
     /** Rolls squad size: 20% two-man, 60% three-man, 20% four-man. */
     private rollSquadSize(): number {
         const roll = Math.random();
         if (roll < ContractGenerator.SQUAD_SIZE_TWO_CHANCE) return 2;
         if (roll < ContractGenerator.SQUAD_SIZE_TWO_CHANCE + ContractGenerator.SQUAD_SIZE_FOUR_CHANCE) return 4;
         return 3;
+    }
+
+    /** Trade runs never roll squadSize 2 (no hands to spare): 3 or 4 only,
+     *  at the same relative 3:4 weighting as rollSquadSize (60% vs 20% of
+     *  the full distribution), renormalized over {3, 4} alone — that's a
+     *  75/25 three/four split, not the full distribution's raw 60/20. */
+    private rollTradeRunSquadSize(): number {
+        const fourChance = ContractGenerator.SQUAD_SIZE_FOUR_CHANCE
+            / (1 - ContractGenerator.SQUAD_SIZE_TWO_CHANCE);
+        return Math.random() < fourChance ? 4 : 3;
     }
 
     private pick<T>(arr: T[]): T {
@@ -224,10 +357,36 @@ export class ContractGenerator {
         return 1;
     }
 
-    public generateContract(year: number, contractsCompleted: number = 0): Contract {
-        const maxAct = this.maxActUnlocked(year, contractsCompleted);
-        const eligibleRegions = REGION_FLAVORS.filter(r => r.act <= maxAct);
-        const region = this.pick(eligibleRegions);
+    /** Shared bounty-style payout roll: deeper acts/segments and longer
+     *  sorties pay more, Standing Orders adjust, danger pay adjusts last.
+     *  Every pass re-rounds to £5 so the final figure is always a clean
+     *  invoice number. `year` applies PAYOUT_PER_YEAR on top of the base so
+     *  income keeps pace with dividend escalation and enemy hardening
+     *  instead of plateauing once act 3 unlocks — see PAYOUT_PER_YEAR's
+     *  comment. Exactly 1.0x at year 1, so act-1/year-1 numbers are
+     *  unchanged from before this lever existed. */
+    private rollBountyPayout(year: number, act: number, segment: number, numCombats: number, squadSize: number): number {
+        const basePay = 30 + act * 20 + segment * 25;
+        const yearMultiplier = 1 + ContractGenerator.PAYOUT_PER_YEAR * Math.max(0, year - 1);
+        const jitter = 0.85 + Math.random() * 0.3;
+        const jitteredPayout = Math.round((basePay * yearMultiplier * numCombats * jitter) / 5) * 5;
+        const standingOrdersPayout = Math.round(StandingOrdersState.getInstance().contractPayout(jitteredPayout) / 5) * 5;
+        const dangerPayMultiplier = ContractGenerator.DANGER_PAY_MULTIPLIER[squadSize] ?? 1.0;
+        return Math.round((standingOrdersPayout * dangerPayMultiplier) / 5) * 5;
+    }
+
+    private rollDeadlineWeeks(): number {
+        return StandingOrdersState.getInstance()
+            .contractDeadlineWeeks(2 + Math.floor(Math.random() * 3)); // 2-4 weeks on the board, base
+    }
+
+    private rollConsumableReward(): string | undefined {
+        return Math.random() < ContractGenerator.CONSUMABLE_REWARD_CHANCE
+            ? this.pick([...CONSUMABLE_REWARD_NAMES])
+            : undefined;
+    }
+
+    private generateBountyContract(region: RegionFlavor, year: number): Contract {
         const template = this.pick(region.templates);
 
         // Segment within the act is the fine-grained difficulty dial.
@@ -236,24 +395,9 @@ export class ContractGenerator {
 
         const numCombats = Math.random() < 0.45 ? 1 : 2;
         const squadSize = this.rollSquadSize();
-        // Deeper acts and segments pay more; two-combat sorties pay almost double.
-        const basePay = 30 + region.act * 20 + segment * 25;
-        const jitter = 0.85 + Math.random() * 0.3;
-        const jitteredPayout = Math.round((basePay * numCombats * jitter) / 5) * 5;
-        // Standing Orders (e.g. Hazard Pay Schedule) apply AFTER the jitter and
-        // re-round to £5, so the final payout is always a clean invoice figure.
-        const standingOrdersPayout = Math.round(StandingOrdersState.getInstance().contractPayout(jitteredPayout) / 5) * 5;
-        // Danger pay: the same encounters are harder with fewer soldiers, so
-        // lean crews draw a premium and big pushes dilute payout per head.
-        // Applied last, re-rounded to £5 like every other pass over payout.
-        const dangerPayMultiplier = ContractGenerator.DANGER_PAY_MULTIPLIER[squadSize] ?? 1.0;
-        const payout = Math.round((standingOrdersPayout * dangerPayMultiplier) / 5) * 5;
-        const deadlineWeeks = StandingOrdersState.getInstance()
-            .contractDeadlineWeeks(2 + Math.floor(Math.random() * 3)); // 2-4 weeks on the board, base
-
-        const consumableRewardName = Math.random() < ContractGenerator.CONSUMABLE_REWARD_CHANCE
-            ? this.pick([...CONSUMABLE_REWARD_NAMES])
-            : undefined;
+        const payout = this.rollBountyPayout(year, region.act, segment, numCombats, squadSize);
+        const deadlineWeeks = this.rollDeadlineWeeks();
+        const consumableRewardName = this.rollConsumableReward();
 
         return new Contract({
             name: template.name,
@@ -276,14 +420,86 @@ export class ContractGenerator {
         });
     }
 
-    /** Top the board back up to targetCount contracts (adjusted by Standing Orders). */
+    /**
+     * Trade run: low base payout + a per-crate freight rate the player
+     * dials in at muster (see ContractBoardPanel's freight stepper).
+     * `payout` on the Contract IS the low base (Contract.projectedPayout
+     * adds cratesLoaded * freightRatePerCrate on top). Full-load act-1
+     * example: ~£58 + 6x£30 = ~£238 vs ~£116 average combat contract —
+     * roughly 2x money for 12 dead cards spread across three decks. Squad
+     * size never rolls 2 (no hands to spare): 3 or 4 only.
+     */
+    private generateTradeRunContract(region: TradeRunRegion, year: number): Contract {
+        const template = this.pick(region.templates);
+
+        const segment = Math.floor(Math.random() * 3);
+        const difficultyStars = segment + 1;
+        const numCombats = Math.random() < 0.45 ? 1 : 2;
+        const squadSize = this.rollTradeRunSquadSize();
+
+        const normalPayoutRoll = this.rollBountyPayout(year, region.act, segment, numCombats, squadSize);
+        const basePayout = Math.round((normalPayoutRoll * ContractGenerator.TRADE_RUN_BASE_PAYOUT_FRACTION) / 5) * 5;
+        const freightRatePerCrate = ContractGenerator.TRADE_RUN_FREIGHT_RATE_PER_ACT * region.act;
+        const maxCrates = ContractGenerator.TRADE_RUN_MAX_CRATES;
+
+        const deadlineWeeks = this.rollDeadlineWeeks();
+        const consumableRewardName = this.rollConsumableReward();
+
+        return new Contract({
+            name: template.name,
+            description: template.description,
+            type: ContractType.TRADE_RUN,
+            client: template.client,
+            paymentClause: template.paymentClause.replace("{payout}", `£${basePayout}`),
+            act: region.act,
+            segment,
+            difficultyStars,
+            numCombats,
+            deadlineWeeks,
+            durationWeeks: numCombats + 1,
+            payout: basePayout,
+            squadSize,
+            regionName: region.regionName,
+            consumableRewardName,
+            maxCrates,
+            freightRatePerCrate,
+        });
+    }
+
+    public generateContract(year: number, contractsCompleted: number = 0): Contract {
+        const maxAct = this.maxActUnlocked(year, contractsCompleted);
+
+        if (Math.random() < ContractGenerator.TRADE_RUN_CHANCE) {
+            const eligibleTradeRegions = TRADE_RUN_REGIONS.filter(r => r.act <= maxAct);
+            return this.generateTradeRunContract(this.pick(eligibleTradeRegions), year);
+        }
+
+        const eligibleRegions = REGION_FLAVORS.filter(r => r.act <= maxAct);
+        return this.generateBountyContract(this.pick(eligibleRegions), year);
+    }
+
+    /** Top the board back up to targetCount contracts (adjusted by Standing
+     *  Orders). At least one trade run per full board refresh (starting
+     *  from an empty board) so the axis is always available, even though
+     *  each contract only independently rolls ~20% odds. */
     public refillBoard(existing: Contract[], year: number, contractsCompleted: number = 0, targetCount: number = 5): Contract[] {
         const board = [...existing];
         const adjustedTarget = StandingOrdersState.getInstance().contractBoardTarget(targetCount);
+        const isFullRefresh = existing.length === 0;
         while (board.length < adjustedTarget) {
             board.push(this.generateContract(year, contractsCompleted));
         }
+        if (isFullRefresh && board.length > 0 && !board.some(c => c.isTradeRun)) {
+            const maxAct = this.maxActUnlocked(year, contractsCompleted);
+            const eligibleTradeRegions = TRADE_RUN_REGIONS.filter(r => r.act <= maxAct);
+            board[board.length - 1] = this.generateTradeRunContract(this.pick(eligibleTradeRegions), year);
+        }
         return board;
+    }
+
+    /** Exposed for tests. */
+    public static getAllTradeRunTemplates(): TradeRunTemplate[] {
+        return TRADE_RUN_REGIONS.flatMap(r => r.templates);
     }
 
     /**

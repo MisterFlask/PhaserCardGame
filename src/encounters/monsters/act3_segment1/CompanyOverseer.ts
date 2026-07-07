@@ -11,7 +11,7 @@ export class CompanyOverseer extends AutomatedCharacter {
             name: 'Company Overseer',
             portraitName: 'overseer',
             maxHitpoints: 70,
-            description: 'A ruthless manager of hellish industry.'
+            description: "A Baron's man, middling rank, who has clearly mistaken the Furnace floor for a public school and himself for the housemaster. Carries a ledger he consults before every blow, apparently to confirm he is still within his disciplinary allowance for the shift. Draws strength from every worker he wounds, which he regards as sound economics rather than anything requiring justification. Requisitioned a scab labourer to do his fighting for him within the first minute of the engagement - efficient, I'll grant him that."
         });
         this.buffs.push(new Bulwark(2));
         this.buffs.push(new Exploitation(2));

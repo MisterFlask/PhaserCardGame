@@ -15,7 +15,7 @@ export class RegionalManager extends AutomatedCharacter {
             name: 'Regional Manager',
             portraitName: 'manager-demon',
             maxHitpoints: 320,
-            description: 'Brimstone Baron of infernal industry.'
+            description: "One of the Brimstone Barons proper, and keen that we understand the distinction between himself and the overseers he employs - a distinction that amounts, so far as I could tell, to a considerably larger office and a considerably worse temper. Grows stronger and better armoured the longer a negotiation drags on, which he treats as a point of pride rather than a warning. Halfway through our meeting he announced a 'surprise reorganisation' and had two of his overseers thrown bodily into the room; I have sat through gentler shareholder votes. He also has a distressing habit of setting fire to whatever paperwork is nearest whenever a deadline looms, ours included."
         });
         this.size = CardSize.LARGE;
         this.buffs.push(new Armored(4));

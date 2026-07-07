@@ -11,7 +11,7 @@ export class OldGuardGrenadier extends AutomatedCharacter {
             name: 'Old Guard Grenadier',
             portraitName: 'Napoleonic Zombie',
             maxHitpoints: 80,
-            description: 'Risen veteran of countless wars'
+            description: "One of the Emperor's original grenadiers, by his uniform buttons anyway, and still marching a campaign that ended, if the histories are to be believed, some eighty years ago. Rusted through at the joints and bayonet alike, he keeps entrenching regardless - digging, refilling, digging again, a man who has forgotten every order except the last one. Threw a grenade at us with the enthusiasm of a much fresher corpse. Best not to look him in the eye; something in there is still keeping count of the years."
         });
         this.buffs.push(new DoNotLookAtMe(1));
         this.buffs.push(new Implacable(1));

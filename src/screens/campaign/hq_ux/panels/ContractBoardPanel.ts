@@ -79,6 +79,9 @@ export class ContractBoardPanel extends AbstractHqPanel {
     private launchLabel!: Phaser.GameObjects.Text;
     private selectedSquad: PlayerCharacter[] = [];
     private hoverTooltip: TextBox | null = null;
+    /** Freight stepper state, Trade Run notices only. Reset whenever the
+     *  selected contract changes (see the pin pointerdown handler). */
+    private cratesLoaded: number = 0;
 
     constructor(scene: Scene) {
         super(scene, 'Contract Board');
@@ -240,6 +243,7 @@ export class ContractBoardPanel extends AbstractHqPanel {
     public show(): void {
         CampaignUiState.getInstance().ensureContractsPopulated();
         this.selectedSquad = [];
+        this.cratesLoaded = 0;
         CampaignUiState.getInstance().selectedContract = null;
         this.rebuild();
         super.show();
@@ -333,6 +337,11 @@ export class ContractBoardPanel extends AbstractHqPanel {
         // covers a pin either.
         if (campaign.selectedContract) {
             this.addDynamic(this.buildNotice(campaign.selectedContract, NOTICE_POS.x, NOTICE_POS.y));
+        }
+
+        // --- Freight stepper: Trade Run notices only ---
+        if (campaign.selectedContract?.isTradeRun) {
+            this.addDynamic(this.buildFreightStepper(campaign.selectedContract));
         }
 
         // --- Personnel ledger, right third ---
@@ -429,12 +438,18 @@ export class ContractBoardPanel extends AbstractHqPanel {
             this.hideHoverTooltip();
         });
         container.on('pointerdown', () => {
+            const switchingContract = campaign.selectedContract?.id !== contract.id;
             campaign.selectedContract = contract;
             // Switching to a pin with fewer slots than currently selected:
             // trim the overflow off the end rather than wiping the whole
             // selection (keeps as much of a careful muster as still fits).
             if (this.selectedSquad.length > contract.squadSize) {
                 this.selectedSquad = this.selectedSquad.slice(0, contract.squadSize);
+            }
+            // Freight stepper resets whenever the selected contract changes
+            // (re-clicking the same already-selected pin keeps the count).
+            if (switchingContract) {
+                this.cratesLoaded = 0;
             }
             this.rebuild();
         });
@@ -481,9 +496,13 @@ export class ContractBoardPanel extends AbstractHqPanel {
             fontFamily: Fonts.BODY, fontSize: '16px', color: Palette.INK_FADED,
         }));
 
+        const crewLabel = ContractBoardPanel.crewRequirementLabel(contract.squadSize);
+        const freightLabel = contract.isTradeRun
+            ? ` · £${contract.freightRatePerCrate} per crate delivered, carriage of up to ${contract.maxCrates}`
+            : '';
         const noticeFooterLine = contract.consumableRewardName
-            ? `${ContractBoardPanel.crewRequirementLabel(contract.squadSize)} · Provisioning grant included: ${contract.consumableRewardName}`
-            : ContractBoardPanel.crewRequirementLabel(contract.squadSize);
+            ? `${crewLabel}${freightLabel} · Provisioning grant included: ${contract.consumableRewardName}`
+            : `${crewLabel}${freightLabel}`;
         container.add(this.scene.add.text(-NOTICE_W / 2 + 18, -NOTICE_H / 2 + 124, noticeFooterLine, {
             fontFamily: Fonts.BODY, fontSize: '13px', fontStyle: 'italic', color: Palette.INK_FADED,
             wordWrap: { width: NOTICE_W - 40 },
@@ -497,15 +516,20 @@ export class ContractBoardPanel extends AbstractHqPanel {
         expiry.setRotation(-0.02);
         container.add(expiry);
 
-        // Payout, ledger-style bottom right
-        const payoutText = this.scene.add.text(NOTICE_W / 2 - 20, NOTICE_H / 2 - 36, `£${contract.payout}`, {
+        // Payout, ledger-style bottom right. Trade runs quote the low base
+        // here — the freight stepper shows the projected total once selected.
+        const payoutLabel = contract.isTradeRun ? `£${contract.payout}+` : `£${contract.payout}`;
+        const payoutText = this.scene.add.text(NOTICE_W / 2 - 20, NOTICE_H / 2 - 36, payoutLabel, {
             fontFamily: Fonts.DISPLAY, fontSize: '30px', color: Palette.INK,
         }).setOrigin(1, 0.5);
         container.add(payoutText);
         payoutText.setInteractive({ useHandCursor: false });
         payoutText.on('pointerover', () => {
+            const tooltip = contract.isTradeRun
+                ? `Base payment on delivery: [b]£${contract.payout}[/b], plus [b]£${contract.freightRatePerCrate}[/b] per crate carried, banked directly to the Company vault.`
+                : `Payment on completion: [b]£${contract.payout}[/b], banked directly to the Company vault.`;
             this.showHoverTooltip(
-                `Payment on completion: [b]£${contract.payout}[/b], banked directly to the Company vault.`,
+                tooltip,
                 container.x + payoutText.x, container.y + payoutText.y - 24,
             );
         });
@@ -528,7 +552,8 @@ export class ContractBoardPanel extends AbstractHqPanel {
         seal.on('pointerout', () => this.hideHoverTooltip());
 
         // Display + tooltips only: no pointerdown handler, this notice
-        // neither re-selects nor trims the muster.
+        // neither re-selects nor trims the muster (selection happens via the
+        // map pins, which also own the freight-stepper reset).
         return container;
     }
 
@@ -596,6 +621,64 @@ export class ContractBoardPanel extends AbstractHqPanel {
         return container;
     }
 
+    /**
+     * Freight stepper: +/- crate count for a selected Trade Run notice.
+     * Projected payout (base + crates x freightRate) updates live. Launch
+     * gate is unchanged by crate count — only the squad-size check gates
+     * dispatch (see refreshStatus).
+     */
+    private buildFreightStepper(contract: Contract): Phaser.GameObjects.Container {
+        // Sits above the dispatch plaque, clear of both the launch button
+        // (scale.height - 130) below and the muster roll cards above.
+        const x = this.scene.scale.width * 0.82;
+        const y = this.scene.scale.height - 220;
+        const container = this.scene.add.container(x, y);
+        const W = 340, H = 74;
+
+        container.add(drawWoodPanel(this.scene, W, H));
+        container.add(this.scene.add.text(0, -H / 2 + 16,
+            `FREIGHT: ${contract.cratesLoaded}/${contract.maxCrates} CRATES`, {
+            fontFamily: Fonts.DISPLAY, fontSize: '18px', color: Palette.BRASS_TEXT,
+        }).setOrigin(0.5));
+        container.add(this.scene.add.text(0, H / 2 - 16,
+            `Projected: £${contract.projectedPayout}`, {
+            fontFamily: Fonts.BODY, fontSize: '16px', color: Palette.WHITE,
+        }).setOrigin(0.5));
+
+        const makeStepButton = (label: string, dx: number, delta: number): void => {
+            const btn = this.scene.add.container(dx, 0);
+            const chrome = this.scene.add.graphics();
+            const enabled = delta > 0
+                ? contract.cratesLoaded < contract.maxCrates
+                : contract.cratesLoaded > 0;
+            chrome.fillStyle(enabled ? Palette.WAX_RED : Palette.WOOD_PANEL, 1);
+            chrome.fillRect(-22, -22, 44, 44);
+            chrome.lineStyle(2, enabled ? Palette.BRASS_BRIGHT : Palette.DISABLED, 1);
+            chrome.strokeRect(-22, -22, 44, 44);
+            const label_ = this.scene.add.text(0, -2, label, {
+                fontFamily: Fonts.DISPLAY, fontSize: '26px',
+                color: enabled ? Palette.WHITE : Palette.DISABLED_TEXT,
+            }).setOrigin(0.5);
+            btn.add([chrome, label_]);
+            btn.setSize(44, 44);
+            if (enabled) {
+                btn.setInteractive();
+                btn.on('pointerover', () => btn.setScale(1.05));
+                btn.on('pointerout', () => btn.setScale(1));
+                btn.on('pointerdown', () => {
+                    this.cratesLoaded = Phaser.Math.Clamp(this.cratesLoaded + delta, 0, contract.maxCrates);
+                    contract.cratesLoaded = this.cratesLoaded;
+                    this.rebuild();
+                });
+            }
+            container.add(btn);
+        };
+        makeStepButton('-', -W / 2 + 32, -1);
+        makeStepButton('+', W / 2 - 32, 1);
+
+        return container;
+    }
+
     private makeStamp(text: string, x: number, y: number): Phaser.GameObjects.Text {
         return this.scene.add.text(x, y, text, {
             fontFamily: Fonts.UTILITY, fontSize: '13px', fontStyle: 'bold',
@@ -620,8 +703,11 @@ export class ContractBoardPanel extends AbstractHqPanel {
         const contract = campaign.selectedContract;
         const required = this.requiredSquadSize();
 
+        const freightNote = contract?.isTradeRun
+            ? `  ·  ${contract.cratesLoaded} crate(s) loaded, £${contract.projectedPayout} projected`
+            : '';
         const briefing = contract
-            ? `"${contract.description}"  ·  ${contract.paymentClause}`
+            ? `"${contract.description}"  ·  ${contract.paymentClause}${freightNote}`
             : `Select a posting on the map and muster your squad.`;
         this.statusText.setText(`${briefing}   ·   Squad ${this.selectedSquad.length}/${required}`);
 

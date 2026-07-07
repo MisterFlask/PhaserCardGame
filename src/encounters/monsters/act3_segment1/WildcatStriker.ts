@@ -14,7 +14,7 @@ export class WildcatStriker extends AutomatedCharacter {
             name: 'Wildcat Striker',
             portraitName: 'angry-worker',
             maxHitpoints: 45,
-            description: 'An enraged union militant.'
+            description: "Not sanctioned by the Union proper - a wildcat action, hence the name, undertaken by workers who felt the official line insufficiently pointed. Fights with whatever came off the factory floor, mostly broken gearing, which he is fond of jamming into a man's kit bag mid-scuffle to foul it for later. Frightening in the way that any man with nothing left to lose is frightening, and quick to call his fellows in when the numbers turn against him."
         });
         this.buffs.push(new RevolutionaryFervor(5));
         this.buffs.push(new Terrifying(1));

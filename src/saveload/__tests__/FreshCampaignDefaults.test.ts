@@ -68,12 +68,13 @@ describe('CampaignSave shape-lock (fresh-state defaults)', () => {
     function buildFreshSave(): CampaignSave {
         StandingOrdersState.getInstance().reset();
         return {
-            version: 7,
+            version: 9,
             savedAtIso: new Date(0).toISOString(),
             moneyInVault: 200, // GameState.moneyInVault default (src/rules/GameState.ts) — browser-verified in deliverable 2
             calendar: calendarToDTO(new CampaignCalendar()),
             contracts: [], // CampaignUiState.availableContracts starts empty; populated lazily via ensureContractsPopulated()
             contractsCompleted: 0,
+            contractsCompletedByClient: {}, // CampaignUiState.contractsCompletedByClient starts empty
             ownedProjects: [], // CampaignUiState.ownedStrategicProjects starts empty
             roster: [], // CampaignUiState.roster reseeds via CharacterGenerator; Phaser-tainted, browser-verified only
             standingOrders: standingOrdersToDTO(StandingOrdersState.getInstance()),
@@ -91,6 +92,7 @@ describe('CampaignSave shape-lock (fresh-state defaults)', () => {
             'consumables',
             'contracts',
             'contractsCompleted',
+            'contractsCompletedByClient',
             'moneyInVault',
             'ownedProjects',
             'roster',
@@ -100,6 +102,7 @@ describe('CampaignSave shape-lock (fresh-state defaults)', () => {
         ]);
 
         expect(save.contractsCompleted).toBe(0);
+        expect(save.contractsCompletedByClient).toEqual({});
         expect(save.contracts).toEqual([]);
         expect(save.ownedProjects).toEqual([]);
         expect(save.roster).toEqual([]);
@@ -118,5 +121,15 @@ describe('CampaignSave shape-lock (fresh-state defaults)', () => {
         const restored = JSON.parse(JSON.stringify(save));
         expect(Object.keys(restored).sort()).toEqual(Object.keys(save).sort());
         expect(restored).toEqual(save);
+    });
+
+    it('preserves a populated contractsCompletedByClient map through JSON', () => {
+        const save = buildFreshSave();
+        save.contractsCompletedByClient = {
+            'The Styx Dam Project Office': 3,
+            'Infernal Marine & Postal Underwriters, Ltd.': 1,
+        };
+        const restored: CampaignSave = JSON.parse(JSON.stringify(save));
+        expect(restored.contractsCompletedByClient).toEqual(save.contractsCompletedByClient);
     });
 });

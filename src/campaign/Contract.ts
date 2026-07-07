@@ -4,7 +4,7 @@ import { generateWordGuid } from "../utils/Guid";
 
 export enum ContractType {
     BOUNTY = "Bounty",          // straight combat: clear the target, get paid
-    TRADE_RUN = "Trade Run",    // escort cargo (cargo cards clog the deck); pays more. v2.
+    TRADE_RUN = "Trade Run",    // freight: crates pay per-unit but clog the deck with cargo cards.
     PROCUREMENT = "Procurement" // payout in cards/resources rather than cash. v2.
 }
 
@@ -46,6 +46,22 @@ export class Contract {
      *  only the string, never the instance, per house rule 1). */
     public consumableRewardName?: string;
 
+    /** Trade Run only: maximum crates the freight stepper allows (0/absent
+     *  on combat contracts). */
+    public maxCrates: number;
+    /** Trade Run only: £ paid per crate delivered, on top of the (low) base
+     *  `payout` (0/absent on combat contracts). */
+    public freightRatePerCrate: number;
+    /**
+     * Trade Run only: crates the player actually loaded at muster, 0..
+     * maxCrates. Chosen at dispatch, not generation — deliberately NOT
+     * serialized (see ContractDTO / SAVE_FORMAT_VERSION 8 history comment):
+     * a sortie is never mid-flight in a save (saves are HQ-only, house rule
+     * 4), so a contract on the board always has cratesLoaded 0 and never
+     * needs to survive a reload.
+     */
+    public cratesLoaded: number = 0;
+
     constructor(args: {
         name: string;
         description: string;
@@ -62,6 +78,8 @@ export class Contract {
         squadSize: number;
         regionName: string;
         consumableRewardName?: string;
+        maxCrates?: number;
+        freightRatePerCrate?: number;
     }) {
         this.name = args.name;
         this.description = args.description;
@@ -78,5 +96,19 @@ export class Contract {
         this.squadSize = args.squadSize;
         this.regionName = args.regionName;
         this.consumableRewardName = args.consumableRewardName;
+        this.maxCrates = args.maxCrates ?? 0;
+        this.freightRatePerCrate = args.freightRatePerCrate ?? 0;
+    }
+
+    /** True for trade-run contracts: the muster UI shows a freight stepper
+     *  and payout includes cratesLoaded * freightRatePerCrate. */
+    public get isTradeRun(): boolean {
+        return this.type === ContractType.TRADE_RUN;
+    }
+
+    /** Projected payout at the current cratesLoaded (base contract's payout
+     *  field IS the low base for trade runs — see ContractGenerator). */
+    public get projectedPayout(): number {
+        return this.payout + this.cratesLoaded * this.freightRatePerCrate;
     }
 }

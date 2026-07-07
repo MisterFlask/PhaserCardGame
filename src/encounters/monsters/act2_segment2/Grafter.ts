@@ -34,7 +34,7 @@ export class Grafter extends AutomatedCharacter {
             name: 'Grafter',
             portraitName: 'grafter-trench-medic',
             maxHitpoints: 90,
-            description: 'A trench medic stitching the fallen into grisly servitors.'
+            description: "A field surgeon of sorts, though I use the term charitably. He collects the dead - and, on one occasion I'd rather not revisit, the merely wounded - and stitches them into servants of a kind, all done with a needle the length of a bayonet and a bedside manner to match. Seems to draw strength from any doctrine or theory recited nearby, which suggests he was a keen student before the war and a keener one after. Do not let him examine you at length."
         });
         this.buffs.push(new PatchworkSurgeon());
     }

@@ -11,7 +11,7 @@ export class CrawlingInfestation extends AutomatedCharacter {
             name: "Solicitor Swarm",
             portraitName: "swarm_bugs_placeholder",
             maxHitpoints: 60,
-            description: "it's never just one bug."
+            description: "Legal correspondence has a way of multiplying in this trench-line, and I do mean literally. What begins as a single writ-serving beetle becomes, within the hour, a moving carpet of the things, each one smaller than the last but no less litigious. They bite in aggregate rather than individually, which I am told is meant to be a comfort. It is not. Recommend against reading any of the summonses they leave behind; Jenkins did, and now owes a Belgian solicitor eleven pounds for reasons nobody can explain."
         });
         // swarm buff caps damage from any single attack
         this.buffs.push(new Swarm(10));

@@ -16,7 +16,7 @@ export class TheRevolutionary extends AutomatedCharacter {
             name: 'Union Leader',
             portraitName: 'angry-worker-boss',
             maxHitpoints: 280,
-            description: "Fires the workers' fury."
+            description: "The Union's own, and unmistakably in charge of this stretch of the Foundry Belt, whatever the Barons' paperwork claims to the contrary. Speaks well, in the cockney-and-committee-minutes register they all seem to favour down here, and the furnace floor listens - calls a general strike and the whole works simply stops, us included, mid-motion, until the point is made. Grows more dangerous with every worker rallied to the cause, and is not shy about rallying more the moment a fight turns against her. Struck me, on reflection, as rather more sympathetic than the man we'd just left in the Baron's office. I did not put that in the report."
         });
         this.size = CardSize.LARGE;
         this.buffs.push(new Terrifying(2));

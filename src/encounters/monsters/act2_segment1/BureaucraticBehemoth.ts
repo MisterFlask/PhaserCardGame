@@ -56,7 +56,7 @@ export class BureaucraticBehemoth extends AutomatedCharacter {
             name: "Bureaucratic Behemoth",
             portraitName: "Bureaucratic Beast",
             maxHitpoints: 120,
-            description: "A massive creature adorned with countless forms, stamps, and official seals. Its movements are methodical until provoked."
+            description: "A trench-side inspector, or what's left of one, grown vast on the paperwork it never stopped generating. Every form it ever stamped seems to have fused to its hide - triplicate copies, all of them, rippling when it breathes. It processes complaints with admirable patience right up until you exceed some quota only it knows, at which point patience gives way to something closer to a filing cabinet falling on you from a great height. Morrison lodged an appeal. It did not go well for Morrison."
         });
         
         // Add the tracking buff

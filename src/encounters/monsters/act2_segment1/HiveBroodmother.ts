@@ -34,7 +34,7 @@ export class HiveBroodmother extends AutomatedCharacter {
             name: "Psalter-Louse",
             portraitName: "hive-broodmother-louse",
             maxHitpoints: 50,
-            description: "a pulsating mass of carapace and ooze, surrounded by countless larvae. each strike feels muffled, as if absorbed by a living swarm."
+            description: "Found lodged in what had been a regimental hymnal, of all things - a swollen, glistening thing the guide called a Psalter-Louse, apparently drawn to abandoned scripture the way rot follows a wound. It deposits its eggs directly into whatever's nearest, cards included, and I regret to report I did not learn this until Thompson's playing hand began making a faint clicking noise. The carapace absorbs a blow the way a mattress absorbs a dropped anvil - poorly, but with unsettling patience."
         });
         this.buffs.push(new Popular());
     }

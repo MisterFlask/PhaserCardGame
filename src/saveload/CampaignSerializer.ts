@@ -15,6 +15,8 @@ import {
     SAVE_FORMAT_VERSION
 } from "./SaveDTOs";
 import { SaveRegistries } from "./SaveRegistries";
+import { ABYSSAL_RESEARCH_INSTITUTE_LEGACY_PROJECT_NAME } from "../strategic_projects/StrategicProjectList";
+import { ABYSSAL_RESEARCH_INSTITUTE_ORDER_ID } from "../campaign/orders/LaunchOrders";
 
 /**
  * Converts campaign state to/from the plain-data save format. Only valid at
@@ -82,6 +84,7 @@ export class CampaignSerializer {
             calendar: calendarToDTO(cal),
             contracts: campaign.availableContracts.map(contractToDTO),
             contractsCompleted: campaign.contractsCompleted,
+            contractsCompletedByClient: { ...campaign.contractsCompletedByClient },
             ownedProjects: campaign.ownedStrategicProjects.map(p => ({
                 name: p.name,
                 victoryPoints: p.getVictoryPoints(),
@@ -184,12 +187,43 @@ export class CampaignSerializer {
         campaign.calendar = calendarFromDTO(save.calendar);
         campaign.availableContracts = save.contracts.map(contractFromDTO);
         campaign.contractsCompleted = save.contractsCompleted;
+        campaign.contractsCompletedByClient = { ...(save.contractsCompletedByClient ?? {}) };
         campaign.selectedContract = null;
         campaign.selectedParty = [];
+        // Abyssal Research Institute migration: it shipped as a Capital Work
+        // and converted to a Standing Order (see LaunchOrders.ts's
+        // AbyssalResearchInstituteOrder / strategic_layer_redesign.md's
+        // Standing Orders amendment). A save from before the conversion may
+        // still list it in ownedProjects; ALL_STRATEGIC_PROJECTS keeps the
+        // class around for exactly this case, but it's no longer in
+        // availableStrategicProjects (PURCHASABLE_STRATEGIC_PROJECTS
+        // excludes it), so it must be handled before the generic name-match
+        // below rather than falling through it.
+        //
+        // NOTE ON REACHABILITY: SaveManager.loadOnceOnBoot rejects any save
+        // whose version !== SAVE_FORMAT_VERSION wholesale (no migration
+        // chain exists anywhere in this codebase — every prior version bump,
+        // v2 through v8, relied on the same "mismatched version = start
+        // fresh" behavior). That means a real pre-v9 save with ARI still
+        // owned never actually reaches this method via the normal boot path;
+        // it gets discarded before CampaignSerializer.applySave is called at
+        // all, same as any other save-shape change. This logic exists anyway
+        // because applySave is unit-tested directly (bypassing the version
+        // gate) and because "handle a save that already owns it as a
+        // project" is cheap, correct, and future-proofs the method if the
+        // version gate is ever relaxed to a real migration chain. Simplest-
+        // correct approach: drop the legacy Capital Work entirely and enact
+        // the equivalent order in its place, best-effort (if a slot is
+        // free); if every slot is already taken, the effect lapses but a
+        // board note explains why rather than silently losing it.
+        const ownedProjectDTOs = save.ownedProjects
+            .filter(p => p.name !== ABYSSAL_RESEARCH_INSTITUTE_LEGACY_PROJECT_NAME);
+        const hadLegacyAri = ownedProjectDTOs.length !== save.ownedProjects.length;
+
         // Match by name against the canonical instances so instance-identity
         // checks in the investment UI keep working. Purchasing moves a project
         // from available to owned, so the loader mirrors that split.
-        const ownedByName = new Map(save.ownedProjects.map(p => [p.name, p]));
+        const ownedByName = new Map(ownedProjectDTOs.map(p => [p.name, p]));
         const allProjects = [
             ...campaign.availableStrategicProjects,
             ...campaign.ownedStrategicProjects,
@@ -209,5 +243,20 @@ export class CampaignSerializer {
             .filter((c): c is AbstractConsumable => c !== null);
 
         applyStandingOrdersDTO(StandingOrdersState.getInstance(), save.standingOrders);
+        campaign.syncStandingOrderBonusSlots();
+
+        if (hadLegacyAri) {
+            const ordersState = StandingOrdersState.getInstance();
+            const alreadyActive = ordersState.activeOrderIds.includes(ABYSSAL_RESEARCH_INSTITUTE_ORDER_ID);
+            const migrated = alreadyActive
+                || ordersState.enact(ABYSSAL_RESEARCH_INSTITUTE_ORDER_ID, campaign.calendar.year);
+            campaign.calendar.boardEvents.push({
+                week: campaign.calendar.week,
+                message: migrated
+                    ? "Notice: the Abyssal Research Institute's charter has been reissued as a Standing Order; its research grant continues uninterrupted."
+                    : "Notice: the Abyssal Research Institute's charter has lapsed pending a free Standing Order slot; ratify it at the next board meeting to resume its grant.",
+                isWarning: !migrated,
+            });
+        }
     }
 }

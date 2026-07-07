@@ -42,6 +42,8 @@ export function contractToDTO(c: Contract): ContractDTO {
         squadSize: c.squadSize,
         regionName: c.regionName,
         consumableRewardName: c.consumableRewardName,
+        maxCrates: c.maxCrates,
+        freightRatePerCrate: c.freightRatePerCrate,
     };
 }
 
@@ -62,6 +64,8 @@ export function contractFromDTO(dto: ContractDTO): Contract {
         squadSize: dto.squadSize,
         regionName: dto.regionName,
         consumableRewardName: dto.consumableRewardName,
+        maxCrates: dto.maxCrates,
+        freightRatePerCrate: dto.freightRatePerCrate,
     });
 }
 
