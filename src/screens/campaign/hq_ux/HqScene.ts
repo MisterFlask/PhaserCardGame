@@ -20,6 +20,7 @@ import { PromotionPanel } from './panels/PromotionPanel';
 import { QuartermasterPanel } from './panels/QuartermasterPanel';
 import { SortieReportPanel } from './panels/SortieReportPanel';
 import { pendingLevels } from '../../../campaign/Leveling';
+import { OnboardingLetter } from './OnboardingLetter';
 
 type PanelKey = 'contracts' | 'investment' | 'barracks' | 'ledger' | 'ending' | 'report' | 'promotion' | 'quartermaster';
 
@@ -173,6 +174,15 @@ export class HqScene extends Scene {
 
         // Arriving at HQ (fresh boot or sortie return) is the save checkpoint.
         SaveManager.save();
+
+        // Cavendish's first dispatch: shown once, layered above whichever
+        // panel just got selected, only on the app session that booted with
+        // no save on disk. bootedFresh is a transient session flag (never
+        // serialized) so this never reappears after a reload finds a save.
+        if (SaveManager.bootedFresh) {
+            SaveManager.bootedFresh = false;
+            new OnboardingLetter(this, () => { /* no-op: overlay self-destroys */ });
+        }
     }
 
     private isCampaignOver(): boolean {

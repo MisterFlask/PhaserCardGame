@@ -9,6 +9,14 @@ import { CampaignSerializer } from "./CampaignSerializer";
 export class SaveManager {
     private static hasAttemptedInitialLoad = false;
 
+    /**
+     * Read-only session flag (NOT serialized, not part of any save DTO):
+     * true iff loadOnceOnBoot() ran and found no usable save, i.e. this app
+     * session began a brand-new campaign. Used to gate one-time fresh-boot
+     * UI (the onboarding letter); never touched after the first boot check.
+     */
+    public static bootedFresh = false;
+
     public static hasSave(): boolean {
         try {
             return localStorage.getItem(SAVE_STORAGE_KEY) !== null;
@@ -40,14 +48,19 @@ export class SaveManager {
         try {
             raw = localStorage.getItem(SAVE_STORAGE_KEY);
         } catch {
+            this.bootedFresh = true;
             return false;
         }
-        if (!raw) return false;
+        if (!raw) {
+            this.bootedFresh = true;
+            return false;
+        }
 
         try {
             const save = JSON.parse(raw) as CampaignSave;
             if (save.version !== SAVE_FORMAT_VERSION) {
                 console.warn(`Save version ${save.version} != ${SAVE_FORMAT_VERSION}; starting fresh.`);
+                this.bootedFresh = true;
                 return false;
             }
             CampaignSerializer.applySave(save);
@@ -55,6 +68,7 @@ export class SaveManager {
             return true;
         } catch (e) {
             console.error("Failed to load campaign save; starting fresh:", e);
+            this.bootedFresh = true;
             return false;
         }
     }

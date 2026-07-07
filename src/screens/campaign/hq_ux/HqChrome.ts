@@ -61,7 +61,7 @@ export class HqChrome extends Phaser.GameObjects.Container {
         const bar = scene.add.container(width / 2, STATUS_BAR_Y);
         bar.add(drawWoodPanel(scene, width, STATUS_BAR_HEIGHT, false));
 
-        const title = scene.add.text(-width / 2 + 20, 0, 'The East Inferno Company', {
+        const title = scene.add.text(-width / 2 + 20, 0, 'The East Infernal Company', {
             fontFamily: Fonts.DISPLAY, fontSize: '22px', color: Palette.BRASS_TEXT,
         }).setOrigin(0, 0.5);
         bar.add(title);

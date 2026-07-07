@@ -36,6 +36,7 @@ class GeneralRewardScreen {
     private shouldShow: boolean = false;
     private onDoneCallback?: () => void;
     private background!: Phaser.GameObjects.Rectangle;
+    private titleText!: Phaser.GameObjects.Text;
     private doneButton?: TextBoxButton;
     private activeCardRewardScreen?: CardRewardScreen;
 
@@ -81,15 +82,31 @@ class GeneralRewardScreen {
         .setDepth(CONSTANTS.UI_DEPTH.BACKGROUND)
         .setVisible(false);
 
+        this.titleText = this.scene.add.text(
+            this.centerX,
+            this.centerY - CONSTANTS.BACKGROUND_HEIGHT / 2 + 40,
+            "Objective secured. The Company's factor logs the spoils below for requisition.",
+            {
+                fontSize: '18px',
+                color: '#ffffff',
+                fontFamily: 'Arial',
+                align: 'center',
+                wordWrap: { width: CONSTANTS.BACKGROUND_WIDTH - 80 }
+            }
+        )
+        .setOrigin(0.5)
+        .setDepth(CONSTANTS.UI_DEPTH.REWARDS)
+        .setVisible(false);
+
         this.doneButton = new TextBoxButton({
             scene: this.scene,
             x: this.centerX,
             y: this.centerY + CONSTANTS.BUTTON_Y,
             width: CONSTANTS.BUTTON_WIDTH,
             height: CONSTANTS.BUTTON_HEIGHT,
-            text: 'Done',
-            style: { 
-                fontSize: '24px', 
+            text: 'CLAIM & CONTINUE',
+            style: {
+                fontSize: '20px',
                 color: '#ffffff',
                 fontFamily: 'Arial',
                 align: 'center'
@@ -289,6 +306,7 @@ class GeneralRewardScreen {
         UIContextManager.getInstance().pushContext(UIContext.REWARD_SCREEN);
         this.shouldShow = true;
         this.background.setVisible(true);
+        this.titleText.setVisible(true);
         this.doneButton?.setVisible(true);
 
         this.rewardObjects.forEach(ro => {
@@ -298,7 +316,7 @@ class GeneralRewardScreen {
         });
 
         this.scene.tweens.add({
-            targets: [this.background, this.doneButton, ...this.rewardObjects.map(ro => ro.iconBackground), ...this.rewardObjects.map(ro => ro.icon), ...this.rewardObjects.map(ro => ro.text)],
+            targets: [this.background, this.titleText, this.doneButton, ...this.rewardObjects.map(ro => ro.iconBackground), ...this.rewardObjects.map(ro => ro.icon), ...this.rewardObjects.map(ro => ro.text)],
             alpha: { from: 0, to: 1 },
             duration: CONSTANTS.FADE_DURATION,
             ease: 'Power2'
@@ -312,13 +330,14 @@ class GeneralRewardScreen {
         this.shouldShow = false;
 
         this.scene.tweens.add({
-            targets: [this.background, this.doneButton, ...this.rewardObjects.map(ro => ro.iconBackground), ...this.rewardObjects.map(ro => ro.icon), ...this.rewardObjects.map(ro => ro.text), ...this.rewardObjects.map(ro => ro.tooltipBackground), ...this.rewardObjects.map(ro => ro.tooltipText)],
+            targets: [this.background, this.titleText, this.doneButton, ...this.rewardObjects.map(ro => ro.iconBackground), ...this.rewardObjects.map(ro => ro.icon), ...this.rewardObjects.map(ro => ro.text), ...this.rewardObjects.map(ro => ro.tooltipBackground), ...this.rewardObjects.map(ro => ro.tooltipText)],
             alpha: { from: 1, to: 0 },
             duration: CONSTANTS.FADE_DURATION,
             ease: 'Power2',
             onComplete: () => {
                 if (!this.shouldShow) {
                     this.background.setVisible(false);
+                    this.titleText.setVisible(false);
                     this.doneButton?.setVisible(false);
                     this.rewardObjects.forEach(ro => {
                         ro.iconBackground.setVisible(false);
@@ -339,6 +358,7 @@ class GeneralRewardScreen {
         }
 
         this.background.destroy();
+        this.titleText.destroy();
         this.doneButton?.destroy();
 
         this.rewardObjects.forEach(ro => {
