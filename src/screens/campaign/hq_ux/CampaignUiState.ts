@@ -9,11 +9,37 @@ import { PlayerCharacter } from '../../../gamecharacters/PlayerCharacter';
 import { CampaignRules } from '../../../rules/CampaignRulesHelper';
 import { GameState } from '../../../rules/GameState';
 import { AbstractStrategicProject } from '../../../strategic_projects/AbstractStrategicProject';
+import { CompanySecretariat } from '../../../strategic_projects/CompanySecretariat';
 import { PURCHASABLE_STRATEGIC_PROJECTS } from '../../../strategic_projects/StrategicProjectList';
 
 export const ROSTER_CAP = 8;
 export const RECRUIT_COST = 80;
 const RECRUIT_POOL_SIZE = 3;
+
+/** Contracts fulfilled for the same client before their retainer Standing
+ *  Order unlocks (design doc, "Amendment: Standing Orders" -> "Where orders
+ *  come from" -> "future hook"). */
+export const CLIENT_RETAINER_UNLOCK_THRESHOLD = 3;
+
+/**
+ * Maps a contract client string (Contract.client, e.g. "The Styx Dam Project
+ * Office") to the Standing Order id it unlocks after
+ * CLIENT_RETAINER_UNLOCK_THRESHOLD completed contracts for that client.
+ *
+ * INTENTIONALLY EMPTY at present: the design amendment names this mechanism
+ * as a "future hook" and gives exactly one illustrative example ("fulfil
+ * three Infernal Marine contracts -> Underwriting Retainer") using a client
+ * name that does not match any client in ContractGenerator.ts's actual
+ * REGION_FLAVORS/TRADE_RUN_REGIONS tables. Which of the twelve real clients
+ * get bespoke retainer orders, and what those orders do, is an unresolved
+ * design decision (see TODO.md "Faction reputation + intelligence services"
+ * — flagged as its own design session). The tracking/unlock/UI mechanism
+ * below is fully wired and ready; populate this map (and register the
+ * corresponding StandingOrder subclasses in LaunchOrders.ts) once that
+ * design pass happens. House rule 6: this registry is the only place a
+ * client-to-order mapping may live — no per-client branches elsewhere.
+ */
+export const CLIENT_RETAINER_ORDER_IDS: Record<string, string> = {};
 
 export class CampaignUiState {
     private static instance: CampaignUiState;
@@ -30,6 +56,11 @@ export class CampaignUiState {
     public recruitCandidates: PlayerCharacter[] = [];
     /** Campaign stat, shown on the end-of-campaign screen. */
     public contractsCompleted: number = 0;
+    /** Per-client completion count, keyed by Contract.client. The one owner
+     *  of this fact (house rule 3); SortieManager.resolveSortie increments
+     *  it alongside contractsCompleted. Drives client-unlocked retainer
+     *  Standing Orders (see CLIENT_RETAINER_ORDER_IDS). */
+    public contractsCompletedByClient: Record<string, number> = {};
     /** Canonical owned consumable stock — the one owner of this fact
      *  (house rule 3). SortieManager transfers these into GameState.consumables
      *  (the active loadout) on dispatch and back on successful resolution. */
@@ -68,6 +99,27 @@ export class CampaignUiState {
 
     public ownsProject(name: string): boolean {
         return this.ownedStrategicProjects.some(p => p.name === name);
+    }
+
+    /**
+     * Recomputes StandingOrdersState.bonusSlots from currently owned Capital
+     * Works. A resync rather than an increment: AbstractStrategicProject has
+     * no onPurchase hook and onQuarterEnd fires every quarter (which would
+     * double-count a stored increment), so bonusSlots is derived fresh each
+     * time ownership might have changed. Call after a purchase and after a
+     * save load. Additive with future bonus-slot-granting Capital Works —
+     * extend the sum here, not with an if-this-project branch elsewhere.
+     */
+    public syncStandingOrderBonusSlots(): void {
+        const secretariatBonus = this.ownsProject(new CompanySecretariat().name) ? 1 : 0;
+        StandingOrdersState.getInstance().bonusSlots = secretariatBonus;
+    }
+
+    /** True once CLIENT_RETAINER_UNLOCK_THRESHOLD contracts have been
+     *  fulfilled for the given client. Used by the ratification UI to grey
+     *  out a not-yet-unlocked retainer order row. */
+    public isClientRetainerUnlocked(client: string): boolean {
+        return (this.contractsCompletedByClient[client] ?? 0) >= CLIENT_RETAINER_UNLOCK_THRESHOLD;
     }
 
     /** RECRUIT_COST adjusted by any active Standing Orders (e.g. Recruiting Sergeants). */

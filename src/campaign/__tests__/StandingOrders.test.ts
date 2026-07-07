@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { CampaignCalendar, WEEKS_PER_QUARTER } from '../CampaignCalendar';
 import { ContractGenerator } from '../ContractGenerator';
 import {
-    AggressiveTendering, ArchivesStandingOrder, BarristersOnRetainer, HazardPaySchedule,
-    IncendiaryDoctrine, InvestorRelationsRetainer, LAUNCH_ORDERS, PhrenologyRetainer,
+    AbyssalResearchInstituteOrder, AggressiveTendering, ArchivesStandingOrder, BarristersOnRetainer,
+    HazardPaySchedule, IncendiaryDoctrine, InvestorRelationsRetainer, LAUNCH_ORDERS, PhrenologyRetainer,
     PunctualityClause, RecruitingSergeants
 } from '../orders/LaunchOrders';
 import { StandingOrdersState } from '../orders/StandingOrdersState';
@@ -131,8 +131,8 @@ describe('StandingOrdersState', () => {
     });
 
     describe('launch pool', () => {
-        it('has exactly 9 orders with stable kebab-case ids', () => {
-            expect(LAUNCH_ORDERS).toHaveLength(9);
+        it('has exactly 10 orders with stable kebab-case ids', () => {
+            expect(LAUNCH_ORDERS).toHaveLength(10);
             LAUNCH_ORDERS.forEach(order => {
                 expect(order.id).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/);
                 expect(order.name.length).toBeGreaterThan(0);
@@ -140,7 +140,7 @@ describe('StandingOrdersState', () => {
                 expect(order.flavor.length).toBeGreaterThan(0);
             });
             const ids = new Set(LAUNCH_ORDERS.map(o => o.id));
-            expect(ids.size).toBe(9);
+            expect(ids.size).toBe(10);
         });
     });
 
@@ -252,6 +252,25 @@ describe('StandingOrdersState', () => {
         });
     });
 
+    describe('effect wiring: XP gain (converted Abyssal Research Institute)', () => {
+        it('adds 25% XP, rounded to the nearest whole number', () => {
+            const state = StandingOrdersState.getInstance();
+            state.enact('abyssal-research-institute', 5);
+            expect(state.xpGain(20)).toBe(25); // 20 * 1.25 = 25
+            expect(state.xpGain(10)).toBe(13); // 10 * 1.25 = 12.5 -> rounds to 13
+        });
+
+        it('leaves XP unchanged when the order is not active', () => {
+            const state = StandingOrdersState.getInstance();
+            expect(state.xpGain(20)).toBe(20);
+        });
+
+        it('AbyssalResearchInstituteOrder.modifyXpGain matches the aggregate', () => {
+            const order = new AbyssalResearchInstituteOrder();
+            expect(order.modifyXpGain(20)).toBe(25);
+        });
+    });
+
     describe('effect wiring: status application stacks (Incendiary Doctrine)', () => {
         it('adds 1 stack when an ally applies Burning to an enemy, with the order active', () => {
             const state = StandingOrdersState.getInstance();
@@ -302,6 +321,7 @@ describe('StandingOrdersState', () => {
             expect(ids).toContain(new BarristersOnRetainer().id);
             expect(ids).toContain(new ArchivesStandingOrder().id);
             expect(ids).toContain(new IncendiaryDoctrine().id);
+            expect(ids).toContain(new AbyssalResearchInstituteOrder().id);
         });
     });
 });

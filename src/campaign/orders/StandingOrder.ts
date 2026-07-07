@@ -29,6 +29,13 @@ export abstract class StandingOrder {
     /** hit is the shareholder-satisfaction point loss from a short dividend. */
     public modifySatisfactionHit(hit: number): number { return hit; }
     public modifyCardRewardChoices(n: number): number { return n; }
+    /** XP granted to a surviving squad member for a combat win (see
+     *  Leveling.xpForCombatWin). Converted Abyssal Research Institute lives
+     *  here: its old "extra card reward at sortie start" effect has no
+     *  live hook to attach to post-Amendment (card rewards no longer drop
+     *  mid-run; XP->promotion is the only reward currency now), so the
+     *  faithful conversion is a flat XP bonus per combat win instead. */
+    public modifyXpGain(xp: number): number { return xp; }
     /**
      * Combat/card-mechanics hook (see strategic_layer_redesign.md, "Amendment:
      * Standing Orders" — "+2 damage to Burning" is a legitimate order). Called

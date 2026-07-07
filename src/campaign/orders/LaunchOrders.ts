@@ -98,6 +98,20 @@ export class IncendiaryDoctrine extends StandingOrder {
     }
 }
 
+/** Stable id, exported so CampaignSerializer's legacy-project migration
+ *  (a save with ARI still owned as a Capital Work) can reference it without
+ *  a magic string. */
+export const ABYSSAL_RESEARCH_INSTITUTE_ORDER_ID = "abyssal-research-institute";
+
+export class AbyssalResearchInstituteOrder extends StandingOrder {
+    public readonly id = ABYSSAL_RESEARCH_INSTITUTE_ORDER_ID;
+    public readonly name = "Abyssal Research Institute";
+    public readonly description = "A standing research grant to the Institute at the edge of the Abyssal Frontier converts its findings into field experience: every combat win banks [b]25% additional XP[/b] for the squad.";
+    public readonly flavor = "Research memo: \"We do not yet understand what we found. We do, however, bill for it.\"";
+
+    public modifyXpGain(xp: number): number { return Math.round(xp * 1.25); }
+}
+
 /** Launch pool, in a stable order. Add new orders here, never by id-branch. */
 export const LAUNCH_ORDERS: StandingOrder[] = [
     new AggressiveTendering(),
@@ -109,4 +123,5 @@ export const LAUNCH_ORDERS: StandingOrder[] = [
     new BarristersOnRetainer(),
     new ArchivesStandingOrder(),
     new IncendiaryDoctrine(),
+    new AbyssalResearchInstituteOrder(),
 ];

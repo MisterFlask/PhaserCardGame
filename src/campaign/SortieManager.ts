@@ -10,6 +10,7 @@ import { SceneChanger } from "../screens/SceneChanger";
 import { applyHpHardening, hardeningForYear } from "./EncounterHardening";
 import { Contract } from "./Contract";
 import { xpForCombatWin } from "./Leveling";
+import { StandingOrdersState } from "./orders/StandingOrdersState";
 import { applyCasualties } from "./SortieResolution";
 import { mergeStockWithLoadout } from "./ConsumableStock";
 
@@ -155,9 +156,13 @@ export class SortieManager {
         const bonusXp = isFinalCombat
             ? GameState.getInstance().combatState.combatResources.ashes.value
             : 0;
+        // Standing Orders (e.g. converted Abyssal Research Institute) can
+        // scale the combat-win XP; the ashes bonus is a flat carryover, not
+        // itself scaled, to keep its accounting a simple 1:1 conversion.
+        const orderAdjustedXp = StandingOrdersState.getInstance().xpGain(baseXp);
         this.squad.forEach(character => {
             if (character.hitpoints > 0 && !character.isDeceased) {
-                character.xp += baseXp + bonusXp;
+                character.xp += orderAdjustedXp + bonusXp;
             }
         });
 
@@ -217,6 +222,8 @@ export class SortieManager {
         const totalPayout = contract.projectedPayout;
         gameState.moneyInVault += totalPayout;
         campaign.contractsCompleted++;
+        campaign.contractsCompletedByClient[contract.client] =
+            (campaign.contractsCompletedByClient[contract.client] ?? 0) + 1;
         if (contract.isTradeRun && contract.cratesLoaded > 0) {
             report.push(`Contract "${contract.name}" fulfilled: £${contract.payout} base + `
                 + `${contract.cratesLoaded} crate(s) x £${contract.freightRatePerCrate} freight = £${totalPayout} banked.`);
