@@ -302,7 +302,11 @@ export default class ImageUtils {
                 "wisp_censored.png",
                 "wood_golem.png",
                 "moose.png",
-                "totem_1.png"
+                "totem_1.png",
+
+                // act-1 art burndown batch 1 (July 2026)
+                "hermit.png", "ferryman_mutineer.png", "totem_2.png",
+                "ghost_ship.png", "fare_enforcer.png", "treasure.png"
               ]
         },
         enemies: {
@@ -339,7 +343,11 @@ export default class ImageUtils {
                 // replacements for mismatched stock-art portraits (July 2026)
                 "artiste-slime-painter.png", "brine-bast-meat-beast.png", "french-policeman-gendarme.png",
                 "french-restauranteur-chef.png", "grafter-trench-medic.png", "hive-broodmother-louse.png",
-                "lexiophage-bureaucrat.png"
+                "lexiophage-bureaucrat.png",
+
+                // act-1 art burndown batch 1 (July 2026)
+                "Horror Worm.png", "Salamander.png", "Drowned Sailor.png", "Corrupted Bird.png",
+                "Electric Eel.png", "Pirate.png", "Ooze.png", "Lost Accountant.png"
             ]
         },
         attributes_and_augments: {
