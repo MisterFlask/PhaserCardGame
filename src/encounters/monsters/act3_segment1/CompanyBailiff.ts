@@ -12,13 +12,18 @@ export class CompanyBailiff extends AutomatedCharacter {
         });
     }
 
+    // Balance note (measured 2026-07): half its turns (Requisition Order)
+    // deal zero damage, and it measured 92-100% greedy win rate across
+    // squad sizes, n=40-50 -- one of the free wins keeping act 3 above
+    // target. Seize Assets bumped 16->21 so the damaging half of its cycle
+    // carries more weight.
     override generateNewIntents(): AbstractIntent[] {
         const intents: AbstractIntent[][] = [
             [
                 new ApplyDebuffToAllPlayerCharactersIntent({ debuff: new DrawOneFewerCardNextNTurns(1), owner: this }).withTitle('Requisition Order')
             ],
             [
-                new AttackIntent({ baseDamage: 16, owner: this }).withTitle('Seize Assets')
+                new AttackIntent({ baseDamage: 21, owner: this }).withTitle('Seize Assets')
             ]
         ];
         return IntentListCreator.iterateIntents(intents);

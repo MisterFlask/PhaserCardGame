@@ -9,7 +9,11 @@ export class FrenchPoliceman extends AutomatedCharacter {
         super({
             name: "Prévôt des Maréchaux",
             portraitName: "french-policeman-gendarme",
-            maxHitpoints: 175,
+            // Balance note (measured 2026-07): even as a SOLO (post comp-split,
+            // see EncounterManager.ts's Act2_Segment1 comment), 175 HP plus
+            // Penance+Guilt's economy denial measured ~13-20% greedy win rate
+            // at squad 3, n=30 -- an outlier low even alone. -20% HP.
+            maxHitpoints: 140,
             description: "The Emperor's military police do not die, exactly, so much as decline to stop working. This one has been checking papers at the same crossroads since - by his own account, delivered at length and in the second person - the winter of some campaign I've never heard of. He knows a deserter by smell, he claims, and fixes each of us with a stare that suggests prior acquaintance with our particular species of cowardice. Rather unnervingly accurate, in my case. Do try to look like you belong to a unit."
         });
         

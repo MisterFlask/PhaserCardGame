@@ -11,7 +11,12 @@ export class MoltenAgitator extends AutomatedCharacter {
         super({
             name: 'Molten Agitator',
             portraitName: 'fiery-orator',
-            maxHitpoints: 50,
+            // Balance note (measured 2026-07): as a solo encounter (its
+            // ally-buffing Inflammatory Speech does nothing without other
+            // enemies present) it measured 85-97.5% greedy win rate across
+            // squad sizes, n=40 -- one of the free wins keeping the act-3
+            // average above target. +30% HP.
+            maxHitpoints: 65,
             description: "Stands on an overturned coal-scuttle and orates, at considerable volume, on the means of production - liberally garbled Marxist doctrine, as best I can follow it, though the crowd seems to follow it better than I do. Immune to his own fire entirely, and generous in sharing it with everyone standing nearby, allies and enemies alike, in what I took to be either revolutionary fervour or simple carelessness with a lit torch. Riled the whole furnace floor to a fighting pitch inside a minute. Rather good at his job, actually."
         });
         this.buffs.push(new RevolutionaryFervor(4));

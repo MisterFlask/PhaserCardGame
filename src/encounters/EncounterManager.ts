@@ -85,11 +85,19 @@ import { TheNinthBell } from './monsters/act4_boss/TheNinthBell';
 // Define new character classes
 export class ClockworkAbomination extends AutomatedCharacter {
     constructor() {
-        super({ name: 'Clockwork Abomination', portraitName: 'Clockwork Abomination', maxHitpoints: 30, description: 'One fears one might be post-ingestion, yet pre-digestion.' });
+        // Balance note (measured 2026-07): a pure Stress-debuff intent with
+        // no attack at all measured 100% greedy win rate at act3/squad3.
+        // Stayed pegged at 100% through two passes (added a 7dmg attack at
+        // 30 HP, then 9dmg attack at 42 HP; n=40/50/60). Third pass: HP
+        // raised again and attack damage bumped once more.
+        super({ name: 'Clockwork Abomination', portraitName: 'Clockwork Abomination', maxHitpoints: 55, description: 'One fears one might be post-ingestion, yet pre-digestion.' });
     }
-    
+
     override generateNewIntents(): AbstractIntent[] {
-        return [ new ApplyDebuffToRandomCharacterIntent({ debuff: new Stress(1), owner: this }).withTitle("fascination") ]
+        return [
+            new AttackIntent({ baseDamage: 11, owner: this }).withTitle("Grinding Gears"),
+            new ApplyDebuffToRandomCharacterIntent({ debuff: new Stress(1), owner: this }).withTitle("fascination")
+        ]
     }
 }
 
@@ -219,10 +227,19 @@ export class ActSegment {
 
     static readonly Act2_Segment1 = new ActSegmentData("Act 2 - Segment 1", 2, 1, [
         {
-            enemies: [new FrenchPoliceman(), new FrenchPoliceman()]
+            // Balance note (measured 2026-07): FrenchPoliceman x2 (175 HP each,
+            // Penance+Guilt doubled -- cost-inflation and discard-exhaust
+            // stacking twice over) measured 0% greedy win rate at squad 3,
+            // n=30. Solo FrenchPoliceman alone measured only 16.7%, so the
+            // duplicate is split into a solo entry here rather than paired
+            // with itself again.
+            enemies: [new FrenchPoliceman()]
         },
         {
-            enemies: [new Lexiophage(), new Lexiophage()]
+            // Lexiophage x2 (PhilosophicalShield doubled -- both immune to
+            // damage on any turn without a Skill played) measured 0% greedy
+            // win rate, n=30. Split to solo.
+            enemies: [new Lexiophage()]
         },
         {
             enemies: [new CrawlingInfestation()]
@@ -243,7 +260,11 @@ export class ActSegment {
             enemies: [new OldGuardGrenadier()]
         },
         {
-            enemies: [new TrenchEngineer(), new TrenchEngineer()]
+            // TrenchEngineer x2 (Entrench: unhurt-this-turn grants Block +
+            // stacking Lethality, and doubling halves the odds either one
+            // goes unstruck) measured 6.7% greedy win rate, n=30. Split to
+            // solo.
+            enemies: [new TrenchEngineer()]
         },
         {
             enemies: [new SorrowMothSwarm()]
@@ -255,7 +276,13 @@ export class ActSegment {
             enemies: [new MaxwellCoilTrooper(), new MaxwellCoilTrooper()]
         },
         {
-            enemies: [new GrandArmeeDuelist(), new TrenchEngineer()]
+            // GrandArmeeDuelist (immune to all but one Designated Foe) paired
+            // with TrenchEngineer (self-tanking, self-buffing) measured 6.7%
+            // greedy win rate, n=30, plus a thrown run. Re-paired with a
+            // squishier partner (Skeeterwisp Swarm) so the party still has
+            // something killable by the 3/4 members who aren't the Duelist's
+            // target.
+            enemies: [new GrandArmeeDuelist(), new SkeeterwispSwarm()]
         }
     ]);
 
@@ -313,13 +340,25 @@ export class ActSegment {
 
     static readonly Act3_Segment1 = new ActSegmentData("Act 3 - Segment 1", 3, 1, [
         {
-            enemies: [new UnionEnforcer(), new UnionEnforcer()]
+            // Balance note (measured 2026-07): UnionEnforcer x2 (165 HP each,
+            // 330 combined, Armored(3)/turn, and RevolutionaryFervor(9) that
+            // spikes the survivor's Lethality when its twin dies) measured
+            // 0% greedy win rate at squad 3, n=30. Split to solo.
+            enemies: [new UnionEnforcer()]
         },
         {
             enemies: [new MoltenAgitator()]
         },
         {
-            enemies: [new CompanyOverseer(), new FurnaceForeman()]
+            // CompanyOverseer + FurnaceForeman together measured 0% greedy
+            // win rate, n=30: both summon MechanicalScab reinforcements and
+            // both carry Exploitation/Bloodsucker scaling, so the pairing
+            // ran away on action economy. Un-paired below into two solo
+            // entries so only one summoner is ever in a fight at a time.
+            enemies: [new CompanyOverseer()]
+        },
+        {
+            enemies: [new FurnaceForeman()]
         },
         {
             enemies: [new OverpressureStoker()]
