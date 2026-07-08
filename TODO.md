@@ -15,13 +15,12 @@ protocol. Ordered within sections by priority. Delete items when done.
 
 ## Gameplay & design
 
-- **Trade-run balance + spice pass** — v1 shipped (July 2026, save v8) per
-  `src/docs/trade_run_design.md`: freight stepper, cargo dead-draws, base +
-  £30×act/crate. Launch numbers are sketches (full load ≈ 2× a combat
-  contract for 12 dead cards across 3 decks) — revisit after play. The
-  spec's deferred spice (breakage/theft events targeting cargo, in-combat
-  cargo effects like explosive crates) is good follow-on once the base
-  mechanic proves fun.
+- **Trade-run spice pass** — the balance half closed July 2026 with the
+  data-driven nerf (freight £15×act, 5 crates; sim + longplay agreed the
+  launch numbers printed money — see trade_run_design.md's post-nerf
+  section). Remaining: the spec's deferred spice (breakage/theft events
+  targeting cargo, in-combat cargo effects) once human play confirms the
+  lane is fun at the new rates.
 - **Roster-economy equilibrium — RULED (July 2026, delegated): accepted as
   shipped** — rush treatment (£20/wound-week) shipped and browser-verified,
   but the sim proved it cannot close the lean-vs-hoard gap at any price:
