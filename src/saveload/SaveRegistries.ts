@@ -60,6 +60,11 @@ import { CoinOnTheGround } from "../gamecharacters/playerclasses/cards/other/Coi
 import { CogClass } from "../gamecharacters/playerclasses/CogClass";
 import { DiabolistClass } from "../gamecharacters/playerclasses/DiabolistClass";
 import { SoulVacuum } from "../relics/uncommon/SoulBottler";
+import { Berserk } from "../gamecharacters/statuses/curses/traumas/Berserk";
+import { Greedy } from "../gamecharacters/statuses/curses/traumas/Greedy";
+import { Idolatrous } from "../gamecharacters/statuses/curses/traumas/Idolatrous";
+import { Paranoid } from "../gamecharacters/statuses/curses/traumas/Paranoid";
+import { Vain } from "../gamecharacters/statuses/curses/traumas/Vain";
 
 type BuffCtor = new (...args: any[]) => AbstractBuff;
 
@@ -137,6 +142,10 @@ export class SaveRegistries {
             [
                 new FireRevolver(), new Defend(), new Rummage(),
                 new CoinOnTheGround(), new Jumpscare(), new SoulVacuum(),
+                // Trauma curses granted when Stress hits its threshold
+                // (Stress.onCombatStart) — land on the master deck, so must
+                // survive save/load.
+                new Berserk(), new Greedy(), new Idolatrous(), new Paranoid(), new Vain(),
             ].forEach(register);
         }
         const factory = this.cardByName.get(className);

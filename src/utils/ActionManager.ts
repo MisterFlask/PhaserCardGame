@@ -571,18 +571,11 @@ export class ActionManager {
         // Consolidate stacks of buffs of the same type
         this.consolidateBuffsOnCharacters(combatState);
 
-        // now stress for all characters
-        combatState.allPlayerAndEnemyCharacters.forEach(character => {
-            var stress =  character.getBuffStacks("stress") 
-            if (stress >= 10) {
-                this.applyBuffToCharacter(character as BaseCharacter, new Stress(-10));
-                var trauma= TraumaLibrary.getRandomTrauma()
-                this.createCardToHand(trauma);
-                this.addCardToMasterDeck(trauma);
-                this.applyBuffToCharacter(character as BaseCharacter, new Lethality(-2));
-            }
-        });
-
+        // NOTE: the stress-threshold consequence (>=10 stress -> trauma etc.)
+        // used to live here but was dead code — getBuffStacks("stress") never
+        // matched the buff's canonical name "Stress". The live implementation
+        // is Stress.onCombatStart() (July 2026); do not resurrect it here or
+        // it will double-fire.
     }
     consolidateResourceScalingOnCard(card: PlayableCard) {
         if (!card.resourceScalings || card.resourceScalings.length <= 1) {
