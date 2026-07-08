@@ -385,7 +385,11 @@ export default class ImageUtils {
                 'sea-turtle.png', 'shattered-heart.png', 'smart.png', 'spiked-tentacle.png',
                 'sticky-boot.png', 'surprised-skull.png', 'unbalanced.png', 'weight-lifting-up.png', 'pizza-slice.png',
                 'card-draw-minus.png', 'do-not-look.png', 'heavy.png', 'self-destruct.png',
-                'egg-clutch.png', 'regeneration.png', 'giant.png', 'spiky-wing.png', 'duel.png', 'fencer.png'
+                'egg-clutch.png', 'regeneration.png', 'giant.png', 'spiky-wing.png', 'duel.png', 'fencer.png',
+
+                // icon art batch 5: buff icons (July 2026)
+                'bureaucrat.png', 'f.png', 'syringe.png', 'snowflake.png', 'scroll.png', 'decay.png',
+                'ear-worm.png', 'spear.png', 'greed.png', 'leech.png', 'minion.png', 'factory.png'
             ]
         },
         map_icons: {
@@ -447,7 +451,11 @@ export default class ImageUtils {
                 'star-swirl.png', 'uncertainty.png', 'unstable-orb.png', 'sword-array.png',
                 // pentacle-intent avoids a key collision with the diabolist
                 // card pentacle icon (keys are filenames sans extension).
-                'chemical-bolt.png', 'add-card-to-pile.png', 'pentacle-intent.png'
+                'chemical-bolt.png', 'add-card-to-pile.png', 'pentacle-intent.png',
+
+                // icon art batch 5: intent icons (July 2026)
+                'card-plus.png', 'tag.png', 'running-ninja.png', 'heal.png', 'grenade.png',
+                'card-burn.png', 'hazard.png', 'fire-breath.png'
             ]
         },
     };
