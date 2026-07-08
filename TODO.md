@@ -49,29 +49,24 @@ smoke-gated CI and deploys the compressed site to gh-pages).
   selling; acquisition is sortie-only by v1 ruling
   (relic_equipment_design.md).
 
-## Capital Works rebuild (designed July 2026 — implement now)
+## Capital Works rebuild residuals
 
-Full spec + rulings: `src/docs/strategic_layer_redesign.md`, "Amendment:
-Capital Works Rebuild". Scraps all seven shipped Capital Works (keeps
-Levi-Maxwell + Secretariat), replaces them with nine designed projects.
-Three sequential Sonnet batches (shared files force the ordering):
+Batches A-C shipped July 2026 (spec + rulings: strategic_layer_redesign.md,
+"Amendment: Capital Works Rebuild"; all nine new projects + hooks live,
+save v16). Remaining:
 
-1. **Batch A — pool swap + simple projects.** Delete the nine dead project
-   files; add Pattern Room, Corrective Phrenology Wing, Cantonment Annexe
-   (dynamic roster cap), Company Store (per-soldier quarterly income),
-   Company Gazette (+20 VP per completed contract via a new
-   `onContractCompleted` hook); rewrite StrategicProjectList; re-point the
-   Barracks gate constants; bump SAVE_FORMAT_VERSION; fix lint tests.
-2. **Batch B — contract-board projects.** Dis Legation (quarterly exclusive
-   contract, flagged off the 5-slot refill count) + Grand Trunk Extension
-   (+16 contracts credit into `maxActUnlocked`).
-3. **Batch C — death infrastructure.** Probate & Effects Office (card
-   archive + Barracks bequest) + Soul Collateral Office (escrow + Recovery
-   contract). Witness rule, probate ordering, relic settlement per the
-   amendment's Rulings. Save shape grows (archive, escrow); bump again.
-4. **Art batch (after C):** six new projects launch on "" placeholders;
-   generate portraits via the generate-game-art skill (relic-style simple
-   iconography per the art-style memory).
+- **Art batch:** seven new projects launch on "" placeholders (and the two
+  reused keys — the_foundry, retraining_program — never had art either);
+  generate portraits via the generate-game-art skill (relic-style simple
+  iconography per the art-style memory).
+- **Numbers are design-sketch tier** like everything else awaiting the
+  playtest gate: Store £8/soldier, Gazette 20 VP, Legation ×1.4, Trunk +16,
+  escrow 8w/4w/+25 — all named exported constants; retune against the
+  played-campaign journal.
+- **Death-path browser proof** — smoke can't produce casualties; escrow/
+  probate/forfeit are covered by pure-module + serializer round-trip tests
+  only. First real playtest death (or a scripted qa harness with forced
+  casualties, if ever wanted) closes this.
 
 ## Content expansion (template proven, held for act-4 play contact)
 

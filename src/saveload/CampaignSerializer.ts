@@ -66,6 +66,12 @@ export class CampaignSerializer {
             level: character.level,
             equippedRelics: character.equippedRelics.map(r => this.relicToDTO(r)),
             insuredRelicNames: character.insuredRelics.map(r => r.getDisplayName()),
+            // v16: the original starting kit, serialized faithfully. Before
+            // this, characterFromDTO rebuilt startingDeck as a copy of the
+            // whole master deck — inflating deckCap after every reload and
+            // making every card a "starter" for the Probate & Effects
+            // Office's non-starter intake. See CharacterDTO.startingDeck.
+            startingDeck: character.startingDeck.map(c => this.cardToDTO(c)),
         };
     }
 
@@ -113,6 +119,11 @@ export class CampaignSerializer {
             consumables: campaign.consumables.map(c => this.consumableToDTO(c)),
             charterVictoryPoints: campaign.charterVictoryPoints,
             armoury: campaign.armoury.map(r => this.relicToDTO(r)),
+            cardArchive: campaign.cardArchive.map(c => this.cardToDTO(c)),
+            escrowedSouls: campaign.escrowedSouls.map(e => ({
+                character: this.characterToDTO(e.soldier),
+                contractName: e.contractName,
+            })),
         };
     }
 
@@ -185,7 +196,15 @@ export class CampaignSerializer {
                 character.cardsInMasterDeck.push(card);
             }
         });
-        character.startingDeck = character.cardsInMasterDeck.map(c => c.Copy());
+        // v16: restore the actual starting kit when the save carries it;
+        // fall back to the legacy copy-of-master reconstruction for older
+        // DTO shapes (reachable only via direct unit tests — the version
+        // gate discards real older saves).
+        character.startingDeck = dto.startingDeck
+            ? dto.startingDeck
+                .map(cardDto => this.cardFromDTO(cardDto))
+                .filter((c): c is PlayableCard => c !== null)
+            : character.cardsInMasterDeck.map(c => c.Copy());
 
         character.equippedRelics = dto.equippedRelics
             .map(r => this.relicFromDTO(r))
@@ -292,6 +311,15 @@ export class CampaignSerializer {
         campaign.armoury = save.armoury
             .map(r => this.relicFromDTO(r))
             .filter((r): r is AbstractRelic => r !== null);
+        campaign.cardArchive = (save.cardArchive ?? [])
+            .map(c => this.cardFromDTO(c))
+            .filter((c): c is PlayableCard => c !== null);
+        campaign.escrowedSouls = (save.escrowedSouls ?? [])
+            .map(e => {
+                const soldier = this.characterFromDTO(e.character);
+                return soldier ? { soldier, contractName: e.contractName } : null;
+            })
+            .filter((e): e is { soldier: PlayerCharacter; contractName: string } => e !== null);
 
         applyStandingOrdersDTO(StandingOrdersState.getInstance(), save.standingOrders);
         campaign.syncStandingOrderBonusSlots();

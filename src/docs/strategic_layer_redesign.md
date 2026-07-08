@@ -332,6 +332,10 @@ Institute legacy class stays (serializer migration path is unit-tested).
   soul comes back, the kit doesn't.
 - **Probate ordering.** Probate fires only on *final* death: immediately if
   Soul Collateral isn't owned, or on escrow forfeit.
+- **Recovery-sortie wipe.** A squad wipe on the Recovery contract's own
+  sortie forfeits the souls under recovery immediately (probate fires then,
+  if owned) — the Court writes off the collateral twice over. No re-post;
+  escrowed souls never outlive their contract.
 - **Portrait reuse.** the_foundry → Pattern Room, retraining_program →
   Phrenology Wing, our_man_in_dis → Dis Legation. The rest launch on the ""
   placeholder sentinel pending an art batch.

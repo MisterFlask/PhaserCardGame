@@ -15,7 +15,10 @@ import { AbstractStrategicProject } from '../../../strategic_projects/AbstractSt
 import { CantonmentAnnexe } from '../../../strategic_projects/CantonmentAnnexe';
 import { CompanySecretariat } from '../../../strategic_projects/CompanySecretariat';
 import { GRAND_TRUNK_GATE_CREDIT, TheGrandTrunkExtension } from '../../../strategic_projects/TheGrandTrunkExtension';
+import { PROBATE_ARCHIVE_CAP, ProbateAndEffectsOffice } from '../../../strategic_projects/ProbateAndEffectsOffice';
 import { PURCHASABLE_STRATEGIC_PROJECTS } from '../../../strategic_projects/StrategicProjectList';
+import { PlayableCard } from '../../../gamecharacters/PlayableCard';
+import { pushWithArchiveCap, selectNonStarterCards, settleDeaths } from '../../../campaign/DeathSettlement';
 import { PlaytestJournal } from '../../../utils/PlaytestJournal';
 
 /** £ cost to underwrite one equipped relic against loss (one-time, per relic). */
@@ -110,6 +113,17 @@ export class CampaignUiState {
      *  Starts with the EmergencyTeleporter that used to seed
      *  GameState.relicsInventory every run (see GameState.initializeRun). */
     public armoury: AbstractRelic[] = [new EmergencyTeleporter()];
+    /** The Company Archive (Probate & Effects Office, Capital Works Rebuild
+     *  Batch C): dead soldiers' non-starter cards awaiting bequest. The one
+     *  owner of this fact (house rule 3). Capacity PROBATE_ARCHIVE_CAP,
+     *  enforced at intake (archiveEffectsOf) by striking off the oldest. */
+    public cardArchive: PlayableCard[] = [];
+    /** Souls held by the Soul Collateral Office pending recovery — off the
+     *  roster (no wages, no cap pressure), keyed to their Recovery of
+     *  Company Assets contract by name. The one owner of this fact (house
+     *  rule 3). SortieManager enters/redeems souls; advanceWeeks below
+     *  forfeits them when the recovery contract lapses. */
+    public escrowedSouls: { soldier: PlayerCharacter; contractName: string }[] = [];
 
     private constructor() {}
 
@@ -167,6 +181,58 @@ export class CampaignUiState {
     public getEffectiveContractsCompletedForGates(): number {
         return this.contractsCompleted
             + (this.ownsProject(new TheGrandTrunkExtension().name) ? GRAND_TRUNK_GATE_CREDIT : 0);
+    }
+
+    /**
+     * Probate intake (The Probate & Effects Office, Capital Works Rebuild
+     * Batch C): a finally-dead soldier's non-starter cards pass to the
+     * Company Archive, oldest entries struck off past PROBATE_ARCHIVE_CAP.
+     * Callers (SortieManager on an uncollateralized death; the escrow
+     * forfeit path below) must already have consulted the pure plan
+     * (DeathSettlement.settleDeaths) — this only performs the transfer.
+     * Returns how many cards entered the archive, for report lines.
+     */
+    public archiveEffectsOf(soldier: PlayerCharacter): number {
+        const effects = selectNonStarterCards(soldier.cardsInMasterDeck, soldier.startingDeck);
+        this.cardArchive = pushWithArchiveCap(this.cardArchive, effects, PROBATE_ARCHIVE_CAP);
+        return effects.length;
+    }
+
+    /**
+     * THE escrow-forfeit path (Soul Collateral Office ruling: escrowed souls
+     * never outlive their contract). Shared by both triggers — the deadline
+     * lapse intercept in advanceWeeks below, and a squad wipe on the
+     * Recovery contract's own sortie (SortieManager.handleSquadWipe) — so
+     * the two can never drift apart (house rule 6). Removes the contract's
+     * souls from escrow; final death, so probate fires NOW if owned
+     * (probate-ordering ruling, re-derived through the same pure plan as a
+     * sortie death, with the collateral gone); records a warning-style
+     * board event built by `writeOff` from the comma-joined names. Returns
+     * the board-event message (for the caller's own report lines), or null
+     * when the contract held no souls in escrow.
+     */
+    public forfeitEscrowForContract(contractName: string, writeOff: (names: string) => string): string | null {
+        const forfeited = this.escrowedSouls.filter(e => e.contractName === contractName);
+        if (forfeited.length === 0) return null;
+        this.escrowedSouls = this.escrowedSouls.filter(e => e.contractName !== contractName);
+
+        const plan = settleDeaths({
+            soulCollateralOwned: false, // the collateral just lapsed
+            probateOwned: this.ownsProject(new ProbateAndEffectsOffice().name),
+            squadWiped: false,
+            deaths: forfeited.map(e => e.soldier.name),
+        });
+        forfeited
+            .filter(e => plan.archiveCardsOf.includes(e.soldier.name))
+            .forEach(e => this.archiveEffectsOf(e.soldier));
+
+        const message = writeOff(forfeited.map(e => e.soldier.name).join(', '));
+        this.calendar.boardEvents.push({
+            week: this.calendar.week,
+            message,
+            isWarning: true,
+        });
+        return message;
     }
 
     /**
@@ -398,6 +464,19 @@ export class CampaignUiState {
         // deliberate over-deduction of at most n-1 weeks against its 12-week
         // deadline, acceptable noise next to a second aging path.)
         this.availableContracts.forEach(c => c.deadlineWeeks -= n);
+
+        // Escrow forfeit (Soul Collateral Office): an expiring Recovery of
+        // Company Assets contract takes its souls with it. The shared
+        // forfeit path (forfeitEscrowForContract above) handles the escrow
+        // removal, the probate-on-final-death ruling, and the warning-style
+        // board event; only the deadline trigger and its register live here.
+        this.availableContracts
+            .filter(c => c.deadlineWeeks <= 0 && (c.recoveryOfSouls?.length ?? 0) > 0)
+            .forEach(lapsed => {
+                this.forfeitEscrowForContract(lapsed.name,
+                    names => `The escrow on ${names} lapses. The Court writes off the collateral.`);
+            });
+
         this.availableContracts = this.availableContracts.filter(c => c.deadlineWeeks > 0);
         this.availableContracts = ContractGenerator.getInstance()
             .refillBoard(this.availableContracts, this.calendar.year, this.getEffectiveContractsCompletedForGates(), 5, this.contractsCompletedByClient);

@@ -75,7 +75,7 @@ describe('CampaignSave shape-lock (fresh-state defaults)', () => {
     function buildFreshSave(): CampaignSave {
         StandingOrdersState.getInstance().reset();
         return {
-            version: 15,
+            version: 16,
             savedAtIso: new Date(0).toISOString(),
             moneyInVault: 200, // GameState.moneyInVault default (src/rules/GameState.ts) — browser-verified in deliverable 2
             calendar: calendarToDTO(new CampaignCalendar()),
@@ -93,6 +93,8 @@ describe('CampaignSave shape-lock (fresh-state defaults)', () => {
             // see relic_equipment_design.md's Migration section). Hardcoded
             // literal per the Phaser-taint note above.
             armoury: [{ name: 'Emergency Teleporter', stacks: 2 }],
+            cardArchive: [], // CampaignUiState.cardArchive starts empty (Probate & Effects Office, Capital Works Rebuild Batch C)
+            escrowedSouls: [], // CampaignUiState.escrowedSouls starts empty (Soul Collateral Office)
         };
     }
 
@@ -104,11 +106,13 @@ describe('CampaignSave shape-lock (fresh-state defaults)', () => {
         expect(Object.keys(save).sort()).toEqual([
             'armoury',
             'calendar',
+            'cardArchive',
             'charterVictoryPoints',
             'consumables',
             'contracts',
             'contractsCompleted',
             'contractsCompletedByClient',
+            'escrowedSouls',
             'moneyInVault',
             'ownedProjects',
             'recruitCandidates',
@@ -127,6 +131,8 @@ describe('CampaignSave shape-lock (fresh-state defaults)', () => {
         expect(save.consumables).toEqual([]);
         expect(save.charterVictoryPoints).toBe(0);
         expect(save.armoury).toEqual([{ name: 'Emergency Teleporter', stacks: 2 }]);
+        expect(save.cardArchive).toEqual([]);
+        expect(save.escrowedSouls).toEqual([]);
         expect(save.standingOrders).toEqual({ active: [], pending: null, bonusSlots: 0 });
         expect(save.calendar).toEqual({
             week: 1,
@@ -192,5 +198,49 @@ describe('CampaignSave shape-lock (fresh-state defaults)', () => {
         const restored: CampaignSave = JSON.parse(JSON.stringify(save));
         expect(restored.ownedProjects[0].victoryPoints).toBe(2500);
         expect(restored.ownedProjects[0].stagesPurchased).toBe(3);
+    });
+
+    // v16: death infrastructure (Capital Works Rebuild Batch C). A populated
+    // Company Archive, an escrowed soul (CharacterDTO + contractName), and a
+    // Recovery of Company Assets contract (£0, recoveryOfSouls set) must all
+    // survive an actual JSON round-trip. The live-object halves
+    // (CampaignSerializer.toSave/applySave) are Phaser-tainted and
+    // browser-covered; this locks the persisted shapes themselves.
+    it('round-trips a populated cardArchive, an escrowed soul, and a recovery contract through JSON', () => {
+        const save = buildFreshSave();
+        const archivedCard = {
+            className: 'FireRevolver', displayName: 'Fire Revolver+',
+            buffs: [], baseDamage: 9, baseBlock: 0, baseEnergyCost: 1, baseMagicNumber: 0,
+        };
+        const escrowedCharacter = {
+            name: 'Pte. Ostrander', portraitName: 'blackhand_female_1', className: 'Blackhand',
+            maxHitpoints: 30, weeksWoundedRemaining: 0, traits: [],
+            deck: [archivedCard], xp: 45, level: 2,
+            equippedRelics: [], insuredRelicNames: [],
+            startingDeck: [archivedCard],
+        };
+        save.cardArchive = [archivedCard];
+        save.escrowedSouls = [{ character: escrowedCharacter, contractName: 'Recovery of Company Assets: Pte. Ostrander' }];
+        save.contracts = [{
+            name: 'Recovery of Company Assets: Pte. Ostrander',
+            description: 'The Office holds Pte. Ostrander in escrow pending physical recovery.',
+            type: 'Bounty',
+            client: 'The Soul Collateral Office',
+            paymentClause: 'No invoice will be raised. The Company does not pay to be returned its own property.',
+            act: 2, segment: 1, difficultyStars: 2, numCombats: 1,
+            deadlineWeeks: 8, durationWeeks: 2, payout: 0, squadSize: 3,
+            regionName: 'Deep France',
+            exemptFromBoardSlots: true,
+            recoveryOfSouls: ['Pte. Ostrander'],
+        }];
+
+        const restored: CampaignSave = JSON.parse(JSON.stringify(save));
+        expect(restored.cardArchive).toEqual(save.cardArchive);
+        expect(restored.escrowedSouls).toEqual(save.escrowedSouls);
+        expect(restored.escrowedSouls[0].character.startingDeck).toEqual([archivedCard]);
+        expect(restored.contracts[0].recoveryOfSouls).toEqual(['Pte. Ostrander']);
+        expect(restored.contracts[0].payout).toBe(0);
+        expect(restored.contracts[0].deadlineWeeks).toBe(8);
+        expect(restored.contracts[0].exemptFromBoardSlots).toBe(true);
     });
 });

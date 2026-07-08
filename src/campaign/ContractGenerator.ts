@@ -394,6 +394,14 @@ export const LEGATION_PAYOUT_MULTIPLIER = 1.4;
 export const LEGATION_DEADLINE_WEEKS = 12;
 
 /**
+ * Soul Collateral Office escrow deadline (Capital Works Rebuild table #4).
+ * Defined here for the same reason as the LEGATION constants above
+ * (generateRecoveryContract consumes it; campaign/ can never import the
+ * Phaser-tainted strategic_projects/); SoulCollateralOffice.ts re-exports it.
+ */
+export const ESCROW_DEADLINE_WEEKS = 8;
+
+/**
  * Generates the weekly contract board. Difficulty scales with campaign year:
  * later years unlock deeper regions and harder encounter segments.
  */
@@ -694,6 +702,38 @@ export class ContractGenerator {
         contract.deadlineWeeks = LEGATION_DEADLINE_WEEKS;
         contract.exemptFromBoardSlots = true;
         contract.name = `Legation: ${contract.name}`;
+        return contract;
+    }
+
+    /**
+     * Recovery of Company Assets (Capital Works Rebuild table #4, The Soul
+     * Collateral Office): posts when soldiers die on a WON sortie while the
+     * Office is owned. Reuses the bounty plumbing for act-appropriate
+     * encounter/squad fields (act = the sortie the souls were lost on), then
+     * overrides the commercial terms: £0 payout, no VP, a fixed
+     * ESCROW_DEADLINE_WEEKS deadline, board-slot exemption, and the Office's
+     * own name/client/clause. recoveryOfSouls carries the escrowed names;
+     * SortieManager.resolveSortie redeems them on completion and
+     * CampaignUiState.advanceWeeks forfeits them on expiry.
+     */
+    public generateRecoveryContract(soulNames: string[], act: number): Contract {
+        const region = REGION_FLAVORS.find(r => r.act === act) ?? REGION_FLAVORS[0];
+        const contract = this.generateBountyContract(region, 1, {});
+
+        const namesList = soulNames.join(", ");
+        contract.name = soulNames.length > 1
+            ? `Recovery of Company Assets: ${soulNames[0]} (and ${soulNames.length - 1} ${soulNames.length - 1 === 1 ? 'other' : 'others'})`
+            : `Recovery of Company Assets: ${soulNames[0]}`;
+        contract.client = "The Soul Collateral Office";
+        contract.description = `The Office holds ${namesList} in escrow pending physical recovery. `
+            + `The souls in question are Company property under clause 44(b); their prior owners are invited to reclaim them by force.`;
+        contract.paymentClause = "No invoice will be raised. The Company does not pay to be returned its own property.";
+        contract.payout = 0;
+        contract.vpReward = 0;
+        contract.deadlineWeeks = ESCROW_DEADLINE_WEEKS;
+        contract.exemptFromBoardSlots = true;
+        contract.recoveryOfSouls = [...soulNames];
+        contract.consumableRewardName = undefined; // no provisioning grants on escrow work
         return contract;
     }
 

@@ -81,6 +81,16 @@ export class Contract {
      */
     public exemptFromBoardSlots: boolean = false;
 
+    /**
+     * Recovery of Company Assets contracts only (Soul Collateral Office —
+     * Capital Works Rebuild Batch C): names of the escrowed souls this
+     * contract recovers. Undefined on every other contract. Completion
+     * redeems them (SortieManager.resolveSortie); expiry forfeits them
+     * (CampaignUiState.advanceWeeks). Set post-construction by
+     * generateRecoveryContract, like exemptFromBoardSlots.
+     */
+    public recoveryOfSouls?: string[];
+
     constructor(args: {
         name: string;
         description: string;

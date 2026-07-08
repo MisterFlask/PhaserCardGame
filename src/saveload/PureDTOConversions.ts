@@ -46,6 +46,9 @@ export function contractToDTO(c: Contract): ContractDTO {
         freightRatePerCrate: c.freightRatePerCrate,
         vpReward: c.vpReward,
         exemptFromBoardSlots: c.exemptFromBoardSlots,
+        // Omitted entirely (not null) on non-recovery contracts, keeping
+        // their DTO shape unchanged from v15.
+        ...(c.recoveryOfSouls ? { recoveryOfSouls: [...c.recoveryOfSouls] } : {}),
     };
 }
 
@@ -73,6 +76,9 @@ export function contractFromDTO(dto: ContractDTO): Contract {
     // Not a constructor arg (set post-construction by generateLegationContract,
     // same as the generator does) — absent on pre-v15 shapes, so default false.
     contract.exemptFromBoardSlots = dto.exemptFromBoardSlots ?? false;
+    if (dto.recoveryOfSouls) {
+        contract.recoveryOfSouls = [...dto.recoveryOfSouls];
+    }
     return contract;
 }
 

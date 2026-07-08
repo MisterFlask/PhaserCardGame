@@ -1,5 +1,5 @@
 import Phaser, { Scene } from 'phaser';
-import { deckCap, pendingLevels, relicSlots } from '../../../../campaign/Leveling';
+import { deckCap, isAtDeckCap, pendingLevels, relicSlots } from '../../../../campaign/Leveling';
 import { RUSH_TREATMENT_COST_PER_WEEK } from '../../../../campaign/RushTreatment';
 import { PlayableCard } from '../../../../gamecharacters/PlayableCard';
 import { PlayerCharacter } from '../../../../gamecharacters/PlayerCharacter';
@@ -16,6 +16,7 @@ import { CampaignUiState, RELIC_INSURANCE_COST } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
 import { PlaytestJournal } from '../../../../utils/PlaytestJournal';
 import { CorrectivePhrenologyWing } from '../../../../strategic_projects/CorrectivePhrenologyWing';
+import { BEQUEST_COST, ProbateAndEffectsOffice } from '../../../../strategic_projects/ProbateAndEffectsOffice';
 import { ThePatternRoom } from '../../../../strategic_projects/ThePatternRoom';
 
 const REMOVAL_COST = 40;
@@ -24,6 +25,7 @@ const THERAPY_COST = 30;
 const THERAPY_RELIEF = 4;
 const REMOVAL_GATE = new CorrectivePhrenologyWing().name;
 const UPGRADE_GATE = new ThePatternRoom().name;
+const BEQUEST_GATE = new ProbateAndEffectsOffice().name;
 const ARMOURY_PICKER_DEPTH = DepthManager.getInstance().REWARD_SCREEN + 2000;
 
 /**
@@ -229,6 +231,12 @@ export class BarracksPanel extends AbstractHqPanel {
             if (this.selectedCard) {
                 this.buildCardActions(width);
             }
+
+            // Bequeath from Archive (The Probate & Effects Office, Capital
+            // Works Rebuild Batch C): sits beneath the Remove/Upgrade
+            // actions. Only rendered when the Office is owned and the
+            // Company Archive holds anything.
+            this.buildBequestAction(width);
         }
 
         // --- Recruits, right column ---
@@ -338,6 +346,101 @@ export class BarracksPanel extends AbstractHqPanel {
             this.setStatus(`${soldier.name}'s card reworked at the Foundry: ${card.name}.`);
             this.rebuild();
         });
+    }
+
+    /**
+     * "Bequeath from Archive (£30)" (The Probate & Effects Office): shown
+     * beneath the Remove/Upgrade card actions whenever the Office is owned,
+     * the Company Archive is non-empty, and a soldier is selected. Opens a
+     * picker of archived cards (same overlay pattern as the armoury relic
+     * picker). Deck-cap gated, matching PromotionPanel's acquisition rule.
+     */
+    private buildBequestAction(width: number): void {
+        const campaign = CampaignUiState.getInstance();
+        const soldier = this.selectedSoldier;
+        if (!soldier) return;
+        if (!campaign.ownsProject(BEQUEST_GATE)) return;
+        if (campaign.cardArchive.length === 0) return;
+
+        const y = 180 + soldier.cardsInMasterDeck.length * 46 + 20 + (this.selectedCard ? 96 : 0);
+        const atCap = isAtDeckCap(soldier, soldier.startingDeck.length, soldier.cardsInMasterDeck.length);
+        const canBequeath = GameState.getInstance().moneyInVault >= BEQUEST_COST && !atCap;
+        const bequestButton = this.addDynamic(new TextBoxButton({
+            scene: this.scene, x: width * 0.45, y, width: 340, height: 40,
+            text: `Bequeath from Archive (£${BEQUEST_COST})`,
+            style: { fontSize: '14px', fontFamily: Fonts.BODY, color: canBequeath ? Palette.WHITE : Palette.DISABLED_TEXT },
+            fillColor: canBequeath ? Palette.VERDIGRIS : Palette.DISABLED
+        }));
+        bequestButton.onClick(() => {
+            if (!canBequeath) {
+                this.setStatus(atCap ? `${soldier.name}'s repertoire is at capacity.` : 'Insufficient funds.');
+                return;
+            }
+            this.showArchivePicker(soldier);
+        });
+    }
+
+    /** Full-screen overlay listing the Company Archive's cards; picking one
+     *  bequeaths a copy onto `soldier` for BEQUEST_COST. Same overlay
+     *  pattern (and element pool) as the armoury relic picker. */
+    private showArchivePicker(soldier: PlayerCharacter): void {
+        const campaign = CampaignUiState.getInstance();
+        const centerX = this.scene.scale.width / 2;
+        const centerY = this.scene.scale.height / 2;
+
+        const backdrop = this.scene.add.rectangle(centerX, centerY, 1100, 620, 0x000000, 0.9)
+            .setStrokeStyle(4, 0xC9A227)
+            .setDepth(ARMOURY_PICKER_DEPTH);
+        this.armouryPickerElements.push(backdrop);
+
+        const instructions = new TextBox({
+            scene: this.scene, x: centerX, y: centerY - 270, width: 1000, height: 60,
+            text: `[color=gold]THE COMPANY ARCHIVE[/color]\nBequeath an entry from the effects of the deceased to ${soldier.name} (£${BEQUEST_COST}).`,
+            style: { fontSize: '20px', fontFamily: Fonts.BODY, color: Palette.WHITE, align: 'center', wordWrap: { width: 960 } },
+            fillColor: Palette.WOOD_DARK
+        }).setDepth(ARMOURY_PICKER_DEPTH + 1);
+        this.armouryPickerElements.push(instructions);
+
+        campaign.cardArchive.forEach((card, i) => {
+            const col = i % 2;
+            const row = Math.floor(i / 2);
+            const x = centerX - 260 + col * 520;
+            const y = centerY - 190 + row * 70;
+            const entry = new TextBoxButton({
+                scene: this.scene, x, y, width: 500, height: 60,
+                text: `[color=gold]${card.name}[/color]`,
+                style: { fontSize: '13px', fontFamily: Fonts.BODY, color: Palette.WHITE, align: 'center', wordWrap: { width: 470 } },
+                fillColor: Palette.WOOD_PANEL
+            }).setDepth(ARMOURY_PICKER_DEPTH + 1);
+            entry.onClick(() => {
+                const gameState = GameState.getInstance();
+                if (gameState.moneyInVault < BEQUEST_COST) {
+                    this.setStatus('Insufficient funds.');
+                    return;
+                }
+                gameState.moneyInVault -= BEQUEST_COST;
+                campaign.cardArchive = campaign.cardArchive.filter(c => c !== card);
+                const copy = card.Copy();
+                soldier.addCard(copy); // sets owningCharacter and pushes onto cardsInMasterDeck
+                SaveManager.save();
+                PlaytestJournal.getInstance().record('purchase', { kind: 'bequest', cost: BEQUEST_COST, soldier: soldier.name, card: card.name });
+                this.clearArmouryPicker();
+                this.setStatus(`${card.name} passes to ${soldier.name} under the terms of the estate. The Office retains its fee.`);
+                this.rebuild();
+            });
+            this.armouryPickerElements.push(entry);
+        });
+
+        const closeButton = new TextBoxButton({
+            scene: this.scene, x: centerX, y: centerY + 270, width: 220, height: 50,
+            text: 'Close',
+            style: { fontSize: '18px', fontFamily: Fonts.DISPLAY, color: Palette.WHITE },
+            fillColor: Palette.WAX_RED
+        }).setDepth(ARMOURY_PICKER_DEPTH + 1);
+        closeButton.onClick(() => this.clearArmouryPicker());
+        this.armouryPickerElements.push(closeButton);
+
+        this.add(this.armouryPickerElements);
     }
 
     /**

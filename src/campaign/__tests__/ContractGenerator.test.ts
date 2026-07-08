@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ContractGenerator, LEGATION_DEADLINE_WEEKS, LEGATION_PAYOUT_MULTIPLIER } from '../ContractGenerator';
+import { ContractGenerator, ESCROW_DEADLINE_WEEKS, LEGATION_DEADLINE_WEEKS, LEGATION_PAYOUT_MULTIPLIER } from '../ContractGenerator';
 
 const gen = ContractGenerator.getInstance();
 
@@ -344,6 +344,47 @@ describe('ContractGenerator', () => {
                 expect(board).toContain(legation);
                 expect(board.filter(c => !c.exemptFromBoardSlots)).toHaveLength(5);
                 expect(board).toHaveLength(6);
+            }
+        });
+    });
+
+    describe('Recovery of Company Assets (Capital Works Rebuild Batch C, The Soul Collateral Office)', () => {
+        it('posts on the Office\'s terms: £0, no VP, 8-week deadline, slot-exempt, souls attached', () => {
+            for (let i = 0; i < 50; i++) {
+                const c = gen.generateRecoveryContract(['Pte. Ostrander'], 2);
+                expect(c.payout).toBe(0);
+                expect(c.projectedPayout).toBe(0);
+                expect(c.vpReward).toBe(0);
+                expect(c.deadlineWeeks).toBe(ESCROW_DEADLINE_WEEKS);
+                expect(c.exemptFromBoardSlots).toBe(true);
+                expect(c.recoveryOfSouls).toEqual(['Pte. Ostrander']);
+                expect(c.client).toBe('The Soul Collateral Office');
+                expect(c.paymentClause).toBe('No invoice will be raised. The Company does not pay to be returned its own property.');
+                expect(c.description).toContain('Pte. Ostrander');
+                expect(c.description).toContain('clause 44(b)');
+                expect(c.consumableRewardName).toBeUndefined();
+                expect(c.isTradeRun).toBe(false);
+                expect(c.isPrestige).toBe(false);
+            }
+        });
+
+        it('names the first soul and counts the rest', () => {
+            expect(gen.generateRecoveryContract(['Pte. Ostrander'], 1).name)
+                .toBe('Recovery of Company Assets: Pte. Ostrander');
+            expect(gen.generateRecoveryContract(['Pte. Ostrander', 'Cpl. Weeks'], 1).name)
+                .toBe('Recovery of Company Assets: Pte. Ostrander (and 1 other)');
+            expect(gen.generateRecoveryContract(['Pte. Ostrander', 'Cpl. Weeks', 'Sgt. Vane'], 1).name)
+                .toBe('Recovery of Company Assets: Pte. Ostrander (and 2 others)');
+        });
+
+        it('draws its encounter fields from the act the souls were lost on', () => {
+            for (let act = 1; act <= 4; act++) {
+                const c = gen.generateRecoveryContract(['Pte. Ostrander'], act);
+                expect(c.act).toBe(act);
+                expect(c.numCombats).toBeGreaterThanOrEqual(1);
+                expect(c.numCombats).toBeLessThanOrEqual(2);
+                expect([2, 3, 4]).toContain(c.squadSize);
+                expect(c.durationWeeks).toBe(c.numCombats + 1);
             }
         });
     });

@@ -4,6 +4,8 @@ import { CantonmentAnnexe } from "./CantonmentAnnexe";
 import { CompanySecretariat } from "./CompanySecretariat";
 import { CorrectivePhrenologyWing } from "./CorrectivePhrenologyWing";
 import { LeviMaxwellAscensionProtocol } from "./LeviMaxwellAscensionProtocol";
+import { ProbateAndEffectsOffice } from "./ProbateAndEffectsOffice";
+import { SoulCollateralOffice } from "./SoulCollateralOffice";
 import { TheCompanyGazette } from "./TheCompanyGazette";
 import { TheCompanyStore } from "./TheCompanyStore";
 import { TheDisLegation } from "./TheDisLegation";
@@ -18,7 +20,9 @@ import { ThePatternRoom } from "./ThePatternRoom";
  * service unlocks, a bare slot purchase). Batch A was the pool swap plus
  * four new-mechanic projects (deck infra unlocks, roster cap, per-soldier
  * income, per-contract VP); Batch B adds the two contract-board works
- * (The Dis Legation, The Grand Trunk Extension). The Foundry, Retraining
+ * (The Dis Legation, The Grand Trunk Extension); Batch C adds the death
+ * infrastructure (The Probate & Effects Office, The Soul Collateral Office —
+ * tree chain: Pattern Room → Probate → Soul Collateral). The Foundry, Retraining
  * Program, Dis Municipal Bonds, Our Man In Dis, Lethe Extraction Co., and the
  * four dead cargo projects (Smythe-Bowyer Poppy Fields, Blue Room Reading
  * Societies, Revolutionary Contacts, Phlegethon Coalfalls) are deleted
@@ -37,6 +41,8 @@ export const ALL_STRATEGIC_PROJECTS: AbstractStrategicProject[] = [
     new TheCompanyGazette(),
     new TheDisLegation(),
     new TheGrandTrunkExtension(),
+    new ProbateAndEffectsOffice(),
+    new SoulCollateralOffice(),
     new AbyssalResearchInstitute(),
 ];
 

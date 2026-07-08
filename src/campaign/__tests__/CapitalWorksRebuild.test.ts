@@ -153,3 +153,133 @@ describe('The Dis Legation — quarterly exclusive commission (onQuarterEnd ctx.
         expect(CAMPAIGN_UI_STATE_SOURCE).toContain('The Legation secures a private commission: ${contract.name}.');
     });
 });
+
+// --- Batch C: death infrastructure (The Probate & Effects Office, The Soul
+// Collateral Office). The DECISION logic is real-unit-tested in
+// DeathSettlement.test.ts (pure module); these lints cover the Phaser-side
+// application only, per convention.
+const PROBATE_SOURCE = fs.readFileSync(
+    path.resolve(process.cwd(), 'src/strategic_projects/ProbateAndEffectsOffice.ts'), 'utf-8'
+);
+const SOUL_COLLATERAL_SOURCE = fs.readFileSync(
+    path.resolve(process.cwd(), 'src/strategic_projects/SoulCollateralOffice.ts'), 'utf-8'
+);
+const SORTIE_MANAGER_SOURCE = fs.readFileSync(
+    path.resolve(process.cwd(), 'src/campaign/SortieManager.ts'), 'utf-8'
+);
+const BARRACKS_SOURCE = fs.readFileSync(
+    path.resolve(process.cwd(), 'src/screens/campaign/hq_ux/panels/BarracksPanel.ts'), 'utf-8'
+);
+
+describe('Batch C constants and prerequisite chain', () => {
+    it('PROBATE_ARCHIVE_CAP is 12 and BEQUEST_COST is £30', () => {
+        expect(PROBATE_SOURCE).toContain('PROBATE_ARCHIVE_CAP = 12;');
+        expect(PROBATE_SOURCE).toContain('BEQUEST_COST = 30;');
+    });
+
+    it('ESCROW_RECOVERY_WOUND_WEEKS is 4 and ESCROW_RECOVERY_STRESS is 25', () => {
+        expect(SOUL_COLLATERAL_SOURCE).toContain('ESCROW_RECOVERY_WOUND_WEEKS = 4;');
+        expect(SOUL_COLLATERAL_SOURCE).toContain('ESCROW_RECOVERY_STRESS = 25;');
+    });
+
+    it('ESCROW_DEADLINE_WEEKS is defined in ContractGenerator and re-exported by the Office (single source of truth)', () => {
+        expect(SOUL_COLLATERAL_SOURCE).toContain('ESCROW_DEADLINE_WEEKS } from "../campaign/ContractGenerator"');
+        expect(SOUL_COLLATERAL_SOURCE).toContain('export { ESCROW_DEADLINE_WEEKS }');
+    });
+
+    it('tree chain: Pattern Room -> Probate -> Soul Collateral', () => {
+        const probatePrereqs = extractMethod(PROBATE_SOURCE, 'public override getPrerequisites(): AbstractStrategicProject[]');
+        expect(probatePrereqs).toContain('new ThePatternRoom()');
+        const collateralPrereqs = extractMethod(SOUL_COLLATERAL_SOURCE, 'public override getPrerequisites(): AbstractStrategicProject[]');
+        expect(collateralPrereqs).toContain('new ProbateAndEffectsOffice()');
+    });
+});
+
+describe('SortieManager applies the pure death-settlement plan (resolveSortie)', () => {
+    it('consults settleDeaths with ownership flags and squadWiped: false, and posts the recovery contract', () => {
+        expect(SORTIE_MANAGER_SOURCE).toContain('settleDeaths({');
+        expect(SORTIE_MANAGER_SOURCE).toContain('soulCollateralOwned: campaign.ownsProject(new SoulCollateralOffice().name)');
+        expect(SORTIE_MANAGER_SOURCE).toContain('probateOwned: campaign.ownsProject(new ProbateAndEffectsOffice().name)');
+        expect(SORTIE_MANAGER_SOURCE).toContain('generateRecoveryContract(plan.escrow, contract.act)');
+        expect(SORTIE_MANAGER_SOURCE).toContain('A recovery commission is posted.');
+    });
+
+    it('handleSquadWipe never consults the plan for the wiped squad\'s own deaths (witness rule)', () => {
+        const wipeSection = SORTIE_MANAGER_SOURCE.slice(
+            SORTIE_MANAGER_SOURCE.indexOf('handleSquadWipe'),
+            SORTIE_MANAGER_SOURCE.indexOf('private settleEquipmentForCasualty'));
+        expect(wipeSection.length).toBeGreaterThan(0);
+        // The wiped squad's own deaths get no escrow and no probate: the
+        // plan is never consulted directly here. The ONLY escrow touch a
+        // wipe may make is the shared forfeit path for a Recovery
+        // contract's pre-existing souls (asserted separately below).
+        expect(wipeSection).not.toContain('settleDeaths');
+        expect(wipeSection).not.toContain('escrowedSouls');
+    });
+
+    it('a wipe on a Recovery contract\'s own sortie forfeits its souls through the SHARED forfeit path (ruling)', () => {
+        const wipeSection = SORTIE_MANAGER_SOURCE.slice(
+            SORTIE_MANAGER_SOURCE.indexOf('handleSquadWipe'),
+            SORTIE_MANAGER_SOURCE.indexOf('private settleEquipmentForCasualty'));
+        expect(wipeSection).toContain('contract.recoveryOfSouls');
+        expect(wipeSection).toContain('campaign.forfeitEscrowForContract(contract.name');
+        expect(wipeSection).toContain('The Court writes off the collateral twice over.');
+    });
+
+    it('redeems recovered souls over the cap with the recovery wound and stress applied', () => {
+        expect(SORTIE_MANAGER_SOURCE).toContain('soldier.weeksWoundedRemaining = ESCROW_RECOVERY_WOUND_WEEKS');
+        expect(SORTIE_MANAGER_SOURCE).toContain('stressBuff.stacks += ESCROW_RECOVERY_STRESS');
+        expect(SORTIE_MANAGER_SOURCE).toContain('new Stress(ESCROW_RECOVERY_STRESS)');
+        expect(SORTIE_MANAGER_SOURCE).toContain('campaign.roster.push(soldier)');
+        // Ruling: return is allowed even over the roster cap — no cap check
+        // may guard the redemption push.
+        const redemption = SORTIE_MANAGER_SOURCE.slice(
+            SORTIE_MANAGER_SOURCE.indexOf('Escrow redemption'),
+            SORTIE_MANAGER_SOURCE.indexOf('Playtest telemetry baselines'));
+        expect(redemption).not.toContain('getRosterCap');
+    });
+});
+
+describe('CampaignUiState escrow forfeit and probate intake', () => {
+    it('forfeitEscrowForContract is the ONE forfeit path: pure plan, probate-now, warning board event', () => {
+        const body = extractMethod(CAMPAIGN_UI_STATE_SOURCE, 'public forfeitEscrowForContract(contractName: string, writeOff: (names: string) => string): string | null');
+        expect(body).toContain('soulCollateralOwned: false, // the collateral just lapsed');
+        expect(body).toContain('settleDeaths({');
+        expect(body).toContain('this.archiveEffectsOf(e.soldier)');
+        expect(body).toContain('isWarning: true');
+        // settleDeaths must be CALLED nowhere else in this file — the lapse
+        // intercept and the wipe path both go through this helper. (The
+        // import statement has no opening paren, so it doesn't count.)
+        expect(CAMPAIGN_UI_STATE_SOURCE.split('settleDeaths(').length - 1).toBe(1);
+    });
+
+    it('advanceWeeks intercepts lapsing recovery contracts through the shared forfeit path', () => {
+        expect(CAMPAIGN_UI_STATE_SOURCE).toContain('this.forfeitEscrowForContract(lapsed.name');
+        expect(CAMPAIGN_UI_STATE_SOURCE).toContain('The escrow on ${names} lapses. The Court writes off the collateral.');
+    });
+
+    it('archiveEffectsOf takes non-starter cards under the archive cap', () => {
+        const body = extractMethod(CAMPAIGN_UI_STATE_SOURCE, 'public archiveEffectsOf(soldier: PlayerCharacter): number');
+        expect(body).toContain('selectNonStarterCards(soldier.cardsInMasterDeck, soldier.startingDeck)');
+        expect(body).toContain('pushWithArchiveCap(this.cardArchive');
+        expect(body).toContain('PROBATE_ARCHIVE_CAP');
+    });
+});
+
+describe('Barracks bequest (The Probate & Effects Office)', () => {
+    it('gates on the Office by class name (no string drift), the archive, funds, and the deck cap', () => {
+        expect(BARRACKS_SOURCE).toContain('const BEQUEST_GATE = new ProbateAndEffectsOffice().name;');
+        expect(BARRACKS_SOURCE).toContain('if (!campaign.ownsProject(BEQUEST_GATE)) return;');
+        expect(BARRACKS_SOURCE).toContain('if (campaign.cardArchive.length === 0) return;');
+        expect(BARRACKS_SOURCE).toContain('isAtDeckCap(soldier, soldier.startingDeck.length, soldier.cardsInMasterDeck.length)');
+        expect(BARRACKS_SOURCE).toContain(`Bequeath from Archive (£\${BEQUEST_COST})`);
+    });
+
+    it('bequest deducts the fee, moves the card out of the archive, and copies it onto the soldier', () => {
+        expect(BARRACKS_SOURCE).toContain('gameState.moneyInVault -= BEQUEST_COST;');
+        expect(BARRACKS_SOURCE).toContain('campaign.cardArchive = campaign.cardArchive.filter(c => c !== card);');
+        expect(BARRACKS_SOURCE).toContain('const copy = card.Copy();');
+        expect(BARRACKS_SOURCE).toContain('soldier.addCard(copy);');
+        expect(BARRACKS_SOURCE).toContain("kind: 'bequest'");
+    });
+});

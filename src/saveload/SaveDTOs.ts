@@ -69,7 +69,15 @@
 //      optional exemptFromBoardSlots (true only on Legation commissions,
 //      which sit outside the 5-slot public board — see
 //      Contract.exemptFromBoardSlots / ContractGenerator.refillBoard).
-export const SAVE_FORMAT_VERSION = 15;
+// v16: Capital Works Rebuild, Batch C (death infrastructure: Probate &
+//      Effects Office, Soul Collateral Office). CampaignSave gains
+//      cardArchive (CardDTO[]) and escrowedSouls
+//      ({ character, contractName }[]); ContractDTO gains recoveryOfSouls
+//      (Recovery of Company Assets contracts only); CharacterDTO gains
+//      startingDeck (fixes the lossy copy-of-master reconstruction that
+//      would have neutered probate's non-starter detection after a reload —
+//      see CharacterDTO.startingDeck's doc comment).
+export const SAVE_FORMAT_VERSION = 16;
 export const SAVE_STORAGE_KEY = 'east-infernal-company-save';
 
 export interface BuffDTO {
@@ -114,6 +122,14 @@ export interface CharacterDTO {
      *  has been underwritten (£40 one-time). Names, not indices, since
      *  array order isn't a stable identity. */
     insuredRelicNames: string[];
+    /** The soldier's original starting kit (v16). Before this field existed,
+     *  applySave rebuilt startingDeck as a copy of the WHOLE master deck,
+     *  which silently inflated deckCap after every reload and would have
+     *  neutered the Probate & Effects Office's non-starter detection (every
+     *  card counted as a starter post-load). Optional: when absent (older
+     *  DTO shape in direct unit tests), the legacy copy-of-master fallback
+     *  applies. */
+    startingDeck?: CardDTO[];
 }
 
 export interface RelicDTO {
@@ -153,6 +169,10 @@ export interface ContractDTO {
      *  true when the contract doesn't occupy a public board slot — see
      *  Contract.exemptFromBoardSlots / ContractGenerator.refillBoard. */
     exemptFromBoardSlots?: boolean;
+    /** Recovery of Company Assets contracts only (absent on every other
+     *  contract): the escrowed soul names this contract recovers — see
+     *  Contract.recoveryOfSouls / the Soul Collateral Office. */
+    recoveryOfSouls?: string[];
 }
 
 export interface ConsumableDTO {
@@ -215,4 +235,13 @@ export interface CampaignSave {
      *  The in-sortie loadout on GameState.relicsInventory never serializes
      *  (saves are HQ-only) — mirrors the `consumables` field's contract. */
     armoury: RelicDTO[];
+    /** The Company Archive (Probate & Effects Office, Capital Works Rebuild
+     *  Batch C): dead soldiers' non-starter cards awaiting bequest. Capped
+     *  at PROBATE_ARCHIVE_CAP by the intake path, not on load. */
+    cardArchive: CardDTO[];
+    /** Souls held by the Soul Collateral Office pending recovery. Escrowed
+     *  soldiers are OFF the roster (no wages, no cap pressure); contractName
+     *  ties each soul to its Recovery of Company Assets contract for the
+     *  forfeit path. */
+    escrowedSouls: { character: CharacterDTO; contractName: string }[];
 }

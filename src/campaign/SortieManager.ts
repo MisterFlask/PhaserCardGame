@@ -2,6 +2,7 @@ import { EncounterManager } from "../encounters/EncounterManager";
 import { EventsManager } from "../events/EventsManager";
 import { injectCargoIntoSquad, stripCargoFromSquad } from "../gamecharacters/cargo/CargoInjection";
 import { Lethality } from "../gamecharacters/buffs/standard/Lethality";
+import { Stress } from "../gamecharacters/buffs/standard/Stress";
 import { PlayerCharacter } from "../gamecharacters/PlayerCharacter";
 import { AbstractReward } from "../rewards/AbstractReward";
 import { GameState } from "../rules/GameState";
@@ -9,9 +10,13 @@ import { CampaignUiState } from "../screens/campaign/hq_ux/CampaignUiState";
 import { SceneChanger } from "../screens/SceneChanger";
 import { applyHpHardening, hardeningForYear } from "./EncounterHardening";
 import { Contract } from "./Contract";
+import { ContractGenerator } from "./ContractGenerator";
+import { settleDeaths } from "./DeathSettlement";
 import { xpForCombatWin } from "./Leveling";
 import { StandingOrdersState } from "./orders/StandingOrdersState";
 import { applyCasualties } from "./SortieResolution";
+import { ESCROW_RECOVERY_STRESS, ESCROW_RECOVERY_WOUND_WEEKS, SoulCollateralOffice } from "../strategic_projects/SoulCollateralOffice";
+import { ProbateAndEffectsOffice } from "../strategic_projects/ProbateAndEffectsOffice";
 import { mergeStockWithLoadout } from "./ConsumableStock";
 import { PlaytestJournal } from "../utils/PlaytestJournal";
 
@@ -227,6 +232,22 @@ export class SortieManager {
             report.push(`Casualty benefit remitted: £${deathBenefitTotal}. The Company thanks the deceased for their custom.`);
         }
 
+        // Ruling (Capital Works Rebuild Batch C, recorded in the amendment's
+        // Rulings section): a wipe on a Recovery contract's OWN sortie
+        // forfeits its escrowed souls immediately — no re-post; escrowed
+        // souls must never outlive their contract. Runs through the same
+        // shared forfeit path as the deadline lapse
+        // (CampaignUiState.forfeitEscrowForContract), so probate fires now
+        // if owned. The wiped squad's OWN deaths keep the witness rule
+        // exactly as above — no escrow, no probate for them.
+        if (contract.recoveryOfSouls && contract.recoveryOfSouls.length > 0) {
+            const writeOffMessage = campaign.forfeitEscrowForContract(contract.name,
+                names => `The escrow on ${names} is voided with the party sent to recover it. The Court writes off the collateral twice over.`);
+            if (writeOffMessage) {
+                report.push(writeOffMessage);
+            }
+        }
+
         // The squad's carried consumables go down with them — lost, not
         // returned to campaign stock. Same for whatever's left in
         // relicsInventory: settleEquipmentForCasualty already pulled insured
@@ -324,6 +345,38 @@ export class SortieManager {
         // this sortie are applied after, so they don't tick during it.
         campaign.advanceWeeks(contract.durationWeeks);
 
+        // Escrow redemption (Soul Collateral Office, Capital Works Rebuild
+        // Batch C): a completed Recovery of Company Assets contract returns
+        // its souls to the roster — over the roster cap if need be (ruling)
+        // — wounded, shaken, and on the books. Placed AFTER advanceWeeks for
+        // the same reason wounds are: the recovery wound must not tick down
+        // during the sortie that inflicted it. Names not found in escrow are
+        // skipped gracefully.
+        if (contract.recoveryOfSouls && contract.recoveryOfSouls.length > 0) {
+            const recovered: string[] = [];
+            contract.recoveryOfSouls.forEach(name => {
+                const entryIdx = campaign.escrowedSouls.findIndex(e => e.soldier.name === name);
+                if (entryIdx < 0) return;
+                const [entry] = campaign.escrowedSouls.splice(entryIdx, 1);
+                const soldier = entry.soldier;
+                soldier.isDeceased = false;
+                soldier.hitpoints = soldier.maxHitpoints;
+                soldier.weeksWoundedRemaining = ESCROW_RECOVERY_WOUND_WEEKS;
+                const stressBuff = soldier.buffs.find(b => b.id === "stress");
+                if (stressBuff) {
+                    stressBuff.stacks += ESCROW_RECOVERY_STRESS;
+                } else {
+                    soldier.buffs.push(new Stress(ESCROW_RECOVERY_STRESS));
+                }
+                campaign.roster.push(soldier);
+                recovered.push(name);
+            });
+            if (recovered.length > 0) {
+                report.push(`The Soul Collateral Office releases ${recovered.join(', ')} from escrow: `
+                    + `wounded ${ESCROW_RECOVERY_WOUND_WEEKS} weeks, considerably shaken, and re-entered on the Company's books.`);
+            }
+        }
+
         // Playtest telemetry baselines (consumable/relic counts before
         // resolution's transfers below move them around) so the eventual
         // sortie_resolved record can report net deltas.
@@ -359,6 +412,42 @@ export class SortieManager {
                 gameState.moneyInVault += deathBenefitTotal;
                 report.push(`Casualty benefit remitted: £${deathBenefitTotal}. The Company thanks the deceased for their custom.`);
             }
+        }
+
+        // Death settlement (Capital Works Rebuild Batch C): the pure plan
+        // (DeathSettlement.settleDeaths) decides escrow vs probate vs
+        // permanent loss; this block only applies it. Ordering rulings
+        // honored here: relics of the dead settled ABOVE, exactly as before
+        // (the soul comes back, the kit doesn't), and this runs AFTER
+        // advanceWeeks so a posted recovery contract never ages before it
+        // appears. resolveSortie is the won-sortie path, so squadWiped is
+        // false by construction (wipes take handleSquadWipe, which never
+        // consults the plan — witness rule).
+        if (casualties.deaths.length > 0) {
+            const plan = settleDeaths({
+                soulCollateralOwned: campaign.ownsProject(new SoulCollateralOffice().name),
+                probateOwned: campaign.ownsProject(new ProbateAndEffectsOffice().name),
+                squadWiped: false,
+                deaths: casualties.deaths.map(d => d.name),
+            });
+
+            if (plan.postRecoveryContract && plan.escrow.length > 0) {
+                const recovery = ContractGenerator.getInstance().generateRecoveryContract(plan.escrow, contract.act);
+                this.squad
+                    .filter(c => plan.escrow.includes(c.name))
+                    .forEach(soldier => campaign.escrowedSouls.push({ soldier, contractName: recovery.name }));
+                campaign.availableContracts.push(recovery);
+                report.push(`The Soul Collateral Office enters ${plan.escrow.join(', ')} into escrow. A recovery commission is posted.`);
+            }
+
+            plan.archiveCardsOf.forEach(name => {
+                const soldier = this.squad.find(c => c.name === name);
+                if (!soldier) return;
+                const archived = campaign.archiveEffectsOf(soldier);
+                if (archived > 0) {
+                    report.push(`The Probate & Effects Office enters ${archived} card(s) from ${name}'s effects into the Company Archive.`);
+                }
+            });
         }
 
         // Decks persist between sorties by design; only combat-scoped state
