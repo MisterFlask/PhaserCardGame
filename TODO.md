@@ -31,13 +31,11 @@ protocol. Ordered within sections by priority. Delete items when done.
   mid-quarter agency. Future lever ONLY if human play disagrees: partial
   survival on squad wipe (weakens the roster-pays-the-price stakes; take
   reluctantly).
-- **Stress threshold is a stub** — Stress.ts documents "at 10 stacks: lose
-  all Stress, gain 1 Trauma, lose 2 Strength" but `onCombatStart` contains
-  only a `// todo` (found July 2026 via a peer session's data extraction).
-  Therapy (£30) and event stress-costs are priced against a consequence
-  that never fires. Either implement the threshold (check Trauma exists as
-  a buff) or reprice stress interactions — small, but it's a lie in the
-  player-facing description today.
+- **Negative-Lethality idiom is cosmetic** — Lethality(-2) self-prunes to 0
+  on characters without positive stacks (Lethality lacks canGoNegative), so
+  the Stress-threshold "-2 Strength" and three older usages (BloomOfSorrow,
+  HellDiseases) mostly no-op. Playtest-era design call: either a real
+  stat-down buff or reprice those effects.
 - **Human playtest of the economy tuning** — payouts/dividends were calibrated
   against a lossless simulation (see commit history: +1wk sortie overhead,
   £120 dividend base). The sim validates the shape, not the fun. Someone has
