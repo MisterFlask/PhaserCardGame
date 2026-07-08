@@ -3,9 +3,11 @@
 import Phaser from 'phaser';
 import { AbstractCard, Team, UiCard } from '../../gamecharacters/AbstractCard';
 import { AutomatedCharacter } from '../../gamecharacters/AutomatedCharacter';
+import type { BaseCharacter } from '../../gamecharacters/BaseCharacter';
 import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
 import { CardSize } from '../../gamecharacters/Primitives';
 import { GameState } from '../../rules/GameState';
+import { CombatAnimationManager } from '../../ui/animations/CombatAnimationManager';
 import { DepthManager } from '../../ui/DepthManager';
 import { EnemyPositionManager } from '../../ui/EnemyPositionManager';
 import CombatSceneLayoutUtils from '../../ui/LayoutUtils';
@@ -456,24 +458,37 @@ export class CombatCardManager {
     public removeEnemyCard(enemyCard: PhysicalCard): void {
         this.enemyPositionManager.releasePosition(enemyCard.data.id);
         this.enemyUnits = this.enemyUnits.filter(card => card !== enemyCard);
-        // Check if there are any active tweens on this card's container
-        const activeTweens = this.scene.tweens.getTweensOf(enemyCard.container);
-        if (activeTweens.length === 0) {
 
-            // Fade and scale down animation
-            this.scene.tweens.add({
-                targets: enemyCard.container,
-                alpha: 0,
-                scaleX: 0.1,
-                scaleY: 0.1,
-                duration: 800,
-                ease: 'Power2',
-                onComplete: () => {
-                    enemyCard.obliterate();
-                    this.enemyUnits = this.enemyUnits.filter(card => card !== enemyCard);
-                }
-            });
-        }
+        const enemy = enemyCard.data.isBaseCharacter() ? (enemyCard.data as unknown as BaseCharacter) : undefined;
+        const runDeathFlourish = enemy && enemy.isDead()
+            ? CombatAnimationManager.getInstance().deathFlourish(enemy, this.scene)
+            : Promise.resolve(false);
+
+        runDeathFlourish.then((bespokeRan) => {
+            if (bespokeRan) {
+                enemyCard.obliterate();
+                this.enemyUnits = this.enemyUnits.filter(card => card !== enemyCard);
+                return;
+            }
+
+            // Check if there are any active tweens on this card's container
+            const activeTweens = this.scene.tweens.getTweensOf(enemyCard.container);
+            if (activeTweens.length === 0) {
+                // Fade and scale down animation
+                this.scene.tweens.add({
+                    targets: enemyCard.container,
+                    alpha: 0,
+                    scaleX: 0.1,
+                    scaleY: 0.1,
+                    duration: 800,
+                    ease: 'Power2',
+                    onComplete: () => {
+                        enemyCard.obliterate();
+                        this.enemyUnits = this.enemyUnits.filter(card => card !== enemyCard);
+                    }
+                });
+            }
+        });
     }
 
     public cleanup(): void {
