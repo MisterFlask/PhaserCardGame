@@ -23,7 +23,7 @@ export class TheNinthBell extends AutomatedCharacter {
     constructor() {
         super({
             name: "The Ninth Bell",
-            portraitName: "",
+            portraitName: "the-ninth-bell",
             maxHitpoints: 380,
             description: "Cavendish survey note, and I choose my words with some care: the Iron Choir maintains that it does not ring its own bells, that the compound's campanile has always rung itself, and that this has never once been remarked upon as unusual. Having now stood beneath it during an engagement, I am inclined to believe the second claim and disbelieve the first with equal conviction. It counts its tolls audibly, and each one lands heavier than the last, as though the bell itself is keeping a ledger and the ledger is coming due. Struck hard enough, the bronze audibly cracks - and whatever mechanism was holding its shape in check goes with it. What follows the crack rings considerably less like a hymn."
         });

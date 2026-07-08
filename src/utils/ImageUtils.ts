@@ -43,6 +43,10 @@ export default class ImageUtils {
                 "swamp-1.png",
                 "swamp-2.png",
                 "swamp-3.png",
+
+                // act-4 art batch 4: Brimstone Badlands combat backgrounds (July 2026)
+                "brimstone-badlands-oil-painting-1.png",
+                "brimstone-badlands-oil-painting-2.png",
               ]
         },
         portraits_npcs: {
@@ -313,7 +317,12 @@ export default class ImageUtils {
 
                 // act-3 art burndown batch 3 (July 2026)
                 "overseer.png", "foreman.png", "robot-minion.png", "fiery-orator.png",
-                "tough-worker.png", "angry-worker.png", "manager-demon.png", "angry-worker-boss.png"
+                "tough-worker.png", "angry-worker.png", "manager-demon.png", "angry-worker-boss.png",
+
+                // act-4 art batch 4: Brimstone Badlands enemy portraits (July 2026)
+                "vent-tick.png", "slag-porter.png", "choir-novice.png", "bell-warden.png",
+                "brimstone-prospector.png", "interdicted-hauler.png", "choir-cantor.png",
+                "foundry-seraph.png", "barons-assessor.png", "caldera-shambler.png", "the-ninth-bell.png"
               ]
         },
         enemies: {

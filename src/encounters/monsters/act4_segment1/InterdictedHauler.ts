@@ -11,7 +11,7 @@ export class InterdictedHauler extends AutomatedCharacter {
     constructor() {
         super({
             name: "Interdicted Hauler",
-            portraitName: "",
+            portraitName: "interdicted-hauler",
             maxHitpoints: 108,
             description: "Cavendish survey note: a freight-engine seized under the interdict and left standing on the compound apron with its cargo of raw brimstone still loaded and its boiler, evidently, still lit. Nobody among the Choir's toll-men would approach it closely enough to explain why. The gauge is climbing at a rate I'd call alarming if the Choir seemed alarmed by it, which they conspicuously do not. Recommend distance."
         });

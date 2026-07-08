@@ -10,7 +10,7 @@ export class BellWarden extends AutomatedCharacter {
     constructor() {
         super({
             name: "Bell-Warden",
-            portraitName: "",
+            portraitName: "bell-warden",
             maxHitpoints: 144,
             description: "Cavendish survey note: stationed at the compound's inner gate, cast rather than born by the look of the joints, and rings faintly with every step whether struck or not. The first blow any of us landed was answered a beat later by a wall of plating none of us saw him raise - the same trick the Furnace Belt's ironclads favour, though this one rings a clear, precise note when it happens, as if logging the transaction for someone's benefit. His counter-toll left two of the party fumbling their next draw."
         });

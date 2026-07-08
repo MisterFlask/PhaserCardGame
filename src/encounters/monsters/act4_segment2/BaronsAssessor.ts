@@ -10,7 +10,7 @@ export class BaronsAssessor extends AutomatedCharacter {
     constructor() {
         super({
             name: "Baron's Assessor",
-            portraitName: "",
+            portraitName: "barons-assessor",
             maxHitpoints: 106,
             description: "Cavendish survey note: arrived with a levy schedule and a clerk to carry it, and informed the party we were operating within the Barons' claimed tariff zone without a permit on file. The remedy, he explained at length, is an assessment - applied, apparently, at his sole discretion and to whichever of our resources he judges undertaxed. He also took a keen interest in how quickly we could muster our hands, and saw fit to slow that too, for what he called 'administrative parity.'"
         });

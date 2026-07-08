@@ -10,7 +10,7 @@ export class FoundrySeraph extends AutomatedCharacter {
     constructor() {
         super({
             name: "Foundry Seraph",
-            portraitName: "",
+            portraitName: "foundry-seraph",
             maxHitpoints: 144,
             description: "Cavendish survey note: the Iron Choir's own, and unmistakably a cut above the compound's rank-and-file wardens - wings of hammered plate, welded rather than worn, and a bearing that suggests it considers combat a liturgical function rather than a chore. Alternates without variation between two postures: a defensive one, wings folded close, that shrugs off everything thrown at it, and an offensive one, wings flared, that puts a very great deal back. The Choir apparently regards the pattern as a hymn. I regarded it as entirely predictable and no less dangerous for it."
         });

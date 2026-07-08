@@ -12,7 +12,7 @@ export class BrimstoneProspector extends AutomatedCharacter {
     constructor() {
         super({
             name: "Brimstone Prospector",
-            portraitName: "",
+            portraitName: "brimstone-prospector",
             maxHitpoints: 52,
             description: "Cavendish survey note: independent, unlicensed, and considerably faster on his feet than his claim stakes suggest he ought to be. Works a knife with the casual confidence of a man who has never once had to finish a fight he started, mostly because he doesn't - lands one cut, judges the ground unfavourable, and is three fissures away before anyone can press the advantage. The Barons class him a nuisance. I'd class him sensible."
         });

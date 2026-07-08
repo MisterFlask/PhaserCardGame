@@ -9,7 +9,7 @@ export class SlagPorter extends AutomatedCharacter {
     constructor() {
         super({
             name: "Slag Porter",
-            portraitName: "",
+            portraitName: "slag-porter",
             maxHitpoints: 66,
             description: "Cavendish survey note: a yoked pack-beast bred (or built - the distinction is not always clear down here) to haul raw brimstone off the vent field, and it has apparently decided this particular haul is beneath it. Refuses to move, plants all four feet, and simply absorbs whatever is thrown at it with the aggrieved patience of a creature that has filed a grievance and is waiting on a reply. Its kick, when it finally deigns to deliver one, carries the full weight of its objection."
         });

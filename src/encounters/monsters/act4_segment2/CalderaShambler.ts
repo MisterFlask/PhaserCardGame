@@ -14,7 +14,7 @@ export class CalderaShambler extends AutomatedCharacter {
     constructor() {
         super({
             name: "Caldera Shambler",
-            portraitName: "",
+            portraitName: "caldera-shambler",
             maxHitpoints: 150,
             description: "Cavendish survey note: a slag-crusted bulk that appears to have congealed, rather than been born, somewhere at the caldera's rim, and moves at a pace that makes 'shambler' feel generous rather than accurate. Its crust holds heat the way a kiln holds heat, and it sheds a good deal of that heat onto whoever gets close enough to strike it - Morrison's coat is still smouldering, three days on. Slow, armoured, and in absolutely no hurry, which is somehow the most alarming quality of the three."
         });

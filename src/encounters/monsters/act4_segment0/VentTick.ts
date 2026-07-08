@@ -30,7 +30,7 @@ export class VentTick extends AutomatedCharacter {
     constructor() {
         super({
             name: "Vent Tick",
-            portraitName: "",
+            portraitName: "vent-tick",
             maxHitpoints: 46,
             description: "Cavendish survey note, Brimstone Badlands vent field 4: a chitinous scavenger that clusters at fissure mouths in numbers no single trap accounts for, on the theory - mine, not the Company's - that the vents themselves are a nursery rather than a feeding ground. Bites for remarkably little, but deposits something in whatever it bites that continues developing well after the tick has been swept aside. The Barons' foremen call the resulting welts 'productive.' I have asked them to stop."
         });

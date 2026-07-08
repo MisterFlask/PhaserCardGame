@@ -435,7 +435,17 @@ export class Encounter {
         if (GameState.getInstance().currentAct == 1) {
             return swampBackgrounds[Math.floor(Math.random() * swampBackgrounds.length)];
         }
-        
+
+        // act-4: Brimstone Badlands volcanic extraction country draws from its
+        // own dedicated backgrounds rather than the general-purpose Hell pool.
+        var brimstoneBadlandsBackgrounds = [
+            "brimstone-badlands-oil-painting-1",
+            "brimstone-badlands-oil-painting-2",
+        ]
+        if (GameState.getInstance().currentAct == 4) {
+            return brimstoneBadlandsBackgrounds[Math.floor(Math.random() * brimstoneBadlandsBackgrounds.length)];
+        }
+
         var backgroundsPossible = [
             "backrooms-oil-painting",
             "canyon-oil-painting",

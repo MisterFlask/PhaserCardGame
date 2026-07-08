@@ -10,7 +10,7 @@ export class ChoirCantor extends AutomatedCharacter {
     constructor() {
         super({
             name: "Choir Cantor",
-            portraitName: "",
+            portraitName: "choir-cantor",
             maxHitpoints: 84,
             description: "Cavendish survey note: senior to the novices by voice alone, so far as I can determine - there is no visible rank insignia, only a deeper register and a considerably more confident hymn. Leads the compound's other residents through what I can only call a working chorus: wounds close, tempers rise, and the whole line seems to draw breath together on her cue. I did not enjoy standing near her. None of us did."
         });
