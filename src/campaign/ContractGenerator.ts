@@ -431,8 +431,8 @@ export class ContractGenerator {
     /** Trade runs pay a low base (half a normal contract's roll) plus a
      *  per-crate freight rate that scales with act. */
     private static readonly TRADE_RUN_BASE_PAYOUT_FRACTION = 0.5;
-    private static readonly TRADE_RUN_FREIGHT_RATE_PER_ACT = 30;
-    private static readonly TRADE_RUN_MAX_CRATES = 6;
+    private static readonly TRADE_RUN_FREIGHT_RATE_PER_ACT = 15;
+    private static readonly TRADE_RUN_MAX_CRATES = 5;
 
     /** Prestige Commissions (src/docs/vp_endgame_design.md) unlock year 3+,
      *  trophies rather than a lane: at most one per full board refresh. */
@@ -557,9 +557,12 @@ export class ContractGenerator {
      * dials in at muster (see ContractBoardPanel's freight stepper).
      * `payout` on the Contract IS the low base (Contract.projectedPayout
      * adds cratesLoaded * freightRatePerCrate on top). Full-load act-1
-     * example: ~£58 + 6x£30 = ~£238 vs ~£116 average combat contract —
-     * roughly 2x money for 12 dead cards spread across three decks. Squad
-     * size never rolls 2 (no hands to spare): 3 or 4 only.
+     * example: ~£58 + 5x£15 = ~£133 vs ~£116 average combat contract —
+     * a modest edge for 10 dead cards spread across three decks (balance
+     * pass, see trade_run_design.md's "Numbers (post-nerf)" section for the
+     * two signals — sim canary + longplay — that drove the cut from
+     * £30/6 crates). Squad size never rolls 2 (no hands to spare): 3 or 4
+     * only.
      */
     private generateTradeRunContract(region: TradeRunRegion, year: number, contractsCompletedByClient: Record<string, number>): Contract {
         const template = this.pick(region.templates);

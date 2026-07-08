@@ -48,6 +48,30 @@ load; every crate pays, and every crate makes the fights harder.**
   - Full-load act-1 example: ~£58 + 6×£30 = **~£238** vs ~£116 average
     combat contract — roughly 2× money for 12 dead cards spread across
     three decks. That is the intended tension; expect a balance pass.
+  - **Superseded by the "Numbers (post-nerf)" section below** — these were
+    the original launch numbers, kept here for history.
+
+### Numbers (post-nerf, economy balance pass, 2026-07-08)
+
+Two independent signals agreed the numbers above were overpowered: the
+campaign sim's `maxFreight` policy measured ~2.78x `greedyPayout`'s average
+final vault (the canary in `CampaignSimulator.test.ts` had been widened to a
+6x ceiling to accommodate this instead of acting on it), and a full-engine
+longplay (commit 5a2c232) banked £15.5k by year 3 at satisfaction 100
+running trade runs at full crates, with the doom clock never biting.
+
+- `freightRatePerCrate = £15 × act` (was £30 × act).
+- `maxCrates = 5` (was 6).
+- `basePayout` fraction (0.5×) and the dead-draw cost mechanism (2 cargo
+  cards/crate) are UNCHANGED — this pass only retunes price, not mechanism.
+- Full-load act-1 example: ~£58 + 5×£15 = **~£133** vs ~£116 average combat
+  contract — a modest edge for 10 dead cards spread across three decks.
+- Measured post-nerf: `maxFreight` averages ~1.5x-1.9x `greedyPayout`'s final
+  vault (roster 6, vault 500, 16 quarters, N=100 seeds, 20 repeated
+  measurements, max observed 1.92x) — see `CampaignSimulator.test.ts`'s
+  retightened canary (band: 1.2x-2.0x). £20/5-crates and £18/5-crates were
+  both tried first and occasionally poked over the 2.0x ceiling at smaller
+  sample sizes; £15/5 held with real margin at N=100.
 - Trade runs never roll squadSize 2 (no hands to spare); 3 or 4 only.
   A 4-soldier big push dilutes cargo across more decks — that interaction
   is intentional and free.

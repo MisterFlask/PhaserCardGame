@@ -390,27 +390,43 @@ describe('CampaignSimulator', () => {
 
     describe('trade-run policy shape', () => {
         /**
-         * Measured (20 seeds, roster 6, vault 500, 16 quarters): maxFreight
-         * averages ~2.78x greedyPayout's final vault (avgTrade ~5659 vs
-         * avgGreedy ~2037), with high per-seed variance (individual ratios
-         * from 1.3x to 11x — trade-run availability is only ~20% of
-         * generated contracts, so a policy that insists on trade runs can
-         * get board-starved in a bad-luck run and fall back to greedy
-         * picks, or get a lucky run of high-crate trade runs).
+         * RETIGHTENED (economy balance pass, 2026-07-08): two independent
+         * signals agreed trade runs were overpowered — this canary's old
+         * ~6x ceiling was widened to accommodate a ~2.78x measurement
+         * instead of acting on it, and a full-engine longplay (commit
+         * 5a2c232) banked £15.5k by year 3 at satisfaction 100 running
+         * trade runs at full crates, never tripping the doom clock. Fix:
+         * ContractGenerator's TRADE_RUN_FREIGHT_RATE_PER_ACT £30 -> £20 -> £18
+         * were both still capable of poking over 2.0x average at N=30-60
+         * seeds; £15/act (TRADE_RUN_MAX_CRATES unchanged at 5, stepped down
+         * from 6 separately) is the frontier that held clear of 2.0x across
+         * 20 repeated N=100 measurements (observed range ~1.55x-1.92x,
+         * roster 6, vault 500, 16 quarters). See trade_run_design.md's
+         * "Numbers (post-nerf)" section for both constants.
          *
-         * This ~2-3x average edge is CONSISTENT with ContractGenerator's own
-         * doc comment on trade runs ("Full-load act-1 example: ~£238 vs
-         * ~£116 average combat contract — roughly 2x money for 12 dead cards
-         * spread across three decks") — the "12 dead cards" cost is a deck-
-         * quality tax this abstracted sim cannot represent (combat is a
-         * single sortieWinRate parameter, not a card-level simulation), so
-         * the sim necessarily sees trade runs as a free lunch. The bounds
-         * below are widened from the brief's literal "not 3x" to "not 6x"
-         * specifically to account for this known sim-fidelity gap, while
-         * still catching a genuinely pathological blowup.
+         * N=100 (not the original 10, mislabeled "20" in the old comment)
+         * is needed for measurement stability: ContractGenerator uses
+         * uncontrolled Math.random() internally for board generation (see
+         * this file's RNG-discipline note in CampaignSimulator.ts), so the
+         * ratio itself is noisy run-to-run even with the seeded rng fixed.
+         * N=60 was tried first and flaked against the 2.0x ceiling roughly
+         * 1-in-13 runs (one observed failure in 15 repeats); N=100 was
+         * stable across 20/20 repeated measurements with real margin (max
+         * observed 1.92x), so it's used here to keep this a genuine
+         * non-flake canary rather than a coin flip at the boundary.
+         *
+         * The known sim-fidelity gap remains: ContractGenerator's own doc
+         * comment on trade runs still shows a real £ edge (full-load act-1
+         * ~£133 vs ~£116 average combat contract) for 10 dead cards spread
+         * across three decks — a deck-quality tax this abstracted sim
+         * cannot represent (combat is a single sortieWinRate parameter, not
+         * a card-level simulation) — so the sim's measured ratio runs
+         * somewhat hotter than the raw £ edge alone would suggest. The
+         * bounds below are the brief's own target band (1.2x-2.0x), not
+         * widened for the gap this time.
          */
         it('nets a materially higher but not fantastical average vault than greedyPayout', () => {
-            const tradeResults = seededRuns(10, rng => runCampaignSimulation({
+            const tradeResults = seededRuns(100, rng => runCampaignSimulation({
                 combatModel: DEFAULT_COMBAT_MODEL,
                 policy: maxFreight,
                 targetRosterSize: 6,
@@ -419,7 +435,7 @@ describe('CampaignSimulator', () => {
                 startingRosterSize: 6,
                 rng,
             }));
-            const greedyResults = seededRuns(10, rng => runCampaignSimulation({
+            const greedyResults = seededRuns(100, rng => runCampaignSimulation({
                 combatModel: DEFAULT_COMBAT_MODEL,
                 policy: greedyPayout,
                 targetRosterSize: 6,
@@ -434,11 +450,11 @@ describe('CampaignSimulator', () => {
 
             expect(avgTrade).toBeGreaterThan(0);
             expect(avgGreedy).toBeGreaterThan(0);
-            // Loose canary band: catches a genuine blowup (e.g. free money
-            // from a freight-math bug) without flagging the documented,
-            // intentional ~2-3x edge as a regression.
-            expect(avgTrade / avgGreedy).toBeLessThan(6);
-            expect(avgTrade / avgGreedy).toBeGreaterThan(0.5);
+            // Retightened canary: catches both a genuine blowup (freight-math
+            // bug) and a return to the pre-nerf overpowered band, while
+            // leaving headroom for legitimate run-to-run noise.
+            expect(avgTrade / avgGreedy).toBeLessThan(2.0);
+            expect(avgTrade / avgGreedy).toBeGreaterThan(1.2);
         });
 
         it('a policy with no eligible squad size returns null and the sim does not crash', () => {

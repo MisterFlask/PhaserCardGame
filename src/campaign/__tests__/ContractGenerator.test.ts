@@ -95,8 +95,8 @@ describe('ContractGenerator', () => {
             const contract = gen.generateContract(10);
             if (!contract.isTradeRun) continue;
             tradeRunCount++;
-            expect(contract.maxCrates).toBe(6);
-            expect(contract.freightRatePerCrate).toBe(30 * contract.act);
+            expect(contract.maxCrates).toBe(5);
+            expect(contract.freightRatePerCrate).toBe(15 * contract.act);
             expect(contract.cratesLoaded).toBe(0);
             expect([3, 4]).toContain(contract.squadSize); // never 2: no hands to spare
         }
