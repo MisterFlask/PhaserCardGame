@@ -29,6 +29,10 @@ import { StandingOrdersState } from "../orders/StandingOrdersState";
 // directly rather than hand-mirrored like SIM_RECRUIT_COST/SIM_ROSTER_CAP
 // below, since it already lives somewhere legal for this module to import.
 import { RUSH_TREATMENT_COST_PER_WEEK } from "../RushTreatment";
+// Plain JSON import (Node-safe, no Phaser) — measured per-act/squadSize
+// combat win rates from scripts/measure-combat-rates.mjs's headless combat
+// harness. See combatModelForSortie's doc comment for how this is consumed.
+import combatRatesFixture from "./combat-rates.fixture.json";
 
 /**
  * Mirrors CampaignUiState.RECRUIT_COST (src/screens/campaign/hq_ux/CampaignUiState.ts).
@@ -72,6 +76,48 @@ export const DEFAULT_COMBAT_MODEL: CombatModel = {
     woundWeeksMin: 2,
     woundWeeksMax: 4,
 };
+
+/**
+ * Fixture-mode combat model (combatModel: 'fixture' config knob): per-sortie
+ * sortieWinRate is looked up from the real headless-combat measurements in
+ * combat-rates.fixture.json (see scripts/measure-combat-rates.mjs) keyed by
+ * the contract's own `act` and `squadSize` fields, using the greedy-policy
+ * cell as a lower-bound-on-human-play proxy (see that script's header
+ * comment and CLAUDE.md's task brief for why greedy rather than
+ * randomLegal). woundChancePerSoldier/deathChancePerSoldier/wound-week
+ * range are DELIBERATELY left at DEFAULT_COMBAT_MODEL's tuned values in
+ * every fixture-mode sortie — this mode only swaps the win/loss roll for a
+ * measured one; it does not retune any economy ratchet (those three knobs
+ * stay exactly as the balance pass tuned them, per this task's scope).
+ *
+ * Falls back to DEFAULT_COMBAT_MODEL.sortieWinRate for any (act, squadSize)
+ * combination missing from the fixture (e.g. a stale/partial fixture file)
+ * rather than throwing, since a missing cell should degrade gracefully in a
+ * long-running sim rather than abort a whole run.
+ */
+interface CombatRatesFixtureCell {
+    act: number;
+    squadSize: number;
+    policy: string;
+    winRate: number;
+}
+interface CombatRatesFixture {
+    generatedAt: string;
+    n: number;
+    policyVersions: Record<string, string>;
+    cells: Record<string, CombatRatesFixtureCell>;
+}
+const FIXTURE = combatRatesFixture as CombatRatesFixture;
+
+/** Looks up the measured greedy-policy win rate for (act, squadSize) from
+ *  combat-rates.fixture.json, falling back to DEFAULT_COMBAT_MODEL's flat
+ *  rate if that exact cell isn't present. */
+export function combatModelForSortie(act: number, squadSize: number): CombatModel {
+    const key = `act${act}_squad${squadSize}_greedy`;
+    const cell = FIXTURE.cells[key];
+    const sortieWinRate = cell ? cell.winRate : DEFAULT_COMBAT_MODEL.sortieWinRate;
+    return { ...DEFAULT_COMBAT_MODEL, sortieWinRate };
+}
 
 /**
  * A contract-selection policy: given the board and the currently available
@@ -212,7 +258,16 @@ export const maxFreight: ContractPolicy = {
 };
 
 export interface SimulatorConfig {
-    combatModel: CombatModel;
+    /**
+     * Either a flat CombatModel (existing behavior — every sortie rolls the
+     * same sortieWinRate regardless of act/squadSize) or the literal
+     * 'fixture', which resolves a per-sortie CombatModel from
+     * combat-rates.fixture.json via combatModelForSortie(contract.act,
+     * contract.squadSize) at the point each sortie is rolled. See
+     * combatModelForSortie's doc comment for what fixture mode does and
+     * does not change.
+     */
+    combatModel: CombatModel | 'fixture';
     policy: ContractPolicy;
     /** Roster size the sim recruits up to when short and can afford it. */
     targetRosterSize: number;
@@ -348,7 +403,14 @@ export function runCampaignSimulation(config: SimulatorConfig): SimulatorResult 
             choice.contract.cratesLoaded = choice.cratesLoaded;
             sortiesRun++;
 
-            const won = rng() < combatModel.sortieWinRate;
+            // Fixture mode resolves a fresh per-sortie model keyed by this
+            // contract's own act/squadSize; flat mode reuses the same
+            // CombatModel for every sortie (existing behavior, unchanged).
+            const sortieCombatModel: CombatModel = combatModel === 'fixture'
+                ? combatModelForSortie(choice.contract.act, choice.contract.squadSize)
+                : combatModel;
+
+            const won = rng() < sortieCombatModel.sortieWinRate;
             if (won) {
                 vault += choice.contract.projectedPayout;
                 // Prestige Commissions pay £0 (projectedPayout collapses to
@@ -360,12 +422,12 @@ export function runCampaignSimulation(config: SimulatorConfig): SimulatorResult 
                 }
                 contractsCompleted++;
                 choice.squad.forEach(soldier => {
-                    if (rng() < combatModel.deathChancePerSoldier) {
+                    if (rng() < sortieCombatModel.deathChancePerSoldier) {
                         deaths++;
                         roster = roster.filter(s => s.id !== soldier.id);
-                    } else if (rng() < combatModel.woundChancePerSoldier) {
-                        const weeks = combatModel.woundWeeksMin
-                            + Math.floor(rng() * (combatModel.woundWeeksMax - combatModel.woundWeeksMin + 1));
+                    } else if (rng() < sortieCombatModel.woundChancePerSoldier) {
+                        const weeks = sortieCombatModel.woundWeeksMin
+                            + Math.floor(rng() * (sortieCombatModel.woundWeeksMax - sortieCombatModel.woundWeeksMin + 1));
                         soldier.woundedUntilWeek = calendar.week + choice.contract.durationWeeks + weeks;
                     }
                 });

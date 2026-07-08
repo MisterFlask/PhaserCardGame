@@ -7,6 +7,13 @@ import { StandingOrdersState } from '../orders/StandingOrdersState';
 import { RUSH_TREATMENT_COST_PER_WEEK } from '../RushTreatment';
 
 /**
+ * NOTE on the whole file above this comment: it was already 531 lines when
+ * this section was appended (combat win-rate measurement bridge task) --
+ * see the "combatModel: 'fixture' mode" describe block at the bottom for
+ * the one new test this task adds. Nothing above this line was touched.
+ */
+
+/**
  * Balance-ratchet tests for the campaign economy, run headlessly via
  * CampaignSimulator (no Phaser, no browser). Each test runs 10-60 seeded
  * repetitions and reports on the aggregate — see each test's comment for
@@ -526,6 +533,60 @@ describe('CampaignSimulator', () => {
             expect(avgCharterVp).toBeGreaterThan(0);
             const neverConvertBanksNoVp = noConvert.every(r => r.charterVictoryPoints === 0);
             expect(neverConvertBanksNoVp).toBe(true);
+        });
+    });
+
+    describe("combatModel: 'fixture' mode (combat win-rate measurement bridge)", () => {
+        /**
+         * Non-ratcheting smoke test only: combatModel: 'fixture' resolves a
+         * per-sortie CombatModel from the real measured headless-combat win
+         * rates in combat-rates.fixture.json (see
+         * scripts/measure-combat-rates.mjs and combatModelForSortie's doc
+         * comment in CampaignSimulator.ts) instead of one flat scalar. This
+         * test asserts only that 10 seeded campaigns complete without
+         * throwing in fixture mode -- it does NOT assert any survival-rate
+         * band (that would be a ratchet, and this task's brief explicitly
+         * forbids retuning any existing economy ratchet). The
+         * survival-delta vs scalar mode is logged for the record, not
+         * asserted.
+         */
+        it('runs 10 seeded campaigns in fixture mode without error', () => {
+            const N = 10;
+            const fixtureResults = seededRuns(N, rng => runCampaignSimulation({
+                combatModel: 'fixture',
+                policy: greedyPayout,
+                targetRosterSize: 6,
+                quarters: 16,
+                startingVault: 500,
+                startingRosterSize: 6,
+                rng,
+            }));
+            expect(fixtureResults).toHaveLength(N);
+            for (const r of fixtureResults) {
+                expect(Number.isFinite(r.finalVault)).toBe(true);
+                expect(r.quartersSurvived).toBeGreaterThanOrEqual(0);
+            }
+
+            // Logged only, per the brief -- not a ratchet assertion.
+            const scalarResults = seededRuns(N, rng => runCampaignSimulation({
+                combatModel: DEFAULT_COMBAT_MODEL,
+                policy: greedyPayout,
+                targetRosterSize: 6,
+                quarters: 16,
+                startingVault: 500,
+                startingRosterSize: 6,
+                rng,
+            }));
+            const avgSurvivedFixture = fixtureResults.reduce((a, r) => a + r.quartersSurvived, 0) / N;
+            const avgSurvivedScalar = scalarResults.reduce((a, r) => a + r.quartersSurvived, 0) / N;
+            const avgVaultFixture = fixtureResults.reduce((a, r) => a + r.finalVault, 0) / N;
+            const avgVaultScalar = scalarResults.reduce((a, r) => a + r.finalVault, 0) / N;
+            console.log(
+                `[fixture-vs-scalar] avgQuartersSurvived: fixture=${avgSurvivedFixture.toFixed(1)} ` +
+                `scalar=${avgSurvivedScalar.toFixed(1)} (delta=${(avgSurvivedFixture - avgSurvivedScalar).toFixed(1)}); ` +
+                `avgFinalVault: fixture=${avgVaultFixture.toFixed(0)} scalar=${avgVaultScalar.toFixed(0)} ` +
+                `(delta=${(avgVaultFixture - avgVaultScalar).toFixed(0)})`
+            );
         });
     });
 });

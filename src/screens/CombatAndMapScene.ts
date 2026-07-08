@@ -36,6 +36,7 @@ import SoundUtils from '../utils/SoundUtils';
 import { runSmokeTest } from '../utils/SmokeTest';
 import { runHeadlessCombat, HeadlessCombatParams } from '../combat/sim/HeadlessCombat';
 import { randomLegalPolicy, mulberry32 } from '../combat/sim/RandomLegalPolicy';
+import { greedyPolicy } from '../combat/sim/GreedyPolicy';
 import { CharacterGenerator } from '../gamecharacters/CharacterGenerator';
 import { ActSegment } from '../encounters/EncounterManager';
 import { AutomatedCharacterType } from '../Types';
@@ -554,6 +555,11 @@ installBackgroundStepper();
 (window as any).applyPromotion = applyPromotion;
 (window as any).CardRewardsGenerator = CardRewardsGenerator;
 (window as any).CampaignSerializer = CampaignSerializer;
+// Exposed so out-of-process QA scripts (scripts/measure-combat-rates.mjs)
+// can reach the real per-act encounter tables via page.evaluate the same
+// way this file's own runHeadlessCombat default does, without a second
+// bundle entry point.
+(window as any).ActSegment = ActSegment;
 
 // Headless combat simulator debug hook (see src/combat/sim/HeadlessCombat.ts
 // and TODO.md's "Headless combat simulator" entry). Runs a full combat
@@ -567,11 +573,16 @@ installBackgroundStepper();
 // Usage from the browser console:
 //   await window.runHeadlessCombat()                         // one default combat
 //   await window.runHeadlessCombat({ seed: 42, squadSize: 4 })
+//   await window.runHeadlessCombat({ policy: 'greedy' })      // src/combat/sim/GreedyPolicy.ts
 (window as any).runHeadlessCombat = async (opts?: {
     squadSize?: number;
     enemies?: AutomatedCharacterType[];
     seed?: number;
     maxTurns?: number;
+    /** Which IPlayPolicy drives the player side. 'random' (default) is the
+     *  v1 randomLegalPolicy; 'greedy' is the v2 GreedyPolicy baseline (see
+     *  src/combat/sim/GreedyPolicy.ts and scripts/measure-combat-rates.mjs). */
+    policy?: 'random' | 'greedy';
 }) => {
     const gameState = GameState.getInstance();
     const savedRunCharacters = gameState.currentRunCharacters;
@@ -588,10 +599,11 @@ installBackgroundStepper();
         const enemies = opts?.enemies ?? ActSegment.Act1_Segment0.encounters[0].enemies.map(e => e.Copy());
 
         const rng = opts?.seed !== undefined ? mulberry32(opts.seed) : Math.random;
+        const policy = opts?.policy === 'greedy' ? greedyPolicy() : randomLegalPolicy(rng);
         const params: HeadlessCombatParams = {
             players,
             enemies,
-            policy: randomLegalPolicy(rng),
+            policy,
             maxTurns: opts?.maxTurns
         };
         return await runHeadlessCombat(params);
