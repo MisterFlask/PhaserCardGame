@@ -123,8 +123,14 @@ describe('CampaignSimulator', () => {
                 // the 0.75-winrate company (see the losing-economy test).
                 // Band retuned around the measured post-act-4 equilibrium;
                 // the floor is the load-bearing edge now.
+                // FLAKE RULING (2026-07-08): 24/40 observed once in six runs
+                // on an UNMODIFIED baseline during the Capital Works rebuild
+                // (reproduced with the change reverted, so not caused by it).
+                // Per the recorded flake-watch plan (TODO.md), floor widened
+                // 26 -> 24 to cover the observed tail. If it flakes below 24,
+                // stop widening and re-measure the distribution instead.
                 expect(survived40, `roster ${roster}: ${survived40}/40 survived to quarter 40`)
-                    .toBeGreaterThanOrEqual(26);
+                    .toBeGreaterThanOrEqual(24);
                 expect(survived40, `roster ${roster}: ${survived40}/40 survived to quarter 40`)
                     .toBeLessThanOrEqual(40);
             }

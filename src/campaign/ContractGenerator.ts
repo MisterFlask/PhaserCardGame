@@ -382,6 +382,18 @@ const TRADE_RUN_REGIONS: TradeRunRegion[] = [
 ];
 
 /**
+ * Dis Legation tuning constants (Capital Works Rebuild, July 2026 — see
+ * src/docs/strategic_layer_redesign.md's amendment table #8). Defined HERE
+ * rather than on TheDisLegation.ts because generateLegationContract consumes
+ * them and campaign/ must never import strategic_projects/ (house rule 1:
+ * AbstractStrategicProject is Phaser-tainted via AbstractCard).
+ * TheDisLegation.ts re-exports them, so sim/tests can read them from either
+ * module without drift.
+ */
+export const LEGATION_PAYOUT_MULTIPLIER = 1.4;
+export const LEGATION_DEADLINE_WEEKS = 12;
+
+/**
  * Generates the weekly contract board. Difficulty scales with campaign year:
  * later years unlock deeper regions and harder encounter segments.
  */
@@ -659,6 +671,32 @@ export class ContractGenerator {
         });
     }
 
+    /**
+     * Legation commission (Capital Works Rebuild table #8, The Dis Legation):
+     * one ordinary bounty contract at the CURRENT best act — reusing
+     * maxActUnlocked and the existing region/template plumbing, no
+     * special-case templates — then adjusted: payout ×LEGATION_PAYOUT_MULTIPLIER
+     * (rounded to integer £), a fixed LEGATION_DEADLINE_WEEKS deadline, the
+     * board-slot exemption flag, and a "Legation: " name prefix. Trade-run
+     * and prestige generation paths are deliberately untouched.
+     */
+    public generateLegationContract(year: number, contractsCompleted: number = 0, contractsCompletedByClient: Record<string, number> = {}): Contract {
+        const maxAct = this.maxActUnlocked(year, contractsCompleted);
+        const region = REGION_FLAVORS.find(r => r.act === maxAct)!;
+        const contract = this.generateBountyContract(region, year, contractsCompletedByClient);
+
+        const basePayout = contract.payout;
+        contract.payout = Math.round(basePayout * LEGATION_PAYOUT_MULTIPLIER);
+        // The bounty path already substituted {payout} with the pre-multiplier
+        // figure; keep the invoice honest (clause must always quote the actual
+        // payout — see ContractGenerator.test.ts's payment-clause invariant).
+        contract.paymentClause = contract.paymentClause.replace(`£${basePayout}`, `£${contract.payout}`);
+        contract.deadlineWeeks = LEGATION_DEADLINE_WEEKS;
+        contract.exemptFromBoardSlots = true;
+        contract.name = `Legation: ${contract.name}`;
+        return contract;
+    }
+
     public generateContract(year: number, contractsCompleted: number = 0, contractsCompletedByClient: Record<string, number> = {}): Contract {
         const maxAct = this.maxActUnlocked(year, contractsCompleted);
 
@@ -674,13 +712,19 @@ export class ContractGenerator {
     /** Top the board back up to targetCount contracts (adjusted by Standing
      *  Orders). At least one trade run per full board refresh (starting
      *  from an empty board) so the axis is always available, even though
-     *  each contract only independently rolls ~20% odds. */
+     *  each contract only independently rolls ~20% odds.
+     *
+     *  Slot-exempt contracts (Contract.exemptFromBoardSlots, e.g. Legation
+     *  commissions) raise the effective target by their own count, so they
+     *  never squeeze the public board's refill — the board always tops up
+     *  to targetCount NON-exempt contracts. */
     public refillBoard(
         existing: Contract[], year: number, contractsCompleted: number = 0, targetCount: number = 5,
         contractsCompletedByClient: Record<string, number> = {}
     ): Contract[] {
         const board = [...existing];
-        const adjustedTarget = StandingOrdersState.getInstance().contractBoardTarget(targetCount);
+        const exemptCount = existing.filter(c => c.exemptFromBoardSlots).length;
+        const adjustedTarget = StandingOrdersState.getInstance().contractBoardTarget(targetCount) + exemptCount;
         const isFullRefresh = existing.length === 0;
         while (board.length < adjustedTarget) {
             board.push(this.generateContract(year, contractsCompleted, contractsCompletedByClient));

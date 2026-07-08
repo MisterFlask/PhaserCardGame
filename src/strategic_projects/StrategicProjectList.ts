@@ -6,6 +6,8 @@ import { CorrectivePhrenologyWing } from "./CorrectivePhrenologyWing";
 import { LeviMaxwellAscensionProtocol } from "./LeviMaxwellAscensionProtocol";
 import { TheCompanyGazette } from "./TheCompanyGazette";
 import { TheCompanyStore } from "./TheCompanyStore";
+import { TheDisLegation } from "./TheDisLegation";
+import { TheGrandTrunkExtension } from "./TheGrandTrunkExtension";
 import { ThePatternRoom } from "./ThePatternRoom";
 
 /**
@@ -13,9 +15,10 @@ import { ThePatternRoom } from "./ThePatternRoom";
  * "Amendment: Capital Works Rebuild". Replaces the shipped Capital Works pool
  * wholesale: of the seven prior purchasable projects, most were flat in both
  * mechanics and flavor (near-duplicate income drips, a passive VP drip, bare
- * service unlocks, a bare slot purchase). This is Batch A of the rebuild —
- * the simple pool swap plus four new-mechanic projects (deck infra unlocks,
- * roster cap, per-soldier income, per-contract VP). The Foundry, Retraining
+ * service unlocks, a bare slot purchase). Batch A was the pool swap plus
+ * four new-mechanic projects (deck infra unlocks, roster cap, per-soldier
+ * income, per-contract VP); Batch B adds the two contract-board works
+ * (The Dis Legation, The Grand Trunk Extension). The Foundry, Retraining
  * Program, Dis Municipal Bonds, Our Man In Dis, Lethe Extraction Co., and the
  * four dead cargo projects (Smythe-Bowyer Poppy Fields, Blue Room Reading
  * Societies, Revolutionary Contacts, Phlegethon Coalfalls) are deleted
@@ -32,6 +35,8 @@ export const ALL_STRATEGIC_PROJECTS: AbstractStrategicProject[] = [
     new CantonmentAnnexe(),
     new TheCompanyStore(),
     new TheCompanyGazette(),
+    new TheDisLegation(),
+    new TheGrandTrunkExtension(),
     new AbyssalResearchInstitute(),
 ];
 

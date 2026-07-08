@@ -1,5 +1,5 @@
 import { GameState } from "../rules/GameState";
-import { AbstractStrategicProject } from "./AbstractStrategicProject";
+import { AbstractStrategicProject, QuarterEndContext } from "./AbstractStrategicProject";
 
 // Capital Works Rebuild (July 2026) — see src/docs/strategic_layer_redesign.md's
 // "Amendment: Capital Works Rebuild" table (#6). No art yet; "" is the
@@ -21,7 +21,7 @@ export class TheCompanyStore extends AbstractStrategicProject {
         return 220;
     }
 
-    public override onQuarterEnd(ctx: { rosterSize: number }): void {
+    public override onQuarterEnd(ctx: QuarterEndContext): void {
         GameState.getInstance().moneyInVault += ctx.rosterSize * COMPANY_STORE_INCOME_PER_SOLDIER;
     }
 }

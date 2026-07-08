@@ -71,6 +71,16 @@ export class Contract {
      *  See src/docs/vp_endgame_design.md. */
     public vpReward: number;
 
+    /**
+     * Capital Works Rebuild (July 2026): true for contracts that don't
+     * occupy a public board slot (e.g. the Dis Legation's exclusive
+     * commissions). ContractGenerator.refillBoard raises its refill target
+     * by the number of exempt contracts present, so these never squeeze the
+     * public board. Aging/expiry applies normally. Set post-construction by
+     * the generating path (generateLegationContract), default false.
+     */
+    public exemptFromBoardSlots: boolean = false;
+
     constructor(args: {
         name: string;
         description: string;

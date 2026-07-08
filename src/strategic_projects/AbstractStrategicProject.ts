@@ -20,6 +20,30 @@ export interface StrategicProjectStage {
  *  Capital Work purchases (see AbstractStrategicProject.canPurchaseNextStage). */
 export const WEEKS_PER_CAMPAIGN_YEAR = WEEKS_PER_QUARTER * QUARTERS_PER_YEAR;
 
+/**
+ * Everything a Capital Work may consult at the quarterly board meeting
+ * (Capital Works Rebuild, July 2026). Assembled by the sole caller,
+ * CampaignUiState.advanceWeeks — projects never import the screens/ layer,
+ * so any campaign fact a quarterly effect needs must ride this context.
+ *
+ * - rosterSize: roster headcount at the meeting (The Company Store).
+ * - year: current campaign year (ContractGenerator input).
+ * - contractsCompletedForGates: completed-contract count AS SEEN BY THE ACT
+ *   GATES — already includes the Grand Trunk Extension's credit; see
+ *   CampaignUiState.getEffectiveContractsCompletedForGates.
+ * - contractsCompletedByClient: raw per-client completion tallies
+ *   (Chartered Partner payout input).
+ * - postContract: posts a generated contract onto the HQ board and records
+ *   a board-minutes line (The Dis Legation).
+ */
+export interface QuarterEndContext {
+    rosterSize: number;
+    year: number;
+    contractsCompletedForGates: number;
+    contractsCompletedByClient: Record<string, number>;
+    postContract: (c: Contract) => void;
+}
+
 export abstract class AbstractStrategicProject extends AbstractCard {
 
     public isOwned: boolean = false;
@@ -136,9 +160,9 @@ export abstract class AbstractStrategicProject extends AbstractCard {
     }
 
     /** Fires at each quarterly board meeting (was per-run before the contract
-     *  pivot). ctx.rosterSize is the roster's size at that moment (Capital
-     *  Works Rebuild, July 2026 — see The Company Store). */
-    public onQuarterEnd(ctx: { rosterSize: number }): void {
+     *  pivot). See QuarterEndContext for what rides in ctx (Capital Works
+     *  Rebuild, July 2026 — The Company Store, The Dis Legation). */
+    public onQuarterEnd(ctx: QuarterEndContext): void {
 
     }
 

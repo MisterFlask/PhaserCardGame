@@ -39,7 +39,7 @@ describe('The Company Store — £8/soldier income (AbstractStrategicProject.onQ
     });
 
     it('onQuarterEnd pays ctx.rosterSize * COMPANY_STORE_INCOME_PER_SOLDIER into the vault', () => {
-        const body = extractMethod(COMPANY_STORE_SOURCE, 'public override onQuarterEnd(ctx: { rosterSize: number }): void');
+        const body = extractMethod(COMPANY_STORE_SOURCE, 'public override onQuarterEnd(ctx: QuarterEndContext): void');
         expect(body).toContain('ctx.rosterSize * COMPANY_STORE_INCOME_PER_SOLDIER');
         expect(body).toContain('moneyInVault +=');
     });
@@ -86,5 +86,70 @@ describe('CampaignUiState.getRosterCap — Cantonment Annexe (8 -> 10)', () => {
         );
         expect(barracksSource).toContain('campaign.getRosterCap()');
         expect(barracksSource).not.toMatch(/[^.]ROSTER_CAP\b/);
+    });
+});
+
+// --- Batch B: contract-board Capital Works (The Dis Legation, The Grand
+// Trunk Extension). Same source-lint constraint as above; the Legation's
+// contract-generation mechanics themselves are REAL unit tests in
+// ContractGenerator.test.ts (ContractGenerator is Phaser-free).
+const DIS_LEGATION_SOURCE = fs.readFileSync(
+    path.resolve(process.cwd(), 'src/strategic_projects/TheDisLegation.ts'), 'utf-8'
+);
+const GRAND_TRUNK_SOURCE = fs.readFileSync(
+    path.resolve(process.cwd(), 'src/strategic_projects/TheGrandTrunkExtension.ts'), 'utf-8'
+);
+
+describe('CampaignUiState.getEffectiveContractsCompletedForGates — Grand Trunk Extension (+16)', () => {
+    it('GRAND_TRUNK_GATE_CREDIT is 16', () => {
+        const match = GRAND_TRUNK_SOURCE.match(/GRAND_TRUNK_GATE_CREDIT = (\d+);/);
+        expect(match, 'GRAND_TRUNK_GATE_CREDIT not found').toBeTruthy();
+        expect(Number(match![1])).toBe(16);
+    });
+
+    it('is defined as contractsCompleted plus the credit when the Extension is owned', () => {
+        const body = extractMethod(CAMPAIGN_UI_STATE_SOURCE, 'public getEffectiveContractsCompletedForGates(): number');
+        expect(body).toContain('this.contractsCompleted');
+        expect(body).toContain('TheGrandTrunkExtension');
+        expect(body).toContain('GRAND_TRUNK_GATE_CREDIT');
+    });
+
+    it('BOTH refillBoard call sites and the quarterly ctx consult it, never raw contractsCompleted', () => {
+        // No /s flag (tsconfig targets pre-es2018); [^)]* already spans
+        // newlines since a negated class matches them.
+        const refillCalls = CAMPAIGN_UI_STATE_SOURCE.match(/\.refillBoard\([^)]*\)/g) ?? [];
+        expect(refillCalls.length).toBe(2); // ensureContractsPopulated + advanceWeeks
+        refillCalls.forEach(call => {
+            expect(call).toContain('this.getEffectiveContractsCompletedForGates()');
+            expect(call).not.toContain('this.contractsCompleted,');
+        });
+        expect(CAMPAIGN_UI_STATE_SOURCE).toContain('contractsCompletedForGates: this.getEffectiveContractsCompletedForGates()');
+    });
+
+    it('requires The Dis Legation as a prerequisite', () => {
+        const body = extractMethod(GRAND_TRUNK_SOURCE, 'public override getPrerequisites(): AbstractStrategicProject[]');
+        expect(body).toContain('new TheDisLegation()');
+    });
+});
+
+describe('The Dis Legation — quarterly exclusive commission (onQuarterEnd ctx.postContract)', () => {
+    it('onQuarterEnd generates via generateLegationContract with the ctx gate inputs and posts via ctx.postContract', () => {
+        const body = extractMethod(DIS_LEGATION_SOURCE, 'public override onQuarterEnd(ctx: QuarterEndContext): void');
+        expect(body).toContain('generateLegationContract');
+        expect(body).toContain('ctx.year');
+        expect(body).toContain('ctx.contractsCompletedForGates');
+        expect(body).toContain('ctx.contractsCompletedByClient');
+        expect(body).toContain('ctx.postContract(contract)');
+    });
+
+    it('re-exports the tuning constants defined in ContractGenerator (single source of truth)', () => {
+        expect(DIS_LEGATION_SOURCE).toContain('LEGATION_PAYOUT_MULTIPLIER } from "../campaign/ContractGenerator"');
+        expect(DIS_LEGATION_SOURCE).toContain('export { LEGATION_DEADLINE_WEEKS, LEGATION_PAYOUT_MULTIPLIER }');
+    });
+
+    it('advanceWeeks wires postContract to push onto the board and record a Legation minutes line', () => {
+        expect(CAMPAIGN_UI_STATE_SOURCE).toContain('postContract: (contract: Contract) => {');
+        expect(CAMPAIGN_UI_STATE_SOURCE).toContain('this.availableContracts.push(contract)');
+        expect(CAMPAIGN_UI_STATE_SOURCE).toContain('The Legation secures a private commission: ${contract.name}.');
     });
 });

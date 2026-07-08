@@ -45,11 +45,12 @@ export function contractToDTO(c: Contract): ContractDTO {
         maxCrates: c.maxCrates,
         freightRatePerCrate: c.freightRatePerCrate,
         vpReward: c.vpReward,
+        exemptFromBoardSlots: c.exemptFromBoardSlots,
     };
 }
 
 export function contractFromDTO(dto: ContractDTO): Contract {
-    return new Contract({
+    const contract = new Contract({
         name: dto.name,
         description: dto.description,
         type: dto.type as ContractType,
@@ -69,6 +70,10 @@ export function contractFromDTO(dto: ContractDTO): Contract {
         freightRatePerCrate: dto.freightRatePerCrate,
         vpReward: dto.vpReward,
     });
+    // Not a constructor arg (set post-construction by generateLegationContract,
+    // same as the generator does) — absent on pre-v15 shapes, so default false.
+    contract.exemptFromBoardSlots = dto.exemptFromBoardSlots ?? false;
+    return contract;
 }
 
 export function standingOrdersToDTO(state: StandingOrdersState): StandingOrdersDTO {

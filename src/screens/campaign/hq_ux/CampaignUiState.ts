@@ -14,6 +14,7 @@ import { GameState } from '../../../rules/GameState';
 import { AbstractStrategicProject } from '../../../strategic_projects/AbstractStrategicProject';
 import { CantonmentAnnexe } from '../../../strategic_projects/CantonmentAnnexe';
 import { CompanySecretariat } from '../../../strategic_projects/CompanySecretariat';
+import { GRAND_TRUNK_GATE_CREDIT, TheGrandTrunkExtension } from '../../../strategic_projects/TheGrandTrunkExtension';
 import { PURCHASABLE_STRATEGIC_PROJECTS } from '../../../strategic_projects/StrategicProjectList';
 import { PlaytestJournal } from '../../../utils/PlaytestJournal';
 
@@ -131,7 +132,7 @@ export class CampaignUiState {
     public ensureContractsPopulated(): void {
         if (this.availableContracts.length === 0) {
             this.availableContracts = ContractGenerator.getInstance()
-                .refillBoard(this.availableContracts, this.calendar.year, this.contractsCompleted, 5, this.contractsCompletedByClient);
+                .refillBoard(this.availableContracts, this.calendar.year, this.getEffectiveContractsCompletedForGates(), 5, this.contractsCompletedByClient);
         }
     }
 
@@ -152,6 +153,20 @@ export class CampaignUiState {
      *  the ROSTER_CAP constant directly. */
     public getRosterCap(): number {
         return ROSTER_CAP + (this.ownsProject(new CantonmentAnnexe().name) ? 2 : 0);
+    }
+
+    /**
+     * contractsCompleted AS SEEN BY THE ACT GATES
+     * (ContractGenerator.maxActUnlocked): the raw tally plus the Grand Trunk
+     * Extension's +16 credit while owned (Capital Works Rebuild table #9 —
+     * same derived-from-ownership pattern as getRosterCap). Every act-gate
+     * consumer (both refillBoard call sites and the Legation's quarterly
+     * generation) must use this; telemetry/journal keeps recording the raw
+     * contractsCompleted.
+     */
+    public getEffectiveContractsCompletedForGates(): number {
+        return this.contractsCompleted
+            + (this.ownsProject(new TheGrandTrunkExtension().name) ? GRAND_TRUNK_GATE_CREDIT : 0);
     }
 
     /**
@@ -338,11 +353,28 @@ export class CampaignUiState {
                 return paid;
             },
             () => {
-                // Project income (bonds, embassies) lands at the top of the
-                // board meeting — before wages and the dividend — so money
-                // arriving that quarter can pay that quarter's bills.
+                // Project income (store scrip, legation commissions) lands at
+                // the top of the board meeting — before wages and the dividend
+                // — so money arriving that quarter can pay that quarter's
+                // bills. postContract lets a project (The Dis Legation) put a
+                // generated contract straight onto the board with a minutes
+                // line, without the project class importing this layer.
                 meetingVaultBeforeIncome = gameState.moneyInVault;
-                this.ownedStrategicProjects.forEach(project => project.onQuarterEnd({ rosterSize: this.roster.length }));
+                const quarterCtx = {
+                    rosterSize: this.roster.length,
+                    year: this.calendar.year,
+                    contractsCompletedForGates: this.getEffectiveContractsCompletedForGates(),
+                    contractsCompletedByClient: this.contractsCompletedByClient,
+                    postContract: (contract: Contract) => {
+                        this.availableContracts.push(contract);
+                        this.calendar.boardEvents.push({
+                            week: this.calendar.week,
+                            message: `The Legation secures a private commission: ${contract.name}.`,
+                            isWarning: false,
+                        });
+                    },
+                };
+                this.ownedStrategicProjects.forEach(project => project.onQuarterEnd(quarterCtx));
                 meetingIncome = gameState.moneyInVault - meetingVaultBeforeIncome;
             },
         );
@@ -361,11 +393,14 @@ export class CampaignUiState {
             }
         });
 
-        // Contracts age off the board; fresh ones post.
+        // Contracts age off the board; fresh ones post. (A Legation contract
+        // posted at this advance's board meeting ages by the full n too — a
+        // deliberate over-deduction of at most n-1 weeks against its 12-week
+        // deadline, acceptable noise next to a second aging path.)
         this.availableContracts.forEach(c => c.deadlineWeeks -= n);
         this.availableContracts = this.availableContracts.filter(c => c.deadlineWeeks > 0);
         this.availableContracts = ContractGenerator.getInstance()
-            .refillBoard(this.availableContracts, this.calendar.year, this.contractsCompleted, 5, this.contractsCompletedByClient);
+            .refillBoard(this.availableContracts, this.calendar.year, this.getEffectiveContractsCompletedForGates(), 5, this.contractsCompletedByClient);
 
         // A fresh crop of hopefuls drifts through the recruitment office.
         this.recruitCandidates = [];

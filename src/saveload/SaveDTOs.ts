@@ -64,7 +64,12 @@
 //      ownedProjects can name a now-deleted class (mismatched-version saves
 //      are discarded and start fresh; established behavior, no migration
 //      chain exists in this codebase).
-export const SAVE_FORMAT_VERSION = 14;
+// v15: Capital Works Rebuild, Batch B (contract-board Capital Works). Added
+//      The Dis Legation and The Grand Trunk Extension; ContractDTO gains
+//      optional exemptFromBoardSlots (true only on Legation commissions,
+//      which sit outside the 5-slot public board — see
+//      Contract.exemptFromBoardSlots / ContractGenerator.refillBoard).
+export const SAVE_FORMAT_VERSION = 15;
 export const SAVE_STORAGE_KEY = 'east-infernal-company-save';
 
 export interface BuffDTO {
@@ -144,6 +149,10 @@ export interface ContractDTO {
      *  Victory Points granted on completion instead of £ (payout is always 0
      *  on these). See src/docs/vp_endgame_design.md. */
     vpReward?: number;
+    /** Legation commissions only (false/absent on every other contract):
+     *  true when the contract doesn't occupy a public board slot — see
+     *  Contract.exemptFromBoardSlots / ContractGenerator.refillBoard. */
+    exemptFromBoardSlots?: boolean;
 }
 
 export interface ConsumableDTO {

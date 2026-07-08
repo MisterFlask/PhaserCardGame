@@ -115,6 +115,9 @@ Three sequential Sonnet batches (shared files force the ordering):
   stay browser-only; headless-combat covers the practical need.
 - **CampaignSimulator baseline flake watch** — the Monte Carlo baseline
   once flaked at its 89/90 threshold; widen one notch if it repeats.
+  2026-07-08: T1's survival floor also flaked (24/40 vs floor 26 on an
+  unmodified baseline, 1-in-6 runs); floor widened to 24 per this plan.
+  Next flake on any ratchet: re-measure the distribution, don't widen.
 
 ## Cost optimization (verification & delegation)
 
