@@ -67,12 +67,13 @@ protocol. Ordered within sections by priority. Delete items when done.
 
 ## Content breadth
 
-- **Regions 4+** — worldbuilding.md already describes the Brimstone
-  Badlands, Screaming Forests, Clockwork Wastes, and Abyssal Frontier;
-  none are in the game (3 acts only). Each new region = contract templates
-  + encounter tables + enemies. Also the natural fix for late-campaign
-  variety alongside region hardening. Good Codex-lane batch work once the
-  enemy-design spec exists.
+- **Regions 5+** — Brimstone Badlands shipped as act 4 (July 2026, spec:
+  `src/docs/act4_brimstone_badlands_design.md` — the repeatable template
+  for region expansions: survey → lead spec → content dispatch → art
+  batch). Remaining from worldbuilding: Screaming Forests, Clockwork
+  Wastes, Abyssal Frontier. Each wants the same pipeline; decide unlock
+  laddering beyond year 7 first (a 5th act needs charter-length thought —
+  maybe regions 5+ are parallel year-7 unlocks, not deeper tiers).
 - **Enemy spawn QA residual** — 7 of 10 new act 2/3 enemies runtime-verified
   via `scripts/qa-spawn.mjs` across ~30 error-free forced sorties; Foundry
   Tick, Union Runner, Ironclad Picket (all registered, idiom-identical to
