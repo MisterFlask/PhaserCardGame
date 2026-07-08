@@ -24,17 +24,17 @@ describe('ContractGenerator', () => {
     it('unlocks deeper regions early for a fast-playing company', () => {
         const actsAtEightContracts = new Set<number>();
         const actsAtTwentyContracts = new Set<number>();
-        const actsAtTwentyEightContracts = new Set<number>();
+        const actsAtFiftySixContracts = new Set<number>();
         for (let i = 0; i < 200; i++) {
             actsAtEightContracts.add(gen.generateContract(1, 8).act);
             actsAtTwentyContracts.add(gen.generateContract(1, 20).act);
-            actsAtTwentyEightContracts.add(gen.generateContract(1, 28).act);
+            actsAtFiftySixContracts.add(gen.generateContract(1, 56).act);
         }
         expect(actsAtEightContracts.has(2)).toBe(true);
         expect(actsAtEightContracts.has(3)).toBe(false);
         expect(actsAtTwentyContracts.has(3)).toBe(true);
         expect(actsAtTwentyContracts.has(4)).toBe(false);
-        expect(actsAtTwentyEightContracts.has(4)).toBe(true);
+        expect(actsAtFiftySixContracts.has(4)).toBe(true);
     });
 
     it('act 4 (Brimstone Badlands) unlocks at year 7, not before', () => {

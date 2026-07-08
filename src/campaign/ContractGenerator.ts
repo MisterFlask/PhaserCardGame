@@ -477,9 +477,13 @@ export class ContractGenerator {
      * proven competence (contracts completed), whichever comes first — a
      * fast-playing company sees variety sooner instead of grinding the
      * Styx Delta for two full years.
+     *
+     * Balance sketch: longplay 2026-07 hit 28 contracts by year 2, unlocking
+     * act 4 absurdly early. Adjusted to 56 ≈ year-7-equivalent throughput
+     * (2 contracts/quarter × 28 quarters).
      */
     private maxActUnlocked(year: number, contractsCompleted: number): number {
-        if (year >= 7 || contractsCompleted >= 28) return 4;
+        if (year >= 7 || contractsCompleted >= 56) return 4;
         if (year >= 6 || contractsCompleted >= 20) return 3;
         if (year >= 3 || contractsCompleted >= 8) return 2;
         return 1;
