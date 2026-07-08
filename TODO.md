@@ -120,12 +120,12 @@ protocol. Ordered within sections by priority. Delete items when done.
   commit 06bb963. Continue in ~15-image batches with the same prompt:
   act-2 enemies next, then act-3, then non-enemy refs (buff/intent icons
   need a different, simpler style — flag for a fresh taste gate).
-- **Image pipeline pass** — deployment is settled (gh-pages, prod bundle
-  2.9MB as of July 2026); the remaining payload problem is resources/
-  (~170MB of PNGs). A dedicated pass: lossy-compress sprites (pngquant/
-  webp), consider downscaling the oversized enemy art, and teach the
-  deploy's change-detection to ship only referenced assets (the manifest
-  knows exactly which files the game loads).
+- **Deploy pipeline: done (July 2026)** — referenced-only staging +
+  sharp compression ships 77MB instead of 284MB (assemble-site.mjs,
+  --compress in the CI deploy). Residual: ~50MB of the staged payload is
+  manifest-wired-but-unreleased content (unshipped card sets, portrait
+  variants) — pruning those from the MANIFEST (not the deploy script) is
+  the next size lever if it matters.
 
 - **Combat-restart race hardening** — `cleanupAndRestartCombat`
   (CombatAndMapScene) recreates managers and re-queues actions while the old
