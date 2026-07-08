@@ -476,8 +476,9 @@ export default class ImageUtils {
      * Loads all images from all categories into the Phaser loader.
      * The key is automatically derived from the filename by stripping the `.png` extension.
      * @param loader - The Phaser loader object.
+     * @param scene - The Phaser scene (used to check texture cache).
      */
-    public loadAllImages(loader: Phaser.Loader.LoaderPlugin): void {
+    public loadAllImages(loader: Phaser.Loader.LoaderPlugin, scene: Phaser.Scene): void {
         console.log('Starting to load all images...');
         
         // Add error event listener
@@ -497,13 +498,19 @@ export default class ImageUtils {
         for (const category in ImageUtils.images) {
             const categoryData = ImageUtils.images[category as keyof typeof ImageUtils.images];
             console.log(`Loading category: ${category}, count of assets: ${categoryData.files.length}`);
-            
+
             categoryData.files.forEach((file: string) => {
                 const key = file.replace(/\.(png)$/, '');
+
+                // Skip if texture already exists in cache
+                if (scene.textures.exists(key)) {
+                    return;
+                }
+
                 const fullUrl = `${this.baseURL}${categoryData.prefix}${file}`;
-                
+
                 console.log(`Attempting to load [${key}] from: ${fullUrl}`);
-                
+
                 loader.image({
                     key: key,
                     url: fullUrl

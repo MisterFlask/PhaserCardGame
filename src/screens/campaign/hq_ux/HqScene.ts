@@ -75,7 +75,7 @@ export class HqScene extends Scene {
         installLoaderWatchdog(this);
 
         // Add all images to the load queue (served from local resources/)
-        new ImageUtils().loadAllImages(this.load);
+        new ImageUtils().loadAllImages(this.load, this);
         SoundUtils.loadAllSounds(this.load);
 
         SceneChanger.setCurrentScene(this);

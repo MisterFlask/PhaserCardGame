@@ -95,7 +95,7 @@ class CombatScene extends Phaser.Scene {
         installLoaderWatchdog(this);
 
         // Add all images to the load queue (served from local resources/)
-        new ImageUtils().loadAllImages(this.load);
+        new ImageUtils().loadAllImages(this.load, this);
         SoundUtils.loadAllSounds(this.load);
 
         ActionManagerFetcher.initServicesAsync(this);
