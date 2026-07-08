@@ -79,9 +79,11 @@ protocol. Ordered within sections by priority. Delete items when done.
   verified siblings) keep missing the random draws. Low risk; closes
   naturally next time anyone plays act 3, or add a target-encounter
   override to qa-spawn if it nags.
-- **Cog class identity** — one of four classes has placeholder lore and the
-  thinnest mechanical identity (Manufactured cards). Either invest (design
-  pass + cards) or consider whether four classes is right at all.
+- **Cog: the Manufactory shipped (July 2026)** — Rivet tokens + six
+  manufacture cards + real lore per `src/docs/cog_class_design.md` (ruling:
+  four classes stays). Residual: the six new cards reference no art keys
+  yet (they'll ride the placeholder path — add them to a future art batch),
+  and the class wants a balance look once human play reaches it.
 
 ## Flavor (from the July 2026 flavor audit)
 
