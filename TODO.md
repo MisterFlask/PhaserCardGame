@@ -115,12 +115,13 @@ protocol. Ordered within sections by priority. Delete items when done.
   thud/board-sting via SoundUtils registry, persisted mute toggle.
   Residual: per-region ambient loops (bigger files, wants taste), volume
   settings, and more event-specific stings (victory, promotion, wipe).
-- **Burn down the missing-art allowlist (131 left)** — batch 1 (July 2026)
-  resolved all 15 act-1 portrait refs; the composite style prompt that
-  passed the lead's taste gate is recorded in that batch's agent report and
-  commit 06bb963. Continue in ~15-image batches with the same prompt:
-  act-2 enemies next, then act-3, then non-enemy refs (buff/intent icons
-  need a different, simpler style — flag for a fresh taste gate).
+- **Missing-art allowlist: 94 rows left** — five batches shipped (all enemy
+  portraits acts 1-4, twenty icons; prompts recorded in commits 06bb963 /
+  37f58bb). Remaining rows are deeper content (cards, portraits variants)
+  plus two deliberate holds: the `"shield"` literal is shared by a buff
+  icon AND Defend's card portrait (rename one ref before arting either),
+  and the node-map location-buff refs are dead code — delete the buffs
+  instead of arting them.
 - **Deploy pipeline: done (July 2026)** — referenced-only staging +
   sharp compression ships 77MB instead of 284MB (assemble-site.mjs,
   --compress in the CI deploy). Residual: ~50MB of the staged payload is
