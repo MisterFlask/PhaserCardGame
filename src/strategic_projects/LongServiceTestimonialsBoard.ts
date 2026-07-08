@@ -6,7 +6,8 @@ import { AbstractStrategicProject } from "./AbstractStrategicProject";
 // irreversible); banked VP land on the OWNED instance's victoryPoints — the
 // same per-project serialization path as The Company Gazette. Cannot retire
 // the last roster soldier; the wounded may be retired.
-// No art yet; "" is the documented auto-placeholder sentinel.
+// Art lives in Sprites/StrategicProjects/testimonials_board.png (art pass,
+// July 2026).
 export const TESTIMONIAL_VP_PER_LEVEL = 20;
 
 export class LongServiceTestimonialsBoard extends AbstractStrategicProject {
@@ -14,7 +15,7 @@ export class LongServiceTestimonialsBoard extends AbstractStrategicProject {
         super({
             name: "The Long Service & Testimonials Board",
             description: "Unlocks retirement at the Barracks: a retired soldier banks [b]20 Victory Points per level[/b] and leaves the wage ledger.",
-            portraitName: ""
+            portraitName: "testimonials_board"
         });
         this.flavorText = "A gold watch, a printed citation, and a quiet redaction from the wage ledger.";
     }

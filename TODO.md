@@ -55,10 +55,6 @@ Batches A-C shipped July 2026 (spec + rulings: strategic_layer_redesign.md,
 "Amendment: Capital Works Rebuild"; all nine new projects + hooks live,
 save v16). Remaining:
 
-- **Art batch:** all fourteen rebuilt/second-wave projects launch on ""
-  placeholders (the two reused keys — the_foundry, retraining_program —
-  never had art either); generate portraits via the generate-game-art
-  skill (relic-style simple iconography per the art-style memory).
 - **Numbers are design-sketch tier** like everything else awaiting the
   playtest gate: Store £8/soldier, Gazette 20 VP, Legation ×1.4, Trunk +16,
   escrow 8w/4w/+25 — all named exported constants; retune against the

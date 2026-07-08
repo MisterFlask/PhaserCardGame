@@ -6,7 +6,8 @@ import { AbstractStrategicProject } from "./AbstractStrategicProject";
 // that can't inflate veterans. Wounded/stressed soldiers may drill (ruling).
 // Promotions surface via the existing derived pending-level flow (PROMOTE
 // action / debrief) — the drill never resolves levels itself.
-// No art yet; "" is the documented auto-placeholder sentinel.
+// Art lives in Sprites/StrategicProjects/school_of_musketry.png (art pass,
+// July 2026).
 export const DRILL_COST = 40;
 export const DRILL_XP = 20;
 export const DRILL_MAX_LEVEL = 4;
@@ -16,7 +17,7 @@ export class SchoolOfMusketry extends AbstractStrategicProject {
         super({
             name: "The School of Musketry & Applied Blasphemy",
             description: "Unlocks drill at the Barracks: [b]£40[/b] grants a soldier below level 4 [b]+20 XP[/b].",
-            portraitName: ""
+            portraitName: "school_of_musketry"
         });
         this.flavorText = "The curriculum is one week of marksmanship and eleven weeks of learning which prayers make it worse.";
     }

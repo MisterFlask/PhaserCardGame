@@ -4,14 +4,14 @@ import { AbstractStrategicProject } from "./AbstractStrategicProject";
 // "Amendment: Capital Works Rebuild" table (#5). Roster cap effect is read
 // dynamically off ownership by CampaignUiState.getRosterCap() (house rule 6:
 // a hook, not a stored increment) — see that method's doc comment.
-// No art yet; "" is the documented sentinel for "auto-generate a placeholder"
-// (see AssetManifestLint.test.ts / AbstractCard), same as CompanySecretariat.
+// Art lives in Sprites/StrategicProjects/cantonment_annexe.png (art pass,
+// July 2026).
 export class CantonmentAnnexe extends AbstractStrategicProject {
     constructor() {
         super({
             name: "The Cantonment Annexe",
             description: "Increases roster capacity from 8 to [b]10[/b].",
-            portraitName: ""
+            portraitName: "cantonment_annexe"
         });
         this.flavorText = "Two additional bunkrooms, one additional chaplain, no additional questions.";
     }

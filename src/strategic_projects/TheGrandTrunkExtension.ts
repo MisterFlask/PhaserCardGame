@@ -10,7 +10,8 @@ import { TheDisLegation } from "./TheDisLegation";
 // year 7 (calendar unlocks everything), so it's a tempo purchase. First real
 // prerequisite edge in the rebuilt pool (requires The Dis Legation); the
 // InvestmentPanel tech tree renders/enforces prerequisites generically.
-// No art yet; "" is the documented auto-placeholder sentinel.
+// Art lives in Sprites/StrategicProjects/grand_trunk_extension.png (art
+// pass, July 2026).
 export const GRAND_TRUNK_GATE_CREDIT = 16;
 
 export class TheGrandTrunkExtension extends AbstractStrategicProject {
@@ -18,7 +19,7 @@ export class TheGrandTrunkExtension extends AbstractStrategicProject {
         super({
             name: "The Grand Trunk Extension",
             description: "Counts as [b]16 completed contracts[/b] toward regional access — deeper regions open to the Company earlier.",
-            portraitName: ""
+            portraitName: "grand_trunk_extension"
         });
         this.flavorText = "The rail does not go where the market is. The market comes to where the rail is.";
     }

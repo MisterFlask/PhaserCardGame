@@ -9,9 +9,7 @@ import { AbstractStrategicProject, QuarterEndContext } from "./AbstractStrategic
 // (generateLegationContract consumes them, and campaign/ must never import
 // this Phaser-tainted module — house rule 1) and re-exported here so the
 // amendment's "named exports, sim-checkable" ruling still points at this file.
-// No art yet; the old our_man_in_dis key was itself missing art (allowlisted
-// in AssetManifestLint), so "" — the documented auto-placeholder sentinel —
-// is used rather than reusing a broken key.
+// Art lives in Sprites/StrategicProjects/dis_legation.png (art pass, July 2026).
 export { LEGATION_DEADLINE_WEEKS, LEGATION_PAYOUT_MULTIPLIER };
 
 export class TheDisLegation extends AbstractStrategicProject {
@@ -19,7 +17,7 @@ export class TheDisLegation extends AbstractStrategicProject {
         super({
             name: "The Dis Legation",
             description: "Each board meeting, the Legation secures one exclusive contract at [b]+40% payout[/b], over and above the public board.",
-            portraitName: ""
+            portraitName: "dis_legation"
         });
         this.flavorText = "The attaché speaks thirteen infernal dialects and bills in all of them.";
     }

@@ -152,9 +152,6 @@ const EXPECTED_MISSING_IMAGE_REFS: { file: string; value: string }[] = [
     { file: 'gamecharacters/statuses/curses/traumas/Vain.ts', value: "vain-curse" },
     { file: 'screens/subcomponents/CombatCardManager.ts', value: "exhaustpile" },
     { file: 'strategic_projects/AbyssalResearchInstitute.ts', value: "abyssal_research_institute" },
-    { file: 'strategic_projects/LeviMaxwellAscensionProtocol.ts', value: "levi_maxwell_ascension_protocol" },
-    { file: 'strategic_projects/ThePatternRoom.ts', value: "the_foundry" },
-    { file: 'strategic_projects/CorrectivePhrenologyWing.ts', value: "retraining_program" },
 ];
 
 describe('Asset manifest integrity (source lint)', () => {

@@ -13,7 +13,8 @@ import { ProbateAndEffectsOffice } from "./ProbateAndEffectsOffice";
 // DEFINED in ContractGenerator.ts (generateRecoveryContract consumes it;
 // campaign/ can never import this Phaser-tainted module — house rule 1) and
 // re-exported here, same pattern as TheDisLegation's LEGATION constants.
-// No art yet; "" is the documented auto-placeholder sentinel.
+// Art lives in Sprites/StrategicProjects/soul_collateral_office.png (art
+// pass, July 2026).
 export { ESCROW_DEADLINE_WEEKS };
 export const ESCROW_RECOVERY_WOUND_WEEKS = 4;
 export const ESCROW_RECOVERY_STRESS = 25;
@@ -23,7 +24,7 @@ export class SoulCollateralOffice extends AbstractStrategicProject {
         super({
             name: "The Soul Collateral Office",
             description: "A soldier killed on a won sortie is held in escrow: a Recovery contract posts with an [b]8-week deadline[/b]. Complete it to reclaim them — wounded, shaken, and on the books. Squad wipes are not covered.",
-            portraitName: ""
+            portraitName: "soul_collateral_office"
         });
         this.flavorText = "The men sign the collateral clause on their first day. Most of them even read it.";
     }

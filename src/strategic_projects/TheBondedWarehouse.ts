@@ -6,7 +6,8 @@ import { AbstractStrategicProject } from "./AbstractStrategicProject";
 // dynamically off ownership by CampaignUiState.getConsumableStockCap()
 // (roster-cap pattern). ConsumableStock.ts stays pure and project-ignorant:
 // mergeStockWithLoadout takes the cap as a parameter.
-// No art yet; "" is the documented auto-placeholder sentinel.
+// Art lives in Sprites/StrategicProjects/bonded_warehouse.png (art pass,
+// July 2026).
 export const WAREHOUSE_STOCK_BONUS = 3;
 
 export class TheBondedWarehouse extends AbstractStrategicProject {
@@ -14,7 +15,7 @@ export class TheBondedWarehouse extends AbstractStrategicProject {
         super({
             name: "The Bonded Warehouse",
             description: "Raises consumable stock capacity from 3 to [b]6[/b].",
-            portraitName: ""
+            portraitName: "bonded_warehouse"
         });
         this.flavorText = "The excise man is welcome to inspect anything he can find.";
     }

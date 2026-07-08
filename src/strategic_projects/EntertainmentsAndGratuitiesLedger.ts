@@ -12,7 +12,8 @@ import { AbstractStrategicProject, QuarterEndContext } from "./AbstractStrategic
 // gates, telemetry) is untouched. Client selection is pure
 // (ClientReputation.pickMostServedClient); eligible clients ride in on
 // ctx.retainerClients — this class never imports CampaignUiState.
-// No art yet; "" is the documented auto-placeholder sentinel.
+// Art lives in Sprites/StrategicProjects/gratuities_ledger.png (art pass,
+// July 2026).
 export const GRATUITIES_CREDIT_PER_QUARTER = 1;
 
 export class EntertainmentsAndGratuitiesLedger extends AbstractStrategicProject {
@@ -20,7 +21,7 @@ export class EntertainmentsAndGratuitiesLedger extends AbstractStrategicProject 
         super({
             name: "The Entertainments & Gratuities Ledger",
             description: "Each board meeting, credits one completed contract toward the Company's most-served client's retainer.",
-            portraitName: ""
+            portraitName: "gratuities_ledger"
         });
         this.flavorText = "Officially, the line item is 'stationery.'";
     }
