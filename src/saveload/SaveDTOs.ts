@@ -46,7 +46,16 @@
 //      RelicEquipment.test.ts's constructor-state lint). Fresh-campaign
 //      value for armoury is a single EmergencyTeleporter (migrated from
 //      GameState.relicsInventory's old run-scoped seed; see GameState.ts).
-export const SAVE_FORMAT_VERSION = 12;
+// v13: Staged Capital Works (src/docs/vp_endgame_design.md's Levi-Maxwell
+//      Ascension Protocol capstone). OwnedProjectDTO gains optional
+//      stagesPurchased/lastStagePurchaseWeek, read back onto
+//      AbstractStrategicProject.stagesPurchased/lastStagePurchaseWeek by
+//      CampaignSerializer.applySave. Both fields are optional and only
+//      meaningful for a project with a `stages` ladder (currently only
+//      Levi-Maxwell Ascension Protocol); every other owned project's DTO
+//      omits them, same as today. Fresh-campaign value: n/a (ownedProjects
+//      starts empty).
+export const SAVE_FORMAT_VERSION = 13;
 export const SAVE_STORAGE_KEY = 'east-infernal-company-save';
 
 export interface BuffDTO {
@@ -144,6 +153,13 @@ export interface CalendarDTO {
 export interface OwnedProjectDTO {
     name: string;
     victoryPoints: number;
+    /** Staged Capital Works only (AbstractStrategicProject.stages set) — see
+     *  src/docs/vp_endgame_design.md. Absent/undefined on every non-staged
+     *  owned project, same as today. */
+    stagesPurchased?: number;
+    /** Absolute campaign week the last stage was bought, paired with
+     *  stagesPurchased above. */
+    lastStagePurchaseWeek?: number;
 }
 
 export interface StandingOrdersDTO {

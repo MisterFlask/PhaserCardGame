@@ -99,6 +99,13 @@ export class CampaignSerializer {
             ownedProjects: campaign.ownedStrategicProjects.map(p => ({
                 name: p.name,
                 victoryPoints: p.getVictoryPoints(),
+                // Only meaningful for staged Capital Works (see
+                // AbstractStrategicProject.stages); omitted otherwise so a
+                // non-staged project's DTO shape is unchanged from before v13.
+                ...(p.isStaged() ? {
+                    stagesPurchased: p.stagesPurchased,
+                    lastStagePurchaseWeek: p.lastStagePurchaseWeek,
+                } : {}),
             })),
             roster: campaign.roster.map(c => this.characterToDTO(c)),
             recruitCandidates: campaign.recruitCandidates.map(c => this.characterToDTO(c)),
@@ -262,7 +269,13 @@ export class CampaignSerializer {
         campaign.ownedStrategicProjects = allProjects
             .filter(p => ownedByName.has(p.name));
         campaign.ownedStrategicProjects.forEach(p => {
-            p.victoryPoints = ownedByName.get(p.name)!.victoryPoints;
+            const dto = ownedByName.get(p.name)!;
+            p.victoryPoints = dto.victoryPoints;
+            // Staged Capital Works only (AbstractStrategicProject.stages);
+            // absent on the DTO for every non-staged project, same as the
+            // fields' own default (0) on a freshly constructed instance.
+            p.stagesPurchased = dto.stagesPurchased ?? 0;
+            p.lastStagePurchaseWeek = dto.lastStagePurchaseWeek ?? 0;
         });
         campaign.availableStrategicProjects = allProjects
             .filter(p => !ownedByName.has(p.name));

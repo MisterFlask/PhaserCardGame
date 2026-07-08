@@ -75,7 +75,7 @@ describe('CampaignSave shape-lock (fresh-state defaults)', () => {
     function buildFreshSave(): CampaignSave {
         StandingOrdersState.getInstance().reset();
         return {
-            version: 12,
+            version: 13,
             savedAtIso: new Date(0).toISOString(),
             moneyInVault: 200, // GameState.moneyInVault default (src/rules/GameState.ts) — browser-verified in deliverable 2
             calendar: calendarToDTO(new CampaignCalendar()),
@@ -158,5 +158,39 @@ describe('CampaignSave shape-lock (fresh-state defaults)', () => {
         save.charterVictoryPoints = 430; // e.g. one Prestige Commission + two Charter Buyback blocks
         const restored: CampaignSave = JSON.parse(JSON.stringify(save));
         expect(restored.charterVictoryPoints).toBe(430);
+    });
+
+    // v13: staged Capital Works (src/docs/vp_endgame_design.md's Levi-Maxwell
+    // Ascension Protocol capstone). stagesPurchased/lastStagePurchaseWeek are
+    // optional on OwnedProjectDTO and only ever set for a staged project —
+    // these two cases (mid-stage, and omitted for a non-staged project)
+    // exercise both branches of that contract through an actual JSON round-trip.
+    it('round-trips a mid-stage staged project (stagesPurchased + lastStagePurchaseWeek survive JSON)', () => {
+        const save = buildFreshSave();
+        save.ownedProjects = [
+            { name: 'Levi-Maxwell Ascension Protocol', victoryPoints: 0, stagesPurchased: 1, lastStagePurchaseWeek: 157 },
+        ];
+        const restored: CampaignSave = JSON.parse(JSON.stringify(save));
+        expect(restored.ownedProjects).toEqual([
+            { name: 'Levi-Maxwell Ascension Protocol', victoryPoints: 0, stagesPurchased: 1, lastStagePurchaseWeek: 157 },
+        ]);
+    });
+
+    it('a non-staged owned project omits stagesPurchased/lastStagePurchaseWeek entirely (unchanged pre-v13 shape)', () => {
+        const save = buildFreshSave();
+        save.ownedProjects = [{ name: 'The Foundry', victoryPoints: 0 }];
+        const restored: CampaignSave = JSON.parse(JSON.stringify(save));
+        expect(restored.ownedProjects).toEqual([{ name: 'The Foundry', victoryPoints: 0 }]);
+        expect('stagesPurchased' in restored.ownedProjects[0]).toBe(false);
+    });
+
+    it('a fully-staged project at completion carries the 2500 VP payout through JSON', () => {
+        const save = buildFreshSave();
+        save.ownedProjects = [
+            { name: 'Levi-Maxwell Ascension Protocol', victoryPoints: 2500, stagesPurchased: 3, lastStagePurchaseWeek: 261 },
+        ];
+        const restored: CampaignSave = JSON.parse(JSON.stringify(save));
+        expect(restored.ownedProjects[0].victoryPoints).toBe(2500);
+        expect(restored.ownedProjects[0].stagesPurchased).toBe(3);
     });
 });

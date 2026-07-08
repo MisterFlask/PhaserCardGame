@@ -4,6 +4,7 @@ import { STANDING_ORDER_REGISTRY, StandingOrdersState } from '../../../../campai
 import { GameState } from '../../../../rules/GameState';
 import { SaveManager } from '../../../../saveload/SaveManager';
 import { AbstractStrategicProject } from '../../../../strategic_projects/AbstractStrategicProject';
+import { isYearGatedProjectAvailable } from '../../../../strategic_projects/StrategicProjectList';
 import { StrategicProjectTechTree } from '../../../../strategic_projects/StrategicProjectTechTree';
 import { TextBoxButton } from '../../../../ui/Button';
 import { PhysicalProjectCard } from '../../../../ui/PhysicalProjectCard';
@@ -169,6 +170,12 @@ export class InvestmentPanel extends AbstractHqPanel {
     }
 
     show(): void {
+        // Rebuild the tech tree on every show, not just at construction: the
+        // available pool can change between visits now that a project can be
+        // year-gated (isYearGatedProjectAvailable) — a campaign year ticking
+        // over while the player is elsewhere in the HQ must be reflected the
+        // next time this panel opens.
+        this.displayTechTree();
         this.setTab(this.activeTab);
         super.show();
     }
@@ -232,10 +239,17 @@ export class InvestmentPanel extends AbstractHqPanel {
 
     private displayTechTree(): void {
         const campaignState = CampaignUiState.getInstance();
-        
-        // Combine available and owned projects for the tech tree layout
+        const year = campaignState.calendar.year;
+
+        // Combine available and owned projects for the tech tree layout.
+        // Year-gated projects (PROJECT_MIN_PURCHASE_YEAR, e.g. Levi-Maxwell
+        // Ascension Protocol from year 4) are held out of the *available*
+        // half entirely until their year clears — "only appears in the
+        // available pool from year 4+" (src/docs/vp_endgame_design.md).
+        // Once owned, a project is no longer part of the pool at all, so the
+        // owned half is never filtered by this gate.
         const allProjects = [
-            ...campaignState.availableStrategicProjects,
+            ...campaignState.availableStrategicProjects.filter(p => isYearGatedProjectAvailable(p, year)),
             ...campaignState.ownedStrategicProjects
         ];
         
@@ -301,18 +315,28 @@ export class InvestmentPanel extends AbstractHqPanel {
     private onProjectClicked(project: AbstractStrategicProject): void {
         const campaignState = CampaignUiState.getInstance();
 
+        // Staged Capital Works (e.g. Levi-Maxwell Ascension Protocol) stay
+        // clickable after the first stage — they move into owned on stage 1
+        // like any other purchase, but each subsequent stage is bought the
+        // same way, gated by canPurchaseNextStage (year gate) rather than
+        // prerequisites. See src/docs/vp_endgame_design.md.
+        if (project.isStaged()) {
+            this.onStagedProjectClicked(project);
+            return;
+        }
+
         // Check if player can afford it and prerequisites are met
         const prerequisites = project.getPrerequisites();
-        const prereqsMet = prerequisites.length === 0 || prerequisites.every(prereq => 
+        const prereqsMet = prerequisites.length === 0 || prerequisites.every(prereq =>
             campaignState.ownedStrategicProjects.some(owned => owned.name === prereq.name)
         );
-        
+
         if (campaignState.getCurrentFunds() >= project.getMoneyCost() && prereqsMet) {
             // Move from available to owned
             campaignState.availableStrategicProjects = campaignState.availableStrategicProjects
                 .filter(p => p !== project);
             campaignState.ownedStrategicProjects.push(project);
-            
+
             // Deduct funds from GameState
             GameState.getInstance().moneyInVault -= project.getMoneyCost();
 
@@ -329,6 +353,41 @@ export class InvestmentPanel extends AbstractHqPanel {
             // Purchases are permanent: checkpoint immediately.
             SaveManager.save();
         }
+    }
+
+    /** Buys the next stage of a staged Capital Work. Moves the project into
+     *  owned on its first stage (same visible transition as any other
+     *  Capital Work); subsequent stages just advance stagesPurchased while
+     *  it stays owned. Refuses silently (dry refusal line is rendered on the
+     *  card itself, not here) if funds are short or the year gate hasn't
+     *  cleared. */
+    private onStagedProjectClicked(project: AbstractStrategicProject): void {
+        const campaignState = CampaignUiState.getInstance();
+        const currentWeek = campaignState.calendar.week;
+        const wasOwned = campaignState.ownedStrategicProjects.includes(project);
+
+        // Pool-availability year gate (e.g. year 4+ for Levi-Maxwell) only
+        // applies before the project is first bought; once owned it's no
+        // longer part of the pool and only the stage gate matters.
+        if (!wasOwned && !isYearGatedProjectAvailable(project, campaignState.calendar.year)) return;
+
+        const gate = project.canPurchaseNextStage(currentWeek);
+        if (!gate.ok) return;
+        if (campaignState.getCurrentFunds() < project.getMoneyCost()) return;
+
+        GameState.getInstance().moneyInVault -= project.getMoneyCost();
+        project.purchaseNextStage(currentWeek);
+
+        if (!wasOwned) {
+            campaignState.availableStrategicProjects = campaignState.availableStrategicProjects
+                .filter(p => p !== project);
+            campaignState.ownedStrategicProjects.push(project);
+        }
+
+        campaignState.syncStandingOrderBonusSlots();
+        this.scene.events.emit('fundsChanged');
+        this.updateCards();
+        SaveManager.save();
     }
     
     private highlightConnections(project: AbstractStrategicProject): void {
