@@ -71,6 +71,17 @@ import { UnionRunner } from './monsters/act3_segment1/UnionRunner';
 import { IroncladPicket } from './monsters/act3_segment1/IroncladPicket';
 import { RegionalManager } from './monsters/act3_boss/RegionalManager';
 import { TheRevolutionary } from './monsters/act3_boss/TheRevolutionary';
+import { VentTick } from './monsters/act4_segment0/VentTick';
+import { SlagPorter } from './monsters/act4_segment0/SlagPorter';
+import { ChoirNovice } from './monsters/act4_segment0/ChoirNovice';
+import { BellWarden } from './monsters/act4_segment1/BellWarden';
+import { BrimstoneProspector } from './monsters/act4_segment1/BrimstoneProspector';
+import { InterdictedHauler } from './monsters/act4_segment1/InterdictedHauler';
+import { ChoirCantor } from './monsters/act4_segment1/ChoirCantor';
+import { FoundrySeraph } from './monsters/act4_segment2/FoundrySeraph';
+import { BaronsAssessor } from './monsters/act4_segment2/BaronsAssessor';
+import { CalderaShambler } from './monsters/act4_segment2/CalderaShambler';
+import { TheNinthBell } from './monsters/act4_boss/TheNinthBell';
 // Define new character classes
 export class ClockworkAbomination extends AutomatedCharacter {
     constructor() {
@@ -341,6 +352,69 @@ export class ActSegment {
             enemies: [new TheRevolutionary()]
         }
     ]);
+
+    static readonly Act4_Segment0 = new ActSegmentData("Act 4 - Segment 0", 4, 0, [
+        {
+            enemies: [new VentTick(), new VentTick(), new VentTick()]
+        },
+        {
+            enemies: [new SlagPorter()]
+        },
+        {
+            enemies: [new ChoirNovice(), new ChoirNovice()]
+        },
+        {
+            enemies: [new VentTick(), new SlagPorter()]
+        },
+        {
+            enemies: [new ChoirNovice(), new VentTick()]
+        }
+    ]);
+
+    static readonly Act4_Segment1 = new ActSegmentData("Act 4 - Segment 1", 4, 1, [
+        {
+            enemies: [new BellWarden()]
+        },
+        {
+            enemies: [new BrimstoneProspector(), new BrimstoneProspector()]
+        },
+        {
+            enemies: [new InterdictedHauler()]
+        },
+        {
+            enemies: [new ChoirCantor(), new ChoirNovice()]
+        },
+        {
+            enemies: [new BellWarden(), new BrimstoneProspector()]
+        },
+        {
+            enemies: [new InterdictedHauler(), new ChoirNovice()]
+        }
+    ]);
+
+    static readonly Act4_Segment2 = new ActSegmentData("Act 4 - Segment 2", 4, 2, [
+        {
+            enemies: [new FoundrySeraph()]
+        },
+        {
+            enemies: [new BaronsAssessor()]
+        },
+        {
+            enemies: [new CalderaShambler()]
+        },
+        {
+            enemies: [new BaronsAssessor(), new ChoirCantor()]
+        },
+        {
+            enemies: [new FoundrySeraph(), new ChoirNovice()]
+        }
+    ]);
+
+    static readonly Boss_Act4 = new ActSegmentData("Boss Fight - Act 4", 4, 3, [
+        {
+            enemies: [new TheNinthBell()]
+        }
+    ]);
 }
 
 export class Encounter {
@@ -573,6 +647,8 @@ function getBossSegment(act: number): ActSegmentData {
         return ActSegment.Boss_Act2;
     } else if (act == 3) {
         return ActSegment.Boss_Act3;
+    } else if (act == 4) {
+        return ActSegment.Boss_Act4;
     }
     throw new Error(`No boss encounters found for act ${act}`);
 }

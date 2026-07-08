@@ -18,18 +18,34 @@ describe('ContractGenerator', () => {
         }
         expect(acts.has(2)).toBe(true);
         expect(acts.has(3)).toBe(true);
+        expect(acts.has(4)).toBe(true);
     });
 
     it('unlocks deeper regions early for a fast-playing company', () => {
         const actsAtEightContracts = new Set<number>();
         const actsAtTwentyContracts = new Set<number>();
+        const actsAtTwentyEightContracts = new Set<number>();
         for (let i = 0; i < 200; i++) {
             actsAtEightContracts.add(gen.generateContract(1, 8).act);
             actsAtTwentyContracts.add(gen.generateContract(1, 20).act);
+            actsAtTwentyEightContracts.add(gen.generateContract(1, 28).act);
         }
         expect(actsAtEightContracts.has(2)).toBe(true);
         expect(actsAtEightContracts.has(3)).toBe(false);
         expect(actsAtTwentyContracts.has(3)).toBe(true);
+        expect(actsAtTwentyContracts.has(4)).toBe(false);
+        expect(actsAtTwentyEightContracts.has(4)).toBe(true);
+    });
+
+    it('act 4 (Brimstone Badlands) unlocks at year 7, not before', () => {
+        const actsAtYearSix = new Set<number>();
+        const actsAtYearSeven = new Set<number>();
+        for (let i = 0; i < 300; i++) {
+            actsAtYearSix.add(gen.generateContract(6).act);
+            actsAtYearSeven.add(gen.generateContract(7).act);
+        }
+        expect(actsAtYearSix.has(4)).toBe(false);
+        expect(actsAtYearSeven.has(4)).toBe(true);
     });
 
     it('produces well-formed contracts', () => {
@@ -170,6 +186,54 @@ describe('ContractGenerator', () => {
             // template's raw clause (with the token) must match modulo that.
             expect(c.paymentClause).toBe(template!.paymentClause.replace('{payout}', `£${c.payout}`));
         }
+    });
+
+    describe('Brimstone Badlands (act 4, src/docs/act4_brimstone_badlands_design.md)', () => {
+        it('bounty templates keep name/client/description/paymentClause co-occurring as defined', () => {
+            const templates = ContractGenerator.getAllTemplates().filter(t => t.client.includes('Iron Choir')
+                || t.name.includes('Vent-Field') || t.name.includes('Caldera') || t.name.includes('Concordat')
+                || t.name.includes('Runaway Extraction') || t.name.includes('Pilgrim'));
+            expect(templates.length).toBeGreaterThan(0);
+            const byName = new Map(templates.map(t => [t.name, t]));
+
+            let seen = 0;
+            for (let i = 0; i < 500; i++) {
+                const c = gen.generateContract(10);
+                if (c.isTradeRun || c.act !== 4) continue;
+                seen++;
+                const template = byName.get(c.name);
+                expect(template).toBeDefined();
+                expect(c.client).toBe(template!.client);
+                expect(c.description).toBe(template!.description);
+                expect(c.paymentClause).toBe(template!.paymentClause.replace('{payout}', `£${c.payout}`));
+            }
+            expect(seen).toBeGreaterThan(0);
+        });
+
+        it('trade run templates keep name/client/description/paymentClause co-occurring as defined', () => {
+            const templates = ContractGenerator.getAllTradeRunTemplates().filter(t => t.cargoLabel.includes('brimstone')
+                || t.cargoLabel.includes('oil casks') || t.cargoLabel.includes('phlogiston'));
+            expect(templates.length).toBe(3);
+            const byName = new Map(templates.map(t => [t.name, t]));
+
+            let seen = 0;
+            for (let i = 0; i < 1000; i++) {
+                const c = gen.generateContract(10);
+                if (!c.isTradeRun || c.act !== 4) continue;
+                seen++;
+                const template = byName.get(c.name);
+                expect(template).toBeDefined();
+                expect(c.client).toBe(template!.client);
+                expect(c.description).toBe(template!.description);
+                expect(c.paymentClause).toBe(template!.paymentClause.replace('{payout}', `£${c.payout}`));
+            }
+            expect(seen).toBeGreaterThan(0);
+        });
+
+        it('introduces "The Iron Choir, per its Concordat" as a new client string', () => {
+            const templates = ContractGenerator.getAllTemplates();
+            expect(templates.some(t => t.client === 'The Iron Choir, per its Concordat')).toBe(true);
+        });
     });
 
     describe('Prestige Commissions (src/docs/vp_endgame_design.md)', () => {

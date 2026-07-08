@@ -105,13 +105,21 @@ describe('CampaignSimulator', () => {
                     rng,
                 }));
                 const survived40 = results.filter(r => r.quartersSurvived >= 40).length;
-                // Wide tolerance (16-36 of 40, i.e. 40%-90%) around the
-                // 50-80% design target to absorb ContractGenerator's
-                // internal RNG noise across seed batches without flaking.
+                // Band history: originally 16-36/40 (40%-90%) around a
+                // 50-80% design target. Act 4 (July 2026) deliberately
+                // shifted the equilibrium: Brimstone Badlands unlocks at
+                // year 7 as late-charter income relief, so a 0.9-winrate
+                // company that reaches it now mostly survives (measured
+                // 37-39/40 post-act-4). LEAD RULING: accepted — late-game
+                // tension lives in the score pivot (Charter Buyback vs
+                // solvency), not raw survival; the doom clock still kills
+                // the 0.75-winrate company (see the losing-economy test).
+                // Band retuned around the measured post-act-4 equilibrium;
+                // the floor is the load-bearing edge now.
                 expect(survived40, `roster ${roster}: ${survived40}/40 survived to quarter 40`)
-                    .toBeGreaterThanOrEqual(16);
+                    .toBeGreaterThanOrEqual(26);
                 expect(survived40, `roster ${roster}: ${survived40}/40 survived to quarter 40`)
-                    .toBeLessThanOrEqual(36);
+                    .toBeLessThanOrEqual(40);
             }
         });
 

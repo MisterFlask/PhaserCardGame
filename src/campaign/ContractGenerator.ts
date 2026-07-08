@@ -169,6 +169,54 @@ const REGION_FLAVORS: RegionFlavor[] = [
             },
         ],
     },
+    {
+        regionName: "Brimstone Badlands",
+        act: 4,
+        templates: [
+            {
+                // Repossession: mineral rights are the disputed asset.
+                name: "Settle the Vent-Field Claim",
+                client: "The Brimstone Barons, jointly",
+                description: "Two survey crews have staked the same fissure, and the Barons would prefer the matter settled by whoever is still standing rather than by the Concordat's arbitrators, who charge by the hour and side with neither party on principle.",
+                paymentClause: "{payout} on undisputed possession, paid in cash, no minute taken.",
+            },
+            {
+                // Political subsidy: access under a religious embargo.
+                name: "Provision the Choir Compound Under Interdict",
+                client: "The Iron Choir, per its Concordat",
+                description: "The compound has declared itself closed to secular trade for the duration of a rite the Concordat will not name. It still needs feeding. The Choir does not haggle and does not explain; it simply expects the crates to arrive.",
+                paymentClause: "{payout} on delivery inside the wall, per the Concordat's own terms.",
+            },
+            {
+                // Insurance mitigation: a runaway asset is a liability until stopped.
+                name: "Shut Down the Runaway Extraction Engine",
+                client: "Continental Casualty & Ossuary Underwriters",
+                description: "A brimstone-boring engine has thrown its governor and is now extracting considerably more than its lease permits, in every direction at once. Every additional yard bored is a subsidence claim our client would rather not underwrite.",
+                paymentClause: "{payout} on shutdown, per indemnity schedule 14, runaway-plant rider.",
+            },
+            {
+                // Political subsidy: outcome (repatriation), not property.
+                name: "Repatriate the Pilgrim Laborers",
+                client: "The British Trade Delegation, Delta Office",
+                description: "A contingent of indentured pilgrims has wandered off its assigned vent field and into a jurisdiction the Delegation is not presently prepared to explain to London. Their return, quietly, is the entire ask.",
+                paymentClause: "{payout} on their return to the field, drawn against the Delegation's discretionary fund.",
+            },
+            {
+                // Revenue protection: the survey party's data is the paying asset.
+                name: "Escort the Caldera Survey",
+                client: "Brimstone Barons Equipment Leasing Consortium",
+                description: "A leased survey team is mapping caldera pressure for the Consortium's next lease auction, and an auction without pressure data fetches auction prices for nothing in particular. The team walks; the escort is not optional.",
+                paymentClause: "{payout} on the survey's safe return, per lease-recovery schedule 1.",
+            },
+            {
+                // Insurance mitigation: audit a religious levy before it's honored as a claim.
+                name: "Audit the Concordat Tithe",
+                client: "The Iron Choir, per its Concordat",
+                description: "The Choir's tithe rolls show more brimstone leaving the compound than the compound's own extraction can account for, and the Concordat would like that discrepancy resolved before it becomes a subject for hymn. Discreetly, if possible.",
+                paymentClause: "{payout} on a certified finding, per the Concordat's own terms.",
+            },
+        ],
+    },
 ];
 
 /** The Court of Directors: an internal client for Prestige Commissions only.
@@ -304,6 +352,33 @@ const TRADE_RUN_REGIONS: TradeRunRegion[] = [
             },
         ],
     },
+    {
+        regionName: "Brimstone Badlands",
+        act: 4,
+        templates: [
+            {
+                name: "Raw Brimstone off the Vent Field",
+                client: "The Brimstone Barons, jointly",
+                description: "Unrefined stock straight off the fissure, wanted at the Furnace Belt before the next lease auction resets the going rate out from under the Barons' feet.",
+                paymentClause: "{payout} on delivery, plus carriage per crate, paid in cash, no minute taken.",
+                cargoLabel: "brimstone crates",
+            },
+            {
+                name: "Blessed Bearing-Oil for the Choir",
+                client: "The Iron Choir, per its Concordat",
+                description: "A consecrated lubricant for the compound's machinery, blessed by whichever office within the Choir handles such things and unwilling to say which. The bells apparently seize without it.",
+                paymentClause: "{payout} on delivery inside the wall, per the Concordat's own terms.",
+                cargoLabel: "oil casks",
+            },
+            {
+                name: "Refined Phlogiston for the Barons",
+                client: "Brimstone Barons Equipment Leasing Consortium",
+                description: "Finished phlogiston stock, refined and volatile, that the Consortium would rather move by contractor wagon than by its own liveried convoys, which the Choir's toll-men have taken to inspecting rather too closely of late.",
+                paymentClause: "{payout} on delivery, plus carriage per flask, per lease-recovery schedule 1.",
+                cargoLabel: "phlogiston flasks",
+            },
+        ],
+    },
 ];
 
 /**
@@ -404,6 +479,7 @@ export class ContractGenerator {
      * Styx Delta for two full years.
      */
     private maxActUnlocked(year: number, contractsCompleted: number): number {
+        if (year >= 7 || contractsCompleted >= 28) return 4;
         if (year >= 6 || contractsCompleted >= 20) return 3;
         if (year >= 3 || contractsCompleted >= 8) return 2;
         return 1;

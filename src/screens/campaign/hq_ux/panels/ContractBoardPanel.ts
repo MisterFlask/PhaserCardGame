@@ -64,6 +64,7 @@ const REGION_ANCHORS: Record<string, RegionAnchor> = {
     'Styx Delta': { anchor: { x: 0.22, y: 0.60 }, label: { x: 0.24, y: 0.73 } },
     'Deep France': { anchor: { x: 0.46, y: 0.47 }, label: { x: 0.46, y: 0.61 } },
     'Dis Foundry Belt': { anchor: { x: 0.75, y: 0.25 }, label: { x: 0.75, y: 0.41 } },
+    'Brimstone Badlands': { anchor: { x: 0.93, y: 0.42 }, label: { x: 0.91, y: 0.55 } },
 };
 const DEFAULT_REGION_ANCHOR: RegionAnchor = { anchor: { x: 0.55, y: 0.72 } };
 

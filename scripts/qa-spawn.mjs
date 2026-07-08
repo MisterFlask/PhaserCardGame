@@ -1,9 +1,18 @@
 #!/usr/bin/env node
 // scripts/qa-spawn.mjs — ONE-OFF QA tool (not committed, not CI).
 // Boots the game headless (same harness as ci-smoke.mjs) and force-dispatches
-// sorties with contract.act/segment overridden to 2/3, so the ten new act-2/3
-// enemies actually spawn at runtime. Reports every enemy spawned, which new
-// ones were hit, and any action-queue errors.
+// sorties with contract.act/segment overridden, so new enemies actually spawn
+// at runtime. Reports every enemy spawned, which new ones were hit, and any
+// action-queue errors.
+//
+// Act 4 (Brimstone Badlands) configs added per
+// src/docs/act4_brimstone_badlands_design.md's verification bar: segments
+// 0/1/2 (act 4, seg 0/1/2) plus a boss config (act 4, seg 3 — getBossSegment's
+// Boss_Act4 lookup and getRandomCombatEncounter's generic act+segment match
+// both key off segment 3, so forcing contract.segment=3 spawns The Ninth Bell
+// through the same dispatch loop as any other segment, no separate boss path
+// needed). Repeated several times each since each segment's encounter table
+// is sampled randomly and only guarantees one class per run.
 
 import http from 'node:http';
 import fs from 'node:fs';
@@ -60,7 +69,8 @@ async function main() {
 
         const result = await page.evaluate(async () => {
             const L = (m, x) => console.log('[ETEST] ' + m + (x !== undefined ? ' :: ' + JSON.stringify(x) : ''));
-            const NEW_ENEMIES = ['Revenant Auditor','Maxwell-Coil','Duelist','Quartermaster','Line-Breaker','Foundry Tick','Overpressure Stoker','Company Bailiff','Union Runner','Ironclad Picket'];
+            const NEW_ENEMIES = ['Revenant Auditor','Maxwell-Coil','Duelist','Quartermaster','Line-Breaker','Foundry Tick','Overpressure Stoker','Company Bailiff','Union Runner','Ironclad Picket',
+                'Vent Tick','Slag Porter','Choir Novice','Bell-Warden','Brimstone Prospector','Interdicted Hauler','Choir Cantor','Foundry Seraph',"Baron's Assessor",'Caldera Shambler','The Ninth Bell'];
             const wait = (pred, ms, desc) => new Promise((res, rej) => {
                 const t0 = Date.now();
                 const t = setInterval(() => { try {
@@ -71,7 +81,15 @@ async function main() {
             const findIn = (list, pred) => { for (const o of list) { if (pred(o)) return o; if (Array.isArray(o.list)) { const f = findIn(o.list, pred); if (f) return f; } } return null; };
             const scene = () => window.game.scene.getScenes(true)[0];
             const gs = window.getGameState(); const cs = window.getCampaignState();
-            const seen = new Set(); const failures = []; const configs = [[3,1],[3,1],[3,1],[2,1],[2,1],[3,1],[3,1],[2,1]];
+            const seen = new Set(); const failures = []; const configs = [
+                [3,1],[3,1],[3,1],[2,1],[2,1],[3,1],[3,1],[2,1],
+                // Act 4 (Brimstone Badlands): segments 0/1/2 repeated to sample
+                // every random encounter-table entry, plus a boss config (seg 3).
+                [4,0],[4,0],[4,0],[4,0],[4,0],[4,0],[4,0],[4,0],[4,0],[4,0],
+                [4,1],[4,1],[4,1],[4,1],[4,1],[4,1],
+                [4,2],[4,2],[4,2],[4,2],[4,2],
+                [4,3],
+            ];
             for (let i = 0; i < configs.length; i++) {
                 const [act, seg] = configs[i];
                 try {
