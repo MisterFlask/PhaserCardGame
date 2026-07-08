@@ -256,7 +256,9 @@ export abstract class PlayableCard extends AbstractCard {
 
         // Apply resource scalings
         for (const scaling of this.resourceScalings) {
-            scaledDamage += (scaling.attackScaling ?? 0) + this.getRelevantResourceValue(scaling);
+            if (scaling.attackScaling !== undefined) {
+                scaledDamage += scaling.attackScaling * this.getRelevantResourceValue(scaling);
+            }
         }
 
         return scaledDamage;
@@ -270,7 +272,9 @@ export abstract class PlayableCard extends AbstractCard {
 
         // Apply resource scalings
         for (const scaling of this.resourceScalings) {
-            scaledBlock += (scaling.blockScaling ?? 0) + this.getRelevantResourceValue(scaling);
+            if (scaling.blockScaling !== undefined) {
+                scaledBlock += scaling.blockScaling * this.getRelevantResourceValue(scaling);
+            }
         }
 
         return scaledBlock;
@@ -284,7 +288,9 @@ export abstract class PlayableCard extends AbstractCard {
 
         // Apply resource scalings
         for (const scaling of this.resourceScalings) {
-            scaledMagicNumber += (scaling.magicNumberScaling ?? 0) + this.getRelevantResourceValue(scaling);
+            if (scaling.magicNumberScaling !== undefined) {
+                scaledMagicNumber += scaling.magicNumberScaling * this.getRelevantResourceValue(scaling);
+            }
         }
 
         return scaledMagicNumber;

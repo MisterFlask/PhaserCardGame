@@ -7,7 +7,7 @@ import { Damaged } from "../../gamecharacters/buffs/playable_card/SaleTags/Damag
 import { OnSale } from "../../gamecharacters/buffs/playable_card/SaleTags/OnSale";
 import { BloodPriceBuff } from "../../gamecharacters/buffs/standard/Bloodprice";
 import { IncreaseBlood } from "../../gamecharacters/buffs/standard/combatresource/IncreaseBlood";
-import { IncreaseIron as IncreaseMettle } from "../../gamecharacters/buffs/standard/combatresource/IncreaseMetal";
+import { IncreaseMettle } from "../../gamecharacters/buffs/standard/combatresource/IncreaseMettle";
 import { IncreasePluck } from "../../gamecharacters/buffs/standard/combatresource/IncreasePluck";
 import { IncreaseSmog } from "../../gamecharacters/buffs/standard/combatresource/IncreaseSmog";
 import { IncreaseVenture } from "../../gamecharacters/buffs/standard/combatresource/IncreaseVenture";

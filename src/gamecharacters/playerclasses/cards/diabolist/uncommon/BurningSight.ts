@@ -33,11 +33,11 @@ export class BurningSight extends PlayableCard {
             }
         }
 
-        // Gain 3 Pages
+        // Gain 3 Ashes
         this.actionManager.modifyAshes(this.getBaseMagicNumberAfterResourceScaling());
     }
 
     override get description(): string {
-        return `Exhaust the top 2 cards of your deck. Gain 2 Pages.}.`;
+        return `Exhaust the top 2 cards of your deck. Gain 2 Ashes.}.`;
     }
 }

@@ -95,4 +95,13 @@ describe('SaveRegistries completeness (source lint)', () => {
         expect(offenders, `Cards that can enter persistent decks but aren't in SaveRegistries: ${offenders.join(', ')}`)
             .toEqual([]);
     });
+
+    it('keeps legacy buff-name aliases for classes renamed after saves shipped', () => {
+        // Saves store buff.constructor.name; these classes were renamed
+        // (Pages→Ashes, Iron→Mettle) so the old names must stay resolvable.
+        for (const legacyName of ['IncreasePages', 'IncreaseIron']) {
+            expect(registrySource, `SaveRegistries.ts lost the legacy alias for "${legacyName}"`)
+                .toContain(`${legacyName}:`);
+        }
+    });
 });

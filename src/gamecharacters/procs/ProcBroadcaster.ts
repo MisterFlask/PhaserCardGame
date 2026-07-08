@@ -28,7 +28,13 @@ export class ProcBroadcaster {
                 buff.onEvent(event);
             });
         });
-    }   
+        // Relics live in relicsInventory, not on any character's buff list —
+        // they must be broadcast to explicitly (mirrors
+        // retrieveAllRelevantBuffsForProcs below).
+        GameState.getInstance().relicsInventory?.forEach(relic => {
+            relic.onEvent(event);
+        });
+    }
 
 
 

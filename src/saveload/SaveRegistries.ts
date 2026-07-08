@@ -38,8 +38,8 @@ import { Damaged } from "../gamecharacters/buffs/playable_card/SaleTags/Damaged"
 import { OnSale } from "../gamecharacters/buffs/playable_card/SaleTags/OnSale";
 import { BloodPriceBuff } from "../gamecharacters/buffs/standard/Bloodprice";
 import { IncreaseBlood } from "../gamecharacters/buffs/standard/combatresource/IncreaseBlood";
-import { IncreaseIron } from "../gamecharacters/buffs/standard/combatresource/IncreaseMetal";
-import { IncreasePages } from "../gamecharacters/buffs/standard/combatresource/IncreasePages";
+import { IncreaseMettle } from "../gamecharacters/buffs/standard/combatresource/IncreaseMettle";
+import { IncreaseAshes } from "../gamecharacters/buffs/standard/combatresource/IncreaseAshes";
 import { IncreasePluck } from "../gamecharacters/buffs/standard/combatresource/IncreasePluck";
 import { IncreaseSmog } from "../gamecharacters/buffs/standard/combatresource/IncreaseSmog";
 import { IncreaseVenture } from "../gamecharacters/buffs/standard/combatresource/IncreaseVenture";
@@ -79,7 +79,7 @@ const BUFF_CLASSES: BuffCtor[] = [
     SelfWindingMechanism, ReinforcedChassis, OverpressuredValves, SurplusRequisitions,
     PactWhisper, GraveyardShift, MarkedSoul, WardingSigil,
     // buffs that can land on cards (starting decks + reward modifiers)
-    IncreasePages, IncreaseIron, IncreaseVenture, IncreaseSmog,
+    IncreaseAshes, IncreaseMettle, IncreaseVenture, IncreaseSmog,
     IncreaseBlood, IncreasePluck, Lethality,
     Doubled, Lightweight, GrowingPowerBuff, Buster,
     SurfaceSellValue, HellSellValue, BloodPriceBuff,
@@ -88,6 +88,13 @@ const BUFF_CLASSES: BuffCtor[] = [
     Stress,
 ];
 
+// Saves store buff.constructor.name; renamed classes must keep resolving
+// under the name older saves recorded (Pages→Ashes, Iron→Mettle, July 2026).
+const LEGACY_BUFF_NAMES: Record<string, BuffCtor> = {
+    IncreasePages: IncreaseAshes,
+    IncreaseIron: IncreaseMettle,
+};
+
 export class SaveRegistries {
     private static buffByName?: Map<string, BuffCtor>;
     private static cardByName?: Map<string, () => PlayableCard>;
@@ -95,6 +102,9 @@ export class SaveRegistries {
     public static createBuff(className: string, stacks: number): AbstractBuff | null {
         if (!this.buffByName) {
             this.buffByName = new Map(BUFF_CLASSES.map(c => [c.name, c]));
+            for (const [legacyName, ctor] of Object.entries(LEGACY_BUFF_NAMES)) {
+                this.buffByName.set(legacyName, ctor);
+            }
         }
         const ctor = this.buffByName.get(className);
         if (!ctor) {

@@ -5,7 +5,6 @@ import { EntityRarity } from "../gamecharacters/EntityRarity";
 import { PlayableCard } from "../gamecharacters/PlayableCard";
 import { PlayerCharacter } from "../gamecharacters/PlayerCharacter";
 import { CardLibrary } from "../gamecharacters/playerclasses/cards/CardLibrary";
-import { GameState } from "./GameState";
 import { ModifierContext } from "./modifiers/AbstractCardModifier";
 import { CardModifierRegistry } from "./modifiers/CardModifierRegistry";
 
@@ -111,8 +110,6 @@ export class CardRewardsGenerator {
     }
 
     public generateCardRewardsForCombat(): PlayableCard[] {
-        const gameState = GameState.getInstance();
-        const pagesValue = gameState.combatState.combatResources.ashes.value;
         // Reward power scales with contract depth: act/segment map onto the
         // 1-50 "floor" scale the distribution curve was designed around.
         const contract = SortieManager.getInstance().activeContract;
@@ -120,15 +117,7 @@ export class CardRewardsGenerator {
             ? ((contract.act - 1) * 3 + contract.segment + 1) * 5
             : 1;
 
-        let pagesCardsAdded = 0;
-        if (pagesValue > 4) {
-            pagesCardsAdded = 1;
-        }
-        if (pagesValue > 10) {
-            pagesCardsAdded = 2;
-        }
-
-        const numCardsToGenerate = StandingOrdersState.getInstance().cardRewardChoices(3 + pagesCardsAdded);
+        const numCardsToGenerate = StandingOrdersState.getInstance().cardRewardChoices(3);
         const distribution = this.calculatePowerLevelDistribution(currentFloor);
 
         // Generate cards based on power levels
@@ -140,10 +129,9 @@ export class CardRewardsGenerator {
 
     /**
      * Level-up card choices (Amendment: Soldier Levels & Promotions). Runs
-     * at HQ, not during combat — deliberately does NOT read combatState (no
-     * ashes bonus here; that's a combat-only mechanic that no longer applies
-     * once post-combat rewards are gone). Cards are restricted to the
-     * promoted character's own class pool, not the whole squad's.
+     * at HQ, not during combat — deliberately does NOT read combatState.
+     * Cards are restricted to the promoted character's own class pool, not
+     * the whole squad's.
      *
      * Rarity weighting reuses calculatePowerLevelDistribution's 1-50 "floor"
      * curve. Balance-pass sketch mapping: newLevel (1-10) * 5, so a level-10

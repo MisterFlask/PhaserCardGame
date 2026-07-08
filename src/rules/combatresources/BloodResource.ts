@@ -23,6 +23,7 @@ export class BloodResource extends AbstractCombatResource {
             ActionManager.getInstance().DoAThing("Blood Resource Click", () => {
                 ActionManager.getInstance().gainEnergy(BloodResource.ENERGY_GAIN);
                 this.value -= BloodResource.BLOOD_COST;
+                this.broadcastResourceUsed();
             });
             return true;
         }

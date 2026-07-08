@@ -1,3 +1,4 @@
+import { ProcBroadcaster } from "../../gamecharacters/procs/ProcBroadcaster";
 import { AbstractCombatEvent } from "../AbstractCombatEvent";
 
 export abstract class AbstractCombatResource {
@@ -17,7 +18,14 @@ export abstract class AbstractCombatResource {
 
     // returns true if the resource was used, false if it was not used
     public abstract onClick(): boolean;
-} 
+
+    // Broadcasts that this resource was successfully spent. Call this at the
+    // moment a spend actually succeeds (after the value deduction), never on
+    // a cancelled/refunded spend.
+    protected broadcastResourceUsed(): void {
+        ProcBroadcaster.getInstance().broadcastCombatEvent(new CombatResourceUsedEvent(this));
+    }
+}
 
 export class CombatResourceUsedEvent extends AbstractCombatEvent {
     resource: AbstractCombatResource;
