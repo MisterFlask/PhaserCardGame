@@ -14,6 +14,7 @@ export class AssemblyLine extends PlayableCard {
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.COMMON,
+            portraitName: "assembly-line-card-art",
         });
         this.baseEnergyCost = 1;
         this.flavorText = "Every station does one thing. The last station hands you a Rivet.";

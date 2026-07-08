@@ -36,6 +36,7 @@ export class ProductionQuota extends PlayableCard {
             cardType: CardType.POWER,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.RARE,
+            portraitName: "production-quota-card-art",
         });
         this.baseEnergyCost = 2;
         this.flavorText = "The line does not stop for lunch, injury, or the sound of screaming.";

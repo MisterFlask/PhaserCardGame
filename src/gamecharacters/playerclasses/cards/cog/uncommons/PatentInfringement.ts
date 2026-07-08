@@ -16,6 +16,7 @@ export class PatentInfringement extends PlayableCard {
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.UNCOMMON,
+            portraitName: "patent-infringement-card-art",
         });
         this.baseEnergyCost = 1;
         this.flavorText = "The original inventor is owed royalties. The original inventor is not owed a reply.";

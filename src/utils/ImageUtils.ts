@@ -275,6 +275,14 @@ export default class ImageUtils {
                 'spider-face.png', 'templar-shield.png', 'terror.png', 'wasp-sting.png'
             ]
         },
+        cards_cog: {
+            prefix: 'Sprites/Cards/Cog/',
+            files: [
+                'assembly-line-card-art.png', 'depreciation-schedule-card-art.png',
+                'patent-infringement-card-art.png', 'production-quota-card-art.png',
+                'rivet-card-art.png', 'stamp-press-card-art.png', 'warranty-clause-card-art.png'
+            ]
+        },
         maps: {
             prefix: 'Backgrounds/Act/',
             files: ['styx_delta.png', "dis.png", "caves.png", "jungle.png", "city.png"]

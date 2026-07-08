@@ -13,6 +13,7 @@ export class StampPress extends PlayableCard {
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.COMMON,
+            portraitName: "stamp-press-card-art",
         });
         this.baseEnergyCost = 1;
         this.baseMagicNumber = 2; // Number of Rivets to manufacture

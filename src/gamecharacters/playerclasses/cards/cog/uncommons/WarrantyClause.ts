@@ -24,6 +24,7 @@ export class WarrantyClause extends PlayableCard {
             cardType: CardType.SKILL,
             targetingType: TargetingType.ALLY,
             rarity: EntityRarity.UNCOMMON,
+            portraitName: "warranty-clause-card-art",
         });
         this.baseEnergyCost = 2;
         this.baseBlock = 8;

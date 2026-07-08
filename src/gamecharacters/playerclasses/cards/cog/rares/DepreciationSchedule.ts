@@ -39,6 +39,7 @@ export class DepreciationSchedule extends PlayableCard {
             cardType: CardType.POWER,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.RARE,
+            portraitName: "depreciation-schedule-card-art",
         });
         this.baseEnergyCost = 1;
         this.flavorText = "On the books, the asset loses value every quarter. In the field, it just gets meaner.";

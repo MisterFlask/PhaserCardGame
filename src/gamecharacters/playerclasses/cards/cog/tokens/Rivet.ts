@@ -16,6 +16,7 @@ export class Rivet extends PlayableCard {
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
             rarity: EntityRarity.TOKEN,
+            portraitName: "rivet-card-art",
         });
         this.baseEnergyCost = 0;
         this.baseDamage = 3;
