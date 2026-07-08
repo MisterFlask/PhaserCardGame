@@ -74,13 +74,17 @@ jobs:
           fi
       - name: Assemble site (full, with resources)
         # Full path: resources/ changed (or diff was inconclusive). Ships
-        # resources/ alongside the build.
+        # only the resources/ files the game actually loads (ImageUtils.ts
+        # manifest + the explicit sounds/fonts extras in
+        # scripts/assemble-site.mjs), lossily recompressed, instead of the
+        # whole ~170MB+ resources/ tree. See scripts/assemble-site.mjs for
+        # what's included and why. The `test` job's smoke step (npm run
+        # smoke) serves the full repo root, not this pruned site/ output;
+        # completeness of the manifest + extras list was verified manually
+        # by serving site/ and running the smoke driver against it (see
+        # commit description / PR notes) rather than by a standing CI step.
         if: steps.detect.outputs.resources_changed == 'true'
-        run: |
-          mkdir -p site/dist
-          cp index.html site/
-          cp dist/bundle.js site/dist/
-          cp -r resources site/resources
+        run: node scripts/assemble-site.mjs --compress
       - name: Assemble site (light, code only)
         # Light path: resources/ unchanged. Ship only the app shell + bundle;
         # the previously-published resources/ on gh-pages is left in place.

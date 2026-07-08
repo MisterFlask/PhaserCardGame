@@ -12,6 +12,7 @@
     "happy-dom": "^20.10.6",
     "nodemon": "^3.1.4",
     "puppeteer": "^25.3.0",
+    "sharp": "^0.35.3",
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4",
@@ -28,7 +29,8 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "generate:relic-icons": "ts-node src/content_pipeline/relic_icon_generation.ts",
-    "smoke": "node scripts/ci-smoke.mjs"
+    "smoke": "node scripts/ci-smoke.mjs",
+    "assemble:site": "node scripts/assemble-site.mjs"
   },
   "name": "phaser-game",
   "version": "1.0.0",
