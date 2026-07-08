@@ -85,6 +85,11 @@ Sonnet agents. Division of labor:
 
 - **Lead plans, reviews, commits.** Task decomposition, specs, final review,
   integration verification, and all git commits stay with the lead.
+- **Merge to master once verification is green — no user approval needed.**
+  Session work branches exist so parallel agents don't trip over each other,
+  not as a review gate; after the definition-of-done checks pass and the lead
+  has reviewed, merge to master directly. (External-agent lanes still go
+  through PRs + green CI, below.)
 - **Sonnet agents implement.** Dispatch briefs must carry: file pointers, the
   relevant house rules, explicit decision points, acceptance criteria, and the
   exact verification commands. Agents run typecheck + tests + the relevant
