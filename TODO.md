@@ -134,16 +134,15 @@ protocol. Ordered within sections by priority. Delete items when done.
   action queue may still be resolving, and `CombatUIManager.initialize()`'s
   obliterate-then-replace has no protection if teardown throws. This path is
   LIVE now (narrative events swap combats in). Wants a queue-drained gate.
-- **Headless combat simulator** — full extraction plan exists (architecture
-  review, July 2026): four seams — HeadlessActionManager (override animation/
-  emit methods), IPlayPolicy interface (replaces the two UI-blocking card
-  selection actions), stub CombatUiManager + CombatCardManager. ~35-40 files,
-  mostly mechanical. PREREQS DONE (July 2026): rules/animation split in
-  ActionManager (incidentally fixed a latent bug — dealDamage skipped all
-  rules effects for targets without a physicalCard) and scene-optional
-  intent texture checks. Ready for the main extraction whenever a session
-  wants a big mechanical push; payoff is combat balance ratchets in the
-  economy sim (real fights instead of win-rate scalars).
+- **Headless combat: SHIPPED (July 2026)** — `window.runHeadlessCombat` +
+  IPlayPolicy + `scripts/qa-headless-combat.mjs` run scene-free combats at
+  ~85ms each (50-combat harness green). Follow-ons, in payoff order:
+  (1) **wire real combat win-rates into the economy sim** — replace the
+  campaign sim's win-rate scalar with measured headless outcomes per
+  squad-comp/act (the whole point of the extraction); (2) smarter policies
+  than randomLegal (greedy-damage, block-aware) so measured rates mean
+  something; (3) determinism pass if reproducibility ever matters (rules
+  code calls raw Math.random — same limit as the campaign sim).
 
 ## Cost optimization (verification & delegation)
 
