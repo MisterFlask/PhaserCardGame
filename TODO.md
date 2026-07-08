@@ -36,10 +36,15 @@ protocol. Ordered within sections by priority. Delete items when done.
   the Stress-threshold "-2 Strength" and three older usages (BloomOfSorrow,
   HellDiseases) mostly no-op. Playtest-era design call: either a real
   stat-down buff or reprice those effects.
-- **Human playtest of the economy tuning** — payouts/dividends were calibrated
-  against a lossless simulation (see commit history: +1wk sortie overhead,
-  £120 dividend base). The sim validates the shape, not the fun. Someone has
-  to actually play a few years and report.
+- **Human playtest — THE gate for everything below it (instrumented, July
+  2026)** — the game now records every decision to a playtest journal
+  (console: `playtestJournal.download()` / `.summary()`). One played
+  campaign produces the dataset that unblocks: economy feel, standing-order
+  balance, trade-run rates/spice, hardening numbers, Cog power, client
+  specialization, roster equilibrium, negative-Lethality repricing,
+  reward-screen revival, hero-slot judgment, and the Regions 5+ go/no-go.
+  When the owner plays: ask for the journal file, then run a balance cycle
+  against it.
 - **Standing Orders balance pass** — the launch numbers (payout +20%,
   wound +1w, recruit ×0.6, escalation ×0.75 …) are design-doc sketches,
   untested against the economy sim or human play. Revisit after a few
