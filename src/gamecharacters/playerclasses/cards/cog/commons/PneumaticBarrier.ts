@@ -14,6 +14,7 @@ export class PneumaticBarrier extends PlayableCard {
             cardType: CardType.SKILL,
             targetingType: TargetingType.ALLY,
             rarity: EntityRarity.COMMON,
+            portraitName: "shield-drone",
         });
         this.baseEnergyCost = 1;
         this.baseBlock = 7;

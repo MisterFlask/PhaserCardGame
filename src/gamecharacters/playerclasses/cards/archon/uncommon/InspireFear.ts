@@ -8,6 +8,7 @@ export class InspireFear extends PlayableCard {
     constructor() {
         super({
             name: "Inspire Fear",
+            portraitName: "shouting",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.UNCOMMON,

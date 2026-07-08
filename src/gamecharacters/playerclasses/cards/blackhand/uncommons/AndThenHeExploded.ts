@@ -11,6 +11,7 @@ export class AndThenHeExploded extends PlayableCardWithHelpers {
     constructor() {
         super({
             name: "And Then He Exploded",
+            portraitName: "grenade-a",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
             rarity: EntityRarity.UNCOMMON,

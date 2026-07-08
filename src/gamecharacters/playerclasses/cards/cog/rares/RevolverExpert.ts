@@ -43,6 +43,7 @@ export class RevolverExpert extends PlayableCard {
             cardType: CardType.POWER,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.RARE,
+            portraitName: "autogun",
         });
         this.baseEnergyCost = 2;
         this.flavorText = "Knows every revolver on the manifest by serial number and temperament.";

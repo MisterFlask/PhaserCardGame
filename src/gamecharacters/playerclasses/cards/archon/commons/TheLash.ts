@@ -9,6 +9,7 @@ export class TheLash extends PlayableCard {
     constructor() {
         super({
             name: "The Lash",
+            portraitName: "worms",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
             rarity: EntityRarity.COMMON,

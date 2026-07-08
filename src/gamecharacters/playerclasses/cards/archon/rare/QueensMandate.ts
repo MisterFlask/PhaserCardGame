@@ -8,6 +8,7 @@ export class QueensMandate extends PlayableCard {
     constructor() {
         super({
             name: "Queen's Mandate",
+            portraitName: "coronation",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.RARE,

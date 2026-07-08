@@ -17,6 +17,7 @@ export class EldritchMutter extends PlayableCard {
         this.baseBlock = 2;
         this.baseEnergyCost = 0;
         this.buffs.push(new ExhaustBuff());
+        this.portraitName = "shadow-follower";
     }
 
     override get description(): string {

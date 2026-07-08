@@ -40,6 +40,7 @@ export class ObsidianCandles extends PlayableCard {
     constructor() {
         super({
             name: "Obsidian Candles",
+            portraitName: "lit-candelabra",
             cardType: CardType.POWER,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.COMMON,

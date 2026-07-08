@@ -30,6 +30,7 @@ export class TradeGoodsCargo extends PlayableCard {
             rarity: EntityRarity.COMMON,
         });
         this.baseEnergyCost = 0;
+        this.portraitName = "wooden-crate";
         this.flavorText = CARGO_FLAVOR_TEXT_BY_NAME[displayName] ?? "";
     }
 

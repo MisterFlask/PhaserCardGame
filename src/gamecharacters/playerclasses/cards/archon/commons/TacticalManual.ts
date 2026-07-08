@@ -9,6 +9,7 @@ export class TacticalManual extends PlayableCard {
     constructor() {
         super({
             name: "Tactical Manual",
+            portraitName: "checklist",
             cardType: CardType.SKILL,
             targetingType: TargetingType.ALLY,
             rarity: EntityRarity.COMMON,

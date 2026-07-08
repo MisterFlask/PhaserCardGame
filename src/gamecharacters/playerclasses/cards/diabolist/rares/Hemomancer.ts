@@ -8,6 +8,7 @@ export class Hemomancer extends PlayableCard {
     constructor() {
         super({
             name: "Hemomancer",
+            portraitName: "gem-pendant",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.RARE,

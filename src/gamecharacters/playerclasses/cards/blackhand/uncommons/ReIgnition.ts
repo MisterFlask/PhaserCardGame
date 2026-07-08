@@ -8,7 +8,7 @@ export class ReIgnition extends PlayableCard {
         super({
             name: "Re-ignition",
             description: `_`,
-            portraitName: "fire-silhouette",
+            portraitName: "flaming-trident",
             targetingType: TargetingType.ALLY,
         });
         this.baseBlock = 5;

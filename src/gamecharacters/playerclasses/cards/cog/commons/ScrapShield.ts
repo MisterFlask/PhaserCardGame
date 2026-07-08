@@ -13,6 +13,7 @@ export class ScrapShield extends PlayableCard {
             cardType: CardType.SKILL,
             targetingType: TargetingType.ALLY,
             rarity: EntityRarity.COMMON,
+            portraitName: "metal-plate",
         });
         this.baseBlock = 12;
         this.baseEnergyCost = 1;

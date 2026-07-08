@@ -10,6 +10,7 @@ export class RitualKnife extends PlayableCard {
     constructor() {
         super({
             name: "Ritual Knife",
+            portraitName: "reaper-scythe",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
             rarity: EntityRarity.COMMON,

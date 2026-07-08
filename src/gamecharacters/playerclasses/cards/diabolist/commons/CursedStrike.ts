@@ -12,6 +12,7 @@ export class CursedStrike extends PlayableCard {
     constructor() {
         super({
             name: "Cursed Strike",
+            portraitName: "skull-bolt",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
             rarity: EntityRarity.COMMON,

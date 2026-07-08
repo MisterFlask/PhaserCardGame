@@ -9,6 +9,7 @@ export class Pyronox extends PlayableCard {
     constructor() {
         super({
             name: "Pyronox",
+            portraitName: "fire-zone",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.RARE,

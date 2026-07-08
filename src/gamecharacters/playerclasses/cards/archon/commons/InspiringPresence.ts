@@ -8,6 +8,7 @@ export class InspiringPresence extends PlayableCard {
     constructor() {
         super({
             name: "Inspiring Presence",
+            portraitName: "spectacle-lenses",
             cardType: CardType.POWER,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.COMMON,

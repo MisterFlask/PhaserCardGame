@@ -11,6 +11,7 @@ export class LastBastion extends PlayableCard {
     constructor() {
         super({
             name: "Last Bastion",
+            portraitName: "mountaintop",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.RARE,

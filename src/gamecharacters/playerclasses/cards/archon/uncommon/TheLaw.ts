@@ -10,6 +10,7 @@ export class TheLaw extends PlayableCard {
     constructor() {
         super({
             name: "The Law",
+            portraitName: "uprising",
             cardType: CardType.POWER,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.UNCOMMON,

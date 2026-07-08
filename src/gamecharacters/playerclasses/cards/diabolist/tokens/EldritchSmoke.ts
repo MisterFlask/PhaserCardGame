@@ -8,6 +8,7 @@ export class EldritchSmoke extends PlayableCard {
     constructor() {
         super({
             name: "Eldritch Smoke",
+            portraitName: "jason-mask",
             cardType: CardType.SKILL,
             targetingType: TargetingType.ALLY,
             rarity: EntityRarity.SPECIAL,

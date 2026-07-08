@@ -10,6 +10,7 @@ export class CorrosiveAccelerant extends PlayableCardWithHelpers {
     constructor() {
         super({
             name: "Corrosive Accelerant",
+            portraitName: "chemical-tank",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.COMMON,

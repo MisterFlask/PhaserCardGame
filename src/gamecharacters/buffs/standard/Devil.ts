@@ -47,6 +47,7 @@ class SmolderingCard extends PlayableCard {
         this.buffs.push(new Unstable());
         this.buffs.push(new ExhaustBuff());
         this.buffs.push(new Hazardous(damageAmount));
+        this.portraitName = "smoldering-card-art";
     }
 
     override get description(): string {

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<defs>
+  <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#ffe58a"/>
+    <stop offset="100%" stop-color="#8a5a00"/>
+  </linearGradient>
+</defs>
+<rect width="512" height="512" fill="#000"/>
+<g fill="url(#g)">
+  <circle cx="250" cy="175" r="56"/>
+  <circle cx="332" cy="205" r="40"/>
+</g>
+<g fill="none" stroke="#000" stroke-width="8">
+  <circle cx="250" cy="175" r="56"/>
+</g>
+<g fill="url(#g)">
+  <path d="M 178 460 L 340 460 L 328 400 L 190 400 Z"/>
+  <!-- thumb, curling in from the side -->
+  <path d="M 178 420 Q 120 400 108 350 Q 106 328 126 326 Q 145 330 150 355 Q 165 390 195 405 Z"/>
+  <!-- four clawed fingers curling inward toward the coins -->
+  <path d="M 205 400 Q 168 350 178 285 Q 186 258 208 262 Q 226 275 222 302 Q 222 355 232 400 Z"/>
+  <path d="M 245 400 Q 216 335 228 255 Q 236 226 258 230 Q 276 244 270 274 Q 268 340 268 400 Z"/>
+  <path d="M 288 400 Q 268 340 280 265 Q 288 238 308 244 Q 322 258 314 285 Q 306 345 306 400 Z"/>
+  <path d="M 328 400 Q 314 355 322 305 Q 328 282 346 288 Q 358 300 350 322 Q 340 362 340 400 Z"/>
+</g>
+</svg>

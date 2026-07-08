@@ -44,6 +44,7 @@ export class PowerCore extends PlayableCard {
             cardType: CardType.POWER,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.UNCOMMON,
+            portraitName: "power-button",
         });
         this.baseEnergyCost = 1;
         this.flavorText = "Hums at a frequency the engineers describe, off the record, as 'wrong.'";

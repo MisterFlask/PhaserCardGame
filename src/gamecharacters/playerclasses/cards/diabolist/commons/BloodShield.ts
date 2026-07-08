@@ -12,7 +12,7 @@ export class BloodShield extends PlayableCard {
     constructor() {
         super({
             name: "Blood Shield",
-            portraitName: "blood-shield",
+            portraitName: "attached-shield",
             targetingType: TargetingType.ALLY,
         });
         this.baseBlock = 13;

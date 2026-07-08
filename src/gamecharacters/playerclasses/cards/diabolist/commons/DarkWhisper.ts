@@ -12,6 +12,7 @@ export class DarkWhisper extends PlayableCard {
     constructor() {
         super({
             name: "Dark Whisper",
+            portraitName: "spider-face",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.COMMON,

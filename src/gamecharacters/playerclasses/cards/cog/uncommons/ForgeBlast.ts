@@ -14,6 +14,7 @@ export class ForgeBlast extends PlayableCard {
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
             rarity: EntityRarity.UNCOMMON,
+            portraitName: "stick-grenade",
         });
         this.baseDamage = 10;
         this.flavorText = "The forge does not stop giving simply because the shot has left the barrel.";

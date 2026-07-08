@@ -15,6 +15,7 @@ class SlaughterbotCard extends PlayableCard {
         });
         this.baseEnergyCost = 1;
         this.baseDamage = 12;
+        this.portraitName = "slaughterbot-card-art";
     }
 
     override get description(): string {

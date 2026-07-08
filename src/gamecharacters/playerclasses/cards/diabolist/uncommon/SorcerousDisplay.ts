@@ -9,6 +9,7 @@ export class SorcerousDisplay extends PlayableCard {
     constructor() {
         super({
             name: "Sorcerous Display",
+            portraitName: "pentagram-rose",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.UNCOMMON,

@@ -20,6 +20,7 @@ export class SacredRelicsCargo extends PlayableCard {
         this.surfacePurchaseValue = 20;
         this.baseDamage = 15;
         this.buffs.push(new HellSellValue(50));
+        this.portraitName = "sacred-relics-cargo";
         this.flavorText = "Provenance uncertain. Efficacy against devils, less so.";
     }
 

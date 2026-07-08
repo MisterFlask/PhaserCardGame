@@ -10,7 +10,7 @@ export class HazmatSpecialist extends PlayableCard {
 		super({
 			name: "Hazmat Specialist",
 			description: `_`,
-			portraitName: "hazmat-suit",
+			portraitName: "defensive-wall",
 			targetingType: TargetingType.NO_TARGETING,
 		});
 		this.baseBlock = 6;

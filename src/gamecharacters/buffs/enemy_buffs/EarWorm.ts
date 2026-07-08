@@ -55,6 +55,7 @@ export class EarWormCard extends PlayableCard {
         this.baseMagicNumber = 1;
         this.baseEnergyCost = 1;
         this.buffs.push(new EarWorm(this.baseMagicNumber));
+        this.portraitName = "ear-worm-card-art";
     }
 
 

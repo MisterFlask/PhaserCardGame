@@ -42,6 +42,7 @@ export class Heliolust extends PlayableCard {
         this.buffs.push(new Ethereal());
         this.buffs.push(new ExhaustBuff());
         this.buffs.push(new StressOnRetainBuff());
+        this.portraitName = "heliolust-curse";
     }
 
     override get description(): string {

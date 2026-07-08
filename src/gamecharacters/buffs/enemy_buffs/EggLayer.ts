@@ -76,6 +76,7 @@ export class Moth extends PlayableCard {
         this.buffs.push(new ExhaustBuff());
         this.buffs.push(new Hazardous(4));
         this.buffs.push(new SelfAssigning());
+        this.portraitName = "moth-card-art";
     }
 
     override get description(): string {

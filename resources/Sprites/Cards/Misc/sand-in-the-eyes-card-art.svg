@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f5e3ae"/>
+      <stop offset="100%" stop-color="#6b4b16"/>
+    </linearGradient>
+    <g id="grit">
+      <polygon points="0,0 52,-16 34,22"/>
+    </g>
+  </defs>
+  <rect width="512" height="512" fill="#000"/>
+  <!-- handful of grit flying in from lower-left -->
+  <g fill="url(#g)">
+    <use href="#grit" transform="translate(58 410) rotate(-40) scale(1.7)"/>
+    <use href="#grit" transform="translate(126 452) rotate(-28) scale(1.25)"/>
+    <use href="#grit" transform="translate(30 316) rotate(-54) scale(1.35)"/>
+    <use href="#grit" transform="translate(150 372) rotate(-36) scale(1.15)"/>
+  </g>
+  <!-- wide, struck eye -->
+  <g fill="url(#g)">
+    <path d="M140 270 C 205 196 307 196 372 270 C 307 322 205 322 140 270 Z"/>
+  </g>
+  <g fill="#000">
+    <path d="M256 254 L 278 278 L 256 290 L 234 278 Z"/>
+  </g>
+</svg>

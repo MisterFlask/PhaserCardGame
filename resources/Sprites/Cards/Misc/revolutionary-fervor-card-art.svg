@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff9a6a"/>
+      <stop offset="100%" stop-color="#7a0000"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="#000"/>
+  <g fill="url(#g)">
+    <!-- forearm -->
+    <rect x="206" y="256" width="100" height="184" rx="20"/>
+    <!-- fist -->
+    <rect x="168" y="102" width="176" height="164" rx="42"/>
+    <!-- thumb, fused to the fist -->
+    <path d="M172 176 C 128 172 104 202 110 236 C 116 266 148 280 176 266 C 154 248 150 210 172 184 Z"/>
+  </g>
+  <!-- knuckle creases -->
+  <g stroke="#000" stroke-width="12" stroke-linecap="round">
+    <line x1="212" y1="106" x2="212" y2="150"/>
+    <line x1="256" y1="102" x2="256" y2="150"/>
+    <line x1="300" y1="106" x2="300" y2="150"/>
+  </g>
+  <!-- revolutionary energy, flanking motion lines -->
+  <g stroke="url(#g)" stroke-width="18" stroke-linecap="round">
+    <line x1="140" y1="150" x2="90" y2="118"/>
+    <line x1="128" y1="200" x2="70" y2="188"/>
+    <line x1="372" y1="150" x2="422" y2="118"/>
+    <line x1="384" y1="200" x2="442" y2="188"/>
+  </g>
+</svg>

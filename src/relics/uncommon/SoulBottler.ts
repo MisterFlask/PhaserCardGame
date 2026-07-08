@@ -48,6 +48,7 @@ export class SoulVacuum extends PlayableCard {
         this.buffs.push(new ExhaustBuff());
         this.buffs.push(new Lightweight(4));
         this.buffs.push(new SoulVacuumValueBuff());
+        this.portraitName = "soul-vacuum-card-art";
     }
 
     override get description(): string {

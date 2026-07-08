@@ -9,6 +9,7 @@ export class Glower extends PlayableCard {
     constructor() {
         super({
             name: "Glower",
+            portraitName: "eyepatch",
             cardType: CardType.SKILL,
             targetingType: TargetingType.ENEMY,
             rarity: EntityRarity.UNCOMMON,

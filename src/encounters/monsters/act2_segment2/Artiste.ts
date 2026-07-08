@@ -21,6 +21,7 @@ class ModernArtAttack extends PlayableCard {
         });
         this.baseDamage = 5;
         this.buffs.push(new Painful(1));
+        this.portraitName = "modern-art-attack-card-art";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {
@@ -41,6 +42,7 @@ class ModernArtDefend extends PlayableCard {
             rarity: EntityRarity.COMMON,
         });
         this.baseBlock = 4;
+        this.portraitName = "modern-art-defend-card-art";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

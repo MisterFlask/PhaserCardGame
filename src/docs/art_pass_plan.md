@@ -70,7 +70,22 @@ infernal accents, "no characters, no text, no watermark").
   new `Backgrounds/Events/` manifest category.
 - Verify with `node scripts/qa-events.mjs` (renders every pooled event).
 
-## Work package 3 — cards (118 images)
+## Work package 3 — cards — DONE (July 2026, no generation needed)
+
+Completed without the OpenAI pipeline: it turned out large curated
+game-icons pools already existed on disk (Archon 35, Cog 71, Diabolist 32,
+Blackhand 37, Rookie/Sifter/Hammer/Madness) — most unwired. All 118
+placeholder cards now have art: ~80 assigned from those pools (wired into
+the manifest under cards_archon/cards_cog/etc.), 37 authored as SVG
+glyphs matching the gradient-on-black icon convention (SVG sources
+committed beside the PNGs; rasterized via scripts/rasterize-card-svg.mjs,
+which uses the local headless Chromium), and a handful of key
+renames/reuses. 17 allowlist rows removed; the "shield" literal hold was
+resolved by renaming Defend's icon to rookie-defend. Verified: typecheck,
+202/202 vitest, build, smoke. The original spec below is retained for
+reference.
+
+## ~~Work package 3 — cards (118 images)~~ (superseded, see above)
 
 **Convention (owner note): card art must stay simple and easily readable —
 flat white game-icons.net-style glyphs, same as the existing 17 bespoke

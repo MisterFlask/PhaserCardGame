@@ -9,6 +9,7 @@ export class TakeCover extends PlayableCard {
     constructor() {
         super({
             name: "Take Cover",
+            portraitName: "tripwire",
             cardType: CardType.SKILL,
             targetingType: TargetingType.ALLY,
             rarity: EntityRarity.COMMON,

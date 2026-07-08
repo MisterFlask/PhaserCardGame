@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e6ddc0"/>
+      <stop offset="100%" stop-color="#3e3a2c"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="#000"/>
+  <g fill="url(#g)">
+    <!-- left wings -->
+    <path d="M246 190
+             C 160 100 70 96 44 150
+             C 20 200 60 260 130 262
+             C 90 280 70 320 96 356
+             C 118 386 164 384 200 350
+             C 220 330 236 300 246 260
+             Z"/>
+    <!-- right wings (mirrored) -->
+    <path d="M266 190
+             C 352 100 442 96 468 150
+             C 492 200 452 260 382 262
+             C 422 280 442 320 416 356
+             C 394 386 348 384 312 350
+             C 292 330 276 300 266 260
+             Z"/>
+    <!-- body -->
+    <path d="M256 150
+             C 274 150 286 168 286 200
+             L 286 330
+             C 286 372 272 404 256 420
+             C 240 404 226 372 226 330
+             L 226 200
+             C 226 168 238 150 256 150 Z"/>
+  </g>
+  <g fill="none" stroke="url(#g)" stroke-width="12" stroke-linecap="round">
+    <path d="M248 156 C 224 120 200 104 180 100"/>
+    <path d="M264 156 C 288 120 312 104 332 100"/>
+  </g>
+  <g fill="url(#g)">
+    <circle cx="180" cy="100" r="14"/>
+    <circle cx="332" cy="100" r="14"/>
+  </g>
+</svg>

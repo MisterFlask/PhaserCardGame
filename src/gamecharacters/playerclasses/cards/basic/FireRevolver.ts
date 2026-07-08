@@ -9,7 +9,7 @@ export class FireRevolver extends PlayableCard {
         super({
             name: "Fire Revolver",
             description: `_`,
-            portraitName: "gun",
+            portraitName: "rookie-fire-revolver",
             targetingType: TargetingType.ENEMY,
         });
         this.baseDamage = 6;

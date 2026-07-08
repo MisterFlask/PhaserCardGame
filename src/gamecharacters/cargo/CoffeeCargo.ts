@@ -15,6 +15,7 @@ export class CoffeeCargo extends PlayableCard {
         this.buffs.push(new HellSellValue(60));
         this.surfacePurchaseValue = 50;
         this.hellPurchaseValue = 0;
+        this.portraitName = "coffee-cargo";
         this.flavorText = "Keeps the damned awake. The Company finds this useful.";
     }
 

@@ -15,6 +15,7 @@ export class BalefireRevolver extends PlayableCard {
         this.baseDamage = 20;
         this.baseMagicNumber = 2; // Health cost
         this.baseEnergyCost = 1;
+        this.portraitName = "volcano";
     }
 
     override get description(): string {

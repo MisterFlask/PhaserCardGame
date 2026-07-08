@@ -10,6 +10,7 @@ export class DeathOrGlory extends PlayableCard {
     constructor() {
         super({
             name: "Death or Glory",
+            portraitName: "headshot",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
             rarity: EntityRarity.RARE,

@@ -12,6 +12,7 @@ export class ReplicateArmaments extends PlayableCard {
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.COMMON,
+            portraitName: "mirror-mirror",
         });
         this.baseEnergyCost = 1;
         this.baseMagicNumber = 2; // Amount of Lethality to grant

@@ -78,10 +78,13 @@ smoke-gated CI and deploys the compressed site to gh-pages).
   ContractGenerator — the same pattern applies here if reproducibility
   ever matters. The other two follow-ons — measured win-rates into the
   sim, smarter policies — shipped July 2026.)
-- **Missing-art allowlist: 94 rows** — remaining rows are unreleased-
-  content cards/portrait variants (art them when the content ships). Two
-  deliberate holds: rename one side of the shared `"shield"` literal
-  before arting either; delete rather than art any dead refs.
+- **Missing-art allowlist: 77 rows** — the July 2026 card art pass gave
+  every released card real art (assigned on-disk icons + authored SVG
+  glyphs; see src/docs/art_pass_plan.md), removing 17 rows. The
+  `"shield"` hold is resolved (Defend now uses `rookie-defend`, so the
+  one remaining `shield` ref may be arted freely). Remaining rows are
+  unreleased-content refs, buff icons, and secondary in-file refs;
+  delete rather than art any dead refs.
 - **Manifest pruning** — ~50MB of the 77MB deploy is manifest-wired but
   unreleased content; prune the MANIFEST (not the deploy script) if size
   starts mattering.

@@ -12,7 +12,7 @@ export class Defend extends PlayableCardWithHelpers {
         super({
             name: "Defend",
             description: `_`,
-            portraitName: "shield",
+            portraitName: "rookie-defend",
             targetingType: TargetingType.ALLY,
         });
         this.baseBlock = 5;

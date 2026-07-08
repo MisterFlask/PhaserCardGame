@@ -16,6 +16,7 @@ export class Hipfire extends PlayableCard {
         this.baseDamage = 3;
         this.baseEnergyCost = 0;
         this.buffs.push(new ExhaustBuff());
+        this.portraitName = "musket";
     }
 
     override get description(): string {

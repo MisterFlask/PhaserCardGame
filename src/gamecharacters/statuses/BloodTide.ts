@@ -12,6 +12,7 @@ export class BloodTide extends PlayableCard {
             rarity: EntityRarity.SPECIAL,
         });
         this.baseEnergyCost = 1;
+        this.portraitName = "blood-tide";
     }
 
     override get description(): string {
