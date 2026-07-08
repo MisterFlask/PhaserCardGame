@@ -50,12 +50,12 @@ protocol. Ordered within sections by priority. Delete items when done.
   HP/year, +1 Lethality/3yr) are balance sketches untested against human
   play; the sim models difficulty only as win rate, so this is playtest
   material.
-- **VP endgame: v1 shipped (July 2026, save v11)** — Prestige Commissions
-  (year 3+) and Charter Buyback (year 8+, 1.3:1) per
-  `src/docs/vp_endgame_design.md`; sim-ratcheted (convert-late wins score
-  52.5% of pairs with better survival). Residual: the Levi-Maxwell
-  three-stage capstone stays spec'd-deferred until strategic projects
-  support staged purchases; balance numbers are sketches pending play.
+- **VP endgame: COMPLETE (July 2026)** — Prestige Commissions, Charter
+  Buyback, and the Levi-Maxwell three-stage capstone (save v13, staged
+  Capital Works infrastructure now general) per
+  `src/docs/vp_endgame_design.md`. All numbers are balance sketches
+  pending play; the staged-projects capability is reusable for future
+  multi-stage ventures.
 - **Faction reputation v2** — v1 shipped July 2026 per
   `src/docs/faction_reputation_design.md` (tiers from completion counts, six
   retainer orders, Chartered Partner +10%). Explicitly deferred there:
