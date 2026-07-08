@@ -575,7 +575,10 @@ export class DoSomethingIntent extends AbstractIntent {
     action: () => void;
     constructor({ owner, action, imageName, title }: { owner: BaseCharacter, action: () => void, imageName?: string, title?: string }) {
         super({ imageName: imageName ?? 'uncertainty', target: undefined, owner: owner });
-        ActionManager.getInstance().animateAttackerTilt(owner.physicalCard as PhysicalCard);
+        // Guard against headless/edge cases where physicalCard is not present
+        if (owner.physicalCard) {
+            ActionManager.getInstance().animateAttackerTilt(owner.physicalCard);
+        }
         this.action = action;
         this.title = title ?? 'Do Something';
     }
