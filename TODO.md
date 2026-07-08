@@ -109,6 +109,14 @@ protocol. Ordered within sections by priority. Delete items when done.
 
 ## Engineering
 
+- **Card-asset loader spam** — the longplay logs show a Diabolist card
+  asset (`terror`) re-requesting via the loader on nearly every action for
+  the whole campaign (~thousands of attempts; it loads fine, the spam is
+  the bug). Find who calls the load path per-render instead of once
+  (likely a dynamic loadImage in a card render/tooltip path) and cache it.
+  Cosmetic + log-noise + minor perf; good Haiku-size task with a repro
+  (any longplay run's log).
+
 - **DOM test environment: CLOSED NEGATIVE (July 2026 spike)** — happy-dom
   cannot host Phaser under vitest: after stubbing canvas 2D, Phaser's
   WebGLRenderer hits `if (typeof WEBGL_DEBUG) require('phaser3spectorjs')`
