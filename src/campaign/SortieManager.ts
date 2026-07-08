@@ -97,8 +97,12 @@ export class SortieManager {
         // picker in v1): transfer ownership from campaign stock into the
         // active loadout. A move, not a copy — CampaignUiState.consumables
         // is empty for the sortie's duration (house rule 3: one owner).
+        // The dynamic stock cap (The Bonded Warehouse) is stamped onto the
+        // sortie state at the same handoff moment, so combat slot rendering
+        // and event grants honor it without importing the campaign layer.
         gameState.consumables = [...campaign.consumables];
         campaign.consumables = [];
+        gameState.maxConsumables = campaign.getConsumableStockCap();
 
         // Deployed soldiers' equipped relics ride along too (same transfer
         // pattern as consumables): they never leave their owner's slots
@@ -473,7 +477,7 @@ export class SortieManager {
         // keeping campaign items first and dropping overflow from the end
         // (the debug-only test tool can overfill the loadout; normal play
         // cannot).
-        campaign.consumables = mergeStockWithLoadout(campaign.consumables, gameState.consumables);
+        campaign.consumables = mergeStockWithLoadout(campaign.consumables, gameState.consumables, campaign.getConsumableStockCap());
         gameState.consumables = [];
 
         // Equipped relics on living soldiers return to their slots (they

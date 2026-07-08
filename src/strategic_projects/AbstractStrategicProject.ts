@@ -35,6 +35,15 @@ export const WEEKS_PER_CAMPAIGN_YEAR = WEEKS_PER_QUARTER * QUARTERS_PER_YEAR;
  *   (Chartered Partner payout input).
  * - postContract: posts a generated contract onto the HQ board and records
  *   a board-minutes line (The Dis Legation).
+ * - retainerClients: the client names carrying retainer Standing Orders
+ *   (keys of CampaignUiState's CLIENT_RETAINER_ORDER_IDS registry), passed
+ *   in so no project ever imports that layer (The Entertainments &
+ *   Gratuities Ledger).
+ * - creditClientRelationship: adds n completion credits to a client's tally
+ *   — genuine relationship credit (retainer unlocks AND Chartered Partner
+ *   status; second-wave ruling) — and records a board-minutes line. The one
+ *   owner (CampaignUiState.contractsCompletedByClient) mutates; raw
+ *   contractsCompleted is untouched.
  */
 export interface QuarterEndContext {
     rosterSize: number;
@@ -42,6 +51,8 @@ export interface QuarterEndContext {
     contractsCompletedForGates: number;
     contractsCompletedByClient: Record<string, number>;
     postContract: (c: Contract) => void;
+    retainerClients: string[];
+    creditClientRelationship: (client: string, n: number) => void;
 }
 
 export abstract class AbstractStrategicProject extends AbstractCard {

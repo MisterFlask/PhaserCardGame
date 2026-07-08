@@ -16,6 +16,7 @@ import { CantonmentAnnexe } from '../../../strategic_projects/CantonmentAnnexe';
 import { CompanySecretariat } from '../../../strategic_projects/CompanySecretariat';
 import { GRAND_TRUNK_GATE_CREDIT, TheGrandTrunkExtension } from '../../../strategic_projects/TheGrandTrunkExtension';
 import { PROBATE_ARCHIVE_CAP, ProbateAndEffectsOffice } from '../../../strategic_projects/ProbateAndEffectsOffice';
+import { TheBondedWarehouse, WAREHOUSE_STOCK_BONUS } from '../../../strategic_projects/TheBondedWarehouse';
 import { PURCHASABLE_STRATEGIC_PROJECTS } from '../../../strategic_projects/StrategicProjectList';
 import { PlayableCard } from '../../../gamecharacters/PlayableCard';
 import { pushWithArchiveCap, selectNonStarterCards, settleDeaths } from '../../../campaign/DeathSettlement';
@@ -286,10 +287,20 @@ export class CampaignUiState {
         return true;
     }
 
-    /** True when owned stock is at the shared cap; purchases and grants are
-     *  blocked/redirected once this holds. */
+    /** MAX_CONSUMABLE_STOCK plus +3 if The Bonded Warehouse Capital Work is
+     *  owned (Capital Works Rebuild second wave, table #13 — same
+     *  derived-from-ownership pattern as getRosterCap). Every cap
+     *  consumer — isConsumableStockFull below, SortieManager's post-sortie
+     *  merge clamp, QuartermasterPanel's display/denials — must use this
+     *  method rather than the constant. */
+    public getConsumableStockCap(): number {
+        return MAX_CONSUMABLE_STOCK + (this.ownsProject(new TheBondedWarehouse().name) ? WAREHOUSE_STOCK_BONUS : 0);
+    }
+
+    /** True when owned stock is at the (dynamic) cap; purchases and grants
+     *  are blocked/redirected once this holds. */
     public isConsumableStockFull(): boolean {
-        return this.consumables.length >= MAX_CONSUMABLE_STOCK;
+        return this.consumables.length >= this.getConsumableStockCap();
     }
 
     /**
@@ -431,11 +442,27 @@ export class CampaignUiState {
                     year: this.calendar.year,
                     contractsCompletedForGates: this.getEffectiveContractsCompletedForGates(),
                     contractsCompletedByClient: this.contractsCompletedByClient,
+                    retainerClients: Object.keys(CLIENT_RETAINER_ORDER_IDS),
                     postContract: (contract: Contract) => {
                         this.availableContracts.push(contract);
                         this.calendar.boardEvents.push({
                             week: this.calendar.week,
                             message: `The Legation secures a private commission: ${contract.name}.`,
+                            isWarning: false,
+                        });
+                    },
+                    // Gratuities (Capital Works Rebuild second wave, table
+                    // #14): genuine relationship credit — the one owner of
+                    // the per-client tallies mutates here (house rule 3),
+                    // advancing retainer unlocks and Chartered Partner
+                    // status alike. Raw contractsCompleted (act gates,
+                    // telemetry) is deliberately untouched.
+                    creditClientRelationship: (client: string, n: number) => {
+                        this.contractsCompletedByClient[client] =
+                            (this.contractsCompletedByClient[client] ?? 0) + n;
+                        this.calendar.boardEvents.push({
+                            week: this.calendar.week,
+                            message: `Entertainments & gratuities rendered to ${client}. The ledger notes 'stationery.'`,
                             isWarning: false,
                         });
                     },

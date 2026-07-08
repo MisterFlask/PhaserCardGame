@@ -3,14 +3,19 @@ import { AbyssalResearchInstitute } from "./AbyssalResearchInstitute";
 import { CantonmentAnnexe } from "./CantonmentAnnexe";
 import { CompanySecretariat } from "./CompanySecretariat";
 import { CorrectivePhrenologyWing } from "./CorrectivePhrenologyWing";
+import { EntertainmentsAndGratuitiesLedger } from "./EntertainmentsAndGratuitiesLedger";
 import { LeviMaxwellAscensionProtocol } from "./LeviMaxwellAscensionProtocol";
+import { LongServiceTestimonialsBoard } from "./LongServiceTestimonialsBoard";
 import { ProbateAndEffectsOffice } from "./ProbateAndEffectsOffice";
+import { SchoolOfMusketry } from "./SchoolOfMusketry";
 import { SoulCollateralOffice } from "./SoulCollateralOffice";
+import { TheBondedWarehouse } from "./TheBondedWarehouse";
 import { TheCompanyGazette } from "./TheCompanyGazette";
 import { TheCompanyStore } from "./TheCompanyStore";
 import { TheDisLegation } from "./TheDisLegation";
 import { TheGrandTrunkExtension } from "./TheGrandTrunkExtension";
 import { ThePatternRoom } from "./ThePatternRoom";
+import { WattleAndGraySalvageAuctioneers } from "./WattleAndGraySalvageAuctioneers";
 
 /**
  * Capital Works Rebuild (July 2026) — see src/docs/strategic_layer_redesign.md's
@@ -22,7 +27,10 @@ import { ThePatternRoom } from "./ThePatternRoom";
  * income, per-contract VP); Batch B adds the two contract-board works
  * (The Dis Legation, The Grand Trunk Extension); Batch C adds the death
  * infrastructure (The Probate & Effects Office, The Soul Collateral Office —
- * tree chain: Pattern Room → Probate → Soul Collateral). The Foundry, Retraining
+ * tree chain: Pattern Room → Probate → Soul Collateral); Batch D is the
+ * second wave (Testimonials Board, Wattle & Gray, School of Musketry,
+ * Bonded Warehouse, Gratuities Ledger — all root-level, no prereqs, no
+ * save-shape change). The Foundry, Retraining
  * Program, Dis Municipal Bonds, Our Man In Dis, Lethe Extraction Co., and the
  * four dead cargo projects (Smythe-Bowyer Poppy Fields, Blue Room Reading
  * Societies, Revolutionary Contacts, Phlegethon Coalfalls) are deleted
@@ -43,6 +51,11 @@ export const ALL_STRATEGIC_PROJECTS: AbstractStrategicProject[] = [
     new TheGrandTrunkExtension(),
     new ProbateAndEffectsOffice(),
     new SoulCollateralOffice(),
+    new LongServiceTestimonialsBoard(),
+    new WattleAndGraySalvageAuctioneers(),
+    new SchoolOfMusketry(),
+    new TheBondedWarehouse(),
+    new EntertainmentsAndGratuitiesLedger(),
     new AbyssalResearchInstitute(),
 ];
 

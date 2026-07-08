@@ -18,6 +18,9 @@ import { PlaytestJournal } from '../../../../utils/PlaytestJournal';
 import { CorrectivePhrenologyWing } from '../../../../strategic_projects/CorrectivePhrenologyWing';
 import { BEQUEST_COST, ProbateAndEffectsOffice } from '../../../../strategic_projects/ProbateAndEffectsOffice';
 import { ThePatternRoom } from '../../../../strategic_projects/ThePatternRoom';
+import { LongServiceTestimonialsBoard, TESTIMONIAL_VP_PER_LEVEL } from '../../../../strategic_projects/LongServiceTestimonialsBoard';
+import { DRILL_COST, DRILL_MAX_LEVEL, DRILL_XP, SchoolOfMusketry } from '../../../../strategic_projects/SchoolOfMusketry';
+import { SALVAGE_SELL_FRACTION, WattleAndGraySalvageAuctioneers } from '../../../../strategic_projects/WattleAndGraySalvageAuctioneers';
 
 const REMOVAL_COST = 40;
 const UPGRADE_COST = 60;
@@ -26,6 +29,9 @@ const THERAPY_RELIEF = 4;
 const REMOVAL_GATE = new CorrectivePhrenologyWing().name;
 const UPGRADE_GATE = new ThePatternRoom().name;
 const BEQUEST_GATE = new ProbateAndEffectsOffice().name;
+const RETIRE_GATE = new LongServiceTestimonialsBoard().name;
+const DRILL_GATE = new SchoolOfMusketry().name;
+const SALVAGE_GATE = new WattleAndGraySalvageAuctioneers().name;
 const ARMOURY_PICKER_DEPTH = DepthManager.getInstance().REWARD_SCREEN + 2000;
 
 /**
@@ -40,6 +46,12 @@ export class BarracksPanel extends AbstractHqPanel {
 
     private selectedSoldier: PlayerCharacter | null = null;
     private selectedCard: PlayableCard | null = null;
+
+    /** Arm-confirm state for the irreversible Retire with Testimonial
+     *  action (The Long Service & Testimonials Board): first click arms,
+     *  second executes. Disarmed whenever another soldier is selected (and
+     *  on show); the retire button renders its armed state from this. */
+    private armedRetirement: PlayerCharacter | null = null;
 
     /** Armoury picker overlay: shown after clicking an empty equipment slot. */
     private armouryPickerElements: Phaser.GameObjects.GameObject[] = [];
@@ -72,6 +84,7 @@ export class BarracksPanel extends AbstractHqPanel {
         CampaignUiState.getInstance().ensureRecruitsPopulated();
         this.selectedSoldier = null;
         this.selectedCard = null;
+        this.armedRetirement = null;
         this.clearArmouryPicker();
         this.rebuild();
         super.show();
@@ -121,6 +134,9 @@ export class BarracksPanel extends AbstractHqPanel {
                 fillColor: selected ? Palette.VERDIGRIS : Palette.WOOD_PANEL
             }));
             button.onClick(() => {
+                // Selecting a (different) soldier disarms any pending
+                // retirement confirmation.
+                if (this.armedRetirement !== soldier) this.armedRetirement = null;
                 this.selectedSoldier = soldier;
                 this.selectedCard = null;
                 this.rebuild();
@@ -206,6 +222,11 @@ export class BarracksPanel extends AbstractHqPanel {
         // unequip, INSURE button per equipped-uninsured relic.
         if (this.selectedSoldier) {
             belowRosterY = this.buildEquipmentStrip(this.selectedSoldier, width, belowRosterY);
+            // Second-wave Capital Works actions (each self-gates on its
+            // project): School of Musketry drill, then the Testimonials
+            // Board's irreversible retire (arm-confirm).
+            belowRosterY = this.buildDrillAction(this.selectedSoldier, width, belowRosterY);
+            belowRosterY = this.buildRetireAction(this.selectedSoldier, width, belowRosterY);
         }
 
         // --- Deck of the selected soldier, middle column ---
@@ -346,6 +367,88 @@ export class BarracksPanel extends AbstractHqPanel {
             this.setStatus(`${soldier.name}'s card reworked at the Foundry: ${card.name}.`);
             this.rebuild();
         });
+    }
+
+    /**
+     * Drill (The School of Musketry & Applied Blasphemy, second wave): £40
+     * grants +20 XP to the selected soldier, below level DRILL_MAX_LEVEL
+     * only — a rebuild pump that can't inflate veterans. Wounded/stressed
+     * soldiers may drill (ruling). Pending promotions surface through the
+     * existing derived flow (PROMOTE button / debrief); this never resolves
+     * levels itself. Returns the y just past the row.
+     */
+    private buildDrillAction(soldier: PlayerCharacter, width: number, startY: number): number {
+        const campaign = CampaignUiState.getInstance();
+        if (!campaign.ownsProject(DRILL_GATE)) return startY;
+        if (soldier.level >= DRILL_MAX_LEVEL) return startY;
+
+        const canAfford = GameState.getInstance().moneyInVault >= DRILL_COST;
+        const drillButton = this.addDynamic(new TextBoxButton({
+            scene: this.scene, x: width * 0.14, y: startY, width: 400, height: 44,
+            text: `Drill ${soldier.name} (£${DRILL_COST}, +${DRILL_XP} XP)`,
+            style: { fontSize: '14px', fontFamily: Fonts.BODY, color: canAfford ? Palette.WHITE : Palette.DISABLED_TEXT },
+            fillColor: canAfford ? Palette.VERDIGRIS : Palette.DISABLED
+        }));
+        drillButton.onClick(() => {
+            if (!canAfford) { this.setStatus('Insufficient funds. The School does not drill on credit.'); return; }
+            GameState.getInstance().moneyInVault -= DRILL_COST;
+            soldier.xp += DRILL_XP;
+            SaveManager.save();
+            PlaytestJournal.getInstance().record('purchase', { kind: 'drill', cost: DRILL_COST, soldier: soldier.name, xp: DRILL_XP });
+            this.setStatus(`${soldier.name} completes a week at the School of Musketry & Applied Blasphemy. +${DRILL_XP} XP.`);
+            this.rebuild();
+        });
+        return startY + 52;
+    }
+
+    /**
+     * Retire with Testimonial (The Long Service & Testimonials Board,
+     * second wave): banks TESTIMONIAL_VP_PER_LEVEL × level onto the OWNED
+     * project instance's victoryPoints (the same per-project serialization
+     * path as The Company Gazette) and strikes the soldier from the roster
+     * (wages stop by construction). Irreversible, so arm-confirm: first
+     * click arms, second executes; selecting another soldier disarms.
+     * Cannot retire the last roster soldier; the wounded may be retired.
+     * Returns the y just past the row.
+     */
+    private buildRetireAction(soldier: PlayerCharacter, width: number, startY: number): number {
+        const campaign = CampaignUiState.getInstance();
+        if (!campaign.ownsProject(RETIRE_GATE)) return startY;
+
+        const vp = TESTIMONIAL_VP_PER_LEVEL * soldier.level;
+        const isLastSoldier = campaign.roster.length <= 1;
+        const armed = this.armedRetirement === soldier;
+        const retireButton = this.addDynamic(new TextBoxButton({
+            scene: this.scene, x: width * 0.14, y: startY, width: 400, height: 44,
+            text: armed
+                ? `CONFIRM: retire ${soldier.name} (banks ${vp} VP)`
+                : `Retire with Testimonial (banks ${vp} VP)`,
+            style: { fontSize: '14px', fontFamily: Fonts.BODY, color: isLastSoldier ? Palette.DISABLED_TEXT : Palette.WHITE },
+            fillColor: isLastSoldier ? Palette.DISABLED : (armed ? Palette.WAX_RED : Palette.WOOD_PANEL)
+        }));
+        retireButton.onClick(() => {
+            if (isLastSoldier) {
+                this.setStatus('The Company cannot retire its last soldier. Someone must mind the ledgers.');
+                return;
+            }
+            if (!armed) {
+                this.armedRetirement = soldier;
+                this.setStatus('Click again to confirm the citation.');
+                this.rebuild();
+                return;
+            }
+            this.armedRetirement = null;
+            campaign.roster = campaign.roster.filter(c => c !== soldier);
+            const board = campaign.ownedStrategicProjects.find(p => p.name === RETIRE_GATE);
+            if (board) board.victoryPoints += vp;
+            this.selectedSoldier = null;
+            this.selectedCard = null;
+            SaveManager.save();
+            PlaytestJournal.getInstance().record('retirement', { soldier: soldier.name, level: soldier.level, vp });
+            this.setStatus(`${soldier.name} retires with a testimonial: ${vp} VP entered in the Board's ledger, one name struck from the wage book.`);
+            this.rebuild();
+        });
+        return startY + 52;
     }
 
     /**
@@ -547,15 +650,22 @@ export class BarracksPanel extends AbstractHqPanel {
             }).setDepth(ARMOURY_PICKER_DEPTH + 1);
             this.armouryPickerElements.push(empty);
         } else {
+            // With Wattle & Gray owned, each unassigned relic also offers a
+            // sell action at 50% of list (equipped relics never appear here
+            // — the armoury is by definition unequipped stock; unequip
+            // first to sell a slotted relic). Entries narrow to make room.
+            const salvageOwned = campaign.ownsProject(SALVAGE_GATE);
             campaign.armoury.forEach((relic, i) => {
                 const col = i % 2;
                 const row = Math.floor(i / 2);
                 const x = centerX - 260 + col * 520;
                 const y = centerY - 190 + row * 70;
+                const entryW = salvageOwned ? 400 : 500;
+                const entryX = salvageOwned ? x - 50 : x;
                 const entry = new TextBoxButton({
-                    scene: this.scene, x, y, width: 500, height: 60,
+                    scene: this.scene, x: entryX, y, width: entryW, height: 60,
                     text: `[color=gold]${relic.getDisplayName()}[/color]\n${relic.getDescription()}`,
-                    style: { fontSize: '13px', fontFamily: Fonts.BODY, color: Palette.WHITE, align: 'center', wordWrap: { width: 470 } },
+                    style: { fontSize: '13px', fontFamily: Fonts.BODY, color: Palette.WHITE, align: 'center', wordWrap: { width: entryW - 30 } },
                     fillColor: Palette.WOOD_PANEL
                 }).setDepth(ARMOURY_PICKER_DEPTH + 1);
                 entry.onClick(() => {
@@ -569,6 +679,26 @@ export class BarracksPanel extends AbstractHqPanel {
                     this.rebuild();
                 });
                 this.armouryPickerElements.push(entry);
+
+                if (salvageOwned) {
+                    const salePrice = Math.floor(relic.price * SALVAGE_SELL_FRACTION);
+                    const sellButton = new TextBoxButton({
+                        scene: this.scene, x: x + 205, y, width: 95, height: 60,
+                        text: `Sell\n£${salePrice}`,
+                        style: { fontSize: '13px', fontFamily: Fonts.DISPLAY, color: Palette.WHITE, align: 'center' },
+                        fillColor: Palette.WAX_RED
+                    }).setDepth(ARMOURY_PICKER_DEPTH + 1);
+                    sellButton.onClick(() => {
+                        campaign.armoury = campaign.armoury.filter(r => r !== relic);
+                        GameState.getInstance().moneyInVault += salePrice;
+                        SaveManager.save();
+                        PlaytestJournal.getInstance().record('sale', { kind: 'relic', price: salePrice, name: relic.getDisplayName() });
+                        this.clearArmouryPicker();
+                        this.setStatus(`${relic.getDisplayName()} goes to Wattle & Gray for £${salePrice}. Half of list, as quoted.`);
+                        this.rebuild();
+                    });
+                    this.armouryPickerElements.push(sellButton);
+                }
             });
         }
 

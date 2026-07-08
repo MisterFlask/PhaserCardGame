@@ -358,6 +358,30 @@ Institute legacy class stays (serializer migration path is unit-tested).
 - *Imperial Telegraph Concession* (see contracts early) — thin without the
   intelligence layer.
 
+### Second wave (July 2026, same ruling authority — Batch D)
+
+| # | Capital Work | Cost | Effect | Family |
+|---|---|---|---|---|
+| 10 | **The Long Service & Testimonials Board** | £260 | Barracks action: retire a soldier, banking **20 VP × their level** (onto the project's own victoryPoints); wages stop. Cannot retire the last soldier; the wounded may be retired. Irreversible → arm-confirm click. | VP / roster pivot |
+| 11 | **Wattle & Gray, Salvage Auctioneers** | £180 | Unlocks **selling**: unequipped armoury relics at 50% of `AbstractRelic.price`, held consumables at 50% of `basePrice`. (Acquisition stays sortie-only — the relic-v1 ruling governs buying, not liquidation.) | economy |
+| 12 | **The School of Musketry & Applied Blasphemy** | £240 | Barracks drill: **£40 → +20 XP**, soldiers below level 4 only (rebuild pump that can't inflate veterans). Wounded/stressed may drill. Promotions resolve via the existing pending-level flow. | roster |
+| 13 | **The Bonded Warehouse** | £150 | Consumable stock cap **+3** (dynamic, roster-cap pattern). The sortie merge clamp (`mergeStockWithLoadout`) must honor the dynamic cap too. | provisioning |
+| 14 | **The Entertainments & Gratuities Ledger** | £220 | Each board meeting, **+1 completion credit** to the most-served client among the `CLIENT_RETAINER_ORDER_IDS` registry (ties alphabetical; no-op before any are served). Ruling: gratuities are genuine relationship credit — they advance Chartered Partner status too; the raw `contractsCompleted` total (act gates, telemetry) is untouched. | contract board / clients |
+
+No save-shape change and **no version bump**: new projects can't appear in an
+old save's ownedProjects, and every effect rides already-serialized facts
+(xp, per-project victoryPoints, per-client tallies, stock lists). Constants
+(named exports, playtest-retunable): TESTIMONIAL_VP_PER_LEVEL 20,
+SALVAGE_SELL_FRACTION 0.5, DRILL_COST 40 / DRILL_XP 20 / DRILL_MAX_LEVEL 4,
+WAREHOUSE_STOCK_BONUS 3, GRATUITIES_CREDIT_PER_QUARTER 1.
+
+Second-wave holds (generated, not taken): *Cook's Infernal Tours* (re-skin
+of the Legation mechanic — save for pool variety), *Court Painters' Retainer*
+(buyback rate boost, no new decision), *Speculative Building Society*
+(compounding income needs new serialized state for marginal payoff),
+*Cartographic Bureau* (permanent 6th board slot would undercut the
+Aggressive Tendering order).
+
 ## Amendment: Soldier Levels & Promotions (July 2026)
 
 **Status:** Approved direction. Supersedes post-combat card rewards and the

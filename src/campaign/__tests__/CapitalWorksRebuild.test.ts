@@ -283,3 +283,116 @@ describe('Barracks bequest (The Probate & Effects Office)', () => {
         expect(BARRACKS_SOURCE).toContain("kind: 'bequest'");
     });
 });
+
+// --- Batch D: second wave (Testimonials Board, Wattle & Gray, School of
+// Musketry, Bonded Warehouse, Gratuities Ledger). Pure pieces are
+// real-unit-tested elsewhere (pickMostServedClient in ClientReputation.test.ts,
+// the mergeStockWithLoadout cap parameter in SortieManagerClamp.test.ts);
+// these lints cover the Phaser-side wiring, per convention.
+const TESTIMONIALS_SOURCE = fs.readFileSync(
+    path.resolve(process.cwd(), 'src/strategic_projects/LongServiceTestimonialsBoard.ts'), 'utf-8'
+);
+const SALVAGE_SOURCE = fs.readFileSync(
+    path.resolve(process.cwd(), 'src/strategic_projects/WattleAndGraySalvageAuctioneers.ts'), 'utf-8'
+);
+const MUSKETRY_SOURCE = fs.readFileSync(
+    path.resolve(process.cwd(), 'src/strategic_projects/SchoolOfMusketry.ts'), 'utf-8'
+);
+const WAREHOUSE_SOURCE = fs.readFileSync(
+    path.resolve(process.cwd(), 'src/strategic_projects/TheBondedWarehouse.ts'), 'utf-8'
+);
+const GRATUITIES_SOURCE = fs.readFileSync(
+    path.resolve(process.cwd(), 'src/strategic_projects/EntertainmentsAndGratuitiesLedger.ts'), 'utf-8'
+);
+const QUARTERMASTER_SOURCE = fs.readFileSync(
+    path.resolve(process.cwd(), 'src/screens/campaign/hq_ux/panels/QuartermasterPanel.ts'), 'utf-8'
+);
+
+describe('Batch D constants', () => {
+    it('all five tuning constants match the amendment', () => {
+        expect(TESTIMONIALS_SOURCE).toContain('TESTIMONIAL_VP_PER_LEVEL = 20;');
+        expect(SALVAGE_SOURCE).toContain('SALVAGE_SELL_FRACTION = 0.5;');
+        expect(MUSKETRY_SOURCE).toContain('DRILL_COST = 40;');
+        expect(MUSKETRY_SOURCE).toContain('DRILL_XP = 20;');
+        expect(MUSKETRY_SOURCE).toContain('DRILL_MAX_LEVEL = 4;');
+        expect(WAREHOUSE_SOURCE).toContain('WAREHOUSE_STOCK_BONUS = 3;');
+        expect(GRATUITIES_SOURCE).toContain('GRATUITIES_CREDIT_PER_QUARTER = 1;');
+    });
+});
+
+describe('Retire with Testimonial (BarracksPanel)', () => {
+    it('routes banked VP to the OWNED project instance and strikes the soldier from the roster', () => {
+        expect(BARRACKS_SOURCE).toContain('const board = campaign.ownedStrategicProjects.find(p => p.name === RETIRE_GATE);');
+        expect(BARRACKS_SOURCE).toContain('if (board) board.victoryPoints += vp;');
+        expect(BARRACKS_SOURCE).toContain('campaign.roster = campaign.roster.filter(c => c !== soldier);');
+        expect(BARRACKS_SOURCE).toContain('const vp = TESTIMONIAL_VP_PER_LEVEL * soldier.level;');
+    });
+
+    it('is arm-confirmed (irreversible) and refuses the last roster soldier', () => {
+        expect(BARRACKS_SOURCE).toContain('private armedRetirement: PlayerCharacter | null = null;');
+        expect(BARRACKS_SOURCE).toContain('Click again to confirm the citation.');
+        expect(BARRACKS_SOURCE).toContain('const isLastSoldier = campaign.roster.length <= 1;');
+        expect(BARRACKS_SOURCE).toContain('The Company cannot retire its last soldier.');
+    });
+});
+
+describe('Drill (BarracksPanel)', () => {
+    it('gates on ownership and DRILL_MAX_LEVEL, adds DRILL_XP, never resolves levels itself', () => {
+        expect(BARRACKS_SOURCE).toContain('if (!campaign.ownsProject(DRILL_GATE)) return startY;');
+        expect(BARRACKS_SOURCE).toContain('if (soldier.level >= DRILL_MAX_LEVEL) return startY;');
+        expect(BARRACKS_SOURCE).toContain('soldier.xp += DRILL_XP;');
+        const drillBody = extractMethod(BARRACKS_SOURCE, 'private buildDrillAction(soldier: PlayerCharacter, width: number, startY: number): number');
+        expect(drillBody).not.toContain('soldier.level =');
+        expect(drillBody).not.toContain('level++');
+    });
+});
+
+describe('Salvage (Wattle & Gray)', () => {
+    it('Quartermaster sells held consumables at floor(basePrice * SALVAGE_SELL_FRACTION)', () => {
+        expect(QUARTERMASTER_SOURCE).toContain('Math.floor(consumable.basePrice * SALVAGE_SELL_FRACTION)');
+        expect(QUARTERMASTER_SOURCE).toContain('campaign.consumables = campaign.consumables.filter(c => c !== consumable);');
+        expect(QUARTERMASTER_SOURCE).toContain("record('sale', { kind: 'consumable'");
+    });
+
+    it('Barracks armoury picker sells unequipped relics at floor(price * SALVAGE_SELL_FRACTION)', () => {
+        expect(BARRACKS_SOURCE).toContain('Math.floor(relic.price * SALVAGE_SELL_FRACTION)');
+        expect(BARRACKS_SOURCE).toContain('campaign.armoury = campaign.armoury.filter(r => r !== relic);');
+        expect(BARRACKS_SOURCE).toContain("record('sale', { kind: 'relic'");
+    });
+});
+
+describe('Consumable stock cap (The Bonded Warehouse)', () => {
+    it('getConsumableStockCap derives from ownership (roster-cap pattern) and every consumer uses it', () => {
+        const body = extractMethod(CAMPAIGN_UI_STATE_SOURCE, 'public getConsumableStockCap(): number');
+        expect(body).toContain('MAX_CONSUMABLE_STOCK');
+        expect(body).toContain('TheBondedWarehouse');
+        expect(body).toContain('WAREHOUSE_STOCK_BONUS');
+
+        const fullBody = extractMethod(CAMPAIGN_UI_STATE_SOURCE, 'public isConsumableStockFull(): boolean');
+        expect(fullBody).toContain('this.getConsumableStockCap()');
+
+        expect(SORTIE_MANAGER_SOURCE).toContain('mergeStockWithLoadout(campaign.consumables, gameState.consumables, campaign.getConsumableStockCap())');
+        expect(SORTIE_MANAGER_SOURCE).toContain('gameState.maxConsumables = campaign.getConsumableStockCap();');
+        expect(QUARTERMASTER_SOURCE).toContain('campaign.getConsumableStockCap()');
+    });
+});
+
+describe('Gratuities Ledger (creditClientRelationship)', () => {
+    it('the ctx hook mutates the one owner and records the stationery minutes line', () => {
+        expect(CAMPAIGN_UI_STATE_SOURCE).toContain('creditClientRelationship: (client: string, n: number) => {');
+        expect(CAMPAIGN_UI_STATE_SOURCE).toContain('this.contractsCompletedByClient[client] =');
+        expect(CAMPAIGN_UI_STATE_SOURCE).toContain("Entertainments & gratuities rendered to ${client}. The ledger notes 'stationery.'");
+        expect(CAMPAIGN_UI_STATE_SOURCE).toContain('retainerClients: Object.keys(CLIENT_RETAINER_ORDER_IDS)');
+    });
+
+    it('the project picks via the pure helper and credits GRATUITIES_CREDIT_PER_QUARTER, never importing CampaignUiState', () => {
+        const body = extractMethod(GRATUITIES_SOURCE, 'public override onQuarterEnd(ctx: QuarterEndContext): void');
+        expect(body).toContain('pickMostServedClient(ctx.contractsCompletedByClient, ctx.retainerClients)');
+        expect(body).toContain('ctx.creditClientRelationship(client, GRATUITIES_CREDIT_PER_QUARTER)');
+        // Doc comments may MENTION CampaignUiState; an import STATEMENT of
+        // it (or of anything under screens/) is what would break the
+        // layering. Import lines here are single-line, anchored at column 0.
+        expect(GRATUITIES_SOURCE).not.toMatch(/^import[^\n]*CampaignUiState/m);
+        expect(GRATUITIES_SOURCE).not.toMatch(/^import[^\n]*screens\//m);
+    });
+});

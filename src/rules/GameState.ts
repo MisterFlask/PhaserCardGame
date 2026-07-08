@@ -54,11 +54,13 @@ export class GameState {
     // this array on dispatch and back out on successful resolution (lost on
     // squad wipe). A fresh campaign starts with zero — no default seed.
     public consumables: AbstractConsumable[] = [];
-    /** Alias for the shared cap, kept so combat UI (slot rendering) doesn't
-     *  need to import ConsumableStock directly. */
-    public get maxConsumables(): number {
-        return MAX_CONSUMABLE_STOCK;
-    }
+    /** The sortie's consumable-slot cap, kept here so combat UI (slot
+     *  rendering) and event grants don't import ConsumableStock directly.
+     *  Defaults to the base cap; SortieManager stamps the campaign's dynamic
+     *  cap (CampaignUiState.getConsumableStockCap — The Bonded Warehouse
+     *  widens it) at dispatch, the same HQ->sortie handoff moment the
+     *  loadout itself transfers. Never serialized (sortie-scoped). */
+    public maxConsumables: number = MAX_CONSUMABLE_STOCK;
 
     public getRandomAllyCharacter(): PlayerCharacter {
         return this.currentRunCharacters[Math.floor(Math.random() * this.currentRunCharacters.length)];
