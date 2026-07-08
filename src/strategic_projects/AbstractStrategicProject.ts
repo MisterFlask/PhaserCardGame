@@ -4,6 +4,7 @@ import { Team } from "../gamecharacters/AbstractCard";
 import { PlayableCard } from "../gamecharacters/PlayableCard";
 import { CardType } from "../gamecharacters/Primitives";
 import { WEEKS_PER_QUARTER, QUARTERS_PER_YEAR } from "../campaign/CampaignCalendar";
+import { Contract } from "../campaign/Contract";
 import { StrategicResource } from "./strategic_resources.ts/StrategicResources";
 
 /** One stage of a multi-stage ("staged") Capital Work — see
@@ -116,20 +117,28 @@ export abstract class AbstractStrategicProject extends AbstractCard {
         return [];
     }
 
-    public getStrategicResourceCost(): StrategicResource[]
-    {
-        return [
-            StrategicResource.InfernalMachinery.ofQuantity(1),
-            StrategicResource.WhiteflameDistillate.ofQuantity(2),
-        ];
+    /**
+     * Vestigial: no mechanical consumer ever read this (Capital Works are
+     * purchased with £ alone — see InvestmentPanel), and no display path did
+     * either (grepped clean across src/ before the Capital Works Rebuild,
+     * July 2026 — see src/docs/strategic_layer_redesign.md's amendment).
+     * Left as an overridable hook (rather than deleted outright) only
+     * because LeviMaxwellAscensionProtocol, a kept pre-rebuild class, still
+     * overrides it; StrategicResources.ts itself stays for that reason too.
+     * New Batch-A projects must NOT override this.
+     */
+    public getStrategicResourceCost(): StrategicResource[] {
+        return [];
     }
 
     public getAdditionalCargoOptions(): PlayableCard[] {
         return [];
     }
 
-    /** Fires at each quarterly board meeting (was per-run before the contract pivot). */
-    public onQuarterEnd(): void {
+    /** Fires at each quarterly board meeting (was per-run before the contract
+     *  pivot). ctx.rosterSize is the roster's size at that moment (Capital
+     *  Works Rebuild, July 2026 — see The Company Store). */
+    public onQuarterEnd(ctx: { rosterSize: number }): void {
 
     }
 
@@ -138,6 +147,14 @@ export abstract class AbstractStrategicProject extends AbstractCard {
      *  stage's effect (e.g. the final stage's VP payout). Never fires for
      *  non-staged projects (those use the ordinary owned/purchased flow). */
     public onStagePurchased(stageNumber: number): void {
+
+    }
+
+    /** Fires once per successfully completed contract sortie (SUCCESS path
+     *  only — never on a squad wipe; see SortieManager.resolveSortie), for
+     *  every currently-owned project. No-op by default; override to grant a
+     *  per-contract effect (e.g. The Company Gazette's VP drip). */
+    public onContractCompleted(contract: Contract): void {
 
     }
 }

@@ -49,6 +49,30 @@ smoke-gated CI and deploys the compressed site to gh-pages).
   selling; acquisition is sortie-only by v1 ruling
   (relic_equipment_design.md).
 
+## Capital Works rebuild (designed July 2026 — implement now)
+
+Full spec + rulings: `src/docs/strategic_layer_redesign.md`, "Amendment:
+Capital Works Rebuild". Scraps all seven shipped Capital Works (keeps
+Levi-Maxwell + Secretariat), replaces them with nine designed projects.
+Three sequential Sonnet batches (shared files force the ordering):
+
+1. **Batch A — pool swap + simple projects.** Delete the nine dead project
+   files; add Pattern Room, Corrective Phrenology Wing, Cantonment Annexe
+   (dynamic roster cap), Company Store (per-soldier quarterly income),
+   Company Gazette (+20 VP per completed contract via a new
+   `onContractCompleted` hook); rewrite StrategicProjectList; re-point the
+   Barracks gate constants; bump SAVE_FORMAT_VERSION; fix lint tests.
+2. **Batch B — contract-board projects.** Dis Legation (quarterly exclusive
+   contract, flagged off the 5-slot refill count) + Grand Trunk Extension
+   (+16 contracts credit into `maxActUnlocked`).
+3. **Batch C — death infrastructure.** Probate & Effects Office (card
+   archive + Barracks bequest) + Soul Collateral Office (escrow + Recovery
+   contract). Witness rule, probate ordering, relic settlement per the
+   amendment's Rulings. Save shape grows (archive, escrow); bump again.
+4. **Art batch (after C):** six new projects launch on "" placeholders;
+   generate portraits via the generate-game-art skill (relic-style simple
+   iconography per the art-style memory).
+
 ## Content expansion (template proven, held for act-4 play contact)
 
 - **Regions 5+** — Brimstone Badlands shipped as act 4; the pipeline

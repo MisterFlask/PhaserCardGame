@@ -55,7 +55,16 @@
 //      Levi-Maxwell Ascension Protocol); every other owned project's DTO
 //      omits them, same as today. Fresh-campaign value: n/a (ownedProjects
 //      starts empty).
-export const SAVE_FORMAT_VERSION = 13;
+// v14: Capital Works Rebuild, Batch A (src/docs/strategic_layer_redesign.md's
+//      amendment). Deleted The Foundry, Retraining Program, Dis Municipal
+//      Bonds, Our Man In Dis, Lethe Extraction Co., and the four dead cargo
+//      projects; added The Pattern Room, The Corrective Phrenology Wing, The
+//      Cantonment Annexe, The Company Store, The Company Gazette. No DTO
+//      shape change — the version bump alone is required because a save's
+//      ownedProjects can name a now-deleted class (mismatched-version saves
+//      are discarded and start fresh; established behavior, no migration
+//      chain exists in this codebase).
+export const SAVE_FORMAT_VERSION = 14;
 export const SAVE_STORAGE_KEY = 'east-infernal-company-save';
 
 export interface BuffDTO {

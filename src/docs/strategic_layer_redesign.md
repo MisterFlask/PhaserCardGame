@@ -282,6 +282,78 @@ Two problems with projects-as-pure-purchases:
    if-this-order branches.
 4. Pull the five dead cargo projects from the purchasable pool.
 
+## Amendment: Capital Works Rebuild (July 2026)
+
+**Status:** Approved direction (owner-delegated ruling). Replaces the shipped
+Capital Works pool wholesale. Motivation: of the seven purchasable projects,
+two were near-duplicate income drips (£25/£35 per quarter), one was a passive
+VP drip, two were bare service unlocks, and one a bare slot purchase — flat in
+both mechanics and flavor. Only the Levi-Maxwell capstone carried a real
+decision. This amendment applies the design rule above (a project must change
+which contracts you can take, who you can field, the shape of a sortie, or the
+dividend math) to the Capital Works track itself.
+
+### The new roster
+
+| # | Capital Work | Cost | Prereq | Effect | Family |
+|---|---|---|---|---|---|
+| 1 | **The Pattern Room** | £150 | — | Unlocks card upgrading at the Barracks (£60/upgrade). | deck infra |
+| 2 | **The Corrective Phrenology Wing** | £120 | — | Unlocks card removal at the Barracks (£40/removal). | deck infra |
+| 3 | **The Probate & Effects Office** | £200 | Pattern Room | A dead soldier's non-starter cards pass to the Company Archive (cap 12, oldest struck off). Barracks action: bequeath an archived card to a serving soldier, £30. | deck infra / consequences |
+| 4 | **The Soul Collateral Office** | £350 | Probate & Effects | A soldier killed on a *won* sortie is held in escrow: a £0-payout **Recovery of Company Assets** contract posts (8-week deadline, current act, doesn't occupy a public board slot). Complete it → all souls from that sortie return (wounded 4 weeks, +25 stress). Lapse → forfeit for good (probate then applies). | roster / rules change |
+| 5 | **The Cantonment Annexe** | £180 | — | Roster capacity 8 → 10 (wages remain the counterweight). | roster |
+| 6 | **The Company Store** | £220 | — | Each board meeting, recovers £8 per rostered soldier (wage garnishment in scrip — income that scales with the player's own roster choices). | economy |
+| 7 | **The Company Gazette** | £300 | — | +20 VP per contract completed while owned. Replaces the passive Lethe drip: scoring is tied to activity, and *when to buy* stays the endgame pivot decision. | VP |
+| 8 | **The Dis Legation** | £300 | — | Each board meeting posts one exclusive Legation contract: current best act, payout ×1.4, 12-week deadline, flagged so it doesn't squeeze the 5-slot public board. | contract board |
+| 9 | **The Grand Trunk Extension** | £250 | Dis Legation | Counts as +16 completed contracts toward the proven-competence act gates (`ContractGenerator.maxActUnlocked`) — deeper regions open earlier; useless by year 7, so it's a tempo purchase. | contract board |
+
+**Retained:** *Company Secretariat* (+1 Standing Order slot — mandated by the
+Standing Orders amendment; flavor kept) and the *Levi-Maxwell Ascension
+Protocol* staged capstone (already redesigned under vp_endgame_design.md; not
+part of the half-baked set). Pool = 11.
+
+**Deleted outright** (SAVE_FORMAT_VERSION bump discards old saves, so the
+keep-for-save-matching classes can finally go): The Foundry, Retraining
+Program, Dis Municipal Bonds, Our Man In Dis, Lethe Extraction Co., plus the
+four dead cargo projects (Smythe-Bowyer Poppy Fields, Blue Room Reading
+Societies, Revolutionary Contacts, Phlegethon Coalfalls). The Abyssal Research
+Institute legacy class stays (serializer migration path is unit-tested).
+
+### Rulings
+
+- **The witness rule.** Neither escrow (Soul Collateral) nor probate applies
+  on a full squad wipe — "escrow requires a surviving witness to countersign
+  the loss adjustment." Keeps wipe risk intact (the roster-equilibrium ruling
+  stands).
+- **Escrow scope.** One Recovery contract per lost sortie, recovering all of
+  that sortie's souls. Escrowed soldiers leave the roster (no wages, no cap
+  pressure); recovery re-adds them even if the roster is at cap (temporary
+  overflow allowed; wages resume). Their *relics settle as on death* — the
+  soul comes back, the kit doesn't.
+- **Probate ordering.** Probate fires only on *final* death: immediately if
+  Soul Collateral isn't owned, or on escrow forfeit.
+- **Portrait reuse.** the_foundry → Pattern Room, retraining_program →
+  Phrenology Wing, our_man_in_dis → Dis Legation. The rest launch on the ""
+  placeholder sentinel pending an art batch.
+- **Tuning constants** (all named exports, sim-checkable): Store £8/soldier,
+  Gazette 20 VP, Legation ×1.4 / 12 weeks, Trunk +16 contracts credit,
+  escrow 8 weeks / 4-week wound / +25 stress, archive cap 12, bequest £30.
+
+### Generated but rejected (and why)
+
+- *Actuarial Department / de Veer Survey* (enemy-comp preview) — wants the
+  intelligence UI already deferred to faction-rep v2; don't ship half of it.
+- *Salvage Exchange* (relic shop) — contradicts the recorded relic-v1 ruling
+  (acquisition is sortie-only).
+- *St. Dymphna's Annex* (faster stress/wound recovery) — a passive rate
+  modifier, which the Standing Orders amendment explicitly reserves for
+  Orders, and rush treatment/therapy already cover the capability.
+- *Indentured Souls Registry* (cheap flawed recruits) — good, but belongs to
+  the faction-embassy batch where recruit gating gets built anyway.
+- *Creative Accounting* — already a Standing Order.
+- *Imperial Telegraph Concession* (see contracts early) — thin without the
+  intelligence layer.
+
 ## Amendment: Soldier Levels & Promotions (July 2026)
 
 **Status:** Approved direction. Supersedes post-combat card rewards and the

@@ -314,6 +314,12 @@ export class SortieManager {
             report.push(`Provisioning grant included: ${this.pendingConsumableRewardName}.`);
         }
 
+        // Capital Works Rebuild (July 2026): fire the per-contract-completed
+        // hook for every owned project (The Company Gazette's VP drip is the
+        // only current consumer). SUCCESS path only — handleSquadWipe never
+        // calls resolveSortie, so a wipe never fires this.
+        campaign.ownedStrategicProjects.forEach(project => project.onContractCompleted(contract));
+
         // Time passes first (the sortie took this long); wounds sustained on
         // this sortie are applied after, so they don't tick during it.
         campaign.advanceWeeks(contract.durationWeeks);

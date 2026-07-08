@@ -12,16 +12,18 @@ import { TextBoxButton } from '../../../../ui/Button';
 import { DepthManager } from '../../../../ui/DepthManager';
 import { TextBox } from '../../../../ui/TextBox';
 import { drawBackdropDim, drawWoodPanel, Fonts, Palette } from '../../../../ui/UIStyle';
-import { CampaignUiState, RELIC_INSURANCE_COST, ROSTER_CAP } from '../CampaignUiState';
+import { CampaignUiState, RELIC_INSURANCE_COST } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
 import { PlaytestJournal } from '../../../../utils/PlaytestJournal';
+import { CorrectivePhrenologyWing } from '../../../../strategic_projects/CorrectivePhrenologyWing';
+import { ThePatternRoom } from '../../../../strategic_projects/ThePatternRoom';
 
 const REMOVAL_COST = 40;
 const UPGRADE_COST = 60;
 const THERAPY_COST = 30;
 const THERAPY_RELIEF = 4;
-const REMOVAL_GATE = 'Retraining Program';
-const UPGRADE_GATE = 'The Foundry';
+const REMOVAL_GATE = new CorrectivePhrenologyWing().name;
+const UPGRADE_GATE = new ThePatternRoom().name;
 const ARMOURY_PICKER_DEPTH = DepthManager.getInstance().REWARD_SCREEN + 2000;
 
 /**
@@ -93,7 +95,7 @@ export class BarracksPanel extends AbstractHqPanel {
         // --- Roster, left column ---
         // Chrome (status bar + tab rail) occupies y 0-100; column headers
         // start below it with headroom to spare.
-        this.addDynamic(this.buildColumnHeader(`ROSTER · ${campaign.roster.length}/${ROSTER_CAP}`, width * 0.14, 130, 420));
+        this.addDynamic(this.buildColumnHeader(`ROSTER · ${campaign.roster.length}/${campaign.getRosterCap()}`, width * 0.14, 130, 420));
         campaign.roster.forEach((soldier, i) => {
             const selected = this.selectedSoldier === soldier;
             const trait = soldier.buffs.find(b => b.isPersonaTrait)?.getDisplayName() ?? '';
@@ -246,7 +248,7 @@ export class BarracksPanel extends AbstractHqPanel {
             }));
             const recruitCost = campaign.getRecruitCost();
             const canHire = GameState.getInstance().moneyInVault >= recruitCost
-                && campaign.roster.length < ROSTER_CAP;
+                && campaign.roster.length < campaign.getRosterCap();
             const hireButton = this.addDynamic(new TextBoxButton({
                 scene: this.scene, x: width * 0.78, y: 222 + i * 100, width: 170, height: 38,
                 text: `Hire (£${recruitCost})`,
@@ -260,7 +262,7 @@ export class BarracksPanel extends AbstractHqPanel {
                     this.setStatus(`${candidate.name} signs the Company ledger. Welcome aboard.`);
                     this.rebuild();
                 } else {
-                    this.setStatus(campaign.roster.length >= ROSTER_CAP
+                    this.setStatus(campaign.roster.length >= campaign.getRosterCap()
                         ? 'The barracks are full.'
                         : 'Insufficient funds.');
                 }

@@ -27,7 +27,7 @@ export class AbyssalResearchInstitute extends AbstractStrategicProject {
         ];
     }
 
-    public override onQuarterEnd(): void {
+    public override onQuarterEnd(ctx: { rosterSize: number }): void {
         // Gain a card reward at the beginning of each run
     }
 }

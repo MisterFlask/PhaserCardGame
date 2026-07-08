@@ -12,6 +12,7 @@ import { EmergencyTeleporter } from '../../../relics/special/EmergencyTeleporter
 import { CampaignRules } from '../../../rules/CampaignRulesHelper';
 import { GameState } from '../../../rules/GameState';
 import { AbstractStrategicProject } from '../../../strategic_projects/AbstractStrategicProject';
+import { CantonmentAnnexe } from '../../../strategic_projects/CantonmentAnnexe';
 import { CompanySecretariat } from '../../../strategic_projects/CompanySecretariat';
 import { PURCHASABLE_STRATEGIC_PROJECTS } from '../../../strategic_projects/StrategicProjectList';
 import { PlaytestJournal } from '../../../utils/PlaytestJournal';
@@ -144,6 +145,15 @@ export class CampaignUiState {
         return this.ownedStrategicProjects.some(p => p.name === name);
     }
 
+    /** ROSTER_CAP plus +2 if the Cantonment Annexe Capital Work is owned
+     *  (Capital Works Rebuild, July 2026 — see
+     *  src/docs/strategic_layer_redesign.md's amendment table #5). Every
+     *  cap-enforcing/displaying call site must use this method rather than
+     *  the ROSTER_CAP constant directly. */
+    public getRosterCap(): number {
+        return ROSTER_CAP + (this.ownsProject(new CantonmentAnnexe().name) ? 2 : 0);
+    }
+
     /**
      * Recomputes StandingOrdersState.bonusSlots from currently owned Capital
      * Works. A resync rather than an increment: AbstractStrategicProject has
@@ -185,7 +195,7 @@ export class CampaignUiState {
         const gameState = GameState.getInstance();
         const cost = this.getRecruitCost();
         if (gameState.moneyInVault < cost) return false;
-        if (this.roster.length >= ROSTER_CAP) return false;
+        if (this.roster.length >= this.getRosterCap()) return false;
         if (!this.recruitCandidates.includes(candidate)) return false;
 
         gameState.moneyInVault -= cost;
@@ -332,7 +342,7 @@ export class CampaignUiState {
                 // board meeting — before wages and the dividend — so money
                 // arriving that quarter can pay that quarter's bills.
                 meetingVaultBeforeIncome = gameState.moneyInVault;
-                this.ownedStrategicProjects.forEach(project => project.onQuarterEnd());
+                this.ownedStrategicProjects.forEach(project => project.onQuarterEnd({ rosterSize: this.roster.length }));
                 meetingIncome = gameState.moneyInVault - meetingVaultBeforeIncome;
             },
         );

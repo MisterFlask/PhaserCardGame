@@ -91,10 +91,19 @@ describe('Levi-Maxwell Ascension Protocol capstone', () => {
 });
 
 describe('Levi-Maxwell year-4 purchasability gate (StrategicProjectList)', () => {
-    it('is back in the purchasable pool (no longer in DEAD_CARGO_PROJECT_NAMES)', () => {
-        const deadListMatch = PROJECT_LIST_SOURCE.match(/const DEAD_CARGO_PROJECT_NAMES = new Set\(\[([\s\S]*?)\]\);/);
-        expect(deadListMatch, 'DEAD_CARGO_PROJECT_NAMES not found').toBeTruthy();
-        expect(deadListMatch![1]).not.toContain('LeviMaxwellAscensionProtocol');
+    // Capital Works Rebuild (July 2026): the DEAD_CARGO_PROJECT_NAMES
+    // machinery (and the four cargo projects it excluded) is gone entirely —
+    // see StrategicProjectList.ts's header comment. Levi-Maxwell's presence
+    // in the purchasable pool is asserted directly against ALL_STRATEGIC_PROJECTS
+    // / PURCHASABLE_STRATEGIC_PROJECTS instead of a since-removed exclusion list.
+    it('is listed in ALL_STRATEGIC_PROJECTS and not excluded from PURCHASABLE_STRATEGIC_PROJECTS', () => {
+        const allMatch = PROJECT_LIST_SOURCE.match(/export const ALL_STRATEGIC_PROJECTS: AbstractStrategicProject\[\] = \[([\s\S]*?)\];/);
+        expect(allMatch, 'ALL_STRATEGIC_PROJECTS not found').toBeTruthy();
+        expect(allMatch![1]).toContain('LeviMaxwellAscensionProtocol');
+
+        const purchasableMatch = PROJECT_LIST_SOURCE.match(/export const PURCHASABLE_STRATEGIC_PROJECTS: AbstractStrategicProject\[\] =([\s\S]*?);/);
+        expect(purchasableMatch, 'PURCHASABLE_STRATEGIC_PROJECTS not found').toBeTruthy();
+        expect(purchasableMatch![1]).not.toContain('LeviMaxwellAscensionProtocol');
     });
 
     it('is gated to year 4+ via PROJECT_MIN_PURCHASE_YEAR', () => {

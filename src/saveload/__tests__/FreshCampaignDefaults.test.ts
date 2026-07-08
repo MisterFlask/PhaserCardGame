@@ -75,7 +75,7 @@ describe('CampaignSave shape-lock (fresh-state defaults)', () => {
     function buildFreshSave(): CampaignSave {
         StandingOrdersState.getInstance().reset();
         return {
-            version: 13,
+            version: 14,
             savedAtIso: new Date(0).toISOString(),
             moneyInVault: 200, // GameState.moneyInVault default (src/rules/GameState.ts) — browser-verified in deliverable 2
             calendar: calendarToDTO(new CampaignCalendar()),
@@ -178,9 +178,9 @@ describe('CampaignSave shape-lock (fresh-state defaults)', () => {
 
     it('a non-staged owned project omits stagesPurchased/lastStagePurchaseWeek entirely (unchanged pre-v13 shape)', () => {
         const save = buildFreshSave();
-        save.ownedProjects = [{ name: 'The Foundry', victoryPoints: 0 }];
+        save.ownedProjects = [{ name: 'The Pattern Room', victoryPoints: 0 }];
         const restored: CampaignSave = JSON.parse(JSON.stringify(save));
-        expect(restored.ownedProjects).toEqual([{ name: 'The Foundry', victoryPoints: 0 }]);
+        expect(restored.ownedProjects).toEqual([{ name: 'The Pattern Room', victoryPoints: 0 }]);
         expect('stagesPurchased' in restored.ownedProjects[0]).toBe(false);
     });
 
