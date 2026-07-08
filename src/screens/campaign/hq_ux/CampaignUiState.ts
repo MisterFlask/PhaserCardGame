@@ -14,6 +14,7 @@ import { GameState } from '../../../rules/GameState';
 import { AbstractStrategicProject } from '../../../strategic_projects/AbstractStrategicProject';
 import { CompanySecretariat } from '../../../strategic_projects/CompanySecretariat';
 import { PURCHASABLE_STRATEGIC_PROJECTS } from '../../../strategic_projects/StrategicProjectList';
+import { PlaytestJournal } from '../../../utils/PlaytestJournal';
 
 /** £ cost to underwrite one equipped relic against loss (one-time, per relic). */
 export const RELIC_INSURANCE_COST = 40;
@@ -295,6 +296,13 @@ export class CampaignUiState {
      */
     public advanceWeeks(n: number): void {
         const gameState = GameState.getInstance();
+        // Playtest telemetry accumulators for the current board meeting, if
+        // any (advanceWeeks' onBoardMeetingStart/wages/dividend callbacks run
+        // income -> wages -> dividend, in that order, once per quarter
+        // boundary crossed — see CampaignCalendar.settleDividend doc).
+        let meetingVaultBeforeIncome = gameState.moneyInVault;
+        let meetingIncome = 0;
+        let meetingWagesPaid = 0;
 
         this.calendar.advanceWeeks(
             n,
@@ -303,6 +311,10 @@ export class CampaignUiState {
                 // and wages have settled.
                 const paid = Math.min(amountDue, gameState.moneyInVault);
                 gameState.moneyInVault -= paid;
+                PlaytestJournal.getInstance().record('board_meeting_settled', { year: this.calendar.year, quarter: this.calendar.quarterOfYear, income: meetingIncome, wagesPaid: meetingWagesPaid, dividendDue: amountDue, dividendPaid: paid, satisfactionAfter: this.calendar.shareholderSatisfaction });
+                meetingVaultBeforeIncome = gameState.moneyInVault;
+                meetingIncome = 0;
+                meetingWagesPaid = 0;
                 return paid;
             },
             () => this.roster.length * WAGE_PER_SOLDIER_PER_QUARTER,
@@ -312,13 +324,16 @@ export class CampaignUiState {
                 // existing dividend-shortfall consequences, not a new penalty.
                 const paid = Math.min(amountDue, gameState.moneyInVault);
                 gameState.moneyInVault -= paid;
+                meetingWagesPaid = paid;
                 return paid;
             },
             () => {
                 // Project income (bonds, embassies) lands at the top of the
                 // board meeting — before wages and the dividend — so money
                 // arriving that quarter can pay that quarter's bills.
+                meetingVaultBeforeIncome = gameState.moneyInVault;
                 this.ownedStrategicProjects.forEach(project => project.onQuarterEnd());
+                meetingIncome = gameState.moneyInVault - meetingVaultBeforeIncome;
             },
         );
 

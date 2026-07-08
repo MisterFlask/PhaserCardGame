@@ -14,6 +14,7 @@ import { TextBox } from '../../../../ui/TextBox';
 import { drawBackdropDim, drawWoodPanel, Fonts, Palette } from '../../../../ui/UIStyle';
 import { CampaignUiState, RELIC_INSURANCE_COST, ROSTER_CAP } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
+import { PlaytestJournal } from '../../../../utils/PlaytestJournal';
 
 const REMOVAL_COST = 40;
 const UPGRADE_COST = 60;
@@ -161,6 +162,7 @@ export class BarracksPanel extends AbstractHqPanel {
                     }
                 }
                 SaveManager.save();
+                PlaytestJournal.getInstance().record('purchase', { kind: 'therapy', cost: therapyCost, soldier: soldier.name });
                 this.setStatus(`${soldier.name} spends an afternoon with the accredited phrenologists. Stress: ${soldier.stress}.`);
                 this.rebuild();
             });
@@ -185,6 +187,7 @@ export class BarracksPanel extends AbstractHqPanel {
                 GameState.getInstance().moneyInVault -= RUSH_TREATMENT_COST_PER_WEEK;
                 soldier.weeksWoundedRemaining = Math.max(0, soldier.weeksWoundedRemaining - 1);
                 SaveManager.save();
+                PlaytestJournal.getInstance().record('purchase', { kind: 'rush-heal', cost: RUSH_TREATMENT_COST_PER_WEEK, soldier: soldier.name });
                 this.setStatus(soldier.weeksWoundedRemaining > 0
                     ? `The Infirmary bills the Company £${RUSH_TREATMENT_COST_PER_WEEK} to hasten ${soldier.name}'s recovery. ${soldier.weeksWoundedRemaining}w remaining.`
                     : `${soldier.name} is discharged from the Infirmary, fit for duty ahead of schedule.`);
@@ -253,6 +256,7 @@ export class BarracksPanel extends AbstractHqPanel {
             hireButton.onClick(() => {
                 if (campaign.hireRecruit(candidate)) {
                     SaveManager.save();
+                    PlaytestJournal.getInstance().record('purchase', { kind: 'recruit', cost: recruitCost, name: candidate.name });
                     this.setStatus(`${candidate.name} signs the Company ledger. Welcome aboard.`);
                     this.rebuild();
                 } else {
@@ -383,6 +387,7 @@ export class BarracksPanel extends AbstractHqPanel {
                             return;
                         }
                         SaveManager.save();
+                        PlaytestJournal.getInstance().record('purchase', { kind: 'relic-insure', cost: RELIC_INSURANCE_COST, soldier: soldier.name, relic: relic.getDisplayName() });
                         this.setStatus(`${relic.getDisplayName()} underwritten for £${RELIC_INSURANCE_COST}. Infernal Marine & Postal thanks you for your custom.`);
                         this.rebuild();
                     });

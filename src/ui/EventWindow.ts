@@ -6,6 +6,7 @@ import { DepthManager } from './DepthManager';
 import { EventButton } from './EventButton';
 import { TextBox } from './TextBox';
 import { TooltipAttachment } from './TooltipAttachment';
+import { PlaytestJournal } from '../utils/PlaytestJournal';
 
 export class EventWindow extends Phaser.GameObjects.Container {
     private frame: DecorativeFrame;
@@ -165,6 +166,7 @@ export class EventWindow extends Phaser.GameObjects.Container {
             if (choice.canChoose()) {
                 button.onClick(() => {
                     this.animateOut(() => {
+                        PlaytestJournal.getInstance().record('event_choice', { event: event.name, choice: choice.text });
                         choice.effect();
                         onEventComplete(choice.nextEvent);
                         this.destroy();

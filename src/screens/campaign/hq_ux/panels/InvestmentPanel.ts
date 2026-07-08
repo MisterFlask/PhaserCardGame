@@ -16,6 +16,7 @@ import {
     CLIENT_RETAINER_ORDER_IDS, CLIENT_RETAINER_UNLOCK_THRESHOLD
 } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
+import { PlaytestJournal } from '../../../../utils/PlaytestJournal';
 
 type InvestmentTab = 'capital-works' | 'standing-orders';
 
@@ -221,6 +222,7 @@ export class InvestmentPanel extends AbstractHqPanel {
         // Conversions are permanent: checkpoint immediately, same discipline
         // as a Capital Work purchase.
         SaveManager.save();
+        PlaytestJournal.getInstance().record('purchase', { kind: 'buyback', cost: CHARTER_BUYBACK_MONEY_COST, vpGained: CHARTER_BUYBACK_VP_REWARD });
     }
 
     private clearCards(): void {
@@ -352,6 +354,7 @@ export class InvestmentPanel extends AbstractHqPanel {
 
             // Purchases are permanent: checkpoint immediately.
             SaveManager.save();
+            PlaytestJournal.getInstance().record('purchase', { kind: 'project', cost: project.getMoneyCost(), name: project.name });
         }
     }
 
@@ -388,6 +391,7 @@ export class InvestmentPanel extends AbstractHqPanel {
         this.scene.events.emit('fundsChanged');
         this.updateCards();
         SaveManager.save();
+        PlaytestJournal.getInstance().record('purchase', { kind: 'stage', cost: project.getMoneyCost(), name: project.name });
     }
     
     private highlightConnections(project: AbstractStrategicProject): void {
@@ -586,6 +590,7 @@ export class InvestmentPanel extends AbstractHqPanel {
             actionButton.onClick(() => {
                 ordersState.enact(order.id, year);
                 SaveManager.save();
+                PlaytestJournal.getInstance().record('purchase', { kind: 'retainer-enact', name: order.name });
                 this.rebuildStandingOrders();
             });
         } else {

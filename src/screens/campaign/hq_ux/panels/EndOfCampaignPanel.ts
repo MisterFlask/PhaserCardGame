@@ -7,6 +7,7 @@ import { TextBox } from '../../../../ui/TextBox';
 import { drawBackdropDim, drawPaper, Fonts, Palette } from '../../../../ui/UIStyle';
 import { CampaignUiState } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
+import { PlaytestJournal } from '../../../../utils/PlaytestJournal';
 
 const MINUTES_W = 860;
 const MINUTES_H = 620;
@@ -106,6 +107,8 @@ export class EndOfCampaignPanel extends AbstractHqPanel {
             `Victory points from ventures: ${projectVictoryPoints}\n` +
             `Charter victory points (Prestige Commissions, Charter Buyback): ${charterVictoryPoints}\n\n` +
             `FINAL SCORE: ${finalScore}`;
+
+        PlaytestJournal.getInstance().record('campaign_end', { sacked: cal.isSacked, weeks: cal.week - 1, contractsCompleted: campaign.contractsCompleted, rosterSize: campaign.roster.length, vault: gameState.moneyInVault, projectVictoryPoints, charterVictoryPoints, finalScore });
 
         if (cal.isSacked) {
             this.headline.setText('SERVICES NO LONGER REQUIRED');

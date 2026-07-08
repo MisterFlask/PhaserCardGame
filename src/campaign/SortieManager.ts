@@ -13,6 +13,7 @@ import { xpForCombatWin } from "./Leveling";
 import { StandingOrdersState } from "./orders/StandingOrdersState";
 import { applyCasualties } from "./SortieResolution";
 import { mergeStockWithLoadout } from "./ConsumableStock";
+import { PlaytestJournal } from "../utils/PlaytestJournal";
 
 /**
  * Runs a contract sortie: a fixed sequence of 1-2 combats with no node map.
@@ -102,6 +103,8 @@ export class SortieManager {
         squad.forEach(character => {
             gameState.relicsInventory.push(...character.equippedRelics);
         });
+
+        PlaytestJournal.getInstance().record('sortie_dispatched', { contractType: contract.type, act: contract.act, segment: contract.segment, squadSize: squad.length, payout: contract.projectedPayout, crates: contract.cratesLoaded });
 
         this.launchNextCombat();
     }
@@ -242,6 +245,8 @@ export class SortieManager {
         this.lastSortieReport = report;
         this.hasUnviewedReport = true;
 
+        PlaytestJournal.getInstance().record('sortie_resolved', { outcome: 'wipe', contractType: contract.type, act: contract.act, casualties: this.squad.map(c => c.name), wounds: [], xpGained: 0, insurancePayout, deathBenefitTotal });
+
         SceneChanger.switchToCampaignScene();
     }
 
@@ -312,6 +317,12 @@ export class SortieManager {
         // Time passes first (the sortie took this long); wounds sustained on
         // this sortie are applied after, so they don't tick during it.
         campaign.advanceWeeks(contract.durationWeeks);
+
+        // Playtest telemetry baselines (consumable/relic counts before
+        // resolution's transfers below move them around) so the eventual
+        // sortie_resolved record can report net deltas.
+        const consumablesBefore = campaign.consumables.length;
+        const armouryBefore = campaign.armoury.length;
 
         // Casualties and wounds come home with the squad.
         const casualties = applyCasualties(this.squad);
@@ -395,6 +406,8 @@ export class SortieManager {
             .filter(e => e.week > campaign.calendar.week - contract.durationWeeks)
             .map(e => e.message)];
         this.hasUnviewedReport = true;
+
+        PlaytestJournal.getInstance().record('sortie_resolved', { outcome: 'success', contractType: contract.type, act: contract.act, payout: totalPayout, casualties: casualties.deaths.map(d => d.name), wounds: casualties.wounds.map(w => ({ name: w.subject.name, weeks: w.weeks })), consumableDelta: campaign.consumables.length - consumablesBefore, relicDelta: campaign.armoury.length - armouryBefore });
 
         SceneChanger.switchToCampaignScene();
     }

@@ -34,6 +34,7 @@ import ImageUtils from '../utils/ImageUtils';
 import { installLoaderWatchdog } from '../utils/LoaderWatchdog';
 import SoundUtils from '../utils/SoundUtils';
 import { runSmokeTest } from '../utils/SmokeTest';
+import { PlaytestJournal, survivingHpFraction } from '../utils/PlaytestJournal';
 import { runHeadlessCombat, HeadlessCombatParams } from '../combat/sim/HeadlessCombat';
 import { randomLegalPolicy, mulberry32 } from '../combat/sim/RandomLegalPolicy';
 import { greedyPolicy } from '../combat/sim/GreedyPolicy';
@@ -386,6 +387,7 @@ class CombatScene extends Phaser.Scene {
             && GameState.getInstance().combatState.playerCharacters.every(c => c.isDead())) {
             this.combatEndHandled = true;
             this.defeatOverlayShown = true;
+            PlaytestJournal.getInstance().record('combat_ended', { won: false, turns: GameState.getInstance().combatState.currentTurn, survivingHpFraction: 0 });
             new DefeatOverlay(this, () => {
                 SortieManager.getInstance().handleSquadWipe();
             });
@@ -396,6 +398,7 @@ class CombatScene extends Phaser.Scene {
         if (this.isCombatFinished() && !this.combatEndHandled) {
             this.combatEndHandled = true;
             console.log("Combat finished");
+            PlaytestJournal.getInstance().record('combat_ended', { won: true, turns: GameState.getInstance().combatState.currentTurn, survivingHpFraction: survivingHpFraction(GameState.getInstance().combatState.playerCharacters) });
             ActionManager.getInstance().endCombat();
             this.cardManager.onCombatEnd();
             this.uiManager.onCombatEnd();
@@ -522,6 +525,7 @@ installBackgroundStepper();
 (window as any).getStandingOrdersState = () => StandingOrdersState.getInstance();
 // Registry doubles as a console factory for buffs/cards during testing.
 (window as any).SaveRegistries = SaveRegistries;
+(window as any).playtestJournal = PlaytestJournal.getInstance();
 (window as any).getActionQueueErrors = () => ActionManager.getInstance().actionQueue.lastErrors;
 // Drives the full sortie loop (HQ -> dispatch -> combat -> payout -> HQ ->
 // save/reload) headlessly and reports compact JSON; see src/utils/SmokeTest.ts.

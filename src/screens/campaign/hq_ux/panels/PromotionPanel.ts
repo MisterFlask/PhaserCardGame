@@ -12,6 +12,7 @@ import { TextBox } from '../../../../ui/TextBox';
 import { CardGuiUtils } from '../../../../utils/CardGuiUtils';
 import { CampaignUiState } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
+import { PlaytestJournal } from '../../../../utils/PlaytestJournal';
 
 const PROMOTION_DEPTH = DepthManager.getInstance().REWARD_SCREEN + 2000;
 
@@ -169,6 +170,7 @@ export class PromotionPanel extends AbstractHqPanel {
         // (now-destroyed) on-screen PhysicalCard.
         const result = applyPromotion(soldier, chosenCard);
         this.clearCardChoices();
+        PlaytestJournal.getInstance().record('promotion_pick', { soldier: soldier.name, card: chosenCard.name, displaced: displacedCard?.name ?? null });
 
         if (result.perkGranted) {
             this.showPerkReveal(soldier, result.perkGranted.getDisplayName(), result.perkGranted.getDescription());

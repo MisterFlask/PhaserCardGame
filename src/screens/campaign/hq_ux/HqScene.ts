@@ -12,6 +12,7 @@ import { HqChrome, HqTabKey } from './HqChrome';
 import { AbstractHqPanel } from './panels/AbstractHqPanel';
 import { SortieManager } from '../../../campaign/SortieManager';
 import { SaveManager } from '../../../saveload/SaveManager';
+import { PlaytestJournal } from '../../../utils/PlaytestJournal';
 import { BarracksPanel } from './panels/BarracksPanel';
 import { ContractBoardPanel } from './panels/ContractBoardPanel';
 import { EndOfCampaignPanel } from './panels/EndOfCampaignPanel';
@@ -183,6 +184,7 @@ export class HqScene extends Scene {
         // serialized) so this never reappears after a reload finds a save.
         if (SaveManager.bootedFresh) {
             SaveManager.bootedFresh = false;
+            PlaytestJournal.getInstance().record('campaign_start', {});
             new OnboardingLetter(this, () => { /* no-op: overlay self-destroys */ });
         }
     }

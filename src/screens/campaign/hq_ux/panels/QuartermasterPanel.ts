@@ -8,6 +8,7 @@ import { TextBox } from '../../../../ui/TextBox';
 import { drawBackdropDim, drawPaper, drawWoodPanel, Fonts, Palette } from '../../../../ui/UIStyle';
 import { CampaignUiState } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
+import { PlaytestJournal } from '../../../../utils/PlaytestJournal';
 
 const CARD_W = 300;
 const CARD_H = 168;
@@ -159,6 +160,7 @@ export class QuartermasterPanel extends AbstractHqPanel {
         }
 
         SaveManager.save();
+        PlaytestJournal.getInstance().record('purchase', { kind: 'consumable', cost: price, name: template.getDisplayName() });
         this.rebuild();
     }
 
