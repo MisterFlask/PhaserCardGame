@@ -300,6 +300,18 @@ export class TextBox extends Phaser.GameObjects.Container {
         }
     }
 
+    /**
+     * Set the background border color (and optionally width). Also records it
+     * as the caller-specified strokeColor so later setBackgroundColor() calls
+     * preserve it instead of reverting to the black/white default.
+     */
+    setStrokeColor(color: number, lineWidth: number = 2): void {
+        this.strokeColor = color;
+        if (this.background) {
+            this.background.setStrokeStyle(lineWidth, color);
+        }
+    }
+
     setFillColor(color: number): void {
         if (this.background) {
             this.background.setFillStyle(color);

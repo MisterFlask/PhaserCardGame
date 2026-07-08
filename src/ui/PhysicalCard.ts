@@ -442,7 +442,13 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
         if (this.data.isPlayableCard()) {
             const playableCard = this.data as PlayableCardType;
-            this.nameBox.setBackgroundColor(playableCard.rarity.color);
+            // Rarity reads as the plate's BORDER; the themed wood fill stays.
+            const rarityBorder = PhysicalCard.RARITY_BORDER_OVERRIDES[playableCard.rarity.id]
+                ?? playableCard.rarity.color;
+            if (this.lastAppliedRarityBorder !== rarityBorder) {
+                this.lastAppliedRarityBorder = rarityBorder;
+                this.nameBox.setStrokeColor(rarityBorder);
+            }
             this.costBox?.setText(`${playableCard.energyCost}`);
             this.updateResourceScalingBox(playableCard);
             if (this.cardTypeBox) {
@@ -777,7 +783,9 @@ export class PhysicalCard implements IPhysicalCardInterface {
             height: 30,  // Reduced height since we're tightening the layout
             text: data.name,
             textBoxName: "nameBox:" + data.id,
-            style: { fontSize: '20px', fontFamily: Fonts.DISPLAY, color: Palette.WHITE, wordWrap: { width: cardWidth - 10 } },
+            // Wrap at the plate's actual width (cardWidth+40) minus padding,
+            // so names like "Fire Revolver+" don't wrap or clip early.
+            style: { fontSize: '20px', fontFamily: Fonts.DISPLAY, color: Palette.WHITE, wordWrap: { width: cardWidth + 20 } },
             fillColor: Palette.WOOD_PANEL,
             strokeColor: Palette.BRASS,
             bigTextOverVariableColors: true,
@@ -906,6 +914,16 @@ export class PhysicalCard implements IPhysicalCardInterface {
         SKILL: 0x2f3d52, // desaturated blue-slate
         POWER: Palette.VERDIGRIS,
     };
+
+    /** Rarity shows as the name plate's border color. The gray rarities
+     *  (0xA0A0A0) would read as a near-invisible smudge against the wood, so
+     *  they fall back to the standard brass border — i.e. "no special signal". */
+    private static readonly RARITY_BORDER_OVERRIDES: Record<string, number> = {
+        TOKEN: Palette.BRASS,
+        BASIC: Palette.BRASS,
+        COMMON: Palette.BRASS,
+    };
+    private lastAppliedRarityBorder: number | null = null;
 
     private maybeCreateCardTypeBox(data: AbstractCard) {
         if (data.isPlayableCard()) {

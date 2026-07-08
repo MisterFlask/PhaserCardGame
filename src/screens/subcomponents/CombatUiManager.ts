@@ -18,6 +18,7 @@ import Menu from '../../ui/Menu';
 import { PhysicalConsumable } from '../../ui/PhysicalConsumable';
 import { SubtitleManager } from '../../ui/SubtitleManager';
 import { TextBox } from '../../ui/TextBox';
+import { TooltipAttachment } from '../../ui/TooltipAttachment';
 import { TransientUiState } from '../../ui/TransientUiState';
 import { UIContext, UIContextManager } from '../../ui/UIContextManager';
 import { Fonts, Palette } from '../../ui/UIStyle';
@@ -38,6 +39,7 @@ class CombatUIManager {
     public battlefieldArea!: Phaser.GameObjects.Rectangle;
     public handArea!: Phaser.GameObjects.Rectangle;
     public energyDisplay!: TextBox;
+    private energyTooltip?: TooltipAttachment;
     public resourceIndicators: CombatResourceDisplay[] = [];
     private subtitleTextBox?: TextBox;
     private generalRewardScreen!: GeneralRewardScreen;
@@ -127,18 +129,27 @@ class CombatUIManager {
         }
     }
 
+    /** Energy is welded to the draw pile: directly above the pile icon at
+     *  bottom-left. Single source of truth for create + updateLayout. */
+    private getEnergyDisplayPosition(): { x: number, y: number } {
+        return {
+            x: this.scene.scale.width * 0.1,
+            y: CombatSceneLayoutUtils.getPileY(this.scene) - 90
+        };
+    }
+
     private createEnergyDisplay(): void {
-        const pileY = CombatSceneLayoutUtils.getPileY(this.scene);
+        const energyPos = this.getEnergyDisplayPosition();
 
         this.energyDisplay = new TextBox({
             scene: this.scene,
-            x: 100,
-            y: pileY,
-            width: 100,
-            height: 40,
+            x: energyPos.x,
+            y: energyPos.y,
+            width: 120,
+            height: 60,
             text: this.getEnergyText(),
             style: {
-                fontSize: '26px',
+                fontSize: '32px',
                 color: Palette.BRASS_TEXT,
                 fontFamily: Fonts.DISPLAY
             },
@@ -148,6 +159,13 @@ class CombatUIManager {
         });
 
         this.scene.add.existing(this.energyDisplay);
+        this.energyDisplay.setInteractive();
+        this.energyTooltip = new TooltipAttachment({
+            scene: this.scene,
+            container: this.energyDisplay,
+            tooltipText: "Energy: expended to play cards. The ration is replenished at the start of each turn.",
+            fillColor: Palette.WOOD_DARK
+        });
         this.scene.events.on('update', this.updateEnergyDisplay, this);
     }
 
@@ -279,13 +297,12 @@ class CombatUIManager {
     }
 
     private createEndTurnButton(): void {
-        const gameWidth = this.scene.scale.width;
-        const pileY = CombatSceneLayoutUtils.getPileY(this.scene);
+        const anchor = CombatSceneLayoutUtils.getEndTurnButtonPosition(this.scene);
 
         this.endTurnButton = new TextBoxButton({
             scene: this.scene,
-            x: gameWidth * 0.7,
-            y: pileY,
+            x: anchor.x,
+            y: anchor.y,
             width: 180,
             height: 56,
             text: 'End Turn',
@@ -308,7 +325,8 @@ class CombatUIManager {
 
     public updateLayout(width: number, height: number): void {
         this.menu.updatePosition(width * 0.25, height / 2);
-        this.endTurnButton.setPosition(width * 0.7, CombatSceneLayoutUtils.getPileY(this.scene));
+        const endTurnAnchor = CombatSceneLayoutUtils.getEndTurnButtonPosition(this.scene);
+        this.endTurnButton.setPosition(endTurnAnchor.x, endTurnAnchor.y);
 
         const menuButton = this.scene.children.getByName('MenuButton') as TextBoxButton;
         if (menuButton) {
@@ -318,8 +336,8 @@ class CombatUIManager {
         this.updateGameAreas();
         this.updateConsumablesArea();
 
-        const pileY = CombatSceneLayoutUtils.getPileY(this.scene);
-        this.energyDisplay.setPosition(100, pileY);
+        const energyPos = this.getEnergyDisplayPosition();
+        this.energyDisplay.setPosition(energyPos.x, energyPos.y);
 
     }
     
@@ -424,8 +442,10 @@ class CombatUIManager {
         const spacingY = slotSize + 16;
         this.slotBoxRefs = [];
         for (let i = 0; i < maxSlots; i++) {
+            // Empty slots are faint chrome: a thin brass outline, not bright
+            // white boxes competing with actual consumables for attention.
             const slotBox = this.scene.add.rectangle(0, i * spacingY, slotSize, slotSize)
-                .setStrokeStyle(2, 0xffffff)
+                .setStrokeStyle(1, Palette.BRASS, 0.3)
                 .setOrigin(0.5, 0.5);
             this.slotBoxesContainer.add(slotBox);
             this.slotBoxRefs.push(slotBox);
@@ -521,6 +541,7 @@ class CombatUIManager {
         this.resourceIndicators = [];
         this.scene.events.off('update', this.updateResourceIndicators, this);
         this.scene.events.off('update', this.updateEnergyDisplay, this);
+        this.energyTooltip?.destroy();
 
         this.scene.events.off('abstractEvent:launch', this.onAbstractEventLaunch, this);
         this.scene.events.off('update', () => {
@@ -552,15 +573,12 @@ class CombatUIManager {
 
         const gameWidth = this.scene.scale.width;
         const gameHeight = this.scene.scale.height;
+        // Compact column, raised so its bottom clears the End Turn corner
+        // (bottom edge at ~height*0.78), x kept inboard of the roster.
         const startX = gameWidth - 300;
-        const startY = gameHeight - 500;
-        const spacingY = 80;
-
-        const boxPadding = 10;
-        const backgroundWidth = 240;
-        const backgroundHeight = resourceArray.length * spacingY + boxPadding * 2;
-        const backgroundX = startX - boxPadding + backgroundWidth / 2 - 40;
-        const backgroundY = startY - boxPadding + backgroundHeight / 2;
+        const spacingY = 58;
+        const columnHeight = resourceArray.length * spacingY;
+        const startY = gameHeight * 0.78 - columnHeight + spacingY / 2;
 
         resourceArray.forEach((resource, index) => {
             const resourceDisplay = new CombatResourceDisplay(

@@ -183,9 +183,12 @@ export class CombatCardManager {
         const gameWidth = this.scene.scale.width;
         const pileY = CombatSceneLayoutUtils.getPileY(this.scene);
 
+        // Bottom-row layout: draw pile + energy bottom-left, discard pile
+        // bottom-right (restores the left-to-right card-flow metaphor),
+        // exhaust pile tucked inboard of discard.
         this.exhaustPile = CardGuiUtils.getInstance().createCard({
             scene: this.scene,
-            x: gameWidth * 0.3,
+            x: gameWidth * 0.72,
             y: pileY,
             data: new UiCard({ name: 'Exhaust Pile (0)', description: 'Exhausted cards', portraitName: "exhaustpile",tint:0x800080,size:CardSize.TINY }),
             onCardCreatedEventCallback: (card: PhysicalCard) => {
@@ -215,7 +218,7 @@ export class CombatCardManager {
 
         this.discardPile = CardGuiUtils.getInstance().createCard({
             scene: this.scene,
-            x: gameWidth * 0.2,
+            x: gameWidth * 0.8,
             y: pileY,
             data: new UiCard({ name: 'Discard Pile (0)', description: 'Discarded cards',     portraitName: "abstract-069" , tint:0xFF0000,size:CardSize.TINY  }),
             onCardCreatedEventCallback: (card: PhysicalCard) => {
