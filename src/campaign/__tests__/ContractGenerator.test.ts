@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ContractGenerator } from '../ContractGenerator';
+import { isOppositionId, OPPOSITIONS } from '../Oppositions';
 
 const gen = ContractGenerator.getInstance();
 
@@ -300,6 +301,49 @@ describe('ContractGenerator', () => {
                 const template = byName.get(prestige.name);
                 expect(template).toBeDefined();
                 expect(prestige.description).toBe(template!.description);
+            }
+            expect(seen).toBeGreaterThan(0);
+        });
+    });
+
+    describe('Opposition system (src/campaign/Oppositions.ts)', () => {
+        it('every bounty template carries a valid opposition matching its own region\'s act', () => {
+            const templates = ContractGenerator.getAllTemplates();
+            expect(templates.length).toBeGreaterThan(0);
+            templates.forEach(t => {
+                expect(isOppositionId(t.opposition), `${t.name}: "${t.opposition}" is not a valid OppositionId`).toBe(true);
+            });
+        });
+
+        it('every trade-run template carries a valid opposition', () => {
+            const templates = ContractGenerator.getAllTradeRunTemplates();
+            expect(templates.length).toBeGreaterThan(0);
+            templates.forEach(t => {
+                expect(isOppositionId(t.opposition), `${t.name}: "${t.opposition}" is not a valid OppositionId`).toBe(true);
+            });
+        });
+
+        it('generated bounty and trade-run contracts carry their template\'s opposition, matching their own act', () => {
+            let seenBounty = 0, seenTradeRun = 0;
+            for (let i = 0; i < 500; i++) {
+                const c = gen.generateContract(10);
+                if (c.isPrestige) continue;
+                expect(isOppositionId(c.opposition), `${c.name}: "${c.opposition}" is not a valid OppositionId`).toBe(true);
+                expect(OPPOSITIONS[c.opposition as keyof typeof OPPOSITIONS].act).toBe(c.act);
+                if (c.isTradeRun) seenTradeRun++; else seenBounty++;
+            }
+            expect(seenBounty).toBeGreaterThan(0);
+            expect(seenTradeRun).toBeGreaterThan(0);
+        });
+
+        it('prestige contracts always have undefined opposition', () => {
+            let seen = 0;
+            for (let i = 0; i < 200; i++) {
+                const board = gen.refillBoard([], 8);
+                const prestige = board.find(c => c.isPrestige);
+                if (!prestige) continue;
+                seen++;
+                expect(prestige.opposition).toBeUndefined();
             }
             expect(seen).toBeGreaterThan(0);
         });

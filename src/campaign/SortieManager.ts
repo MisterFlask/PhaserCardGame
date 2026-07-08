@@ -115,7 +115,7 @@ export class SortieManager {
     public launchNextCombat(): void {
         if (!this.activeContract) return;
         const encounter = EncounterManager.getInstance()
-            .getRandomCombatEncounter(this.activeContract.act, this.activeContract.segment);
+            .getRandomCombatEncounter(this.activeContract.act, this.activeContract.segment, this.activeContract.opposition);
 
         // Hell hardens with campaign time: scale this fresh batch of enemies
         // by the current year before anything else touches them (design doc:

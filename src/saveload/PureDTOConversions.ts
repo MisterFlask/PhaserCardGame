@@ -45,6 +45,7 @@ export function contractToDTO(c: Contract): ContractDTO {
         maxCrates: c.maxCrates,
         freightRatePerCrate: c.freightRatePerCrate,
         vpReward: c.vpReward,
+        opposition: c.opposition,
     };
 }
 
@@ -68,6 +69,7 @@ export function contractFromDTO(dto: ContractDTO): Contract {
         maxCrates: dto.maxCrates,
         freightRatePerCrate: dto.freightRatePerCrate,
         vpReward: dto.vpReward,
+        opposition: dto.opposition,
     });
 }
 

@@ -55,7 +55,14 @@
 //      Levi-Maxwell Ascension Protocol); every other owned project's DTO
 //      omits them, same as today. Fresh-campaign value: n/a (ownedProjects
 //      starts empty).
-export const SAVE_FORMAT_VERSION = 13;
+// v14: Opposition system (src/campaign/Oppositions.ts). ContractDTO gains
+//      optional Contract.opposition (an OppositionId string; undefined on
+//      Prestige Commissions and on any contract generated before this field
+//      existed -- SortieManager/EncounterManager treat a missing opposition
+//      as the pre-existing uniform-random encounter pick, so no migration is
+//      needed). Fresh-campaign value: n/a (opposition is set per-contract at
+//      generation).
+export const SAVE_FORMAT_VERSION = 14;
 export const SAVE_STORAGE_KEY = 'east-infernal-company-save';
 
 export interface BuffDTO {
@@ -135,6 +142,9 @@ export interface ContractDTO {
      *  Victory Points granted on completion instead of £ (payout is always 0
      *  on these). See src/docs/vp_endgame_design.md. */
     vpReward?: number;
+    /** OppositionId string (src/campaign/Oppositions.ts); undefined on
+     *  Prestige Commissions and on saves from before v14. */
+    opposition?: string;
 }
 
 export interface ConsumableDTO {

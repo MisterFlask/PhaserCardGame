@@ -71,6 +71,15 @@ export class Contract {
      *  See src/docs/vp_endgame_design.md. */
     public vpReward: number;
 
+    /** The opposition (src/campaign/Oppositions.ts) this contract's sortie
+     *  is expected to fight, as an OppositionId string (kept as a plain
+     *  string here per house rule 1 -- only type-only imports of the pure
+     *  Oppositions module are safe at this Phaser boundary). Biases
+     *  SortieManager's encounter pick toward that family, with a small
+     *  complication chance of drawing from outside it. Undefined on Prestige
+     *  Commissions (internal Court work, no named opposition). */
+    public opposition?: string;
+
     constructor(args: {
         name: string;
         description: string;
@@ -90,6 +99,7 @@ export class Contract {
         maxCrates?: number;
         freightRatePerCrate?: number;
         vpReward?: number;
+        opposition?: string;
     }) {
         this.name = args.name;
         this.description = args.description;
@@ -109,6 +119,7 @@ export class Contract {
         this.maxCrates = args.maxCrates ?? 0;
         this.freightRatePerCrate = args.freightRatePerCrate ?? 0;
         this.vpReward = args.vpReward ?? 0;
+        this.opposition = args.opposition;
     }
 
     /** True for trade-run contracts: the muster UI shows a freight stepper

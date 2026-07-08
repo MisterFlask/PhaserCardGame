@@ -2,6 +2,7 @@ import { Contract, ContractType } from "./Contract";
 import { CONSUMABLE_REWARD_NAMES } from "./ConsumableStock";
 import { StandingOrdersState } from "./orders/StandingOrdersState";
 import { applyCharteredPartnerBonus } from "./ClientReputation";
+import { OppositionId } from "./Oppositions";
 
 /**
  * A contract template bundles name/client/description/paymentClause as one
@@ -16,6 +17,10 @@ interface ContractTemplate {
     description: string;
     /** Invoice register; may contain the literal token {payout}. */
     paymentClause: string;
+    /** Who the squad is nominally fighting (src/campaign/Oppositions.ts).
+     *  Must belong to this template's own region's act (enforced by
+     *  OppositionCoverageLint.test.ts). */
+    opposition: OppositionId;
 }
 
 interface RegionFlavor {
@@ -35,6 +40,7 @@ const REGION_FLAVORS: RegionFlavor[] = [
                 client: "The Styx Dam Project Office",
                 description: "Guild ferrymen have declared certain channels 'closed for mourning'. Every idle barge costs the Project Office toll revenue it has already spent. The Company does not recognize mourning.",
                 paymentClause: "{payout} on reopening of navigation, invoiced against the Project's works budget.",
+                opposition: 'boatmens-guild',
             },
             {
                 // Insurance mitigation: underwriter pays to stop claims.
@@ -42,6 +48,7 @@ const REGION_FLAVORS: RegionFlavor[] = [
                 client: "Infernal Marine & Postal Underwriters, Ltd.",
                 description: "Something in the reeds has been eating the mail. The mail is insured; the couriers are not. Our client would prefer to stop paying claims on both.",
                 paymentClause: "{payout} on certified cessation of losses, per indemnity schedule 4.",
+                opposition: 'delta-fauna',
             },
             {
                 // Repossession: the asset itself is worth money.
@@ -49,6 +56,7 @@ const REGION_FLAVORS: RegionFlavor[] = [
                 client: "Styx Delta Ferry & Lighterage Company",
                 description: "A sandbar squatter camp has been boarding company barges without paying passage, and stripping the fittings when they disembark. The fittings are the expensive part.",
                 paymentClause: "{payout} on recovery of fittings, less 10% adjuster's fee, per cargo-loss schedule 2.",
+                opposition: 'squatters-salvage',
             },
             {
                 // Political subsidy: outcome, not property.
@@ -56,6 +64,7 @@ const REGION_FLAVORS: RegionFlavor[] = [
                 client: "The British Trade Delegation, Delta Office",
                 description: "A brigand camp has set up within sight of the survey markers, which the Delegation finds diplomatically embarrassing during ongoing rift-access negotiations. Visibility, not violence, is the problem to be solved.",
                 paymentClause: "{payout} on the camp's absence, drawn against the Delegation's discretionary fund.",
+                opposition: 'squatters-salvage',
             },
             {
                 // Insurance mitigation: reduce future claims by removing the hazard.
@@ -63,6 +72,7 @@ const REGION_FLAVORS: RegionFlavor[] = [
                 client: "Infernal Marine & Postal Underwriters, Ltd.",
                 description: "A bloom of skeeterwisps has been swarming survey crews, and every stung surveyor is a disability claim on our client's books. Thinning the bloom is cheaper than paying out.",
                 paymentClause: "{payout} on verified thinning, per indemnity schedule 4, addendum: vermin.",
+                opposition: 'delta-fauna',
             },
             {
                 // Revenue protection: the survey itself is the toll-generating asset.
@@ -70,6 +80,15 @@ const REGION_FLAVORS: RegionFlavor[] = [
                 client: "The Styx Dam Project Office",
                 description: "The survey party has the turbine's flow readings, and the readings are worth nothing if the party doesn't reach the boat with them. The dam cannot be costed without this data, and an uncosted dam earns the Project Office nothing.",
                 paymentClause: "{payout} on the party's safe return, invoiced against the Project's works budget.",
+                opposition: 'delta-fauna',
+            },
+            {
+                // Repossession/scientific stake: specimens are the paying asset.
+                name: "Collect Specimens Along the Skeeterwisp Line",
+                client: "De Koninklijke Wetenschappelijke Helrader Maatschappij",
+                description: "The Maatschappij requires fresh specimens of the delta's fauna for the Rotterdam archives, live where practicable, intact where not. Our client stresses that 'intact' is the lower and considerably more achievable standard.",
+                paymentClause: "{payout} on delivery to the collection agent, per the Maatschappij's standing specimen tariff.",
+                opposition: 'delta-fauna',
             },
         ],
     },
@@ -83,6 +102,7 @@ const REGION_FLAVORS: RegionFlavor[] = [
                 client: "Reichsinfernokorps Liaison Office",
                 description: "The Emperor Undying's men have entrenched across a concession the Liaison Office would rather not admit exists. They require the trench cleared and their own involvement to remain unrecorded.",
                 paymentClause: "{payout} on clearance, paid in cash, per the Office's usual arrangement: no paperwork.",
+                opposition: 'grande-armee',
             },
             {
                 // Insurance mitigation: fewer casualties, fewer claims.
@@ -90,6 +110,7 @@ const REGION_FLAVORS: RegionFlavor[] = [
                 client: "Continental Casualty & Ossuary Underwriters",
                 description: "The trenches produce nothing but casualties and paperwork, and the ossuary has begun producing revenants who file their own claims. Our client would like the second problem to stop before it becomes a precedent.",
                 paymentClause: "{payout} on incineration, per indemnity schedule 9, revenant rider.",
+                opposition: 'grande-armee',
             },
             {
                 // Political subsidy: outcome desired for reasons of state.
@@ -97,6 +118,7 @@ const REGION_FLAVORS: RegionFlavor[] = [
                 client: "The British Trade Delegation, Continental Office",
                 description: "A machine-gun emplacement has taken to firing in time with a hymn, which is unnerving the telegraph relay crew two miles back and delaying dispatches the Delegation needs sent by nightfall.",
                 paymentClause: "{payout} on the guns falling silent, drawn against the Delegation's discretionary fund.",
+                opposition: 'grande-armee',
             },
             {
                 // Repossession: recovering an asset of direct value.
@@ -104,6 +126,7 @@ const REGION_FLAVORS: RegionFlavor[] = [
                 client: "Deep France Concession Holdings",
                 description: "A patrol of the Emperor's revenant auditors has made off with the concession's boundary ledgers. Without the ledgers, Holdings cannot prove title to three parishes of mined-out trench frontage, and unproven title is unsellable title.",
                 paymentClause: "{payout} on recovery of the ledgers, invoiced against the concession's title-defense reserve.",
+                opposition: 'grande-armee',
             },
             {
                 // Revenue protection: supply line for a paying operation.
@@ -111,6 +134,7 @@ const REGION_FLAVORS: RegionFlavor[] = [
                 client: "Maison Vachon, Purveyors to the Front",
                 description: "A rival quartermaster has been requisitioning Maison Vachon's supply carts at the crossroads, under color of martial law that does not, in fact, apply to caterers. Every requisitioned cart is a canceled dinner service and a refunded officers' mess contract.",
                 paymentClause: "{payout} on the carts' return, per the Maison's standing supply agreement.",
+                opposition: 'rear-echelon',
             },
             {
                 // Insurance mitigation via demonstration of resolve, billed like a service.
@@ -118,6 +142,7 @@ const REGION_FLAVORS: RegionFlavor[] = [
                 client: "Reichsinfernokorps Liaison Office",
                 description: "Management requires a demonstration of resolve along the ridge line, chiefly so the Liaison Office can report progress to Berlin without further specifics. Resolve is billed hourly and the meter is already running.",
                 paymentClause: "{payout} on demonstrated resolve, paid in cash, per the Office's usual arrangement: no paperwork.",
+                opposition: 'grande-armee',
             },
         ],
     },
@@ -131,6 +156,7 @@ const REGION_FLAVORS: RegionFlavor[] = [
                 client: "Dis Foundry Belt Board of Overseers",
                 description: "The Stoker's Union has walked off shift three furnaces early, and every idle furnace is heat the Board has already sold forward. The Board would like the furnaces staffed again, by whichever means prove necessary.",
                 paymentClause: "{payout} on resumption of shift work, invoiced against the Board's production contingency.",
+                opposition: 'stokers-union',
             },
             {
                 // Repossession: the asset is worth money and the client wants it back.
@@ -138,6 +164,7 @@ const REGION_FLAVORS: RegionFlavor[] = [
                 client: "Brimstone Barons Equipment Leasing Consortium",
                 description: "The Stoker's Union has occupied Company property and, worse from the Consortium's view, stopped making the lease payments on it. The property is on fire, but it is still leased property, and leased property gets repossessed.",
                 paymentClause: "{payout} on recovery of the machinery, less depreciation, per lease-recovery schedule 1.",
+                opposition: 'stokers-union',
             },
             {
                 // Insurance mitigation: strikebreakers as a covered service.
@@ -145,6 +172,7 @@ const REGION_FLAVORS: RegionFlavor[] = [
                 client: "Dis Foundry Belt Board of Overseers",
                 description: "The replacement crews are contracted, paid, and refusing to walk to the furnace floor unescorted, which is a labor cost the Board is accruing whether or not any labor occurs. Deliver them intact and the meter stops.",
                 paymentClause: "{payout} on the crews reaching shift, invoiced against the Board's production contingency.",
+                opposition: 'stokers-union',
             },
             {
                 // Insurance mitigation: audit the source of claims before they're paid out.
@@ -152,6 +180,7 @@ const REGION_FLAVORS: RegionFlavor[] = [
                 client: "Continental Casualty & Ossuary Underwriters",
                 description: "A rash of furnace-floor 'accidents' has produced more claims than the Union's own casualty numbers can explain. Our client suspects sabotage rather than misfortune, and sabotage is a category they don't have to pay out on if it can be proven.",
                 paymentClause: "{payout} on a certified finding, per indemnity schedule 11, fraud investigation rider.",
+                opposition: 'stokers-union',
             },
             {
                 // Repossession: the office itself, and the paperwork inside it, are the asset.
@@ -159,13 +188,31 @@ const REGION_FLAVORS: RegionFlavor[] = [
                 client: "Brimstone Barons Equipment Leasing Consortium",
                 description: "The Union has occupied the Overseer's office along with the machinery, and the office safe holds the original lease documents the Consortium needs to enforce the repossession in the first place. No documents, no claim.",
                 paymentClause: "{payout} on recovery of the office and its contents, per lease-recovery schedule 1.",
+                opposition: 'stokers-union',
             },
             {
                 // Political subsidy: discretion is what's being purchased.
+                // Flavor lightly clarified (2026-07, opposition tagging pass):
+                // named the Company's own overseers as the discreet target so
+                // the family a contract-biased sortie draws from is legible
+                // from the notice (Barons wouldn't need discretion moving
+                // against their own striking workforce -- that fight is
+                // already public).
                 name: "Satisfy the Brimstone Barons' Discretion",
                 client: "The Brimstone Barons, jointly",
-                description: "The Barons require a certain matter along Furnace Row resolved without their names appearing in the Board's minutes. The matter itself is unremarkable; the discretion is what costs money.",
+                description: "The Barons require a certain matter of Company overseers along Furnace Row resolved without their names appearing in the Board's minutes. The matter itself is unremarkable; the discretion is what costs money.",
                 paymentClause: "{payout} on resolution, paid in cash, no minute taken.",
+                opposition: 'company-men',
+            },
+            {
+                // Political subsidy: the Union buys the Company's neutrality
+                // as a service, same as any other client -- the joke being
+                // that our billable hours have no politics.
+                name: "Retain the Company Against Its Own Management",
+                client: "The Stoker's Union, Amalgamated Chapters",
+                description: "The Union wishes to retain the Company's services against certain of the Company's own overseers and repossession machinery, and finds nothing irregular in the request. Neither, on reflection, does the Company.",
+                paymentClause: "{payout} on the Union's satisfaction, invoiced against Chapter dues, no questions raised on either side.",
+                opposition: 'company-men',
             },
         ],
     },
@@ -179,13 +226,18 @@ const REGION_FLAVORS: RegionFlavor[] = [
                 client: "The Brimstone Barons, jointly",
                 description: "Two survey crews have staked the same fissure, and the Barons would prefer the matter settled by whoever is still standing rather than by the Concordat's arbitrators, who charge by the hour and side with neither party on principle.",
                 paymentClause: "{payout} on undisputed possession, paid in cash, no minute taken.",
+                opposition: 'barons-interests',
             },
             {
-                // Political subsidy: access under a religious embargo.
+                // Political subsidy: access under a religious embargo. Not a
+                // fight against the Choir itself -- a supply run past the
+                // interdict, contested by whoever else the Barons' interests
+                // put in the way of that delivery.
                 name: "Provision the Choir Compound Under Interdict",
                 client: "The Iron Choir, per its Concordat",
                 description: "The compound has declared itself closed to secular trade for the duration of a rite the Concordat will not name. It still needs feeding. The Choir does not haggle and does not explain; it simply expects the crates to arrive.",
                 paymentClause: "{payout} on delivery inside the wall, per the Concordat's own terms.",
+                opposition: 'barons-interests',
             },
             {
                 // Insurance mitigation: a runaway asset is a liability until stopped.
@@ -193,6 +245,7 @@ const REGION_FLAVORS: RegionFlavor[] = [
                 client: "Continental Casualty & Ossuary Underwriters",
                 description: "A brimstone-boring engine has thrown its governor and is now extracting considerably more than its lease permits, in every direction at once. Every additional yard bored is a subsidence claim our client would rather not underwrite.",
                 paymentClause: "{payout} on shutdown, per indemnity schedule 14, runaway-plant rider.",
+                opposition: 'barons-interests',
             },
             {
                 // Political subsidy: outcome (repatriation), not property.
@@ -200,6 +253,7 @@ const REGION_FLAVORS: RegionFlavor[] = [
                 client: "The British Trade Delegation, Delta Office",
                 description: "A contingent of indentured pilgrims has wandered off its assigned vent field and into a jurisdiction the Delegation is not presently prepared to explain to London. Their return, quietly, is the entire ask.",
                 paymentClause: "{payout} on their return to the field, drawn against the Delegation's discretionary fund.",
+                opposition: 'vent-fauna',
             },
             {
                 // Revenue protection: the survey party's data is the paying asset.
@@ -207,6 +261,7 @@ const REGION_FLAVORS: RegionFlavor[] = [
                 client: "Brimstone Barons Equipment Leasing Consortium",
                 description: "A leased survey team is mapping caldera pressure for the Consortium's next lease auction, and an auction without pressure data fetches auction prices for nothing in particular. The team walks; the escort is not optional.",
                 paymentClause: "{payout} on the survey's safe return, per lease-recovery schedule 1.",
+                opposition: 'vent-fauna',
             },
             {
                 // Insurance mitigation: audit a religious levy before it's honored as a claim.
@@ -214,6 +269,7 @@ const REGION_FLAVORS: RegionFlavor[] = [
                 client: "The Iron Choir, per its Concordat",
                 description: "The Choir's tithe rolls show more brimstone leaving the compound than the compound's own extraction can account for, and the Concordat would like that discrepancy resolved before it becomes a subject for hymn. Discreetly, if possible.",
                 paymentClause: "{payout} on a certified finding, per the Concordat's own terms.",
+                opposition: 'iron-choir',
             },
         ],
     },
@@ -276,25 +332,32 @@ const TRADE_RUN_REGIONS: TradeRunRegion[] = [
         act: 1,
         templates: [
             {
+                // Route hazard: the delta's fauna is what threatens barge traffic.
                 name: "Reagent Barrels to the Dam Works",
                 client: "The Styx Dam Project Office",
                 description: "The Project Office has over-ordered curing reagent again and needs it moved before the quartermaster notices the invoice. Barge space is available; escort is not, officially.",
                 paymentClause: "{payout} on delivery, plus carriage per barrel, invoiced against the Project's works budget.",
                 cargoLabel: "reagent barrels",
+                opposition: 'delta-fauna',
             },
             {
+                // Route hazard: a discreet cargo avoids attention, chiefly
+                // from whoever's squatting the channels it must pass.
                 name: "Opium for the Brimstone Barons",
                 client: "The Brimstone Barons, jointly",
                 description: "A discreet consignment the Barons would rather arrive by contractor than by their own liveried barges, which draw attention the cargo cannot afford.",
                 paymentClause: "{payout} on delivery, plus carriage per crate, paid in cash, no minute taken.",
                 cargoLabel: "opium crates",
+                opposition: 'squatters-salvage',
             },
             {
+                // Explicit: the fare-dodgers are squatters-salvage.
                 name: "Fittings for the Ferry Company",
                 client: "Styx Delta Ferry & Lighterage Company",
                 description: "Replacement fittings for the barges the fare-dodgers keep stripping. The Company would like them to arrive before the next boarding, not after.",
                 paymentClause: "{payout} on delivery, plus carriage per crate, per cargo-loss schedule 2.",
                 cargoLabel: "crated fittings",
+                opposition: 'squatters-salvage',
             },
         ],
     },
@@ -303,25 +366,33 @@ const TRADE_RUN_REGIONS: TradeRunRegion[] = [
         act: 2,
         templates: [
             {
+                // Template's own flavor: officers' mess / rear-area morale
+                // trade, contested by the rear-echelon operators who run the
+                // front's black-market supply.
                 name: "Crates of Spicy Literature for the Garrisons",
                 client: "Maison Vachon, Purveyors to the Front",
                 description: "Morale material the officers' mess will not requisition through proper channels but will absolutely pay for through improper ones.",
                 paymentClause: "{payout} on delivery, plus carriage per crate, per the Maison's standing supply agreement.",
                 cargoLabel: "crates of spicy literature",
+                opposition: 'rear-echelon',
             },
             {
+                // Front-line delivery, straight into grande-armee-held trench country.
                 name: "Revenant-Grade Coal to the Front",
                 client: "Reichsinfernokorps Liaison Office",
                 description: "The trenches burn coal faster than the Liaison Office can admit to Berlin. A contractor delivery leaves no requisition trail back to the discretionary fund.",
                 paymentClause: "{payout} on delivery, plus carriage per sack, paid in cash, per the Office's usual arrangement: no paperwork.",
                 cargoLabel: "coal sacks",
+                opposition: 'grande-armee',
             },
             {
+                // Explicit: the Spectral Auditors are grande-armee.
                 name: "Ledger Copies for Concession Holdings",
                 client: "Deep France Concession Holdings",
                 description: "Duplicate boundary ledgers, in case the originals meet the Spectral Auditors again. Holdings would like a second copy somewhere the revenants cannot subpoena.",
                 paymentClause: "{payout} on delivery, plus carriage per case, invoiced against the concession's title-defense reserve.",
                 cargoLabel: "ledger cases",
+                opposition: 'grande-armee',
             },
         ],
     },
@@ -330,25 +401,32 @@ const TRADE_RUN_REGIONS: TradeRunRegion[] = [
         act: 3,
         templates: [
             {
+                // Explicit: moved before the Stoker's Union gets to it.
                 name: "Copper Ingots off Furnace Row",
                 client: "Brimstone Barons Equipment Leasing Consortium",
                 description: "Smelted stock the Consortium wants off the books before the Stoker's Union works out it can be melted down into something more useful than ingots.",
                 paymentClause: "{payout} on delivery, plus carriage per ingot crate, per lease-recovery schedule 1.",
                 cargoLabel: "copper ingots",
+                opposition: 'stokers-union',
             },
             {
+                // Explicit: the Union may treat the cargo as evidence.
                 name: "Sacred Relics for the Overseers",
                 client: "Dis Foundry Belt Board of Overseers",
                 description: "Reclaimed devotional relics from the Overseer's office, wanted upstairs before the Union decides they're evidence rather than heirlooms.",
                 paymentClause: "{payout} on delivery, plus carriage per case, invoiced against the Board's production contingency.",
                 cargoLabel: "relic cases",
+                opposition: 'stokers-union',
             },
             {
+                // Route hazard: foundry vermin are the ambient threat to a
+                // supply cart, distinct from the Union's political dispute.
                 name: "Alcohol Consignment for the Strikebreakers",
                 client: "Dis Foundry Belt Board of Overseers",
                 description: "Ration liquor for the replacement crews, who have made clear through their foreman that morale is a line item too.",
                 paymentClause: "{payout} on delivery, plus carriage per barrel, invoiced against the Board's production contingency.",
                 cargoLabel: "liquor barrels",
+                opposition: 'foundry-vermin',
             },
         ],
     },
@@ -357,25 +435,31 @@ const TRADE_RUN_REGIONS: TradeRunRegion[] = [
         act: 4,
         templates: [
             {
+                // Route hazard: straight off the fissure, through vent-fauna territory.
                 name: "Raw Brimstone off the Vent Field",
                 client: "The Brimstone Barons, jointly",
                 description: "Unrefined stock straight off the fissure, wanted at the Furnace Belt before the next lease auction resets the going rate out from under the Barons' feet.",
                 paymentClause: "{payout} on delivery, plus carriage per crate, paid in cash, no minute taken.",
                 cargoLabel: "brimstone crates",
+                opposition: 'vent-fauna',
             },
             {
+                // Destination client's own family: delivery inside the Choir's wall.
                 name: "Blessed Bearing-Oil for the Choir",
                 client: "The Iron Choir, per its Concordat",
                 description: "A consecrated lubricant for the compound's machinery, blessed by whichever office within the Choir handles such things and unwilling to say which. The bells apparently seize without it.",
                 paymentClause: "{payout} on delivery inside the wall, per the Concordat's own terms.",
                 cargoLabel: "oil casks",
+                opposition: 'iron-choir',
             },
             {
+                // Explicit: the Choir's toll-men are the route hazard here.
                 name: "Refined Phlogiston for the Barons",
                 client: "Brimstone Barons Equipment Leasing Consortium",
                 description: "Finished phlogiston stock, refined and volatile, that the Consortium would rather move by contractor wagon than by its own liveried convoys, which the Choir's toll-men have taken to inspecting rather too closely of late.",
                 paymentClause: "{payout} on delivery, plus carriage per flask, per lease-recovery schedule 1.",
                 cargoLabel: "phlogiston flasks",
+                opposition: 'iron-choir',
             },
         ],
     },
@@ -553,6 +637,7 @@ export class ContractGenerator {
             squadSize,
             regionName: region.regionName,
             consumableRewardName,
+            opposition: template.opposition,
         });
     }
 
@@ -609,6 +694,7 @@ export class ContractGenerator {
             consumableRewardName,
             maxCrates,
             freightRatePerCrate,
+            opposition: template.opposition,
         });
     }
 

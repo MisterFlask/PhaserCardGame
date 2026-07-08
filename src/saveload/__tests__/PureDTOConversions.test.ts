@@ -57,6 +57,7 @@ describe('contract DTO round-trip', () => {
             expect(restored.maxCrates).toBe(contract.maxCrates);
             expect(restored.freightRatePerCrate).toBe(contract.freightRatePerCrate);
             expect(restored.vpReward).toBe(contract.vpReward);
+            expect(restored.opposition).toBe(contract.opposition);
         }
     });
 
@@ -75,6 +76,40 @@ describe('contract DTO round-trip', () => {
             expect(restored.payout).toBe(0);
             expect(restored.vpReward).toBe(prestige.vpReward);
             expect(restored.client).toBe('The Court of Directors');
+            // Prestige Commissions carry no named opposition (internal Court
+            // work) -- the absent-field case round-trips as undefined, not
+            // as some stale/serialized value.
+            expect(prestige.opposition).toBeUndefined();
+            expect(restored.opposition).toBeUndefined();
+        }
+        expect(sawPrestige).toBe(true);
+    });
+
+    it('preserves a bounty/trade-run contract\'s opposition through the round-trip', () => {
+        let seen = 0;
+        for (let i = 0; i < 100; i++) {
+            const contract = ContractGenerator.getInstance().generateContract(10);
+            if (contract.isPrestige) continue;
+            seen++;
+            expect(contract.opposition).toBeDefined();
+            const restored = contractFromDTO(JSON.parse(JSON.stringify(contractToDTO(contract))));
+            expect(restored.opposition).toBe(contract.opposition);
+        }
+        expect(seen).toBeGreaterThan(0);
+    });
+
+    it('preserves the absent-opposition case (Prestige Commissions) through the round-trip', () => {
+        let sawPrestige = false;
+        for (let i = 0; i < 200 && !sawPrestige; i++) {
+            const board = ContractGenerator.getInstance().refillBoard([], 6);
+            const prestige = board.find(c => c.isPrestige);
+            if (!prestige) continue;
+            sawPrestige = true;
+            expect(prestige.opposition).toBeUndefined();
+            const dto = contractToDTO(prestige);
+            expect(dto.opposition).toBeUndefined();
+            const restored = contractFromDTO(JSON.parse(JSON.stringify(dto)));
+            expect(restored.opposition).toBeUndefined();
         }
         expect(sawPrestige).toBe(true);
     });

@@ -1,6 +1,7 @@
 import Phaser, { Scene } from 'phaser';
 import { isCharteredPartner } from '../../../../campaign/ClientReputation';
 import { Contract } from '../../../../campaign/Contract';
+import { isOppositionId, OPPOSITIONS } from '../../../../campaign/Oppositions';
 import { SortieManager } from '../../../../campaign/SortieManager';
 import { PlayerCharacter } from '../../../../gamecharacters/PlayerCharacter';
 import { DepthManager } from '../../../../ui/DepthManager';
@@ -12,7 +13,10 @@ import { CampaignUiState } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
 
 const NOTICE_W = 380;
-const NOTICE_H = 170;
+// +20 (2026-07, opposition line): one more detail line needed room without
+// crowding the expiry stamp; the map-pin keep-out zone (noticeKeepOut) reads
+// NOTICE_H generically, so this stays self-consistent with pin placement.
+const NOTICE_H = 190;
 
 /** Roman numerals, matching the tally marks drawWaxSeal engraves on the wax. */
 const ROMAN_NUMERALS = ['I', 'II', 'III'];
@@ -430,10 +434,14 @@ export class ContractBoardPanel extends AbstractHqPanel {
             const weeksLabel = `${contract.durationWeeks} week${contract.durationWeeks > 1 ? 's' : ''}`;
             const engagementsLabel = `${contract.numCombats} engagement${contract.numCombats > 1 ? 's' : ''}`;
             const deadlineLabel = `${contract.deadlineWeeks} week${contract.deadlineWeeks > 1 ? 's' : ''}`;
+            const oppositionLabel = isOppositionId(contract.opposition)
+                ? `[b]${OPPOSITIONS[contract.opposition].displayName}[/b]`
+                : '[i]unconfirmed[/i]';
             this.showHoverTooltip(
                 `[b]${contract.name}[/b]\n${contract.client}\n` +
                 `${engagementsLabel} · ${weeksLabel} · ${ContractBoardPanel.crewRequirementLabel(contract.squadSize)}\n` +
-                `Expires in ${deadlineLabel}`,
+                `Expires in ${deadlineLabel}\n` +
+                `Expected opposition: ${oppositionLabel}`,
                 container.x, container.y - 90,
             );
         });
@@ -522,6 +530,20 @@ export class ContractBoardPanel extends AbstractHqPanel {
                 : `${crewLabel}${freightLabel}`;
         container.add(this.scene.add.text(-NOTICE_W / 2 + 18, -NOTICE_H / 2 + 124, noticeFooterLine, {
             fontFamily: Fonts.BODY, fontSize: '13px', fontStyle: 'italic', color: Palette.INK_FADED,
+            wordWrap: { width: NOTICE_W - 40 },
+        }));
+
+        // Expected opposition (src/campaign/Oppositions.ts): who the Survey
+        // Desk expects the squad to actually fight. Plain scene.add.text, not
+        // a BBCode-capable TextBox (matches the sibling lines above, none of
+        // which parse BBCode either), so "unconfirmed" reads via the line's
+        // own italic styling rather than literal [i] markup.
+        const oppositionLabel = isOppositionId(contract.opposition)
+            ? OPPOSITIONS[contract.opposition].displayName
+            : 'unconfirmed';
+        container.add(this.scene.add.text(-NOTICE_W / 2 + 18, -NOTICE_H / 2 + 142,
+            `Expected opposition: ${oppositionLabel}`, {
+            fontFamily: Fonts.BODY, fontSize: '12px', fontStyle: 'italic', color: Palette.INK_FADED,
             wordWrap: { width: NOTICE_W - 40 },
         }));
 
