@@ -2,6 +2,7 @@ import { Contract, ContractType } from "./Contract";
 import { CONSUMABLE_REWARD_NAMES } from "./ConsumableStock";
 import { StandingOrdersState } from "./orders/StandingOrdersState";
 import { applyCharteredPartnerBonus } from "./ClientReputation";
+import { filterBlacklistedTemplates } from "./Factions";
 
 /**
  * A contract template bundles name/client/description/paymentClause as one
@@ -519,7 +520,10 @@ export class ContractGenerator {
     }
 
     private generateBountyContract(region: RegionFlavor, year: number, contractsCompletedByClient: Record<string, number>): Contract {
-        const template = this.pick(region.templates);
+        // Faction blacklists (faction_reputation_design.md, "Amendment:
+        // Faction Relationships v2"): Blacklisted factions' clients stop
+        // generating, with the empty-pool fallback baked into the filter.
+        const template = this.pick(filterBlacklistedTemplates(region.templates, contractsCompletedByClient));
 
         // Segment within the act is the fine-grained difficulty dial.
         const segment = Math.floor(Math.random() * 3);
@@ -569,7 +573,10 @@ export class ContractGenerator {
      * only.
      */
     private generateTradeRunContract(region: TradeRunRegion, year: number, contractsCompletedByClient: Record<string, number>): Contract {
-        const template = this.pick(region.templates);
+        // Faction blacklists (faction_reputation_design.md, "Amendment:
+        // Faction Relationships v2"): Blacklisted factions' clients stop
+        // generating, with the empty-pool fallback baked into the filter.
+        const template = this.pick(filterBlacklistedTemplates(region.templates, contractsCompletedByClient));
 
         const segment = Math.floor(Math.random() * 3);
         const difficultyStars = segment + 1;
