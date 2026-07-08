@@ -1,5 +1,6 @@
 import { ProcBroadcaster } from "../../../gamecharacters/procs/ProcBroadcaster";
 import { GameState } from "../../../rules/GameState";
+import { UIContext, UIContextManager } from "../../../ui/UIContextManager";
 import { ActionManagerFetcher } from "../../ActionManagerFetcher";
 import { GameAction } from "../GameAction";
 
@@ -31,6 +32,12 @@ export class BeginTurnAction extends GameAction {
     async playAction(): Promise<GameAction[]> {
         const gameState = GameState.getInstance();
         const combatState = gameState.combatState;
+
+        // Pop the enemy-turn context pushed by EndTurnAction (absent on the
+        // first turn of combat, where BeginTurnAction runs without it)
+        if (UIContextManager.getInstance().isContext(UIContext.COMBAT_BUT_NOT_YOUR_TURN)) {
+            UIContextManager.getInstance().popContext();
+        }
 
         // Erase block from all player characters
         combatState.playerCharacters.forEach(character => {
