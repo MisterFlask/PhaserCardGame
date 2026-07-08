@@ -11,7 +11,7 @@ class Entrench extends AbstractBuff {
     constructor(blockAmount: number = 6, strengthGain: number = 1) {
         super();
         this.isDebuff = false;
-        this.imageName = "shield";
+        this.imageName = "buff-shield";
         this.stacks = blockAmount;
         this.secondaryStacks = 0; // 0 = not struck this turn
         this.strengthGain = strengthGain;

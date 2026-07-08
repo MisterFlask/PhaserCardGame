@@ -87,7 +87,7 @@ const EXPECTED_MISSING_IMAGE_REFS: { file: string; value: string }[] = [
     { file: 'encounters/events/event_buffs/HellDiseases.ts', value: "imps_itch_icon" },
     { file: 'encounters/events/event_buffs/HellDiseases.ts', value: "pit_sweats_icon" },
     { file: 'encounters/events/event_buffs/HellDiseases.ts', value: "wormrot_icon" },
-    { file: 'encounters/monsters/act2_segment1/TrenchEngineer.ts', value: "shield" },
+    { file: 'encounters/monsters/act2_segment1/TrenchEngineer.ts', value: "buff-shield" },
     { file: 'gamecharacters/buffs/enemy_buffs/Robotic.ts', value: "robotic" },
     { file: 'gamecharacters/buffs/enemy_buffs/SignalInterference.ts', value: "lightning-bolt" },
     { file: 'gamecharacters/buffs/enemy_buffs/TariffAura.ts', value: "coins" },
@@ -162,8 +162,6 @@ const EXPECTED_MISSING_IMAGE_REFS: { file: string; value: string }[] = [
     { file: 'strategic_projects/RevolutionaryContacts.ts', value: "revolutionary_contacts" },
     { file: 'strategic_projects/SmytheBowyerPoppyFields.ts', value: "smythe_bowyer_poppy_fields" },
     { file: 'strategic_projects/TheFoundry.ts', value: "the_foundry" },
-    { file: 'ui/PhysicalBuff.ts', value: "adjacent_location_icon" },
-    { file: 'ui/PhysicalBuff.ts', value: "current_location_icon" },
 ];
 
 describe('Asset manifest integrity (source lint)', () => {

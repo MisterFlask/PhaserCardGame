@@ -140,33 +140,3 @@ export class PhysicalBuff {
         });
     }
 }
-
-export class CurrentLocationBuff extends AbstractBuff {
-    constructor(scene: Phaser.Scene, x: number, y: number) {
-        super();
-        this.imageName = 'current_location_icon';
-    }
-
-    getDisplayName(): string {
-        return 'Current Location';
-    }
-
-    getDescription(): string {
-        return 'This is your current location.';
-    }
-}
-
-export class AdjacentLocationBuff extends AbstractBuff {
-    constructor(scene: Phaser.Scene, x: number, y: number) {
-        super();
-        this.imageName = 'adjacent_location_icon';
-    }
-
-    getDisplayName(): string {
-        return 'Adjacent Location';
-    }
-
-    getDescription(): string {
-        return 'This location is adjacent to your current position.';
-    }
-}
