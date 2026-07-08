@@ -309,7 +309,11 @@ export default class ImageUtils {
                 "ghost_ship.png", "fare_enforcer.png", "treasure.png",
 
                 // act-2 art burndown batch 2 (July 2026)
-                "frost_knight.png"
+                "frost_knight.png",
+
+                // act-3 art burndown batch 3 (July 2026)
+                "overseer.png", "foreman.png", "robot-minion.png", "fiery-orator.png",
+                "tough-worker.png", "angry-worker.png", "manager-demon.png", "angry-worker-boss.png"
               ]
         },
         enemies: {
