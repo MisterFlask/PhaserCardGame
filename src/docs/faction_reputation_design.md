@@ -154,16 +154,73 @@ reputation screen; the board tags ARE the system.
 ### Deferred to v2.1 shelf (do NOT stub)
 
 - **Hostile-tier teeth**: faction reinforcements via EncounterHardening,
-  trade-run tolls, one assassination-attempt event.
+  trade-run tolls, one assassination-attempt event. *(Partially shipped —
+  see the v2.1 amendment below; reinforcements and the event remain.)*
 - **Union retaliation texture**: recruit-cost bumps, wound-week
   stretches, a strike event freezing a Standing Order slot; détente via a
   donation to the Widows' and Orphans' Fund (£ for standing — the one
-  purchasable relationship, priced to sting).
+  purchasable relationship, priced to sting). *(Shipped except détente
+  and the narrative events — see the v2.1 amendment below.)*
 - **Positive faction tiers**: recruit gating ("faction rep gates the good
   ones"), embassies as commitment devices (Strategic Projects family),
   Basalt Court favor-denominated contracts, Clogger vendor stock.
 - **Dual-sided contracts**: the same incident offered by both sides of a
   rivalry; taking either removes both.
+
+## Amendment: Union Retaliation (v2.1, July 2026)
+
+Lead-authored under owner-delegated authority. The Union is the one
+faction blacklisting cannot touch — it has no clients, so its standing
+only falls, and its weapon is labor, not custom. Retaliation is therefore
+**derived pressure, not events**: a pure module
+(`src/campaign/FactionPressures.ts`, sibling of Factions.ts) computes
+penalties from Union standing at consult time. Still zero stored state,
+still no save bump. Penalties self-lift if standing ever recovers (it
+can't today; détente stays shelved precisely because it needs stored
+state and a SAVE_FORMAT_VERSION bump — lead work).
+
+**Ruling: the Hostile tier now exists** (≤ −9, `FactionHostilityTier`),
+superseding v2's "do NOT stub" note above — v2.1 is the substance it was
+waiting for. Blacklisting semantics for client factions are unchanged.
+
+### The pressure table (Union standing, balance sketches per convention)
+
+| Tier | Register | Effect |
+|---|---|---|
+| Noted (≤ −3) | grievance, not injury | none beyond v2's "(relations strained)" tag |
+| Blacklisted (≤ −6) | "Union rates" | recruit cost ×1.25; therapy cost ×1.25 (each re-rounded to £5); new wounds +1 week. The stretcher-bearers, porters, and orderlies are all union men, and they have been told about you. |
+| Hostile (≤ −9) | "the labor question" | one Standing Order slot suspended (floor 1 — the Company always keeps one order running); Dis Foundry Belt trade-run freight −£10/crate at generation (floor £5/crate — crates get "mishandled") |
+
+### Seams (all AFTER the StandingOrdersState pass, like Chartered Partner)
+
+- Recruit/therapy: `CampaignUiState` cost getters.
+- Wounds: `applyCasualties` (SortieResolution) gains an optional
+  completions-map param, threaded from SortieManager's resolution.
+- Slots: `slotsForYear`/`enact` gain an optional `unionSlotPenalty`
+  param (default 0). InvestmentPanel passes it; **the save-restore
+  re-enactment path (CampaignSerializer) deliberately does not** —
+  restoring prior state must never fail on pressure. Over-quota active
+  orders persist; only NEW enactments are blocked while over quota.
+- Freight: ContractGenerator's trade-run construction, keyed to
+  `UNION_TERRITORY_REGION` ("Dis Foundry Belt" — a registry constant,
+  not an inline string).
+
+### Surfaces
+
+Costs simply change; the notice line remains the primary teaching
+surface. One annotation: the Standing Orders panel notes the suspended
+slot ("one slot suspended pending resolution of the labor question")
+while Hostile. Narrative announcements (strike declaration, assassination
+attempt) stay shelved with the events batch.
+
+### Balance note
+
+The sim passes an empty completions map, so all pressure is sim-invisible
+(same construction as blacklisting). Union standing falls via Baron and
+Overseer work only — reachable from year 1 through the act-1 opium trade
+run, but −9 in practice means sustained Act 3 management work, i.e.
+deliberate specialization. Counterplay: the Underwriters' neutral lane in
+the Foundry Belt, pacing Baron exposure, or (future) paying the Fund.
 
 ### Balance note (convention: EncounterHardening.ts:12-14)
 

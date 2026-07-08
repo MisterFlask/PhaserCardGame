@@ -3,7 +3,8 @@ import { ContractGenerator } from '../ContractGenerator';
 import {
     BLACKLISTED_STANDING_THRESHOLD, CLIENT_FACTIONS, Faction, FactionHostilityTier,
     filterBlacklistedTemplates, getFactionForClient, getFactionStanding, getHostilityTier,
-    isFactionBlacklisted, NOTED_STANDING_THRESHOLD, offendedFactionsForClient, rivalsOf, RIVALRIES,
+    HOSTILE_STANDING_THRESHOLD, isFactionBlacklisted, NOTED_STANDING_THRESHOLD, offendedFactionsForClient,
+    rivalsOf, RIVALRIES,
 } from '../Factions';
 
 describe('CLIENT_FACTIONS / RIVALRIES registry (lint)', () => {
@@ -90,17 +91,30 @@ describe('hostility tiers', () => {
         expect(getHostilityTier(-5)).toBe(FactionHostilityTier.NOTED);
     });
 
-    it('-6 and -20 are Blacklisted', () => {
+    it('-6 and -8 are Blacklisted (v2.1: -20 moved to Hostile, see below)', () => {
         expect(getHostilityTier(-6)).toBe(FactionHostilityTier.BLACKLISTED);
-        expect(getHostilityTier(-20)).toBe(FactionHostilityTier.BLACKLISTED);
+        expect(getHostilityTier(-8)).toBe(FactionHostilityTier.BLACKLISTED);
     });
 
     it('+6 is Cordial', () => {
         expect(getHostilityTier(6)).toBe(FactionHostilityTier.CORDIAL);
     });
 
-    it('does not declare a Hostile tier', () => {
-        expect(Object.values(FactionHostilityTier)).toEqual(['Cordial', 'Noted', 'Blacklisted']);
+    it('declares the four-tier ladder (v2.1: Hostile shipped)', () => {
+        expect(Object.values(FactionHostilityTier)).toEqual(['Cordial', 'Noted', 'Blacklisted', 'Hostile']);
+    });
+
+    it('-9 and -30 are Hostile', () => {
+        expect(getHostilityTier(-9)).toBe(FactionHostilityTier.HOSTILE);
+        expect(getHostilityTier(-30)).toBe(FactionHostilityTier.HOSTILE);
+    });
+
+    it('-8 is still Blacklisted', () => {
+        expect(getHostilityTier(-8)).toBe(FactionHostilityTier.BLACKLISTED);
+    });
+
+    it('HOSTILE_STANDING_THRESHOLD matches the design doc (-9)', () => {
+        expect(HOSTILE_STANDING_THRESHOLD).toBe(-9);
     });
 });
 
@@ -120,6 +134,16 @@ describe('isFactionBlacklisted / filterBlacklistedTemplates', () => {
         expect(filtered.some(t => getFactionForClient(t.client) === Faction.BRITISH_CROWN)).toBe(false);
         expect(filtered.length).toBeGreaterThan(0);
         expect(filtered.length).toBeLessThan(mixedTemplates.length);
+    });
+
+    it('remains true at Hostile standings (v2.1: a Hostile faction\'s clients are still off the board)', () => {
+        const hostileMap = { 'Styx Delta Ferry & Lighterage Company': 9 };
+        expect(getFactionStanding(Faction.BRITISH_CROWN, hostileMap)).toBe(-9);
+        expect(getHostilityTier(getFactionStanding(Faction.BRITISH_CROWN, hostileMap))).toBe(FactionHostilityTier.HOSTILE);
+        expect(isFactionBlacklisted(Faction.BRITISH_CROWN, hostileMap)).toBe(true);
+
+        const deepHostileMap = { 'Styx Delta Ferry & Lighterage Company': 20 };
+        expect(isFactionBlacklisted(Faction.BRITISH_CROWN, deepHostileMap)).toBe(true);
     });
 
     it('falls back to the original list unchanged when filtering would empty it', () => {

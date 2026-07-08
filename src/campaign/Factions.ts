@@ -109,31 +109,40 @@ export function getFactionStanding(
     return standing;
 }
 
-/** Standing thresholds for the hostility ladder (design doc). Hostile
- *  (<= -9) is deferred to v2.1 and deliberately NOT stubbed here — no
- *  enum member, no threshold constant. */
+/** Standing thresholds for the hostility ladder (design doc). Ruling
+ *  (v2.1 amendment, "Union Retaliation"): the Hostile tier has shipped —
+ *  it supersedes v2's "do NOT stub" note that used to live here. Blacklist
+ *  semantics for client factions are unchanged by its arrival; see
+ *  isFactionBlacklisted below. */
 export const NOTED_STANDING_THRESHOLD = -3;
 export const BLACKLISTED_STANDING_THRESHOLD = -6;
+export const HOSTILE_STANDING_THRESHOLD = -9;
 
 export enum FactionHostilityTier {
     CORDIAL = "Cordial",
     NOTED = "Noted",
     BLACKLISTED = "Blacklisted",
+    HOSTILE = "Hostile",
 }
 
 /** Tier for a given standing value. */
 export function getHostilityTier(standing: number): FactionHostilityTier {
+    if (standing <= HOSTILE_STANDING_THRESHOLD) return FactionHostilityTier.HOSTILE;
     if (standing <= BLACKLISTED_STANDING_THRESHOLD) return FactionHostilityTier.BLACKLISTED;
     if (standing <= NOTED_STANDING_THRESHOLD) return FactionHostilityTier.NOTED;
     return FactionHostilityTier.CORDIAL;
 }
 
-/** True once a faction's standing has fallen to Blacklisted. */
+/** True once a faction's standing has fallen to Blacklisted OR WORSE (v2.1:
+ *  Hostile is a strictly worse standing than Blacklisted, not a sibling
+ *  tier — a Hostile faction's clients are still off the board). Compares
+ *  standing directly against the threshold rather than tier equality, since
+ *  getHostilityTier(-9) now returns HOSTILE, not BLACKLISTED. */
 export function isFactionBlacklisted(
     faction: Faction,
     contractsCompletedByClient: Record<string, number>
 ): boolean {
-    return getHostilityTier(getFactionStanding(faction, contractsCompletedByClient)) === FactionHostilityTier.BLACKLISTED;
+    return getFactionStanding(faction, contractsCompletedByClient) <= BLACKLISTED_STANDING_THRESHOLD;
 }
 
 /** True if the client's faction is Blacklisted. False for unmapped
