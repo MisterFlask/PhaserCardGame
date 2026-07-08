@@ -1,5 +1,6 @@
 import { TextBox } from './TextBox';
 import SoundUtils from '../utils/SoundUtils';
+import { Fonts, Palette } from './UIStyle';
 
 export class TextBoxButton extends TextBox {
     private isEnabled: boolean = true;
@@ -11,6 +12,8 @@ export class TextBoxButton extends TextBox {
     private hoverScale: number = 1.1;
 
     private initialized = false;
+    /** Only themed (default-color) buttons swap text color when disabled. */
+    private isThemedDefault: boolean;
 
     constructor(params: {
         scene: Phaser.Scene,
@@ -23,12 +26,21 @@ export class TextBoxButton extends TextBox {
         backgroundImage?: string,
         textBoxName?: string,
         fillColor?: number,
+        strokeColor?: number,
         expandDirection?: 'up' | 'down'
     }) {
-        super(params);
-        this.normalColor = params.fillColor ?? 0x555555;
-        this.hoverColor = 0x777777;
-        this.disabledColor = 0x888888;
+        // Themed defaults apply only when the caller doesn't specify their
+        // own fillColor/style, so existing callers with explicit colors are
+        // unaffected.
+        super({
+            ...params,
+            style: params.style ?? { fontSize: '20px', fontFamily: Fonts.DISPLAY, color: Palette.WHITE },
+            strokeColor: params.strokeColor ?? (params.fillColor === undefined ? Palette.BRASS : undefined),
+        });
+        this.normalColor = params.fillColor ?? Palette.WOOD_PANEL;
+        this.hoverColor = params.fillColor !== undefined ? 0x777777 : Palette.VERDIGRIS;
+        this.disabledColor = params.fillColor !== undefined ? 0x888888 : Palette.DISABLED;
+        this.isThemedDefault = params.fillColor === undefined;
     }
 
     private addButtonBehavior(): this {
@@ -52,9 +64,11 @@ export class TextBoxButton extends TextBox {
         this.isEnabled = isEnabled;
         if (isEnabled) {
             this.setFillColor(this.normalColor);
+            if (this.isThemedDefault) this.setTextColor(Palette.WHITE);
             this.setInteractive();
         } else {
             this.setFillColor(this.disabledColor);
+            if (this.isThemedDefault) this.setTextColor(Palette.DISABLED_TEXT);
             this.disableInteractive();
         }
         return this;

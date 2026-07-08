@@ -18,6 +18,7 @@ export interface TextBoxConfig {
     text: string;
     style?: Phaser.Types.GameObjects.Text.TextStyle;
     fillColor?: number;
+    strokeColor?: number;
     parseAreaTags?: boolean;
 }
 
@@ -36,6 +37,13 @@ export class TextBox extends Phaser.GameObjects.Container {
     protected horizontalExpand: HorizontalExpand;
     private debugGraphics: Phaser.GameObjects.Graphics;
     protected fillColor: number;
+    /**
+     * Opt-in background border color (e.g. Palette.BRASS). When set, this
+     * survives setBackgroundColor() calls instead of being recomputed from
+     * fill brightness. Undefined preserves the original white/black-derived
+     * behavior for callers that don't pass it.
+     */
+    protected strokeColor?: number;
     protected assignedWidth: number;
     private areaElements: Map<string, Phaser.GameObjects.Container> = new Map();
 
@@ -70,6 +78,7 @@ export class TextBox extends Phaser.GameObjects.Container {
         backgroundImage?: string,
         textBoxName?: string,
         fillColor?: number,
+        strokeColor?: number,
         verticalExpand?: VerticalExpand,
         horizontalExpand?: HorizontalExpand,
         bigTextOverVariableColors?: boolean,
@@ -88,6 +97,7 @@ export class TextBox extends Phaser.GameObjects.Container {
             backgroundImage,
             textBoxName,
             fillColor = 0x000000,
+            strokeColor,
             verticalExpand = 'down',
             horizontalExpand = 'right',
             bigTextOverVariableColors = false,
@@ -107,21 +117,24 @@ export class TextBox extends Phaser.GameObjects.Container {
         
         this.assignedWidth = width;
 
+        this.strokeColor = strokeColor;
         this.background = scene.add.rectangle(0, 0, this.assignedWidth, height, fillColor)
-            .setStrokeStyle(2, 0xffffff)
+            .setStrokeStyle(2, strokeColor ?? 0xffffff)
             // **Center the background rectangle**
             .setOrigin(0.5, 0.5);
         this.add(this.background);
-        
+
 
         this.fillColor = fillColor;
 
         // Determine if the background color is light
         const isLightBackground = this.isColorLight(this.fillColor);
 
-        // Set text color based on background brightness
-        const textColor = isLightBackground ? '#000000' : '#FFFFFF';
-        const strokeColor = isLightBackground ? '#FFFFFF' : '#000000';
+        // Set text color based on background brightness, unless the caller
+        // opted into an explicit color via style.color (e.g. themed brass/red
+        // text that shouldn't be overridden by fill-brightness heuristics).
+        const textColor = style.color ?? (isLightBackground ? '#000000' : '#FFFFFF');
+        const strokeTextColor = isLightBackground ? '#FFFFFF' : '#000000';
         const shadowColor = isLightBackground ? '#AAAAAA' : '#222222';
 
         // Modify the text style to include dynamic colors
@@ -135,7 +148,7 @@ export class TextBox extends Phaser.GameObjects.Container {
             fontFamily: style.fontFamily,
 
             color: textColor,
-            stroke: strokeColor,
+            stroke: strokeTextColor,
             strokeThickness: 3,
             shadow: {
                 offsetX: 2,
@@ -243,8 +256,9 @@ export class TextBox extends Phaser.GameObjects.Container {
     setBackgroundColor(color: number): void {
         if (this.background) {
             this.background.setFillStyle(color);
-            // Determine outline color based on background color lightness
-            const outlineColor = this.isColorLight(color) ? 0x000000 : 0xFFFFFF;
+            // Preserve a caller-specified strokeColor (e.g. brass borders);
+            // otherwise fall back to the brightness-derived black/white outline.
+            const outlineColor = this.strokeColor ?? (this.isColorLight(color) ? 0x000000 : 0xFFFFFF);
             this.background.setStrokeStyle(2, outlineColor);
         }
         this.fillColor = color; // Store the color for later use
@@ -277,6 +291,13 @@ export class TextBox extends Phaser.GameObjects.Container {
     override setInteractive(hitArea?: any, callback?: any, dropZone?: boolean): this {
         const { width, height } = this.calculateBoundingBox();
         return super.setInteractive(this.background, Phaser.Geom.Rectangle.Contains, dropZone);
+    }
+
+    /** Opt-in text (fore)color override, e.g. for a disabled-button tint. */
+    setTextColor(color: string): void {
+        if (this.text) {
+            this.text.setColor(color);
+        }
     }
 
     setFillColor(color: number): void {

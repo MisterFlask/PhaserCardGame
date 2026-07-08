@@ -2,6 +2,7 @@ import { GameState } from "../../rules/GameState";
 import { PhysicalRelic } from "../../ui/PhysicalRelic";
 import { TextBox } from "../../ui/TextBox";
 import { TooltipAttachment } from "../../ui/TooltipAttachment";
+import { Fonts, Palette } from "../../ui/UIStyle";
 
 export class CampaignBriefStatus extends Phaser.GameObjects.Container {
     private actNumberText: TextBox;
@@ -35,10 +36,11 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
             text: `Act ${GameState.getInstance().currentAct}`,
             style: {
                 fontSize: '18px',
-                color: '#ffd700', // Gold color for act number
-                fontFamily: 'Arial',
-                fontStyle: 'bold'
-            }
+                color: Palette.BRASS_TEXT,
+                fontFamily: Fonts.DISPLAY,
+            },
+            fillColor: Palette.WOOD_PANEL,
+            strokeColor: Palette.BRASS,
         });
 
         // Company funds display
@@ -51,9 +53,11 @@ export class CampaignBriefStatus extends Phaser.GameObjects.Container {
             text: `💷 £${GameState.getInstance().moneyInVault}`,
             style: {
                 fontSize: '16px',
-                color: '#ff4444',
-                fontFamily: 'Arial'
-            }
+                color: Palette.BRASS_TEXT,
+                fontFamily: Fonts.DISPLAY,
+            },
+            fillColor: Palette.WOOD_PANEL,
+            strokeColor: Palette.BRASS,
         });
         // Make the currency text interactive so that tooltip hover events are registered
         this.combinedCurrencyText.setInteractive();

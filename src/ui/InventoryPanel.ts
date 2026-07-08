@@ -19,17 +19,15 @@ export default class InventoryPanel {
     }
 
     private createInventoryButton(): void {
-        // Create inventory button using TextBox
+        // Create inventory button using TextBox (themed defaults from Button.ts)
         this.inventoryButton = new TextBoxButton({
             scene: this.scene,
             x: 85, // Adjusted for the button width
             y: 50,
             width: 150,
             height: 40,
-            text: 'INVENTORY',
+            text: 'Inventory',
             textBoxName: 'inventoryButton',
-            style: { fontSize: '24px' },
-            fillColor: 0x000000
         }).onClick(() => this.toggleInventory());
         this.inventoryButton.setScrollFactor(0);
 

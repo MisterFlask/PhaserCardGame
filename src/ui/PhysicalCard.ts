@@ -17,6 +17,7 @@ import { TextBox } from "./TextBox";
 import { TooltipAttachment } from './TooltipAttachment';
 import { TransientUiState } from './TransientUiState';
 import { UIContext } from './UIContextManager';
+import { Fonts, Palette } from './UIStyle';
 
 /**
  * physicalcard shows a single card on screen. 
@@ -161,6 +162,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
 
         // hp / cost / resource scaling / card type boxes
         this.hpBox = this.maybeCreateHpBox(data);
+        this.maybeCreateHpBar(data);
         this.maybeCreateCostAndResourceScalingBoxes(data);
         this.maybeCreateCardTypeBox(data);
 
@@ -195,6 +197,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
         // ui after
         this.uiContainer.add([this.nameBox, this.descBox, this.blocksContainer, this.buffsContainer, this.intentsContainer, this.incomingIntentsContainer]);
         if (this.hpBox) this.uiContainer.add(this.hpBox);
+        if (this.hpBarTrack) this.uiContainer.add(this.hpBarTrack);
+        if (this.hpBarFill) this.uiContainer.add(this.hpBarFill);
         if (this.costBox) this.uiContainer.add(this.costBox);
         if (this.resourceScalingBox) this.uiContainer.add(this.resourceScalingBox);
         if (this.cardTypeBox) this.uiContainer.add(this.cardTypeBox);
@@ -282,6 +286,8 @@ export class PhysicalCard implements IPhysicalCardInterface {
         this.descBox.destroy();
         this.cardTooltip.destroy();
         this.hpBox?.destroy();
+        this.hpBarTrack?.destroy();
+        this.hpBarFill?.destroy();
         this.blockTooltip.destroy();
         this.cardImage?.destroy();
         this.cardBackground?.destroy();
@@ -432,6 +438,7 @@ export class PhysicalCard implements IPhysicalCardInterface {
             const baseCharacter = this.data as BaseCharacterType;
             this.hpBox.setText(`${baseCharacter.hitpoints}/${baseCharacter.maxHitpoints}`);
         }
+        this.updateHpBar();
 
         if (this.data.isPlayableCard()) {
             const playableCard = this.data as PlayableCardType;
@@ -770,7 +777,9 @@ export class PhysicalCard implements IPhysicalCardInterface {
             height: 30,  // Reduced height since we're tightening the layout
             text: data.name,
             textBoxName: "nameBox:" + data.id,
-            style: { fontSize: '22px', fontFamily: 'impact', color: '#000', wordWrap: { width: cardWidth - 10 } },
+            style: { fontSize: '20px', fontFamily: Fonts.DISPLAY, color: Palette.WHITE, wordWrap: { width: cardWidth - 10 } },
+            fillColor: Palette.WOOD_PANEL,
+            strokeColor: Palette.BRASS,
             bigTextOverVariableColors: true,
             strokeIsOn: true
         });
@@ -808,10 +817,57 @@ export class PhysicalCard implements IPhysicalCardInterface {
                 width: 66,
                 height: 30,
                 text: `${baseCharacter.hitpoints}/${baseCharacter.maxHitpoints}`,
-                style: { fontSize: '14px', color: '#ff0000', fontFamily: 'Arial' }
+                style: { fontSize: '14px', color: Palette.WHITE, fontFamily: Fonts.DISPLAY },
+                fillColor: Palette.WOOD_DARK,
+                strokeColor: Palette.BRASS,
             });
         }
         return null;
+    }
+
+    /**
+     * Slim HP bar: near-black track, single red-family fill for both enemies
+     * and allies (decision: one fill color keeps the bar legible against both
+     * portrait palettes; team is already distinguished by position/portrait).
+     * Lives in uiContainer so it moves with the card's combat-animation tweens.
+     */
+    private static readonly HP_BAR_TRACK_COLOR = 0x1a120b;
+    private static readonly HP_BAR_FILL_COLOR = Palette.WAX_RED;
+    private static readonly HP_BAR_WIDTH = 66;
+    private static readonly HP_BAR_HEIGHT = 8;
+    private hpBarTrack: Phaser.GameObjects.Rectangle | null = null;
+    private hpBarFill: Phaser.GameObjects.Rectangle | null = null;
+
+    private maybeCreateHpBar(data: AbstractCard): void {
+        if (!data.isBaseCharacter()) return;
+        const width = PhysicalCard.HP_BAR_WIDTH;
+        const height = PhysicalCard.HP_BAR_HEIGHT;
+        this.hpBarTrack = this.scene.add.rectangle(0, 0, width, height, PhysicalCard.HP_BAR_TRACK_COLOR)
+            .setStrokeStyle(1, Palette.BRASS)
+            .setOrigin(0, 0.5);
+        this.hpBarFill = this.scene.add.rectangle(0, 0, width, height, PhysicalCard.HP_BAR_FILL_COLOR)
+            .setOrigin(0, 0.5);
+    }
+
+    private updateHpBar(): void {
+        if (!this.hpBarTrack || !this.hpBarFill || !this.data.isBaseCharacter()) return;
+        const baseCharacter = this.data as BaseCharacterType;
+        const scale = this.data.size.sizeModifier;
+        const newWidth = this.cardConfig.cardWidth * scale;
+        const newHeight = this.cardConfig.cardHeight * scale;
+
+        // hpBox is centered at (newWidth/2+10, -newHeight/2+10); the bar sits
+        // just below it, left-anchored (origin 0, 0.5) at the same left edge.
+        const hpBoxCenterX = newWidth / 2 + 10;
+        const barLeftX = hpBoxCenterX - PhysicalCard.HP_BAR_WIDTH / 2;
+        const barY = -newHeight / 2 + 10 + 18; // just below the hpBox text
+        this.hpBarTrack.setPosition(barLeftX, barY);
+        this.hpBarFill.setPosition(barLeftX, barY);
+
+        const ratio = baseCharacter.maxHitpoints > 0
+            ? Phaser.Math.Clamp(baseCharacter.hitpoints / baseCharacter.maxHitpoints, 0, 1)
+            : 0;
+        this.hpBarFill.width = PhysicalCard.HP_BAR_WIDTH * ratio;
     }
 
     private maybeCreateCostAndResourceScalingBoxes(data: AbstractCard) {
@@ -826,8 +882,9 @@ export class PhysicalCard implements IPhysicalCardInterface {
             width: 30,
             height: 30,
             text: `${playableCard.energyCost}`,
-            style: { fontSize: '14px', color: '#ffffff', fontFamily: 'Arial' },
-            fillColor: 0x0000ff
+            style: { fontSize: '16px', color: Palette.BRASS_TEXT, fontFamily: Fonts.DISPLAY },
+            fillColor: Palette.WOOD_DARK,
+            strokeColor: Palette.BRASS,
         });
 
         this.resourceScalingBox = new TextBox({
@@ -837,16 +894,25 @@ export class PhysicalCard implements IPhysicalCardInterface {
             width: 100,
             height: 30,
             text: '',
-            style: { fontSize: '14px', color: '#ffffff', fontFamily: 'Arial' },
-            fillColor: 0x000000
+            style: { fontSize: '14px', color: Palette.WHITE, fontFamily: Fonts.BODY },
+            fillColor: Palette.WOOD_DARK,
+            strokeColor: Palette.BRASS,
         });
     }
+
+    /** Type-differentiated but theme-compatible tones for the card-type chip. */
+    private static readonly CARD_TYPE_CHIP_COLOR: Record<string, number> = {
+        ATTACK: Palette.WAX_RED,
+        SKILL: 0x2f3d52, // desaturated blue-slate
+        POWER: Palette.VERDIGRIS,
+    };
 
     private maybeCreateCardTypeBox(data: AbstractCard) {
         if (data.isPlayableCard()) {
             const playableCard = data as PlayableCardType;
             const cw = this.cardBackground.displayWidth;
             const ch = this.cardBackground.displayHeight;
+            const chipColor = PhysicalCard.CARD_TYPE_CHIP_COLOR[playableCard.cardType.name] ?? Palette.WOOD_PANEL;
             this.cardTypeBox = new TextBox({
                 scene: this.scene,
                 x: -cw / 2,
@@ -856,10 +922,12 @@ export class PhysicalCard implements IPhysicalCardInterface {
                 text: playableCard.cardType.displayName,
                 style: {
                     fontSize: '12px',
-                    color: '#ffffff',
-                    fontFamily: 'Arial',
+                    color: Palette.WHITE,
+                    fontFamily: Fonts.DISPLAY,
                     align: 'center'
-                }
+                },
+                fillColor: chipColor,
+                strokeColor: Palette.BRASS,
             });
         }
     }

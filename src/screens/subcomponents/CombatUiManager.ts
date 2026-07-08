@@ -20,6 +20,7 @@ import { SubtitleManager } from '../../ui/SubtitleManager';
 import { TextBox } from '../../ui/TextBox';
 import { TransientUiState } from '../../ui/TransientUiState';
 import { UIContext, UIContextManager } from '../../ui/UIContextManager';
+import { Fonts, Palette } from '../../ui/UIStyle';
 import { ActionManager } from '../../utils/ActionManager';
 import SoundUtils from '../../utils/SoundUtils';
 import GeneralRewardScreen from './GeneralRewardScreen';
@@ -137,11 +138,12 @@ class CombatUIManager {
             height: 40,
             text: this.getEnergyText(),
             style: {
-                fontSize: '24px',
-                color: '#ffffff',
-                fontFamily: 'Arial'
+                fontSize: '26px',
+                color: Palette.BRASS_TEXT,
+                fontFamily: Fonts.DISPLAY
             },
-            fillColor: 0x0000ff,
+            fillColor: Palette.WOOD_PANEL,
+            strokeColor: Palette.BRASS,
             textBoxName: 'EnergyDisplay'
         });
 
@@ -254,10 +256,10 @@ class CombatUIManager {
             height: 40,
             text: '☰ Menu',
             style: {
-                fontSize: '28px',
-                color: '#ffffff',
+                fontSize: '20px',
+                fontFamily: Fonts.DISPLAY,
+                color: Palette.WHITE,
             },
-            fillColor: 0x000000,
             textBoxName: 'MenuButton'
         }).setZoomScales(1.0, 1.1);
 
@@ -284,14 +286,15 @@ class CombatUIManager {
             scene: this.scene,
             x: gameWidth * 0.7,
             y: pileY,
-            width: 120,
-            height: 40,
+            width: 180,
+            height: 56,
             text: 'End Turn',
             style: {
-                fontSize: '24px',
-                color: '#ffffff'
+                fontSize: '26px',
+                fontFamily: Fonts.DISPLAY,
+                color: Palette.WHITE,
             },
-            backgroundImage: 'button_background',
+            strokeColor: Palette.BRASS_BRIGHT,
             textBoxName: 'EndTurnButton'
         });
 

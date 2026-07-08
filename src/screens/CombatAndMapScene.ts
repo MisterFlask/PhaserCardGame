@@ -27,7 +27,7 @@ import InventoryPanel from '../ui/InventoryPanel';
 import CombatSceneLayoutUtils from '../ui/LayoutUtils';
 import { PhysicalCard } from '../ui/PhysicalCard';
 import { UIContext, UIContextManager } from '../ui/UIContextManager';
-import { loadCompanyFonts } from '../ui/UIStyle';
+import { Fonts, loadCompanyFonts } from '../ui/UIStyle';
 import { ActionManager } from '../utils/ActionManager';
 import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
 import ImageUtils from '../utils/ImageUtils';
@@ -183,12 +183,11 @@ class CombatScene extends Phaser.Scene {
             scene: this,
             x: 300,
             y: 100,
-            width: 100,
+            width: 150,
             height: 40,
             text: 'Objective',
-            style: { fontSize: '24px' },
-            textBoxName: 'mapButton',
-            fillColor: 0x555555
+            style: { fontSize: '22px', fontFamily: Fonts.DISPLAY },
+            textBoxName: 'mapButton'
         });
         this.mapButton
             .onClick(() => {
