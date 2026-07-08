@@ -41,10 +41,13 @@ smoke-gated CI and deploys the compressed site to gh-pages).
   per-combat drops. Delete only if it stays unused past September.
 - **Contract-board hero slot** — the survey-map rework partially answers
   the critique; decide if a priority-pin treatment is still wanted.
-- **Faction reputation v2** — six more client retainers, embassies,
-  recruitment gating, intelligence products (wants an enemy-comp preview
-  UI). Revisit after play shows whether players specialize
-  (faction_reputation_design.md).
+- **Faction reputation v2.1** — v2 shipped July 2026 (faction registry,
+  derived standing, rivalry pairs, Pleases/Offends notice line, blacklist
+  at −6; faction_reputation_design.md amendment). Remaining shelf: six
+  more client retainers, Hostile-tier teeth, Union retaliation + détente,
+  embassies, recruitment gating, dual-sided contracts, intelligence
+  products (wants an enemy-comp preview UI). Revisit after play shows
+  whether players specialize.
 - **Relic economy residuals** — an HQ acquisition surface (shop) and
   selling; acquisition is sortie-only by v1 ruling
   (relic_equipment_design.md).

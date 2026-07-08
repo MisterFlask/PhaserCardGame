@@ -75,3 +75,113 @@ client strings — lint-style test; tier math unit tests; round-trip
 untouched since no save change) + build + smoke; browser: force
 contractsCompletedByClient to 3 and 6 via console, verify unlock row and
 the +10% generation tag.
+
+## Amendment: Faction Relationships v2 (July 2026)
+
+Lead-authored under owner-delegated authority. v1 above answers "which
+clients remember you"; v2 answers "whose side does that put you on." Same
+philosophy: the smallest true system, and **standing stays derived — no
+new save state, no SAVE_FORMAT_VERSION bump.**
+
+### Factions and the client map
+
+Every generator client string except the Court of Directors (internal, as
+ever) belongs to exactly one faction. The mapping is a single registry —
+`src/campaign/Factions.ts` (house rule 6: the ONE place it lives;
+generator and UI both consult it).
+
+| Faction | Clients |
+|---|---|
+| The British Crown | The Styx Dam Project Office; British Trade Delegation, Delta & Continental Offices |
+| The Styxian Boatmen's Guild | Styx Delta Ferry & Lighterage Company |
+| The Reichsinfernokorps | Liaison Office; **Deep France Concession Holdings** (ruling: the commercial face of the German concession system — its contracts fight the Emperor's revenant auditors, and the Liaison Office "would rather not admit the concession exists") |
+| The Empire Undying | Maison Vachon, Purveyors to the Front (purveyor to the French lines; its rivals' quartermasters are the ones requisitioning its carts) |
+| The Brimstone Barons | Equipment Leasing Consortium; The Brimstone Barons, jointly |
+| The Dis Board of Overseers | Dis Foundry Belt Board of Overseers |
+| The Underwriters' Pool | Infernal Marine & Postal; Continental Casualty & Ossuary (insurers profit from everyone's disasters and hold no grudges — the deliberately always-open fallback) |
+| The Iron Choir | The Iron Choir, per its Concordat |
+| The Dis Stokers' Union | none — and never. Labor does not commission mercenaries; the Union exists in this system only to be offended (retaliation texture is v2.1 shelf material) |
+| The Basalt Courts / The Cloggers | declared in the registry, no clients yet — content hooks for aristocratic-favor contracts and Dutch vendor stock (future acts) |
+
+### Rivalries (static — the act conflicts, plus labor)
+
+- British Crown ↔ Boatmen's Guild (Act 1)
+- Empire Undying ↔ Reichsinfernokorps (Act 2)
+- Brimstone Barons ↔ Stokers' Union; Dis Overseers ↔ Stokers' Union
+  (Act 3 — management is a side, and it has two faces)
+
+No live faction-to-faction dynamics. **Rejected, not deferred**: the acts
+encode the conflicts statically; a war ticker is a lot of state for
+ambience. Liveliness, if wanted later, is board-minutes flavor keyed to
+the Company's own standing.
+
+### Standing (derived)
+
+`standing(F) = completions for F's clients − completions for F's rivals'
+clients`, computed entirely from the shipped
+`contractsCompletedByClient`. Properties worth knowing:
+
+- The two sides of a conflict mirror each other; you can never be
+  blacklisted by both sides of the same rivalry.
+- Factions whose rivals have no clients (Barons, Overseers, insurers,
+  Choir) can never go negative. The Union is the only faction whose
+  standing only falls.
+- With current client tables, no region's template pool can be emptied by
+  blacklists (every pool holds a never-negative client). The generator
+  still guards the case — see ladder below — for future content.
+
+### Hostility ladder
+
+| Standing | Tier | Effect |
+|---|---|---|
+| ≥ −2 | Cordial | none |
+| ≤ −3 | Noted | flavor only: the notice's Offends line gains "(relations strained)" |
+| ≤ −6 | Blacklisted | that faction's clients stop generating — bounty and trade template pools filter at pick. If a filter would empty a pool, the generator quietly ignores the blacklist for that pick: commerce forgives necessity. |
+| ≤ −9 | Hostile | **deferred to v2.1, do NOT stub** (no enum member, no threshold constant) |
+
+Blacklisting is deliberately irreversible in v2: their clients gone means
+no completions path back. Détente mechanisms are shelf material (below).
+
+### The notice line (the whole UI surface)
+
+Every non-prestige contract notice gains one derived register line:
+"Pleases: X." plus "Offends: Y." when X has rivals (Act 3 thus tags both
+Baron and Overseer work as offending the Union — correct). Rendered
+alongside the existing CHARTERED PARTNER tag (ContractBoardPanel), derived
+at render time from the registry. Same surface philosophy as v1: no
+reputation screen; the board tags ARE the system.
+
+### Deferred to v2.1 shelf (do NOT stub)
+
+- **Hostile-tier teeth**: faction reinforcements via EncounterHardening,
+  trade-run tolls, one assassination-attempt event.
+- **Union retaliation texture**: recruit-cost bumps, wound-week
+  stretches, a strike event freezing a Standing Order slot; détente via a
+  donation to the Widows' and Orphans' Fund (£ for standing — the one
+  purchasable relationship, priced to sting).
+- **Positive faction tiers**: recruit gating ("faction rep gates the good
+  ones"), embassies as commitment devices (Strategic Projects family),
+  Basalt Court favor-denominated contracts, Clogger vendor stock.
+- **Dual-sided contracts**: the same incident offered by both sides of a
+  rivalry; taking either removes both.
+
+### Balance note (convention: EncounterHardening.ts:12-14)
+
+The economy sim calls `refillBoard` WITHOUT `contractsCompletedByClient`
+(CampaignSimulator.ts:388,442), so blacklisting is invisible to the sim
+and the ratchets — by construction, not by luck. Thresholds (−3/−6) are
+launch sketches; reaching −6 requires six net completions against a
+faction, i.e. deliberate specialization, which is the intent.
+
+### Verification bar (implementing agent)
+
+Lint test: every generator client string (bounty + trade, via the
+existing getAll*Templates hooks) maps to a faction, Court of Directors
+excluded, rivalry pairs symmetric-by-construction and reference declared
+factions. Unit tests: standing math (incl. the Union two-rival case and
+the mirror property), tier thresholds. Generator tests: seeded — a
+blacklisted faction's clients never emitted; empty-pool fallback via the
+exposed filter helper. Typecheck + full vitest + build + smoke; browser:
+contrive contractsCompletedByClient via console, verify the
+Pleases/Offends line, the "(relations strained)" annotation, and a
+blacklisted board.
