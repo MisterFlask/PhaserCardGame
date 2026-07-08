@@ -34,6 +34,11 @@ import ImageUtils from '../utils/ImageUtils';
 import { installLoaderWatchdog } from '../utils/LoaderWatchdog';
 import SoundUtils from '../utils/SoundUtils';
 import { runSmokeTest } from '../utils/SmokeTest';
+import { runHeadlessCombat, HeadlessCombatParams } from '../combat/sim/HeadlessCombat';
+import { randomLegalPolicy, mulberry32 } from '../combat/sim/RandomLegalPolicy';
+import { CharacterGenerator } from '../gamecharacters/CharacterGenerator';
+import { ActSegment } from '../encounters/EncounterManager';
+import { AutomatedCharacterType } from '../Types';
 import { HqScene } from './campaign/hq_ux/HqScene';
 import { SceneChanger } from './SceneChanger';
 import { CampaignBriefStatus } from './subcomponents/CampaignBriefStatus';
@@ -549,5 +554,52 @@ installBackgroundStepper();
 (window as any).applyPromotion = applyPromotion;
 (window as any).CardRewardsGenerator = CardRewardsGenerator;
 (window as any).CampaignSerializer = CampaignSerializer;
+
+// Headless combat simulator debug hook (see src/combat/sim/HeadlessCombat.ts
+// and TODO.md's "Headless combat simulator" entry). Runs a full combat
+// through the real rules pipeline with no scene, using a random squad and
+// a fixed default enemy encounter unless overridden. GameState is a
+// process-wide singleton, so this snapshots and restores
+// currentRunCharacters/combatState.playerCharacters/combatState.enemies
+// around the run -- calling this from HqScene (the normal starting point)
+// should leave the live campaign state as it found it.
+//
+// Usage from the browser console:
+//   await window.runHeadlessCombat()                         // one default combat
+//   await window.runHeadlessCombat({ seed: 42, squadSize: 4 })
+(window as any).runHeadlessCombat = async (opts?: {
+    squadSize?: number;
+    enemies?: AutomatedCharacterType[];
+    seed?: number;
+    maxTurns?: number;
+}) => {
+    const gameState = GameState.getInstance();
+    const savedRunCharacters = gameState.currentRunCharacters;
+    const savedPlayers = gameState.combatState.playerCharacters;
+    const savedEnemies = gameState.combatState.enemies;
+
+    try {
+        const squadSize = opts?.squadSize ?? 3;
+        const players = Array.from({ length: squadSize },
+            () => CharacterGenerator.getInstance().generateRandomCharacter());
+        // Fresh instances every call: ActSegment's encounter tables are
+        // static/shared, and reusing them would carry hitpoints/buffs over
+        // between runs.
+        const enemies = opts?.enemies ?? ActSegment.Act1_Segment0.encounters[0].enemies.map(e => e.Copy());
+
+        const rng = opts?.seed !== undefined ? mulberry32(opts.seed) : Math.random;
+        const params: HeadlessCombatParams = {
+            players,
+            enemies,
+            policy: randomLegalPolicy(rng),
+            maxTurns: opts?.maxTurns
+        };
+        return await runHeadlessCombat(params);
+    } finally {
+        gameState.currentRunCharacters = savedRunCharacters;
+        gameState.combatState.playerCharacters = savedPlayers;
+        gameState.combatState.enemies = savedEnemies;
+    }
+};
 
 export default CombatScene;

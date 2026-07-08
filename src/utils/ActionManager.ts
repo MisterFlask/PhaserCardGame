@@ -1193,6 +1193,14 @@ export class ActionQueue {
     private currentActionNode: ActionNode | null = null;
     private isResolving: boolean = false;
 
+    /** True once the queue has fully drained (no queued or in-flight
+     *  action). Headless combat (src/combat/sim/HeadlessCombat.ts) has no
+     *  scene to poll for UI settling the way SmokeTest.ts does, so it polls
+     *  this instead between policy decisions. */
+    public isIdle(): boolean {
+        return !this.isResolving && this.queue.length === 0 && this.currentActionNode === null;
+    }
+
     addAction(action: GameAction): void {
         if (this.currentActionNode) {
             this.currentActionNode.children.push(new ActionNode(action));

@@ -13,6 +13,21 @@ let workerUnavailable = false;
 let nextId = 0;
 const pending = new Map<number, () => void>();
 
+// Headless combat simulation (src/combat/sim/HeadlessCombat.ts) drives
+// thousands of these delays per combat with no human waiting on a screen;
+// collapsing them to setImmediate-speed (but still yielding a tick, so the
+// ActionQueue's pop/await ordering is unchanged) is the difference between
+// a combat taking milliseconds and it taking real wall-clock seconds. This
+// is a deliberate global switch, not per-call plumbing, because the delay
+// is invoked from many call sites (WaitAction, DrawCardsAction,
+// ExhaustCardAction, ActionQueue.resolveActions) that call the free
+// function directly rather than through an overridable method.
+let headlessZeroDelay = false;
+
+export function setHeadlessZeroDelay(enabled: boolean): void {
+    headlessZeroDelay = enabled;
+}
+
 function getWorker(): Worker | null {
     if (worker) {
         return worker;
@@ -47,6 +62,17 @@ function getWorker(): Worker | null {
 }
 
 export function backgroundResistantDelay(ms: number): Promise<void> {
+    if (headlessZeroDelay) {
+        // A queued macrotask (setTimeout, even at 0ms) is clamped to ~4ms by
+        // browsers once nesting depth passes the HTML5 spec's threshold --
+        // negligible for a human-paced UI but ruinous when a single headless
+        // combat fires this call 100+ times (draw/play/damage/state-based
+        // effects all funnel through here). A microtask still yields (so
+        // this stays a real async boundary, not a synchronous call) without
+        // that floor.
+        return Promise.resolve();
+    }
+
     const activeWorker = typeof Worker === 'undefined' ? null : getWorker();
 
     if (!activeWorker) {

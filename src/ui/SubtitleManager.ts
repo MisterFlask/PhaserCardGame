@@ -2,16 +2,35 @@ import { TextBox } from './TextBox';
 
 export class SubtitleManager {
     private static instance: SubtitleManager;
-    private scene: Phaser.Scene;
+    // Optional: headless combat (src/combat/sim/HeadlessCombat.ts) runs turn
+    // resolution (enemy intent narration goes through displaySubtitle) with
+    // no live scene at all. Mirrors AbstractIntent.isUsingPlaceholderImage's
+    // scene-optional guard.
+    private scene?: Phaser.Scene;
     private subtitleTextBox?: TextBox;
     private portraitImage?: Phaser.GameObjects.Image;
 
-    private constructor(scene: Phaser.Scene) {
+    private constructor(scene?: Phaser.Scene) {
         this.scene = scene;
     }
 
     public static setInstance(scene: Phaser.Scene): void {
         SubtitleManager.instance = new SubtitleManager(scene);
+    }
+
+    /** Headless combat has no scene to construct a UI-backed instance with;
+     *  this creates a no-op-capable manager instead of throwing. Safe to
+     *  call repeatedly (e.g. once per simulated combat) -- only takes
+     *  effect if no instance (headless or scene-backed) already exists, so
+     *  it won't clobber a real scene's manager if one is somehow live. */
+    public static initHeadless(): void {
+        if (!SubtitleManager.instance) {
+            SubtitleManager.instance = new SubtitleManager(undefined);
+        }
+    }
+
+    public static isInitialized(): boolean {
+        return !!SubtitleManager.instance;
     }
 
     public static getInstance(scene?: Phaser.Scene): SubtitleManager {
@@ -25,6 +44,9 @@ export class SubtitleManager {
     }
 
     public async showSubtitle(text: string, portraitKey?: string): Promise<void> {
+        if (!this.scene) {
+            return;
+        }
         const centerX = this.scene.scale.width / 2;
         const subtitleWidth = 400;
         const portraitSize = 50; // adjust as needed

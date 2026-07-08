@@ -1,3 +1,4 @@
+import { getActiveHeadlessPolicy } from "../../../combat/sim/HeadlessPolicyRegistry";
 import { GameState } from "../../../rules/GameState";
 import CombatUiManager from "../../../screens/subcomponents/CombatUiManager";
 import { PlayableCardType } from "../../../Types";
@@ -20,17 +21,34 @@ export class RequireCardSelectionFromHandAction extends GameAction {
     }
 
     async playAction(): Promise<GameAction[]> {
-        const combatUiManager = CombatUiManager.getInstance();
-        const scene = combatUiManager.scene;
         const gameState = GameState.getInstance();
         const currentHand = gameState.combatState.currentHand;
 
-        // If the min number of cards is greater than the current hand size, 
+        // If the min number of cards is greater than the current hand size,
         // just perform the action on the set of cards that are in the player's hand.
         if (this.params.min > currentHand.length) {
             this.params.action(currentHand as PlayableCardType[]);
             return [];
         }
+
+        // Headless combat (src/combat/sim/HeadlessCombat.ts) has no scene to
+        // put a CardSelectionFromHandManager overlay on; resolve via the
+        // active IPlayPolicy instead of touching CombatUiManager at all.
+        const headlessPolicy = getActiveHeadlessPolicy();
+        if (headlessPolicy) {
+            const selected = headlessPolicy.chooseCardsFromHand({
+                name: this.params.name,
+                instructions: this.params.instructions,
+                min: this.params.min,
+                max: this.params.max,
+                candidates: currentHand as PlayableCardType[]
+            });
+            this.params.action(selected);
+            return [];
+        }
+
+        const combatUiManager = CombatUiManager.getInstance();
+        const scene = combatUiManager.scene;
 
         const selectionManager = new CardSelectionFromHandManager({
             scene: scene,
@@ -46,4 +64,4 @@ export class RequireCardSelectionFromHandAction extends GameAction {
 
         return [];
     }
-} 
+}
