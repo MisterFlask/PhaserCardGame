@@ -3,6 +3,7 @@ import { ProcBroadcaster } from "../../../gamecharacters/procs/ProcBroadcaster";
 import { DeckLogic, PileName } from "../../../rules/DeckLogicHelper";
 import { backgroundResistantDelay } from "../../BackgroundResistantDelay";
 import { GameAction } from "../GameAction";
+import { ModifyAshesAction } from "./ModifyCombatResourceAction";
 import { WaitAction } from "../WaitAction";
 
 export class ExhaustCardAction extends GameAction {
@@ -50,6 +51,17 @@ export class ExhaustCardAction extends GameAction {
                 buff.onAnyCardExhausted(card);
             });
 
-        return [];
+        // Pyre economy: exhausting one of the player's cards grants 1 Ash.
+        // This action is the single choke point for gameplay exhausts —
+        // everything routes through ActionManager.exhaustCard (including
+        // Sacrifice via BasicProcs), which queues this action; the grant
+        // lives here beside the onExhaust/onAnyCardExhausted procs so the
+        // two can never disagree about what counts as "exhausted". Direct
+        // DeckLogic.moveCardToPile(PileName.Exhaust) placements (power
+        // consumption after play, transform-removals) deliberately skip
+        // exhaust procs and likewise grant nothing. Queued as a child
+        // ModifyAshesAction — the same path ActionManager.modifyAshes uses —
+        // so the resource display pulses on the value change.
+        return [new ModifyAshesAction(1)];
     }
 } 

@@ -405,9 +405,11 @@ are doled out:
 
 - Each combat won: XP = 10 + 5×act to every deployed surviving soldier
   (wounded still earn it; the dead do not).
-- Ashes (combat resource): its post-combat bonus-card payoff dies with
-  post-combat rewards; instead ashes.value converts to bonus XP per squad
-  member at combat end.
+- Ashes (combat resource): no meta-layer payoff of any kind (ruling, July
+  2026 — supersedes the earlier bonus-XP conversion). Ashes is a
+  combat-scoped pyre economy: +1 whenever one of the player's cards is
+  exhausted or sacrificed, spent (2) to retrieve a card from the exhaust
+  pile. XP comes from combat wins alone.
 - Cost from level L to L+1: 20 + 10×(L−1). (~1 sortie to level 2; ~16
   sorties to cap.)
 

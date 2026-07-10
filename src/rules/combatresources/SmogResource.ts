@@ -36,6 +36,7 @@ export class SmogResource extends AbstractCombatResource {
                             ActionManager.getInstance().DoAThing("Smog Resource Click", () => {
                                 const card = selectedCards[0];
                                 ActionManager.getInstance().moveCardToPile(card, PileName.Hand);
+                                this.broadcastResourceUsed();
                             });
                         }
                     },

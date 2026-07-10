@@ -2,7 +2,7 @@ import { TextGlyphs } from "../../../../text/TextGlyphs";
 import { BaseCharacter } from "../../../BaseCharacter";
 import { AbstractBuff } from "../../AbstractBuff";
 
-export class IncreaseIron extends AbstractBuff {
+export class IncreaseMettle extends AbstractBuff {
     constructor() {
         super();
         this.stackable = true;
@@ -20,4 +20,4 @@ export class IncreaseIron extends AbstractBuff {
     public onThisCardInvoked(target?: BaseCharacter): void {
         this.actionManager.modifyMettle(this.stacks);
     }
-} 
+}

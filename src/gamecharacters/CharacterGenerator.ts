@@ -12,8 +12,8 @@ import { StrongBack } from "./buffs/persona/StrongBack";
 import { Undersider } from "./buffs/persona/Undersider";
 import { WellDrilled } from "./buffs/persona/WellDrilled";
 import { IncreaseBlood } from "./buffs/standard/combatresource/IncreaseBlood";
-import { IncreaseIron } from "./buffs/standard/combatresource/IncreaseMetal";
-import { IncreasePages as IncreaseAshes } from "./buffs/standard/combatresource/IncreasePages";
+import { IncreaseMettle } from "./buffs/standard/combatresource/IncreaseMettle";
+import { IncreaseAshes } from "./buffs/standard/combatresource/IncreaseAshes";
 import { IncreaseSmog } from "./buffs/standard/combatresource/IncreaseSmog";
 import { IncreaseVenture } from "./buffs/standard/combatresource/IncreaseVenture";
 import { Lethality } from "./buffs/standard/Lethality";
@@ -127,7 +127,7 @@ export class CharacterGenerator {
     }
 
     private getRandomStartingAttackBuff(): AbstractBuff {
-        const buffs = [new IncreaseAshes(), new IncreaseIron(), new IncreaseVenture(), new IncreaseSmog(), new IncreaseBlood(), new Lethality(4)]
+        const buffs = [new IncreaseAshes(), new IncreaseMettle(), new IncreaseVenture(), new IncreaseSmog(), new IncreaseBlood(), new Lethality(4)]
         return buffs[Math.floor(Math.random() * buffs.length)]
     }
 }

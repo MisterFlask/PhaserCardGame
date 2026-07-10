@@ -2,7 +2,7 @@
 
 Combat resources represent different types of power that can be accumulated during combat.
 
-Mechanically, they serve two purposes: first, they provide a SCALING MECHANISM: cards can scale damage or block or special effects based on a specific resource, e.g. a card might have improved damage with Ashes.  Likewise, the Burning status effect ALWAYS scales with Ashes.
+Mechanically, they serve two purposes: first, they provide a SCALING MECHANISM: cards can scale damage or block or special effects based on a specific resource, e.g. a card might have improved damage with Ashes.  Likewise, the Burning status effect ALWAYS scales with Blood.
 
 Second, the ashes have an effect whereby you can SPEND them at any time to trigger effects.
 
@@ -11,19 +11,23 @@ Second, the ashes have an effect whereby you can SPEND them at any time to trigg
 ## Blood
 - **Icon**: blood_icon
 - **Color**: Red (0xff0000)
-- **Click Effect**: Spend 2 Blood to gain 1 Energy
+- **Click Effect**: Spend 1 Blood to gain 1 Energy
 
 ## Mettle
 - **Icon**: iron_icon
 - **Color**: Gray (0x808080)
-- **Click Effect**: Spend 1 Mettle to grant 3 Block to all allies
+- **Click Effect**: Spend 1 Mettle to grant 2 Block to all characters
 
 ## Ashes
 - **Icon**: ashes_icon
 - **Color**: Beige (0xF5F5DC)
-- **Passive Effect**: At end of combat:
-  - At 4+ Ashes: Gain one additional card reward option
-  - At 10+ Ashes: Gain two additional card reward options
+- **Gain**: +1 Ash whenever one of the player's cards is exhausted (including via Sacrifice)
+- **Click Effect**: Spend 2 Ashes to return a chosen card from the exhaust pile to hand
+- **Implementation Details**:
+  - Opens card selection UI for exhaust pile
+  - Selection is cancellable (cost refunded on cancel)
+  - Requires at least one card in exhaust pile
+  - Combat-scoped: zeroed at end of combat, no meta-layer payoff
 
 ## Pluck
 - **Icon**: feather_icon
@@ -42,7 +46,7 @@ Second, the ashes have an effect whereby you can SPEND them at any time to trigg
 ## Venture
 - **Icon**: venture_icon
 - **Color**: Gold (0xFFD700)
-- **Click Effect**: Spend 1 Venture to draw a card
+- **Click Effect**: Spend 2 Venture to draw a card
 
 # Basic Procs
 

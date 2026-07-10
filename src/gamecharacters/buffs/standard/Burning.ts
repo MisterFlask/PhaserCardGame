@@ -14,7 +14,7 @@ export class Burning extends AbstractBuff {
 
     override getDescription(): string {
         const totalDamage = this.baseDamage + GameState.getInstance().combatState.combatResources.blood.value;
-        return `At the end of turn or whenever a card is discarded, take ${totalDamage} damage and decrease stacks by 1. Damage increases with ${TextGlyphs.getInstance().ashesIcon}.`;
+        return `At the end of turn or whenever a card is discarded, take ${totalDamage} damage and decrease stacks by 1. Damage increases with ${TextGlyphs.getInstance().bloodIcon}.`;
     }
 
     constructor(stacks: number = 1) {

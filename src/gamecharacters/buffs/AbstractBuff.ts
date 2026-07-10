@@ -447,10 +447,6 @@ export abstract class AbstractBuff implements IAbstractBuff {
         return name;
     }
 
-    public afterCombatResourceSpent(resourceWithNewQuantity: AbstractCombatResource, amountSpent: number){
-
-    }
-    
     public modifyCombatResourceGained(resourceWithOldQuantity: AbstractCombatResource, amountToBeGained: number): CombatResourceGainedResult{
         return {newAmountToBeGained: amountToBeGained, logicTriggered: false, preventGaining: false};
     }
