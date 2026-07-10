@@ -44,7 +44,7 @@ export class StartCombatAction extends GameAction {
         combatState.currentDiscardPile = [];
         combatState.currentExhaustPile = [];
 
-        // Set max energy based on relics
+        // Base energy is a hardcoded 3; relic-based scaling is unimplemented.
         combatState.defaultMaxEnergy = 3; // Base energy
         
         new BeginTurnAction().playAction();

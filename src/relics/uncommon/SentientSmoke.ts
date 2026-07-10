@@ -1,8 +1,7 @@
 import { EntityRarity } from "../../gamecharacters/EntityRarity";
 import { EldritchSmoke } from "../../gamecharacters/playerclasses/cards/diabolist/tokens/EldritchSmoke";
 import { BasicProcs } from "../../gamecharacters/procs/BasicProcs";
-import { AbstractCombatEvent } from "../../rules/AbstractCombatEvent";
-import { SpentCombatResourceEvent } from "../../utils/actions/CombatEvents";
+import { CombatResourceUsedEvent } from "../../rules/combatresources/AbstractCombatResource";
 import { AbstractRelic } from "../AbstractRelic";
 
 export class SentientSmoke extends AbstractRelic {
@@ -21,8 +20,8 @@ export class SentientSmoke extends AbstractRelic {
         return "Whenever you spend Smog, manufacture an Eldritch Smoke to your hand.";
     }
 
-    onEvent(event: AbstractCombatEvent): void {
-        if (event instanceof SpentCombatResourceEvent && event.resourceAfterSpending.name === "Smog") {
+    override onEvent(event: CombatResourceUsedEvent): void {
+        if (event instanceof CombatResourceUsedEvent && event.isSmog()) {
             BasicProcs.getInstance().ManufactureCardToHand(new EldritchSmoke());
         }
     }

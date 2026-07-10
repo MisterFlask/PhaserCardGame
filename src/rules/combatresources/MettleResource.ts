@@ -28,6 +28,7 @@ export class MettleResource extends AbstractCombatResource {
                     });
                 });
                 this.value -= MettleResource.METTLE_COST;
+                this.broadcastResourceUsed();
             });
             return true;
         }

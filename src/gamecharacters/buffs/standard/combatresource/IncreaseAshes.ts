@@ -2,7 +2,7 @@ import { TextGlyphs } from "../../../../text/TextGlyphs";
 import { BaseCharacter } from "../../../BaseCharacter";
 import { AbstractBuff } from "../../AbstractBuff";
 
-export class IncreasePages extends AbstractBuff {
+export class IncreaseAshes extends AbstractBuff {
     constructor() {
         super();
         this.stackable = true;
@@ -10,7 +10,7 @@ export class IncreasePages extends AbstractBuff {
     }
 
     getDisplayName(): string {
-        return "Increase Pages";
+        return "Increase Ashes";
     }
 
     getDescription(): string {
@@ -18,7 +18,7 @@ export class IncreasePages extends AbstractBuff {
     }
 
     public onThisCardInvoked(target?: BaseCharacter): void {
-        this.actionManager.modifyAshes(this.stacks); 
+        this.actionManager.modifyAshes(this.stacks);
         this.actionManager.exhaustCard(this.getOwnerAsPlayableCard()!);
     }
 }

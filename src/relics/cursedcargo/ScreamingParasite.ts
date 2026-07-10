@@ -1,7 +1,8 @@
 import { Stress } from "../../gamecharacters/buffs/standard/Stress";
 import { EntityRarity } from "../../gamecharacters/EntityRarity";
-import { AbstractCombatResource } from "../../rules/combatresources/AbstractCombatResource";
+import { CombatResourceUsedEvent } from "../../rules/combatresources/AbstractCombatResource";
 import { GameState } from "../../rules/GameState";
+import { ActionManager } from "../../utils/ActionManager";
 import { AbstractRelic } from "../AbstractRelic";
 
 export class ScreamingParasite extends AbstractRelic {
@@ -20,14 +21,11 @@ export class ScreamingParasite extends AbstractRelic {
         return "Whenever you spend Blood, all allies gain 1 Stress.";
     }
 
-    override afterCombatResourceSpent(resourceWithNewQuantity: AbstractCombatResource, amountSpent: number){
-        const gameState = GameState.getInstance();
-        if (!gameState.combatState || resourceWithNewQuantity.name !== "Blood" || amountSpent <= 0) {
-            return;
+    override onEvent(event: CombatResourceUsedEvent): void {
+        if (event instanceof CombatResourceUsedEvent && event.isBlood()) {
+            GameState.getInstance().combatState.playerCharacters.forEach(character => {
+                ActionManager.getInstance().applyBuffToCharacter(character, new Stress(1));
+            });
         }
-
-        gameState.combatState.playerCharacters.forEach(character => {
-            this.actionManager.applyBuffToCharacter(character, new Stress(1));
-        });
     }
 }

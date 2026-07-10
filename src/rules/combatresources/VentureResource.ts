@@ -20,7 +20,7 @@ export class VentureResource extends AbstractCombatResource {
             ActionManager.getInstance().DoAThing("Venture Resource Click", () => {
                 ActionManager.getInstance().drawCards(1);
                 this.value -= VentureResource.DRAW_CARD_COST;
-
+                this.broadcastResourceUsed();
             });
             return true;
         }

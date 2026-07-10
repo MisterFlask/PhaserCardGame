@@ -1,16 +1,16 @@
 import { TextGlyphs } from '../../text/TextGlyphs';
-import { PlayableCardType } from '../../Types';
 import { ActionManager } from '../../utils/ActionManager';
+import { PileName } from '../DeckLogicHelper';
 import { GameState } from '../GameState';
 import { AbstractCombatResource } from './AbstractCombatResource';
 
 export class AshesResource extends AbstractCombatResource {
-    private static readonly ASHES_COST: number = 2;
+    private static readonly RETURN_CARD_COST: number = 2;
 
     constructor() {
         super(
             "Ashes",
-            `Pay ${AshesResource.ASHES_COST} Ashes: Increase damage and block of a random card in your hand by 50%.`,
+            `Spend ${AshesResource.RETURN_CARD_COST} Ashes: Return a card from your exhaust pile to your hand`,
             'ashes_icon',
             TextGlyphs.getInstance().ashesIcon
         );
@@ -19,39 +19,35 @@ export class AshesResource extends AbstractCombatResource {
 
     public onClick(): boolean {
         const gameState = GameState.getInstance();
-        if (this.value >= 2) {
-            // Filter hand for cards with damage or block
-            const eligibleCards = gameState.combatState.currentHand.filter(card => 
-                card.baseDamage > 0 || card.baseBlock > 0
-            );
+        if (this.value >= AshesResource.RETURN_CARD_COST) {
+            if (gameState.combatState.currentExhaustPile.length > 0) {
+                // Deduct the cost upfront
+                this.value -= AshesResource.RETURN_CARD_COST;
 
-            if (eligibleCards.length === 0) {
-                // Display a message if no eligible card is available.
-                ActionManager.getInstance().displaySubtitle("No eligible cards for Ashes boost", 1000);
-                return false;
+                ActionManager.getInstance().selectFromCardPool({
+                    name: "Retrieve from the Pyre",
+                    instructions: "Choose a card to return to your hand",
+                    min: 1,
+                    max: 1,
+                    cancellable: true,
+                    cardPool: gameState.combatState.currentExhaustPile,
+                    action: (selectedCards) => {
+                        if (selectedCards.length > 0) {
+                            ActionManager.getInstance().DoAThing("Ashes Resource Click", () => {
+                                const card = selectedCards[0];
+                                ActionManager.getInstance().moveCardToPile(card, PileName.Hand);
+                                this.broadcastResourceUsed();
+                            });
+                        }
+                    },
+                    onCancelAction: () => {
+                        // Refund the cost if cancelled
+                        this.value += AshesResource.RETURN_CARD_COST;
+                    }
+                });
             }
-
-            // Use requireCardSelection instead of randomly selecting a card.
-            ActionManager.getInstance().requireCardSelectionFromHand({
-                name: "Ashes Ability",
-                instructions: "Select a card to empower (damage and block increased by 50%)",
-                min: 1,
-                max: 1,
-                cancellable: false,
-                action: (selectedCards: PlayableCardType[]) => {
-                    const targetCard = selectedCards[0];
-                    if (targetCard.baseDamage > 0) {
-                        targetCard.baseDamage = Math.floor(targetCard.baseDamage * 1.5);
-                    }
-                    if (targetCard.baseBlock > 0) {
-                        targetCard.baseBlock = Math.floor(targetCard.baseBlock * 1.5);
-                    }
-                    targetCard.name += "⚡";
-                    this.value -= 2;
-                }
-            });
             return true;
         }
         return false;
-    } 
-} 
+    }
+}

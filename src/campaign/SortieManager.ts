@@ -158,22 +158,14 @@ export class SortieManager {
         if (!this.activeContract) return;
 
         // XP for the win to every deployed soldier still standing (design
-        // doc: "wounded still earn it; the dead do not"). The old ashes
-        // payoff converts to bonus XP ONCE, at the sortie's final combat:
-        // combatResources persist across a sortie's combats, so a
-        // per-combat read would re-grant earlier combats' ashes.
+        // doc: "wounded still earn it; the dead do not").
         const baseXp = xpForCombatWin(this.activeContract.act);
-        const isFinalCombat = this.combatsRemaining() <= 1;
-        const bonusXp = isFinalCombat
-            ? GameState.getInstance().combatState.combatResources.ashes.value
-            : 0;
         // Standing Orders (e.g. converted Abyssal Research Institute) can
-        // scale the combat-win XP; the ashes bonus is a flat carryover, not
-        // itself scaled, to keep its accounting a simple 1:1 conversion.
+        // scale the combat-win XP.
         const orderAdjustedXp = StandingOrdersState.getInstance().xpGain(baseXp);
         this.squad.forEach(character => {
             if (character.hitpoints > 0 && !character.isDeceased) {
-                character.xp += orderAdjustedXp + bonusXp;
+                character.xp += orderAdjustedXp;
             }
         });
 

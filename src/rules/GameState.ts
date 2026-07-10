@@ -252,7 +252,7 @@ export class CombatResources {
     }
     modifyMettle(byAmount: number) {
         this.mettle.value += byAmount;
-        console.log(`Modified Iron by ${byAmount}. New value: ${this.mettle.value}`);
+        console.log(`Modified Mettle by ${byAmount}. New value: ${this.mettle.value}`);
     }
     modifyVenture(byAmount: number) {
         this.venture.value += byAmount;

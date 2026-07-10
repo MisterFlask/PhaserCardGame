@@ -26,6 +26,7 @@ export class PluckResource extends AbstractCombatResource {
                     ActionManager.getInstance().applyBuffToCharacterOrCard(character, new TemporaryLethality(PluckResource.TEMPORARY_LETHALITY_AMOUNT));
                 });
                 this.value -= PluckResource.PLUCK_COST;
+                this.broadcastResourceUsed();
             });
             return true;
         }
