@@ -21,6 +21,104 @@ and the Regions 5+ go/no-go.
 Also user-gated: **pushing** (66+ local commits; first push runs the
 smoke-gated CI and deploys the compressed site to gh-pages).
 
+## Path to banger (July 2026 full-state audit)
+
+Assessment ruling: the loop is complete end-to-end and strongly voiced;
+what stands between "complete" and "banger" is (A) the first hour, (B) the
+sensory floor, (C) the difficulty curve, (D) late-act content depth. A/B/E
+items are pre-playtest-safe (they touch no gated balance numbers); C/D
+items note their gates individually.
+
+### A. First hour — a new player must hook inside 30 minutes
+
+- **Title screen + main menu scene** — the game boots straight into
+  `HqScene` (scene list in `CombatAndMapScene.ts`; only two scenes exist).
+  Add a menu scene: Continue / New Charter (confirm-over-existing-save) /
+  Settings. Gives save-delete a proper home; `OnboardingLetter` plays
+  after New Charter instead of on raw boot.
+- **Settings surface** — mute (a `SoundUtils` localStorage flag) is the
+  only option in the game. Settings panel reachable from HQ and combat:
+  master/SFX/music volume sliders, mute. Persist in localStorage, never
+  in the save.
+- **Mechanics glossary + resource tooltips** — stress, Ashes, the five
+  combat resources, Lethality, dividend/satisfaction, and Standing Orders
+  have zero in-game explanation. Wire `TooltipAttachment` onto
+  `CombatResourceDisplay` and the ledger/board-meeting numbers; add a
+  registry-driven "Company Handbook" HQ panel (BBCode pages, Cavendish's
+  voice) covering the ~10 core mechanics.
+- **Scripted first sortie** — onboarding today is one non-interactive
+  letter. Script the first contract of a fresh charter: staged, skippable
+  hint callouts (energy, drag-to-target, enemy intents, block, stress)
+  driven by combat state. Never serialized — HQ-only saves make the
+  mid-tutorial-quit case free.
+
+### B. Sensory floor — a deckbuilder with no music reads as a demo
+
+- **Music system** — there is NO music, anywhere. MusicManager (per-scene
+  track selection, crossfade, its own volume bus): an HQ theme, one combat
+  theme per region (4), board-meeting/defeat/victory stings. CC0 sourcing
+  is the standing ruling; Victorian-industrial register. Absorbs the old
+  "per-region ambient loops" audio residual.
+- **Combat SFX + damage numbers** — five generic SFX exist in
+  `SoundUtils.ts`. Add per-category card sounds (attack/skill/power/
+  curse), enemy hit + death, £-payout and promotion stings; a distinct
+  scaling damage-number popup (damage currently reuses the generic
+  word-float in `AnimationPrimitives.floatingText`); upgrade the default
+  enemy death from fade to a dissolve/collapse built from existing
+  primitives.
+
+### C. Difficulty curve & replay (sim-informed; final numbers play-gated)
+
+- **Act-curve smoothing sweep** — measured greedy win rates run
+  97.5 / 85 / 77.5 / 55 by act (`combat-rates.fixture.json`): act 1 is a
+  near-freebie and act 4 a coinflip — a cliff, not a ramp. Iterate with
+  `measure-combat-rates` toward a monotonic ~88/78/68/58 greedy curve,
+  then re-derive the economy ratchets per-act instead of the flat 0.9
+  `sortieWinRate` assumption in `CampaignSimulator.test.ts` (T1 currently
+  tolerates up to 100% charter survival — late-game tension rests
+  entirely on score). Coarse smoothing may precede the playtest; final
+  tuning is playtest-era.
+- **Charter Terms (difficulty selector / NG+)** — no difficulty,
+  ascension, or NG+ mechanism exists. After the first played campaign:
+  an XCOM-style "charter terms" ladder chosen at New Charter (harsher
+  dividend escalation, faster region hardening, pricier wages — all
+  existing named constants in `CampaignCalendar`/`EncounterHardening`/
+  `ContractGenerator`). Design doc first; implementation is cheap against
+  those knobs.
+
+### D. Content depth — the late acts thin out exactly when stakes peak
+
+- **Blackhand parity batch** — 15 cards vs 21/22/17 for Archon/Cog/
+  Diabolist. +6 cards (2 per rarity) via the proven class-identity
+  dispatch template (see the Cog Manufactory commits).
+- **Act 3/4 enemy depth** — act 3 has 11 regulars (fewest), act 4 has 10
+  regulars and a SINGLE boss (`TheNinthBell`) vs 2–4 bosses elsewhere.
+  +4–6 act-3 regulars, +4 act-4 regulars, +1 act-4 boss; qa-spawn each
+  batch per definition of done.
+- **Intelligence family is entirely unshipped** — of the six Standing
+  Order families, family 4 has zero representation: no Actuarial Review
+  order in `LaunchOrders.ts`, no De Veer project, no enemy-comp preview
+  anywhere. Minimal slice: an Actuarial Review Standing Order + a
+  pre-dispatch enemy-composition preview on the contract board. Also
+  unblocks the faction-rep-v2 "intelligence products" item below.
+- **Perk pool slack** — every class has exactly 4 perks, the design-doc
+  minimum: a level-8 soldier draws their second perk from 3 and pools
+  never surprise. +2–3 perks per class (flavor lines with them — perks
+  are currently 0/16 flavored, see the flavor batch item).
+- **PROCUREMENT contracts** — enum stub in `Contract.ts`, never emitted by
+  `ContractGenerator`. Payout in cards/equipment/consumables instead of £
+  — the fourth mechanically distinct contract shape. Hold for playtest
+  contact if contract variety already feels sufficient in play.
+
+### E. Craft polish (small, ungated)
+
+- **Deck viewer is programmer-art** — `src/ui/Menu.ts` renders a deck as
+  raw `JSON.stringify` in a text box. Replace with the card-grid
+  treatment the promotion flow already uses.
+- **RelicsLibrary duplicate** — `new SonorousKlaxon()` appears twice in
+  `cursedCargoRelics` (RelicsLibrary.ts lines 59/68), silently doubling
+  its draw weight.
+
 ## Awaiting play (rulings recorded; do not churn without data)
 
 - **Standing Orders numbers** — launch sketches (payout +20%, wound +1w,
@@ -71,12 +169,18 @@ save v16). Remaining:
   Screaming Forests / Clockwork Wastes / Abyssal Frontier. Decide unlock
   laddering first: a 5th tier stretches the 10-year charter — parallel
   year-7 unlocks may fit better than deeper tiers.
-- **Card/buff flavor batch** — flavorText renders everywhere already;
-  regular cards shipped July 2026, BUFFS remain mechanics-only. Pure
-  writing, per-class batches.
-- **Unreachable boss/rare relics** — ~15 exist in code but nothing grants
-  them; wire into content (act-4/5 rewards?) and give them flavor lines
-  when they ship.
+- **Flavor batches (pure writing)** — flavorText renders everywhere
+  already; regular cards shipped July 2026. Remaining, per July audit:
+  BUFFS (mechanics-only), perks 0/16, consumables 0/14, relics 24/45.
+  Per-system batches; Cavendish register.
+- **Unreachable boss/rare relics** — 10 fully-coded relic classes are
+  imported by nothing (not `RelicsLibrary.ts`, not `SaveRegistries.ts`;
+  grep-verified 2026-07-10): MarrowSpike, MachineEffigy, Nightshard,
+  StovepipeHat, HemomancyTome, Shatterkiss, Boneflood, EchoHarvest,
+  Slaughterbots, SentientSmoke — plus boss-pool relics nothing grants. Wire into
+  content (act-4/5 rewards?); register in SaveRegistries the moment any
+  becomes grantable (the lint test will name offenders) and give them
+  flavor lines when they ship.
 
 ## Engineering residuals (small, ungated)
 
@@ -100,8 +204,6 @@ save v16). Remaining:
 - **Manifest pruning** — ~50MB of the 77MB deploy is manifest-wired but
   unreleased content; prune the MANIFEST (not the deploy script) if size
   starts mattering.
-- **Audio residuals** — per-region ambient loops (wants taste), volume
-  settings, victory/promotion/wipe stings. CC0 sourcing is the ruling.
 - **DOM test environment: CLOSED NEGATIVE** — do not retry happy-dom/jsdom
   for Phaser imports (WebGLRenderer's `typeof WEBGL_DEBUG` bundler guard is
   unconditionally truthy under Node and alias-proof). Character round-trips
