@@ -10,9 +10,12 @@ import {
 } from '../../../../ui/UIStyle';
 import { CampaignUiState } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
+import {
+    computePinPositions, PIN_TAG_H, PIN_TAG_W, REGION_ANCHORS,
+} from './contractPinLayout';
 
 const NOTICE_W = 380;
-const NOTICE_H = 170;
+const NOTICE_H = 240;
 
 /** Roman numerals, matching the tally marks drawWaxSeal engraves on the wax. */
 const ROMAN_NUMERALS = ['I', 'II', 'III'];
@@ -23,26 +26,7 @@ const MAP_RECT = { x: 32, y: 110, width: 1344, height: 896 };
 
 /** Where the selected contract's full notice docks: a cartouche over the
  *  dark inland sea, lower-left of the map, where the geography is empty. */
-const NOTICE_POS = { x: 270, y: 895 };
-
-const PIN_TAG_W = 170;
-const PIN_TAG_H = 54;
-
-/** Scatter geometry for same-region contracts: first contract sits on the
- *  region anchor, subsequent ones fan out at increasing angle/radius. No
- *  randomness so pins are stable across rebuilds. */
-const SCATTER_ANGLE_STEP = 2.4;
-const SCATTER_RADIUS_BASE = 60;
-const SCATTER_RADIUS_STEP = 18;
-/** How many scatter slots to probe before falling back to the anchor. A
- *  full board is 5-7 contracts, usually split across regions; 48 slots is
- *  far more headroom than a single region can ever need. */
-const SCATTER_MAX_SLOTS = 48;
-
-/** A pin's visual extent around its position: brass tack + seal above the
- *  point, parchment tag hanging below. Used to keep pins fully on the map
- *  and fully clear of the keep-out zones. */
-const PIN_EXTENT = { side: PIN_TAG_W / 2, up: 22, down: PIN_TAG_H + 14 };
+const NOTICE_POS = { x: 270, y: 880 };
 
 /** Keep-out margin around the docked notice cartouche. */
 const NOTICE_KEEPOUT_MARGIN = 15;
@@ -50,23 +34,6 @@ const NOTICE_KEEPOUT_MARGIN = 15;
 /** The map art's ornate compass rose (normalized image coords; radius as a
  *  fraction of image width). Pins and their tags stay clear of it. */
 const COMPASS_ROSE = { x: 0.80, y: 0.76, radiusFrac: 0.12 };
-
-/** Normalized (0..1) image-space anchor for a region's pin cluster, plus
- *  where the (always-drawn) region label sits. Unknown regions fall back to
- *  DEFAULT_REGION_ANCHOR with no label — a data table, not per-region
- *  branches, per house rule 6. */
-interface RegionAnchor {
-    anchor: { x: number; y: number };
-    label?: { x: number; y: number };
-}
-
-const REGION_ANCHORS: Record<string, RegionAnchor> = {
-    'Styx Delta': { anchor: { x: 0.22, y: 0.60 }, label: { x: 0.24, y: 0.73 } },
-    'Deep France': { anchor: { x: 0.46, y: 0.47 }, label: { x: 0.46, y: 0.61 } },
-    'Dis Foundry Belt': { anchor: { x: 0.75, y: 0.25 }, label: { x: 0.75, y: 0.41 } },
-    'Brimstone Badlands': { anchor: { x: 0.93, y: 0.42 }, label: { x: 0.91, y: 0.55 } },
-};
-const DEFAULT_REGION_ANCHOR: RegionAnchor = { anchor: { x: 0.55, y: 0.72 } };
 
 /**
  * The contract board: a survey map of Hell. Contracts appear as brass-tacked
@@ -154,79 +121,25 @@ export class ContractBoardPanel extends AbstractHqPanel {
         };
     }
 
-    private static regionAnchorFor(regionName: string): RegionAnchor {
-        return REGION_ANCHORS[regionName] ?? DEFAULT_REGION_ANCHOR;
-    }
-
-    /** Deterministic scatter offset (screen px) for slot k of a region's
-     *  fan-out: slot 0 is the anchor itself, later slots spiral outward. */
-    private static scatterOffset(slot: number): { dx: number; dy: number } {
-        if (slot === 0) return { dx: 0, dy: 0 };
-        const angle = slot * SCATTER_ANGLE_STEP;
-        const radius = SCATTER_RADIUS_BASE + slot * SCATTER_RADIUS_STEP;
-        return { dx: Math.cos(angle) * radius, dy: Math.sin(angle) * radius };
-    }
-
-    /** The keep-out rectangle around the docked notice cartouche: pins must
+    /** The keep-out rectangle around the docked notice cartouche, in the
+     *  {x, y, width, height} shape contractPinLayout expects: pins must
      *  never be even partially covered by the selected contract's notice. */
-    private static noticeKeepOut(): { left: number; right: number; top: number; bottom: number } {
+    private static noticeKeepOutRect(): { x: number; y: number; width: number; height: number } {
         return {
-            left: NOTICE_POS.x - NOTICE_W / 2 - NOTICE_KEEPOUT_MARGIN,
-            right: NOTICE_POS.x + NOTICE_W / 2 + NOTICE_KEEPOUT_MARGIN,
-            top: NOTICE_POS.y - NOTICE_H / 2 - NOTICE_KEEPOUT_MARGIN,
-            bottom: NOTICE_POS.y + NOTICE_H / 2 + NOTICE_KEEPOUT_MARGIN,
+            x: NOTICE_POS.x - NOTICE_W / 2 - NOTICE_KEEPOUT_MARGIN,
+            y: NOTICE_POS.y - NOTICE_H / 2 - NOTICE_KEEPOUT_MARGIN,
+            width: NOTICE_W + NOTICE_KEEPOUT_MARGIN * 2,
+            height: NOTICE_H + NOTICE_KEEPOUT_MARGIN * 2,
         };
     }
 
-    /** Whether a pin centered at (x, y) — with its full tack + tag extent —
-     *  stays on the map, clear of the notice cartouche, and clear of the
-     *  compass rose. */
-    private static pinPlacementValid(x: number, y: number): boolean {
-        const left = x - PIN_EXTENT.side;
-        const right = x + PIN_EXTENT.side;
-        const top = y - PIN_EXTENT.up;
-        const bottom = y + PIN_EXTENT.down;
-
-        // Fully inside the map image.
-        if (left < MAP_RECT.x || right > MAP_RECT.x + MAP_RECT.width) return false;
-        if (top < MAP_RECT.y || bottom > MAP_RECT.y + MAP_RECT.height) return false;
-
-        // Clear of the docked-notice cartouche (always reserved, so pins
-        // don't jump around when a contract is selected/deselected).
-        const keepOut = ContractBoardPanel.noticeKeepOut();
-        if (left < keepOut.right && right > keepOut.left && top < keepOut.bottom && bottom > keepOut.top) {
-            return false;
-        }
-
-        // Clear of the compass rose (circle-vs-rect test).
-        const cx = MAP_RECT.x + COMPASS_ROSE.x * MAP_RECT.width;
-        const cy = MAP_RECT.y + COMPASS_ROSE.y * MAP_RECT.height;
-        const r = COMPASS_ROSE.radiusFrac * MAP_RECT.width;
-        const nearestX = Phaser.Math.Clamp(cx, left, right);
-        const nearestY = Phaser.Math.Clamp(cy, top, bottom);
-        if ((nearestX - cx) ** 2 + (nearestY - cy) ** 2 < r * r) return false;
-
-        return true;
-    }
-
-    /** Screen position for the idxInRegion-th contract pinned in a region:
-     *  the idxInRegion-th scatter slot whose full pin extent passes the
-     *  keep-out checks. Deterministic, so pins are stable across rebuilds. */
-    private pinPositionFor(regionName: string, idxInRegion: number): { x: number; y: number } {
-        const { anchor } = ContractBoardPanel.regionAnchorFor(regionName);
-        const base = this.imageToScreen(anchor.x, anchor.y);
-        let validSeen = -1;
-        for (let slot = 0; slot < SCATTER_MAX_SLOTS; slot++) {
-            const { dx, dy } = ContractBoardPanel.scatterOffset(slot);
-            const x = base.x + dx;
-            const y = base.y + dy;
-            if (!ContractBoardPanel.pinPlacementValid(x, y)) continue;
-            validSeen++;
-            if (validSeen === idxInRegion) return { x, y };
-        }
-        // Pathological fallback (should never happen with sane anchors):
-        // stack on the anchor rather than vanish.
-        return base;
+    /** The map art's ornate compass rose, in screen space. */
+    private static compassRoseCircle(): { x: number; y: number; radius: number } {
+        return {
+            x: MAP_RECT.x + COMPASS_ROSE.x * MAP_RECT.width,
+            y: MAP_RECT.y + COMPASS_ROSE.y * MAP_RECT.height,
+            radius: COMPASS_ROSE.radiusFrac * MAP_RECT.width,
+        };
     }
 
     private drawLaunchChrome(ready: boolean): void {
@@ -325,12 +238,17 @@ export class ContractBoardPanel extends AbstractHqPanel {
         const campaign = CampaignUiState.getInstance();
 
         // --- Survey map: one pin per posted contract, scattered around its
-        // region anchor ---
-        const seenPerRegion: Record<string, number> = {};
-        campaign.availableContracts.forEach((contract) => {
-            const idxInRegion = seenPerRegion[contract.regionName] ?? 0;
-            seenPerRegion[contract.regionName] = idxInRegion + 1;
-            this.addDynamic(this.buildContractPin(contract, idxInRegion));
+        // region anchor. All positions are computed together (not pin by
+        // pin) so later pins can steer clear of earlier ones. ---
+        const pinPositions = computePinPositions(
+            campaign.availableContracts,
+            MAP_RECT,
+            ContractBoardPanel.noticeKeepOutRect(),
+            ContractBoardPanel.compassRoseCircle(),
+        );
+        campaign.availableContracts.forEach((contract, i) => {
+            const { x, y } = pinPositions[i];
+            this.addDynamic(this.buildContractPin(contract, x, y));
         });
 
         // --- Docked notice for the selected contract: a cartouche over the
@@ -366,10 +284,9 @@ export class ContractBoardPanel extends AbstractHqPanel {
     }
 
     /** One brass-tacked pin on the survey map, marking a posted contract. */
-    private buildContractPin(contract: Contract, idxInRegion: number): Phaser.GameObjects.Container {
+    private buildContractPin(contract: Contract, x: number, y: number): Phaser.GameObjects.Container {
         const campaign = CampaignUiState.getInstance();
         const selected = campaign.selectedContract?.id === contract.id;
-        const { x, y } = this.pinPositionFor(contract.regionName, idxInRegion);
 
         const container = this.scene.add.container(x, y);
 
@@ -485,10 +402,23 @@ export class ContractBoardPanel extends AbstractHqPanel {
         pin.fillCircle(-2, -NOTICE_H / 2 + 10, 3);
         container.add(pin);
 
-        container.add(this.scene.add.text(-NOTICE_W / 2 + 18, -NOTICE_H / 2 + 26, contract.name, {
+        // Flowed block: name, client line, engagements line, and the italic
+        // footer stack top-to-bottom, each positioned below the previous by
+        // its measured height + a small gap. Fixed y-offsets used to collide
+        // whenever a line word-wrapped; flowing avoids that regardless of
+        // how many lines any given piece of text takes. maxLines caps on the
+        // name and footer keep pathologically long content from bursting
+        // the paper even with the taller NOTICE_H.
+        const flowGap = 6;
+        let flowY = -NOTICE_H / 2 + 26;
+
+        const nameText = this.scene.add.text(-NOTICE_W / 2 + 18, flowY, contract.name, {
             fontFamily: Fonts.DISPLAY, fontSize: '21px', color: Palette.INK,
             wordWrap: { width: NOTICE_W - 100 },
-        }));
+            maxLines: 2,
+        });
+        container.add(nameText);
+        flowY += nameText.height + flowGap;
 
         // Prestige Commissions (src/docs/vp_endgame_design.md) are styled as
         // a commendation: the Court of Directors client tag reads distinctly
@@ -499,17 +429,21 @@ export class ContractBoardPanel extends AbstractHqPanel {
         const clientLine = contract.isPrestige
             ? `COMMENDATION · ${contract.client.toUpperCase()}`
             : `CLIENT: ${contract.client.toUpperCase()}${chartered ? ' · CHARTERED PARTNER' : ''}`;
-        container.add(this.scene.add.text(-NOTICE_W / 2 + 18, -NOTICE_H / 2 + 82, clientLine, {
+        const clientText = this.scene.add.text(-NOTICE_W / 2 + 18, flowY, clientLine, {
             fontFamily: Fonts.UTILITY, fontSize: '12px',
             color: contract.isPrestige ? Palette.GOOD_TEXT : (chartered ? Palette.GOOD_TEXT : Palette.INK_FADED),
             letterSpacing: 2,
             wordWrap: { width: NOTICE_W - 36 },
-        }));
+        });
+        container.add(clientText);
+        flowY += clientText.height + flowGap;
 
-        container.add(this.scene.add.text(-NOTICE_W / 2 + 18, -NOTICE_H / 2 + 104,
+        const engagementsText = this.scene.add.text(-NOTICE_W / 2 + 18, flowY,
             `${contract.numCombats} engagement${contract.numCombats > 1 ? 's' : ''} · ${contract.durationWeeks} weeks · ${contract.regionName}`, {
             fontFamily: Fonts.BODY, fontSize: '16px', color: Palette.INK_FADED,
-        }));
+        });
+        container.add(engagementsText);
+        flowY += engagementsText.height + flowGap;
 
         const crewLabel = ContractBoardPanel.crewRequirementLabel(contract.squadSize);
         const freightLabel = contract.isTradeRun
@@ -520,10 +454,12 @@ export class ContractBoardPanel extends AbstractHqPanel {
             : contract.consumableRewardName
                 ? `${crewLabel}${freightLabel} · Provisioning grant included: ${contract.consumableRewardName}`
                 : `${crewLabel}${freightLabel}`;
-        container.add(this.scene.add.text(-NOTICE_W / 2 + 18, -NOTICE_H / 2 + 124, noticeFooterLine, {
+        const footerText = this.scene.add.text(-NOTICE_W / 2 + 18, flowY, noticeFooterLine, {
             fontFamily: Fonts.BODY, fontSize: '13px', fontStyle: 'italic', color: Palette.INK_FADED,
             wordWrap: { width: NOTICE_W - 40 },
-        }));
+            maxLines: 3,
+        });
+        container.add(footerText);
 
         const expiry = this.scene.add.text(-NOTICE_W / 2 + 18, NOTICE_H / 2 - 36,
             `EXPIRES IN ${contract.deadlineWeeks} WEEK${contract.deadlineWeeks > 1 ? 'S' : ''}`, {

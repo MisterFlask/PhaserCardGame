@@ -1,5 +1,6 @@
 import { CombatRules } from '../rules/CombatRulesHelper';
 import { GameState } from '../rules/GameState';
+import type { CharacterAnimation } from '../ui/animations/AnimationTypes';
 import { AbstractCard, Team } from './AbstractCard';
 import { AbstractIntent } from './AbstractIntent';
 import { IBaseCharacter } from './IBaseCharacter';
@@ -84,6 +85,24 @@ export class BaseCharacter extends AbstractCard implements IBaseCharacter {
 
     public healFully(): void {
         this.hitpoints = this.maxHitpoints;
+    }
+
+    /** Bespoke attack-flourish animation. Return null (the default) to fall back to the
+     *  stock attacker tilt -- overriding characters compose primitives from src/ui/animations/. */
+    public getAttackAnimation(): CharacterAnimation | null {
+        return null;
+    }
+
+    /** Bespoke hurt-flourish animation. Return null (the default) to fall back to the
+     *  stock jiggle+glow. */
+    public getHurtAnimation(): CharacterAnimation | null {
+        return null;
+    }
+
+    /** Bespoke death-flourish animation. Return null (the default) to fall back to the
+     *  stock fade-and-scale-down removal. */
+    public getDeathAnimation(): CharacterAnimation | null {
+        return null;
     }
 }
 

@@ -3,6 +3,7 @@ import { AbstractCombatResource } from '../rules/combatresources/AbstractCombatR
 import { ShadowedImage } from './ShadowedImage';
 import { TooltipAttachment } from './TooltipAttachment';
 import { UIContext, UIContextManager } from './UIContextManager';
+import { Fonts, Palette } from './UIStyle';
 
 export class CombatResourceDisplay extends Phaser.GameObjects.Container {
     private icon: ShadowedImage;
@@ -14,9 +15,11 @@ export class CombatResourceDisplay extends Phaser.GameObjects.Container {
     private glowEffect: Phaser.GameObjects.Sprite;
     private isHovering: boolean = false;
     
-    // Define consistent button dimensions - slightly increased width for better spacing
-    private static readonly BUTTON_WIDTH = 120;
-    private static readonly BUTTON_HEIGHT = 60;
+    // Compact button dimensions: the column has to clear the End Turn corner.
+    private static readonly BUTTON_WIDTH = 100;
+    private static readonly BUTTON_HEIGHT = 48;
+    /** Alpha for the whole display while the resource sits at zero. */
+    private static readonly ZERO_VALUE_ALPHA = 0.45;
 
     constructor(scene: Scene, x: number, y: number, resource: AbstractCombatResource) {
         super(scene, x, y);
@@ -25,12 +28,12 @@ export class CombatResourceDisplay extends Phaser.GameObjects.Container {
 
         // Create button background with rounded corners
         this.buttonBackground = scene.add.rectangle(
-            0, 0, 
-            CombatResourceDisplay.BUTTON_WIDTH, 
-            CombatResourceDisplay.BUTTON_HEIGHT, 
-            0x333333, 0.8
+            0, 0,
+            CombatResourceDisplay.BUTTON_WIDTH,
+            CombatResourceDisplay.BUTTON_HEIGHT,
+            Palette.WOOD_PANEL, 0.9
         )
-            .setStrokeStyle(2, 0xffffff)
+            .setStrokeStyle(2, Palette.BRASS)
             .setOrigin(0.5, 0.5);
         
         // Add a subtle glow effect behind the button (initially invisible)
@@ -52,19 +55,18 @@ export class CombatResourceDisplay extends Phaser.GameObjects.Container {
         this.icon = new ShadowedImage({
             scene,
             texture: resource.icon,
-            displaySize: 42,
+            displaySize: 34,
             shadowOffset: 2
         });
-        
+
         // Position the icon slightly to the left for better layout
-        this.icon.setPosition(-25, -5);
-        
+        this.icon.setPosition(-22, 0);
+
         // Create value text and position it to the right of the icon
-        this.valueText = scene.add.text(25, 0, `${resource.value}`, {
-            fontSize: '22px',
-            color: '#ffffff',
-            fontFamily: 'Arial',
-            fontStyle: 'bold'
+        this.valueText = scene.add.text(22, 0, `${resource.value}`, {
+            fontSize: '20px',
+            color: Palette.BRASS_TEXT,
+            fontFamily: Fonts.DISPLAY,
         });
         this.valueText.setShadow(2, 2, '#000000', 2, true, true);
         this.valueText.setOrigin(0.5, 0.5);
@@ -91,6 +93,9 @@ export class CombatResourceDisplay extends Phaser.GameObjects.Container {
             .on('pointerover', this.handlePointerOver, this)
             .on('pointerout', this.handlePointerOut, this);
         
+        // Start in the right emphasis state for the initial value.
+        this.setAlpha(resource.value === 0 ? CombatResourceDisplay.ZERO_VALUE_ALPHA : 1);
+
         // Add to scene
         scene.add.existing(this);
         this.scene.events.on('update', this.update, this);
@@ -140,8 +145,8 @@ export class CombatResourceDisplay extends Phaser.GameObjects.Container {
         });
         
         // Change button color to indicate it's interactive
-        this.buttonBackground.setFillStyle(0x555555, 0.9);
-        this.buttonBackground.setStrokeStyle(2, 0xffff00);
+        this.buttonBackground.setFillStyle(Palette.VERDIGRIS, 0.9);
+        this.buttonBackground.setStrokeStyle(2, Palette.BRASS_BRIGHT);
     }
     
     private handlePointerOut(): void {
@@ -164,8 +169,8 @@ export class CombatResourceDisplay extends Phaser.GameObjects.Container {
         });
         
         // Restore original button color
-        this.buttonBackground.setFillStyle(0x333333, 0.8);
-        this.buttonBackground.setStrokeStyle(2, 0xffffff);
+        this.buttonBackground.setFillStyle(Palette.WOOD_PANEL, 0.9);
+        this.buttonBackground.setStrokeStyle(2, Palette.BRASS);
     }
 
     private pulseIcon(): void {
@@ -197,11 +202,11 @@ export class CombatResourceDisplay extends Phaser.GameObjects.Container {
             yoyo: true,
             repeat: 1,
             onComplete: () => {
-                this.buttonBackground.setFillStyle(0x333333, 0.8);
+                this.buttonBackground.setFillStyle(Palette.WOOD_PANEL, 0.9);
             }
         });
     }
-    
+
     private pulseGlow(): void {
         // Create a pulse animation for the glow to draw attention
         this.scene.tweens.add({
@@ -226,6 +231,13 @@ export class CombatResourceDisplay extends Phaser.GameObjects.Container {
             this.previousValue = newValue;
         }
         this.valueText.setText(`${newValue}`);
+
+        // De-emphasize zero-value resources; the container stays interactive
+        // (tooltip + click still work) — it just recedes visually.
+        const targetAlpha = newValue === 0 ? CombatResourceDisplay.ZERO_VALUE_ALPHA : 1;
+        if (this.alpha !== targetAlpha) {
+            this.setAlpha(targetAlpha);
+        }
     }
 
     public destroy(): void {

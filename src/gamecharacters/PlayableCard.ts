@@ -7,6 +7,7 @@ import { VentureResource } from "../rules/combatresources/VentureResource";
 import { CombatRules, DamageCalculationResult } from "../rules/CombatRulesHelper";
 import { CombatResources, CombatState, GameState } from "../rules/GameState";
 import { BaseCharacterType } from "../Types";
+import type { CardPlayAnimation } from "../ui/animations/AnimationTypes";
 import { TransientUiState } from "../ui/TransientUiState";
 import type { ActionManager } from "../utils/ActionManager";
 import { ActionManagerFetcher } from "../utils/ActionManagerFetcher";
@@ -328,6 +329,12 @@ export abstract class PlayableCard extends AbstractCard {
     }
 
     abstract InvokeCardEffects(targetCard?: AbstractCard): void;
+
+    /** Bespoke play-flourish animation for this card. Return null (the default) to fall
+     *  back to no flourish -- overriding cards compose primitives from src/ui/animations/. */
+    public getPlayAnimation(): CardPlayAnimation | null {
+        return null;
+    }
 
     public IsPerformableOn(targetCard?: AbstractCard): boolean {
         return true;
