@@ -220,12 +220,32 @@ class CombatInputHandler {
         }
     }
 
+    /** Hover-raise treatment for hand cards: lift + slight zoom so the
+     *  hovered card reads clearly over its overlapping neighbors. */
+    private static readonly HOVER_LIFT_Y = 40;
+    private static readonly HOVER_LIFT_SCALE = 1.1;
+
     private handleGameObjectOver = (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject): void => {
         if (!UIContextManager.getInstance().isContext(UIContext.COMBAT)) return;
         if (gameObject instanceof Phaser.GameObjects.Container && (gameObject as any).physicalCard instanceof PhysicalCard) {
             const physicalCard = (gameObject as any).physicalCard as PhysicalCard;
             physicalCard.container.setDepth(DepthManager.getInstance().CARD_HOVER);
             this.transientUiState.setHoveredCard(physicalCard);
+
+            // Lift hand cards on hover. arrangeCards exempts the hovered card
+            // so its per-frame re-arrange doesn't fight this tween; skip the
+            // lift entirely while any drag is in flight.
+            if (this.cardManager.playerHand.includes(physicalCard) && !this.transientUiState.draggedCard) {
+                this.scene.tweens.killTweensOf(physicalCard.container);
+                this.scene.tweens.add({
+                    targets: physicalCard.container,
+                    y: CombatSceneLayoutUtils.getHandY(this.scene) - CombatInputHandler.HOVER_LIFT_Y,
+                    scaleX: CombatInputHandler.HOVER_LIFT_SCALE,
+                    scaleY: CombatInputHandler.HOVER_LIFT_SCALE,
+                    duration: 120,
+                    ease: 'Power2'
+                });
+            }
         }
     }
 
@@ -236,6 +256,21 @@ class CombatInputHandler {
             physicalCard.container.setDepth(DepthManager.getInstance().CARD_BASE);
             if (this.transientUiState.hoveredCard === physicalCard) {
                 this.transientUiState.setHoveredCard(null);
+            }
+
+            // Restore a lifted hand card. The dragged card is left to
+            // handleDragEnd's animateCardBack so the two don't fight.
+            if (this.cardManager.playerHand.includes(physicalCard)
+                && this.transientUiState.draggedCard !== physicalCard) {
+                this.scene.tweens.killTweensOf(physicalCard.container);
+                this.scene.tweens.add({
+                    targets: physicalCard.container,
+                    y: CombatSceneLayoutUtils.getHandY(this.scene),
+                    scaleX: 1,
+                    scaleY: 1,
+                    duration: 120,
+                    ease: 'Power2'
+                });
             }
         }
     }

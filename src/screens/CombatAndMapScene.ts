@@ -20,14 +20,14 @@ import { SaveRegistries } from '../saveload/SaveRegistries';
 import { StandingOrdersState } from '../campaign/orders/StandingOrdersState';
 import { CampaignUiState } from './campaign/hq_ux/CampaignUiState';
 import { TextBoxButton } from '../ui/Button';
-import { CheapGlowEffect } from '../ui/CheapGlowEffect';
+import { TextBox } from '../ui/TextBox';
 import { CombatHighlightsManager } from '../ui/CombatHighlightsManager';
 import { DepthManager } from '../ui/DepthManager';
 import InventoryPanel from '../ui/InventoryPanel';
 import CombatSceneLayoutUtils from '../ui/LayoutUtils';
 import { PhysicalCard } from '../ui/PhysicalCard';
 import { UIContext, UIContextManager } from '../ui/UIContextManager';
-import { loadCompanyFonts } from '../ui/UIStyle';
+import { Fonts, loadCompanyFonts, Palette, woodTextBoxOptions } from '../ui/UIStyle';
 import { ActionManager } from '../utils/ActionManager';
 import { ActionManagerFetcher } from '../utils/ActionManagerFetcher';
 import ImageUtils from '../utils/ImageUtils';
@@ -69,8 +69,13 @@ class CombatScene extends Phaser.Scene {
     private inventoryPanel!: InventoryPanel;
     private detailsScreenManager!: DetailsScreenManager;
     private mapButton!: TextBoxButton;
-    private mapButtonGlow!: CheapGlowEffect;
+    /** Brass-shimmer border pulse on the mapButton while it awaits a click.
+     *  (Replaced CheapGlowEffect here: its own pulse tween forces a uniform
+     *  scale, so it always degenerated into a pale offset box.) */
+    private mapButtonPulse?: Phaser.Tweens.Tween;
     private lastMapButtonText: string = '';
+    private sortiePlaque!: TextBox;
+    private lastSortiePlaqueText: string = '';
     private campaignBriefStatus!: CampaignBriefStatus;
     private characterDeckOverlay!: CharacterDeckOverlay;
     private combatEndHandled: boolean = false;
@@ -178,17 +183,23 @@ class CombatScene extends Phaser.Scene {
         this.events.once('shutdown', this.obliterate, this);
         this.events.once('destroy', this.obliterate, this);
 
-        // Create the sortie-advance button (labeled by update() as the sortie progresses)
+        // Create the sortie-advance button (labeled by update() as the sortie
+        // progresses). CONTRACT: the smoke test and QA harnesses locate this
+        // object by textBoxName 'mapButton' and emit 'pointerdown'/'pointerup'
+        // on it directly (emits fire even while hidden), so it must keep its
+        // name, identity, and onClick wiring for the whole combat. Pre-combat
+        // it's hidden (dead click target) behind the sortie-progress plaque;
+        // post-combat syncSortieAdvanceUi() shows it at the End Turn anchor.
+        const endTurnAnchor = CombatSceneLayoutUtils.getEndTurnButtonPosition(this);
         this.mapButton = new TextBoxButton({
             scene: this,
-            x: 300,
-            y: 100,
-            width: 100,
+            x: endTurnAnchor.x,
+            y: endTurnAnchor.y,
+            width: 150,
             height: 40,
             text: 'Objective',
-            style: { fontSize: '24px' },
-            textBoxName: 'mapButton',
-            fillColor: 0x555555
+            style: { fontSize: '22px', fontFamily: Fonts.DISPLAY },
+            textBoxName: 'mapButton'
         });
         this.mapButton
             .onClick(() => {
@@ -198,12 +209,22 @@ class CombatScene extends Phaser.Scene {
                 }
             });
         this.add.existing(this.mapButton);
+        this.mapButton.setVisible(false);
 
-        // Create glow effect for map button
-        this.mapButtonGlow = new CheapGlowEffect(this, this.mapButton.x, this.mapButton.y);
-        this.mapButtonGlow.setScale(1.5, 0.75); // Width: 1.5x, Height: 0.75x (half height)
-        this.mapButtonGlow.setDepth(this.mapButton.depth - 1); // Place behind button
-        this.mapButtonGlow.turnOff();
+        // Passive sortie-progress plaque (top-left, where the old dead-click
+        // Objective button used to sit). Not interactive by design.
+        this.sortiePlaque = new TextBox({
+            scene: this,
+            x: 150,
+            y: 200,
+            width: 220,
+            height: 36,
+            text: '',
+            ...woodTextBoxOptions('18px'),
+            textBoxName: 'sortiePlaque'
+        });
+        this.sortiePlaque.setScrollFactor(0);
+        this.sortiePlaque.setVisible(false);
 
         this.campaignBriefStatus = new CampaignBriefStatus(this, true);
         this.add.existing(this.campaignBriefStatus);
@@ -254,9 +275,10 @@ class CombatScene extends Phaser.Scene {
             this.campaignBriefStatus.destroy();
         }
         
-        // Clean up the map button glow
-        if (this.mapButtonGlow) {
-            this.mapButtonGlow.destroy();
+        this.stopMapButtonPulse();
+
+        if (this.sortiePlaque) {
+            this.sortiePlaque.destroy();
         }
 
         // Remove the pile click event listeners
@@ -320,14 +342,10 @@ class CombatScene extends Phaser.Scene {
         // Reposition inventory button
         this.inventoryPanel.resize(width, height);
 
-        // Reposition map button
-        if (this.mapButton) {
-            this.mapButton.setPosition(100, 200);
-        }
-
-        // Reposition map button glow effect
-        if (this.mapButtonGlow) {
-            this.mapButtonGlow.setPosition(this.mapButton.x, this.mapButton.y);
+        // Sortie-advance UI: position/visibility have a single owner in
+        // syncSortieAdvanceUi() (anchored to the End Turn corner post-combat).
+        if (this.mapButton && this.sortiePlaque) {
+            this.syncSortieAdvanceUi();
         }
 
         this.mapButton.setScrollFactor(0);
@@ -343,21 +361,25 @@ class CombatScene extends Phaser.Scene {
         }
     }
 
-    update(time: number, delta: number): void {
-        this.cardManager.drawPile.setGlow(false);
-        this.cardManager.discardPile.setGlow(false);
-
-        this.performanceMonitor.update(time, delta);
-
-        // Make map button glow after combat ends
-        if (this.combatEndHandled && this.mapButton) {
-            this.mapButtonGlow.turnOn(true); // Turn on with pulsing
-        } else {
-            this.mapButtonGlow.turnOff();
-        }
-
-        // During a contract sortie the button advances the sortie instead of opening the map
+    /**
+     * One owner for the sortie-advance UI state, run every frame (and from
+     * resize). Pre-combat the mapButton is a dead click target, so it stays
+     * hidden behind the passive sortie-progress plaque; once combatEndHandled
+     * flips, it takes over the End Turn anchor (End Turn hides) with its glow.
+     * cleanupAndRestartCombat resets combatEndHandled, so the per-frame sync
+     * also flips everything back for the next combat in the sortie.
+     *
+     * SCRIPT CONTRACT (smoke test + QA harnesses): the button keeps its
+     * textBoxName 'mapButton', object identity, label relabeling, and its
+     * pointerdown handler at all times — the harnesses find it by name and
+     * emit pointer events on it directly, which fire even while hidden.
+     */
+    private syncSortieAdvanceUi(): void {
         const sortie = SortieManager.getInstance();
+
+        // During a contract sortie the button advances the sortie; the label
+        // doubles as the harnesses' "combat won" signal, so keep it current
+        // regardless of visibility.
         if (sortie.isActive()) {
             const desiredText = !this.combatEndHandled
                 ? 'Objective'
@@ -367,9 +389,71 @@ class CombatScene extends Phaser.Scene {
                 this.mapButton.setText(desiredText);
             }
         }
-        
-        // Update glow effect
-        this.mapButtonGlow.update();
+
+        if (this.combatEndHandled) {
+            // Post-combat: the advance button takes over the End Turn corner.
+            const anchor = CombatSceneLayoutUtils.getEndTurnButtonPosition(this);
+            this.mapButton.setPosition(anchor.x, anchor.y);
+            this.mapButton.setVisible(true);
+            this.uiManager.endTurnButton.setVisible(false);
+            this.sortiePlaque.setVisible(false);
+            this.startMapButtonPulse();
+        } else {
+            this.mapButton.setVisible(false);
+            this.uiManager.endTurnButton.setVisible(true);
+            this.stopMapButtonPulse();
+
+            // Passive progress plaque while the fight is on.
+            if (sortie.isActive() && sortie.activeContract) {
+                const engagement = `Engagement ${sortie.combatsCompleted + 1} of ${sortie.activeContract.numCombats}`;
+                if (this.lastSortiePlaqueText !== engagement) {
+                    this.lastSortiePlaqueText = engagement;
+                    this.sortiePlaque.setText(engagement);
+                }
+                this.sortiePlaque.setVisible(true);
+            } else {
+                this.sortiePlaque.setVisible(false);
+            }
+        }
+    }
+
+    /** Looping brass shimmer on the mapButton border: BRASS -> BRASS_BRIGHT
+     *  with a slight width swell. Subtler than the old glow sprite and always
+     *  aligned, since it draws on the button's own background. */
+    private startMapButtonPulse(): void {
+        if (this.mapButtonPulse) return;
+        const from = Phaser.Display.Color.ValueToColor(Palette.BRASS);
+        const to = Phaser.Display.Color.ValueToColor(Palette.BRASS_BRIGHT);
+        const proxy = { t: 0 };
+        this.mapButtonPulse = this.tweens.add({
+            targets: proxy,
+            t: 100,
+            duration: 700,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut',
+            onUpdate: () => {
+                const c = Phaser.Display.Color.Interpolate.ColorWithColor(from, to, 100, proxy.t);
+                const lineWidth = 2 + (proxy.t / 100) * 1.5;
+                this.mapButton.setStrokeColor(Phaser.Display.Color.GetColor(c.r, c.g, c.b), lineWidth);
+            }
+        });
+    }
+
+    private stopMapButtonPulse(): void {
+        if (!this.mapButtonPulse) return;
+        this.mapButtonPulse.stop();
+        this.mapButtonPulse = undefined;
+        this.mapButton.setStrokeColor(Palette.BRASS);
+    }
+
+    update(time: number, delta: number): void {
+        this.cardManager.drawPile.setGlow(false);
+        this.cardManager.discardPile.setGlow(false);
+
+        this.performanceMonitor.update(time, delta);
+
+        this.syncSortieAdvanceUi();
 
         // Sync the hand with the game state
         if (this.cardManager) {
