@@ -11,6 +11,8 @@ import { Lethality } from "../../../gamecharacters/buffs/standard/Lethality";
 import { EntityRarity } from "../../../gamecharacters/EntityRarity";
 import { PlayableCard } from "../../../gamecharacters/PlayableCard";
 import { CardType } from "../../../gamecharacters/Primitives";
+import { Anim } from "../../../ui/animations/AnimationPrimitives";
+import { CharacterAnimation } from "../../../ui/animations/AnimationTypes";
 
 class FerrymansFee extends PlayableCard {
     constructor() {
@@ -90,5 +92,20 @@ export class FareEnforcer extends AutomatedCharacter {
 
         this.isBlockingTurn = !this.isBlockingTurn;
         return intents;
+    }
+
+    override getAttackAnimation(): CharacterAnimation {
+        return async (ctx) => {
+            if (!ctx.physicalCard) return;
+
+            await Anim.lungeToward(ctx.scene, ctx.physicalCard.container,
+                ctx.targetPhysicalCard ? { x: ctx.targetPhysicalCard.container.x, y: ctx.targetPhysicalCard.container.y } : undefined,
+                { distanceFraction: 0.5, duration: 180 });
+
+            await Promise.all([
+                Anim.scalePunch(ctx.scene, ctx.physicalCard.container, { scale: 1.3, duration: 160 }),
+                Anim.cameraShake(ctx.scene, { intensity: 0.003, duration: 100 })
+            ]);
+        };
     }
 }

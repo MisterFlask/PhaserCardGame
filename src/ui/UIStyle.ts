@@ -123,3 +123,24 @@ export function applyHoverLift(obj: Phaser.GameObjects.Container, baseScale: num
     obj.on('pointerover', () => obj.setScale(baseScale * 1.02));
     obj.on('pointerout', () => obj.setScale(baseScale));
 }
+
+/**
+ * One-liner preset for TextBox/TextBoxButton call sites in the combat HUD:
+ * dark wood fill, brass border, cream Fonts.DISPLAY text. Spread this into
+ * a TextBox/TextBoxButton config and override individual fields as needed.
+ */
+export function woodTextBoxOptions(fontSize: string = '20px'): {
+    fillColor: number;
+    strokeColor: number;
+    style: Phaser.Types.GameObjects.Text.TextStyle;
+} {
+    return {
+        fillColor: Palette.WOOD_PANEL,
+        strokeColor: Palette.BRASS,
+        style: {
+            fontSize,
+            fontFamily: Fonts.DISPLAY,
+            color: Palette.WHITE,
+        },
+    };
+}

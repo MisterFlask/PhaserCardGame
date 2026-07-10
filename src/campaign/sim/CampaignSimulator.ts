@@ -13,13 +13,16 @@
 // by card — ActionManager/the combat scene are scene-bound and cannot run
 // headless (see CLAUDE.md "Known sharp edges").
 //
-// RNG discipline: ContractGenerator uses Math.random() internally for board
-// generation (squad size, payout jitter, region/template picks) — that
-// nondeterminism is accepted as-is and NOT controlled here. Every decision
-// this simulator itself makes (contract selection among the generated
-// board, win/wound/death rolls, recruiting) is driven through the injected
-// `rng` parameter so a seeded run is reproducible modulo ContractGenerator's
-// own internal randomness.
+// RNG discipline (fixed 2026-07-08): ContractGenerator used to call
+// Math.random() internally for board generation (squad size, payout jitter,
+// region/template picks), which meant "seeded" simulator runs were only
+// reproducible modulo board generation and the ratchet tests below flaked
+// intermittently. ContractGenerator.generateContract/refillBoard now take an
+// injectable `rng` parameter (defaulting to Math.random for existing
+// non-sim callers), and this simulator threads its own config.rng into both
+// refillBoard call sites below — so every decision, board generation
+// included, now runs off the single injected `rng` stream and a seeded run
+// is fully reproducible end to end.
 
 import { CampaignCalendar, WAGE_PER_SOLDIER_PER_QUARTER, WEEKS_PER_QUARTER } from "../CampaignCalendar";
 import { Contract } from "../Contract";
@@ -162,10 +165,12 @@ function pickSquad(soldiers: SimSoldier[], size: number): SimSoldier[] {
  * contract's squad size (reacting to a board that happens to be trade-run-
  * heavy, squadSize 3-4 only). Both fired often enough that the RNG-stream/
  * board-refill coupling documented at this file's top (ContractGenerator
- * uses uncontrolled Math.random() internally) dominated: shifting *when*
- * sorties fire cascades into materially different win/wound/death rolls for
- * everything after, so eagerly buying back partial availability didn't
- * reliably pay for itself. Restricting to the true stall floor (zero
+ * used uncontrolled Math.random() internally at measurement time — since
+ * seeded, 2026-07-08, see the RNG-discipline note at the top of this file)
+ * dominated: shifting *when* sorties fire cascades into materially
+ * different win/wound/death rolls for everything after, so eagerly buying
+ * back partial availability didn't reliably pay for itself. Restricting to
+ * the true stall floor (zero
  * available) fires far less often (~1-2 times per 16-quarter run) and only
  * when the alternative is certain idle weeks with no income at all — the
  * scenario the T2 gap analysis actually describes ("wound-attrition
@@ -385,7 +390,7 @@ export function runCampaignSimulation(config: SimulatorConfig): SimulatorResult 
         // board fresh each quarter rather than carrying deadlines across
         // quarter boundaries — a simplification documented here: the sim
         // does not model individual contract deadlines expiring mid-quarter).
-        board = contractGenerator.refillBoard(board, calendar.year, contractsCompleted);
+        board = contractGenerator.refillBoard(board, calendar.year, contractsCompleted, 5, {}, rng);
 
         // Run sorties for as many weeks as fit in this quarter.
         let weeksLeftInQuarter = WEEKS_PER_QUARTER;
@@ -439,7 +444,7 @@ export function runCampaignSimulation(config: SimulatorConfig): SimulatorResult 
             }
 
             weeksLeftInQuarter -= choice.contract.durationWeeks;
-            board = contractGenerator.refillBoard(board, calendar.year, contractsCompleted);
+            board = contractGenerator.refillBoard(board, calendar.year, contractsCompleted, 5, {}, rng);
         }
 
         // Settle the quarter: wages, then dividend, via CampaignCalendar's
@@ -475,9 +480,10 @@ export function runCampaignSimulation(config: SimulatorConfig): SimulatorResult 
         //    CampaignCalendar's accounting order — so a bare-dividend floor
         //    starves that meeting's wage bill).
         //  - At most one block converts per quarter (not a greedy drain to
-        //    the floor). ContractGenerator's board generation uses
-        //    uncontrolled Math.random() internally (see this file's
-        //    RNG-discipline note at the top); a larger single-quarter vault
+        //    the floor). ContractGenerator's board generation used
+        //    uncontrolled Math.random() internally at measurement time
+        //    (since seeded, 2026-07-08, see this file's RNG-discipline note
+        //    at the top); a larger single-quarter vault
         //    delta between the convert/never-convert runs was measured to
         //    cascade into a materially different sortie sequence entirely
         //    independent of the buyback's own economics, swinging survival

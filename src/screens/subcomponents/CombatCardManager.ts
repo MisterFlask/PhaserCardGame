@@ -3,9 +3,11 @@
 import Phaser from 'phaser';
 import { AbstractCard, Team, UiCard } from '../../gamecharacters/AbstractCard';
 import { AutomatedCharacter } from '../../gamecharacters/AutomatedCharacter';
+import type { BaseCharacter } from '../../gamecharacters/BaseCharacter';
 import { IAbstractCard } from '../../gamecharacters/IAbstractCard';
 import { CardSize } from '../../gamecharacters/Primitives';
 import { GameState } from '../../rules/GameState';
+import { CombatAnimationManager } from '../../ui/animations/CombatAnimationManager';
 import { DepthManager } from '../../ui/DepthManager';
 import { EnemyPositionManager } from '../../ui/EnemyPositionManager';
 import CombatSceneLayoutUtils from '../../ui/LayoutUtils';
@@ -181,9 +183,12 @@ export class CombatCardManager {
         const gameWidth = this.scene.scale.width;
         const pileY = CombatSceneLayoutUtils.getPileY(this.scene);
 
+        // Bottom-row layout: draw pile + energy bottom-left, discard pile
+        // bottom-right (restores the left-to-right card-flow metaphor),
+        // exhaust pile tucked inboard of discard.
         this.exhaustPile = CardGuiUtils.getInstance().createCard({
             scene: this.scene,
-            x: gameWidth * 0.3,
+            x: gameWidth * 0.72,
             y: pileY,
             data: new UiCard({ name: 'Exhaust Pile (0)', description: 'Exhausted cards', portraitName: "exhaustpile",tint:0x800080,size:CardSize.TINY }),
             onCardCreatedEventCallback: (card: PhysicalCard) => {
@@ -213,7 +218,7 @@ export class CombatCardManager {
 
         this.discardPile = CardGuiUtils.getInstance().createCard({
             scene: this.scene,
-            x: gameWidth * 0.2,
+            x: gameWidth * 0.8,
             y: pileY,
             data: new UiCard({ name: 'Discard Pile (0)', description: 'Discarded cards',     portraitName: "abstract-069" , tint:0xFF0000,size:CardSize.TINY  }),
             onCardCreatedEventCallback: (card: PhysicalCard) => {
@@ -456,24 +461,37 @@ export class CombatCardManager {
     public removeEnemyCard(enemyCard: PhysicalCard): void {
         this.enemyPositionManager.releasePosition(enemyCard.data.id);
         this.enemyUnits = this.enemyUnits.filter(card => card !== enemyCard);
-        // Check if there are any active tweens on this card's container
-        const activeTweens = this.scene.tweens.getTweensOf(enemyCard.container);
-        if (activeTweens.length === 0) {
 
-            // Fade and scale down animation
-            this.scene.tweens.add({
-                targets: enemyCard.container,
-                alpha: 0,
-                scaleX: 0.1,
-                scaleY: 0.1,
-                duration: 800,
-                ease: 'Power2',
-                onComplete: () => {
-                    enemyCard.obliterate();
-                    this.enemyUnits = this.enemyUnits.filter(card => card !== enemyCard);
-                }
-            });
-        }
+        const enemy = enemyCard.data.isBaseCharacter() ? (enemyCard.data as unknown as BaseCharacter) : undefined;
+        const runDeathFlourish = enemy && enemy.isDead()
+            ? CombatAnimationManager.getInstance().deathFlourish(enemy, this.scene)
+            : Promise.resolve(false);
+
+        runDeathFlourish.then((bespokeRan) => {
+            if (bespokeRan) {
+                enemyCard.obliterate();
+                this.enemyUnits = this.enemyUnits.filter(card => card !== enemyCard);
+                return;
+            }
+
+            // Check if there are any active tweens on this card's container
+            const activeTweens = this.scene.tweens.getTweensOf(enemyCard.container);
+            if (activeTweens.length === 0) {
+                // Fade and scale down animation
+                this.scene.tweens.add({
+                    targets: enemyCard.container,
+                    alpha: 0,
+                    scaleX: 0.1,
+                    scaleY: 0.1,
+                    duration: 800,
+                    ease: 'Power2',
+                    onComplete: () => {
+                        enemyCard.obliterate();
+                        this.enemyUnits = this.enemyUnits.filter(card => card !== enemyCard);
+                    }
+                });
+            }
+        });
     }
 
     public cleanup(): void {

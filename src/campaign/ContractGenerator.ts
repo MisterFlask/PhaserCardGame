@@ -534,9 +534,11 @@ export class ContractGenerator {
      *  guaranteed every refresh (these are rare trophies, not a lane). */
     private static readonly PRESTIGE_REFRESH_CHANCE = 0.5;
 
-    /** Rolls squad size: 20% two-man, 60% three-man, 20% four-man. */
-    private rollSquadSize(): number {
-        const roll = Math.random();
+    /** Rolls squad size: 20% two-man, 60% three-man, 20% four-man.
+     *  rng is injectable for deterministic tests (defaults to Math.random,
+     *  same pattern as SortieResolution.ts's applyCasualties). */
+    private rollSquadSize(rng: () => number): number {
+        const roll = rng();
         if (roll < ContractGenerator.SQUAD_SIZE_TWO_CHANCE) return 2;
         if (roll < ContractGenerator.SQUAD_SIZE_TWO_CHANCE + ContractGenerator.SQUAD_SIZE_FOUR_CHANCE) return 4;
         return 3;
@@ -546,14 +548,14 @@ export class ContractGenerator {
      *  at the same relative 3:4 weighting as rollSquadSize (60% vs 20% of
      *  the full distribution), renormalized over {3, 4} alone — that's a
      *  75/25 three/four split, not the full distribution's raw 60/20. */
-    private rollTradeRunSquadSize(): number {
+    private rollTradeRunSquadSize(rng: () => number): number {
         const fourChance = ContractGenerator.SQUAD_SIZE_FOUR_CHANCE
             / (1 - ContractGenerator.SQUAD_SIZE_TWO_CHANCE);
-        return Math.random() < fourChance ? 4 : 3;
+        return rng() < fourChance ? 4 : 3;
     }
 
-    private pick<T>(arr: T[]): T {
-        return arr[Math.floor(Math.random() * arr.length)];
+    private pick<T>(arr: T[], rng: () => number): T {
+        return arr[Math.floor(rng() * arr.length)];
     }
 
     /**
@@ -581,43 +583,43 @@ export class ContractGenerator {
      *  instead of plateauing once act 3 unlocks — see PAYOUT_PER_YEAR's
      *  comment. Exactly 1.0x at year 1, so act-1/year-1 numbers are
      *  unchanged from before this lever existed. */
-    private rollBountyPayout(year: number, act: number, segment: number, numCombats: number, squadSize: number): number {
+    private rollBountyPayout(year: number, act: number, segment: number, numCombats: number, squadSize: number, rng: () => number): number {
         const basePay = 30 + act * 20 + segment * 25;
         const yearMultiplier = 1 + ContractGenerator.PAYOUT_PER_YEAR * Math.max(0, year - 1);
-        const jitter = 0.85 + Math.random() * 0.3;
+        const jitter = 0.85 + rng() * 0.3;
         const jitteredPayout = Math.round((basePay * yearMultiplier * numCombats * jitter) / 5) * 5;
         const standingOrdersPayout = Math.round(StandingOrdersState.getInstance().contractPayout(jitteredPayout) / 5) * 5;
         const dangerPayMultiplier = ContractGenerator.DANGER_PAY_MULTIPLIER[squadSize] ?? 1.0;
         return Math.round((standingOrdersPayout * dangerPayMultiplier) / 5) * 5;
     }
 
-    private rollDeadlineWeeks(): number {
+    private rollDeadlineWeeks(rng: () => number): number {
         return StandingOrdersState.getInstance()
-            .contractDeadlineWeeks(2 + Math.floor(Math.random() * 3)); // 2-4 weeks on the board, base
+            .contractDeadlineWeeks(2 + Math.floor(rng() * 3)); // 2-4 weeks on the board, base
     }
 
-    private rollConsumableReward(): string | undefined {
-        return Math.random() < ContractGenerator.CONSUMABLE_REWARD_CHANCE
-            ? this.pick([...CONSUMABLE_REWARD_NAMES])
+    private rollConsumableReward(rng: () => number): string | undefined {
+        return rng() < ContractGenerator.CONSUMABLE_REWARD_CHANCE
+            ? this.pick([...CONSUMABLE_REWARD_NAMES], rng)
             : undefined;
     }
 
-    private generateBountyContract(region: RegionFlavor, year: number, contractsCompletedByClient: Record<string, number>): Contract {
-        const template = this.pick(region.templates);
+    private generateBountyContract(region: RegionFlavor, year: number, contractsCompletedByClient: Record<string, number>, rng: () => number): Contract {
+        const template = this.pick(region.templates, rng);
 
         // Segment within the act is the fine-grained difficulty dial.
-        const segment = Math.floor(Math.random() * 3);
+        const segment = Math.floor(rng() * 3);
         const difficultyStars = segment + 1;
 
-        const numCombats = Math.random() < 0.45 ? 1 : 2;
-        const squadSize = this.rollSquadSize();
-        const rolledPayout = this.rollBountyPayout(year, region.act, segment, numCombats, squadSize);
+        const numCombats = rng() < 0.45 ? 1 : 2;
+        const squadSize = this.rollSquadSize(rng);
+        const rolledPayout = this.rollBountyPayout(year, region.act, segment, numCombats, squadSize, rng);
         // Chartered Partner (faction_reputation_design.md): applied after all
         // other payout passes (danger pay included, via rollBountyPayout),
         // re-rounded to £5.
         const payout = applyCharteredPartnerBonus(rolledPayout, template.client, contractsCompletedByClient);
-        const deadlineWeeks = this.rollDeadlineWeeks();
-        const consumableRewardName = this.rollConsumableReward();
+        const deadlineWeeks = this.rollDeadlineWeeks(rng);
+        const consumableRewardName = this.rollConsumableReward(rng);
 
         return new Contract({
             name: template.name,
@@ -653,15 +655,15 @@ export class ContractGenerator {
      * £30/6 crates). Squad size never rolls 2 (no hands to spare): 3 or 4
      * only.
      */
-    private generateTradeRunContract(region: TradeRunRegion, year: number, contractsCompletedByClient: Record<string, number>): Contract {
-        const template = this.pick(region.templates);
+    private generateTradeRunContract(region: TradeRunRegion, year: number, contractsCompletedByClient: Record<string, number>, rng: () => number): Contract {
+        const template = this.pick(region.templates, rng);
 
-        const segment = Math.floor(Math.random() * 3);
+        const segment = Math.floor(rng() * 3);
         const difficultyStars = segment + 1;
-        const numCombats = Math.random() < 0.45 ? 1 : 2;
-        const squadSize = this.rollTradeRunSquadSize();
+        const numCombats = rng() < 0.45 ? 1 : 2;
+        const squadSize = this.rollTradeRunSquadSize(rng);
 
-        const normalPayoutRoll = this.rollBountyPayout(year, region.act, segment, numCombats, squadSize);
+        const normalPayoutRoll = this.rollBountyPayout(year, region.act, segment, numCombats, squadSize, rng);
         const rolledBasePayout = Math.round((normalPayoutRoll * ContractGenerator.TRADE_RUN_BASE_PAYOUT_FRACTION) / 5) * 5;
         // Chartered Partner (faction_reputation_design.md): applied after all
         // other payout passes, re-rounded to £5 — same pass as the bounty path.
@@ -673,8 +675,8 @@ export class ContractGenerator {
             .freightRatePerCrate(ContractGenerator.TRADE_RUN_FREIGHT_RATE_PER_ACT * region.act);
         const maxCrates = ContractGenerator.TRADE_RUN_MAX_CRATES;
 
-        const deadlineWeeks = this.rollDeadlineWeeks();
-        const consumableRewardName = this.rollConsumableReward();
+        const deadlineWeeks = this.rollDeadlineWeeks(rng);
+        const consumableRewardName = this.rollConsumableReward(rng);
 
         return new Contract({
             name: template.name,
@@ -710,21 +712,21 @@ export class ContractGenerator {
      * bounty payout would (DANGER_PAY_MULTIPLIER), applied to VP instead of
      * £, then rounded to the nearest 5 — see design doc "Payout: £0" clause.
      */
-    private generatePrestigeContract(year: number, maxAct: number): Contract {
-        const region = this.pick(REGION_FLAVORS.filter(r => r.act <= maxAct));
-        const template = this.pick(PRESTIGE_TEMPLATES);
+    private generatePrestigeContract(year: number, maxAct: number, rng: () => number): Contract {
+        const region = this.pick(REGION_FLAVORS.filter(r => r.act <= maxAct), rng);
+        const template = this.pick(PRESTIGE_TEMPLATES, rng);
 
-        const segment = Math.floor(Math.random() * 3);
+        const segment = Math.floor(rng() * 3);
         const difficultyStars = segment + 1;
-        const numCombats = Math.random() < 0.45 ? 1 : 2;
-        const squadSize = this.rollSquadSize();
+        const numCombats = rng() < 0.45 ? 1 : 2;
+        const squadSize = this.rollSquadSize(rng);
 
         const baseVp = ContractGenerator.PRESTIGE_VP_BASE
             + ContractGenerator.PRESTIGE_VP_PER_YEAR * Math.max(0, year - ContractGenerator.PRESTIGE_MIN_YEAR);
         const dangerPayMultiplier = ContractGenerator.DANGER_PAY_MULTIPLIER[squadSize] ?? 1.0;
         const vpReward = Math.round((baseVp * dangerPayMultiplier) / 5) * 5;
 
-        const deadlineWeeks = this.rollDeadlineWeeks();
+        const deadlineWeeks = this.rollDeadlineWeeks(rng);
 
         return new Contract({
             name: template.name,
@@ -745,36 +747,45 @@ export class ContractGenerator {
         });
     }
 
-    public generateContract(year: number, contractsCompleted: number = 0, contractsCompletedByClient: Record<string, number> = {}): Contract {
+    /** rng is injectable for deterministic tests (defaults to Math.random,
+     *  same pattern as SortieResolution.ts's applyCasualties) — threaded
+     *  through as a plain parameter rather than stored as instance state,
+     *  since this class is a shared process-wide singleton. */
+    public generateContract(
+        year: number, contractsCompleted: number = 0, contractsCompletedByClient: Record<string, number> = {},
+        rng: () => number = Math.random
+    ): Contract {
         const maxAct = this.maxActUnlocked(year, contractsCompleted);
 
-        if (Math.random() < ContractGenerator.TRADE_RUN_CHANCE) {
+        if (rng() < ContractGenerator.TRADE_RUN_CHANCE) {
             const eligibleTradeRegions = TRADE_RUN_REGIONS.filter(r => r.act <= maxAct);
-            return this.generateTradeRunContract(this.pick(eligibleTradeRegions), year, contractsCompletedByClient);
+            return this.generateTradeRunContract(this.pick(eligibleTradeRegions, rng), year, contractsCompletedByClient, rng);
         }
 
         const eligibleRegions = REGION_FLAVORS.filter(r => r.act <= maxAct);
-        return this.generateBountyContract(this.pick(eligibleRegions), year, contractsCompletedByClient);
+        return this.generateBountyContract(this.pick(eligibleRegions, rng), year, contractsCompletedByClient, rng);
     }
 
     /** Top the board back up to targetCount contracts (adjusted by Standing
      *  Orders). At least one trade run per full board refresh (starting
      *  from an empty board) so the axis is always available, even though
-     *  each contract only independently rolls ~20% odds. */
+     *  each contract only independently rolls ~20% odds. rng is injectable
+     *  for deterministic tests (defaults to Math.random) — see
+     *  generateContract's doc comment. */
     public refillBoard(
         existing: Contract[], year: number, contractsCompleted: number = 0, targetCount: number = 5,
-        contractsCompletedByClient: Record<string, number> = {}
+        contractsCompletedByClient: Record<string, number> = {}, rng: () => number = Math.random
     ): Contract[] {
         const board = [...existing];
         const adjustedTarget = StandingOrdersState.getInstance().contractBoardTarget(targetCount);
         const isFullRefresh = existing.length === 0;
         while (board.length < adjustedTarget) {
-            board.push(this.generateContract(year, contractsCompleted, contractsCompletedByClient));
+            board.push(this.generateContract(year, contractsCompleted, contractsCompletedByClient, rng));
         }
         if (isFullRefresh && board.length > 0 && !board.some(c => c.isTradeRun)) {
             const maxAct = this.maxActUnlocked(year, contractsCompleted);
             const eligibleTradeRegions = TRADE_RUN_REGIONS.filter(r => r.act <= maxAct);
-            board[board.length - 1] = this.generateTradeRunContract(this.pick(eligibleTradeRegions), year, contractsCompletedByClient);
+            board[board.length - 1] = this.generateTradeRunContract(this.pick(eligibleTradeRegions, rng), year, contractsCompletedByClient, rng);
         }
 
         // Prestige Commissions: year 3+, ~1 per full board refresh at most
@@ -784,11 +795,11 @@ export class ContractGenerator {
         // top-up of an existing board with a prestige contract still on it
         // does not roll another).
         if (isFullRefresh && board.length > 0 && year >= ContractGenerator.PRESTIGE_MIN_YEAR
-            && !board.some(c => c.isPrestige) && Math.random() < ContractGenerator.PRESTIGE_REFRESH_CHANCE) {
+            && !board.some(c => c.isPrestige) && rng() < ContractGenerator.PRESTIGE_REFRESH_CHANCE) {
             const maxAct = this.maxActUnlocked(year, contractsCompleted);
             const replaceIdx = board.findIndex(c => !c.isTradeRun);
             if (replaceIdx >= 0) {
-                board[replaceIdx] = this.generatePrestigeContract(year, maxAct);
+                board[replaceIdx] = this.generatePrestigeContract(year, maxAct, rng);
             }
         }
         return board;
