@@ -316,8 +316,10 @@ export class SortieManager {
         const consumablesBefore = campaign.consumables.length;
         const armouryBefore = campaign.armoury.length;
 
-        // Casualties and wounds come home with the squad.
-        const casualties = applyCasualties(this.squad);
+        // Casualties and wounds come home with the squad. Union rates
+        // (faction_reputation_design.md v2.1 amendment) ride the same
+        // completions map as every other faction-standing consult.
+        const casualties = applyCasualties(this.squad, undefined, campaign.contractsCompletedByClient);
         casualties.deaths.forEach(dead => {
             campaign.roster = campaign.roster.filter(c => c !== dead);
         });

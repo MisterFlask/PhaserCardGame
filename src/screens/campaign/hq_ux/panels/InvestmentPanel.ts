@@ -1,4 +1,5 @@
 import Phaser, { Scene } from 'phaser';
+import { unionOrderSlotPenalty } from '../../../../campaign/FactionPressures';
 import { StandingOrder } from '../../../../campaign/orders/StandingOrder';
 import { STANDING_ORDER_REGISTRY, StandingOrdersState } from '../../../../campaign/orders/StandingOrdersState';
 import { GameState } from '../../../../rules/GameState';
@@ -463,7 +464,10 @@ export class InvestmentPanel extends AbstractHqPanel {
         const ordersState = StandingOrdersState.getInstance();
         const campaign = CampaignUiState.getInstance();
         const year = campaign.calendar.year;
-        const slots = ordersState.slotsForYear(year);
+        // Union rates, faction_reputation_design.md v2.1 amendment — applied
+        // after the Standing Orders pass, same as every other Union seam.
+        const unionSlotPenalty = unionOrderSlotPenalty(campaign.contractsCompletedByClient);
+        const slots = ordersState.slotsForYear(year, unionSlotPenalty);
         const activeCount = ordersState.activeOrderIds.length;
 
         // Slot status header
@@ -472,6 +476,14 @@ export class InvestmentPanel extends AbstractHqPanel {
             text: `STANDING ORDERS · ${activeCount}/${slots}`,
             style: { fontSize: '22px', fontFamily: Fonts.DISPLAY, color: Palette.BRASS_TEXT }
         }));
+
+        // Labor-question note (v2.1): one line, only while the penalty bites.
+        if (unionSlotPenalty > 0) {
+            this.addStandingOrdersDynamic(scene.add.text(
+                width / 2, 234, 'one slot suspended pending resolution of the labor question',
+                { fontFamily: Fonts.BODY, fontSize: '13px', color: Palette.CRIMSON_TEXT, fontStyle: 'italic' }
+            ).setOrigin(0.5, 0));
+        }
 
         const orders = Array.from(STANDING_ORDER_REGISTRY.values());
         const cols = 2;
@@ -485,7 +497,7 @@ export class InvestmentPanel extends AbstractHqPanel {
             const row = Math.floor(i / cols);
             const x = originX + col * colW;
             const y = startY + row * rowH + ORDER_CARD_H / 2;
-            this.addStandingOrdersDynamic(this.buildOrderCard(order, x, y, ordersState, year));
+            this.addStandingOrdersDynamic(this.buildOrderCard(order, x, y, ordersState, year, unionSlotPenalty));
         });
 
         // Locked client-retainer rows: orders gated on repeat business with a
@@ -508,9 +520,12 @@ export class InvestmentPanel extends AbstractHqPanel {
         }
     }
 
-    /** ACTIVE / PENDING / available state for a single order, plus its card UI. */
+    /** ACTIVE / PENDING / available state for a single order, plus its card UI.
+     *  `unionSlotPenalty` (v2.1 amendment, default 0) is threaded through to
+     *  both the free-slot check and the ENACT action below. */
     private buildOrderCard(
-        order: StandingOrder, x: number, y: number, ordersState: StandingOrdersState, year: number
+        order: StandingOrder, x: number, y: number, ordersState: StandingOrdersState, year: number,
+        unionSlotPenalty: number = 0
     ): Phaser.GameObjects.Container {
         const scene = this.scene;
         const container = scene.add.container(x, y);
@@ -522,7 +537,7 @@ export class InvestmentPanel extends AbstractHqPanel {
         // order freshly enacted this quarter that also appears in pendingOrderIds
         // (see StandingOrdersState.enact doc comment).
         const isQueuedForRemoval = isActive && pendingList !== null && !pendingList.includes(order.id);
-        const hasFreeSlot = activeSlotsFree(ordersState, year);
+        const hasFreeSlot = activeSlotsFree(ordersState, year, unionSlotPenalty);
 
         const bg = scene.add.graphics();
         bg.fillStyle(Palette.PAPER_SHADOW, 0.5);
@@ -588,7 +603,7 @@ export class InvestmentPanel extends AbstractHqPanel {
         } else if (hasFreeSlot) {
             actionButton.setText('ENACT');
             actionButton.onClick(() => {
-                ordersState.enact(order.id, year);
+                ordersState.enact(order.id, year, unionSlotPenalty);
                 SaveManager.save();
                 PlaytestJournal.getInstance().record('purchase', { kind: 'retainer-enact', name: order.name });
                 this.rebuildStandingOrders();
@@ -710,7 +725,10 @@ export class InvestmentPanel extends AbstractHqPanel {
     }
 }
 
-/** True if the order slate has room for one more active order this year. */
-function activeSlotsFree(ordersState: StandingOrdersState, year: number): boolean {
-    return ordersState.activeOrderIds.length < ordersState.slotsForYear(year);
+/** True if the order slate has room for one more active order this year.
+ *  `unionSlotPenalty` (v2.1 amendment, default 0) shrinks the quota while
+ *  the Union is Hostile; over-quota active orders persist regardless (this
+ *  only gates whether ANOTHER can be enacted). */
+function activeSlotsFree(ordersState: StandingOrdersState, year: number, unionSlotPenalty: number = 0): boolean {
+    return ordersState.activeOrderIds.length < ordersState.slotsForYear(year, unionSlotPenalty);
 }

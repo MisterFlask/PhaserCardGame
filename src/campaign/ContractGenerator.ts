@@ -2,6 +2,8 @@ import { Contract, ContractType } from "./Contract";
 import { CONSUMABLE_REWARD_NAMES } from "./ConsumableStock";
 import { StandingOrdersState } from "./orders/StandingOrdersState";
 import { applyCharteredPartnerBonus } from "./ClientReputation";
+import { filterBlacklistedTemplates } from "./Factions";
+import { unionFreightRatePerCrate } from "./FactionPressures";
 
 /**
  * A contract template bundles name/client/description/paymentClause as one
@@ -521,7 +523,12 @@ export class ContractGenerator {
     }
 
     private generateBountyContract(region: RegionFlavor, year: number, contractsCompletedByClient: Record<string, number>, rng: () => number): Contract {
-        const template = this.pick(region.templates, rng);
+        // Faction blacklists (faction_reputation_design.md, "Amendment:
+        // Faction Relationships v2"): Blacklisted factions' clients stop
+        // generating, with the empty-pool fallback baked into the filter.
+        // (The filter consumes no rng — the injectable stream sees the same
+        // draw count either way; only the pool contents change.)
+        const template = this.pick(filterBlacklistedTemplates(region.templates, contractsCompletedByClient), rng);
 
         // Segment within the act is the fine-grained difficulty dial.
         const segment = Math.floor(rng() * 3);
@@ -571,7 +578,12 @@ export class ContractGenerator {
      * only.
      */
     private generateTradeRunContract(region: TradeRunRegion, year: number, contractsCompletedByClient: Record<string, number>, rng: () => number): Contract {
-        const template = this.pick(region.templates, rng);
+        // Faction blacklists (faction_reputation_design.md, "Amendment:
+        // Faction Relationships v2"): Blacklisted factions' clients stop
+        // generating, with the empty-pool fallback baked into the filter.
+        // (The filter consumes no rng — the injectable stream sees the same
+        // draw count either way; only the pool contents change.)
+        const template = this.pick(filterBlacklistedTemplates(region.templates, contractsCompletedByClient), rng);
 
         const segment = Math.floor(rng() * 3);
         const difficultyStars = segment + 1;
@@ -586,8 +598,15 @@ export class ContractGenerator {
         // Preferred Lading Rates retainer (freight bump, faction_reputation_design.md
         // "NEW HOOK (freight)"): flat £ added at generation, same
         // consult-StandingOrdersState pattern as every other generator lever.
-        const freightRatePerCrate = StandingOrdersState.getInstance()
+        const ordersFreightRatePerCrate = StandingOrdersState.getInstance()
             .freightRatePerCrate(ContractGenerator.TRADE_RUN_FREIGHT_RATE_PER_ACT * region.act);
+        // Union rates (faction_reputation_design.md v2.1 amendment): Dis
+        // Foundry Belt crates get "mishandled" while the Union is Hostile —
+        // applied AFTER the Standing Orders pass, same discipline as
+        // Chartered Partner above.
+        const freightRatePerCrate = unionFreightRatePerCrate(
+            ordersFreightRatePerCrate, region.regionName, contractsCompletedByClient
+        );
         const maxCrates = ContractGenerator.TRADE_RUN_MAX_CRATES;
 
         const deadlineWeeks = this.rollDeadlineWeeks(rng);
