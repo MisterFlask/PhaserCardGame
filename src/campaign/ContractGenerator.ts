@@ -466,6 +466,26 @@ const TRADE_RUN_REGIONS: TradeRunRegion[] = [
 ];
 
 /**
+ * Dis Legation tuning constants (Capital Works Rebuild, July 2026 — see
+ * src/docs/strategic_layer_redesign.md's amendment table #8). Defined HERE
+ * rather than on TheDisLegation.ts because generateLegationContract consumes
+ * them and campaign/ must never import strategic_projects/ (house rule 1:
+ * AbstractStrategicProject is Phaser-tainted via AbstractCard).
+ * TheDisLegation.ts re-exports them, so sim/tests can read them from either
+ * module without drift.
+ */
+export const LEGATION_PAYOUT_MULTIPLIER = 1.4;
+export const LEGATION_DEADLINE_WEEKS = 12;
+
+/**
+ * Soul Collateral Office escrow deadline (Capital Works Rebuild table #4).
+ * Defined here for the same reason as the LEGATION constants above
+ * (generateRecoveryContract consumes it; campaign/ can never import the
+ * Phaser-tainted strategic_projects/); SoulCollateralOffice.ts re-exports it.
+ */
+export const ESCROW_DEADLINE_WEEKS = 8;
+
+/**
  * Generates the weekly contract board. Difficulty scales with campaign year:
  * later years unlock deeper regions and harder encounter segments.
  */
@@ -747,6 +767,67 @@ export class ContractGenerator {
         });
     }
 
+    /**
+     * Legation commission (Capital Works Rebuild table #8, The Dis Legation):
+     * one ordinary bounty contract at the CURRENT best act — reusing
+     * maxActUnlocked and the existing region/template plumbing, no
+     * special-case templates — then adjusted: payout ×LEGATION_PAYOUT_MULTIPLIER
+     * (rounded to integer £), a fixed LEGATION_DEADLINE_WEEKS deadline, the
+     * board-slot exemption flag, and a "Legation: " name prefix. Trade-run
+     * and prestige generation paths are deliberately untouched.
+     */
+    public generateLegationContract(
+        year: number, contractsCompleted: number = 0, contractsCompletedByClient: Record<string, number> = {},
+        rng: () => number = Math.random
+    ): Contract {
+        const maxAct = this.maxActUnlocked(year, contractsCompleted);
+        const region = REGION_FLAVORS.find(r => r.act === maxAct)!;
+        const contract = this.generateBountyContract(region, year, contractsCompletedByClient, rng);
+
+        const basePayout = contract.payout;
+        contract.payout = Math.round(basePayout * LEGATION_PAYOUT_MULTIPLIER);
+        // The bounty path already substituted {payout} with the pre-multiplier
+        // figure; keep the invoice honest (clause must always quote the actual
+        // payout — see ContractGenerator.test.ts's payment-clause invariant).
+        contract.paymentClause = contract.paymentClause.replace(`£${basePayout}`, `£${contract.payout}`);
+        contract.deadlineWeeks = LEGATION_DEADLINE_WEEKS;
+        contract.exemptFromBoardSlots = true;
+        contract.name = `Legation: ${contract.name}`;
+        return contract;
+    }
+
+    /**
+     * Recovery of Company Assets (Capital Works Rebuild table #4, The Soul
+     * Collateral Office): posts when soldiers die on a WON sortie while the
+     * Office is owned. Reuses the bounty plumbing for act-appropriate
+     * encounter/squad fields (act = the sortie the souls were lost on), then
+     * overrides the commercial terms: £0 payout, no VP, a fixed
+     * ESCROW_DEADLINE_WEEKS deadline, board-slot exemption, and the Office's
+     * own name/client/clause. recoveryOfSouls carries the escrowed names;
+     * SortieManager.resolveSortie redeems them on completion and
+     * CampaignUiState.advanceWeeks forfeits them on expiry.
+     */
+    public generateRecoveryContract(soulNames: string[], act: number, rng: () => number = Math.random): Contract {
+        const region = REGION_FLAVORS.find(r => r.act === act) ?? REGION_FLAVORS[0];
+        const contract = this.generateBountyContract(region, 1, {}, rng);
+
+        const namesList = soulNames.join(", ");
+        contract.name = soulNames.length > 1
+            ? `Recovery of Company Assets: ${soulNames[0]} (and ${soulNames.length - 1} ${soulNames.length - 1 === 1 ? 'other' : 'others'})`
+            : `Recovery of Company Assets: ${soulNames[0]}`;
+        contract.client = "The Soul Collateral Office";
+        contract.description = `The Office holds ${namesList} in escrow pending physical recovery. `
+            + `The souls in question are Company property under clause 44(b); their prior owners are invited to reclaim them by force.`;
+        contract.paymentClause = "No invoice will be raised. The Company does not pay to be returned its own property.";
+        contract.payout = 0;
+        contract.vpReward = 0;
+        contract.deadlineWeeks = ESCROW_DEADLINE_WEEKS;
+        contract.exemptFromBoardSlots = true;
+        contract.recoveryOfSouls = [...soulNames];
+        contract.consumableRewardName = undefined; // no provisioning grants on escrow work
+        return contract;
+    }
+
     /** rng is injectable for deterministic tests (defaults to Math.random,
      *  same pattern as SortieResolution.ts's applyCasualties) — threaded
      *  through as a plain parameter rather than stored as instance state,
@@ -771,13 +852,19 @@ export class ContractGenerator {
      *  from an empty board) so the axis is always available, even though
      *  each contract only independently rolls ~20% odds. rng is injectable
      *  for deterministic tests (defaults to Math.random) — see
-     *  generateContract's doc comment. */
+     *  generateContract's doc comment.
+     *
+     *  Slot-exempt contracts (Contract.exemptFromBoardSlots, e.g. Legation
+     *  commissions) raise the effective target by their own count, so they
+     *  never squeeze the public board's refill — the board always tops up
+     *  to targetCount NON-exempt contracts. */
     public refillBoard(
         existing: Contract[], year: number, contractsCompleted: number = 0, targetCount: number = 5,
         contractsCompletedByClient: Record<string, number> = {}, rng: () => number = Math.random
     ): Contract[] {
         const board = [...existing];
-        const adjustedTarget = StandingOrdersState.getInstance().contractBoardTarget(targetCount);
+        const exemptCount = existing.filter(c => c.exemptFromBoardSlots).length;
+        const adjustedTarget = StandingOrdersState.getInstance().contractBoardTarget(targetCount) + exemptCount;
         const isFullRefresh = existing.length === 0;
         while (board.length < adjustedTarget) {
             board.push(this.generateContract(year, contractsCompleted, contractsCompletedByClient, rng));

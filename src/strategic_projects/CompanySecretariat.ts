@@ -16,9 +16,9 @@ export class CompanySecretariat extends AbstractStrategicProject {
         super({
             name: "Company Secretariat",
             description: "A permanent secretarial office to handle board paperwork, granting [b]+1 Standing Order slot[/b].",
-            // No art yet; "" is the documented sentinel for "auto-generate a
-            // placeholder" (see AssetManifestLint.test.ts / AbstractCard).
-            portraitName: ""
+            // Art lives in Sprites/StrategicProjects/company_secretariat.png
+            // (art pass, July 2026).
+            portraitName: "company_secretariat"
         });
         this.surfacePurchaseValue = 250;
         this.flavorText = "Minute-book, notice: \"The board can now indulge one further standing folly without losing track of the others.\"";

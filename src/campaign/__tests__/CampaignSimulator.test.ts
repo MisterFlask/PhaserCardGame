@@ -123,22 +123,14 @@ describe('CampaignSimulator', () => {
                 // the 0.75-winrate company (see the losing-economy test).
                 // Band retuned around the measured post-act-4 equilibrium;
                 // the floor is the load-bearing edge now.
-                //
-                // LEAD RULING (2026-07-08): the act-4 alternate-gate repricing
-                // (28 -> 56 contracts, commit 67a66f8, "year-7-equivalent
-                // pace") lowered the equilibrium again — greedy companies
-                // reach the Badlands income relief later. Measured roster-6
-                // survived40 over 10 independent 40-seed blocks: 24-32/40
-                // (~70% mean; identical with and without the opposition-
-                // tagging change, which is flavor/selection-only). ~70% is
-                // inside the 50-80% design target, so the game stands; the
-                // 26 floor (tuned against the 37-39 era) had become flaky.
-                // Floor re-widened around the new roster-6 mean (20/40 =
-                // 50%); ceiling stays 40 per the act-4-era ruling above —
-                // roster 8 still mostly survives (measured 31-39/40), so a
-                // sub-40 ceiling would just re-clip its healthy tail.
+                // (A 2026-07-08 flake at this floor — 24/40, 1-in-6 runs on
+                // an unmodified baseline — was briefly answered by widening
+                // to 24 on the Capital Works branch and to 20 on the
+                // opposition branch; superseded at merge by the root-cause
+                // fix, seeding ContractGenerator's board generation, which
+                // makes this run-to-run deterministic.)
                 expect(survived40, `roster ${roster}: ${survived40}/40 survived to quarter 40`)
-                    .toBeGreaterThanOrEqual(20);
+                    .toBeGreaterThanOrEqual(26);
                 expect(survived40, `roster ${roster}: ${survived40}/40 survived to quarter 40`)
                     .toBeLessThanOrEqual(40);
             }

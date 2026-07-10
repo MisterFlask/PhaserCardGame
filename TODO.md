@@ -49,6 +49,21 @@ smoke-gated CI and deploys the compressed site to gh-pages).
   selling; acquisition is sortie-only by v1 ruling
   (relic_equipment_design.md).
 
+## Capital Works rebuild residuals
+
+Batches A-C shipped July 2026 (spec + rulings: strategic_layer_redesign.md,
+"Amendment: Capital Works Rebuild"; all nine new projects + hooks live,
+save v16). Remaining:
+
+- **Numbers are design-sketch tier** like everything else awaiting the
+  playtest gate: Store £8/soldier, Gazette 20 VP, Legation ×1.4, Trunk +16,
+  escrow 8w/4w/+25 — all named exported constants; retune against the
+  played-campaign journal.
+- **Death-path browser proof** — smoke can't produce casualties; escrow/
+  probate/forfeit are covered by pure-module + serializer round-trip tests
+  only. First real playtest death (or a scripted qa harness with forced
+  casualties, if ever wanted) closes this.
+
 ## Content expansion (template proven, held for act-4 play contact)
 
 - **Regions 5+** — Brimstone Badlands shipped as act 4; the pipeline

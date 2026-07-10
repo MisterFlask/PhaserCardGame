@@ -1,5 +1,5 @@
 import Phaser, { Scene } from 'phaser';
-import { deckCap, pendingLevels, relicSlots } from '../../../../campaign/Leveling';
+import { deckCap, isAtDeckCap, pendingLevels, relicSlots } from '../../../../campaign/Leveling';
 import { RUSH_TREATMENT_COST_PER_WEEK } from '../../../../campaign/RushTreatment';
 import { PlayableCard } from '../../../../gamecharacters/PlayableCard';
 import { PlayerCharacter } from '../../../../gamecharacters/PlayerCharacter';
@@ -12,16 +12,26 @@ import { TextBoxButton } from '../../../../ui/Button';
 import { DepthManager } from '../../../../ui/DepthManager';
 import { TextBox } from '../../../../ui/TextBox';
 import { drawBackdropDim, drawWoodPanel, Fonts, Palette } from '../../../../ui/UIStyle';
-import { CampaignUiState, RELIC_INSURANCE_COST, ROSTER_CAP } from '../CampaignUiState';
+import { CampaignUiState, RELIC_INSURANCE_COST } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
 import { PlaytestJournal } from '../../../../utils/PlaytestJournal';
+import { CorrectivePhrenologyWing } from '../../../../strategic_projects/CorrectivePhrenologyWing';
+import { BEQUEST_COST, ProbateAndEffectsOffice } from '../../../../strategic_projects/ProbateAndEffectsOffice';
+import { ThePatternRoom } from '../../../../strategic_projects/ThePatternRoom';
+import { LongServiceTestimonialsBoard, TESTIMONIAL_VP_PER_LEVEL } from '../../../../strategic_projects/LongServiceTestimonialsBoard';
+import { DRILL_COST, DRILL_MAX_LEVEL, DRILL_XP, SchoolOfMusketry } from '../../../../strategic_projects/SchoolOfMusketry';
+import { SALVAGE_SELL_FRACTION, WattleAndGraySalvageAuctioneers } from '../../../../strategic_projects/WattleAndGraySalvageAuctioneers';
 
 const REMOVAL_COST = 40;
 const UPGRADE_COST = 60;
 const THERAPY_COST = 30;
 const THERAPY_RELIEF = 4;
-const REMOVAL_GATE = 'Retraining Program';
-const UPGRADE_GATE = 'The Foundry';
+const REMOVAL_GATE = new CorrectivePhrenologyWing().name;
+const UPGRADE_GATE = new ThePatternRoom().name;
+const BEQUEST_GATE = new ProbateAndEffectsOffice().name;
+const RETIRE_GATE = new LongServiceTestimonialsBoard().name;
+const DRILL_GATE = new SchoolOfMusketry().name;
+const SALVAGE_GATE = new WattleAndGraySalvageAuctioneers().name;
 const ARMOURY_PICKER_DEPTH = DepthManager.getInstance().REWARD_SCREEN + 2000;
 
 /**
@@ -36,6 +46,12 @@ export class BarracksPanel extends AbstractHqPanel {
 
     private selectedSoldier: PlayerCharacter | null = null;
     private selectedCard: PlayableCard | null = null;
+
+    /** Arm-confirm state for the irreversible Retire with Testimonial
+     *  action (The Long Service & Testimonials Board): first click arms,
+     *  second executes. Disarmed whenever another soldier is selected (and
+     *  on show); the retire button renders its armed state from this. */
+    private armedRetirement: PlayerCharacter | null = null;
 
     /** Armoury picker overlay: shown after clicking an empty equipment slot. */
     private armouryPickerElements: Phaser.GameObjects.GameObject[] = [];
@@ -68,6 +84,7 @@ export class BarracksPanel extends AbstractHqPanel {
         CampaignUiState.getInstance().ensureRecruitsPopulated();
         this.selectedSoldier = null;
         this.selectedCard = null;
+        this.armedRetirement = null;
         this.clearArmouryPicker();
         this.rebuild();
         super.show();
@@ -93,7 +110,7 @@ export class BarracksPanel extends AbstractHqPanel {
         // --- Roster, left column ---
         // Chrome (status bar + tab rail) occupies y 0-100; column headers
         // start below it with headroom to spare.
-        this.addDynamic(this.buildColumnHeader(`ROSTER · ${campaign.roster.length}/${ROSTER_CAP}`, width * 0.14, 130, 420));
+        this.addDynamic(this.buildColumnHeader(`ROSTER · ${campaign.roster.length}/${campaign.getRosterCap()}`, width * 0.14, 130, 420));
         campaign.roster.forEach((soldier, i) => {
             const selected = this.selectedSoldier === soldier;
             const trait = soldier.buffs.find(b => b.isPersonaTrait)?.getDisplayName() ?? '';
@@ -117,6 +134,9 @@ export class BarracksPanel extends AbstractHqPanel {
                 fillColor: selected ? Palette.VERDIGRIS : Palette.WOOD_PANEL
             }));
             button.onClick(() => {
+                // Selecting a (different) soldier disarms any pending
+                // retirement confirmation.
+                if (this.armedRetirement !== soldier) this.armedRetirement = null;
                 this.selectedSoldier = soldier;
                 this.selectedCard = null;
                 this.rebuild();
@@ -202,6 +222,11 @@ export class BarracksPanel extends AbstractHqPanel {
         // unequip, INSURE button per equipped-uninsured relic.
         if (this.selectedSoldier) {
             belowRosterY = this.buildEquipmentStrip(this.selectedSoldier, width, belowRosterY);
+            // Second-wave Capital Works actions (each self-gates on its
+            // project): School of Musketry drill, then the Testimonials
+            // Board's irreversible retire (arm-confirm).
+            belowRosterY = this.buildDrillAction(this.selectedSoldier, width, belowRosterY);
+            belowRosterY = this.buildRetireAction(this.selectedSoldier, width, belowRosterY);
         }
 
         // --- Deck of the selected soldier, middle column ---
@@ -227,6 +252,12 @@ export class BarracksPanel extends AbstractHqPanel {
             if (this.selectedCard) {
                 this.buildCardActions(width);
             }
+
+            // Bequeath from Archive (The Probate & Effects Office, Capital
+            // Works Rebuild Batch C): sits beneath the Remove/Upgrade
+            // actions. Only rendered when the Office is owned and the
+            // Company Archive holds anything.
+            this.buildBequestAction(width);
         }
 
         // --- Recruits, right column ---
@@ -246,7 +277,7 @@ export class BarracksPanel extends AbstractHqPanel {
             }));
             const recruitCost = campaign.getRecruitCost();
             const canHire = GameState.getInstance().moneyInVault >= recruitCost
-                && campaign.roster.length < ROSTER_CAP;
+                && campaign.roster.length < campaign.getRosterCap();
             const hireButton = this.addDynamic(new TextBoxButton({
                 scene: this.scene, x: width * 0.78, y: 222 + i * 100, width: 170, height: 38,
                 text: `Hire (£${recruitCost})`,
@@ -260,7 +291,7 @@ export class BarracksPanel extends AbstractHqPanel {
                     this.setStatus(`${candidate.name} signs the Company ledger. Welcome aboard.`);
                     this.rebuild();
                 } else {
-                    this.setStatus(campaign.roster.length >= ROSTER_CAP
+                    this.setStatus(campaign.roster.length >= campaign.getRosterCap()
                         ? 'The barracks are full.'
                         : 'Insufficient funds.');
                 }
@@ -336,6 +367,183 @@ export class BarracksPanel extends AbstractHqPanel {
             this.setStatus(`${soldier.name}'s card reworked at the Foundry: ${card.name}.`);
             this.rebuild();
         });
+    }
+
+    /**
+     * Drill (The School of Musketry & Applied Blasphemy, second wave): £40
+     * grants +20 XP to the selected soldier, below level DRILL_MAX_LEVEL
+     * only — a rebuild pump that can't inflate veterans. Wounded/stressed
+     * soldiers may drill (ruling). Pending promotions surface through the
+     * existing derived flow (PROMOTE button / debrief); this never resolves
+     * levels itself. Returns the y just past the row.
+     */
+    private buildDrillAction(soldier: PlayerCharacter, width: number, startY: number): number {
+        const campaign = CampaignUiState.getInstance();
+        if (!campaign.ownsProject(DRILL_GATE)) return startY;
+        if (soldier.level >= DRILL_MAX_LEVEL) return startY;
+
+        const canAfford = GameState.getInstance().moneyInVault >= DRILL_COST;
+        const drillButton = this.addDynamic(new TextBoxButton({
+            scene: this.scene, x: width * 0.14, y: startY, width: 400, height: 44,
+            text: `Drill ${soldier.name} (£${DRILL_COST}, +${DRILL_XP} XP)`,
+            style: { fontSize: '14px', fontFamily: Fonts.BODY, color: canAfford ? Palette.WHITE : Palette.DISABLED_TEXT },
+            fillColor: canAfford ? Palette.VERDIGRIS : Palette.DISABLED
+        }));
+        drillButton.onClick(() => {
+            if (!canAfford) { this.setStatus('Insufficient funds. The School does not drill on credit.'); return; }
+            GameState.getInstance().moneyInVault -= DRILL_COST;
+            soldier.xp += DRILL_XP;
+            SaveManager.save();
+            PlaytestJournal.getInstance().record('purchase', { kind: 'drill', cost: DRILL_COST, soldier: soldier.name, xp: DRILL_XP });
+            this.setStatus(`${soldier.name} completes a week at the School of Musketry & Applied Blasphemy. +${DRILL_XP} XP.`);
+            this.rebuild();
+        });
+        return startY + 52;
+    }
+
+    /**
+     * Retire with Testimonial (The Long Service & Testimonials Board,
+     * second wave): banks TESTIMONIAL_VP_PER_LEVEL × level onto the OWNED
+     * project instance's victoryPoints (the same per-project serialization
+     * path as The Company Gazette) and strikes the soldier from the roster
+     * (wages stop by construction). Irreversible, so arm-confirm: first
+     * click arms, second executes; selecting another soldier disarms.
+     * Cannot retire the last roster soldier; the wounded may be retired.
+     * Returns the y just past the row.
+     */
+    private buildRetireAction(soldier: PlayerCharacter, width: number, startY: number): number {
+        const campaign = CampaignUiState.getInstance();
+        if (!campaign.ownsProject(RETIRE_GATE)) return startY;
+
+        const vp = TESTIMONIAL_VP_PER_LEVEL * soldier.level;
+        const isLastSoldier = campaign.roster.length <= 1;
+        const armed = this.armedRetirement === soldier;
+        const retireButton = this.addDynamic(new TextBoxButton({
+            scene: this.scene, x: width * 0.14, y: startY, width: 400, height: 44,
+            text: armed
+                ? `CONFIRM: retire ${soldier.name} (banks ${vp} VP)`
+                : `Retire with Testimonial (banks ${vp} VP)`,
+            style: { fontSize: '14px', fontFamily: Fonts.BODY, color: isLastSoldier ? Palette.DISABLED_TEXT : Palette.WHITE },
+            fillColor: isLastSoldier ? Palette.DISABLED : (armed ? Palette.WAX_RED : Palette.WOOD_PANEL)
+        }));
+        retireButton.onClick(() => {
+            if (isLastSoldier) {
+                this.setStatus('The Company cannot retire its last soldier. Someone must mind the ledgers.');
+                return;
+            }
+            if (!armed) {
+                this.armedRetirement = soldier;
+                this.setStatus('Click again to confirm the citation.');
+                this.rebuild();
+                return;
+            }
+            this.armedRetirement = null;
+            campaign.roster = campaign.roster.filter(c => c !== soldier);
+            const board = campaign.ownedStrategicProjects.find(p => p.name === RETIRE_GATE);
+            if (board) board.victoryPoints += vp;
+            this.selectedSoldier = null;
+            this.selectedCard = null;
+            SaveManager.save();
+            PlaytestJournal.getInstance().record('retirement', { soldier: soldier.name, level: soldier.level, vp });
+            this.setStatus(`${soldier.name} retires with a testimonial: ${vp} VP entered in the Board's ledger, one name struck from the wage book.`);
+            this.rebuild();
+        });
+        return startY + 52;
+    }
+
+    /**
+     * "Bequeath from Archive (£30)" (The Probate & Effects Office): shown
+     * beneath the Remove/Upgrade card actions whenever the Office is owned,
+     * the Company Archive is non-empty, and a soldier is selected. Opens a
+     * picker of archived cards (same overlay pattern as the armoury relic
+     * picker). Deck-cap gated, matching PromotionPanel's acquisition rule.
+     */
+    private buildBequestAction(width: number): void {
+        const campaign = CampaignUiState.getInstance();
+        const soldier = this.selectedSoldier;
+        if (!soldier) return;
+        if (!campaign.ownsProject(BEQUEST_GATE)) return;
+        if (campaign.cardArchive.length === 0) return;
+
+        const y = 180 + soldier.cardsInMasterDeck.length * 46 + 20 + (this.selectedCard ? 96 : 0);
+        const atCap = isAtDeckCap(soldier, soldier.startingDeck.length, soldier.cardsInMasterDeck.length);
+        const canBequeath = GameState.getInstance().moneyInVault >= BEQUEST_COST && !atCap;
+        const bequestButton = this.addDynamic(new TextBoxButton({
+            scene: this.scene, x: width * 0.45, y, width: 340, height: 40,
+            text: `Bequeath from Archive (£${BEQUEST_COST})`,
+            style: { fontSize: '14px', fontFamily: Fonts.BODY, color: canBequeath ? Palette.WHITE : Palette.DISABLED_TEXT },
+            fillColor: canBequeath ? Palette.VERDIGRIS : Palette.DISABLED
+        }));
+        bequestButton.onClick(() => {
+            if (!canBequeath) {
+                this.setStatus(atCap ? `${soldier.name}'s repertoire is at capacity.` : 'Insufficient funds.');
+                return;
+            }
+            this.showArchivePicker(soldier);
+        });
+    }
+
+    /** Full-screen overlay listing the Company Archive's cards; picking one
+     *  bequeaths a copy onto `soldier` for BEQUEST_COST. Same overlay
+     *  pattern (and element pool) as the armoury relic picker. */
+    private showArchivePicker(soldier: PlayerCharacter): void {
+        const campaign = CampaignUiState.getInstance();
+        const centerX = this.scene.scale.width / 2;
+        const centerY = this.scene.scale.height / 2;
+
+        const backdrop = this.scene.add.rectangle(centerX, centerY, 1100, 620, 0x000000, 0.9)
+            .setStrokeStyle(4, 0xC9A227)
+            .setDepth(ARMOURY_PICKER_DEPTH);
+        this.armouryPickerElements.push(backdrop);
+
+        const instructions = new TextBox({
+            scene: this.scene, x: centerX, y: centerY - 270, width: 1000, height: 60,
+            text: `[color=gold]THE COMPANY ARCHIVE[/color]\nBequeath an entry from the effects of the deceased to ${soldier.name} (£${BEQUEST_COST}).`,
+            style: { fontSize: '20px', fontFamily: Fonts.BODY, color: Palette.WHITE, align: 'center', wordWrap: { width: 960 } },
+            fillColor: Palette.WOOD_DARK
+        }).setDepth(ARMOURY_PICKER_DEPTH + 1);
+        this.armouryPickerElements.push(instructions);
+
+        campaign.cardArchive.forEach((card, i) => {
+            const col = i % 2;
+            const row = Math.floor(i / 2);
+            const x = centerX - 260 + col * 520;
+            const y = centerY - 190 + row * 70;
+            const entry = new TextBoxButton({
+                scene: this.scene, x, y, width: 500, height: 60,
+                text: `[color=gold]${card.name}[/color]`,
+                style: { fontSize: '13px', fontFamily: Fonts.BODY, color: Palette.WHITE, align: 'center', wordWrap: { width: 470 } },
+                fillColor: Palette.WOOD_PANEL
+            }).setDepth(ARMOURY_PICKER_DEPTH + 1);
+            entry.onClick(() => {
+                const gameState = GameState.getInstance();
+                if (gameState.moneyInVault < BEQUEST_COST) {
+                    this.setStatus('Insufficient funds.');
+                    return;
+                }
+                gameState.moneyInVault -= BEQUEST_COST;
+                campaign.cardArchive = campaign.cardArchive.filter(c => c !== card);
+                const copy = card.Copy();
+                soldier.addCard(copy); // sets owningCharacter and pushes onto cardsInMasterDeck
+                SaveManager.save();
+                PlaytestJournal.getInstance().record('purchase', { kind: 'bequest', cost: BEQUEST_COST, soldier: soldier.name, card: card.name });
+                this.clearArmouryPicker();
+                this.setStatus(`${card.name} passes to ${soldier.name} under the terms of the estate. The Office retains its fee.`);
+                this.rebuild();
+            });
+            this.armouryPickerElements.push(entry);
+        });
+
+        const closeButton = new TextBoxButton({
+            scene: this.scene, x: centerX, y: centerY + 270, width: 220, height: 50,
+            text: 'Close',
+            style: { fontSize: '18px', fontFamily: Fonts.DISPLAY, color: Palette.WHITE },
+            fillColor: Palette.WAX_RED
+        }).setDepth(ARMOURY_PICKER_DEPTH + 1);
+        closeButton.onClick(() => this.clearArmouryPicker());
+        this.armouryPickerElements.push(closeButton);
+
+        this.add(this.armouryPickerElements);
     }
 
     /**
@@ -442,15 +650,22 @@ export class BarracksPanel extends AbstractHqPanel {
             }).setDepth(ARMOURY_PICKER_DEPTH + 1);
             this.armouryPickerElements.push(empty);
         } else {
+            // With Wattle & Gray owned, each unassigned relic also offers a
+            // sell action at 50% of list (equipped relics never appear here
+            // — the armoury is by definition unequipped stock; unequip
+            // first to sell a slotted relic). Entries narrow to make room.
+            const salvageOwned = campaign.ownsProject(SALVAGE_GATE);
             campaign.armoury.forEach((relic, i) => {
                 const col = i % 2;
                 const row = Math.floor(i / 2);
                 const x = centerX - 260 + col * 520;
                 const y = centerY - 190 + row * 70;
+                const entryW = salvageOwned ? 400 : 500;
+                const entryX = salvageOwned ? x - 50 : x;
                 const entry = new TextBoxButton({
-                    scene: this.scene, x, y, width: 500, height: 60,
+                    scene: this.scene, x: entryX, y, width: entryW, height: 60,
                     text: `[color=gold]${relic.getDisplayName()}[/color]\n${relic.getDescription()}`,
-                    style: { fontSize: '13px', fontFamily: Fonts.BODY, color: Palette.WHITE, align: 'center', wordWrap: { width: 470 } },
+                    style: { fontSize: '13px', fontFamily: Fonts.BODY, color: Palette.WHITE, align: 'center', wordWrap: { width: entryW - 30 } },
                     fillColor: Palette.WOOD_PANEL
                 }).setDepth(ARMOURY_PICKER_DEPTH + 1);
                 entry.onClick(() => {
@@ -464,6 +679,26 @@ export class BarracksPanel extends AbstractHqPanel {
                     this.rebuild();
                 });
                 this.armouryPickerElements.push(entry);
+
+                if (salvageOwned) {
+                    const salePrice = Math.floor(relic.price * SALVAGE_SELL_FRACTION);
+                    const sellButton = new TextBoxButton({
+                        scene: this.scene, x: x + 205, y, width: 95, height: 60,
+                        text: `Sell\n£${salePrice}`,
+                        style: { fontSize: '13px', fontFamily: Fonts.DISPLAY, color: Palette.WHITE, align: 'center' },
+                        fillColor: Palette.WAX_RED
+                    }).setDepth(ARMOURY_PICKER_DEPTH + 1);
+                    sellButton.onClick(() => {
+                        campaign.armoury = campaign.armoury.filter(r => r !== relic);
+                        GameState.getInstance().moneyInVault += salePrice;
+                        SaveManager.save();
+                        PlaytestJournal.getInstance().record('sale', { kind: 'relic', price: salePrice, name: relic.getDisplayName() });
+                        this.clearArmouryPicker();
+                        this.setStatus(`${relic.getDisplayName()} goes to Wattle & Gray for £${salePrice}. Half of list, as quoted.`);
+                        this.rebuild();
+                    });
+                    this.armouryPickerElements.push(sellButton);
+                }
             });
         }
 

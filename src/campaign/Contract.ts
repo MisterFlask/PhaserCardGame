@@ -80,6 +80,26 @@ export class Contract {
      *  Commissions (internal Court work, no named opposition). */
     public opposition?: string;
 
+    /**
+     * Capital Works Rebuild (July 2026): true for contracts that don't
+     * occupy a public board slot (e.g. the Dis Legation's exclusive
+     * commissions). ContractGenerator.refillBoard raises its refill target
+     * by the number of exempt contracts present, so these never squeeze the
+     * public board. Aging/expiry applies normally. Set post-construction by
+     * the generating path (generateLegationContract), default false.
+     */
+    public exemptFromBoardSlots: boolean = false;
+
+    /**
+     * Recovery of Company Assets contracts only (Soul Collateral Office —
+     * Capital Works Rebuild Batch C): names of the escrowed souls this
+     * contract recovers. Undefined on every other contract. Completion
+     * redeems them (SortieManager.resolveSortie); expiry forfeits them
+     * (CampaignUiState.advanceWeeks). Set post-construction by
+     * generateRecoveryContract, like exemptFromBoardSlots.
+     */
+    public recoveryOfSouls?: string[];
+
     constructor(args: {
         name: string;
         description: string;

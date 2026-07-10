@@ -6,7 +6,7 @@ import { AbstractBuff } from "../gamecharacters/buffs/AbstractBuff";
 import { AbstractReward } from "../rewards/AbstractReward";
 import { CardReward } from "../rewards/CardReward";
 import { CardRewardsGenerator } from "../rules/CardRewardsGenerator";
-import { AbstractStrategicProject } from "./AbstractStrategicProject";
+import { AbstractStrategicProject, QuarterEndContext } from "./AbstractStrategicProject";
 import { StrategicResource } from "./strategic_resources.ts/StrategicResources";
 
 export class AbyssalResearchInstitute extends AbstractStrategicProject {
@@ -27,7 +27,7 @@ export class AbyssalResearchInstitute extends AbstractStrategicProject {
         ];
     }
 
-    public override onQuarterEnd(): void {
+    public override onQuarterEnd(ctx: QuarterEndContext): void {
         // Gain a card reward at the beginning of each run
     }
 }

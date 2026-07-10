@@ -1,54 +1,63 @@
 import { AbstractStrategicProject } from "./AbstractStrategicProject";
 import { AbyssalResearchInstitute } from "./AbyssalResearchInstitute";
-import { BlueRoomReadingSocieties } from "./BlueRoomReadingSocieties";
+import { CantonmentAnnexe } from "./CantonmentAnnexe";
 import { CompanySecretariat } from "./CompanySecretariat";
-import { DisMunicipalBonds } from "./DisMunicipalBonds";
-import { LetheExtractionCo } from "./LetheExtractionCo";
+import { CorrectivePhrenologyWing } from "./CorrectivePhrenologyWing";
+import { EntertainmentsAndGratuitiesLedger } from "./EntertainmentsAndGratuitiesLedger";
 import { LeviMaxwellAscensionProtocol } from "./LeviMaxwellAscensionProtocol";
-import { OurManInDis } from "./OurManInDis";
-import { PhlegethonCoalfalls } from "./PhlegethonCoalfalls";
-import { RetrainingProgram } from "./RetrainingProgram";
-import { RevolutionaryContacts } from "./RevolutionaryContacts";
-import { SmytheBowyerPoppyFields } from "./SmytheBowyerPoppyFields";
-import { TheFoundry } from "./TheFoundry";
-
-export const ALL_STRATEGIC_PROJECTS: AbstractStrategicProject[] = [
-    new AbyssalResearchInstitute(),
-    new LeviMaxwellAscensionProtocol(),
-    new OurManInDis(),
-    new LetheExtractionCo(),
-    new DisMunicipalBonds(),
-    new SmytheBowyerPoppyFields(),
-    new BlueRoomReadingSocieties(),
-    new RevolutionaryContacts(),
-    new PhlegethonCoalfalls(),
-    new TheFoundry(),
-    new RetrainingProgram(),
-    new CompanySecretariat(),
-];
+import { LongServiceTestimonialsBoard } from "./LongServiceTestimonialsBoard";
+import { ProbateAndEffectsOffice } from "./ProbateAndEffectsOffice";
+import { SchoolOfMusketry } from "./SchoolOfMusketry";
+import { SoulCollateralOffice } from "./SoulCollateralOffice";
+import { TheBondedWarehouse } from "./TheBondedWarehouse";
+import { TheCompanyGazette } from "./TheCompanyGazette";
+import { TheCompanyStore } from "./TheCompanyStore";
+import { TheDisLegation } from "./TheDisLegation";
+import { TheGrandTrunkExtension } from "./TheGrandTrunkExtension";
+import { ThePatternRoom } from "./ThePatternRoom";
+import { WattleAndGraySalvageAuctioneers } from "./WattleAndGraySalvageAuctioneers";
 
 /**
- * Purchasable pool: ALL_STRATEGIC_PROJECTS minus (a) the four cargo/trade-route
- * projects pulled from the pool by the Standing Orders amendment (July 2026)
- * and (b) Abyssal Research Institute, converted from a Capital Work to a
- * Standing Order by the same amendment (see src/docs/strategic_layer_redesign.md
- * and src/campaign/orders/LaunchOrders.ts's AbyssalResearchInstituteOrder).
- * ALL_STRATEGIC_PROJECTS itself stays intact so the save loader can still
- * match against every instance that might appear in an existing save's
- * ownedProjects list (see CampaignSerializer.applySave's ARI migration).
- *
- * Levi-Maxwell Ascension Protocol was ALSO on this dead list (the retrofit
- * table's "pulled from pool; parked for v2 VP capstone") but has since been
- * repurposed into the staged VP capstone (src/docs/vp_endgame_design.md) and
- * is back in the pool, gated by year instead — see
- * isYearGatedProjectAvailable below.
+ * Capital Works Rebuild (July 2026) — see src/docs/strategic_layer_redesign.md's
+ * "Amendment: Capital Works Rebuild". Replaces the shipped Capital Works pool
+ * wholesale: of the seven prior purchasable projects, most were flat in both
+ * mechanics and flavor (near-duplicate income drips, a passive VP drip, bare
+ * service unlocks, a bare slot purchase). Batch A was the pool swap plus
+ * four new-mechanic projects (deck infra unlocks, roster cap, per-soldier
+ * income, per-contract VP); Batch B adds the two contract-board works
+ * (The Dis Legation, The Grand Trunk Extension); Batch C adds the death
+ * infrastructure (The Probate & Effects Office, The Soul Collateral Office —
+ * tree chain: Pattern Room → Probate → Soul Collateral); Batch D is the
+ * second wave (Testimonials Board, Wattle & Gray, School of Musketry,
+ * Bonded Warehouse, Gratuities Ledger — all root-level, no prereqs, no
+ * save-shape change). The Foundry, Retraining
+ * Program, Dis Municipal Bonds, Our Man In Dis, Lethe Extraction Co., and the
+ * four dead cargo projects (Smythe-Bowyer Poppy Fields, Blue Room Reading
+ * Societies, Revolutionary Contacts, Phlegethon Coalfalls) are deleted
+ * outright — SAVE_FORMAT_VERSION bump discards old saves, so there is no
+ * keep-for-save-matching reason to keep those classes around any longer.
+ * The Abyssal Research Institute legacy class stays (serializer migration
+ * path is unit-tested).
  */
-const DEAD_CARGO_PROJECT_NAMES = new Set([
-    new SmytheBowyerPoppyFields().name,
-    new BlueRoomReadingSocieties().name,
-    new RevolutionaryContacts().name,
-    new PhlegethonCoalfalls().name,
-]);
+export const ALL_STRATEGIC_PROJECTS: AbstractStrategicProject[] = [
+    new LeviMaxwellAscensionProtocol(),
+    new CompanySecretariat(),
+    new ThePatternRoom(),
+    new CorrectivePhrenologyWing(),
+    new CantonmentAnnexe(),
+    new TheCompanyStore(),
+    new TheCompanyGazette(),
+    new TheDisLegation(),
+    new TheGrandTrunkExtension(),
+    new ProbateAndEffectsOffice(),
+    new SoulCollateralOffice(),
+    new LongServiceTestimonialsBoard(),
+    new WattleAndGraySalvageAuctioneers(),
+    new SchoolOfMusketry(),
+    new TheBondedWarehouse(),
+    new EntertainmentsAndGratuitiesLedger(),
+    new AbyssalResearchInstitute(),
+];
 
 /** Name string used both to find a legacy owned copy (migration) and to
  *  exclude it from the purchasable pool. Kept as a named export so the
@@ -56,9 +65,17 @@ const DEAD_CARGO_PROJECT_NAMES = new Set([
  *  (house rule 6: registries over duplicated special-case strings). */
 export const ABYSSAL_RESEARCH_INSTITUTE_LEGACY_PROJECT_NAME = new AbyssalResearchInstitute().name;
 
+/**
+ * Purchasable pool: ALL_STRATEGIC_PROJECTS minus Abyssal Research Institute,
+ * converted from a Capital Work to a Standing Order by the Standing Orders
+ * amendment (see src/docs/strategic_layer_redesign.md and
+ * src/campaign/orders/LaunchOrders.ts's AbyssalResearchInstituteOrder).
+ * ALL_STRATEGIC_PROJECTS itself stays intact so the save loader can still
+ * match against every instance that might appear in an existing save's
+ * ownedProjects list (see CampaignSerializer.applySave's ARI migration).
+ */
 export const PURCHASABLE_STRATEGIC_PROJECTS: AbstractStrategicProject[] =
-    ALL_STRATEGIC_PROJECTS.filter(p =>
-        !DEAD_CARGO_PROJECT_NAMES.has(p.name) && p.name !== ABYSSAL_RESEARCH_INSTITUTE_LEGACY_PROJECT_NAME);
+    ALL_STRATEGIC_PROJECTS.filter(p => p.name !== ABYSSAL_RESEARCH_INSTITUTE_LEGACY_PROJECT_NAME);
 
 /**
  * Campaign-year gate on project *purchasability* — there's no separate

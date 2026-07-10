@@ -4,6 +4,7 @@ import { Team } from "../gamecharacters/AbstractCard";
 import { PlayableCard } from "../gamecharacters/PlayableCard";
 import { CardType } from "../gamecharacters/Primitives";
 import { WEEKS_PER_QUARTER, QUARTERS_PER_YEAR } from "../campaign/CampaignCalendar";
+import { Contract } from "../campaign/Contract";
 import { StrategicResource } from "./strategic_resources.ts/StrategicResources";
 
 /** One stage of a multi-stage ("staged") Capital Work — see
@@ -18,6 +19,41 @@ export interface StrategicProjectStage {
 /** One campaign year, in weeks — the minimum gap enforced between staged
  *  Capital Work purchases (see AbstractStrategicProject.canPurchaseNextStage). */
 export const WEEKS_PER_CAMPAIGN_YEAR = WEEKS_PER_QUARTER * QUARTERS_PER_YEAR;
+
+/**
+ * Everything a Capital Work may consult at the quarterly board meeting
+ * (Capital Works Rebuild, July 2026). Assembled by the sole caller,
+ * CampaignUiState.advanceWeeks — projects never import the screens/ layer,
+ * so any campaign fact a quarterly effect needs must ride this context.
+ *
+ * - rosterSize: roster headcount at the meeting (The Company Store).
+ * - year: current campaign year (ContractGenerator input).
+ * - contractsCompletedForGates: completed-contract count AS SEEN BY THE ACT
+ *   GATES — already includes the Grand Trunk Extension's credit; see
+ *   CampaignUiState.getEffectiveContractsCompletedForGates.
+ * - contractsCompletedByClient: raw per-client completion tallies
+ *   (Chartered Partner payout input).
+ * - postContract: posts a generated contract onto the HQ board and records
+ *   a board-minutes line (The Dis Legation).
+ * - retainerClients: the client names carrying retainer Standing Orders
+ *   (keys of CampaignUiState's CLIENT_RETAINER_ORDER_IDS registry), passed
+ *   in so no project ever imports that layer (The Entertainments &
+ *   Gratuities Ledger).
+ * - creditClientRelationship: adds n completion credits to a client's tally
+ *   — genuine relationship credit (retainer unlocks AND Chartered Partner
+ *   status; second-wave ruling) — and records a board-minutes line. The one
+ *   owner (CampaignUiState.contractsCompletedByClient) mutates; raw
+ *   contractsCompleted is untouched.
+ */
+export interface QuarterEndContext {
+    rosterSize: number;
+    year: number;
+    contractsCompletedForGates: number;
+    contractsCompletedByClient: Record<string, number>;
+    postContract: (c: Contract) => void;
+    retainerClients: string[];
+    creditClientRelationship: (client: string, n: number) => void;
+}
 
 export abstract class AbstractStrategicProject extends AbstractCard {
 
@@ -116,20 +152,28 @@ export abstract class AbstractStrategicProject extends AbstractCard {
         return [];
     }
 
-    public getStrategicResourceCost(): StrategicResource[]
-    {
-        return [
-            StrategicResource.InfernalMachinery.ofQuantity(1),
-            StrategicResource.WhiteflameDistillate.ofQuantity(2),
-        ];
+    /**
+     * Vestigial: no mechanical consumer ever read this (Capital Works are
+     * purchased with £ alone — see InvestmentPanel), and no display path did
+     * either (grepped clean across src/ before the Capital Works Rebuild,
+     * July 2026 — see src/docs/strategic_layer_redesign.md's amendment).
+     * Left as an overridable hook (rather than deleted outright) only
+     * because LeviMaxwellAscensionProtocol, a kept pre-rebuild class, still
+     * overrides it; StrategicResources.ts itself stays for that reason too.
+     * New Batch-A projects must NOT override this.
+     */
+    public getStrategicResourceCost(): StrategicResource[] {
+        return [];
     }
 
     public getAdditionalCargoOptions(): PlayableCard[] {
         return [];
     }
 
-    /** Fires at each quarterly board meeting (was per-run before the contract pivot). */
-    public onQuarterEnd(): void {
+    /** Fires at each quarterly board meeting (was per-run before the contract
+     *  pivot). See QuarterEndContext for what rides in ctx (Capital Works
+     *  Rebuild, July 2026 — The Company Store, The Dis Legation). */
+    public onQuarterEnd(ctx: QuarterEndContext): void {
 
     }
 
@@ -138,6 +182,14 @@ export abstract class AbstractStrategicProject extends AbstractCard {
      *  stage's effect (e.g. the final stage's VP payout). Never fires for
      *  non-staged projects (those use the ordinary owned/purchased flow). */
     public onStagePurchased(stageNumber: number): void {
+
+    }
+
+    /** Fires once per successfully completed contract sortie (SUCCESS path
+     *  only — never on a squad wipe; see SortieManager.resolveSortie), for
+     *  every currently-owned project. No-op by default; override to grant a
+     *  per-contract effect (e.g. The Company Gazette's VP drip). */
+    public onContractCompleted(contract: Contract): void {
 
     }
 }

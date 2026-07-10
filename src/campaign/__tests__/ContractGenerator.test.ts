@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ContractGenerator } from '../ContractGenerator';
+import { ContractGenerator, ESCROW_DEADLINE_WEEKS, LEGATION_DEADLINE_WEEKS, LEGATION_PAYOUT_MULTIPLIER } from '../ContractGenerator';
 import { isOppositionId, OPPOSITIONS } from '../Oppositions';
 
 const gen = ContractGenerator.getInstance();
@@ -346,6 +346,90 @@ describe('ContractGenerator', () => {
                 expect(prestige.opposition).toBeUndefined();
             }
             expect(seen).toBeGreaterThan(0);
+        });
+    });
+
+    describe('Legation commissions (Capital Works Rebuild, The Dis Legation)', () => {
+        it('generateLegationContract applies the payout multiplier, fixed deadline, exempt flag, and name prefix', () => {
+            for (let i = 0; i < 100; i++) {
+                const c = gen.generateLegationContract(5);
+                expect(c.name.startsWith('Legation: ')).toBe(true);
+                expect(c.deadlineWeeks).toBe(LEGATION_DEADLINE_WEEKS);
+                expect(c.exemptFromBoardSlots).toBe(true);
+                expect(c.isTradeRun).toBe(false);
+                expect(c.isPrestige).toBe(false);
+
+                // The underlying bounty payout is always a multiple of £5, so
+                // the multiplied payout must be exactly base * 1.4 (an integer:
+                // 5k * 1.4 = 7k) and dividing back out must recover a clean
+                // multiple of £5 — a deterministic check on the ×1.4 despite
+                // the roll's jitter.
+                expect(c.payout).toBeGreaterThan(0);
+                const impliedBase = c.payout / LEGATION_PAYOUT_MULTIPLIER;
+                expect(impliedBase % 5).toBeCloseTo(0, 8);
+                // Invoice stays honest: the clause quotes the multiplied figure.
+                expect(c.paymentClause).toContain(`£${c.payout}`);
+            }
+        });
+
+        it('generates at the CURRENT max act for the given year/contracts-completed inputs', () => {
+            for (let i = 0; i < 50; i++) {
+                expect(gen.generateLegationContract(1, 0).act).toBe(1);
+                expect(gen.generateLegationContract(1, 8).act).toBe(2);
+                expect(gen.generateLegationContract(1, 20).act).toBe(3);
+                expect(gen.generateLegationContract(10, 0).act).toBe(4);
+            }
+        });
+
+        it('refillBoard tops up to the target count of NON-exempt contracts when an exempt contract is present', () => {
+            for (let i = 0; i < 20; i++) {
+                const legation = gen.generateLegationContract(5);
+                const board = gen.refillBoard([legation], 5);
+                expect(board).toContain(legation);
+                expect(board.filter(c => !c.exemptFromBoardSlots)).toHaveLength(5);
+                expect(board).toHaveLength(6);
+            }
+        });
+    });
+
+    describe('Recovery of Company Assets (Capital Works Rebuild Batch C, The Soul Collateral Office)', () => {
+        it('posts on the Office\'s terms: £0, no VP, 8-week deadline, slot-exempt, souls attached', () => {
+            for (let i = 0; i < 50; i++) {
+                const c = gen.generateRecoveryContract(['Pte. Ostrander'], 2);
+                expect(c.payout).toBe(0);
+                expect(c.projectedPayout).toBe(0);
+                expect(c.vpReward).toBe(0);
+                expect(c.deadlineWeeks).toBe(ESCROW_DEADLINE_WEEKS);
+                expect(c.exemptFromBoardSlots).toBe(true);
+                expect(c.recoveryOfSouls).toEqual(['Pte. Ostrander']);
+                expect(c.client).toBe('The Soul Collateral Office');
+                expect(c.paymentClause).toBe('No invoice will be raised. The Company does not pay to be returned its own property.');
+                expect(c.description).toContain('Pte. Ostrander');
+                expect(c.description).toContain('clause 44(b)');
+                expect(c.consumableRewardName).toBeUndefined();
+                expect(c.isTradeRun).toBe(false);
+                expect(c.isPrestige).toBe(false);
+            }
+        });
+
+        it('names the first soul and counts the rest', () => {
+            expect(gen.generateRecoveryContract(['Pte. Ostrander'], 1).name)
+                .toBe('Recovery of Company Assets: Pte. Ostrander');
+            expect(gen.generateRecoveryContract(['Pte. Ostrander', 'Cpl. Weeks'], 1).name)
+                .toBe('Recovery of Company Assets: Pte. Ostrander (and 1 other)');
+            expect(gen.generateRecoveryContract(['Pte. Ostrander', 'Cpl. Weeks', 'Sgt. Vane'], 1).name)
+                .toBe('Recovery of Company Assets: Pte. Ostrander (and 2 others)');
+        });
+
+        it('draws its encounter fields from the act the souls were lost on', () => {
+            for (let act = 1; act <= 4; act++) {
+                const c = gen.generateRecoveryContract(['Pte. Ostrander'], act);
+                expect(c.act).toBe(act);
+                expect(c.numCombats).toBeGreaterThanOrEqual(1);
+                expect(c.numCombats).toBeLessThanOrEqual(2);
+                expect([2, 3, 4]).toContain(c.squadSize);
+                expect(c.durationWeeks).toBe(c.numCombats + 1);
+            }
         });
     });
 });

@@ -1,14 +1,15 @@
 import Phaser, { Scene } from 'phaser';
-import { MAX_CONSUMABLE_STOCK } from '../../../../campaign/ConsumableStock';
 import { AbstractConsumable } from '../../../../consumables/AbstractConsumable';
 import { ConsumablesLibrary } from '../../../../consumables/ConsumablesLibrary';
 import { GameState } from '../../../../rules/GameState';
 import { SaveManager } from '../../../../saveload/SaveManager';
+import { TextBoxButton } from '../../../../ui/Button';
 import { TextBox } from '../../../../ui/TextBox';
 import { drawBackdropDim, drawPaper, drawWoodPanel, Fonts, Palette } from '../../../../ui/UIStyle';
 import { CampaignUiState } from '../CampaignUiState';
 import { AbstractHqPanel } from './AbstractHqPanel';
 import { PlaytestJournal } from '../../../../utils/PlaytestJournal';
+import { SALVAGE_SELL_FRACTION, WattleAndGraySalvageAuctioneers } from '../../../../strategic_projects/WattleAndGraySalvageAuctioneers';
 
 const CARD_W = 300;
 const CARD_H = 168;
@@ -16,12 +17,15 @@ const CARD_GAP_X = 24;
 const CARD_GAP_Y = 24;
 const COLS = 4;
 const GRID_TOP = 220;
+const SALVAGE_GATE = new WattleAndGraySalvageAuctioneers().name;
 
 /**
  * The Provisioning Office: buy consumables against the Company vault. Shows
  * the full catalog every time — no rotating shop stock in v1. Purchases push
  * straight to campaign stock (CampaignUiState.consumables), capped at
- * MAX_CONSUMABLE_STOCK.
+ * CampaignUiState.getConsumableStockCap() (base 3; The Bonded Warehouse
+ * raises it). With Wattle & Gray owned, held stock can be sold back at 50%
+ * of list via the disposal strip.
  */
 export class QuartermasterPanel extends AbstractHqPanel {
     private dynamic: Phaser.GameObjects.GameObject[] = [];
@@ -68,8 +72,17 @@ export class QuartermasterPanel extends AbstractHqPanel {
         const gameState = GameState.getInstance();
 
         this.statusText.setText(
-            `Vault: £${gameState.moneyInVault}   ·   Held stock: ${campaign.consumables.length}/${MAX_CONSUMABLE_STOCK}`
+            `Vault: £${gameState.moneyInVault}   ·   Held stock: ${campaign.consumables.length}/${campaign.getConsumableStockCap()}`
         );
+
+        // Disposal strip (Wattle & Gray, Salvage Auctioneers): held stock
+        // can be sold back at 50% of list. Sits between the header and the
+        // catalog grid, which shifts down to make room when it appears.
+        let gridTop = GRID_TOP;
+        if (campaign.ownsProject(SALVAGE_GATE) && campaign.consumables.length > 0) {
+            this.buildDisposalStrip(campaign);
+            gridTop = GRID_TOP + 40;
+        }
 
         const catalog = ConsumablesLibrary.getInstance().getAllConsumables();
         const totalW = COLS * CARD_W + (COLS - 1) * CARD_GAP_X;
@@ -79,8 +92,37 @@ export class QuartermasterPanel extends AbstractHqPanel {
             const col = i % COLS;
             const row = Math.floor(i / COLS);
             const x = startX + col * (CARD_W + CARD_GAP_X);
-            const y = GRID_TOP + row * (CARD_H + CARD_GAP_Y) + CARD_H / 2;
+            const y = gridTop + row * (CARD_H + CARD_GAP_Y) + CARD_H / 2;
             this.addDynamic(this.buildCatalogCard(consumable, x, y));
+        });
+    }
+
+    /** One sell button per held consumable, in a centered row. Dry register:
+     *  the auctioneers quote half of list and do not negotiate. */
+    private buildDisposalStrip(campaign: CampaignUiState): void {
+        const held = campaign.consumables;
+        const btnW = 200, gap = 10;
+        const totalW = held.length * btnW + (held.length - 1) * gap;
+        const startX = this.scene.scale.width / 2 - totalW / 2 + btnW / 2;
+
+        held.forEach((consumable, i) => {
+            const salePrice = Math.floor(consumable.basePrice * SALVAGE_SELL_FRACTION);
+            const sellButton = this.addDynamic(new TextBoxButton({
+                scene: this.scene, x: startX + i * (btnW + gap), y: GRID_TOP + 5, width: btnW, height: 36,
+                text: `${consumable.getDisplayName()} — Sell £${salePrice}`,
+                style: { fontSize: '12px', fontFamily: Fonts.BODY, color: Palette.WHITE },
+                fillColor: Palette.WAX_RED
+            }));
+            sellButton.onClick(() => {
+                campaign.consumables = campaign.consumables.filter(c => c !== consumable);
+                GameState.getInstance().moneyInVault += salePrice;
+                SaveManager.save();
+                PlaytestJournal.getInstance().record('sale', { kind: 'consumable', price: salePrice, name: consumable.getDisplayName() });
+                this.rebuild();
+                // Set after rebuild (which resets the header line) so the
+                // receipt stays visible until the next interaction.
+                this.statusText.setText(`${consumable.getDisplayName()} goes to Wattle & Gray for £${salePrice}. Half of list, as quoted.`);
+            });
         });
     }
 
@@ -144,7 +186,8 @@ export class QuartermasterPanel extends AbstractHqPanel {
         const price = template.basePrice;
 
         if (campaign.isConsumableStockFull()) {
-            this.flashStatus(`Requisition denied: the stockroom is full (${MAX_CONSUMABLE_STOCK}/${MAX_CONSUMABLE_STOCK}). File a disposal form before ordering more.`);
+            const cap = campaign.getConsumableStockCap();
+            this.flashStatus(`Requisition denied: the stockroom is full (${cap}/${cap}). File a disposal form before ordering more.`);
             return;
         }
         if (GameState.getInstance().moneyInVault < price) {

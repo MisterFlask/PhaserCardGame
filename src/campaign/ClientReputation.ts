@@ -56,3 +56,21 @@ export function applyCharteredPartnerBonus(
     if (!isCharteredPartner(client, contractsCompletedByClient)) return payout;
     return Math.round((payout * CHARTERED_PARTNER_PAYOUT_MULTIPLIER) / 5) * 5;
 }
+
+/**
+ * The most-served client among `eligibleClients`, judged by the tallies map
+ * (The Entertainments & Gratuities Ledger, Capital Works Rebuild second
+ * wave). Ties break alphabetically; returns null when no eligible client
+ * has been served at all (the Ledger no-ops until a retainer client exists
+ * on the books). Pure — eligible clients are passed in, never imported.
+ */
+export function pickMostServedClient(
+    tallies: Record<string, number>,
+    eligibleClients: string[]
+): string | null {
+    const served = eligibleClients
+        .filter(client => (tallies[client] ?? 0) > 0)
+        .sort(); // alphabetical, so the reduce's strict > keeps the earliest name on ties
+    if (served.length === 0) return null;
+    return served.reduce((best, client) => (tallies[client]! > tallies[best]!) ? client : best);
+}

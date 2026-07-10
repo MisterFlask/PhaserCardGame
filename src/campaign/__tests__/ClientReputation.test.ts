@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { ContractGenerator } from '../ContractGenerator';
 import {
     applyCharteredPartnerBonus, CHARTERED_PARTNER_THRESHOLD, ClientReputationTier,
-    getClientReputationTier, isCharteredPartner, PREFERRED_CONTRACTOR_THRESHOLD
+    getClientReputationTier, isCharteredPartner, pickMostServedClient, PREFERRED_CONTRACTOR_THRESHOLD
 } from '../ClientReputation';
 import { _wireRetainerUnlockCheck, STANDING_ORDER_REGISTRY, StandingOrdersState } from '../orders/StandingOrdersState';
 import {
@@ -241,5 +241,29 @@ describe('client-retainer orders are gated out of the visible registry until unl
     it('the launch pool is never gated by client unlock state', () => {
         fakeCompletions = {};
         expect(STANDING_ORDER_REGISTRY.has('aggressive-tendering')).toBe(true);
+    });
+});
+
+describe('pickMostServedClient (The Entertainments & Gratuities Ledger, Capital Works second wave)', () => {
+    const eligible = ['Maison Vachon', 'The Styx Dam Project Office', 'Continental Casualty'];
+
+    it('picks the eligible client with the highest tally', () => {
+        const tallies = { 'Maison Vachon': 2, 'The Styx Dam Project Office': 5, 'Continental Casualty': 1 };
+        expect(pickMostServedClient(tallies, eligible)).toBe('The Styx Dam Project Office');
+    });
+
+    it('breaks ties alphabetically', () => {
+        const tallies = { 'Maison Vachon': 3, 'The Styx Dam Project Office': 3, 'Continental Casualty': 3 };
+        expect(pickMostServedClient(tallies, eligible)).toBe('Continental Casualty');
+    });
+
+    it('returns null when no eligible client has been served (the Ledger no-ops)', () => {
+        expect(pickMostServedClient({}, eligible)).toBeNull();
+        expect(pickMostServedClient({ 'Maison Vachon': 0 }, eligible)).toBeNull();
+    });
+
+    it('ignores served clients outside the eligible registry (non-retainer clients earn no gratuities)', () => {
+        const tallies = { 'The Court of Directors': 99, 'Maison Vachon': 1 };
+        expect(pickMostServedClient(tallies, eligible)).toBe('Maison Vachon');
     });
 });

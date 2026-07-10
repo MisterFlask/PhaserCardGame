@@ -466,6 +466,28 @@ export default class ImageUtils {
                 'card-burn.png', 'hazard.png', 'fire-breath.png'
             ]
         },
+        strategic_projects: {
+            prefix: 'Sprites/StrategicProjects/',
+            files: [
+                // Capital Works portrait batch (July 2026)
+                'pattern_room.png',
+                'phrenology_wing.png',
+                'cantonment_annexe.png',
+                'company_store.png',
+                'company_gazette.png',
+                'dis_legation.png',
+                'grand_trunk_extension.png',
+                'probate_effects_office.png',
+                'soul_collateral_office.png',
+                'company_secretariat.png',
+                'testimonials_board.png',
+                'wattle_gray_auctioneers.png',
+                'school_of_musketry.png',
+                'bonded_warehouse.png',
+                'gratuities_ledger.png',
+                'levi_maxwell_ascension_protocol.png',
+            ]
+        },
     };
 
     // Served relative to the page: works for local dev (http-server at repo root)

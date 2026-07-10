@@ -133,6 +133,23 @@ describe('contract DTO round-trip', () => {
         expect(sawTradeRun).toBe(true);
     });
 
+    it('round-trips a Recovery of Company Assets contract (recoveryOfSouls, £0, slot exemption)', () => {
+        const contract = ContractGenerator.getInstance().generateRecoveryContract(['Pte. Ostrander', 'Cpl. Weeks'], 3);
+        const restored = contractFromDTO(JSON.parse(JSON.stringify(contractToDTO(contract))));
+        expect(restored.recoveryOfSouls).toEqual(['Pte. Ostrander', 'Cpl. Weeks']);
+        expect(restored.payout).toBe(0);
+        expect(restored.deadlineWeeks).toBe(contract.deadlineWeeks);
+        expect(restored.exemptFromBoardSlots).toBe(true);
+        expect(restored.name).toBe(contract.name);
+        expect(restored.client).toBe('The Soul Collateral Office');
+    });
+
+    it('a non-recovery contract\'s DTO omits recoveryOfSouls entirely (unchanged pre-v16 shape)', () => {
+        const dto = contractToDTO(ContractGenerator.getInstance().generateContract(5));
+        expect('recoveryOfSouls' in dto).toBe(false);
+        expect(contractFromDTO(JSON.parse(JSON.stringify(dto))).recoveryOfSouls).toBeUndefined();
+    });
+
     it('generates a consumable reward on roughly 20% of contracts, always from the reward name table', () => {
         let withReward = 0;
         const trials = 500;

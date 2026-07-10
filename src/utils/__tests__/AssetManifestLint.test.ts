@@ -152,16 +152,6 @@ const EXPECTED_MISSING_IMAGE_REFS: { file: string; value: string }[] = [
     { file: 'gamecharacters/statuses/curses/traumas/Vain.ts', value: "vain-curse" },
     { file: 'screens/subcomponents/CombatCardManager.ts', value: "exhaustpile" },
     { file: 'strategic_projects/AbyssalResearchInstitute.ts', value: "abyssal_research_institute" },
-    { file: 'strategic_projects/BlueRoomReadingSocieties.ts', value: "blue_room_reading" },
-    { file: 'strategic_projects/DisMunicipalBonds.ts', value: "dis_municipal_bonds" },
-    { file: 'strategic_projects/LetheExtractionCo.ts', value: "lethe_extraction" },
-    { file: 'strategic_projects/LeviMaxwellAscensionProtocol.ts', value: "levi_maxwell_ascension_protocol" },
-    { file: 'strategic_projects/OurManInDis.ts', value: "our_man_in_dis" },
-    { file: 'strategic_projects/PhlegethonCoalfalls.ts', value: "phlegethon_coalfalls" },
-    { file: 'strategic_projects/RetrainingProgram.ts', value: "retraining_program" },
-    { file: 'strategic_projects/RevolutionaryContacts.ts', value: "revolutionary_contacts" },
-    { file: 'strategic_projects/SmytheBowyerPoppyFields.ts', value: "smythe_bowyer_poppy_fields" },
-    { file: 'strategic_projects/TheFoundry.ts', value: "the_foundry" },
 ];
 
 describe('Asset manifest integrity (source lint)', () => {
