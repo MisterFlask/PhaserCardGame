@@ -123,14 +123,13 @@ describe('CampaignSimulator', () => {
                 // the 0.75-winrate company (see the losing-economy test).
                 // Band retuned around the measured post-act-4 equilibrium;
                 // the floor is the load-bearing edge now.
-                // FLAKE RULING (2026-07-08): 24/40 observed once in six runs
-                // on an UNMODIFIED baseline during the Capital Works rebuild
-                // (reproduced with the change reverted, so not caused by it).
-                // Per the recorded flake-watch plan (TODO.md), floor widened
-                // 26 -> 24 to cover the observed tail. If it flakes below 24,
-                // stop widening and re-measure the distribution instead.
+                // (A 2026-07-08 flake at this floor — 24/40, 1-in-6 runs on
+                // an unmodified baseline — was briefly answered by widening
+                // to 24 on the Capital Works branch; superseded at merge by
+                // the root-cause fix, seeding ContractGenerator's board
+                // generation, which makes this run-to-run deterministic.)
                 expect(survived40, `roster ${roster}: ${survived40}/40 survived to quarter 40`)
-                    .toBeGreaterThanOrEqual(24);
+                    .toBeGreaterThanOrEqual(26);
                 expect(survived40, `roster ${roster}: ${survived40}/40 survived to quarter 40`)
                     .toBeLessThanOrEqual(40);
             }
@@ -286,9 +285,10 @@ describe('CampaignSimulator', () => {
          * the full trigger history. Price (£20/£15/£10) did not
          * meaningfully move the outcome either: the effect is dominated by
          * ContractGenerator's uncontrolled internal Math.random() (see
-         * this file's RNG-discipline note), which cascades any change in
-         * *when* sorties fire into materially different combat-roll
-         * sequences for the rest of the run.
+         * this file's RNG-discipline note; ContractGenerator has since been
+         * seeded, 2026-07-08 — this finding predates that fix), which
+         * cascades any change in *when* sorties fire into materially
+         * different combat-roll sequences for the rest of the run.
          *
          * This assertion therefore does NOT ratchet parity upward — it
          * pins down that useRushHealing stays a strict improvement-or-wash
@@ -411,11 +411,13 @@ describe('CampaignSimulator', () => {
          * "Numbers (post-nerf)" section for both constants.
          *
          * N=100 (not the original 10, mislabeled "20" in the old comment)
-         * is needed for measurement stability: ContractGenerator uses
-         * uncontrolled Math.random() internally for board generation (see
-         * this file's RNG-discipline note in CampaignSimulator.ts), so the
-         * ratio itself is noisy run-to-run even with the seeded rng fixed.
-         * N=60 was tried first and flaked against the 2.0x ceiling roughly
+         * is needed for measurement stability: at measurement time
+         * ContractGenerator used uncontrolled Math.random() internally for
+         * board generation (see this file's RNG-discipline note in
+         * CampaignSimulator.ts; since seeded, 2026-07-08), so the ratio
+         * itself was noisy run-to-run even with the seeded rng fixed. The
+         * N=100 sample size is kept as a margin-of-safety measurement
+         * buffer regardless. N=60 was tried first and flaked against the 2.0x ceiling roughly
          * 1-in-13 runs (one observed failure in 15 repeats); N=100 was
          * stable across 20/20 repeated measurements with real margin (max
          * observed 1.92x), so it's used here to keep this a genuine
@@ -491,12 +493,13 @@ describe('CampaignSimulator', () => {
          * improvement. Average score: 1054 (convert) vs 785 (never-convert).
          *
          * Roster 6 (leaner economy, less buffer against the buyback's vault
-         * draw) is noisier and NOT asserted here: ContractGenerator's board
-         * generation uses uncontrolled Math.random() internally (this
-         * file's RNG-discipline note at the top), so any quarter's
-         * conversion can perturb the vault just enough to select a
-         * different contract downstream, cascading into a different sortie
-         * sequence unrelated to the buyback's own economics — a roster-8
+         * draw) is noisier and NOT asserted here: at measurement time
+         * ContractGenerator's board generation used uncontrolled
+         * Math.random() internally (this file's RNG-discipline note at the
+         * top; since seeded, 2026-07-08), so any quarter's conversion could
+         * perturb the vault just enough to select a different contract
+         * downstream, cascading into a different sortie sequence unrelated
+         * to the buyback's own economics — a roster-8
          * company's larger buffer absorbs that noise far more cleanly than
          * roster 6's does. Roster 8 (a "sensible roster" size, matching the
          * T1 ratchet's own choice above) is the one this ratchet locks down.
@@ -609,6 +612,35 @@ describe('CampaignSimulator', () => {
                 `avgFinalVault: fixture=${avgVaultFixture.toFixed(0)} scalar=${avgVaultScalar.toFixed(0)} ` +
                 `(delta=${(avgVaultFixture - avgVaultScalar).toFixed(0)})`
             );
+        });
+    });
+
+    describe('determinism', () => {
+        /**
+         * Regression guard for the flake fixed 2026-07-08: ContractGenerator
+         * used to call Math.random() internally for board generation (squad
+         * size, payout jitter, region/template picks), so two "seeded" runs
+         * of runCampaignSimulation with identical config could still diverge
+         * — the root cause of the intermittent "trade-run vs greedy" ratio
+         * and T1 "survived to quarter 40" band flakes elsewhere in this
+         * file. ContractGenerator.generateContract/refillBoard now take an
+         * injectable rng (see this file's and CampaignSimulator.ts's
+         * RNG-discipline notes), and CampaignSimulator threads config.rng
+         * into both refillBoard call sites, so two runs seeded identically
+         * must now produce byte-for-byte identical results.
+         */
+        it('produces identical results for two runs with the same seeded rng', () => {
+            const config = {
+                combatModel: DEFAULT_COMBAT_MODEL,
+                policy: greedyPayout,
+                targetRosterSize: 6,
+                quarters: 16,
+                startingVault: 500,
+                startingRosterSize: 6,
+            };
+            const resultA = runCampaignSimulation({ ...config, rng: makeLcgRng(12345) });
+            const resultB = runCampaignSimulation({ ...config, rng: makeLcgRng(12345) });
+            expect(resultA).toEqual(resultB);
         });
     });
 });

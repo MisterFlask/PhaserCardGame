@@ -88,9 +88,11 @@ save v16). Remaining:
   Wants a queue-drained gate. (The smoke harness tolerates the visible
   symptom; the teardown race itself is unaddressed.)
 - **Headless-combat determinism** — rules code calls raw Math.random, so
-  seeded runs aren't bit-reproducible (same limit as the campaign sim).
-  Only matters if reproducibility ever does. (The other two follow-ons —
-  measured win-rates into the sim, smarter policies — shipped July 2026.)
+  seeded runs aren't bit-reproducible. (The campaign sim had the same
+  limit until 2026-07-08, fixed by threading an injectable rng through
+  ContractGenerator — the same pattern applies here if reproducibility
+  ever matters. The other two follow-ons — measured win-rates into the
+  sim, smarter policies — shipped July 2026.)
 - **Missing-art allowlist: 94 rows** — remaining rows are unreleased-
   content cards/portrait variants (art them when the content ships). Two
   deliberate holds: rename one side of the shared `"shield"` literal
@@ -104,11 +106,6 @@ save v16). Remaining:
   for Phaser imports (WebGLRenderer's `typeof WEBGL_DEBUG` bundler guard is
   unconditionally truthy under Node and alias-proof). Character round-trips
   stay browser-only; headless-combat covers the practical need.
-- **CampaignSimulator baseline flake watch** — the Monte Carlo baseline
-  once flaked at its 89/90 threshold; widen one notch if it repeats.
-  2026-07-08: T1's survival floor also flaked (24/40 vs floor 26 on an
-  unmodified baseline, 1-in-6 runs); floor widened to 24 per this plan.
-  Next flake on any ratchet: re-measure the distribution, don't widen.
 
 ## Cost optimization (verification & delegation)
 

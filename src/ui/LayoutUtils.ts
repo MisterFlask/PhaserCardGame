@@ -22,18 +22,46 @@ class CombatSceneLayoutUtils {
         return scene.scale.height * 0.9;
     }
 
+    /** Single source of truth for the End Turn anchor (bottom-right corner).
+     *  Post-combat, the sortie-advance button takes over this same spot. */
+    static getEndTurnButtonPosition(scene: Phaser.Scene): { x: number, y: number } {
+        return { x: scene.scale.width - 160, y: this.getPileY(scene) };
+    }
+
+    /** The fixed-size name plate (PhysicalCard.createNameBox) is cardWidth+40
+     *  wide and doesn't scale with sizeModifier, so it defines the visual
+     *  footprint for standard hand cards. */
+    private static readonly NAME_PLATE_MARGIN = 40;
+
+    /** Hand spacing derived from the actual rendered card footprint
+     *  (background displayWidth reflects sizeModifier; the fixed name plate
+     *  sets the floor). Full footprint — zero overlap — whenever it fits;
+     *  the min() against totalWidth/(n+1) compresses only when the hand is
+     *  genuinely too wide, and hover-raise covers that crowded case. */
+    static getHandCardSpacing(scene: Phaser.Scene, cardArray: PhysicalCard[]): number {
+        const baseWidth = CardGuiUtils.getInstance().cardConfig.cardWidth;
+        const renderedWidth = cardArray.reduce(
+            (max, card) => Math.max(max, card.cardBackground?.displayWidth ?? baseWidth),
+            baseWidth
+        );
+        const footprint = Math.max(renderedWidth, baseWidth + this.NAME_PLATE_MARGIN);
+        return Math.min(footprint, scene.scale.width / (cardArray.length + 1));
+    }
+
     static arrangeCards(scene: Phaser.Scene, cardArray: PhysicalCard[], yPosition: number): void {
-        const gameWidth = scene.scale.width;
-        const totalWidth = gameWidth;
-        const cardSpacing = Math.min(CardGuiUtils.getInstance().cardConfig.cardWidth, totalWidth / (cardArray.length + 1));
+        const totalWidth = scene.scale.width;
+        const cardSpacing = this.getHandCardSpacing(scene, cardArray);
         const totalCardsWidth = cardArray.length * cardSpacing;
         const startX = (totalWidth - totalCardsWidth) / 2;
 
+        const transientState = TransientUiState.getInstance();
         cardArray.forEach((card, index) => {
-            // Don't move the card that is being dragged
-            if (TransientUiState.getInstance().draggedCard !== card) {
+            // Don't move the card being dragged, nor the hovered card (the
+            // hover-raise in CombatInputHandler owns its position until
+            // pointerout — otherwise this per-frame arrange fights the lift).
+            if (transientState.draggedCard !== card && transientState.hoveredCard !== card) {
                 const targetX = startX + index * cardSpacing;
-                
+
                 // Use tweens instead of direct position setting
                 scene.tweens.add({
                     targets: card.container,
@@ -64,12 +92,11 @@ class CombatSceneLayoutUtils {
     }
 
     static getCardPositionInHand(scene: Phaser.Scene, index: number, cardArray: PhysicalCard[]): { x: number, y: number } {
-        const gameWidth = scene.scale.width;
-        const totalWidth = gameWidth;
-        const cardSpacing = Math.min(CardGuiUtils.getInstance().cardConfig.cardWidth, totalWidth / (cardArray.length + 1));
+        const totalWidth = scene.scale.width;
+        const cardSpacing = this.getHandCardSpacing(scene, cardArray);
         const totalCardsWidth = cardArray.length * cardSpacing;
         const startX = (totalWidth - totalCardsWidth) / 2;
-        
+
         return {
             x: startX + index * cardSpacing,
             y: this.getHandY(scene)

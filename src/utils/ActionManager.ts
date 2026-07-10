@@ -20,6 +20,7 @@ import { CombatRules, DamageCalculationResult } from "../rules/CombatRulesHelper
 import { DeckLogic, PileName } from "../rules/DeckLogicHelper";
 import { CombatSceneData } from "../screens/CombatAndMapScene";
 import { AutomatedCharacterType, BaseCharacterType, PlayableCardType } from "../Types";
+import { CombatAnimationManager } from "../ui/animations/CombatAnimationManager";
 import { SubtitleManager } from "../ui/SubtitleManager";
 import { FleeCombatAction } from "./actions/FleeCombatAction";
 import { GameAction } from "./actions/GameAction";
@@ -327,9 +328,14 @@ export class ActionManager {
         }
     }
 
-    public tiltCharacter(character: BaseCharacterType){
+    public tiltCharacter(character: BaseCharacterType, target?: BaseCharacterType){
         if (character.physicalCard) {
-            this.animateAttackerTilt(character.physicalCard);
+            this.actionQueue.addAction(new GenericAction(async () => {
+                await CombatAnimationManager.getInstance().enemyAttackFlourish(
+                    character as unknown as BaseCharacter, this.scene, target as unknown as BaseCharacter | undefined
+                );
+                return [];
+            }));
         }
     }
 
@@ -471,6 +477,11 @@ export class ActionManager {
         const gameState = GameState.getInstance();
         const combatState = gameState.combatState;
 
+        // Captured now, synchronously: a successful drag-play tweens the dragged
+        // PhysicalCard to the discard pile and obliterates it before this queued
+        // action runs, so sourceXY must not depend on card.container surviving.
+        const sourceXY = card.container ? { x: card.container.x, y: card.container.y } : { x: 0, y: 0 };
+
         let missingEnergy = playableCard.energyCost - combatState.energyAvailable;
 
         for (const buff of card.data.buffs) {
@@ -529,6 +540,14 @@ export class ActionManager {
             }else{
                 DeckLogic.moveCardToPile(card.data as PlayableCard, PileName.Discard);
             }
+
+            await CombatAnimationManager.getInstance().playCardFlourish(playableCard, {
+                scene: this.scene,
+                sourceXY,
+                owner: playableCard.owningCharacter,
+                target: target as BaseCharacter | undefined
+            });
+
             if (!card.data.transientUiFlag_disableStandardDiscardAfterPlay){
                 await this.animateDiscardCard(card);
             }
@@ -850,14 +869,13 @@ export class ActionManager {
 
             // Animate the defender jiggle and glow based on unblocked damage (visual only; no-op headlessly)
             if (physicalCardOfTarget) {
-                if (damageResult.unblockedDamage > 0) {
-                    // Unblocked damage dealt: glow red
-                    this.animateDefenderJiggleAndGlow(physicalCardOfTarget, 0xff0000); // Red color
+                const blocked = damageResult.unblockedDamage === 0;
+                if (!blocked) {
                     SoundUtils.play(this.scene, 'damage_thud', 0.4);
-                } else {
-                    // No unblocked damage: glow white
-                    this.animateDefenderJiggleAndGlow(physicalCardOfTarget, 0xffffff); // White color
                 }
+                await CombatAnimationManager.getInstance().struckFlourish(
+                    target as unknown as BaseCharacter, this.scene, { blocked }
+                );
             }
 
             callback?.(damageResult);
@@ -890,53 +908,6 @@ export class ActionManager {
         }));
     }
 
-    
-
-    // {{ edit_4 }}
-    /**
-     * Animates the defender by jiggling and glowing with the specified color.
-     * @param defender The PhysicalCard of the defender.
-     * @param color The color to glow (e.g., red for damage dealt, white otherwise).
-     */
-    private animateDefenderJiggleAndGlow(defender: IPhysicalCardInterface, color: number): void {
-        this.actionQueue.addAction(new GenericAction(async () => {
-            if (this.sceneIsLive()) {
-                // Jiggle the defender
-                this.scene.tweens.add({
-                    targets: defender.container,
-                    x: defender.container.x + 10,
-                    duration: 100,
-                    yoyo: true,
-                    repeat: 2,
-                    ease: 'Power1'
-                });
-
-                var bg = defender.cardBackground;
-                // Glow effect based on damage
-                if (bg instanceof Phaser.GameObjects.Image) {
-                    this.scene.tweens.add({
-                        targets: defender.cardBackground,
-                        tint: color,
-                        duration: 100,
-                        yoyo: true,
-                        ease: 'Power1'
-                    });
-                } else if (bg instanceof Phaser.GameObjects.Rectangle) {
-                    this.scene.tweens.add({
-                        targets: defender.cardBackground,
-                        fillColor: color,
-                        duration: 100,
-                        yoyo: true,
-                        ease: 'Power1'
-                    });
-                }
-            }
-
-            // Wait for the jiggling and glow animation to complete
-            await new WaitAction(300).playAction();
-            return [];
-        }));
-    }
 
     public purchaseShopItem(shop: ShopContents, item: PlayableCardType): void {
         item.OnPurchase();
