@@ -38,6 +38,7 @@ export class ExpertOccultist extends PlayableCard {
     constructor() {
         super({
             name: "Expert Occultist",
+            portraitName: "pentacle",
             cardType: CardType.POWER,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.RARE,

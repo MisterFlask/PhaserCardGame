@@ -13,6 +13,7 @@ export class PneumaticRevolver extends PlayableCard {
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
             rarity: EntityRarity.UNCOMMON,
+            portraitName: "machine-gun",
         });
         this.baseEnergyCost = 2;
         this.baseDamage = 6;

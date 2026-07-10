@@ -11,6 +11,7 @@ export class SoulJar extends PlayableCard {
     constructor(sellValue: number = 20) {
         super({
             name: "Soul Jar",
+            portraitName: "skull-staff",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.TOKEN,

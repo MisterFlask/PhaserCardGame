@@ -7,6 +7,7 @@ export class Orders extends PlayableCard {
     constructor() {
         super({
             name: "Orders",
+            portraitName: "lightning-shout",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.UNCOMMON,

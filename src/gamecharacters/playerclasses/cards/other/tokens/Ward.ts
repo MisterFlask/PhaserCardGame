@@ -16,6 +16,7 @@ export class Ward extends PlayableCard {
         this.baseBlock = 4;
         this.baseEnergyCost = 0;
         this.buffs.push(new ExhaustBuff());
+        this.portraitName = "ward-card-art";
     }
 
     override get description(): string {

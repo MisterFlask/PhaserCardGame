@@ -16,6 +16,7 @@ export class SpicyLiteratureCargo extends PlayableCard {
         this.surfacePurchaseValue = 30;
         this.hellPurchaseValue = 40;
         this.buffs.push(new HellSellValue(100));
+        this.portraitName = "spicy-literature-cargo";
         this.flavorText = "Banned in three provinces and required reading in a fourth.";
     }
 

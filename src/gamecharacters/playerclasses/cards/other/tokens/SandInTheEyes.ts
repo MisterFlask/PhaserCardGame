@@ -15,6 +15,7 @@ export class SandInTheEyes extends PlayableCard {
         });
         this.baseDamage = 2;
         this.baseEnergyCost = 1;
+        this.portraitName = "sand-in-the-eyes-card-art";
     }
 
     override get description(): string {

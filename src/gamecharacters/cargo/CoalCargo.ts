@@ -18,6 +18,7 @@ export class CoalCargo extends PlayableCard {
         this.baseEnergyCost = 1;
         this.buffs.push(new HellSellValue(185));
         this.buffs.push(new Heavy());
+        this.portraitName = "coal-cargo";
         this.flavorText = "Hell has no shortage of coal. It has a shortage of receipts.";
     }
 

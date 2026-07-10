@@ -17,6 +17,7 @@ export class DisruptShielding extends PlayableCard {
         });
         this.id = "DISRUPT_SHIELDING";
         this.buffs.push(new RetainBuff())
+        this.portraitName = "avaunt-card-art";
     }
 
     override InvokeCardEffects(target: BaseCharacter): void {

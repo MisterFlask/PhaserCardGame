@@ -37,6 +37,7 @@ export class ChaliceOfGreed extends PlayableCard {
         this.baseEnergyCost = 0;
         this.buffs.push(new LoseEnergyNextTurnBuff());
         this.buffs.push(new ExhaustBuff());
+        this.portraitName = "chalice-of-greed";
     }
 
     override get description(): string {

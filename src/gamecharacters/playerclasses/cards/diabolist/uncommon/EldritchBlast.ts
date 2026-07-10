@@ -13,6 +13,7 @@ export class EldritchBlast extends PlayableCard {
     constructor() {
         super({
             name: "Eldritch Blast",
+            portraitName: "disintegrate",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
             rarity: EntityRarity.UNCOMMON,

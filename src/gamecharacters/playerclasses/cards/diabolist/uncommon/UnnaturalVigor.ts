@@ -11,6 +11,7 @@ export class UnnaturalVigor extends PlayableCard {
     constructor() {
         super({
             name: "Unnatural Vigor",
+            portraitName: "armor-upgrade",
             cardType: CardType.POWER,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.UNCOMMON,

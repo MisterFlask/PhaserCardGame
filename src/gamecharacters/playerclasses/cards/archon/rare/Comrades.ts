@@ -33,6 +33,7 @@ export class Comrades extends PlayableCard {
     constructor() {
         super({
             name: "Comrades",
+            portraitName: "guards",
             cardType: CardType.POWER,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.RARE,

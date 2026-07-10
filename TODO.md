@@ -139,10 +139,17 @@ items note their gates individually.
   per-combat drops. Delete only if it stays unused past September.
 - **Contract-board hero slot** — the survey-map rework partially answers
   the critique; decide if a priority-pin treatment is still wanted.
-- **Faction reputation v2** — six more client retainers, embassies,
-  recruitment gating, intelligence products (wants an enemy-comp preview
-  UI). Revisit after play shows whether players specialize
-  (faction_reputation_design.md).
+- **Faction reputation v2.2** — v2 (registry, derived standing,
+  Pleases/Offends line, blacklist at −6) and v2.1 (Union retaliation:
+  Hostile tier at −9, Union rates on recruit/therapy/wounds, slot
+  suspension, Foundry freight friction) shipped July 2026 — see
+  faction_reputation_design.md amendments. Remaining shelf: détente
+  (Widows' & Orphans' Fund — needs factionStandingAdjustments + save
+  bump, lead work), strike/assassination narrative events, faction combat
+  reinforcements, six more client retainers, embassies, recruitment
+  gating, dual-sided contracts, intelligence products (wants an
+  enemy-comp preview UI). Revisit after play shows whether players
+  specialize.
 - **Relic economy residuals** — an HQ acquisition surface (shop) and
   selling; acquisition is sortie-only by v1 ruling
   (relic_equipment_design.md).
@@ -197,10 +204,13 @@ save v16). Remaining:
   ContractGenerator — the same pattern applies here if reproducibility
   ever matters. The other two follow-ons — measured win-rates into the
   sim, smarter policies — shipped July 2026.)
-- **Missing-art allowlist: 94 rows** — remaining rows are unreleased-
-  content cards/portrait variants (art them when the content ships). Two
-  deliberate holds: rename one side of the shared `"shield"` literal
-  before arting either; delete rather than art any dead refs.
+- **Missing-art allowlist: 77 rows** — the July 2026 card art pass gave
+  every released card real art (assigned on-disk icons + authored SVG
+  glyphs; see src/docs/art_pass_plan.md), removing 17 rows. The
+  `"shield"` hold is resolved (Defend now uses `rookie-defend`, so the
+  one remaining `shield` ref may be arted freely). Remaining rows are
+  unreleased-content refs, buff icons, and secondary in-file refs;
+  delete rather than art any dead refs.
 - **Manifest pruning** — ~50MB of the 77MB deploy is manifest-wired but
   unreleased content; prune the MANIFEST (not the deploy script) if size
   starts mattering.

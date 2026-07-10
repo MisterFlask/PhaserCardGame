@@ -9,6 +9,7 @@ export class Incoming extends PlayableCard {
     constructor() {
         super({
             name: "Incoming",
+            portraitName: "artillery-shell",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.COMMON,

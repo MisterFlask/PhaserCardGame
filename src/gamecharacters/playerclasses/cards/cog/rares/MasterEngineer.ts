@@ -47,6 +47,7 @@ export class MasterEngineer extends PlayableCard {
             cardType: CardType.POWER,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.RARE,
+            portraitName: "factory-arm",
         });
         this.baseEnergyCost = 2;
         this.flavorText = "The prototype outperforms the original. This is meant to be reassuring.";

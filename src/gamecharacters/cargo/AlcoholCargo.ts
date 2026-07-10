@@ -16,6 +16,7 @@ export class AlcoholCargo extends PlayableCard {
         this.baseEnergyCost = 1;
         this.buffs.push(new HellSellValue(120));
         this.surfacePurchaseValue = 30;
+        this.portraitName = "beer-stein";
         this.flavorText = "Not for drinking. That said, the crate has been opened twice.";
     }
 

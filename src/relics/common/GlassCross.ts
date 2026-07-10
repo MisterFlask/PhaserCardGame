@@ -16,6 +16,7 @@ class HolyBombardment extends PlayableCard {
         });
         this.baseDamage = 15;
         this.buffs = [new ExhaustBuff()];
+        this.portraitName = "holy-bombardment-card-art";
     }
 
     override get description(): string {

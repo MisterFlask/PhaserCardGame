@@ -14,6 +14,7 @@ export class GaussRifle extends PlayableCard {
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
             rarity: EntityRarity.RARE,
+            portraitName: "tesla-turret",
         });
         this.baseEnergyCost = 2;
         this.baseDamage = 20;

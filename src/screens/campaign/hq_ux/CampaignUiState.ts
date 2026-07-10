@@ -2,6 +2,7 @@ import { CampaignCalendar, WAGE_PER_SOLDIER_PER_QUARTER } from '../../../campaig
 import { Contract } from '../../../campaign/Contract';
 import { ContractGenerator } from '../../../campaign/ContractGenerator';
 import { MAX_CONSUMABLE_STOCK } from '../../../campaign/ConsumableStock';
+import { unionRecruitCost, unionTherapyCost } from '../../../campaign/FactionPressures';
 import { relicSlots } from '../../../campaign/Leveling';
 import { _wireRetainerUnlockCheck, StandingOrdersState } from '../../../campaign/orders/StandingOrdersState';
 import { AbstractConsumable } from '../../../consumables/AbstractConsumable';
@@ -259,14 +260,20 @@ export class CampaignUiState {
 
     /** RECRUIT_COST adjusted by any active Standing Orders (e.g. Recruiting Sergeants). */
     public getRecruitCost(): number {
-        return StandingOrdersState.getInstance().recruitCost(RECRUIT_COST);
+        const ordersCost = StandingOrdersState.getInstance().recruitCost(RECRUIT_COST);
+        // Union rates, faction_reputation_design.md v2.1 amendment — applied
+        // after the Standing Orders pass.
+        return unionRecruitCost(ordersCost, this.contractsCompletedByClient);
     }
 
     /** A base therapy £ figure adjusted by any active Standing Orders (e.g.
      *  Accredited Phrenology Retainer). The base cost itself lives with the
      *  caller (BarracksPanel) since it's UI-owned. */
     public getTherapyCost(base: number): number {
-        return StandingOrdersState.getInstance().therapyCost(base);
+        const ordersCost = StandingOrdersState.getInstance().therapyCost(base);
+        // Union rates, faction_reputation_design.md v2.1 amendment — applied
+        // after the Standing Orders pass.
+        return unionTherapyCost(ordersCost, this.contractsCompletedByClient);
     }
 
     /**

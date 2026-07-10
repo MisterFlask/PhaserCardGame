@@ -34,6 +34,10 @@ export interface SmokeTestResult {
 }
 
 const DEFAULT_TIMEOUT_MS = 15000;
+// Boot (reaching a ready HqScene) scales with the asset manifest, which the
+// July 2026 card art pass grew past what 15s reliably covers on software-GL
+// CI runners; only the two boot waits get this larger budget.
+const BOOT_TIMEOUT_MS = 45000;
 const POLL_INTERVAL_MS = 50;
 
 /** Thrown internally to abort the harness cleanly from any step. */
@@ -130,14 +134,14 @@ async function runSteps(steps: SmokeTestStep[]): Promise<void> {
     const campaign = CampaignUiState.getInstance();
     const gameState = GameState.getInstance();
 
-    await waitFor(() => currentSceneKey() === 'HqScene', DEFAULT_TIMEOUT_MS, 'HqScene to be active');
+    await waitFor(() => currentSceneKey() === 'HqScene', BOOT_TIMEOUT_MS, 'HqScene to be active');
     // window.runSmokeTest exists from module load, so a CI runner can call it
     // BEFORE HqScene.create() has registered its event listeners. Capture the
     // leak baselines only once create() has demonstrably finished (navigate
     // listener present), or a boot-time run records 0 and the end-of-loop
     // count of 1 reads as a leak.
     await waitFor(() => (captureListenerCounts()['HqScene.navigate'] ?? 0) >= 1,
-        DEFAULT_TIMEOUT_MS, "HqScene create() to finish (navigate listener registered)");
+        BOOT_TIMEOUT_MS, "HqScene create() to finish (navigate listener registered)");
     const listenerCountsAtStart = captureListenerCounts();
     // ActionQueue.lastErrors is a rolling buffer that persists across harness
     // runs within the same page session; only errors recorded from this point

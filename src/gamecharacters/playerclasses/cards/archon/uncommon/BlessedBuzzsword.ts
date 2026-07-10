@@ -12,6 +12,7 @@ export class BlessedBuzzsword extends PlayableCard {
     constructor() {
         super({
             name: "Blessed Buzzsword",
+            portraitName: "grave-flowers",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
             rarity: EntityRarity.UNCOMMON,

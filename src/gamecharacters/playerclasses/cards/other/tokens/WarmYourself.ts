@@ -17,6 +17,7 @@ export class WarmYourself extends PlayableCard {
         this.baseEnergyCost = 2;
         this.buffs.push(new ExhaustBuff());
         this.buffs.push(new Ethereal());
+        this.portraitName = "ifrit";
     }
 
     override get description(): string {

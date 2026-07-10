@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#dff6ff"/>
+      <stop offset="100%" stop-color="#0b3350"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="#000"/>
+  <g fill="url(#g)">
+    <path d="M256 56
+             C 336 56 392 84 392 120
+             L 392 224
+             C 392 340 332 412 256 460
+             C 180 412 120 340 120 224
+             L 120 120
+             C 120 84 176 56 256 56 Z"/>
+  </g>
+  <!-- jagged crack splitting the shield -->
+  <polygon fill="#000" points="256,56 236,150 292,210 224,300 284,370 256,460 300,370 240,300 308,210 244,150 268,56"/>
+  <!-- displaced shards to sell the "breaking apart" read -->
+  <g fill="url(#g)">
+    <polygon points="150,150 190,120 210,190 165,210"/>
+    <polygon points="370,180 405,160 415,230 378,240"/>
+    <polygon points="120,320 158,300 172,360 132,378"/>
+    <polygon points="392,330 428,320 420,380 386,384"/>
+  </g>
+</svg>

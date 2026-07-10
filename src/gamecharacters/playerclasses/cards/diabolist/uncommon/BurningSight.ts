@@ -9,6 +9,7 @@ export class BurningSight extends PlayableCard {
     constructor() {
         super({
             name: "Burning Sight",
+            portraitName: "eye-shield",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.UNCOMMON,

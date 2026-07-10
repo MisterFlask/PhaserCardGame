@@ -12,6 +12,7 @@ export class ForceShield extends PlayableCard {
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.RARE,
+            portraitName: "armor-vest",
         });
         this.baseBlock = 12;
         this.baseEnergyCost = 1;

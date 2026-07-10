@@ -44,6 +44,7 @@ export class Sap extends PlayableCard {
         this.buffs.push(new RetainBuff());
         this.buffs.push(new StickyBuff());
         this.baseMagicNumber = 1; // Number of cards to be slowed
+        this.portraitName = "sap-status";
     }
 
     override get description(): string {

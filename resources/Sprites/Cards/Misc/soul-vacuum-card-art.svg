@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e6ccff"/>
+      <stop offset="100%" stop-color="#380a5c"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="#000"/>
+  <g fill="url(#g)">
+    <!-- jar -->
+    <path d="M196 250
+             C 160 270 150 310 150 350
+             C 150 400 190 442 256 442
+             C 322 442 362 400 362 350
+             C 362 310 352 270 316 250
+             L 316 210 L 196 210 Z"/>
+    <rect x="222" y="150" width="68" height="70"/>
+    <rect x="206" y="126" width="100" height="30" rx="8"/>
+  </g>
+  <g fill="url(#g)">
+    <!-- soul wisps spiraling into the jar -->
+    <path d="M256 150
+             C 256 108 226 76 186 80
+             C 148 84 122 116 130 152
+             C 136 178 160 194 184 190
+             C 168 184 158 168 162 152
+             C 166 136 184 126 200 132
+             C 214 138 220 154 212 168
+             C 224 160 228 142 220 126
+             C 210 106 184 100 166 112
+             C 142 128 136 158 152 182
+             C 172 210 210 216 238 198
+             C 264 182 274 150 256 150 Z"/>
+    <ellipse cx="120" cy="230" rx="14" ry="22" transform="rotate(30 120 230)"/>
+    <ellipse cx="356" cy="200" rx="16" ry="26" transform="rotate(-25 356 200)"/>
+    <ellipse cx="330" cy="120" rx="10" ry="16" transform="rotate(-10 330 120)"/>
+  </g>
+</svg>

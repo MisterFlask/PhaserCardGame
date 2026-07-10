@@ -29,6 +29,7 @@ export class Soulsuck extends PlayableCard {
     constructor() {
         super({
             name: "Soulsuck",
+            portraitName: "spade-skull",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
             rarity: EntityRarity.RARE,

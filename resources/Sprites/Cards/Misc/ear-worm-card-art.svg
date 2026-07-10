@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e0b076"/>
+      <stop offset="100%" stop-color="#4a2a08"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="#000"/>
+  <!-- ear pinna, opening faces left -->
+  <g fill="none" stroke="url(#g)" stroke-width="46" stroke-linecap="round">
+    <path d="M312 110
+             C 410 110 444 190 434 256
+             C 444 322 410 402 312 402"/>
+  </g>
+  <g fill="url(#g)">
+    <circle cx="312" cy="402" r="30"/>
+  </g>
+  <!-- sound waves approaching the ear -->
+  <g fill="none" stroke="url(#g)" stroke-width="20" stroke-linecap="round">
+    <path d="M96 200 C 130 224 130 288 96 312"/>
+    <path d="M150 178 C 196 214 196 298 150 334"/>
+  </g>
+  <!-- worm coiling into the canal opening -->
+  <g fill="none" stroke="url(#g)" stroke-width="28" stroke-linecap="round" transform="translate(240 256) scale(1.35) translate(-240 -256)">
+    <path d="M204 256
+             C 204 226 232 210 258 222
+             C 280 232 288 260 272 278
+             C 260 291 240 291 232 277"/>
+  </g>
+</svg>

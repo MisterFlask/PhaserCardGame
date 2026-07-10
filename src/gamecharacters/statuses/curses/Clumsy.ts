@@ -37,6 +37,7 @@ export class Clumsy extends PlayableCard {
         });
         this.baseEnergyCost = 1;
         this.buffs.push(new DiscardRandomCardOnDrawnBuff());
+        this.portraitName = "clumsy-curse";
     }
 
     override get description(): string {

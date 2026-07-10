@@ -9,6 +9,7 @@ export class AxeCrazy extends PlayableCard {
     constructor() {
         super({
             name: "Axe Crazy",
+            portraitName: "enrage-card-art",
             cardType: CardType.POWER,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.RARE,

@@ -16,6 +16,7 @@ export class CoinOnTheGround extends PlayableCard {
         this.baseEnergyCost = 1;
         this.buffs.push(new ExhaustBuff());
         this.flavorText = "Heads, tails, or the Company's crest. It always lands crest-up.";
+        this.portraitName = "receive-money";
     }
 
     override InvokeCardEffects(): void {

@@ -13,6 +13,7 @@ export class GenerateCharge extends PlayableCard {
             cardType: CardType.POWER,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.COMMON,
+            portraitName: "battery-pack-alt",
         });
         this.baseEnergyCost = 0;
         this.baseMagicNumber = 2; // Amount of Strength to grant

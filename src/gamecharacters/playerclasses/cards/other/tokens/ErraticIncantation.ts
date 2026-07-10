@@ -14,6 +14,7 @@ export class ErraticIncantation extends PlayableCard {
         });
         this.baseDamage = 5;
         this.baseEnergyCost = 1;
+        this.portraitName = "human-target";
     }
 
     override get description(): string {

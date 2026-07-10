@@ -44,6 +44,7 @@ export class MidnightOil extends PlayableCard {
             cardType: CardType.POWER,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.RARE,
+            portraitName: "oil-drum",
         });
         this.baseEnergyCost = 2;
         this.flavorText = "The workshop never fully closes. Neither, lately, does the worker.";

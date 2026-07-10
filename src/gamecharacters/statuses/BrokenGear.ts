@@ -16,6 +16,7 @@ export class BrokenGear extends PlayableCard {
         this.baseEnergyCost = 0;
         this.buffs.push(new Heavy());
         this.buffs.push(new Hazardous(2));
+        this.portraitName = "broken-gear";
     }
 
     override get description(): string {

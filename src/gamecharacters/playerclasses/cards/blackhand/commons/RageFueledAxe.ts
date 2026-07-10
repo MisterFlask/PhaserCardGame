@@ -10,7 +10,7 @@ export class RageFueledAxe extends PlayableCard {
   constructor() {
     super({
       name: 'Rage-Fueled Axe',
-      portraitName: 'rage-fueled-axe',
+      portraitName: 'gorilla',
       targetingType: TargetingType.ENEMY,
     });
     this.baseDamage = 8;

@@ -13,6 +13,7 @@ export class Buzzsword extends PlayableCard {
     constructor() {
         super({
             name: "Buzzsword",
+            portraitName: "mailed-fist",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
             rarity: EntityRarity.COMMON,

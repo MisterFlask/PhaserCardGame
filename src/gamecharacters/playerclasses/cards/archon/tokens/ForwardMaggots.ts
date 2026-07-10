@@ -8,6 +8,7 @@ export class ForwardMaggots extends PlayableCard {
     constructor() {
         super({
             name: "Forward Maggots",
+            portraitName: "sprint",
             cardType: CardType.SKILL,
             targetingType: TargetingType.ALLY,
             rarity: EntityRarity.SPECIAL,

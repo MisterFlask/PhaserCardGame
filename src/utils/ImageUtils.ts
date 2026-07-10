@@ -120,6 +120,57 @@ export default class ImageUtils {
             prefix: 'Sprites/Cards/StatusCards/',
             files: [
                 'stinging-insects.png',
+                'addiction-curse.png', 'berserk-curse.png', 'greedy-curse.png',
+                'idolatrous-curse.png', 'paranoid-curse.png', 'vain-curse.png',
+                'heliolust-curse.png', 'clumsy-curse.png',
+                'blood-tide.png', 'broken-gear.png', 'chalice-of-greed.png', 'sap-status.png',
+            ]
+        },
+        cards_archon: {
+            prefix: 'Sprites/Cards/Archon/',
+            files: [
+                'artillery-shell.png', 'bolter-gun.png', 'cannon-shot.png', 'checklist.png',
+                'coronation.png', 'eyepatch.png', 'grave-flowers.png', 'guards.png',
+                'headshot.png', 'lightning-shout.png', 'mailed-fist.png', 'mountaintop.png',
+                'mounted-knight.png', 'organigram.png', 'pirate-captain.png', 'shield-bash.png',
+                'shouting.png', 'spectacle-lenses.png', 'sprint.png', 'tripwire.png',
+                'uprising.png', 'wave-crest.png', 'worms.png'
+            ]
+        },
+        cards_rookie: {
+            prefix: 'Sprites/Cards/Rookie/',
+            files: ['rookie-defend.png', 'rookie-fire-revolver.png']
+        },
+        cards_sifter: {
+            prefix: 'Sprites/Cards/Sifter/',
+            files: ['snatch.png', 'wooden-crate.png', 'shadow-follower.png', 'human-target.png', 'ifrit.png']
+        },
+        cards_hammer: {
+            prefix: 'Sprites/Cards/Hammer/',
+            files: ['beer-stein.png', 'volcano.png', 'receive-money.png', 'musket.png']
+        },
+        cards_madness: {
+            prefix: 'Sprites/Cards/Madness/',
+            files: ['oni.png']
+        },
+        cards_cargo: {
+            prefix: 'Sprites/Cards/Cargo/',
+            files: [
+                'coal-cargo.png', 'coffee-cargo.png', 'copper-ingot-cargo.png', 'opium-cargo.png',
+                'revolutionary-literature-cargo.png', 'sacred-relics-cargo.png', 'spicy-literature-cargo.png'
+            ]
+        },
+        cards_misc: {
+            prefix: 'Sprites/Cards/Misc/',
+            files: [
+                'avaunt-card-art.png', 'duct-tape-card-art.png',
+                'first-incantation-card-art.png', 'second-incantation-card-art.png',
+                'third-incantation-card-art.png', 'fourth-incantation-card-art.png',
+                'revolutionary-fervor-card-art.png', 'looming-blizzard-card-art.png',
+                'sand-in-the-eyes-card-art.png', 'ward-card-art.png',
+                'ear-worm-card-art.png', 'moth-card-art.png', 'smoldering-card-art.png',
+                'modern-art-attack-card-art.png', 'modern-art-defend-card-art.png',
+                'holy-bombardment-card-art.png', 'slaughterbot-card-art.png', 'soul-vacuum-card-art.png'
             ]
         },
         cards_cursed_cargo:{
@@ -280,7 +331,11 @@ export default class ImageUtils {
             files: [
                 'assembly-line-card-art.png', 'depreciation-schedule-card-art.png',
                 'patent-infringement-card-art.png', 'production-quota-card-art.png',
-                'rivet-card-art.png', 'stamp-press-card-art.png', 'warranty-clause-card-art.png'
+                'rivet-card-art.png', 'stamp-press-card-art.png', 'warranty-clause-card-art.png',
+                'armor-vest.png', 'autogun.png', 'battery-pack-alt.png', 'factory-arm.png',
+                'hammer-drop.png', 'machine-gun.png', 'metal-plate.png', 'mirror-mirror.png',
+                'oil-drum.png', 'power-button.png', 'shield-drone.png', 'smoking-orb.png',
+                'stick-grenade.png', 'tesla-turret.png', 'upgrade.png'
             ]
         },
         maps: {

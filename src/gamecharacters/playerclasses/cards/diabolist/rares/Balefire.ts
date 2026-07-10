@@ -15,6 +15,7 @@ export class Balefire extends PlayableCard {
     constructor() {
         super({
             name: "Balefire",
+            portraitName: "fire-gem",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
             rarity: EntityRarity.RARE,

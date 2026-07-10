@@ -10,6 +10,7 @@ export class HandCannon extends PlayableCard {
     constructor() {
         super({
             name: "Hand Cannon",
+            portraitName: "cannon-shot",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
             rarity: EntityRarity.COMMON,

@@ -1,6 +1,9 @@
 import Phaser, { Scene } from 'phaser';
 import { isCharteredPartner } from '../../../../campaign/ClientReputation';
 import { Contract } from '../../../../campaign/Contract';
+import {
+    getFactionForClient, getFactionStanding, NOTED_STANDING_THRESHOLD, offendedFactionsForClient,
+} from '../../../../campaign/Factions';
 import { isOppositionId, OPPOSITIONS } from '../../../../campaign/Oppositions';
 import { SortieManager } from '../../../../campaign/SortieManager';
 import { PlayerCharacter } from '../../../../gamecharacters/PlayerCharacter';
@@ -442,6 +445,34 @@ export class ContractBoardPanel extends AbstractHqPanel {
         });
         container.add(clientText);
         flowY += clientText.height + flowGap;
+
+        // Faction "Pleases/Offends" line (faction_reputation_design.md,
+        // "Amendment: Faction Relationships v2" — "The notice line"): the
+        // whole UI surface for v2, derived at render time from the Factions
+        // registry. Prestige contracts and unmapped clients (the Court of
+        // Directors) get no line, same as the Chartered Partner tag above.
+        if (!contract.isPrestige) {
+            const pleasedFaction = getFactionForClient(contract.client);
+            if (pleasedFaction !== undefined) {
+                const offendedFactions = offendedFactionsForClient(contract.client);
+                let factionLine = `Pleases: ${pleasedFaction}.`;
+                if (offendedFactions.length > 0) {
+                    const offendedLabels = offendedFactions.map(rival => {
+                        const standing = getFactionStanding(rival, campaign.contractsCompletedByClient);
+                        const strained = standing <= NOTED_STANDING_THRESHOLD ? ' (relations strained)' : '';
+                        return `${rival}${strained}`;
+                    });
+                    factionLine += ` Offends: ${offendedLabels.join(', ')}.`;
+                }
+                const factionText = this.scene.add.text(-NOTICE_W / 2 + 18, flowY, factionLine, {
+                    fontFamily: Fonts.BODY, fontSize: '12px', fontStyle: 'italic', color: Palette.INK_FADED,
+                    wordWrap: { width: NOTICE_W - 36 },
+                    maxLines: 2,
+                });
+                container.add(factionText);
+                flowY += factionText.height + flowGap;
+            }
+        }
 
         const engagementsText = this.scene.add.text(-NOTICE_W / 2 + 18, flowY,
             `${contract.numCombats} engagement${contract.numCombats > 1 ? 's' : ''} · ${contract.durationWeeks} weeks · ${contract.regionName}`, {

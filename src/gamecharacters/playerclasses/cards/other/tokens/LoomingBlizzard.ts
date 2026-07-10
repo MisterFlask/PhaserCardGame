@@ -41,6 +41,7 @@ export class LoomingBlizzard extends PlayableCard {
         });
         this.baseEnergyCost = 0;
         this.buffs.push(new LoomingBlizzardBuff());
+        this.portraitName = "looming-blizzard-card-art";
     }
 
     override get description(): string {

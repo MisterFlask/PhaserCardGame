@@ -12,6 +12,7 @@ export class Phlogistonist extends PlayableCard {
             cardType: CardType.POWER,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.UNCOMMON,
+            portraitName: "smoking-orb",
         });
         this.baseMagicNumber = 3;
         this.baseEnergyCost = 0;

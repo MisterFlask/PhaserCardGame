@@ -8,6 +8,7 @@ export class ToughItOut extends PlayableCard {
     constructor() {
         super({
             name: "Tough It Out",
+            portraitName: "pirate-captain",
             cardType: CardType.SKILL,
             targetingType: TargetingType.ALLY,
             rarity: EntityRarity.UNCOMMON,

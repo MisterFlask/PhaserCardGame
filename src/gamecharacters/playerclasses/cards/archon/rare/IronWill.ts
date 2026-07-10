@@ -29,6 +29,7 @@ export class IronWill extends PlayableCard {
     constructor() {
         super({
             name: "Iron Will",
+            portraitName: "mounted-knight",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.RARE,

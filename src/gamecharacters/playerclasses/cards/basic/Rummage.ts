@@ -6,7 +6,7 @@ export class Rummage extends PlayableCard {
   constructor() {
     super({
       name: 'Rummage',
-      portraitName: 'rummage',
+      portraitName: 'snatch',
       targetingType: TargetingType.NO_TARGETING,
     });
     this.baseEnergyCost = 1;

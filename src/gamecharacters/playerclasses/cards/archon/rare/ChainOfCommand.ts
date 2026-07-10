@@ -9,6 +9,7 @@ export class ChainOfCommand extends PlayableCard {
     constructor() {
         super({
             name: "Chain of Command",
+            portraitName: "organigram",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.RARE,

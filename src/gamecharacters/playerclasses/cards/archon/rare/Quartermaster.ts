@@ -11,6 +11,7 @@ export class Quartermaster extends PlayableCard {
     constructor() {
         super({
             name: "Quartermaster",
+            portraitName: "bolter-gun",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.RARE,

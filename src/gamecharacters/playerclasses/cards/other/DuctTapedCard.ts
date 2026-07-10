@@ -15,6 +15,8 @@ export class DuctTapedCard extends PlayableCard {
             rarity: EntityRarity.SPECIAL,
         });
 
+        this.portraitName = "duct-tape-card-art";
+
         this.firstCard = firstCard.Copy();
         this.secondCard = secondCard.Copy();
 

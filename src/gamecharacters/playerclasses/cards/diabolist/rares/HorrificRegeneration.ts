@@ -11,6 +11,7 @@ export class HorrificRegeneration extends PlayableCard {
     constructor() {
         super({
             name: "Horrific Regeneration",
+            portraitName: "maggot",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.RARE,

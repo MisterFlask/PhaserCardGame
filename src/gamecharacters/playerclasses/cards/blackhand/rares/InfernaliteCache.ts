@@ -10,7 +10,7 @@ export class InfernaliteCache extends PlayableCard {
         super({
             name: "Infernalite Cache",
             description: `_`,
-            portraitName: "enrage-test",
+            portraitName: "flash-grenade",
             targetingType: TargetingType.NO_TARGETING,
             cardType: CardType.SKILL,
         });

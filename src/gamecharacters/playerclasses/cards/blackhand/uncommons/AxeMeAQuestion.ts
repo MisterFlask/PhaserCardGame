@@ -10,7 +10,7 @@ export class AxeMeAQuestion extends PlayableCard {
     super({
       name: 'Axe Me a Question',
       description: '_',
-      portraitName: 'axe-question',
+      portraitName: 'confrontation',
       targetingType: TargetingType.ENEMY,
     });
     this.baseDamage = 11;

@@ -8,7 +8,7 @@ export class Smokescreen extends PlayableCard {
 		super({
 			name: "Smokescreen",
 			description: `_`,
-			portraitName: "smoke-bomb",
+			portraitName: "smog-grenade",
 			targetingType: TargetingType.NO_TARGETING,
 		});
 		this.baseMagicNumber = 2;

@@ -14,6 +14,7 @@ export class FirstIncantation extends PlayableCard {
             rarity: EntityRarity.SPECIAL,
         });
         this.baseEnergyCost = 1;
+        this.portraitName = "first-incantation-card-art";
     }
 
     override InvokeCardEffects(): void {
@@ -34,6 +35,7 @@ export class SecondIncantation extends PlayableCard {
             rarity: EntityRarity.SPECIAL,
         });
         this.baseEnergyCost = 1;
+        this.portraitName = "second-incantation-card-art";
     }
 
     override InvokeCardEffects(): void {
@@ -54,6 +56,7 @@ export class ThirdIncantation extends PlayableCard {
             rarity: EntityRarity.SPECIAL,
         });
         this.baseEnergyCost = 1;
+        this.portraitName = "third-incantation-card-art";
     }
 
     override InvokeCardEffects(): void {
@@ -75,6 +78,7 @@ export class FourthIncantation extends PlayableCard {
         });
         this.baseEnergyCost = 1;
         this.baseDamage = 999;
+        this.portraitName = "fourth-incantation-card-art";
     }
 
     override InvokeCardEffects(targetCard?: AbstractCard): void {

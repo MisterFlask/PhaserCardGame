@@ -129,14 +129,20 @@ export class StandingOrdersState {
         this.bonusSlots = 0;
     }
 
-    /** 1 slot at campaign start; +1 at years 3, 5, 7, 9 (max 5 before bonuses). */
-    public slotsForYear(year: number): number {
+    /** 1 slot at campaign start; +1 at years 3, 5, 7, 9 (max 5 before bonuses).
+     *  `unionSlotPenalty` (default 0) is the Union-Hostile suspension from
+     *  FactionPressures.unionOrderSlotPenalty (faction_reputation_design.md
+     *  v2.1 amendment) — callers thread it through, EXCEPT the save-restore
+     *  re-enactment path (CampaignSerializer), which deliberately passes
+     *  nothing so restoring prior state never fails on pressure. Floored at
+     *  1: the Company always keeps one order running. */
+    public slotsForYear(year: number, unionSlotPenalty: number = 0): number {
         let slots = 1;
         if (year >= 3) slots++;
         if (year >= 5) slots++;
         if (year >= 7) slots++;
         if (year >= 9) slots++;
-        return slots + this.bonusSlots;
+        return Math.max(1, slots + this.bonusSlots - unionSlotPenalty);
     }
 
     /** Resolved order objects for the active ids; unknown ids are skipped. */
@@ -157,16 +163,22 @@ export class StandingOrdersState {
      * Enact an order into a free slot for the given year. Returns false (no
      * change) if the order is unknown, already active, or no free slot exists.
      * Free-slot enactment is immediate — no board meeting required.
+     *
+     * `unionSlotPenalty` (default 0, see slotsForYear) gates only NEW
+     * enactments while over quota — an order already active from before the
+     * Union went Hostile stays active by construction (this method never
+     * evicts anything); it's the quota check on the way IN that shrinks
+     * (faction_reputation_design.md v2.1 amendment).
      */
-    public enact(orderId: string, year: number): boolean {
+    public enact(orderId: string, year: number, unionSlotPenalty: number = 0): boolean {
         if (!STANDING_ORDER_REGISTRY.has(orderId)) return false;
         if (this.activeOrderIds.includes(orderId)) return false;
-        if (this.activeOrderIds.length >= this.slotsForYear(year)) return false;
+        if (this.activeOrderIds.length >= this.slotsForYear(year, unionSlotPenalty)) return false;
         // A pending change is the post-meeting configuration; a fresh
         // enactment must survive ratification, so it joins both lists.
         if (this.pendingOrderIds !== null) {
             if (this.pendingOrderIds.includes(orderId)) return false;
-            if (this.pendingOrderIds.length >= this.slotsForYear(year)) return false;
+            if (this.pendingOrderIds.length >= this.slotsForYear(year, unionSlotPenalty)) return false;
             this.pendingOrderIds = [...this.pendingOrderIds, orderId];
         }
 

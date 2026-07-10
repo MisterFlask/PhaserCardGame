@@ -325,3 +325,67 @@ describe('StandingOrdersState', () => {
         });
     });
 });
+
+// v2.1 amendment (faction_reputation_design.md, "Union Retaliation"): the
+// Union-Hostile slot suspension. Kept as its own top-level describe so the
+// existing suite above is untouched.
+describe('StandingOrdersState: Union slot penalty (v2.1 amendment)', () => {
+    beforeEach(() => {
+        StandingOrdersState.getInstance().reset();
+    });
+
+    it('slotsForYear floors at 1 even when the penalty would zero it out', () => {
+        const state = StandingOrdersState.getInstance();
+        expect(state.slotsForYear(1, 1)).toBe(1);
+    });
+
+    it('slotsForYear at year 5 (3 slots) with penalty 1 leaves 2', () => {
+        const state = StandingOrdersState.getInstance();
+        expect(state.slotsForYear(5, 1)).toBe(2);
+    });
+
+    it('gates a third enactment while over quota, but allows it once the penalty lifts', () => {
+        const state = StandingOrdersState.getInstance();
+        // Year 5 = 3 slots. Fill 2 with no penalty applied at enactment time.
+        expect(state.enact('aggressive-tendering', 5)).toBe(true);
+        expect(state.enact('punctuality-clause', 5)).toBe(true);
+        expect(state.activeOrderIds).toEqual(['aggressive-tendering', 'punctuality-clause']);
+
+        // With penalty 1, quota is 2 (3-1) and already full: a third is refused.
+        expect(state.enact('hazard-pay-schedule', 5, 1)).toBe(false);
+        expect(state.activeOrderIds).toEqual(['aggressive-tendering', 'punctuality-clause']);
+
+        // Once the penalty lifts (standing recovers), the same third order enacts fine.
+        expect(state.enact('hazard-pay-schedule', 5, 0)).toBe(true);
+        expect(state.activeOrderIds).toEqual(['aggressive-tendering', 'punctuality-clause', 'hazard-pay-schedule']);
+    });
+
+    it('over-quota active orders persist by construction: only NEW enactments are blocked', () => {
+        const state = StandingOrdersState.getInstance();
+        // Enact 2 at year 5 with no penalty (2 of 3 slots).
+        expect(state.enact('aggressive-tendering', 5, 0)).toBe(true);
+        expect(state.enact('punctuality-clause', 5, 0)).toBe(true);
+        expect(state.getActiveOrders()).toHaveLength(2);
+
+        // The Union goes Hostile: quota drops to 2 (3-1), already met by the
+        // 2 active orders. A third enactment is refused...
+        expect(state.enact('hazard-pay-schedule', 5, 1)).toBe(false);
+        // ...but the 2 already-active orders are untouched (enact only gates
+        // NEW enactments; it never evicts existing ones).
+        expect(state.getActiveOrders()).toHaveLength(2);
+        expect(state.activeOrderIds).toEqual(['aggressive-tendering', 'punctuality-clause']);
+    });
+
+    it('applyCasualties adds the Union wound-week penalty on top of the Standing Orders base', () => {
+        // Blacklisted-tier Union standing (-6): friction active, not yet Hostile.
+        const frictionMap = {
+            'The Brimstone Barons, jointly': 3,
+            'Dis Foundry Belt Board of Overseers': 3,
+        };
+        const squad: CasualtySubject[] = [
+            { name: 'A', hitpoints: 10, maxHitpoints: 100, weeksWoundedRemaining: 0, isDeceased: false },
+        ];
+        const report = applyCasualties(squad, () => 0, frictionMap); // rng=0 -> base WOUND_WEEKS_MIN (2)
+        expect(report.wounds[0].weeks).toBe(3); // StandingOrders base (2, no orders active) + Union +1
+    });
+});

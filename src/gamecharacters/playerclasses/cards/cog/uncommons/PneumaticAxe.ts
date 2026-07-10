@@ -31,8 +31,9 @@ export class PneumaticAxe extends PlayableCard {
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
             rarity: EntityRarity.UNCOMMON,
+            portraitName: "hammer-drop",
         });
-        
+
         this.baseDamage = 10;
         this.baseMagicNumber = 2; // Amount of Vulnerable to apply
         this.baseEnergyCost = 1;

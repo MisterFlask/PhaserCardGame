@@ -67,6 +67,7 @@ export class IllFatedBlade extends PlayableCard {
     constructor() {
         super({
             name: "Cursed Blade",
+            portraitName: "daemon-skull",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
             rarity: EntityRarity.RARE,

@@ -10,6 +10,7 @@ export class Shadowflame extends PlayableCard {
     constructor() {
         super({
             name: "Soul Trap",
+            portraitName: "burning-skull",
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
             rarity: EntityRarity.UNCOMMON,

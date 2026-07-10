@@ -16,6 +16,7 @@ export class RevolutionaryFervor extends PlayableCard {
         });
         this.baseEnergyCost = 1;
         this.baseMagicNumber = 3; // Number of cards to draw
+        this.portraitName = "revolutionary-fervor-card-art";
     }
 
     override get description(): string {

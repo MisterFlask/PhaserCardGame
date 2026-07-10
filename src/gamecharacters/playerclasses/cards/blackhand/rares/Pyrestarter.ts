@@ -11,7 +11,7 @@ export class Pyrestarter extends PlayableCard {
         super({
             name: "Pyrestarter",
             description: `_`,
-            portraitName: "fire-starter",
+            portraitName: "flame",
             targetingType: TargetingType.NO_TARGETING,
         });
         this.baseBlock = 6;

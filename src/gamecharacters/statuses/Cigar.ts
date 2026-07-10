@@ -14,6 +14,7 @@ export class Cigar extends PlayableCard {
         });
         this.baseEnergyCost = 0;
         this.buffs.push(new ExhaustBuff());
+        this.portraitName = "cigar";
     }
 
     override get description(): string {

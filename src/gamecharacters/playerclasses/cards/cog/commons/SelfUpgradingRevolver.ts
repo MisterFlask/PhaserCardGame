@@ -11,6 +11,7 @@ export class SelfUpgradingRevolver extends PlayableCard {
             cardType: CardType.ATTACK,
             targetingType: TargetingType.ENEMY,
             rarity: EntityRarity.COMMON,
+            portraitName: "upgrade",
         });
         this.baseEnergyCost = 1;
         this.baseDamage = 6;

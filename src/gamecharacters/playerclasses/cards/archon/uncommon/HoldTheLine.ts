@@ -9,11 +9,11 @@ export class HoldTheLine extends PlayableCard {
     constructor() {
         super({
             name: "Hold The Line",
+            portraitName: "wave-crest",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.UNCOMMON,
         });
-        this.portraitName = "CourageUnderFire";
         this.baseEnergyCost = 2;
         this.baseBlock = 5;
         this.baseMagicNumber = 1;

@@ -7,6 +7,7 @@ export class Bolster extends PlayableCard {
     constructor() {
         super({
             name: "Bolster",
+            portraitName: "shield-bash",
             cardType: CardType.SKILL,
             targetingType: TargetingType.NO_TARGETING,
             rarity: EntityRarity.COMMON,
