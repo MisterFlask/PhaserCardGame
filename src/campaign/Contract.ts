@@ -100,6 +100,17 @@ export class Contract {
      */
     public recoveryOfSouls?: string[];
 
+    /**
+     * 0-based indices, into this sortie's combats, of the combats that will
+     * open with a narrative event. Rolled once at generation
+     * (ContractGenerator.rollEventCombats) so the board can disclose an
+     * event's PRESENCE at posting time; SortieManager.launchNextCombat
+     * consumes an entry when combatsCompleted matches it. Which event fires
+     * is still drawn at launch (EventsManager.getRandomEvent) — only
+     * presence/count is pre-rolled, never the specific event.
+     */
+    public eventCombatIndices: number[] = [];
+
     constructor(args: {
         name: string;
         description: string;
@@ -120,6 +131,7 @@ export class Contract {
         freightRatePerCrate?: number;
         vpReward?: number;
         opposition?: string;
+        eventCombatIndices?: number[];
     }) {
         this.name = args.name;
         this.description = args.description;
@@ -140,6 +152,7 @@ export class Contract {
         this.freightRatePerCrate = args.freightRatePerCrate ?? 0;
         this.vpReward = args.vpReward ?? 0;
         this.opposition = args.opposition;
+        this.eventCombatIndices = args.eventCombatIndices ?? [];
     }
 
     /** True for trade-run contracts: the muster UI shows a freight stepper
@@ -157,5 +170,12 @@ export class Contract {
      *  field IS the low base for trade runs — see ContractGenerator). */
     public get projectedPayout(): number {
         return this.payout + this.cratesLoaded * this.freightRatePerCrate;
+    }
+
+    /** True when at least one of this sortie's combats will open with a
+     *  narrative event — surfaced on the board (ContractBoardPanel) as a
+     *  Survey Desk advisory. Which event is still unrevealed. */
+    public get hasEventEnRoute(): boolean {
+        return this.eventCombatIndices.length > 0;
     }
 }

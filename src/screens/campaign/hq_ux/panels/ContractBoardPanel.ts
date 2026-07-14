@@ -342,6 +342,14 @@ export class ContractBoardPanel extends AbstractHqPanel {
         tag.add(this.scene.add.text(PIN_TAG_W / 2 - 8, PIN_TAG_H / 2 - 8, tagPayoutLabel, {
             fontFamily: Fonts.DISPLAY, fontSize: '18px', color: contract.isPrestige ? Palette.GOOD_TEXT : Palette.INK,
         }).setOrigin(1, 1));
+        // Survey Desk advisory glyph: a scanning player can spot event-
+        // carrying postings without opening the notice. Which event is
+        // still unrevealed — this only marks presence (Contract.hasEventEnRoute).
+        if (contract.hasEventEnRoute) {
+            tag.add(this.scene.add.text(PIN_TAG_W / 2 - 4, -PIN_TAG_H / 2 + 2, '※', {
+                fontFamily: Fonts.UTILITY, fontSize: '14px', color: Palette.CRIMSON_TEXT,
+            }).setOrigin(1, 0));
+        }
         container.add(tag);
 
         container.setSize(PIN_TAG_W, PIN_TAG_H + 40);
@@ -354,11 +362,14 @@ export class ContractBoardPanel extends AbstractHqPanel {
             const oppositionLabel = isOppositionId(contract.opposition)
                 ? `[b]${OPPOSITIONS[contract.opposition].displayName}[/b]`
                 : '[i]unconfirmed[/i]';
+            const eventLine = contract.hasEventEnRoute
+                ? `\nSurvey Desk advisory: ${contract.eventCombatIndices.length > 1 ? 'irregularities' : 'irregularity'} en route.`
+                : '';
             this.showHoverTooltip(
                 `[b]${contract.name}[/b]\n${contract.client}\n` +
                 `${engagementsLabel} · ${weeksLabel} · ${ContractBoardPanel.crewRequirementLabel(contract.squadSize)}\n` +
                 `Expires in ${deadlineLabel}\n` +
-                `Expected opposition: ${oppositionLabel}`,
+                `Expected opposition: ${oppositionLabel}${eventLine}`,
                 container.x, container.y - 90,
             );
         });
@@ -496,6 +507,35 @@ export class ContractBoardPanel extends AbstractHqPanel {
         });
         container.add(oppositionText);
         flowY += oppositionText.height + flowGap;
+
+        // Survey Desk advisory (event disclosure): presence only, never
+        // which event — the board discloses that a sortie combat will open
+        // with an incident, not what it is. Interactive for the full
+        // Company-register explanation.
+        if (contract.hasEventEnRoute) {
+            const advisoryLine = contract.eventCombatIndices.length > 1
+                ? `IRREGULARITIES (${contract.eventCombatIndices.length}) EN ROUTE`
+                : 'IRREGULARITY EN ROUTE';
+            const advisoryText = this.scene.add.text(-NOTICE_W / 2 + 18, flowY,
+                `SURVEY DESK ADVISORY: ${advisoryLine}`, {
+                fontFamily: Fonts.UTILITY, fontSize: '12px', color: Palette.CRIMSON_TEXT,
+                letterSpacing: 2,
+                wordWrap: { width: NOTICE_W - 36 },
+                maxLines: 2,
+            });
+            container.add(advisoryText);
+            advisoryText.setInteractive({ useHandCursor: false });
+            advisoryText.on('pointerover', () => {
+                this.showHoverTooltip(
+                    `The Survey Desk's outriders report [b]an irregularity[/b] along the route. ` +
+                    `Expect an incident before the fighting — negotiable, profitable, or neither. ` +
+                    `Incidental expenditures require receipts.`,
+                    container.x + advisoryText.x, container.y + advisoryText.y - 30,
+                );
+            });
+            advisoryText.on('pointerout', () => this.hideHoverTooltip());
+            flowY += advisoryText.height + flowGap;
+        }
 
         const crewLabel = ContractBoardPanel.crewRequirementLabel(contract.squadSize);
         const freightLabel = contract.isTradeRun

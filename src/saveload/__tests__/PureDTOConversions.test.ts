@@ -58,6 +58,7 @@ describe('contract DTO round-trip', () => {
             expect(restored.freightRatePerCrate).toBe(contract.freightRatePerCrate);
             expect(restored.vpReward).toBe(contract.vpReward);
             expect(restored.opposition).toBe(contract.opposition);
+            expect(restored.eventCombatIndices).toEqual(contract.eventCombatIndices);
         }
     });
 
@@ -148,6 +149,34 @@ describe('contract DTO round-trip', () => {
         const dto = contractToDTO(ContractGenerator.getInstance().generateContract(5));
         expect('recoveryOfSouls' in dto).toBe(false);
         expect(contractFromDTO(JSON.parse(JSON.stringify(dto))).recoveryOfSouls).toBeUndefined();
+    });
+
+    it('round-trips eventCombatIndices when the sortie carries events', () => {
+        let sawEvent = false;
+        for (let i = 0; i < 200 && !sawEvent; i++) {
+            const contract = ContractGenerator.getInstance().generateContract(10);
+            if (!contract.hasEventEnRoute) continue;
+            sawEvent = true;
+            const restored = contractFromDTO(JSON.parse(JSON.stringify(contractToDTO(contract))));
+            expect(restored.eventCombatIndices).toEqual(contract.eventCombatIndices);
+            expect(restored.hasEventEnRoute).toBe(true);
+        }
+        expect(sawEvent).toBe(true);
+    });
+
+    it('a DTO without eventCombatIndices (absent on event-free sorties, or pre-v18 saves) restores to []', () => {
+        let sawNoEvent = false;
+        for (let i = 0; i < 200 && !sawNoEvent; i++) {
+            const contract = ContractGenerator.getInstance().generateContract(10);
+            if (contract.hasEventEnRoute) continue;
+            sawNoEvent = true;
+            const dto = contractToDTO(contract);
+            expect('eventCombatIndices' in dto).toBe(false);
+            const restored = contractFromDTO(JSON.parse(JSON.stringify(dto)));
+            expect(restored.eventCombatIndices).toEqual([]);
+            expect(restored.hasEventEnRoute).toBe(false);
+        }
+        expect(sawNoEvent).toBe(true);
     });
 
     it('generates a consumable reward on roughly 20% of contracts, always from the reward name table', () => {

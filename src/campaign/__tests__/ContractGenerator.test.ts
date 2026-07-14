@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ContractGenerator, ESCROW_DEADLINE_WEEKS, LEGATION_DEADLINE_WEEKS, LEGATION_PAYOUT_MULTIPLIER } from '../ContractGenerator';
 import { isOppositionId, OPPOSITIONS } from '../Oppositions';
+import { makeLcgRng } from '../sim/CampaignSimulator';
 
 const gen = ContractGenerator.getInstance();
 
@@ -430,6 +431,58 @@ describe('ContractGenerator', () => {
                 expect([2, 3, 4]).toContain(c.squadSize);
                 expect(c.durationWeeks).toBe(c.numCombats + 1);
             }
+        });
+    });
+
+    describe('Event presence pre-roll (board disclosure)', () => {
+        it('forcing every rng draw low gives every combat an event, within bounds', () => {
+            const forceEventsRng = () => 0.0;
+            for (let i = 0; i < 50; i++) {
+                const c = gen.generateContract(10, 0, {}, forceEventsRng);
+                expect(c.eventCombatIndices).toHaveLength(c.numCombats);
+                expect(c.eventCombatIndices).toEqual(
+                    Array.from({ length: c.numCombats }, (_, idx) => idx)
+                );
+                c.eventCombatIndices.forEach(idx => {
+                    expect(idx).toBeGreaterThanOrEqual(0);
+                    expect(idx).toBeLessThan(c.numCombats);
+                });
+                expect(c.hasEventEnRoute).toBe(true);
+            }
+        });
+
+        it('forcing every rng draw high (below 1) gives no combat an event', () => {
+            // 0.99 is comfortably above every roll-chance threshold in the
+            // generator (TRADE_RUN_CHANCE 0.2, numCombats 0.45, EVENT_CHANCE
+            // 0.35, etc.), so this exercises the bounty path with zero events.
+            const forceNoEventsRng = () => 0.99;
+            for (let i = 0; i < 50; i++) {
+                const c = gen.generateContract(10, 0, {}, forceNoEventsRng);
+                expect(c.eventCombatIndices).toEqual([]);
+                expect(c.hasEventEnRoute).toBe(false);
+            }
+        });
+
+        it('is deterministic: the same seed produces the same indices', () => {
+            const seed = 104729 * 7;
+            const c1 = gen.generateContract(10, 0, {}, makeLcgRng(seed));
+            const c2 = gen.generateContract(10, 0, {}, makeLcgRng(seed));
+            expect(c2.eventCombatIndices).toEqual(c1.eventCombatIndices);
+            expect(c2.numCombats).toBe(c1.numCombats);
+        });
+
+        it('at the default 35% chance, most multi-trial boards mix contracts with and without events', () => {
+            let withEvent = 0, without = 0;
+            for (let i = 0; i < 200; i++) {
+                const c = gen.generateContract(10);
+                if (c.hasEventEnRoute) withEvent++; else without++;
+                c.eventCombatIndices.forEach(idx => {
+                    expect(idx).toBeGreaterThanOrEqual(0);
+                    expect(idx).toBeLessThan(c.numCombats);
+                });
+            }
+            expect(withEvent).toBeGreaterThan(0);
+            expect(without).toBeGreaterThan(0);
         });
     });
 });

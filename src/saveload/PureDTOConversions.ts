@@ -50,6 +50,9 @@ export function contractToDTO(c: Contract): ContractDTO {
         // Omitted entirely (not null) on non-recovery contracts, keeping
         // their DTO shape unchanged from v15.
         ...(c.recoveryOfSouls ? { recoveryOfSouls: [...c.recoveryOfSouls] } : {}),
+        // Omitted entirely on event-free sorties, keeping the DTO shape
+        // unchanged from v17 for the common (no-event) case.
+        ...(c.eventCombatIndices.length > 0 ? { eventCombatIndices: [...c.eventCombatIndices] } : {}),
     };
 }
 
@@ -74,6 +77,10 @@ export function contractFromDTO(dto: ContractDTO): Contract {
         freightRatePerCrate: dto.freightRatePerCrate,
         vpReward: dto.vpReward,
         opposition: dto.opposition,
+        // Absent on saves from before v18: defaults to [] (no event
+        // disclosed), matching the pre-existing behavior of a contract
+        // nobody rolled events for.
+        eventCombatIndices: dto.eventCombatIndices ?? [],
     });
     // Not a constructor arg (set post-construction by generateLegationContract,
     // same as the generator does) — absent on pre-v15 shapes, so default false.

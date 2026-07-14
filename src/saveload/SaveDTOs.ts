@@ -84,7 +84,15 @@
 //      as the pre-existing uniform-random encounter pick, so no migration is
 //      needed). Fresh-campaign value: n/a (opposition is set per-contract at
 //      generation).
-export const SAVE_FORMAT_VERSION = 17;
+// v18: Contract-board event disclosure. The narrative-event presence roll
+//      moved from SortieManager (rolled per-combat at launch time) to
+//      ContractGenerator (rolled per-combat at generation time), so the
+//      board can disclose it before dispatch -- see Contract.eventCombatIndices
+//      / ContractGenerator.rollEventCombats. ContractDTO gains optional
+//      eventCombatIndices (number[]); absent on saves from before this
+//      version, defaulting to [] on load (no event disclosed, matching the
+//      pre-existing behavior of a contract nobody rolled events for).
+export const SAVE_FORMAT_VERSION = 18;
 export const SAVE_STORAGE_KEY = 'east-infernal-company-save';
 
 export interface BuffDTO {
@@ -183,6 +191,11 @@ export interface ContractDTO {
      *  contract): the escrowed soul names this contract recovers — see
      *  Contract.recoveryOfSouls / the Soul Collateral Office. */
     recoveryOfSouls?: string[];
+    /** 0-based indices of the sortie's combats that will open with a
+     *  narrative event, rolled at generation — see Contract.eventCombatIndices.
+     *  Absent when the sortie carries no events; absent on saves from
+     *  before v18. */
+    eventCombatIndices?: number[];
 }
 
 export interface ConsumableDTO {

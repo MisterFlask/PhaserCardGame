@@ -556,6 +556,12 @@ export class ContractGenerator {
      *  guaranteed every refresh (these are rare trophies, not a lane). */
     private static readonly PRESTIGE_REFRESH_CHANCE = 0.5;
 
+    /** Chance any given combat in a sortie opens with a narrative event.
+     *  Moved here from SortieManager (2026-07) so the board can disclose an
+     *  event's presence at posting time, via Contract.eventCombatIndices —
+     *  the per-combat odds themselves are unchanged. */
+    private static readonly EVENT_CHANCE = 0.35;
+
     /** Rolls squad size: 20% two-man, 60% three-man, 20% four-man.
      *  rng is injectable for deterministic tests (defaults to Math.random,
      *  same pattern as SortieResolution.ts's applyCasualties). */
@@ -626,6 +632,21 @@ export class ContractGenerator {
             : undefined;
     }
 
+    /** Rolls which of the sortie's combats open with a narrative event: one
+     *  rng draw per combat index, independently, at EVENT_CHANCE each — same
+     *  odds SortieManager used to roll per-combat at launch time, just moved
+     *  earlier so the board can disclose presence. Which event fires is
+     *  still drawn at launch (EventsManager.getRandomEvent). */
+    private rollEventCombats(numCombats: number, rng: () => number): number[] {
+        const indices: number[] = [];
+        for (let i = 0; i < numCombats; i++) {
+            if (rng() < ContractGenerator.EVENT_CHANCE) {
+                indices.push(i);
+            }
+        }
+        return indices;
+    }
+
     private generateBountyContract(region: RegionFlavor, year: number, contractsCompletedByClient: Record<string, number>, rng: () => number): Contract {
         // Faction blacklists (faction_reputation_design.md, "Amendment:
         // Faction Relationships v2"): Blacklisted factions' clients stop
@@ -647,6 +668,9 @@ export class ContractGenerator {
         const payout = applyCharteredPartnerBonus(rolledPayout, template.client, contractsCompletedByClient);
         const deadlineWeeks = this.rollDeadlineWeeks(rng);
         const consumableRewardName = this.rollConsumableReward(rng);
+        // Last rng draw before construction, deliberately: keeps the stream
+        // shift for every existing seeded draw above nil within this contract.
+        const eventCombatIndices = this.rollEventCombats(numCombats, rng);
 
         return new Contract({
             name: template.name,
@@ -667,6 +691,7 @@ export class ContractGenerator {
             regionName: region.regionName,
             consumableRewardName,
             opposition: template.opposition,
+            eventCombatIndices,
         });
     }
 
@@ -716,6 +741,9 @@ export class ContractGenerator {
 
         const deadlineWeeks = this.rollDeadlineWeeks(rng);
         const consumableRewardName = this.rollConsumableReward(rng);
+        // Last rng draw before construction, deliberately: keeps the stream
+        // shift for every existing seeded draw above nil within this contract.
+        const eventCombatIndices = this.rollEventCombats(numCombats, rng);
 
         return new Contract({
             name: template.name,
@@ -736,6 +764,7 @@ export class ContractGenerator {
             maxCrates,
             freightRatePerCrate,
             opposition: template.opposition,
+            eventCombatIndices,
         });
     }
 
@@ -766,6 +795,9 @@ export class ContractGenerator {
         const vpReward = Math.round((baseVp * dangerPayMultiplier) / 5) * 5;
 
         const deadlineWeeks = this.rollDeadlineWeeks(rng);
+        // Last rng draw before construction, deliberately: keeps the stream
+        // shift for every existing seeded draw above nil within this contract.
+        const eventCombatIndices = this.rollEventCombats(numCombats, rng);
 
         return new Contract({
             name: template.name,
@@ -783,6 +815,7 @@ export class ContractGenerator {
             squadSize,
             regionName: region.regionName,
             vpReward,
+            eventCombatIndices,
         });
     }
 

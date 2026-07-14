@@ -118,9 +118,6 @@ export class SortieManager {
         this.launchNextCombat();
     }
 
-    /** Chance that a narrative event interrupts a sortie combat. */
-    private static readonly EVENT_CHANCE = 0.35;
-
     public launchNextCombat(): void {
         if (!this.activeContract) return;
         const encounter = EncounterManager.getInstance()
@@ -142,7 +139,13 @@ export class SortieManager {
 
         // Something on the road: the event shows before the fight, and its
         // choices may replace or extend the combat (tolls, escaped daemons...).
-        if (Math.random() < SortieManager.EVENT_CHANCE) {
+        // PRESENCE was pre-rolled at contract generation (see
+        // ContractGenerator.rollEventCombats / Contract.eventCombatIndices),
+        // so the board can disclose it at posting time; combatsCompleted is
+        // the 0-based index of the combat being launched here, matching how
+        // the indices were rolled. Which specific event fires is still drawn
+        // now, at launch — only presence/count was pre-rolled.
+        if (this.activeContract.eventCombatIndices.includes(this.combatsCompleted)) {
             encounter.event = EventsManager.getInstance().getRandomEvent();
             encounter.eventAfterCombat = false;
         }
